@@ -303,6 +303,9 @@ function setView(view) {
     if (title) title.textContent = "Explorer";
     treeRoot?.classList.remove("hidden");
     filterStrip?.classList.remove("hidden");
+  } else if (view === "progress") {
+    if (title) title.textContent = "Progress";
+    navigate({ kind: "progress" });
   } else if (view === "checklist") {
     if (title) title.textContent = "Studijní plán";
     navigate({ kind: "checklist" });
@@ -335,12 +338,11 @@ function applySidebarWidth() {
   document.documentElement.style.setProperty("--sidebar-w", state.sidebarWidth + "px");
   const wb = document.getElementById("workbench");
   if (!wb) return;
-  // Only set inline columns when sidebar is open; when collapsed, let CSS rule win
   if (state.sidebarOpen) {
     wb.style.gridTemplateColumns =
       `var(--activitybar-w) ${state.sidebarWidth}px 4px 1fr`;
   } else {
-    wb.style.gridTemplateColumns = "";
+    wb.style.gridTemplateColumns = `var(--activitybar-w) 0px 0px 1fr`;
   }
 }
 

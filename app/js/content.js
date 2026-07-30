@@ -823,6 +823,7 @@ export function showProgress() {
   const corePct = coreItems.length ? Math.round((coreDone / coreItems.length) * 100) : 0;
 
   const level = progressLevel(pct);
+  const vibe = progressVibe(pct, studiedN, total);
   const wrap = el("div", { className: "progress-view" });
 
   // View toggle bar
@@ -1042,26 +1043,45 @@ function studyTile(item, studied, size) {
   const tasks = item.kind === "exercise"
     ? (state.exercises[item.path]?.task_count || state.exercises[item.path]?.tasks?.length || 0)
     : 0;
-  const btn = el("button", {
-    type: "button",
+  const btn = el("div", {
     className: `study-tile study-tile-${size} ${item.kind}${studied ? " studied" : ""}`,
     title: `${item.title} — ${studied ? "✓ Studied" : "Not studied"}`,
-    onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
   });
   btn.innerHTML = `
     <div class="st-top">
-      <span class="st-status-check">${studied ? "✓" : "○"}</span>
-      <span class="st-title">${escapeHtml(item.title)}</span>
+      <input type="checkbox" class="st-chk-box" ${studied ? "checked" : ""} title="Mark studied" />
+      <span class="st-title" style="cursor:pointer">${escapeHtml(item.title)}</span>
     </div>
     <div class="st-tags-row">
       ${badgesHtml(item.tags)}
     </div>
     <div class="st-meta">
-      ${studied ? "<span class=\"st-check\">✓ SPLNĚNO</span>" : "<span class=\"st-pending\">KE STUDIU</span>"}
+      ${studied ? "<span class=\"st-check\">✓ SPLNĚNO</span>" : "<span class=\"st-pending\">☐ KE STUDIU</span>"}
       ${tasks ? `<span class="st-tasks">${tasks} úkolů</span>` : ""}
       <span class="st-rel">rel: ${item.relevance ?? "—"}/10</span>
     </div>
   `;
+
+  btn.querySelector(".st-title")?.addEventListener("click", () => {
+    window.__pcsNavigate?.({ kind: item.kind, id: item.id });
+  });
+
+  const chk = btn.querySelector(".st-chk-box");
+  chk?.addEventListener("change", (e) => {
+    e.stopPropagation();
+    if (e.target.checked) state.studied.add(item.id);
+    else state.studied.delete(item.id);
+    try {
+      localStorage.setItem("pcs-studied-v1", JSON.stringify(Array.from(state.studied)));
+    } catch { /* */ }
+    btn.classList.toggle("studied", e.target.checked);
+    const metaCheck = btn.querySelector(".st-check, .st-pending");
+    if (metaCheck) {
+      metaCheck.className = e.target.checked ? "st-check" : "st-pending";
+      metaCheck.textContent = e.target.checked ? "✓ SPLNĚNO" : "☐ KE STUDIU";
+    }
+  });
+
   return btn;
 }
 
@@ -1168,6 +1188,18 @@ export function showChecklist() {
 
   const wrap = el("div", { className: "progress-view checklist-view" });
 
+  // View toggle bar
+  const toggleRow = el("div", { className: "progress-view-toggle-row" });
+  toggleRow.innerHTML = `
+    <div class="view-toggle-group">
+      <button type="button" class="btn view-toggle-btn" id="btnViewBoard">Deska (Study Board)</button>
+      <button type="button" class="btn view-toggle-btn active" id="btnViewChecklist">Studijní plán 📋</button>
+    </div>
+  `;
+  wrap.appendChild(toggleRow);
+
+  toggleRow.querySelector("#btnViewBoard")?.addEventListener("click", () => window.__pcsNavigate?.({ kind: "progress" }));
+
   // Hero header
   const hero = el("div", { className: "checklist-hero" });
   hero.innerHTML = `
@@ -1241,6 +1273,7 @@ export function showChecklist() {
       card.innerHTML = `
         <label class="chk-checkbox-label">
           <input type="checkbox" class="chk-box" ${isDone ? "checked" : ""} />
+          <span class="chk-status-tag ${isDone ? "studied" : "pending"}">${isDone ? "✓ SPLNĚNO" : "☐ KE STUDIU"}</span>
           <span class="chk-title">${escapeHtml(item.title)}</span>
         </label>
         <div class="chk-badges">
@@ -1257,6 +1290,7 @@ export function showChecklist() {
 
       // Checkbox click handler
       const chkInput = card.querySelector(".chk-box");
+      const statusTag = card.querySelector(".chk-status-tag");
       chkInput?.addEventListener("change", (e) => {
         if (e.target.checked) state.studied.add(item.id);
         else state.studied.delete(item.id);
@@ -1266,6 +1300,10 @@ export function showChecklist() {
         } catch { /* */ }
 
         card.classList.toggle("studied", e.target.checked);
+        if (statusTag) {
+          statusTag.className = `chk-status-tag ${e.target.checked ? "studied" : "pending"}`;
+          statusTag.textContent = e.target.checked ? "✓ SPLNĚNO" : "☐ KE STUDIU";
+        }
       });
 
       grid.appendChild(card);
