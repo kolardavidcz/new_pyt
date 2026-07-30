@@ -845,6 +845,16 @@ export function showProgress() {
       </div>
     </div>
   `;
+
+  const printProgressBtn = el("button", {
+    type: "button",
+    className: "btn primary btn-print-progress",
+    style: { marginTop: "14px" },
+    title: "Vytisknout studijní přehled s plněním (Ctrl+P)",
+    onClick: () => window.print(),
+  }, "Vytisknout přehled 🖨");
+  heroText.appendChild(printProgressBtn);
+
   hero.append(ring, heroText);
   main.appendChild(hero);
 
@@ -964,6 +974,11 @@ export function showProgress() {
   ));
   foot.appendChild(el("button", {
     type: "button",
+    className: "btn primary btn-print-progress",
+    onClick: () => window.print(),
+  }, "Vytisknout přehled 🖨"));
+  foot.appendChild(el("button", {
+    type: "button",
     className: "btn progress-reset",
     onClick: () => {
       if (confirm("Clear all studied marks (and open history)?")) {
@@ -987,16 +1002,22 @@ function studyTile(item, studied, size) {
   const btn = el("button", {
     type: "button",
     className: `study-tile study-tile-${size} ${item.kind}${studied ? " studied" : ""}`,
-    title: item.title,
+    title: `${item.title} — ${studied ? "✓ Studied" : "Not studied"}`,
     onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
   });
   btn.innerHTML = `
-    <span class="st-title">${escapeHtml(item.title)}</span>
-    <span class="st-meta">
-      ${studied ? "<span class=\"st-check\">✓</span>" : ""}
+    <div class="st-top">
+      <span class="st-status-check">${studied ? "✓" : "○"}</span>
+      <span class="st-title">${escapeHtml(item.title)}</span>
+    </div>
+    <div class="st-tags-row">
+      ${badgesHtml(item.tags)}
+    </div>
+    <div class="st-meta">
+      ${studied ? "<span class=\"st-check\">✓ SPLNĚNO</span>" : "<span class=\"st-pending\">KE STUDIU</span>"}
       ${tasks ? `<span class="st-tasks">${tasks} úkolů</span>` : ""}
-      <span class="st-rel">${item.relevance ?? "—"}</span>
-    </span>
+      <span class="st-rel">${item.relevance ?? "—"}★</span>
+    </div>
   `;
   return btn;
 }
