@@ -1158,11 +1158,23 @@ function progressLevel(pct) {
 let activeChecklistLvl = "all";
 
 function getItemLevel(item) {
-  const w = item.weekNum || 1;
-  if (w <= 2) return "LVL1";
-  if (w <= 5) return "LVL2";
-  if (w <= 8) return "LVL3";
+  const rel = (item.relevance || 5) * 10;
+  const tags = item.tags || [];
+  if (rel >= 90 || (item.weekNum <= 2 && tags.includes("Core"))) return "LVL1";
+  if (rel >= 70) return "LVL2";
+  if (rel >= 50) return "LVL3";
   return "LVL4";
+}
+
+function isItemInLevel(item, lvl) {
+  if (lvl === "all" || lvl === "LVL4") return true;
+  const rel = (item.relevance || 5) * 10;
+  const tags = item.tags || [];
+  const isCore = item.weekNum <= 2 && tags.includes("Core");
+  if (lvl === "LVL1") return rel >= 90 || isCore;
+  if (lvl === "LVL2") return rel >= 70 || isCore;
+  if (lvl === "LVL3") return rel >= 50 || isCore;
+  return true;
 }
 
 function getItemBadges(item) {
@@ -1200,31 +1212,58 @@ export function showChecklist() {
 
   toggleRow.querySelector("#btnViewBoard")?.addEventListener("click", () => window.__pcsNavigate?.({ kind: "progress" }));
 
-  // Hero header
+  const allItems = state.items || [];
+  const lvl1Count = allItems.filter((it) => isItemInLevel(it, "LVL1")).length;
+  const lvl2Count = allItems.filter((it) => isItemInLevel(it, "LVL2")).length;
+  const lvl3Count = allItems.filter((it) => isItemInLevel(it, "LVL3")).length;
+
+  // Hero header with print actions & stats
   const hero = el("div", { className: "checklist-hero" });
   hero.innerHTML = `
     <div class="chk-hero-title">
       <h1>Studijní plán & 4-Úrovňový Checklist 📋</h1>
-      <p class="chk-hero-subtitle">Přehled všech lekcí a cvičení Python kurzu rozdělený do 4 úrovní náročnosti (LVL1–LVL4).</p>
+      <p class="chk-hero-subtitle">Přehled materiálů Python kurzu rozdělený do 4 úrovní podle relevance a náročnosti.</p>
     </div>
-    <div class="chk-print-actions">
-      <button type="button" class="btn primary btn-print-all" title="Vytisknout všechny úrovně (Ctrl+P)">Vytisknout všechny úrovně 🖨</button>
-      <button type="button" class="btn secondary btn-print-lvl" title="Vytisknout vybranou úroveň">Vytisknout aktivní úroveň 🖨</button>
+    <div class="chk-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0;">
+      <div class="chk-stat-card" style="padding:10px 14px;background:var(--editor);border:1px solid var(--border);border-radius:var(--radius-md);text-align:center;">
+        <span style="font-size:20px;font-weight:800;color:var(--text-bright);">${allItems.length}</span>
+        <span style="display:block;font-size:10px;color:var(--text-faint);text-transform:uppercase;margin-top:2px;">Celkem témat</span>
+      </div>
+      <div class="chk-stat-card" style="padding:10px 14px;background:var(--editor);border:1px solid rgba(249,93,18,0.3);border-radius:var(--radius-md);text-align:center;">
+        <span style="font-size:20px;font-weight:800;color:#ea580c;">${lvl1Count}</span>
+        <span style="display:block;font-size:10px;color:#ea580c;text-transform:uppercase;margin-top:2px;">LVL1 Core (≥90%)</span>
+      </div>
+      <div class="chk-stat-card" style="padding:10px 14px;background:var(--editor);border:1px solid rgba(205,163,79,0.3);border-radius:var(--radius-md);text-align:center;">
+        <span style="font-size:20px;font-weight:800;color:#cda34f;">${lvl2Count}</span>
+        <span style="display:block;font-size:10px;color:#cda34f;text-transform:uppercase;margin-top:2px;">LVL2 Relevantní (≥70%)</span>
+      </div>
+      <div class="chk-stat-card" style="padding:10px 14px;background:var(--editor);border:1px solid rgba(78,201,176,0.3);border-radius:var(--radius-md);text-align:center;">
+        <span style="font-size:20px;font-weight:800;color:#4ec9b0;">${lvl3Count}</span>
+        <span style="display:block;font-size:10px;color:#4ec9b0;text-transform:uppercase;margin-top:2px;">LVL3 Podstatná (≥50%)</span>
+      </div>
+    </div>
+    <div class="chk-print-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+      <button type="button" class="btn primary btn-print-lvl1" title="Tisk LVL1">Vytisknout LVL1 (${lvl1Count} témat) 🖨</button>
+      <button type="button" class="btn secondary btn-print-lvl2" title="Tisk LVL2">Vytisknout LVL2 (${lvl2Count} témat) 🖨</button>
+      <button type="button" class="btn secondary btn-print-lvl3" title="Tisk LVL3">Vytisknout LVL3 (${lvl3Count} témat) 🖨</button>
+      <button type="button" class="btn secondary btn-print-all" title="Tisk vše">Vytisknout Vše (${allItems.length} témat) 🖨</button>
     </div>
   `;
   wrap.appendChild(hero);
 
-  hero.querySelector(".btn-print-all")?.addEventListener("click", () => window.print());
-  hero.querySelector(".btn-print-lvl")?.addEventListener("click", () => window.print());
+  hero.querySelector(".btn-print-lvl1")?.addEventListener("click", () => { activeChecklistLvl = "LVL1"; showChecklist(); window.print(); });
+  hero.querySelector(".btn-print-lvl2")?.addEventListener("click", () => { activeChecklistLvl = "LVL2"; showChecklist(); window.print(); });
+  hero.querySelector(".btn-print-lvl3")?.addEventListener("click", () => { activeChecklistLvl = "LVL3"; showChecklist(); window.print(); });
+  hero.querySelector(".btn-print-all")?.addEventListener("click", () => { activeChecklistLvl = "all"; showChecklist(); window.print(); });
 
   // Level Filter Tabs
   const tabsRow = el("div", { className: "chk-lvl-tabs" });
   const levels = [
-    { id: "all", label: "Všechny úrovně (All)" },
-    { id: "LVL1", label: "1. TÝDEN - 2. TÝDEN · LVL1 Core" },
-    { id: "LVL2", label: "3. TÝDEN - 5. TÝDEN · LVL2 Idiomy" },
-    { id: "LVL3", label: "6. TÝDEN - 8. TÝDEN · LVL3 OOP & Mechaniky" },
-    { id: "LVL4", label: "9. TÝDEN - 12. TÝDEN · LVL4 Dojo & System" },
+    { id: "all", label: `Všechny úrovně (${allItems.length})` },
+    { id: "LVL1", label: `LVL1 Core (${lvl1Count})` },
+    { id: "LVL2", label: `LVL2 Idiomy (${lvl2Count})` },
+    { id: "LVL3", label: `LVL3 OOP & System (${lvl3Count})` },
+    { id: "LVL4", label: `LVL4 Complete (${allItems.length})` },
   ];
 
   for (const lvl of levels) {
@@ -1246,11 +1285,12 @@ export function showChecklist() {
   for (const week of state.course?.weeks || []) {
     const weekItems = [...(week.lectures || []), ...(week.exercises || [])]
       .map((it) => state.itemsById.get(it.id) || it)
-      .filter((it) => activeChecklistLvl === "all" || getItemLevel(it) === activeChecklistLvl);
+      .filter((it) => isItemInLevel(it, activeChecklistLvl));
 
     if (!weekItems.length) continue;
 
-    const wBlock = el("section", { className: "chk-week-block" });
+    const hasHighRel = weekItems.some((it) => ((it.relevance || 5) * 10) >= 90);
+    const wBlock = el("section", { className: `chk-week-block${hasHighRel ? " mega-cool-week" : ""}` });
     const weekLvl = getItemLevel(weekItems[0]);
 
     wBlock.innerHTML = `
@@ -1265,9 +1305,11 @@ export function showChecklist() {
       const isDone = isStudied(item.id);
       const relPct = (item.relevance || 5) * 10;
       const badges = getItemBadges(item);
+      const isEpicGlow = relPct >= 90;
+      const isDimmed = relPct < 50;
 
       const card = el("div", {
-        className: `chk-card${isDone ? " studied" : ""}`,
+        className: `chk-card${isDone ? " studied" : ""}${isEpicGlow ? " mega-epic-glow" : ""}${isDimmed ? " chk-card-dimmed" : ""}`,
       });
 
       card.innerHTML = `
