@@ -297,27 +297,12 @@ function setView(view) {
   });
   const title = document.getElementById("sidebarTitle");
   const treeRoot = document.getElementById("treeRoot");
-  const searchPanel = document.getElementById("searchPanel");
-  const progressPanel = document.getElementById("progressPanel");
   const filterStrip = document.getElementById("filterStrip");
 
   if (view === "explorer") {
     if (title) title.textContent = "Explorer";
     treeRoot?.classList.remove("hidden");
-    searchPanel?.classList.add("hidden");
-    progressPanel?.classList.add("hidden");
     filterStrip?.classList.remove("hidden");
-  } else if (view === "search") {
-    if (title) title.textContent = "Search";
-    treeRoot?.classList.remove("hidden");
-    searchPanel?.classList.add("hidden");
-    progressPanel?.classList.add("hidden");
-    filterStrip?.classList.remove("hidden");
-    document.getElementById("filterText")?.focus();
-    navigate({ kind: "search" });
-  } else if (view === "progress") {
-    if (title) title.textContent = "Progress";
-    navigate({ kind: "progress" });
   } else if (view === "checklist") {
     if (title) title.textContent = "Studijní plán";
     navigate({ kind: "checklist" });

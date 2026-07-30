@@ -1168,18 +1168,6 @@ export function showChecklist() {
 
   const wrap = el("div", { className: "progress-view checklist-view" });
 
-  // View toggle bar
-  const toggleRow = el("div", { className: "progress-view-toggle-row" });
-  toggleRow.innerHTML = `
-    <div class="view-toggle-group">
-      <button type="button" class="btn view-toggle-btn" id="btnViewBoard">Deska (Study Board)</button>
-      <button type="button" class="btn view-toggle-btn active" id="btnViewChecklist">Studijní plán 📋</button>
-    </div>
-  `;
-  wrap.appendChild(toggleRow);
-
-  toggleRow.querySelector("#btnViewBoard")?.addEventListener("click", () => showProgress());
-
   // Hero header
   const hero = el("div", { className: "checklist-hero" });
   hero.innerHTML = `
