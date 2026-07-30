@@ -112,7 +112,7 @@ function updateResults(q) {
       results.push({
         kind: item.kind,
         title: item.title,
-        meta: `W${item.weekNum} · ${item.relevance}★ · ${(item.tags || []).join(",")}`,
+        meta: `W${item.weekNum} · rel:${item.relevance}/10 · ${(item.tags || []).join(",")}`,
         action: { kind: item.kind, id: item.id },
       });
     }

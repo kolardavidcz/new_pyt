@@ -514,6 +514,15 @@ function renderExerciseView(item, data, main) {
   highlightRoot(list);
 }
 
+function scoreBarsHtml(score, max = 5) {
+  let html = '<span class="score-bars" aria-hidden="true">';
+  for (let i = 1; i <= max; i++) {
+    html += `<i class="score-bar-seg${i <= score ? " on" : ""}"></i>`;
+  }
+  html += '</span>';
+  return html;
+}
+
 function renderTaskCard(task, item) {
   const card = el("article", {
     className: "task-card",
@@ -531,12 +540,12 @@ function renderTaskCard(task, item) {
     <div class="task-scores" title="${escapeHtml(reason)}">
       <span class="score-badge score-tech" title="Technical Difficulty (T): ${tS}/5 — ${escapeHtml(reason)}">
         <span class="score-label">T</span>
-        <span class="score-val">${"★".repeat(tS)}${"☆".repeat(5 - tS)}</span>
+        ${scoreBarsHtml(tS, 5)}
         <span class="score-num">${tS}/5</span>
       </span>
       <span class="score-badge score-log" title="Insight Difficulty (L): ${lS}/5 — ${escapeHtml(reason)}">
         <span class="score-label">L</span>
-        <span class="score-val">${"★".repeat(lS)}${"☆".repeat(5 - lS)}</span>
+        ${scoreBarsHtml(lS, 5)}
         <span class="score-num">${lS}/5</span>
       </span>
     </div>
@@ -931,7 +940,7 @@ export function showProgress() {
     { at: 25, label: "Quarter", icon: "¼", check: () => pct >= 25 },
     { at: 50, label: "Halfway", icon: "½", check: () => pct >= 50 },
     { at: 75, label: "Nearly there", icon: "¾", check: () => pct >= 75 },
-    { at: 100, label: "Path cleared", icon: "★", check: () => pct >= 100 },
+    { at: 100, label: "Path cleared", icon: "🏆", check: () => pct >= 100 },
   ];
 
   const msWrap = el("div", { className: "progress-milestones" });
@@ -1038,7 +1047,7 @@ function studyTile(item, studied, size) {
     <div class="st-meta">
       ${studied ? "<span class=\"st-check\">✓ SPLNĚNO</span>" : "<span class=\"st-pending\">KE STUDIU</span>"}
       ${tasks ? `<span class="st-tasks">${tasks} úkolů</span>` : ""}
-      <span class="st-rel">${item.relevance ?? "—"}★</span>
+      <span class="st-rel">rel: ${item.relevance ?? "—"}/10</span>
     </div>
   `;
   return btn;
