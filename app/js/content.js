@@ -921,13 +921,13 @@ export function showProgress() {
       block.appendChild(tiles);
     }
     if (exs.length) {
-      const row = el("div", { className: "study-row-label" }, "Homework sets");
+      const row = el("div", { className: "study-row-label" }, "Homework & Exercise sets");
       block.appendChild(row);
-      const tiles = el("div", { className: "study-tiles exercises" });
+      const exCards = el("div", { className: "study-exercise-cards" });
       for (const it of exs) {
-        tiles.appendChild(studyTile(it, done(it.id), "lg"));
+        exCards.appendChild(detailedExerciseCard(it, done(it.id)));
       }
-      block.appendChild(tiles);
+      block.appendChild(exCards);
     }
     board.appendChild(block);
   }
@@ -1051,6 +1051,56 @@ function studyTile(item, studied, size) {
     </div>
   `;
   return btn;
+}
+
+function detailedExerciseCard(item, studied) {
+  const exData = state.exercises[item.path];
+  const tasks = exData?.tasks || [];
+
+  const card = el("div", {
+    className: `study-exercise-card${studied ? " studied" : ""}`,
+  });
+
+  const head = el("div", {
+    className: "sec-head",
+    onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
+  });
+  head.innerHTML = `
+    <div class="sec-title-row">
+      <span class="st-status-check">${studied ? "✓" : "○"}</span>
+      <h3 class="sec-title">${escapeHtml(item.title)}</h3>
+      <span class="sec-status-pill">${studied ? "✓ SPLNĚNO" : "KE STUDIU"}</span>
+    </div>
+    <div class="sec-meta-row">
+      ${badgesHtml(item.tags)}
+      <span class="sec-meta-item">${tasks.length} úkolů</span>
+      <span class="sec-meta-item">rel: ${item.relevance ?? "—"}/10</span>
+    </div>
+  `;
+  card.appendChild(head);
+
+  if (tasks.length) {
+    const list = el("div", { className: "study-task-list" });
+    for (const t of tasks) {
+      const tS = t.technical_score ?? 1;
+      const lS = t.logical_score ?? 1;
+      const tRow = el("div", { className: "study-task-item" });
+      tRow.innerHTML = `
+        <div class="sti-top">
+          <span class="sti-num">Úkol ${t.num}</span>
+          <span class="sti-title">${escapeHtml(t.summary || t.title)}</span>
+          <div class="sti-scores">
+            <span class="score-chip score-tech" title="Technická obtížnost (T): ${tS}/5 — ${escapeHtml(t.challenge_reason || "")}">T${tS} ${scoreBarsHtml(tS, 5)}</span>
+            <span class="score-chip score-log" title="Logická obtížnost (L): ${lS}/5 — ${escapeHtml(t.challenge_reason || "")}">L${lS} ${scoreBarsHtml(lS, 5)}</span>
+          </div>
+        </div>
+      `;
+      list.appendChild(tRow);
+    }
+    card.appendChild(list);
+  }
+
+  return card;
 }
 
 function progressVibe(pct, studiedN, total) {
