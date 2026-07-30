@@ -496,8 +496,11 @@ function renderExerciseView(item, data, main) {
         document.getElementById(task.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
       },
     });
+    const tS = task.technical_score ?? 1;
+    const lS = task.logical_score ?? 1;
     a.innerHTML = `<span class="toc-num">${String(task.num).padStart(2, "0")}</span>` +
-      `<span class="toc-text">${escapeHtml(task.summary || task.title)}</span>`;
+      `<span class="toc-text">${escapeHtml(task.summary || task.title)}</span>` +
+      `<span class="toc-score-chips"><span class="toc-chip-t" title="Technická obtížnost (T): ${tS}/5">T${tS}</span><span class="toc-chip-l" title="Logická obtížnost (L): ${lS}/5">L${lS}</span></span>`;
     tocList.appendChild(a);
   }
   toc.appendChild(tocList);
@@ -517,10 +520,26 @@ function renderTaskCard(task, item) {
     id: task.id,
   });
 
+  const tS = task.technical_score ?? 1;
+  const lS = task.logical_score ?? 1;
+  const reason = task.challenge_reason || "";
+
   const head = el("header", { className: "task-card-head" });
   head.innerHTML = `
     <span class="task-num">Úkol ${task.num}</span>
     <h2 class="task-title">${escapeHtml(task.title)}</h2>
+    <div class="task-scores" title="${escapeHtml(reason)}">
+      <span class="score-badge score-tech" title="Technical Difficulty (T): ${tS}/5 — ${escapeHtml(reason)}">
+        <span class="score-label">T</span>
+        <span class="score-val">${"★".repeat(tS)}${"☆".repeat(5 - tS)}</span>
+        <span class="score-num">${tS}/5</span>
+      </span>
+      <span class="score-badge score-log" title="Insight Difficulty (L): ${lS}/5 — ${escapeHtml(reason)}">
+        <span class="score-label">L</span>
+        <span class="score-val">${"★".repeat(lS)}${"☆".repeat(5 - lS)}</span>
+        <span class="score-num">${lS}/5</span>
+      </span>
+    </div>
   `;
   card.appendChild(head);
 

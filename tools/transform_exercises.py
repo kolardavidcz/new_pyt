@@ -447,6 +447,13 @@ def main() -> int:
         print(f"Missing {OLD_PRI}", file=sys.stderr)
         return 1
 
+    existing = {}
+    if OUT.is_file():
+        try:
+            existing = json.loads(OUT.read_text(encoding="utf-8"))
+        except Exception:
+            existing = {}
+
     out: dict[str, dict] = {}
     files = sorted(OLD_PRI.rglob("*.html"))
     for fp in files:
@@ -459,6 +466,19 @@ def main() -> int:
         data = extract_with_dom(html)
         data["path"] = rel
         data["task_count"] = len(data["tasks"])
+
+        # Merge existing ratings if available
+        if rel in existing:
+            ex_tasks = {t.get("id"): t for t in existing[rel].get("tasks", [])}
+            for t in data["tasks"]:
+                tid = t.get("id")
+                if tid in ex_tasks:
+                    old_t = ex_tasks[tid]
+                    if "technical_score" in old_t: t["technical_score"] = old_t["technical_score"]
+                    if "logical_score" in old_t: t["logical_score"] = old_t["logical_score"]
+                    if "challenge_score" in old_t: t["challenge_score"] = old_t["challenge_score"]
+                    if "challenge_reason" in old_t: t["challenge_reason"] = old_t["challenge_reason"]
+
         out[rel] = data
         print(f"  {rel}: {data['task_count']} tasks — {data['title'][:50]}")
 
