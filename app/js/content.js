@@ -835,7 +835,7 @@ export function showProgress() {
   `;
   wrap.appendChild(toggleRow);
 
-  getEl("#btnViewChecklist", toggleRow)?.addEventListener("click", () => showChecklist());
+  toggleRow.querySelector("#btnViewChecklist")?.addEventListener("click", () => showChecklist());
 
   // Hero
   const hero = el("div", { className: "progress-hero" });
@@ -1161,8 +1161,8 @@ function getItemBadges(item) {
   return badges;
 }
 
-function showChecklist() {
-  const main = getEl("main");
+export function showChecklist() {
+  const main = document.getElementById("main");
   if (!main) return;
   main.replaceChildren();
 
@@ -1178,7 +1178,7 @@ function showChecklist() {
   `;
   wrap.appendChild(toggleRow);
 
-  getEl("#btnViewBoard", toggleRow)?.addEventListener("click", () => showProgress());
+  toggleRow.querySelector("#btnViewBoard")?.addEventListener("click", () => showProgress());
 
   // Hero header
   const hero = el("div", { className: "checklist-hero" });
@@ -1194,8 +1194,8 @@ function showChecklist() {
   `;
   wrap.appendChild(hero);
 
-  getEl(".btn-print-all", hero)?.addEventListener("click", () => window.print());
-  getEl(".btn-print-lvl", hero)?.addEventListener("click", () => window.print());
+  hero.querySelector(".btn-print-all")?.addEventListener("click", () => window.print());
+  hero.querySelector(".btn-print-lvl")?.addEventListener("click", () => window.print());
 
   // Level Filter Tabs
   const tabsRow = el("div", { className: "chk-lvl-tabs" });
@@ -1242,7 +1242,7 @@ function showChecklist() {
     const grid = el("div", { className: "chk-card-grid" });
 
     for (const item of weekItems) {
-      const isDone = done(item.id);
+      const isDone = isStudied(item.id);
       const relPct = (item.relevance || 5) * 10;
       const badges = getItemBadges(item);
 
