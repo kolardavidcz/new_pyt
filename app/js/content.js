@@ -193,10 +193,13 @@ function lectureToolbar(item, mode) {
     if (pages.length) {
       bar.appendChild(el("button", {
         type: "button",
-        className: "btn",
-        title: "One slide at a time",
-        onClick: () => window.__pcsNavigate?.({ kind: "presentation", id: item.id }),
-      }, "See as presentation"));
+        className: "btn primary",
+        title: "Start full screen presentation",
+        onClick: () => {
+          window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[0].id });
+          toggleFullscreen(true);
+        },
+      }, "See as presentation ⛶"));
     }
   } else {
     bar.appendChild(el("button", {
