@@ -107,6 +107,7 @@ function stepSlide(dir) {
 function bindChrome() {
   // Theme
   document.getElementById("btnTheme")?.addEventListener("click", toggleTheme);
+  document.getElementById("btnPrint")?.addEventListener("click", triggerPrint);
   document.getElementById("btnPalette")?.addEventListener("click", () => openPalette());
 
   // Activity bar
@@ -174,6 +175,11 @@ function bindChrome() {
   document.addEventListener("keydown", (e) => {
     const meta = e.ctrlKey || e.metaKey;
     if (meta && e.key.toLowerCase() === "p") {
+      e.preventDefault();
+      triggerPrint();
+      return;
+    }
+    if (meta && e.key.toLowerCase() === "k") {
       e.preventDefault();
       if (isPaletteOpen()) closePalette();
       else openPalette();
@@ -306,9 +312,6 @@ function setView(view) {
   } else if (view === "progress") {
     if (title) title.textContent = "Progress";
     navigate({ kind: "progress" });
-  } else if (view === "checklist") {
-    if (title) title.textContent = "Studijní plán";
-    navigate({ kind: "checklist" });
   }
 
   // Ensure sidebar open when switching views
@@ -377,8 +380,13 @@ function initSash() {
   });
 }
 
-function escape(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function triggerPrint() {
+  const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
+  if (window.printTier && (!activeTab || activeTab.kind === "progress" || activeTab.kind === "home")) {
+    window.printTier(4);
+  } else {
+    window.print();
+  }
 }
 
 boot();

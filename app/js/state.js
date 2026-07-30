@@ -42,12 +42,16 @@ export const state = {
   /** Manually marked “studied” item ids (progress source of truth) */
   studied: new Set(),
 
+  /** Checked items in the 4-level checklist */
+  checklist: new Set(),
+
   /** Currently focused tree node key */
   focusedTreeKey: null,
 };
 
 const SEEN_KEY = "pcs-seen-v1";
 const STUDIED_KEY = "pcs-studied-v1";
+const CHECKLIST_KEY = "pcs-checklist-v1";
 const SIDEBAR_W_KEY = "pcs-sidebar-w";
 
 export function loadPersisted() {
@@ -66,6 +70,13 @@ export function loadPersisted() {
     }
   } catch { /* ignore */ }
   try {
+    const raw = localStorage.getItem(CHECKLIST_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) state.checklist = new Set(arr);
+    }
+  } catch { /* ignore */ }
+  try {
     const w = parseInt(localStorage.getItem(SIDEBAR_W_KEY) || "", 10);
     if (w >= 180 && w <= 520) state.sidebarWidth = w;
   } catch { /* ignore */ }
@@ -81,6 +92,69 @@ export function persistStudied() {
   try {
     localStorage.setItem(STUDIED_KEY, JSON.stringify([...state.studied]));
   } catch { /* ignore */ }
+}
+
+export function persistChecklist() {
+  try {
+    localStorage.setItem(CHECKLIST_KEY, JSON.stringify([...state.checklist]));
+  } catch { /* ignore */ }
+}
+
+export function isChecklistChecked(id) {
+  return !!(id && state.checklist.has(id));
+}
+
+export function toggleChecklist(id) {
+  if (!id) return false;
+  if (state.checklist.has(id)) {
+    state.checklist.delete(id);
+    persistChecklist();
+    return false;
+  }
+  state.checklist.add(id);
+  persistChecklist();
+  return true;
+}
+
+export function resetChecklistState() {
+  state.checklist.clear();
+  try {
+    localStorage.removeItem(CHECKLIST_KEY);
+  } catch { /* ignore */ }
+}
+
+export function calculateChecklistProgress(items = []) {
+  const total = items.length;
+  let checkedCount = 0;
+  const byLevel = {
+    1: { total: 0, checked: 0, pct: 0 },
+    2: { total: 0, checked: 0, pct: 0 },
+    3: { total: 0, checked: 0, pct: 0 },
+    4: { total: 0, checked: 0, pct: 0 },
+  };
+
+  for (const item of items) {
+    const isChecked = state.checklist.has(item.id);
+    if (isChecked) checkedCount++;
+    if (byLevel[item.level]) {
+      byLevel[item.level].total++;
+      if (isChecked) byLevel[item.level].checked++;
+    }
+  }
+
+  for (const lvl in byLevel) {
+    const l = byLevel[lvl];
+    l.pct = l.total > 0 ? Math.round((l.checked / l.total) * 100) : 0;
+  }
+
+  const pctTotal = total > 0 ? Math.round((checkedCount / total) * 100) : 0;
+
+  return {
+    total,
+    checked: checkedCount,
+    pct: pctTotal,
+    byLevel,
+  };
 }
 
 export function persistSidebarW() {

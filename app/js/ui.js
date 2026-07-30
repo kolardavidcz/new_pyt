@@ -73,6 +73,23 @@ function segmentsHtml(filled, max = 10) {
   return html;
 }
 
+/**
+ * Difficulty score bar — 5-segment bar for T (tech) or L (logic) scores.
+ * Reuses rel-seg pattern with axis-specific color.
+ * @param {number} score 1–5
+ * @param {number} [max=5]
+ * @param {"tech"|"log"} [axis="tech"]
+ */
+export function scoreBarHtml(score, max = 5, axis = "tech") {
+  const s = Math.max(0, Math.min(max, Number(score) || 0));
+  const segs = segmentsHtml(s, max);
+  const label = axis === "tech" ? "T" : "L";
+  const full = axis === "tech" ? "Technical Difficulty" : "Insight Difficulty";
+  return `<span class="rel-meter rel-compact score-axis-${axis}" title="${full}: ${s}/${max}">` +
+    `<span class="rel-segs rel-segs-mini" aria-hidden="true">${segs}</span>` +
+    `<span class="rel-pill">${label}${s}</span></span>`;
+}
+
 export function badgesHtml(tags = []) {
   return (tags || [])
     .map((t) => `<span class="badge badge-${escapeAttr(t)}">${escapeHtml(t)}</span>`)

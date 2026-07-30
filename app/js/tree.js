@@ -17,6 +17,31 @@ export function renderTree() {
   if (!root || !state.course) return;
   clear(root);
 
+  // Top special node for Checklist
+  const checkNode = document.createElement("div");
+  checkNode.className = "tree-node";
+  checkNode.dataset.key = "checklist";
+  const checkRow = document.createElement("div");
+  checkRow.className = "tree-row" + (state.focusedTreeKey === "checklist" ? " active" : "");
+  checkRow.setAttribute("role", "treeitem");
+  checkRow.tabIndex = 0;
+  checkRow.dataset.kind = "checklist";
+  checkRow.dataset.id = "checklist";
+  checkRow.innerHTML = `
+    <span class="tree-twistie"></span>
+    <span class="tree-icon" style="color:var(--accent)">📋</span>
+    <span class="tree-label">Studijní plán (4 Úrovně)</span>
+  `;
+  checkRow.addEventListener("click", () => select("checklist", "checklist"));
+  checkRow.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      select("checklist", "checklist");
+    }
+  });
+  checkNode.appendChild(checkRow);
+  root.appendChild(checkNode);
+
   const weeks = state.course.weeks || [];
   for (const week of weeks) {
     const items = weekVisibleItems(week);

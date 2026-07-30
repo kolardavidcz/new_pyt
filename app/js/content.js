@@ -4,7 +4,7 @@ import {
   state, pagesFor, slideDiff, weekVisibleItems, filteredItems, markSeen,
   isStudied, toggleStudied,
 } from "./state.js";
-import { clear, el, starsHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
+import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot } from "./highlight.js";
 import { renderTree } from "./tree.js";
 
@@ -538,16 +538,8 @@ function renderTaskCard(task, item) {
     <span class="task-num">Úkol ${task.num}</span>
     <h2 class="task-title">${escapeHtml(task.title)}</h2>
     <div class="task-scores" title="${escapeHtml(reason)}">
-      <span class="score-badge score-tech" title="Technical Difficulty (T): ${tS}/5 — ${escapeHtml(reason)}">
-        <span class="score-label">T</span>
-        ${scoreBarsHtml(tS, 5)}
-        <span class="score-num">${tS}/5</span>
-      </span>
-      <span class="score-badge score-log" title="Insight Difficulty (L): ${lS}/5 — ${escapeHtml(reason)}">
-        <span class="score-label">L</span>
-        ${scoreBarsHtml(lS, 5)}
-        <span class="score-num">${lS}/5</span>
-      </span>
+      ${scoreBarHtml(tS, 5, "tech")}
+      ${scoreBarHtml(lS, 5, "log")}
     </div>
   `;
   card.appendChild(head);
@@ -791,6 +783,242 @@ export function showSearchResults(query) {
   main.appendChild(grid);
 }
 
+// === Cumulative Study Depth Tiers & PDF Generator ===
+
+const TIERS = [
+  {
+    level: 1,
+    label: "Pass",
+    desc: "Minimum to finish the course — Core items, relevance ≥ 7",
+    filter: (item) => (item.tags || []).includes("Core") && (item.relevance || 0) >= 7,
+  },
+  {
+    level: 2,
+    label: "Solid",
+    desc: "Confident practitioner — Core + relevance ≥ 5, no Skip",
+    filter: (item) => {
+      const tags = item.tags || [];
+      if (tags.includes("Skip")) return false;
+      return tags.includes("Core") || (item.relevance || 0) >= 5;
+    },
+  },
+  {
+    level: 3,
+    label: "Advanced",
+    desc: "Deeper mastery — everything except Skip",
+    filter: (item) => !(item.tags || []).includes("Skip"),
+  },
+  {
+    level: 4,
+    label: "Complete",
+    desc: "Full deep understanding — all items",
+    filter: () => true,
+  },
+];
+
+function getTierItems(level) {
+  const tier = TIERS.find((t) => t.level === level) || TIERS[3];
+  return state.items.filter(tier.filter);
+}
+
+function printTier(level) {
+  const tier = TIERS.find((t) => t.level === level) || TIERS[3];
+  const items = getTierItems(level);
+  const done = (id) => state.studied.has(id);
+
+  const weekMap = new Map();
+  for (const week of state.course?.weeks || []) {
+    const weekItems = [...(week.lectures || []), ...(week.exercises || [])]
+      .map((it) => state.itemsById.get(it.id) || it)
+      .filter((it) => items.some((i) => i.id === it.id));
+    if (weekItems.length) {
+      weekMap.set(week, weekItems);
+    }
+  }
+
+  const output = el("div", { className: "print-tier-output", id: "printTierOutput" });
+
+  const header = el("div", { className: "print-tier-header" });
+  header.innerHTML = `
+    <h1>Python Study Plan — ${escapeHtml(tier.label)}</h1>
+    <p class="tier-subtitle">${escapeHtml(tier.desc)}</p>
+    <p class="tier-stats">${items.length} items · ${items.filter(i => done(i.id)).length} studied · Generated ${new Date().toLocaleDateString("cs-CZ")}</p>
+  `;
+  output.appendChild(header);
+
+  for (const [week, weekItems] of weekMap) {
+    const lecs = weekItems.filter((it) => it.kind === "lecture");
+    const exs = weekItems.filter((it) => it.kind === "exercise");
+
+    const section = el("div", { className: "print-tier-week" });
+    const head = el("div", { className: "print-tier-week-head" });
+    head.textContent = `W${week.week} · ${week.title}`;
+    section.appendChild(head);
+
+    const cols = el("div", { className: "print-tier-cols" });
+
+    function renderRow(item) {
+      const isDone = done(item.id);
+      const exData = item.kind === "exercise" ? state.exercises[item.path] : null;
+      const tagBadges = (item.tags || []).map(t => `<span class="ptr-badge ptr-badge-${escapeHtml(t)}">${escapeHtml(t)}</span>`).join("");
+      const relBar = starsHtml(item.relevance || 5, 10, "compact");
+      let scoreBars = "";
+      if (exData?.tasks?.length) {
+        const avgT = Math.round(exData.tasks.reduce((s, t) => s + (t.technical_score || 1), 0) / exData.tasks.length);
+        const avgL = Math.round(exData.tasks.reduce((s, t) => s + (t.logical_score || 1), 0) / exData.tasks.length);
+        scoreBars = `${scoreBarHtml(avgT, 5, "tech")} ${scoreBarHtml(avgL, 5, "log")}`;
+      }
+
+      return `
+        <div class="print-tier-row">
+          <div class="ptr-chk${isDone ? " done" : ""}"></div>
+          <span class="ptr-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
+          <span class="ptr-badges">${tagBadges}</span>
+          <span class="ptr-bars">${relBar}${scoreBars ? ' ' + scoreBars : ''}</span>
+        </div>
+      `;
+    }
+
+    const lecCol = el("div", { className: "print-tier-col" });
+    lecCol.innerHTML = `<div class="print-tier-col-title">Lectures (${lecs.length})</div>` + (lecs.length ? lecs.map(renderRow).join("") : `<div class="ptr-empty">—</div>`);
+
+    const exCol = el("div", { className: "print-tier-col" });
+    exCol.innerHTML = `<div class="print-tier-col-title">Exercises (${exs.length})</div>` + (exs.length ? exs.map(renderRow).join("") : `<div class="ptr-empty">—</div>`);
+
+    cols.append(lecCol, exCol);
+    section.appendChild(cols);
+    output.appendChild(section);
+  }
+
+  document.body.appendChild(output);
+  document.body.classList.add("printing-tier");
+
+  window.addEventListener("afterprint", function cleanup() {
+    document.body.classList.remove("printing-tier");
+    output.remove();
+    window.removeEventListener("afterprint", cleanup);
+  }, { once: true });
+
+  window.print();
+}
+window.printTier = printTier;
+
+function progressVibe(pct, studiedN, total) {
+  if (total === 0) return "Catalog is empty — run the import tools first.";
+  if (studiedN <= 0) return "Nothing marked studied yet — open a topic and hit “Mark studied”.";
+  if (pct < 25) return "Warming up… mark Core lectures and homework as you finish them.";
+  if (pct < 50) return "Nice study streak — keep clearing homework sets.";
+  if (pct < 75) return "Solid log. Prioritize remaining Core + exercises.";
+  if (pct < 100) return "Almost done — finish the last unstudied tiles!";
+  return "Study log complete 🎉 Everything is marked studied.";
+}
+
+function progressLevel(pct) {
+  if (pct <= 0) return { badge: "Lv 0", name: "Hello, world" };
+  if (pct < 15) return { badge: "Lv 1", name: "REPL tourist" };
+  if (pct < 35) return { badge: "Lv 2", name: "Syntax settler" };
+  if (pct < 55) return { badge: "Lv 3", name: "Pythonic apprentice" };
+  if (pct < 75) return { badge: "Lv 4", name: "Path runner" };
+  if (pct < 100) return { badge: "Lv 5", name: "Almost legend" };
+  return { badge: "Lv MAX", name: "Course complete" };
+}
+
+function studyTile(item, studied, size) {
+  const tasks = item.kind === "exercise"
+    ? (state.exercises[item.path]?.task_count || state.exercises[item.path]?.tasks?.length || 0)
+    : 0;
+  const btn = el("div", {
+    className: `study-tile study-tile-${size} ${item.kind}${studied ? " studied" : ""}`,
+    title: `${item.title} — ${studied ? "✓ Studied" : "Not studied"}`,
+  });
+  btn.innerHTML = `
+    <div class="st-top">
+      <input type="checkbox" class="st-chk-box" ${studied ? "checked" : ""} title="Mark studied" />
+      <span class="st-title" style="cursor:pointer">${escapeHtml(item.title)}</span>
+    </div>
+    <div class="st-tags-row">
+      ${badgesHtml(item.tags)}
+    </div>
+    <div class="st-meta">
+      ${studied ? "<span class=\"st-check\">✓ SPLNĚNO</span>" : "<span class=\"st-pending\">☐ KE STUDIU</span>"}
+      ${tasks ? `<span class="st-tasks">${tasks} úkolů</span>` : ""}
+      ${starsHtml(item.relevance || 5, 10, "compact")}
+    </div>
+  `;
+
+  btn.querySelector(".st-title")?.addEventListener("click", () => {
+    window.__pcsNavigate?.({ kind: item.kind, id: item.id });
+  });
+
+  const chk = btn.querySelector(".st-chk-box");
+  chk?.addEventListener("change", (e) => {
+    e.stopPropagation();
+    if (e.target.checked) state.studied.add(item.id);
+    else state.studied.delete(item.id);
+    try {
+      localStorage.setItem("pcs-studied-v1", JSON.stringify(Array.from(state.studied)));
+    } catch { /* */ }
+    btn.classList.toggle("studied", e.target.checked);
+    const metaCheck = btn.querySelector(".st-check, .st-pending");
+    if (metaCheck) {
+      metaCheck.className = e.target.checked ? "st-check" : "st-pending";
+      metaCheck.textContent = e.target.checked ? "✓ SPLNĚNO" : "☐ KE STUDIU";
+    }
+  });
+
+  return btn;
+}
+
+function detailedExerciseCard(item, studied) {
+  const exData = state.exercises[item.path];
+  const tasks = exData?.tasks || [];
+
+  const card = el("div", {
+    className: `study-exercise-card${studied ? " studied" : ""}`,
+  });
+
+  const head = el("div", {
+    className: "sec-head",
+    onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
+  });
+  head.innerHTML = `
+    <div class="sec-title-row">
+      <span class="st-status-check">${studied ? "✓" : "○"}</span>
+      <h3 class="sec-title">${escapeHtml(item.title)}</h3>
+      <span class="sec-status-pill">${studied ? "✓ SPLNĚNO" : "KE STUDIU"}</span>
+    </div>
+    <div class="sec-meta-row">
+      ${badgesHtml(item.tags)}
+      <span class="sec-meta-item">${tasks.length} úkolů</span>
+      ${starsHtml(item.relevance || 5, 10, "compact")}
+    </div>
+  `;
+  card.appendChild(head);
+
+  if (tasks.length) {
+    const list = el("div", { className: "study-task-list" });
+    for (const t of tasks) {
+      const tS = t.technical_score ?? 1;
+      const lS = t.logical_score ?? 1;
+      const tRow = el("div", { className: "study-task-item" });
+      tRow.innerHTML = `
+        <div class="sti-top">
+          <span class="sti-num">Úkol ${t.num}</span>
+          <span class="sti-title">${escapeHtml(t.summary || t.title)}</span>
+          <div class="sti-scores">
+            ${scoreBarHtml(tS, 5, "tech")}
+            ${scoreBarHtml(lS, 5, "log")}
+          </div>
+        </div>
+      `;
+      list.appendChild(tRow);
+    }
+    card.appendChild(list);
+  }
+
+  return card;
+}
+
 export function showProgress() {
   const main = document.getElementById("main");
   main.className = "catalog progress-view";
@@ -825,18 +1053,6 @@ export function showProgress() {
   const level = progressLevel(pct);
   const vibe = progressVibe(pct, studiedN, total);
   const wrap = el("div", { className: "progress-view" });
-
-  // View toggle bar
-  const toggleRow = el("div", { className: "progress-view-toggle-row" });
-  toggleRow.innerHTML = `
-    <div class="view-toggle-group">
-      <button type="button" class="btn view-toggle-btn active" id="btnViewBoard">Deska (Study Board)</button>
-      <button type="button" class="btn view-toggle-btn" id="btnViewChecklist">Studijní plán 📋</button>
-    </div>
-  `;
-  wrap.appendChild(toggleRow);
-
-  toggleRow.querySelector("#btnViewChecklist")?.addEventListener("click", () => showChecklist());
 
   // Hero
   const hero = el("div", { className: "progress-hero" });
@@ -890,17 +1106,21 @@ export function showProgress() {
     </div>
   `;
 
-  const printProgressBtn = el("button", {
-    type: "button",
-    className: "btn primary btn-print-progress",
-    style: { marginTop: "14px" },
-    title: "Vytisknout studijní přehled s plněním (Ctrl+P)",
-    onClick: () => window.print(),
-  }, "Vytisknout přehled 🖨");
-  heroText.appendChild(printProgressBtn);
+  // 4 Cumulative Tier Print Buttons
+  const printGroup = el("div", { className: "print-tier-buttons" });
+  for (const t of TIERS) {
+    const btn = el("button", {
+      type: "button",
+      className: `btn ${t.level === 1 ? "primary" : "secondary"}`,
+      title: `${t.desc} (Print PDF)`,
+      onClick: () => printTier(t.level),
+    }, `Print: ${t.label} 🖨`);
+    printGroup.appendChild(btn);
+  }
+  heroText.appendChild(printGroup);
 
   hero.append(ring, heroText);
-  main.appendChild(hero);
+  wrap.appendChild(hero);
 
   // Week board: small tiles for lectures, larger for homework sets
   const board = el("div", { className: "study-board" });
@@ -944,7 +1164,7 @@ export function showProgress() {
     }
     board.appendChild(block);
   }
-  main.appendChild(board);
+  wrap.appendChild(board);
 
   // Milestones by studied %
   const milestones = [
@@ -973,7 +1193,7 @@ export function showProgress() {
     msRow.appendChild(chip);
   }
   msWrap.appendChild(msRow);
-  main.appendChild(msWrap);
+  wrap.appendChild(msWrap);
 
   const unstudiedEx = exercises
     .filter((it) => !done(it.id))
@@ -1009,18 +1229,13 @@ export function showProgress() {
       nextList.appendChild(row);
     }
     nextSec.appendChild(nextList);
-    main.appendChild(nextSec);
+    wrap.appendChild(nextSec);
   }
 
   const foot = el("div", { className: "progress-foot" });
   foot.appendChild(el("p", { className: "progress-hint" },
     "Progress uses the manual “Mark studied” button on each lecture/exercise (not auto-open). Saved in localStorage.",
   ));
-  foot.appendChild(el("button", {
-    type: "button",
-    className: "btn primary btn-print-progress",
-    onClick: () => window.print(),
-  }, "Vytisknout přehled 🖨"));
   foot.appendChild(el("button", {
     type: "button",
     className: "btn progress-reset",
@@ -1036,325 +1251,8 @@ export function showProgress() {
       }
     },
   }, "Reset progress"));
-  main.appendChild(foot);
-}
-
-function studyTile(item, studied, size) {
-  const tasks = item.kind === "exercise"
-    ? (state.exercises[item.path]?.task_count || state.exercises[item.path]?.tasks?.length || 0)
-    : 0;
-  const btn = el("div", {
-    className: `study-tile study-tile-${size} ${item.kind}${studied ? " studied" : ""}`,
-    title: `${item.title} — ${studied ? "✓ Studied" : "Not studied"}`,
-  });
-  btn.innerHTML = `
-    <div class="st-top">
-      <input type="checkbox" class="st-chk-box" ${studied ? "checked" : ""} title="Mark studied" />
-      <span class="st-title" style="cursor:pointer">${escapeHtml(item.title)}</span>
-    </div>
-    <div class="st-tags-row">
-      ${badgesHtml(item.tags)}
-    </div>
-    <div class="st-meta">
-      ${studied ? "<span class=\"st-check\">✓ SPLNĚNO</span>" : "<span class=\"st-pending\">☐ KE STUDIU</span>"}
-      ${tasks ? `<span class="st-tasks">${tasks} úkolů</span>` : ""}
-      <span class="st-rel">rel: ${item.relevance ?? "—"}/10</span>
-    </div>
-  `;
-
-  btn.querySelector(".st-title")?.addEventListener("click", () => {
-    window.__pcsNavigate?.({ kind: item.kind, id: item.id });
-  });
-
-  const chk = btn.querySelector(".st-chk-box");
-  chk?.addEventListener("change", (e) => {
-    e.stopPropagation();
-    if (e.target.checked) state.studied.add(item.id);
-    else state.studied.delete(item.id);
-    try {
-      localStorage.setItem("pcs-studied-v1", JSON.stringify(Array.from(state.studied)));
-    } catch { /* */ }
-    btn.classList.toggle("studied", e.target.checked);
-    const metaCheck = btn.querySelector(".st-check, .st-pending");
-    if (metaCheck) {
-      metaCheck.className = e.target.checked ? "st-check" : "st-pending";
-      metaCheck.textContent = e.target.checked ? "✓ SPLNĚNO" : "☐ KE STUDIU";
-    }
-  });
-
-  return btn;
-}
-
-function detailedExerciseCard(item, studied) {
-  const exData = state.exercises[item.path];
-  const tasks = exData?.tasks || [];
-
-  const card = el("div", {
-    className: `study-exercise-card${studied ? " studied" : ""}`,
-  });
-
-  const head = el("div", {
-    className: "sec-head",
-    onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
-  });
-  head.innerHTML = `
-    <div class="sec-title-row">
-      <span class="st-status-check">${studied ? "✓" : "○"}</span>
-      <h3 class="sec-title">${escapeHtml(item.title)}</h3>
-      <span class="sec-status-pill">${studied ? "✓ SPLNĚNO" : "KE STUDIU"}</span>
-    </div>
-    <div class="sec-meta-row">
-      ${badgesHtml(item.tags)}
-      <span class="sec-meta-item">${tasks.length} úkolů</span>
-      <span class="sec-meta-item">rel: ${item.relevance ?? "—"}/10</span>
-    </div>
-  `;
-  card.appendChild(head);
-
-  if (tasks.length) {
-    const list = el("div", { className: "study-task-list" });
-    for (const t of tasks) {
-      const tS = t.technical_score ?? 1;
-      const lS = t.logical_score ?? 1;
-      const tRow = el("div", { className: "study-task-item" });
-      tRow.innerHTML = `
-        <div class="sti-top">
-          <span class="sti-num">Úkol ${t.num}</span>
-          <span class="sti-title">${escapeHtml(t.summary || t.title)}</span>
-          <div class="sti-scores">
-            <span class="score-chip score-tech" title="Technická obtížnost (T): ${tS}/5 — ${escapeHtml(t.challenge_reason || "")}">T${tS} ${scoreBarsHtml(tS, 5)}</span>
-            <span class="score-chip score-log" title="Logická obtížnost (L): ${lS}/5 — ${escapeHtml(t.challenge_reason || "")}">L${lS} ${scoreBarsHtml(lS, 5)}</span>
-          </div>
-        </div>
-      `;
-      list.appendChild(tRow);
-    }
-    card.appendChild(list);
-  }
-
-  return card;
-}
-
-function progressVibe(pct, studiedN, total) {
-  if (total === 0) return "Catalog is empty — run the import tools first.";
-  if (studiedN <= 0) return "Nothing marked studied yet — open a topic and hit “Mark studied”.";
-  if (pct < 25) return "Warming up… mark Core lectures and homework as you finish them.";
-  if (pct < 50) return "Nice study streak — keep clearing homework sets.";
-  if (pct < 75) return "Solid log. Prioritize remaining Core + exercises.";
-  if (pct < 100) return "Almost done — finish the last unstudied tiles!";
-  return "Study log complete 🎉 Everything is marked studied.";
-}
-
-function progressLevel(pct) {
-  if (pct <= 0) return { badge: "Lv 0", name: "Hello, world" };
-  if (pct < 15) return { badge: "Lv 1", name: "REPL tourist" };
-  if (pct < 35) return { badge: "Lv 2", name: "Syntax settler" };
-  if (pct < 55) return { badge: "Lv 3", name: "Pythonic apprentice" };
-  if (pct < 75) return { badge: "Lv 4", name: "Path runner" };
-  if (pct < 100) return { badge: "Lv 5", name: "Almost legend" };
-  return { badge: "Lv MAX", name: "Course complete" };
-}
-
-let activeChecklistLvl = "all";
-
-function getItemLevel(item) {
-  const rel = (item.relevance || 5) * 10;
-  const tags = item.tags || [];
-  if (rel >= 90 || (item.weekNum <= 2 && tags.includes("Core"))) return "LVL1";
-  if (rel >= 70) return "LVL2";
-  if (rel >= 50) return "LVL3";
-  return "LVL4";
-}
-
-function isItemInLevel(item, lvl) {
-  if (lvl === "all" || lvl === "LVL4") return true;
-  const rel = (item.relevance || 5) * 10;
-  const tags = item.tags || [];
-  const isCore = item.weekNum <= 2 && tags.includes("Core");
-  if (lvl === "LVL1") return rel >= 90 || isCore;
-  if (lvl === "LVL2") return rel >= 70 || isCore;
-  if (lvl === "LVL3") return rel >= 50 || isCore;
-  return true;
-}
-
-function getItemBadges(item) {
-  const badges = [];
-  const rel = (item.relevance || 5) * 10;
-  if (rel >= 90) badges.push({ text: "MEGA EPIC", cls: "bg-mega-epic" });
-  else if (rel >= 70) badges.push({ text: "EPIC", cls: "bg-epic" });
-
-  const tags = item.tags || [];
-  if (tags.includes("WOW")) badges.push({ text: "INSIGHT", cls: "bg-insight" });
-  if (tags.includes("Legendary")) badges.push({ text: "CHALLENGE", cls: "bg-challenge" });
-
-  if (item.kind === "exercise") badges.push({ text: "PRACTICE", cls: "bg-practice" });
-  else badges.push({ text: "SHOWCASE", cls: "bg-showcase" });
-
-  return badges;
-}
-
-export function showChecklist() {
-  const main = document.getElementById("main");
-  if (!main) return;
-  main.replaceChildren();
-
-  const wrap = el("div", { className: "progress-view checklist-view" });
-
-  // View toggle bar
-  const toggleRow = el("div", { className: "progress-view-toggle-row" });
-  toggleRow.innerHTML = `
-    <div class="view-toggle-group">
-      <button type="button" class="btn view-toggle-btn" id="btnViewBoard">Deska (Study Board)</button>
-      <button type="button" class="btn view-toggle-btn active" id="btnViewChecklist">Studijní plán 📋</button>
-    </div>
-  `;
-  wrap.appendChild(toggleRow);
-
-  toggleRow.querySelector("#btnViewBoard")?.addEventListener("click", () => window.__pcsNavigate?.({ kind: "progress" }));
-
-  const allItems = state.items || [];
-  const lvl1Count = allItems.filter((it) => isItemInLevel(it, "LVL1")).length;
-  const lvl2Count = allItems.filter((it) => isItemInLevel(it, "LVL2")).length;
-  const lvl3Count = allItems.filter((it) => isItemInLevel(it, "LVL3")).length;
-
-  // Hero header with print actions & stats
-  const hero = el("div", { className: "checklist-hero" });
-  hero.innerHTML = `
-    <div class="chk-hero-title">
-      <h1>Studijní plán & 4-Úrovňový Checklist 📋</h1>
-      <p class="chk-hero-subtitle">Přehled materiálů Python kurzu rozdělený do 4 úrovní podle relevance a náročnosti.</p>
-    </div>
-    <div class="chk-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0;">
-      <div class="chk-stat-card" style="padding:10px 14px;background:var(--editor);border:1px solid var(--border);border-radius:var(--radius-md);text-align:center;">
-        <span style="font-size:20px;font-weight:800;color:var(--text-bright);">${allItems.length}</span>
-        <span style="display:block;font-size:10px;color:var(--text-faint);text-transform:uppercase;margin-top:2px;">Celkem témat</span>
-      </div>
-      <div class="chk-stat-card" style="padding:10px 14px;background:var(--editor);border:1px solid rgba(249,93,18,0.3);border-radius:var(--radius-md);text-align:center;">
-        <span style="font-size:20px;font-weight:800;color:#ea580c;">${lvl1Count}</span>
-        <span style="display:block;font-size:10px;color:#ea580c;text-transform:uppercase;margin-top:2px;">LVL1 Core (≥90%)</span>
-      </div>
-      <div class="chk-stat-card" style="padding:10px 14px;background:var(--editor);border:1px solid rgba(205,163,79,0.3);border-radius:var(--radius-md);text-align:center;">
-        <span style="font-size:20px;font-weight:800;color:#cda34f;">${lvl2Count}</span>
-        <span style="display:block;font-size:10px;color:#cda34f;text-transform:uppercase;margin-top:2px;">LVL2 Relevantní (≥70%)</span>
-      </div>
-      <div class="chk-stat-card" style="padding:10px 14px;background:var(--editor);border:1px solid rgba(78,201,176,0.3);border-radius:var(--radius-md);text-align:center;">
-        <span style="font-size:20px;font-weight:800;color:#4ec9b0;">${lvl3Count}</span>
-        <span style="display:block;font-size:10px;color:#4ec9b0;text-transform:uppercase;margin-top:2px;">LVL3 Podstatná (≥50%)</span>
-      </div>
-    </div>
-    <div class="chk-print-actions" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
-      <button type="button" class="btn primary btn-print-lvl1" title="Tisk LVL1">Vytisknout LVL1 (${lvl1Count} témat) 🖨</button>
-      <button type="button" class="btn secondary btn-print-lvl2" title="Tisk LVL2">Vytisknout LVL2 (${lvl2Count} témat) 🖨</button>
-      <button type="button" class="btn secondary btn-print-lvl3" title="Tisk LVL3">Vytisknout LVL3 (${lvl3Count} témat) 🖨</button>
-      <button type="button" class="btn secondary btn-print-all" title="Tisk vše">Vytisknout Vše (${allItems.length} témat) 🖨</button>
-    </div>
-  `;
-  wrap.appendChild(hero);
-
-  hero.querySelector(".btn-print-lvl1")?.addEventListener("click", () => { activeChecklistLvl = "LVL1"; showChecklist(); window.print(); });
-  hero.querySelector(".btn-print-lvl2")?.addEventListener("click", () => { activeChecklistLvl = "LVL2"; showChecklist(); window.print(); });
-  hero.querySelector(".btn-print-lvl3")?.addEventListener("click", () => { activeChecklistLvl = "LVL3"; showChecklist(); window.print(); });
-  hero.querySelector(".btn-print-all")?.addEventListener("click", () => { activeChecklistLvl = "all"; showChecklist(); window.print(); });
-
-  // Level Filter Tabs
-  const tabsRow = el("div", { className: "chk-lvl-tabs" });
-  const levels = [
-    { id: "all", label: `Všechny úrovně (${allItems.length})` },
-    { id: "LVL1", label: `LVL1 Core (${lvl1Count})` },
-    { id: "LVL2", label: `LVL2 Idiomy (${lvl2Count})` },
-    { id: "LVL3", label: `LVL3 OOP & System (${lvl3Count})` },
-    { id: "LVL4", label: `LVL4 Complete (${allItems.length})` },
-  ];
-
-  for (const lvl of levels) {
-    const btn = el("button", {
-      type: "button",
-      className: `chk-lvl-tab${activeChecklistLvl === lvl.id ? " active" : ""}`,
-      onClick: () => {
-        activeChecklistLvl = lvl.id;
-        showChecklist();
-      },
-    }, lvl.label);
-    tabsRow.appendChild(btn);
-  }
-  wrap.appendChild(tabsRow);
-
-  // Render Weeks & Cards
-  const board = el("div", { className: "chk-board" });
-
-  for (const week of state.course?.weeks || []) {
-    const weekItems = [...(week.lectures || []), ...(week.exercises || [])]
-      .map((it) => state.itemsById.get(it.id) || it)
-      .filter((it) => isItemInLevel(it, activeChecklistLvl));
-
-    if (!weekItems.length) continue;
-
-    const hasHighRel = weekItems.some((it) => ((it.relevance || 5) * 10) >= 90);
-    const wBlock = el("section", { className: `chk-week-block${hasHighRel ? " mega-cool-week" : ""}` });
-    const weekLvl = getItemLevel(weekItems[0]);
-
-    wBlock.innerHTML = `
-      <header class="chk-week-head">
-        <h2><span class="sw-num">${week.week}. TÝDEN</span> ${escapeHtml(week.title)} <span class="chk-lvl-badge">${weekLvl}</span></h2>
-      </header>
-    `;
-
-    const grid = el("div", { className: "chk-card-grid" });
-
-    for (const item of weekItems) {
-      const isDone = isStudied(item.id);
-      const relPct = (item.relevance || 5) * 10;
-      const badges = getItemBadges(item);
-      const isEpicGlow = relPct >= 90;
-      const isDimmed = relPct < 50;
-
-      const card = el("div", {
-        className: `chk-card${isDone ? " studied" : ""}${isEpicGlow ? " mega-epic-glow" : ""}${isDimmed ? " chk-card-dimmed" : ""}`,
-      });
-
-      card.innerHTML = `
-        <label class="chk-checkbox-label">
-          <input type="checkbox" class="chk-box" ${isDone ? "checked" : ""} />
-          <span class="chk-status-tag ${isDone ? "studied" : "pending"}">${isDone ? "✓ SPLNĚNO" : "☐ KE STUDIU"}</span>
-          <span class="chk-title">${escapeHtml(item.title)}</span>
-        </label>
-        <div class="chk-badges">
-          ${badges.map(b => `<span class="chk-badge ${b.cls}">${b.text}</span>`).join("")}
-        </div>
-        <div class="chk-sub">
-          <span>${item.kind === "exercise" ? "Exercise" : "Lecture"} · ${item.path || ""}</span>
-          <div class="chk-rel-wrap" title="Relevance: ${relPct}%">
-            <span class="chk-rel-num">${relPct}%</span>
-            <div class="chk-rel-bar"><div class="chk-rel-fill" style="width:${relPct}%"></div></div>
-          </div>
-        </div>
-      `;
-
-      // Checkbox click handler
-      const chkInput = card.querySelector(".chk-box");
-      const statusTag = card.querySelector(".chk-status-tag");
-      chkInput?.addEventListener("change", (e) => {
-        if (e.target.checked) state.studied.add(item.id);
-        else state.studied.delete(item.id);
-
-        try {
-          localStorage.setItem("pcs-studied-v1", JSON.stringify(Array.from(state.studied)));
-        } catch { /* */ }
-
-        card.classList.toggle("studied", e.target.checked);
-        if (statusTag) {
-          statusTag.className = `chk-status-tag ${e.target.checked ? "studied" : "pending"}`;
-          statusTag.textContent = e.target.checked ? "✓ SPLNĚNO" : "☐ KE STUDIU";
-        }
-      });
-
-      grid.appendChild(card);
-    }
-
-    wBlock.appendChild(grid);
-    board.appendChild(wBlock);
-  }
-
-  wrap.appendChild(board);
+  wrap.appendChild(foot);
   main.appendChild(wrap);
 }
+
+
