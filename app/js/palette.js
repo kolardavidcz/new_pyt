@@ -77,6 +77,7 @@ function updateResults(q) {
   const commands = [
     { kind: "cmd", title: "Go to Welcome", meta: "home", action: { kind: "home" } },
     { kind: "cmd", title: "Show Progress", meta: "progress", action: { kind: "progress" } },
+    { kind: "cmd", title: "Studijní plán (4 Úrovně) 📋", meta: "checklist plan study level", action: { kind: "checklist" } },
     { kind: "cmd", title: "Clear Filters", meta: "filters", action: { kind: "cmd-clear-filters" } },
     { kind: "cmd", title: "Toggle Theme", meta: "theme", action: { kind: "cmd-theme" } },
     { kind: "cmd", title: "Print / Export PDF (Tisk)", meta: "print pdf", action: { kind: "cmd-print" } },

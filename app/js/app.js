@@ -195,6 +195,11 @@ function bindChrome() {
       document.getElementById("filterText")?.focus();
       return;
     }
+    if (meta && e.shiftKey && e.key.toLowerCase() === "c") {
+      e.preventDefault();
+      setView("checklist");
+      return;
+    }
     if (e.key === "Escape") {
       if (isPaletteOpen()) {
         e.preventDefault();
@@ -313,6 +318,9 @@ function setView(view) {
   } else if (view === "progress") {
     if (title) title.textContent = "Progress";
     navigate({ kind: "progress" });
+  } else if (view === "checklist") {
+    if (title) title.textContent = "Studijní plán";
+    navigate({ kind: "checklist" });
   }
 
   // Ensure sidebar open when switching views
