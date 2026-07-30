@@ -1,0 +1,159 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Serializace – „marshal“
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Serializace – „marshal“</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">7</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Metody modulu „marshal“</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Co lze zamaršalovat</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Příklad – bajtkódobjekt</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Příklad – data</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Verze protokolu</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Poznámky</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2012-xx-xx</span></div><h1 class="lecture-title">Serializace – „marshal“</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    Prakticky jedinou úlohou modulu <strong>marshal</strong> je převod bajtkódu do/z předkompilovaných <em>pyc</em>-souborů.
+  </p>
+  <p>
+    Z těchto důvodů není jeho formát úmyslně ani nijak oficiálně dokumentovaný, aby někdo neměl tendenci používat ho místo modulů <a href="/materialy/python/serialization/pickle.xml">pickle</a>, respektive <a href="/materialy/python/serialization/shelve.xml">shelve</a>.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Metody modulu „marshal“"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Metody modulu „marshal“</h2></div><div class="section-body">
+
+  <p>
+    Modul <code>marshal</code> umí maršalovat a odmaršalovávat pomocí dvou skupin metod:
+  </p>
+  <ul>
+    <li>
+        metody pro převod mezi pythonovskou strukturou a jí odpovídajícím zamaršalovaným řetězcem:
+        <ul>
+            <li>
+                <code>mo = marshal.dumps(o)</code> – zamaršaluje hodnotu <em>o</em> do bajtového řetězce <em>mo</em>
+            </li>
+            <li>
+                <code>o = marshal.loads(mo)</code> – převede binární zamaršalovaný řetězec na jemu odpovídající pythonovskou hodnotu <em>o</em>
+            </li>
+        </ul>
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Všimněte si koncového <em>s</em> u metod pro práci s binárními řetězci.
+        </div></div>
+    </li>
+    <li>
+        metody pro čtení/zápis z/do proudu:
+        <ul>
+            <li>
+                <code>marshal.dump(o, file)</code> – zamaršaluje hodnotu <em>o</em> do binárního souboru <em>file</em>
+            </li>
+            <li>
+                <code>o = marshal.load(file)</code> – převede zamaršalovaný objekt z binárního souboru <em>file</em> na jemu odpovídající pythonovskou hodnotu <em>o</em>
+            </li>
+        </ul>
+    </li>
+  </ul>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        <em>file</em> je objekt typu <em>stream</em>, tj. <em>file = open('soubor', 'rwb')</em>, nikoli cesta k souboru.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        <em>dump</em>-metody mají nepovinný parametr <em>version</em> (verze maršalovacího protokolu), ale ten vám v podstatě může být ukradený.
+    </div></div></div>
+
+</div></section><section class="slide-section" id="id3" data-title="Co lze zamaršalovat"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Co lze zamaršalovat</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Zamaršalovat jde především:
+    </p>
+    <ul>
+        <li>objekt bajtkódu (který můžete získat např. pomocí funkce <a href="/materialy/python/bytecode/compile.xml?slajd=2">compile()</a>)</li>
+    </ul>
+    
+    <p class="enumerate">
+        Ale stejně tak se dají zamaršalovat i následující typy:
+    </p>
+    <ul>
+        <li>jednoduché typy – <em>bool</em>, <em>int</em>, <em>float</em>, <em>complex</em>, <em>str</em>, <em>bytes</em>, <em>bytearray</em></li>
+        <li>složené typy – <em>tuple</em>, <em>list</em>, <em>set</em>, <em>frozenset</em>, <em>dict</em> (ale pouze tehdy, pokud obsahují podporované typy)</li>
+        <li><em>sigletony</em> – <em>None</em>, <em>Ellipsis</em>, <em>StopIteration</em></li>
+    </ul>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Pokus o zamaršalování rekurzivního seznamu, množiny nebo slovníku způsobí nekonečnou smyčku.
+    </div></div>
+
+</div></section><section class="slide-section" id="id4" data-title="Příklad – bajtkódobjekt"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Příklad – bajtkódobjekt</h2></div><div class="section-body">
+
+  <p>
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; co = compile("xs = (1, 2, 3)", "", "exec")
+&gt;&gt;&gt; co
+    &lt;code object &lt;module&gt; at 0x00AD3C50, file "", line 1&gt;
+
+&gt;&gt;&gt; mo = marshal.dumps(co)
+&gt;&gt;&gt; mo
+    b'c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x03\x00\x00\x00@
+      \x00\x00\x00s\n\x00\x00\x00d\x04\x00Z\x00\x00d\x03\x00S(\x05\x00\x00
+      \x00i\x01\x00\x00\x00i\x02\x00\x00\x00i\x03\x00\x00\x00N(\x03\x00\x00
+      \x00i\x01\x00\x00\x00i\x02\x00\x00\x00i\x03\x00\x00\x00(\x01\x00\x00
+      \x00u\x02\x00\x00\x00xs(\x00\x00\x00\x00(\x00\x00\x00\x00(\x00\x00\x00
+      \x00u\x00\x00\x00\x00u\x08\x00\x00\x00&lt;module&gt;\x01\x00\x00\x00s\x00
+      \x00\x00\x00'
+
+&gt;&gt;&gt; o = marshal.loads(mo)
+    &lt;code object &lt;module&gt; at 0x00C32070, file "", line 1&gt;
+
+&gt;&gt;&gt; import dis
+&gt;&gt;&gt; dis.dis(o)
+  1           0 LOAD_CONST               4 ((1, 2, 3)) 
+              3 STORE_NAME               0 (xs) 
+              6 LOAD_CONST               3 (None) 
+              9 RETURN_VALUE         
+  </pre>
+
+</div></section><section class="slide-section" id="id5" data-title="Příklad – data"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Příklad – data</h2></div><div class="section-body">
+
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = (1, 2, 3)
+
+&gt;&gt;&gt; mo = marshal.dumps(xs)
+&gt;&gt;&gt; mo
+   b'(\x03\x00\x00\x00i\x01\x00\x00\x00i\x02\x00\x00\x00i\x03\x00\x00\x00'
+
+&gt;&gt;&gt; marshal.loads(mo)
+   (1, 2, 3)
+  </pre>
+
+</div></section><section class="slide-section" id="id6" data-title="Verze protokolu"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Verze protokolu</h2></div><div class="section-body">
+
+  <p>
+    Toho času (Python 3.2) je maršalovací protokol již ve své třetí verzi:
+  </p>
+  <ul>
+    <li>
+        formát <strong>0</strong> – historický formát
+    </li>
+    <li>
+        formát <strong>1</strong> – internované řetězce jsou sdílené 
+    </li>
+    <li>
+        formát <strong>2</strong> – používá binární formát pro zachycení reálných čísel
+    </li>
+  </ul>
+  <p>
+    Verzi formátu můžete zjistit dotazem na <code>marshal.version</code>.
+  </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Poznámky"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Poznámky</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Maršalovací formát není nijak zabezpečen proti nebezpečným datům =&gt;
+    <h1 class="security">Nikdy neodmaršalovávejte cizí data!</h1>
+  </p>
+  
+  <p class="enumerate">
+    A vůbec – modul <em>marshal</em> je skutečně určen jen a pouze pro práci se soubory <em>*.pyc</em>, takže ho radši vážně nezkoušejte nasadit někde jinde.
+  </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 7 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

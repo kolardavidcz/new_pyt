@@ -1,0 +1,243 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>„Abstract Base Classes“
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — „Abstract Base Classes“</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">9</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Jak na to bez ABC I</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Jak na to bez ABC II</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Metatřída „ABCMeta“ a dekorátor „@abstractmethod“</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Kombinace abstraktního a klasických dekorátorů I</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Kombinace abstraktního a klasických dekorátorů II</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Poznámka – „register()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Užití ABC I</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Užití ABC II</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2016-04-14</span></div><h1 class="lecture-title">„Abstract Base Classes“</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        <em>Abstract Base Classes</em> (zkráceně a velmi často <em>ABC</em>) je speciální druh tříd (a také <a href="?slajd=8">skupina specifických tříd</a> ve standardní knihovně), které se vyznačují mimo jiné následujícím:
+    </p>
+    <ul>
+        <li>
+            <a href="?slajd=4">není je možno přímo instanciovat</a>, ale je z nich možno normálně dědit;
+        </li>
+        <li>
+            lze na nich definovat tzv. <strong>abstraktní atributy</strong>, které třídy, jež jsou jejich potomky, musí implementovat, jinak při pokusu o jejich instanciaci obdržíme výjimku;
+        </li>
+        <li>
+            umožňují <a href="?slajd=6">se označit za předky</a> i tříd, které nevznikly jejich poděděním.
+        </li>
+    </ul>
+    <p>
+        Jejich nejprůhlednějším použitím bude asi bod dvě – díky němu totiž <em>ABC</em>s umožňují přesunout kontrolu úplnosti API již do chvíle instanciace a nikoli až do chvíle pokusu o zavolání nenaimplementovaného atributu. (Příklad na dalším slajdu toto snad osvětlí.) Ovšem to není ten <a href="?slajd=8">hlavní důvod</a>, proč byly do jazyka zavedeny.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        PS: Z jiných jazyků konceptu <em>ABC</em> odpovídají pojmy <em>interface</em> nebo <em>trate</em>. Podědit z <em>ABC</em> pak znamená <strong>přijmout (a implementovat) daný kontrakt</strong>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id2" data-title="Jak na to bez ABC I"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Jak na to bez ABC I</h2></div><div class="section-body">
+
+    <p>
+        Při zavedení hierarchie tříd..
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; class Rodič:
+...     def metoda1(self):
+...         raise NotImplementedError()
+...     def metoda2(self):
+...         raise NotImplementedError()
+
+&gt;&gt;&gt; class Potomek(Rodič):
+...     def metoda1(self):
+...         print('Ahoj!')
+    </pre>
+    <p>
+        ..můžeme na potomcích vesele volat poděděné metody:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; p = Potomek()
+
+&gt;&gt;&gt; hasattr(p, 'metoda1')
+0: True
+&gt;&gt;&gt; p.metoda1()
+Ahoj!
+
+&gt;&gt;&gt; hasattr(p, 'metoda2')
+1: True
+&gt;&gt;&gt; p.metoda2()
+Traceback (most recent call last):
+  File "&lt;pyshell#18&gt;", line 1, in &lt;module&gt;
+    p.metoda2()
+  File "&lt;pyshell#10&gt;", line 7, in metoda2
+    raise NotImplementedError()
+NotImplementedError
+    </pre>
+    <p>
+        <em>Potomek</em> sice podědil po <em>Rodiči</em> dvě metody, ale naimplementoval pouze jednu a my se to nedozvíme, dokud se ji nepokusíme zavolat. To není moc příjemné.
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Jak na to bez ABC II"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Jak na to bez ABC II</h2></div><div class="section-body">
+
+    <p>
+        Ba co víc, můžeme si pochopitelně instanciovat přímo <em>Rodiče</em>, jako by se nechumelilo, byť samozřejmě nemá chudák co dělat, protože právě to byl koneckonců i jeho účel:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; class Rodič:
+...     def metoda1(self):
+...         raise NotImplementedError()
+...     def metoda2(self):
+...         raise NotImplementedError()
+
+&gt;&gt;&gt; r = Rodič()
+
+&gt;&gt;&gt; r.metoda1()
+Traceback (most recent call last):
+  File "&lt;pyshell#20&gt;", line 1, in &lt;module&gt;
+    r.metoda1()
+  File "&lt;pyshell#10&gt;", line 4, in metoda1
+    raise NotImplementedError()
+NotImplementedError
+    </pre>
+
+</div></section><section class="slide-section" id="id4" data-title="Metatřída „ABCMeta“ a dekorátor „@abstractmethod“"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Metatřída „ABCMeta“ a dekorátor „@abstractmethod“</h2></div><div class="section-body">
+
+    <p>
+        Ale díky <em>ABC</em>s to jde snadno zařídit i jinak:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; from abc import ABCMeta, abstractmethod
+&gt;&gt;&gt; class Rodič(metaclass=ABCMeta):
+...     
+...     @abstractmethod
+...     def metoda1(self):
+...         raise NotImplementedError()
+...     
+...     @abstractmethod
+...     def metoda2(self):
+...         raise NotImplementedError()
+    </pre>
+    <p>
+        Nyní už nejen že nenainstancujeme <em>Rodiče</em>..
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; r = Rodič()
+Traceback (most recent call last):
+  File "&lt;pyshell#23&gt;", line 1, in &lt;module&gt;
+    r = Rodič()
+TypeError: Can't instantiate abstract class Rodič with abstract methods metoda1, metoda2
+    </pre>
+    <p>
+        ..ale dokonce ani potomka, pokud bude v API chybět implementace vyžadovaných metod:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; class Potomek(Rodič):
+...     
+...     def metoda1(self):
+...         print('Ahoj!')
+
+&gt;&gt;&gt; p = Potomek()
+Traceback (most recent call last):
+  File "&lt;pyshell#25&gt;", line 1, in &lt;module&gt;
+    p = Potomek()
+TypeError: Can't instantiate abstract class Potomek with abstract methods metoda2
+    </pre>
+
+</div></section><section class="slide-section" id="id5" data-title="Kombinace abstraktního a klasických dekorátorů I"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Kombinace abstraktního a klasických dekorátorů I</h2></div><div class="section-body">
+
+    <p>
+        Samozřejmě by to celé nemělo moc smysl, kdyby to nespolupracovalo s ostatními třídními dekorátory, ale (naštěstí) spolupracuje. Jen by dekorátor <em>@abstractmethod</em> měl být vždy poslední (nebo vlastně první), aby bezpečně tušil, která zrovna bije:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        class C(metaclass=ABCMeta):
+
+            # klasické třídní metody
+            @abstractmethod
+            def my_abstract_method(self, ...):
+                ...
+            @classmethod
+            @abstractmethod
+            def my_abstract_classmethod(cls, ...):
+                ...
+            @staticmethod
+            @abstractmethod
+            def my_abstract_staticmethod(...):
+                ...
+   </pre>
+   <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Přímo podle dokumentace.
+   </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="Kombinace abstraktního a klasických dekorátorů II"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Kombinace abstraktního a klasických dekorátorů II</h2></div><div class="section-body">
+
+    <p>
+        Tato spolupráce samozřejmě platí i pro <a href="descriptors.xml">deskriptory</a>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        class C(metaclass=ABCMeta):
+
+            # deskriptor klasicky
+            @abstractmethod
+            def _get_x(self):
+                ...
+            @abstractmethod
+            def _set_x(self, val):
+                ...
+            x = property(_get_x, _set_x)
+
+            # deskriptor pomocí dekorátorů
+            @property
+            @abstractmethod
+            def my_abstract_property(self):
+                ...
+            @my_abstract_property.setter
+            @abstractmethod
+            def my_abstract_property(self, val):
+                ...
+   </pre>
+   <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Přímo podle dokumentace.
+   </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Poznámka – „register()“"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Poznámka – „register()“</h2></div><div class="section-body">
+
+    <p>
+        <em>ABC</em>s můžete využít ještě jedním způsobem – v případě potřeby je můžete zaregistrovat jako předka pro libovolnou jinou třídu. Tím se sice dostanou do jejích předků z hlediska introspekčních funkcí <em>issubclass()</em> a <em>isinstance()</em>, ale příslušné abstraktní metody nejsou ani dostupné, ani vyžadované:
+    </p>
+    <example lang="python" src="_files/register.py"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Podobnou funkcionalitu na úrovni třídy bez potřeby registrace zajistí i metoda <em>__subclasshook__()</em>, ale to už se podívejte <a href="https://docs.python.org/3/library/abc.html" class="external">do dokumentace</a>.
+    </div></div>
+    <p>
+        Kdy se to hodí? Třeba když váš objekt splňuje API nějaké <em>ABC</em>, ale přitom sám není napsán v Python'u (což je mimo jiné případ většiny základních pythoních typů). 
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Ostatně stačí se podívat do modulu <em>_collections_abc.py</em> ve standardní knihovně.
+    </div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="Užití ABC I"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Užití ABC I</h2></div><div class="section-body">
+
+    <p>
+        <em>ABC</em>s tedy pomáhají vyrábět API, kterého se všichni musí držet – „zpola upečená“ implementace se totiž prozradí hned při prvním pokusu o instanciaci dané třídy.
+    </p>
+    <p>
+        Tuto vlastnost využijete nejspíše při práci na velkém projektu a v týmu, případně když váš program budou používat jiní jako knihovnu nebo když budete třeba vyrábět typy dynamicky za běhu programu.
+    </p>
+
+</div></section><section class="slide-section" id="id9" data-title="Užití ABC II"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Užití ABC II</h2></div><div class="section-body">
+
+    <p>
+        Ale možná ještě zajímavější je, že Python poskytuje doslova armádu předpřipravených (abstraktních) tříd, které takto na abstraktní úrovni definují atributy, které musí splňovat objekty, které se mají chovat jako užitečné (vestavěné) typy.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Tak třeba v modulu <em>collections.abc</em> se mimo jiné schovává předpis pro objekty, které se mají chovat jako funkce – ty totiž musí implementovat metodu <em>__call__()</em> a ta je nepřekvapivě na (abstraktní) třídě <em>Callable</em> definována jako abstraktní.
+    </div></div>
+    <p>
+        Ale o tom všem až ve <a href="">vlastní kapitole</a>.
+    </p>
+    <p>
+        PS: Vtipné je, že když čtete <a href="https://python.org/dev/peps/pep-3119/" class="external">PEP 3119</a>, tak zjistíte, že právě tohle byl důvod, proč se <em>ABC</em>s v Python'u vůbec zavedly. Že je ve výsledku můžete používat i pro asi trochu jiné účely, je už jen vedlejší efekt ^_~
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 9 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

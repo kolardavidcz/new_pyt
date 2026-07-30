@@ -1,0 +1,409 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>NumPy – operace s polemi
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — NumPy – operace s polemi</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">17</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">I. Binární (a unární) operace mezi poli</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Další příklady se skaláry</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Složitější typy</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">II. Logické operace</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Po prvcích</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Po polích</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Příklad</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">III. Matematické funkce</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Příklady</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">IV. Další operace</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Sumace – „sum()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">Sumace – „cumsum()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">Extrémy – „min()“, „max()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">Řazení – „sort()“, „argsort()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">Statistika</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">V. Komplexnější příklad</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2017-04-23</span></div><h1 class="lecture-title">NumPy – operace s polemi</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Operace s <strong>(vícerozměrnými) poli</strong> (tedy objekty typu <strong><code>ndarray</code></strong>) v <em>NumPy</em> jsou velmi důležité a také velmi rozmanité. Ruku v ruce s výřezy máme k dispozici velmi početnou armádu metod, které slouží k úpravě již existujících polí/matic a výběru nějakých jejich podmnožin.
+    </p>
+    <p>
+        V dalším si ukážeme pár základních příkladů na práci s numpyovskými polemi, ale jako vždy – <a href="https://docs.scipy.org/doc/numpy-1.14.2/reference/routines.html" class="external">knihovna <em>Numpy</em> je příliš rozsáhlá</a>, abychom zde probrali všechno, a navíc v žádném případě nemůžu tvrdit, že bych ji vůbec nějak ovládal…
+    </p>
+    <p>
+        PS: V příkladech budu používat modul <em>numpy</em> naimportovaný podle zvyku jako:
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            import numpy as np
+        </pre>
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="I. Binární (a unární) operace mezi poli"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">I. Binární (a unární) operace mezi poli</h2></div><div class="section-body">
+
+    <p>
+        Jak <a href="overview.xml?slajd=4">už jsem zmiňoval</a> v přehledové přednášce, unární a <strong>binární operace nad poli jsou v základu prováděny „po složkách“</strong>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # základní pole
+        &gt;&gt;&gt; a = np.array([[1, 2, 3], [4, 5, 6]])
+        
+        # mínus pole
+        &gt;&gt;&gt; -a
+        array([[-1, -2, -3],
+               [-4, -5, -6]])
+        
+        # násobení pole skalárem
+        &gt;&gt;&gt; 3 * a
+        array([[ 3,  6,  9],
+               [12, 15, 18]])
+        
+        # sčítání polí
+        &gt;&gt;&gt; a + a
+        array([[ 2,  4,  6],
+               [ 8, 10, 12]])
+    </pre>
+    <p>
+        Zatímco u násobení pole skalárem a sčítání či odčítání polí (stejného tvaru) to nikoho nepřekvapí, takové násobení už nemá s maticovým vůbec nic společného a musíte na to při práci pamatovat:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; a * a
+        array([[ 1,  4,  9],
+               [16, 25, 36]])
+    </pre>
+
+</div></section><section class="slide-section" id="id3" data-title="Další příklady se skaláry"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Další příklady se skaláry</h2></div><div class="section-body">
+
+    <p>
+        Se skaláry se dá nepřekvapivě „vyřádit“ mnohem více:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; a = np.arange(6).reshape(2, 3)
+        &gt;&gt;&gt; a
+        array([[0, 1, 2],
+               [3, 4, 5]])
+        
+        &gt;&gt;&gt; a + 1
+        array([[1, 2, 3],
+               [4, 5, 6]])
+        
+        &gt;&gt;&gt; 2**a
+        array([[ 1,  2,  4],
+               [ 8, 16, 32]])
+        
+        &gt;&gt;&gt; 2**(a + 1)
+        array([[ 2,  4,  8],
+               [16, 32, 64]])
+        
+        &gt;&gt;&gt; 2**a - 1
+        array([[ 0,  1,  3],
+               [ 7, 15, 31]])
+    </pre>
+
+</div></section><section class="slide-section" id="id4" data-title="Složitější typy"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Složitější typy</h2></div><div class="section-body">
+
+    <p>
+        <em>Numpy</em> ale dokáže i zkonvertovat (a případně též <a href="broadcasting.xml">zbroadcastovat</a>) i složitější pythoní typy, třebas n-tice a seznamy:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; a = np.arange(6).reshape(2, 3)
+        &gt;&gt;&gt; a
+        array([[0, 1, 2],
+               [3, 4, 5]])
+        
+        # Přičtení seznamu zprava:
+        &gt;&gt;&gt; a + [1, 1, 1]
+        array([[1, 2, 3],
+               [4, 5, 6]])
+        
+        # Násobení n-ticí zleva:
+        &gt;&gt;&gt; (2,) * a
+        array([[ 0,  2,  4],
+               [ 6,  8, 10]])
+    </pre>
+
+</div></section><section class="slide-section" id="id5" data-title="II. Logické operace"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">II. Logické operace</h2></div><div class="section-body">
+
+    <p>
+        U logických operací je třeba dát pozor, zda požadujeme jako výsledek:
+    </p>
+    <ul>
+        <li>
+            <a href="?slajd=6">pole</a>, jehož prvky budou příslušným logickým složením prvků vstupních polí (tedy v podstatě binární operace nad prvky pole);
+        </li>
+        <li>
+            <a href="?slajd=7">logickou hodnotu</a>, která je výsledkem porovnání vstupních polí jako celku.
+        </li>
+    </ul>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Následující příklady podle <a href="http://www.scipy-lectures.org/intro/numpy/operations.html" class="external">dokumentace ke SciPy</a>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="Po prvcích"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Po prvcích</h2></div><div class="section-body">
+
+    <p>
+        K dispozici máme celou armádu pythoních <a href="/materialy/python/types/boolean.xml?slajd=3">porovnávacích operátorů</a> plus spoustu dedikovaných logických funkcí:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; a = np.array([1, 1, 0, 0], dtype=bool)
+        &gt;&gt;&gt; b = np.array([1, 0, 1, 0], dtype=bool)
+        
+        # operátor
+        &gt;&gt;&gt; a == b
+        array([ True, False, False,  True])
+        
+        # logická funkce
+        &gt;&gt;&gt; np.logical_or(a, b)
+        array([ True,  True,  True, False])
+    </pre>
+
+</div></section><section class="slide-section" id="id7" data-title="Po polích"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Po polích</h2></div><div class="section-body">
+
+    <p>
+        Většina <a href="https://docs.scipy.org/doc/numpy-1.14.2/reference/routines.logic.html" class="external">dostupných logických funkcí</a> ale operuje nad poli jako celkem:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; a = np.array([1, 2, 0, 4])
+        &gt;&gt;&gt; b = np.array([1, 2, 3, 4])
+        
+        # srovnání polí
+        &gt;&gt;&gt; np.array_equal(a, b)
+        False
+        
+        # redukce pole podle pravdivostní hodnoty prvků
+        &gt;&gt;&gt; np.all(a)
+        False
+        &gt;&gt;&gt; np.any(a)
+        True
+    </pre>
+
+</div></section><section class="slide-section" id="id8" data-title="Příklad"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Příklad</h2></div><div class="section-body">
+
+    <p>
+        Operace se dají dohromady poskládat do výrazně složitějších výroků:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; a = np.array([1, 2, 3, 2])
+        &gt;&gt;&gt; b = np.array([2, 2, 3, 2])
+        &gt;&gt;&gt; c = np.array([6, 4, 4, 5])
+        &gt;&gt;&gt; ((a &lt;= b) &amp; (b &lt;= c)).all()
+        True
+        
+        # Protože:
+        &gt;&gt;&gt; a &lt;= b
+        array([ True,  True,  True,  True])
+        &gt;&gt;&gt; b &lt;= c
+        array([ True,  True,  True,  True])
+        &gt;&gt;&gt; (a &lt;= b) &amp; (b &lt;= c)
+        array([ True,  True,  True,  True])
+    </pre>
+
+</div></section><section class="slide-section" id="id9" data-title="III. Matematické funkce"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">III. Matematické funkce</h2></div><div class="section-body">
+
+    <p>
+        <em>Numpy</em> obsahuje kromě základních matematických konstant..
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; np.pi
+        3.141592653589793
+        &gt;&gt;&gt; np.e
+        2.718281828459045
+    </pre>
+    <p>
+        ..i <a href="https://docs.scipy.org/doc/numpy-1.14.2/reference/routines.math.html" class="external">spoustu matematických metod</a>. Mezi ty patří jak klasické funkce (trigonometrické funkce, transcendetní funkce…), tak také armáda funkcí specializovaných na konkrétní výpočetní oblast (lineární algebra, Fourierova transformace…).
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        V rámci <em>Numpy</em> se jim říká <strong>univerzální funkce</strong> (tzv. <a href="https://docs.scipy.org/doc/numpy-1.14.2/reference/ufuncs.html" class="external"><code>ufunc</code></a>) a jedná se o – typicky vektorizované – funkce operující nad poli metodou „prvek po prvku“ a splňující jisté základní požadavky (jako třebas <a href="broadcasting.xml">broadcasting</a> a <em>typovou konverzi</em> v závislosti na vstupech a výstupech).
+    </div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="Příklady"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Příklady</h2></div><div class="section-body">
+
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # „běžná“ matematika
+        &gt;&gt;&gt; x = np.array([0, np.pi / 2, np.pi])
+        &gt;&gt;&gt; x
+        array([0.        , 1.57079633, 3.14159265])
+        
+        &gt;&gt;&gt; np.sin(x)
+        array([0.0000000e+00, 1.0000000e+00, 1.2246468e-16])
+        
+        &gt;&gt;&gt; np.log(x)
+        __main__:1: RuntimeWarning: divide by zero encountered in log
+        array([      -inf, 0.45158271, 1.14472989])
+        &gt;&gt;&gt; np.log(0)
+        -inf
+    </pre>
+    <br>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # lineární algebra
+        &gt;&gt;&gt; np.linalg.inv([[1, 1], [1, 0]])
+        array([[ 0.,  1.],
+               [ 1., -1.]])
+    </pre>
+    <br>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # komplexní čísla
+        &gt;&gt;&gt; np.conjugate(1+2j)
+        (1-2j)
+    </pre>
+    <br>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # mnohočleny
+        &gt;&gt;&gt; from numpy.polynomial import Polynomial as P
+        
+        # (x-1)(x-2)(x-3)
+        &gt;&gt;&gt; p = P.fromroots([1, 2, 3])
+        # x^3 - 6x^2 + 11x - 6 (ale v opačném pořadí!)
+        &gt;&gt;&gt; p
+        Polynomial([-6., 11., -6.,  1.], domain=[-1.,  1.], window=[-1.,  1.])
+   </pre>
+
+</div></section><section class="slide-section" id="id11" data-title="IV. Další operace"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">IV. Další operace</h2></div><div class="section-body">
+
+    <p>
+        Už jsem zmiňoval, že <a href="https://docs.scipy.org/doc/numpy-1.14.2/reference/routines.html" class="external">knihovna <em>Numpy</em> je obrovská</a> (a navíc často pěkně zmatená), ale přesto si ještě pár dalších základních operací ukážeme.
+    </p>
+    <p>
+        Především půjde o další <em>redukující operace</em>, které převádí vstupní pole na jeden výstupní prvek (jako jsou sumace, extrémy či základní statistické ukazatele).
+    </p>
+
+</div></section><section class="slide-section" id="id12" data-title="Sumace – „sum()“"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Sumace – „sum()“</h2></div><div class="section-body">
+
+    <p>
+        Při <strong>redukci sčítáním</strong> si především můžete vybrat, zda sečtete všechny prvky dohromady, nebo zda provedete sčítání prvků pouze po vybraných osách:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; x = np.array([[1,2], [3,4]])
+        &gt;&gt;&gt; x
+        array([[1, 2],
+               [3, 4]])
+        
+        # celkové sčítání
+        &gt;&gt;&gt; np.sum(x)
+        10
+        
+        # sčítání po osách
+        &gt;&gt;&gt; np.sum(x, axis=0)
+        array([4, 6])
+        &gt;&gt;&gt; np.sum(x, axis=1)
+        array([3, 7])
+    </pre>
+
+</div></section><section class="slide-section" id="id13" data-title="Sumace – „cumsum()“"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">Sumace – „cumsum()“</h2></div><div class="section-body">
+
+    <p>
+        Za zmínku stojí též funkce <em>cumsum()</em> pro kumulativní sčítání nejen ve vybrané ose:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; x = np.arange(12).reshape(3,4)
+        &gt;&gt;&gt; x
+        array([[ 0,  1,  2,  3],
+               [ 4,  5,  6,  7],
+               [ 8,  9, 10, 11]])
+        
+        # přes osy
+        &gt;&gt;&gt; x.cumsum(axis=0)
+        array([[ 0,  1,  2,  3],
+               [ 4,  6,  8, 10],
+               [12, 15, 18, 21]])
+        &gt;&gt;&gt; x.cumsum(axis=1)
+        array([[ 0,  1,  3,  6],
+               [ 4,  9, 15, 22],
+               [ 8, 17, 27, 38]])
+        
+        # PS: výchozí chování
+        &gt;&gt;&gt; x.cumsum()
+        array([ 0,  1,  3,  6, 10, 15, 21, 28, 36, 45, 55, 66])
+    </pre>
+
+</div></section><section class="slide-section" id="id14" data-title="Extrémy – „min()“, „max()“"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">Extrémy – „min()“, „max()“</h2></div><div class="section-body">
+
+    <p>
+        Stejně jako u <a href="?slajd=12">redukce sčítáním</a>, <strong>hledání extrémů</strong> může probíhat přes celé pole nebo jen ve vybraných osách:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; x = np.array([[1,2], [3,4]])
+        &gt;&gt;&gt; x
+        array([[1, 2],
+               [3, 4]])
+        
+        # maximum přes celé pole a jeho index
+        &gt;&gt;&gt; np.max(x)
+        4
+        &gt;&gt;&gt; np.argmax(x)
+        3
+        
+        # maximum po osách
+        &gt;&gt;&gt; np.max(x, axis=0)
+        array([3, 4])
+        &gt;&gt;&gt; np.max(x, axis=1)
+        array([2, 4])
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        A podobně samozřejmě i pro <em>min()</em> a <em>argmin()</em>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id15" data-title="Řazení – „sort()“, „argsort()“"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">Řazení – „sort()“, „argsort()“</h2></div><div class="section-body">
+
+    <p>
+        Prvky v polích je samozřejmě též možno i řadit, a to buď klasicky podle jejich hodnot..
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; a = np.array([[4, 3, 5], [1, 2, 1]])
+        &gt;&gt;&gt; a
+        array([[4, 3, 5],
+               [1, 2, 1]])
+
+        # výchozí řazení po řádcích
+        &gt;&gt;&gt; np.sort(a)
+        array([[3, 4, 5],
+               [1, 1, 2]])
+
+        # vnucené řazení podle jiné osy (zde po sloupcích)
+        &gt;&gt;&gt; np.sort(a, axis=0)
+        array([[1, 2, 1],
+               [4, 3, 5]])
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Také můžete zavolat metodu <em>sort()</em> přímo na poli, ale pak proběhne řazení v místě (tj. ono pole bude mít seřazené prvky a originál ztratíte).
+    </div></div>
+    <p>
+        ..nebo kapku neklasicky pomocí jejich indexů (ať už je získáte odkudkoli; zde z toho samého pole):
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # vstupní pole k seřazení
+        &gt;&gt;&gt; a = np.array([4, 3, 1, 2])
+        
+        # indexy seřazených prvků
+        &gt;&gt;&gt; j = np.argsort(a)
+        &gt;&gt;&gt; j
+        array([2, 3, 1, 0])
+        
+        # výpis seřazených prvků podle jejich indexů
+        &gt;&gt;&gt; a[j]
+        array([1, 2, 3, 4])
+    </pre>
+
+</div></section><section class="slide-section" id="id16" data-title="Statistika"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">Statistika</h2></div><div class="section-body">
+
+    <p>
+        Statistika je samozřejmě velmi rozsáhlá oblast, tak jen drobná ochutnávka:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; x = np.array([1, 2, 3, 1])
+        
+        # průměr
+        &gt;&gt;&gt; x.mean()
+        1.75
+        
+        # medián
+        &gt;&gt;&gt; np.median(x)
+        1.5
+        
+        # standardní deviace
+        &gt;&gt;&gt; x.std()
+        0.82915619758885
+    </pre>
+    <p>
+        Za zapamatování stojí především „klasická“ numpyovská nekonzistence ve volání dostupných metod…
+    </p>
+
+</div></section><section class="slide-section" id="id17" data-title="V. Komplexnější příklad"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">V. Komplexnější příklad</h2></div><div class="section-body">
+
+    <p>
+        Pro zajímavost komplexnější příklad z dokumentace – výpočet Mandelbrotovy množiny ne úplně triviálním postupem:
+    </p>
+    <example lang="python" src="_files/mandelbrot/mandelbrot.py"></example>
+    <img src="_files/mandelbrot/mandelbrot.png" width="640" height="480" alt="Mandelbrotova množina">
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 17 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

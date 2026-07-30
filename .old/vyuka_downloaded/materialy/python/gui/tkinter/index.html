@@ -1,0 +1,218 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>GUI – Tkinter
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — GUI – Tkinter</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">12</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">PS: Kontrola instalace</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Vytvoření okna aplikace</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Vlastnosti okna aplikace</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Manažery vzhledu</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Příklad – obrázek v okně</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Poznámka – vlastnosti objektů</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Příklad – složitější aplikace (vzhled)</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Příklad – složitější aplikace (kód)</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Vlastnosti GUI-komponent</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Další „widžety“ a jejich styly</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Na závěr</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2014-01-03</span></div><h1 class="lecture-title">GUI – Tkinter</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Vzhledem k době svého vzniku obsahuje sice většina pythoních distribucí vestavěný nástroj pro tvorbu <em>grafických uživatelských rozhraní</em> (<em>GUI</em>), ovšem tímto nástrojem je nezaslouženou negativitou provázený <strong>Tkinter</strong> aneb pythoní nadstavba nad nástrojem <strong>Tk</strong>.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Je pravda, že sám Guido van Rossum kdysi prohlásil, že kdyby <em>wxPython (wxWidgets/wxWindows)</em> existoval dříve, byl by dnes v Python'u zahrnut on, ale není tomu tak. Na druhou stranu se <em>Tk</em> s verzí 8.0 (nativní vzhled) a 8.5 (podpora grafických témat) přesunulo svým vzhledem z počítačové prehistorie do moderní doby, takže si s ním ve většině případů bohatě vystačíte. V základní instalaci ovšem chybí všechny novější komponenty typu <em>zobrazovač HTML</em> a podobně, takže s tím musíte počítat.
+    </div></div>
+    <p>
+        Podpora <em>Tkinter</em>'u externími nástroji není zrovna oslnivá, ale pokud chcete distribuovat pythoní programy s GUI bez minima externích závislostí, je to jediná zaručená volba. (Nehledě na to, že všechny ostatní nástroje mají svůj díl problémů s fungováním na všech platformách.)
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="PS: Kontrola instalace"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">PS: Kontrola instalace</h2></div><div class="section-body">
+
+    <p>
+        Pod Windows se při běžné instalaci Python'u nainstaluje i podpora pro <em>tkinter</em>, ale na ostatních platformách je často v samostatném balíčku. Pro ověření korektní instalace stačí zavolat:
+    </p>
+    <pre class="brush: cmd; gutter: false; toolbar: false; ">
+        python -m tkinter
+    </pre>
+    <p>
+        Při funkční instalaci se tím otevře minimalistické testovací GUI.
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Vytvoření okna aplikace"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Vytvoření okna aplikace</h2></div><div class="section-body">
+
+    <example src="_files/okno.py" lang="python"></example>
+    <br>
+    <img src="_files/okno.png" width="208" height="227" alt="screenshot okna">
+    <p>
+        Založení okna aplikace je standardní – vytvoříme příslušný objekt (potomek <code>Tk</code>) a spustíme hlavní zpracovávací smyčku GUI-aplikací (tzv. <em>event loop</em>). Tato smyčka stále běží až do ukončení aplikace (ať už korektním uzavřením nebo havárií) a stará se o zpracování událostí, ke kterým v aplikaci dojde.
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Vlastnosti okna aplikace"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Vlastnosti okna aplikace</h2></div><div class="section-body">
+
+    <p>
+        Založit okno GUI-aplikace je tedy velmi jednoduché, a přitom toto okno už umí prakticky vše, co po něm běžně potřebujeme. Má ovšem výchozí název („tk“) a rozměr (čtverec o hraně ~200 pixelů). Toto vše – i mnoho dalšího – se dá pomocí dalších metod (objektu okna) změnit:
+    </p>
+    <ul>
+        <li>
+            <code>title("NÁZEV OKNA")</code> – nastaví název okna aplikace na uvedený řetězec;
+        </li>
+        <li>
+            <code>geometry("400x200+300+100")</code> – nastaví rozměry okna na 400x200 pixelů a umístí ho levým horním rohem na souřadnice [300, 100] (počítáno od levého horního rohu, osa x běží vpravo, osa y dolů);
+        </li>
+        <li>
+            <code>resizable(width=False, height=True)</code> – oknu bude možné měnit rozměr pouze ve vertikálním směru;
+        </li>
+        <li>
+            <code>attributes('-alpha', 0.7)</code> – nastaví okno na mírně průhledné;
+        </li>
+        <li>
+            <code>attributes('-topmost', True)</code> – způsobí, že okno se bude držet nad všemi ostatními okny i při ztrátě fokusu;
+        </li>
+        <li>
+            <code>iconify()</code> &amp; <code>deiconify()</code> – (z/od)minimalizuje okno na/z pracovní lištu/y;
+        </li>
+        <li>
+            <code>withdraw()</code> – úplně odstraní okno mimo obrazovku (<em>deiconify()</em> ho dokáže vrátit);
+        </li>
+        <li>
+            …
+        </li>
+    </ul>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            V našem příkladě by se tedy uvedené metody volaly na objektu <em>root</em>.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Ty pomlčky na začátku názvu některých vlastností jsou důsledkem překladu a aplikace názvů z původní implementace v Tk do Python'u.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="Manažery vzhledu"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Manažery vzhledu</h2></div><div class="section-body">
+
+    <p>
+        Aby okno také něco dělalo, je třeba naplnit ho nějakými výkonnovými komponentami, jako jsou například tlačítka, menu, texty či obrázky. A tyto komponenty je třeba v rámci okna nějak uspořádat. <em>Tkinter</em> k tomuto účelu poskytuje tři různé (neviditelné) objekty (tzv. <em>layout managers</em>):
+    </p>
+    <ul>
+        <li>
+            <strong>pack</strong> – skládá komponenty za sebou do vertikálních a horizontálních boxů, které poté připojuje do okna na vyhovující pozici (nepřekvapivě asi nejvhodnější pro všechna jednodušší rozvržení obsahu okna);
+        </li>
+        <li>
+            <strong>grid</strong> – pozicuje komponenty v ploše do „oken mříže“ (typickým příkladem budiž kalkulačka :-);
+        </li>
+        <li>
+            <strong>place</strong> – pozicuje komponenty podle absolutních souřadnic (nepřekvapivě je těžko přenositelný, jeho použití je tudíž velmi speciální).
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id6" data-title="Příklad – obrázek v okně"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Příklad – obrázek v okně</h2></div><div class="section-body">
+
+    <p>
+        Bez podrobností si ukažme rovnou, jak v okně aplikace zobrazit obrázek ve formátu GIF:
+    </p>
+    <example src="_files/duha.py" lang="python"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Části b) a c) mohou být prohozeny.
+    </div></div>
+    <img src="_files/duha.png" width="268" height="287" alt="screenshot okna se zelenou duhou">
+    <p>
+        PS: Pokud se nebudete hrabat v <em>geometry()</em>, vlastní okno aplikace se v rámci možností svou velikostí přizpůsobí obsahu.
+    </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Poznámka – vlastnosti objektů"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Poznámka – vlastnosti objektů</h2></div><div class="section-body">
+
+    <p>
+        Všimněte si, že zařazení kanvasu do hierarchie elementů a jeho zobrazení zařídilo zavolání metody <em>pack()</em> přímo na něm. Ve skutečnosti je tato metoda definována na úplně samostatné třídě a všechny jednotlivé komponenty GUI ji díky pythoní vícenásobné dědičnosti sdílejí.
+    </p>
+    <p>
+        Takovýchto tříd, ze kterých komponenty GUI dědí, je více. Výsledkem je, že volání všech potřebných věcí je díky této <em>delegaci</em> (volání metody z komponenty je přesměrováno na příslušný objekt) k dispozici pohodlně na každé komponentě.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Ovšem za cenu řádného znepřehlednění nejen nápovědy – každá GUI-komponenta má průměrně 150 metod, z nichž ovšem naprostá většina je výše uvedeným způsobem poděděná ze sdílených tříd (kterým se většinou říká <em>mixin</em>, protože jejich jediným úkolem je být předky mnoha jiných tříd; často se tak ovšem říká naopak i jejich potomkům).
+    </div></div>
+    <p>
+        Budete-li se chtít podívat, co všechno daný objekt umí, nejlepší je nápověda na příkazové řádce (případně rovnou <a href="http://tcl.tk/doc/" class="external">stránky dokumentace pro Tk</a>…). Někdy však postačí nechat si pro příslušný libovolný objekt GUI vypsat jeho <code>TkObjekt.config()</code> a/nebo <code>TkObjekt.keys()</code>.
+    </p>
+
+</div></section><section class="slide-section" id="id8" data-title="Příklad – složitější aplikace (vzhled)"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Příklad – složitější aplikace (vzhled)</h2></div><div class="section-body">
+
+    <img src="_files/aplikace.png" width="272" height="339" alt="screenshot okna aplikace">
+    <br>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Samozřejmě tahle šílená kombinace normálního a vystouplého rámečku k sobě graficky vůbec nepasuje a ve skutečnosti ji nebudete chtít použít. Tady je jenom pro ukázku možností různých základních komponent.
+    </div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="Příklad – složitější aplikace (kód)"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Příklad – složitější aplikace (kód)</h2></div><div class="section-body">
+
+    <p>
+        Složitější GUI-aplikaci je zvykem (i z praktických důvodů) zavést spíše jako samostatnou třídu:
+    </p>
+    <example src="_files/aplikace.py" lang="python"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Volně podle <a href="http://effbot.org/tkinterbook/tkinter-hello-again.htm" class="external">http://effbot.org/tkinterbook/tkinter-hello-again.htm</a> a <a href="zetcode.com/gui/tkinter/layout/index.html" class="external">zetcode.com/gui/tkinter/layout/index.html</a>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="Vlastnosti GUI-komponent"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Vlastnosti GUI-komponent</h2></div><div class="section-body">
+
+    <p>
+        Stejně jako hlavní okno GUI-aplikace i jeho jednotlivé komponenty mají spoustu vlastností. Velká část z nich je sdílená (například všechny metody pro <a href="?slajd=5">práci s rozložením</a>), ale pochopitelně má každá komponenta i spoustu vlastností vlastních. Sdílené metody zahrnují například:
+    </p>
+    <ul>
+        <li>
+            <code>bell()</code> – zvoneček ^_~
+        </li>
+        <li>
+            <code>focus()</code> – pokusí se (skrz <em>window manager</em>a) předat fokus na uvedenou komponentu;
+        </li>
+        <li>
+            <code>lift()</code> a <code>lower()</code> – pozvedne/poníží pořadí objektu v sekvenci komponent;
+        </li>
+        <li>
+            <code>update()</code> – zpracování všech čekajících událostí;
+        </li>
+        <li>
+            <code>quit()</code> – zavření aplikace;
+        </li>
+        <li>
+            …
+        </li>
+    </ul>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Uvedené metody se konkrétně týkají objektu <em>Frame()</em>, který má kapku jinou řadu předků než třeba <em>Canvas()</em> – ten z výše uvedených sice má jak <code>focus()</code>, tak <code>lift()</code> a <code>lower()</code>, ale jsou to jeho vlastní metody.
+    </div></div>
+
+</div></section><section class="slide-section" id="id11" data-title="Další „widžety“ a jejich styly"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Další „widžety“ a jejich styly</h2></div><div class="section-body">
+
+    <p>
+        Jelikož nemám šanci nahradit oficiální i neoficiální materiály na tvorbu GUI pomocí (nejen) <em>tkinter</em>'u, následuje už jen zběžný přehled některých dostupných komponent, abyste si mohli udělat lepší představu, co je v <em>tkinter</em>'u možné:
+    </p>
+    <ul>
+        <li>
+            <em>Frame</em>, <em>LabelFrame</em>, <em>Panedwindow</em>, <em>Notebook</em> – vizuální sgrupování;
+        </li>
+        <li>
+            formulářové prvky <em>Lable</em>, <em>Button</em>, <em>Checkbutton</em>, <em>Radiobutton</em>, <em>Entry</em>, <em>Combobox</em> (aneb „drop-down menu“), <em>Listbox</em> (aneb „select“), <em>Text</em>, <em>Spinbox</em>;
+        </li>
+        <li>
+            pomocné vizuální nástroje jako <em>Scrollbar</em>, <em>SizeGrip</em>, <em>Progressbar</em>, <em>Scale</em>, <em>Separator</em>;
+        </li>
+        <li>
+            <em>Menu</em> – tvorba menu;
+        </li>
+        <li>
+            tabulkové zobrazení pomocí <em>Treeview</em>;
+        </li>
+        <li>
+            <em>Canvas</em> – práce s bitmapami;
+        </li>
+        <li>
+            …
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id12" data-title="Na závěr"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Na závěr</h2></div><div class="section-body">
+
+    <p>
+        Jednoduché – a přenosné – GUI se dá pomocí Tkinter'u napsat poměrně snadno a rychle. Jakmile toho však budete chtít více, začíná přituhovat. (Ostatně dodnes mne žádný programovací jazyk nepřesvědčil, že na navrhování struktury GUI se hodí lépe než XML. Jak ostatně dokazuje pronikání XML-návrhářů do většiny moderních GUI.)
+    </p>
+    <p>
+        Pokud budete chtít <em>tkinter</em> používat více, jste na tom ale na druhou stranu dnes lépe než ještě třeba před deseti lety – máte totiž k dispozici úžasný přehled použití <strong>Tk</strong> v několika jazycích (samozřejmě včetně Python'u :-) na stránkách <a href="http://tkdocs.com/" class="external">TkDocs.com</a>.
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 12 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

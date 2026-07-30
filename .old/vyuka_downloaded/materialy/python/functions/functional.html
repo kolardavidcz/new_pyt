@@ -1,0 +1,227 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Funkcionální prvky v Python'u
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Funkcionální prvky v Python'u</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">10</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Generátorová notace</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">map(), filter() a spol.</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">„any()“ &amp; „all()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">„min()“ &amp; „max()“ &amp; „sum()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">„map()“ &amp; „filter()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">„zip()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Modul „functools“</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Lambda-funkce</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Generátory</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2011-04-28</span></div><h1 class="lecture-title">Funkcionální prvky v Python'u</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    „Skutečný“ funkcionální jazyk nemá žádné proměnné – jednou přiřazené hodnoty jsou takovými už navždy. Podobně chování funkcí je zcela určeno pouze jejich vstupními parametry a navíc funkce nemění své okolí.
+  </p>
+  <p>
+    Python nesplňuje žádnou z těchto podmínek. Dokonce byste asi měli docela problém napsat program bez použití proměnných. Ale svým protežováním iterovatelných sekvenčních typů se pojetí funkcionálních jazyků docela blíží. Dokonce pro práci s nimi nabízí kromě generátorové notace i několik speciálních funkcí.
+  </p>
+  <p>
+    V dalším se podíváme na několik základních (nejen čistě) funkcionálních prvků jazyka Python.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Generátorová notace"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Generátorová notace</h2></div><div class="section-body">
+
+  <p>
+    Generátorová notace patří mezi jednu z nejtypičtějších pythoních konstrukcí. Umožňuje velmi snadno na místě jednoho řádku za pomoci členů sekvence vyrábět sekvence (seznamy, množiny a slovníky) jiné.
+  </p>
+  
+  <p>
+    Pro <em>seznam</em> má v principu dvě následující podoby (přičemž <em>PRVEK</em> je nejčastěji nějakou funkcí prvků procházené <em>SEKVENCE</em>):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    [ PRVEK for I in SEKVENCE ]
+    [ PRVEK for I in SEKVENCE if PODMÍNKA ]
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Varianty pro množinu, resp. slovník, se liší pouze ve vnějších závorkách, resp. tvaru prvního členu (nepovinná část s podmínkou pro přehlednost vynechána):
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        { PRVEK for I in SEKVENCE }
+        { KLÍČ:HODNOTA for I in SEKVENCE }
+    </pre>
+  </div></div>
+
+</div></section><section class="slide-section" id="id3" data-title="map(), filter() a spol."><div class="section-header"><span class="section-num">3</span><h2 class="section-title">map(), filter() a spol.</h2></div><div class="section-body">
+
+  <p>
+    K typicky funkcionálním operacím patří operace prováděné nad celou sekvenční strukturou najednou.
+  </p>
+  <p>
+    Přitom platí, že je-li možné výsledek operace určit dříve, než je prozkoumána sekvence celá, také se tak stane (takže se nepočítají zbytečné kroky).
+  </p>
+
+</div></section><section class="slide-section" id="id4" data-title="„any()“ &amp; „all()“"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">„any()“ &amp; „all()“</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Funkce <code>any(ITERABLE)</code> vrací <code>True</code>, je-li <em>alespoň jeden</em> prvek z iterovatelné struktury vyhodnocen jako pravdivý. Pro prázdnou strukturu vrací <code>False</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; any('ahoj')
+True
+
+&gt;&gt;&gt; any(['']*5)
+False
+  </pre>
+
+  <p class="enumerate">
+    Funkce <code>all(ITERABLE)</code> vrací <code>True</code>, jsou-li <em>všechny</em> prvky z iterovatelné struktury vyhodnoceny jako pravdivé. Pro prázdnou strukturu vrací také <code>True</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; all('ahoj')
+True
+
+&gt;&gt;&gt; all(['a', 'h', 0, ''])
+False
+  </pre>
+
+</div></section><section class="slide-section" id="id5" data-title="„min()“ &amp; „max()“ &amp; „sum()“"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">„min()“ &amp; „max()“ &amp; „sum()“</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Funkce <code>min(SEKVENCE)</code> vrací <em>nejmenší</em> prvek ze sekvence:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; min([5, 2, 4, 3, 6])
+2
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Pro více vstupních argumentů vrací nejmenší z nich. Nepovinný parametr <em>key</em> umožňuje určit řadicí funkci.
+  </div></div>
+
+  <p class="enumerate">
+    Funkce <code>max(SEKVENCE)</code> vrací <em>největší</em> prvek ze sekvence:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; max([5, 2, 4, 3, 6])
+6
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Pro více vstupních argumentů vrací největší z nich. Nepovinný parametr <em>key</em> umožňuje určit řadicí funkci.
+  </div></div>
+
+  <p class="enumerate">
+    Funkce <code>sum(SEKVENCE)</code> vrací součet prvků v sekvenci:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; sum([5, 2, 4, 3, 6])
+20
+  </pre>
+
+</div></section><section class="slide-section" id="id6" data-title="„map()“ &amp; „filter()“"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">„map()“ &amp; „filter()“</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Funkce <code>map(FUNKCE, ITERABLE)</code> vrací iterátor, který postupně mapuje funkci na jednotlivé prvky iterovatelné struktury:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; map(ord, 'ahoj')
+&lt;map object at 0x01406710&gt;
+&gt;&gt;&gt; list( map(ord, 'ahoj') )
+[97, 104, 111, 106]
+  </pre>
+  <p>
+    Často je jednodušší a průhlednější napsat příslušný generátorový výraz <em>[f(x) for x in xs]</em>.
+  </p>
+
+  <p class="enumerate">
+    Funkce <code>filter(FUNKCE, ITERABLE)</code> vrací iterátor, který postupně vrací ty prvky iterovatelné struktury, pro něž zadaná funkce poskytuje <code>True</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; filter(lambda x: x % 2, [5, 2, 4, 3, 6])
+&lt;filter object at 0x014085F0&gt;
+&gt;&gt;&gt; list( filter(lambda x: x % 2, [5, 2, 4, 3, 6]) )
+[5, 3]
+  </pre>
+  <p>
+    Pro funkci různou od <code>None</code> je často je jednodušší a průhlednější napsat příslušný generátorový výraz <em>[x for x in xs if f(x)]</em>.
+  </p>
+  
+  <hr>
+  
+  <p>
+    Asi už nepřekvapí, že:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+map(f, filter(p, xs))
+  &lt;=&gt;
+[f(x) for x in xs if p(x)]
+  </pre>
+
+</div></section><section class="slide-section" id="id7" data-title="„zip()“"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">„zip()“</h2></div><div class="section-body">
+
+  <p>
+    Funkce <code>zip(*ITERABLES)</code> vrací iterátor, který skládá dohromady do n-tic navzájem si odpovídající prvky z jednotlivých vstupních iterovatelných struktur:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; zip('ahoj', [5, 2, 3, 4])
+&lt;zip object at 0x01400AF8&gt;
+&gt;&gt;&gt; list( zip('ahoj', [5, 2, 3, 4]) )
+[('a', 5), ('h', 2), ('o', 3), ('j', 4)]
+  </pre>
+  <p>
+    Přitom platí:
+  </p>
+  <ul>
+    <li>
+        <em>zip()</em> se vyčerpá na nejkratší dostupné sekvenci. Potřebujete-li opačné chování, použijte <code>itertools.zip_longest()</code>.
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            # a) nejkratší
+            &gt;&gt;&gt; list( zip('ahoj', [5, 2, 3, 4, 1]) )
+            [('a', 5), ('h', 2), ('o', 3), ('j', 4)]
+            
+            # b) nejdelší
+            &gt;&gt;&gt; from itertools import zip_longest
+            &gt;&gt;&gt; list( zip_longest('ahoj', [5, 2, 3, 4, 1]) )
+            [('a', 5), ('h', 2), ('o', 3), ('j', 4), (None, 1)]
+            &gt;&gt;&gt; list( zip_longest('ahoj', [5, 2, 3, 4, 1], fillvalue='X') )
+            [('a', 5), ('h', 2), ('o', 3), ('j', 4), ('X', 1)]
+        </pre>
+    </li>
+    <li>
+        Pro jednu vstupní sekvenci vrací jednoprvkové n-tice.
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            &gt;&gt;&gt; list( zip('ahoj') )
+            [('a',), ('h',), ('o',), ('j',)]
+        </pre>
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id8" data-title="Modul „functools“"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Modul „functools“</h2></div><div class="section-body">
+
+  <p>
+    Další funkcionální prostředky pro práci s funkcemi (<em>higher-order functions</em>) poskytuje modul <em>functools</em>. Jedná se o funkce, které operují nad funkcemi a v nějaké upravené podobě je vrací (tak trochu jako dekorátory; ostatně se většinou jako dekorátory používají).
+  </p>
+  <p>
+    Jelikož uvedené si zaslouží probrat podrobněji, je mu věnována <a href="advanced-3.xml">samostatná přednáška</a>.
+  </p>
+
+</div></section><section class="slide-section" id="id9" data-title="Lambda-funkce"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Lambda-funkce</h2></div><div class="section-body">
+
+  <p>
+    Lambda-funkce jsou anonymní (tj. bezejmenné) funkce definované typicky v rámci jednoho řádku a skládající se pouze z jednoho výrazu, který je vyhodnocován ve chvíli volání funkce:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+lambda [ARGUMENT[Y]]: VÝRAZ
+  </pre>
+
+  <p>
+    Pythonovské lambda-funkce jsou v porovnání s prakticky libovolnou jinou implementací velmi omezené – mohou obsahovat pouze jeden výraz, a to ještě bez složitějších, natožpak dokonce víceřádkových konstrukcí.
+  </p>
+  <p>
+    Ve většině případů ale zastanou obdobnou práci „obyčejné“ funkce v Python'u, protože jsou tzv. <em>first-class object/citizen</em>. (Což především znamená, že je možné je předávat jako parametry do jiných funkcí, vracet je jako návratové hodnoty z funkcí a ukládat je v datových strukturách.)
+  </p>
+
+</div></section><section class="slide-section" id="id10" data-title="Generátory"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Generátory</h2></div><div class="section-body">
+
+  <p>
+    Naprosto typickým prvkem funkcionálního programování je vytváření (potenciálně i nekonečných) struktur, z nichž se vrací pouze ta část, která je aktuálně vyžadována, a nic dalšího se (zatím) nepočítá.
+  </p>
+  <p>
+    V Python'u se konstruktorům takových objektů říká <strong>generátory</strong> a jelikož jsou velmi důležité, je jim věnována <a href="/materialy/python/generators/generators.xml">samostatná přednáška</a>.
+  </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 10 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

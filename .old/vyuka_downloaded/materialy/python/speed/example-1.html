@@ -1,0 +1,412 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Jak na rychlost – příklad s filtrací obrázků
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><link rel="stylesheet" href="/cjs/mathscribe/jqmath-0.4.3.css"><script src="/cjs/mathscribe/jquery-1.4.3.min.js"></script><script src="/cjs/mathscribe/jqmath-etc-0.4.6.min.js" charset="utf-8"></script><style>
+    div.tabobr { text-align: center; }
+    div.tabobr > table { display: inline-block; vertical-align: middle; }
+    div.tabobr > table td { width: 1em; height: 1em; }
+    
+    div#RGB { padding-left: 11em; }
+    table#R, table#G, table#B { transform: perspective(600px) rotateX(25deg) rotateY(-45deg) rotateZ(35deg); position: relative; }
+        table#R { z-index: 3; }
+        table#G { z-index: 2; left: -6.5em; }
+        table#B { z-index: 1; left: -13em; }
+    table#R td { background-color: red; }
+    table#G td { background-color: green; }
+    table#B td, table.blue td { background-color: blue; }
+    
+    table.gray td { background-color: gray; }
+    table.gray td.blue { background-color: blue; }
+    table.gray td.green { background-color: green; }
+    table.gray td.red { background-color: red; }
+    table.gray td.red-light { background-color: red; opacity: 0.3; }
+  </style><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Jak na rychlost – příklad s filtrací obrázků</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">15</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Zadání</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Komentáře</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Python + Numpy nevektorizovaně</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Numba základní</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Numba s mezipamětí</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Cython I</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Cython II</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Cython III</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Cython IV</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Cython V</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Vektorizace kódu</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">Python + Numpy vektorizovaně</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">Srovnání</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">Závěr</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2016-12-21</span></div><h1 class="lecture-title">Jak na rychlost – příklad s filtrací obrázků</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Pro ilustraci principu použití <a href="/materialy/python/speed/numba.xml"><em>Numby</em></a> a <a href="/materialy/python/cython/intro.xml"><em>Cythonu</em></a> pro zrychlení vykonávání běhu pythoních programů a srovnání jejich přístupu použijeme aplikaci korelačního/konvolučního filtru na RGB-obrázek.
+    </p>
+    <p>
+        V praxi by to samozřejmě nikdo nedělal, protože příslušné operace jsou už dávno napsány v Céčku v několika externích knihovnách (především tedy samotném <em>Pillow</em>, kterou budeme používat pro načtení originálu a uložení výsledku operace), ale aplikace korelačního/konvolučního filtru je snad natolik názorná operace, že se k ilustraci hodí.
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Zadání"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Zadání</h2></div><div class="section-body">
+
+    <p>
+        Naším úkolem bude od vstupního obrázku..
+    </p>
+    <img src="_files/ex1/kvetina.jpg" width="500" height="375" alt="květina">
+    <p>
+        ..aplikací zostřovacího filtru..
+    </p>
+    $$
+        (\table -1, -1, -1; -1, 8, -1; -1, -1, -1)
+    $$
+    <p>
+        ..dojít k výsledku:
+    </p>
+    <img src="_files/ex1/kvetina-zostrena.jpg" width="498" height="373" alt="květina zostřená">
+
+</div></section><section class="slide-section" id="id3" data-title="Komentáře"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Komentáře</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Příslušný filtr se aplikuje na dvourozměrné pole $m×n$, náš obrázek je však RGB, konkrétně po načtení jako numpy-pole tvaru $375×500×3$. A protože numbajovský dekorátor <em>@jit</em> se pochopitelně aplikuje na funkce, napíšeme aplikaci filtru jako funkci nad dvourozměrným polem, přestože by totéž šlo napsat lineárně pomocí zanořené smyčky (přes příslušné tři vrstvy obrazu).
+    </p>
+    <div id="RGB" class="tabobr">
+        <table id="R">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        <table id="G">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        <table id="B">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+    </div>
+
+    <p class="enumerate">
+        Uvedený korelační/konvoluční filtr má „problém“ v krajních řádcích a sloupcích, který z důvodů co nejjednoduššího kódu vyřešíme tak, že výstupní obrázek bude o tento okrajový rámeček menší (bude tedy mít rozměr $373×498×3$).
+    </p>
+    <div class="tabobr">
+        <table class="blue">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        →
+        <table class="gray">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue"></td><td class="blue"></td><td></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue"></td><td class="blue"></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+    </div>
+
+    <p class="enumerate">
+        Vlastní zostření obrázku se provede jeho součtem s výsledkem aplikace zostřovacího filtru, celkově tedy budeme aplikovat filtr (masku):
+    </p>
+    $$
+        (\table 0, 0, 0; 0, 1, 0; 0, 0, 0) + (\table -1, -1, -1; -1, 8, -1; -1, -1, -1) = (\table -1, -1, -1; -1, 9, -1; -1, -1, -1)
+    $$
+
+    <p class="enumerate">
+        Pro načtení obrázku a uložení výsledku ve formátu JPEG použijeme příslušné funkce z knihovny <em>Pillow</em>.
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Python + Numpy nevektorizovaně"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Python + Numpy nevektorizovaně</h2></div><div class="section-body">
+
+    <p>
+        Začněmež od čistého pythoního kódu, přičemž filtr budeme aplikovat zanořenou smyčkou (což samo o sobě hlásí pravděpodobný problém v řešení):
+    </p>
+    <example src="_files/ex1/ostreni.py" lang="python"></example>
+    <p>
+        Doba provedení programu přibližně 1,8 sekundy.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Netriviální čas je samozřejmě stráven načítáním a zápisem obrázku z/na disk, nicméně tato část je společná všem programům a nedá se obejít. (Dala by se minimalizovat pro potřeby měření času, ale nemá to cenu.)
+    </div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="Numba základní"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Numba základní</h2></div><div class="section-body">
+
+    <p>
+        S minimem úprav nevektorizovaného řešení (proklikněte si na odpovídající slajd!)..
+    </p>
+    <example src="_files/ex1/numba.0/ostreni.py" lang="python"></example>
+    <p>
+        ..dosáhneme času přibližně 0,54 sekundy.
+    </p>
+
+</div></section><section class="slide-section" id="id6" data-title="Numba s mezipamětí"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Numba s mezipamětí</h2></div><div class="section-body">
+
+    <p>
+        Vliv předkompilování funkce je nepřekvapivě nezanedbatelný:
+    </p>
+    <example src="_files/ex1/numba.1/ostreni.py" lang="python"></example>
+    <p>
+        Při druhém a dalších spuštěních (první spuštění musí provést kompilaci a zapsat ji na disk) dosáhneme na čas kolem 0,35 sekundy.
+    </p>
+    <p>
+        PS: Parametr <code>nopython=True</code> nevyhodil výjimku, <em>Numba</em> si tedy se JITací kódu poradila a opravdu jsme nic dalšího upravovat nemuseli.
+    </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Cython I"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Cython I</h2></div><div class="section-body">
+
+    <p>
+        To cythonizace už není vůbec tak jednoduchá (ač jsme v Python'u 3.x, musel jsem odstranit češtinu z názvů proměnných a také rozbalování n-tic rozdělit na samostatné řádky; o vyznačení typů ani nemluvím) a navíc pouhé doplnění typů..
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/ex1/cython.0/filters.pyx"><em>ex1/cython.0/filters.pyx</em></a></div><example src="_files/ex1/cython.0/filters.pyx" lang="python"></example></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/ex1/cython.0/ostreni.py"><em>ex1/cython.0/ostreni.py</em></a></div><example src="_files/ex1/cython.0/ostreni.py" lang="python"></example></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/ex1/cython.0/setup.py"><em>ex1/cython.0/setup.py</em></a></div><example src="_files/ex1/cython.0/setup.py" lang="python"></example></div></div>
+    <p>
+        ..selže na výjimce:
+    </p>
+    <p style="padding-left: 1em;">
+        <code>filters.pyx:25:34: Invalid operand types for '*' (double[:, :]; long[:, :])</code>
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        A to stačilo zavolat jenom <code>cython -a filters.pyx</code>, ani jsem nemusel použít <em>setup.py</em>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="Cython II"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Cython II</h2></div><div class="section-body">
+
+    <p>
+        Uvedená výjimka se týká kódu:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        output[x, y] = (vyrez * maska).sum()
+    </pre>
+    <p>
+        Cythonu se tedy nelíbí násobení matice maticí, kde jedna z nich je výřezem jiné (takže zjevně nepředstavuje kontinuální úsek paměti).
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        A ne ‒ přetypování z <em>long</em> na <em>double</em> to nespraví.
+    </div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="Cython III"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Cython III</h2></div><div class="section-body">
+
+    <p>
+        Prvním pokusem o opravu budiž „přetypování“ funkcí <em>np.array()</em> na obě inkriminované proměnné <code>vyrez</code> a <code>maska</code>. Nyní už překlad <code>python setup.py build_ext --inplace</code> zabere:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/ex1/cython.1/filters.pyx"><em>ex1/cython.1/filters.pyx</em></a></div><example src="_files/ex1/cython.1/filters.pyx" lang="python"></example></div></div>
+    <p>
+        Ovšem zrychlení se nekoná ‒ jsme na 3,1 sekundy, tedy dokonce ještě hůře než ten úplně základní a naivní kód v čistém Python'u!
+    </p>
+
+</div></section><section class="slide-section" id="id10" data-title="Cython IV"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Cython IV</h2></div><div class="section-body">
+
+    <p>
+        Použití funkce <em>np.asarray()</em> tomu vůbec nepomůže ‒ výsledek je ještě horší, kolem 3,7 sekundy. Ostatně když se podíváme na protokol překladu <code>cython -a filters.pyx</code>..
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">▶ Output</div><div class="html5-output"><iframe src="_files/ex1/cython.2/filters.html" onload="iframeLoaded(this, event)"></iframe></div></div></div>
+    <p>
+        ..vidíme, že řádka 25 na nás svítí sytě žlutou, což uvnitř smyčky <a href="/materialy/python/cython/intro.xml?slajd=7">značí kardinální problém</a>!
+    </p>
+
+</div></section><section class="slide-section" id="id11" data-title="Cython V"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Cython V</h2></div><div class="section-body">
+
+    <p>
+        Nezbývá nám tedy moc nic jiného, než náš originální program „rozvrtat“ ještě víc a uvedené jednořádkové násobení matic přepsat na smyčku:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/ex1/cython.3/filters.pyx"><em>ex1/cython.3/filters.pyx</em></a></div><example src="_files/ex1/cython.3/filters.pyx" lang="python"></example></div></div>
+    <p>
+        Nyní už je protokol v pořádku ‒ žádná sytě žlutá uvnitř smyček:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">▶ Output</div><div class="html5-output"><iframe src="_files/ex1/cython.3/filters.html" onload="iframeLoaded(this, event)"></iframe></div></div></div>
+    <p>
+        A co to udělalo s rychlostí kódu? Spadli jsme na 0,14 sekundy!
+    </p>
+
+</div></section><section class="slide-section" id="id12" data-title="Vektorizace kódu"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Vektorizace kódu</h2></div><div class="section-body">
+
+    <p>
+        Aplikace filtru <a href="?slajd=4">ze čtvrtého slajdu</a> (funkce <em>apply_filter</em>) je napsána pomocí pythoní zanořené smyčky, takže opravdu nebude rychlá (jak jsme ostatně viděli). Kromě přímočarého (a extrémně jednoduchého) zrychlení pomocí Numby a velmi nepřímočarého (a podle mě za to nestojícího) použití Cythonu, můžeme však udělat ještě jednu věc pouze za pomoci Pythonu a Numpy – zkusit řešení převést na <strong>numpy-vektorové</strong> (tedy míněno <em>vícedimenzionální</em>) <strong>operace</strong>.
+    </p>
+    <p>
+        Vektorizační „trik“ (odkoukaný od <a href="http://www.labri.fr/perso/nrougier/teaching/numpy/numpy.html" class="external">Nicolase P. Rougiera</a>) spočívá ve skládání chytře posunutých pohledů na matici hodnot, kterými se na každou pozici výstupní (menší) matice nasčítají právě požadované „buňky“. Označme si jednu z výstupních buněk červeně  a buňky, které se skládají na její výstupní hodnotu, světlejší červenou:
+    </p>
+    <div class="tabobr">
+        <table class="gray">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue red-light"></td><td class="blue red-light"></td><td class="red-light"></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue red-light"></td><td class="blue red"></td><td class="red-light"></td></tr>
+            <tr><td></td><td></td><td class="red-light"></td><td class="red-light"></td><td class="red-light"></td></tr>
+        </table>
+    </div>
+    <p>
+        Pak následující kód (nechť <em>M</em> je naše vstupní matice)..
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        -M[0:-2,0:-2] -   M[0:-2,1:-1] - M[0:-2,2:] -
+         M[1:-1,0:-2] + 9*M[1:-1,1:-1] - M[1:-1,2:] -
+         M[2:  ,0:-2] -   M[2:  ,1:-1] - M[2:  ,2:]
+    </pre>
+    <p>
+        ..způsobí nasčítání sobě si odpovídajících buněk stejně rozměrných pohledů na původní matici (zeleně jsou vyznačeny buňky příslušného výřezu a červeně odpovídající buňka přispívající do konečného součtu):
+    </p>
+    <div class="tabobr">
+        -
+        <table class="gray">
+            <tr><td class="green"></td><td class="green"></td><td class="green"></td><td></td><td></td></tr>
+            <tr><td class="green"></td><td class="blue green"></td><td class="blue green red"></td><td class="blue"></td><td></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue"></td><td class="blue"></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        -
+        <table class="gray">
+            <tr><td></td><td class="green"></td><td class="green"></td><td class="green"></td><td></td></tr>
+            <tr><td></td><td class="blue green"></td><td class="blue green"></td><td class="blue green red"></td><td></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue"></td><td class="blue"></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        -
+        <table class="gray">
+            <tr><td></td><td></td><td class="green"></td><td class="green"></td><td class="green"></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue green"></td><td class="blue green"></td><td class="green red"></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue"></td><td class="blue"></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        <br>
+        -
+        <table class="gray">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td class="green"></td><td class="blue green"></td><td class="blue green"></td><td class="blue"></td><td></td></tr>
+            <tr><td class="green"></td><td class="blue green"></td><td class="blue green red"></td><td class="blue"></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        +9*
+        <table class="gray">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td class="blue green"></td><td class="blue green"></td><td class="blue green"></td><td></td></tr>
+            <tr><td></td><td class="blue green"></td><td class="blue green"></td><td class="blue green red"></td><td></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        -
+        <table class="gray">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue green"></td><td class="blue green"></td><td class="green"></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue green"></td><td class="blue green"></td><td class="green red"></td></tr>
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
+        <br>
+        -
+        <table class="gray">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue"></td><td class="blue"></td><td></td></tr>
+            <tr><td class="green"></td><td class="blue green"></td><td class="blue green"></td><td class="blue"></td><td></td></tr>
+            <tr><td class="green"></td><td class="green"></td><td class="green red"></td><td></td><td></td></tr>
+        </table>
+        -
+        <table class="gray">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue"></td><td class="blue"></td><td></td></tr>
+            <tr><td></td><td class="blue green"></td><td class="blue green"></td><td class="blue green"></td><td></td></tr>
+            <tr><td></td><td class="green"></td><td class="green"></td><td class="green red"></td><td></td></tr>
+        </table>
+        -
+        <table class="gray">
+            <tr><td></td><td></td><td></td><td></td><td></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue"></td><td class="blue"></td><td></td></tr>
+            <tr><td></td><td class="blue"></td><td class="blue green"></td><td class="blue green"></td><td class="green"></td></tr>
+            <tr><td></td><td></td><td class="green"></td><td class="green"></td><td class="green red"></td></tr>
+        </table>
+    </div>
+    <p>
+        Uvedené (zelené) výřezy jsou <strong>všechny stejně veliké</strong> (a to o dva řádky a dva sloupečky menší než vstupní obrázek), proto je <em>Numpy</em> bez řečí sečte. Výsledná hodnota vybrané (červené) buňky je tedy složena z devíti různých hodnot a z nákresu je vidět, že to jsou právě ony požadované hodnoty, které dohromady určují náš konvoluční filtr.
+    </p>
+    <p>
+        Uvedené se stane se všemi buňkami výběrů, takže dohromady složí požadovanou výstupní (modrou) a stejně velkou matici.
+    </p>
+
+</div></section><section class="slide-section" id="id13" data-title="Python + Numpy vektorizovaně"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">Python + Numpy vektorizovaně</h2></div><div class="section-body">
+
+    <p>
+        Nyní tedy nahraďme zanořenou smyčku vektorizovanou operací nad příslušným numpy-polem:
+    </p>
+    <example src="_files/ex1/ostreni_vect.py" lang="python"></example>
+    <p>
+        Doba provedení programu přibližně 0,16 sekundy!
+    </p>
+
+</div></section><section class="slide-section" id="id14" data-title="Srovnání"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">Srovnání</h2></div><div class="section-body">
+
+    <p>
+        Shrňme si výsledky našeho ukázkového příkladu:
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        A mějte přitom na paměti, že funkce <em>apply_filter()</em> se volala pouze třikrát a program navíc načítal a zapisoval z/na disk.
+    </div></div>
+    <table border="1" class="centerTable">
+        <tr>
+            <th>postup</th>
+            <th>čas (s)</th>
+            <th>faktor<br>zpomalení</th>
+            <th>faktor<br>zrychlení</th>
+        </tr>
+        <tr>
+            <td><strong>Python + Numpy (nevektorizovaně)</strong></td>
+            <td>1,8</td>
+            <td>13</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td><strong>Numba</strong></td>
+            <td>0,54</td>
+            <td>4</td>
+            <td>3</td>
+        </tr>
+        <tr>
+            <td><strong>Numba + cache</strong></td>
+            <td>0,35</td>
+            <td>2,5</td>
+            <td>5</td>
+        </tr>
+        <tr>
+            <td><strong>optimalizovaný Cython</strong></td>
+            <td>0,14</td>
+            <td>1</td>
+            <td>13</td>
+        </tr>
+        <tr>
+            <td><strong>Python + Numpy (vektorizovaně)</strong></td>
+            <td>0,16</td>
+            <td>1,1</td>
+            <td>11</td>
+        </tr>
+    </table>
+    <p>
+        Rozdíly na poměrně rychlém stroji pro program, který už jako pythoní neběžel nijak dlouho, se mohou zdáti relativně malé. Nicméně na stroji pomalejším nebo při větším počtu opakování dané operace by už mohly být setsakra znát.
+    </p>
+
+</div></section><section class="slide-section" id="id15" data-title="Závěr"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">Závěr</h2></div><div class="section-body">
+
+    <p>
+        Aplikace konvolučního operátoru na 2D-pole je poměrně reprezentativní příklad, takže z něj nějaký ten závěr můžeme asi celkem učinit:
+    </p>
+    <ul>
+        <li>
+            <strong>Podaří-li se vám vaši úlohu pro <em>Numpy</em> zvektorizovat, máte skoro vyhráno!</strong> A nemusíte se tak většinou už o žádnou další optimalizaci pokoušet. (Záleží ovšem na konkrétním problému.)
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Bohužel, vektorizace není většinou vůbec triviální. Kromě bezvadné znalosti <em>Numpy</em> vyžaduje spoustu zkušenosti. A/nebo nadprůměrné „google-fu“ při hledání řešení.
+            </div></div>
+        </li>
+        <li>
+            Nepodaří-li se vektorizace, máte (typicky) přinejmenším dvě další možnosti:
+            <ul>
+                <li>
+                    Zabere-li na váš program <em>Numba</em> (a to klidně i v této nejjednodušší formě), rozhodně ji použijte ‒ za velmi málo práce docela dost koláčů! (Tím spíš, můžete-li využít cachování kompilace.)
+                </li>
+                <li>
+                    Je-li <em>Numba</em> málo (nebo na váš problém prostě zrovna nefunguje), můžete zkusit <em>Cython</em>. Už to nebude tak jednoduché a občas budete muset kód přiohnout způsobem, který byste nečekali, nicméně výsledek za to stát bude téměř určitě.
+                </li>
+            </ul>
+        </li>
+    </ul>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 15 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

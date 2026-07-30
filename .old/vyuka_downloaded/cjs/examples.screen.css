@@ -1,0 +1,228 @@
+
+.content-main h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: var(--space-xl);
+  border-bottom: 1px solid var(--border-soft);
+  padding-bottom: var(--space-md);
+  letter-spacing: -0.02em;
+}
+
+/* exercise card */
+div.priklad {
+  background: var(--panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xl);
+  overflow: hidden;
+  padding: var(--space-lg);
+  transition: border-color var(--transition);
+}
+
+div.priklad:hover {
+  border-color: var(--border);
+}
+
+div.zadani {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: var(--space-md);
+  display: block;
+}
+
+/* Exercise metadata (diff + relevance + tags) for each úkol */
+.exercise-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+}
+
+.diff-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--panel);
+  border: 1px solid var(--border-subtle);
+  font-size: 10px;
+  text-transform: lowercase;
+}
+
+.rel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.rel-bar {
+  width: 42px;
+  height: 5px;
+  background: var(--border-subtle);
+  border-radius: 3px;
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+}
+.rel-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.tag-badge {
+  font-size: 9.5px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--bg-example-label, #2a2a2a);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+}
+
+/* Reuse diff dots for exercise tasks */
+.diff-dot {
+  width: 8px; height: 8px; display: inline-block; border-radius: 50%; vertical-align: middle;
+}
+.diff-dot.basics    { background: var(--fl-basics, #22c55e); }
+.diff-dot.resyntax  { background: var(--fl-resyntax, #3b82f6); border-radius: 1px; }
+.diff-dot.newconcept{ background: var(--fl-newconcept, #f97316); border-radius: 1px; }
+.diff-dot.pythonic  { background: var(--fl-pythonic, #a855f7); }
+.diff-dot.paradigm  { background: var(--fl-paradigm, #ec4899); transform: rotate(45deg); width: 7px; height: 7px; }
+
+/* Numbering */
+.content-main { counter-reset: priklad-counter; }
+div.priklad { counter-increment: priklad-counter; }
+div.zadani::before {
+  content: "Úkol " counter(priklad-counter) ":";
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent);
+  margin-right: var(--space-xs);
+  white-space: nowrap;
+}
+
+.exercise-details {
+  margin-top: var(--space-sm);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-example);
+  overflow: hidden;
+  transition: border-color var(--transition);
+}
+
+.exercise-details:hover {
+  border-color: var(--border-strong);
+}
+
+.exercise-summary {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 6px var(--space-sm);
+  background: var(--bg-example-label);
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
+
+.exercise-summary::-webkit-details-marker {
+  display: none;
+}
+
+.exercise-summary::before {
+  content: "▶";
+  font-size: 8px;
+  margin-right: 6px;
+  display: inline-block;
+  transition: transform var(--transition);
+  color: var(--text-accent);
+}
+
+.exercise-details[open] .exercise-summary::before {
+  transform: rotate(90deg);
+}
+
+.exercise-details-content {
+  padding: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+  background-color: var(--bg-code);
+  animation: slideInNormal 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes slideInNormal {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+span.komentář {
+  font-weight: normal;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+/* center */
+.center { text-align: center; }
+img.imgcenter { display: block; margin: var(--space-md) auto; border-radius: var(--radius-md); }
+img.zoom:hover { transform: scale(1.5); outline: 1px solid var(--border-accent); }
+
+/* IO Terminal Panel */
+.io-panel {
+  background-color: var(--bg) !important; /* darker console bg */
+  border: 1px solid var(--border-soft) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 12px 16px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 12.5px !important;
+  margin: var(--space-md) 0 !important;
+  line-height: 1.6 !important;
+}
+
+.io-line {
+  margin-bottom: 6px;
+}
+.io-line:last-child {
+  margin-bottom: 0;
+}
+
+.io-input {
+  color: var(--tok-variable) !important; /* command color */
+}
+.io-input code {
+  color: var(--tok-string) !important; /* input string color */
+}
+
+.io-output {
+  color: var(--text) !important; /* output text color */
+}
+
+.io-prompt {
+  font-family: var(--font-sans);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: var(--panel-alt);
+  color: var(--text-soft);
+  padding: 2px 6px;
+  border-radius: 2px;
+  margin-right: 8px;
+  display: inline-block;
+  user-select: none;
+}
+.io-input .io-prompt {
+  border-left: 2px solid var(--accent);
+}
+.io-output .io-prompt {
+  border-left: 2px solid var(--pa);
+}

@@ -1,0 +1,257 @@
+/** Shared application state */
+
+export const TAGS = ["Core", "WOW", "Legendary", "Tricky", "Skip"];
+export const FLAVORS = ["basics", "resyntax", "newconcept", "pythonic", "paradigm"];
+
+export const state = {
+  course: null,
+  slides: {},
+  pagesIndex: {},
+  /** path → structured exercise tasks (from data/exercises.json) */
+  exercises: {},
+  /** Flat list of all lecture/exercise items */
+  items: [],
+  /** week id → week object */
+  weeksById: new Map(),
+  /** item id → item */
+  itemsById: new Map(),
+
+  filters: {
+    text: "",
+    tags: new Set(),       // active tag chips (OR within selection; item must match ALL active if multi? → OR is more UX-friendly)
+    flavors: new Set(),
+    relMin: 1,
+    sort: "course",
+  },
+
+  /** Which sidebar view: explorer | search | progress */
+  view: "explorer",
+  sidebarOpen: true,
+  sidebarWidth: 280,
+
+  /** Open editor tabs: { id, kind, title, itemId?, weekId?, pageId? } */
+  tabs: [],
+  activeTabId: null,
+
+  /** Tree expand state: nodeKey → bool */
+  expanded: new Map(),
+
+  /** Auto-seen item ids (opened once) */
+  seen: new Set(),
+
+  /** Manually marked “studied” item ids (progress source of truth) */
+  studied: new Set(),
+
+  /** Currently focused tree node key */
+  focusedTreeKey: null,
+};
+
+const SEEN_KEY = "pcs-seen-v1";
+const STUDIED_KEY = "pcs-studied-v1";
+const SIDEBAR_W_KEY = "pcs-sidebar-w";
+
+export function loadPersisted() {
+  try {
+    const raw = localStorage.getItem(SEEN_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) state.seen = new Set(arr);
+    }
+  } catch { /* ignore */ }
+  try {
+    const raw = localStorage.getItem(STUDIED_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) state.studied = new Set(arr);
+    }
+  } catch { /* ignore */ }
+  try {
+    const w = parseInt(localStorage.getItem(SIDEBAR_W_KEY) || "", 10);
+    if (w >= 180 && w <= 520) state.sidebarWidth = w;
+  } catch { /* ignore */ }
+}
+
+export function persistSeen() {
+  try {
+    localStorage.setItem(SEEN_KEY, JSON.stringify([...state.seen]));
+  } catch { /* ignore */ }
+}
+
+export function persistStudied() {
+  try {
+    localStorage.setItem(STUDIED_KEY, JSON.stringify([...state.studied]));
+  } catch { /* ignore */ }
+}
+
+export function persistSidebarW() {
+  try {
+    localStorage.setItem(SIDEBAR_W_KEY, String(state.sidebarWidth));
+  } catch { /* ignore */ }
+}
+
+export function markSeen(itemId) {
+  if (!itemId || state.seen.has(itemId)) return;
+  state.seen.add(itemId);
+  persistSeen();
+}
+
+export function isStudied(itemId) {
+  return !!(itemId && state.studied.has(itemId));
+}
+
+/** Toggle manual “studied” flag. Returns new studied state. */
+export function toggleStudied(itemId) {
+  if (!itemId) return false;
+  if (state.studied.has(itemId)) {
+    state.studied.delete(itemId);
+    persistStudied();
+    return false;
+  }
+  state.studied.add(itemId);
+  // also count as seen
+  markSeen(itemId);
+  persistStudied();
+  return true;
+}
+
+export function setStudied(itemId, on) {
+  if (!itemId) return;
+  if (on) {
+    state.studied.add(itemId);
+    markSeen(itemId);
+  } else {
+    state.studied.delete(itemId);
+  }
+  persistStudied();
+}
+
+export function buildIndexes(course) {
+  state.course = course;
+  state.items = [];
+  state.weeksById.clear();
+  state.itemsById.clear();
+
+  for (const week of course.weeks || []) {
+    state.weeksById.set(week.id, week);
+    // default expand first few weeks
+    if (!state.expanded.has(week.id)) {
+      state.expanded.set(week.id, week.week <= 2);
+    }
+    for (const lec of week.lectures || []) {
+      const item = { ...lec, weekId: week.id, weekTitle: week.title, weekNum: week.week };
+      state.items.push(item);
+      state.itemsById.set(item.id, item);
+    }
+    for (const ex of week.exercises || []) {
+      const item = { ...ex, weekId: week.id, weekTitle: week.title, weekNum: week.week };
+      state.items.push(item);
+      state.itemsById.set(item.id, item);
+    }
+  }
+}
+
+export function itemMatchesFilters(item, f = state.filters) {
+  if ((item.relevance ?? 0) < f.relMin) return false;
+
+  if (f.tags.size > 0) {
+    const tags = item.tags || [];
+    let hit = false;
+    for (const t of f.tags) {
+      if (tags.includes(t)) { hit = true; break; }
+    }
+    if (!hit) return false;
+  }
+
+  if (f.flavors.size > 0) {
+    if (!f.flavors.has(item.diff)) return false;
+  }
+
+  if (f.text) {
+    const q = f.text.toLowerCase().trim();
+    if (q) {
+      const hay = [
+        item.title,
+        item.desc,
+        item.compare,
+        item.slug,
+        item.path,
+        ...(item.tags || []),
+        item.diff,
+        item.weekTitle,
+      ].join(" ").toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+  }
+  return true;
+}
+
+export function filteredItems() {
+  let list = state.items.filter((it) => itemMatchesFilters(it));
+  const sort = state.filters.sort;
+  if (sort === "relevance-desc") {
+    list = [...list].sort((a, b) => (b.relevance - a.relevance) || a.title.localeCompare(b.title, "cs"));
+  } else if (sort === "relevance-asc") {
+    list = [...list].sort((a, b) => (a.relevance - b.relevance) || a.title.localeCompare(b.title, "cs"));
+  } else if (sort === "title") {
+    list = [...list].sort((a, b) => a.title.localeCompare(b.title, "cs"));
+  }
+  // course order: keep original
+  return list;
+}
+
+export function weekVisibleItems(week) {
+  const all = [...(week.lectures || []), ...(week.exercises || [])];
+  const f = state.filters;
+  let list = all
+    .map((it) => state.itemsById.get(it.id) || it)
+    .filter((it) => itemMatchesFilters(it, f));
+
+  if (f.sort === "relevance-desc") {
+    list.sort((a, b) => (b.relevance - a.relevance) || a.title.localeCompare(b.title, "cs"));
+  } else if (f.sort === "relevance-asc") {
+    list.sort((a, b) => (a.relevance - b.relevance) || a.title.localeCompare(b.title, "cs"));
+  } else if (f.sort === "title") {
+    list.sort((a, b) => a.title.localeCompare(b.title, "cs"));
+  }
+  return list;
+}
+
+export function filtersActive() {
+  const f = state.filters;
+  return (
+    f.text.trim() !== "" ||
+    f.tags.size > 0 ||
+    f.flavors.size > 0 ||
+    f.relMin > 1 ||
+    f.sort !== "course"
+  );
+}
+
+export function clearFilters() {
+  state.filters.text = "";
+  state.filters.tags.clear();
+  state.filters.flavors.clear();
+  state.filters.relMin = 1;
+  state.filters.sort = "course";
+}
+
+export function pagesFor(path) {
+  const pages = state.pagesIndex[path];
+  if (pages && pages.length) return pages;
+  // Exercises: surface úkols as page-level nodes
+  const ex = state.exercises[path];
+  if (ex?.tasks?.length) {
+    return ex.tasks.map((t) => ({
+      id: t.id,
+      title: t.title || t.summary || t.id,
+    }));
+  }
+  return [];
+}
+
+export function slideDiff(slug, pageId) {
+  const key = `${slug}#${pageId}`;
+  const entry = state.slides[key];
+  if (!entry) return null;
+  return typeof entry === "string" ? entry : entry.diff || null;
+}

@@ -1,0 +1,27 @@
+# import modulu
+>>> import shelve
+
+# otevření databáze
+# (neinteraktivně lépe pomocí kontextu „with“)
+>>> d = shelve.open('shelf')
+
+# objekt podporuje běžné slovníkové metody..
+>>> d['a'] = (1, 2, 3)
+>>> d['a']
+(1, 2, 3)
+>>> 'a' in d
+True
+
+# ..a to včetně rušení záznamů
+>>> xs = ('a', 'b', 'c')
+>>> d['b'] = xs
+>>> d['b']
+('a', 'b', 'c')
+>>> 'b' in d
+True
+>>> del d['b']
+>>> 'b' in d
+False
+
+# na konci práce MUSÍME databázi uzavřít, aby se vše korektně zaznamenalo
+>>> d.close()

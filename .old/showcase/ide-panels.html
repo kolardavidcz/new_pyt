@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Direction C — IDE panels</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#2e3440; --panel:#333a48; --panel-alt:#3b4252; --editor:#2e3440;
+    --text:#d8dee9; --text-soft:#8b96ac; --border:#434c5e; --border-soft:#3b4252;
+    --accent:#88c0d0; --accent-dim:#5b7b85;
+    --pa:#a3be8c; --jc:#ebcb8b; --nw:#bf616a; --uq:#b48ead;
+    --font-sans:'IBM Plex Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:14px;}
+  .app{max-width:1000px;margin:0 auto;border:1px solid var(--border);border-radius:5px;overflow:hidden;}
+
+  /* window chrome */
+  .titlebar{background:var(--panel-alt);padding:.4rem .8rem;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+  .dot{width:11px;height:11px;border-radius:50%;background:var(--border);}
+  .titlebar .name{margin-left:auto;margin-right:auto;font-size:12px;color:var(--text-soft);font-family:var(--font-mono);}
+
+  /* tab bar — proof the 3 page types are ONE system */
+  .tabbar{background:var(--panel-alt);display:flex;border-bottom:1px solid var(--border);}
+  .tab{padding:.55rem 1rem;font-family:var(--font-mono);font-size:12.5px;color:var(--text-soft);border-right:1px solid var(--border);display:flex;align-items:center;gap:7px;cursor:default;}
+  .tab.active{background:var(--editor);color:var(--text);border-top:2px solid var(--accent);margin-top:-1px;}
+  .tab .dot-icon{width:6px;height:6px;border-radius:50%;background:var(--jc);}
+  .tab.active .dot-icon{background:var(--accent);}
+
+  .body{display:flex;}
+  .activitybar{width:44px;background:var(--panel-alt);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:.8rem 0;gap:1.3rem;}
+  .activitybar .icon{width:20px;height:20px;border:1.5px solid var(--text-soft);border-radius:3px;opacity:.55;}
+  .activitybar .icon.on{border-color:var(--accent);opacity:1;}
+
+  .main{flex:1;padding:1.4rem 1.6rem 1.6rem;min-width:0;}
+
+  /* status strip = course progress, framed as build status not decoration */
+  .progressline{display:flex;gap:14px;align-items:center;margin-bottom:1.4rem;font-family:var(--font-mono);font-size:11.5px;color:var(--text-soft);flex-wrap:wrap;}
+  .progressline .chip{display:flex;align-items:center;gap:5px;}
+  .progressline .sq{width:8px;height:8px;border-radius:2px;}
+  .sq.pa{background:var(--pa);} .sq.jc{background:var(--jc);} .sq.nw{background:var(--nw);} .sq.uq{background:var(--uq);}
+
+  .weekrail{display:flex;gap:4px;margin-bottom:1.6rem;font-family:var(--font-mono);flex-wrap:wrap;}
+  .weekrail span{font-size:11px;color:var(--text-soft);border:1px solid var(--border);border-radius:3px;padding:2px 6px;}
+  .weekrail span.active{background:var(--accent-dim);color:#0d1117;border-color:var(--accent);font-weight:600;}
+
+  h2.eyebrow{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-soft);margin:1.6rem 0 .6rem;}
+
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:1rem 1.2rem 1.2rem;margin-bottom:1.4rem;}
+  .panel h3{font-size:15px;font-weight:500;margin-bottom:.5rem;}
+  .taglabel{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;color:var(--jc);background:rgba(235,203,139,.12);padding:2px 7px;border-radius:3px;margin-bottom:.8rem;}
+  .taglabel .sq{width:7px;height:7px;border-radius:2px;background:var(--jc);}
+  .panel p{font-size:13.5px;color:var(--text-soft);margin-bottom:.85rem;line-height:1.6;}
+  .panel code{font-family:var(--font-mono);color:var(--accent);background:rgba(136,192,208,.1);padding:0 4px;border-radius:2px;font-size:.9em;}
+
+  /* code block with line numbers, gutter — and the peek trigger */
+  .code{font-family:var(--font-mono);font-size:12.5px;background:var(--editor);border:1px solid var(--border-soft);border-radius:4px;overflow:hidden;}
+  .code .line{display:grid;grid-template-columns:34px 1fr;}
+  .code .line .ln{color:#4c566a;text-align:right;padding:0 8px 0 0;user-select:none;}
+  .code .line .src{padding:1px 10px 1px 4px;white-space:pre;color:var(--text);}
+  .code .kw{color:var(--accent);text-decoration:underline dotted var(--accent-dim);cursor:pointer;background:rgba(136,192,208,.12);border-radius:2px;padding:0 2px;}
+  .code .cm{color:#616e88;}
+
+  /* peek definition panel — the signature */
+  .peek{background:var(--panel-alt);border-top:1px solid var(--accent-dim);border-bottom:1px solid var(--accent-dim);margin:0;padding:.8rem 1rem 1rem;display:none;}
+  .peek.open{display:block;}
+  .peek-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;}
+  .peek-head span{font-family:var(--font-mono);font-size:11px;color:var(--accent);}
+  .peek-head button{background:none;border:none;color:var(--text-soft);font-family:var(--font-mono);cursor:pointer;font-size:13px;}
+  .peek p{font-size:12.5px;color:var(--text-soft);line-height:1.6;}
+  .peek code{font-family:var(--font-mono);color:var(--jc);background:rgba(235,203,139,.1);padding:0 4px;border-radius:2px;}
+
+  /* exercise panel */
+  .exhead{display:flex;align-items:center;gap:8px;margin-bottom:.4rem;}
+  .exhead .taglabel{color:var(--pa);background:rgba(163,190,140,.12);}
+  .exhead .taglabel .sq{background:var(--pa);}
+  .tri{font-family:var(--font-mono);font-size:12px;color:var(--text-soft);background:var(--editor);border:1px solid var(--border-soft);border-radius:4px;padding:.7rem 1rem;margin:.7rem 0;white-space:pre;}
+  details{margin-top:.7rem;}
+  summary{cursor:pointer;font-family:var(--font-mono);font-size:11.5px;color:var(--accent);}
+  details p{margin-top:.4rem;color:var(--text-soft);font-size:12.5px;}
+
+  .statusbar{background:var(--accent-dim);color:#0d1117;font-family:var(--font-mono);font-size:11px;padding:.35rem .9rem;display:flex;justify-content:space-between;}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="titlebar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="name">python-vscht — Visual Studio Code</span></div>
+
+  <div class="tabbar">
+    <div class="tab"><span class="dot-icon"></span>new_order.html</div>
+    <div class="tab active"><span class="dot-icon"></span>scope.xml</div>
+    <div class="tab"><span class="dot-icon"></span>procvicovani_3.html</div>
+  </div>
+
+  <div class="body">
+    <div class="activitybar">
+      <div class="icon on"></div>
+      <div class="icon"></div>
+      <div class="icon"></div>
+      <div class="icon"></div>
+    </div>
+
+    <div class="main">
+      <div class="progressline">
+        <span class="chip"><span class="sq pa"></span>PA 0/25</span>
+        <span class="chip"><span class="sq jc"></span>J+C++ 0/30</span>
+        <span class="chip"><span class="sq nw"></span>Nové 0/28</span>
+        <span class="chip"><span class="sq uq"></span>Unikát 0/11</span>
+        <span style="margin-left:auto">0/94 celkem</span>
+      </div>
+
+      <div class="weekrail">
+        <span>00</span><span>01</span><span>02</span><span>03</span><span class="active">04</span><span>05</span><span>06</span><span>07</span><span>08</span><span>09</span><span>10</span><span>11</span><span>12</span><span>13</span>
+      </div>
+
+      <h2 class="eyebrow">Přednáška</h2>
+      <div class="panel">
+        <h3>Scope (obor viditelnosti LEGB)</h3>
+        <span class="taglabel"><span class="sq"></span>java/c++ — jinak</span>
+        <p>Pokud byste chtěli skutečně pracovat s proměnnou mimo tělo funkce, musíte použít klíčové slovo <span class="kw-inline" style="color:var(--accent)">global</span>.</p>
+
+        <div class="code">
+          <div class="line"><span class="ln">1</span><span class="src"><span class="cm"># toto je proměnná 'hodnota' na globální úrovni</span></span></div>
+          <div class="line"><span class="ln">2</span><span class="src">hodnota = 'venku'</span></div>
+          <div class="line"><span class="ln">3</span><span class="src"></span></div>
+          <div class="line"><span class="ln">4</span><span class="src">def zmena():</span></div>
+          <div class="line"><span class="ln">5</span><span class="src">&#160;&#160;&#160;&#160;<span class="kw" onclick="togglePeek()">global</span> hodnota</span></div>
+          <div class="line"><span class="ln">6</span><span class="src">&#160;&#160;&#160;&#160;hodnota = 'uvnitř'</span></div>
+
+          <div class="peek open" id="peek">
+            <div class="peek-head">
+              <span>Peek: java_cpp_equivalent.md</span>
+              <button onclick="togglePeek()">×</button>
+            </div>
+            <p>V C++/Javě je proměnná na vnější úrovni vždy vidět odkudkoli — žádné klíčové slovo není potřeba. Python naopak předpokládá, že přiřazení uvnitř funkce je <code>lokální</code>, dokud mu neřeknete <code>global</code> jinak.</p>
+          </div>
+        </div>
+        <p style="margin-top:.7rem;font-size:12px;color:var(--text-soft)">Signature move: podtržená klíčová slova otevírají skutečný Peek Definition panel s C++/Java ekvivalentem — přesně ta interakce, kterou už znáte z vlastního IDE.</p>
+      </div>
+
+      <h2 class="eyebrow">Cvičení</h2>
+      <div class="panel">
+        <div class="exhead">
+          <h3 style="margin-bottom:0">Pascalův trojúhelník</h3>
+          <span class="taglabel"><span class="sq"></span>PA</span>
+        </div>
+        <p>Napište program pro výpis zadaného počtu řádků Pascalova trojúhelníku, správně graficky uspořádaného.</p>
+        <div class="tri">           1
+          1 1
+         1 2 1
+        1 3 3 1
+       1 4 6 4 1</div>
+        <details>
+          <summary>▸ nápověda</summary>
+          <p>Nevíte-li rovnou, jak řešit uspořádání, vyřešte úlohu nejdříve tak, aby psala správné koeficienty, a teprve poté se zabývejte zarovnáním.</p>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar"><span>Python 3.12 · UTF-8 · Ln 5, Col 11</span><span>sync: 0/94 dokončeno</span></div>
+</div>
+
+<script>
+function togglePeek(){
+  document.getElementById('peek').classList.toggle('open');
+}
+</script>
+</body>
+</html>

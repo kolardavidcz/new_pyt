@@ -1,0 +1,129 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>GUI – Tkinter a obrázky (GIF &amp; PNM)
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — GUI – Tkinter a obrázky (GIF &amp; PNM)</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">9</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Obrázek ze souboru</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Obrázek jako bajtový řetězec</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">GIF jako BASE64-data</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Další vlastnosti</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Gama-korekce</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Kopie obrázku „-copy“</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Získání dat obrázku „-data“ &amp; „put()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Data pixelu „get()“</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2016-11-07</span></div><h1 class="lecture-title">GUI – Tkinter a obrázky (GIF &amp; PNM)</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        <strong><code>PhotoImage</code></strong> jest jednou ze dvou tříd, které můžeme použít pro zobrazení obrázků na <em>canvas</em>u tkinterové aplikace. Konkrétně tato třída zvládá následující formáty:
+    </p>
+    <ul>
+        <li>
+            GIF;
+        </li>
+        <li>
+            <a href="/materialy/media/pnm.xml">PNM</a>, a to specificky pouze binární podformáty P5 (odstíny šedi) a P6 (standardní RBG).
+        </li>
+    </ul>
+    <p>
+        Data obrázků je přitom možno načítat buď ze souboru nebo zadávat přímo jako bajtové sekvence (a v případě formátu GIF i jako BASE64-zakódované).
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Obrázek ze souboru"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Obrázek ze souboru</h2></div><div class="section-body">
+
+    <p>
+        Zobrazit na kanvasu obrázek ze souboru se zařizuje parametrem <em>file</em>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        from tkinter import *
+
+        root = Tk()
+        root.title('Obrázek ze souboru')
+
+        #photo = PhotoImage(file='duha-2.gif')
+        photo = PhotoImage(file='duha-2.ppm')
+        w, h = photo.width(), photo.height()
+
+        canvas = Canvas(root, width=w, height=h)
+        image = canvas.create_image((w, h), image=photo, anchor=SE)
+        canvas.pack()
+
+        root.mainloop()
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Soubory: <a href="_files/PI/duha-2.pnm">duha-2.pnm</a>, <a href="_files/PI/duha-2.gif">duha-2.gif</a>
+    </div></div>
+    <p>
+        Jediné, na co nesmíte zapomenout, je poslat do metody <em>create_image()</em> rozměry obrázku, a to jako dvojici. U vlastního kanvasu to není až tak důležité, protože se v rámci možností přizpůsobuje. (Spíš by v tomhle případě byl zbytečně veliký.)
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Obrázek jako bajtový řetězec"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Obrázek jako bajtový řetězec</h2></div><div class="section-body">
+
+    <p>
+        Úplně to samé platí pro obrázek z bajtového řetězce, jen se použije parametr <em>data</em>:
+    </p>
+    <example lang="python" src="_files/PI/pnm-memory.py"></example>
+    <img src="_files/PI/screenshot-0.png" width="342" height="365" alt="screenshot">
+    <p>
+        Pokud sestavíte validní bajtový řetězec (tedy typ <em>bytes()</em>, nikoli <em>bytearray()</em>!) obrázku, bude zobrazen stejně, jako kdybyste ho načetli ze souboru.
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="GIF jako BASE64-data"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">GIF jako BASE64-data</h2></div><div class="section-body">
+
+    <p>
+        Zajímavou variantou – toho času ale pouze pro formát GIF – je načtení dat obrázku v podobě <a href="_files/PI/duha-2.base64">BASE64-zakódovaného řetězce</a>:
+    </p>
+    <example lang="python" src="_files/PI/gif-64.py"></example>
+
+</div></section><section class="slide-section" id="id5" data-title="Další vlastnosti"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Další vlastnosti</h2></div><div class="section-body">
+
+    <p>
+        V <a href="https://docs.python.org/3/library/tkinter.html" class="external">oficiální dokumentaci k <em>tkinter</em>u</a> se už o moc víc nedočtete, ale když se podíváte na vlastnosti tříd <a href="http://www.tcl.tk/man/tcl8.5/TkCmd/image.htm" class="external"><code>image</code></a> a <a href="http://www.tcl.tk/man/tcl8.5/TkCmd/photo.htm" class="external"><code>photo</code></a> u dokumentace <em>Tk</em>, zjistíte, že s obrázky se dá docela slušně „řádit“. Ale to už předpokládá, že umíte „překládat“ dokumentaci pro jazyk <em>Tcl</em> na dokumentaci pro jazyk <em>Python</em>.
+    </p>
+    <p>
+        V dalším se na pár užitečných vlastností obrázků podíváme.
+    </p>
+
+</div></section><section class="slide-section" id="id6" data-title="Gama-korekce"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Gama-korekce</h2></div><div class="section-body">
+
+    <p>
+        Světe div se, ale <em>tkinter</em> umožňuje u zobrazených obrázků měnit jejich jas pomocí <em>gama-korekce</em>:
+    </p>
+    <example lang="python" src="_files/PI/pnm-gamma.py"></example>
+    <img src="_files/PI/screenshot-1.png" width="598" height="621" alt="screenshot" style="padding: 1em;">
+
+</div></section><section class="slide-section" id="id7" data-title="Kopie obrázku „-copy“"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Kopie obrázku „-copy“</h2></div><div class="section-body">
+
+    <p>
+        Zobrazený obrázek můžete také zkopírovat do nového, a to dokonce pouze jeho výřez a ještě při tom změnit jeho velikost. Jediný zádrhel je, že příslušná metoda <em>copy()</em> v <em>tkinter</em>u <a href="http://tkinter.unpythonic.net/wiki/PhotoImage#Copy_a_SubImage" class="external">umí pouze přesnou kopii</a>, takže pro plnou funkcionalitu originálu si musíte odskočit do volání čistého <em>Tk</em>:
+    </p>
+    <example lang="python" src="_files/PI/gif-copy.py"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Soubor: <a href="_files/PI/duha_vicenasobna.5.gif">duha_vicenasobna.5.gif</a>
+    </div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="Získání dat obrázku „-data“ &amp; „put()“"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Získání dat obrázku „-data“ &amp; „put()“</h2></div><div class="section-body">
+
+    <p>
+        Opět odskokem na přímé volání do <em>Tk</em>, protože uvedená metoda nemá v <em>tkinter</em>u vůbec ekvivalent, můžete také získat přímo RBG-data obrázku pomocí metody <em>-data</em> a ta dále použít (zde výřez v odstínech šedi):
+    </p>
+    <example lang="python" src="_files/PI/gif-data.py"></example>
+    <img src="_files/PI/screenshot-2.png" width="854" height="749" alt="screenshot">
+    <p>
+        Data výřezu jsou v tomto případě vrácena jako sekvence RGB-hodnot, které metoda <em>put()</em> dokáže rozkódovat a správně zobrazit.
+    </p>
+
+</div></section><section class="slide-section" id="id9" data-title="Data pixelu „get()“"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Data pixelu „get()“</h2></div><div class="section-body">
+
+    <p>
+        Jako poslední si ukažme ještě zjištění informací o konkrétním pixelu:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/PI/pnm-get.py"><em>PI/pnm-get.py</em></a></div><example src="_files/PI/pnm-get.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/PI/pnm-get.out" lang="text"></example></div></div>
+    <p>
+        Nazpět se vrátí trojice představující postupně dekadickou hodnotu pro červenou, modrou a zelenou složku barvy na příslušných souřadnicích obrázku. A to jako jeden <em>řetězec</em>, tak pozor na to!
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 9 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

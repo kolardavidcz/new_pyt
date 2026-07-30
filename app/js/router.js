@@ -1,0 +1,488 @@
+/** Tab bar + navigation router + browser History API */
+
+import { state } from "./state.js";
+import { clear, svgClose } from "./ui.js";
+import {
+  showHome, showWeek, showFullContent, showPresentation, showPage,
+  showSearchResults, showProgress,
+} from "./content.js";
+import { revealItem, renderTree } from "./tree.js";
+
+/** When true, navigate() does not push a new history entry (used for popstate). */
+let suppressHistory = false;
+
+/**
+ * Navigate to a course view.
+ * @param {object} target
+ * @param {{ replace?: boolean, skipHistory?: boolean }} [opts]
+ */
+export function navigate(target, opts = {}) {
+  const tab = ensureTab(target);
+  activateTab(tab.id);
+  renderTabs();
+  renderBreadcrumb(tab);
+  renderView(tab);
+  updateChrome(tab);
+
+  if (tab.itemId) {
+    revealItem(tab.itemId, tab.pageId);
+  } else if (tab.weekId) {
+    state.focusedTreeKey = tab.weekId;
+    state.expanded.set(tab.weekId, true);
+    renderTree();
+  }
+
+  if (!opts.skipHistory && !suppressHistory) {
+    pushHistory(targetToRoute(target), opts.replace);
+  }
+}
+
+/* ── History API (browser Back / Forward) ──────────────── */
+
+export function initHistory() {
+  // Seed current URL if empty
+  if (!location.hash || location.hash === "#" || location.hash === "#/") {
+    replaceHistory({ kind: "home" });
+  }
+
+  window.addEventListener("popstate", (e) => {
+    const route = e.state?.route || parseHash(location.hash);
+    suppressHistory = true;
+    try {
+      applyRoute(route);
+    } finally {
+      suppressHistory = false;
+    }
+  });
+
+  // Initial load from hash (deep link)
+  const initial = parseHash(location.hash);
+  if (initial && initial.kind !== "home") {
+    // course data may not be ready — caller invokes navigate after boot
+    return initial;
+  }
+  return { kind: "home" };
+}
+
+export function getInitialRoute() {
+  return parseHash(location.hash) || { kind: "home" };
+}
+
+function targetToRoute(target) {
+  // Normalize to a serializable route object
+  const kind = target.kind;
+  if (kind === "home") return { kind: "home" };
+  if (kind === "week") return { kind: "week", id: target.id };
+  if (kind === "lecture" || kind === "exercise" || kind === "content") {
+    return { kind: kind === "content" ? "lecture" : kind, id: target.id };
+  }
+  if (kind === "presentation") return { kind: "presentation", id: target.id };
+  if (kind === "page") return { kind: "page", id: target.id, pageId: target.pageId };
+  if (kind === "search") return { kind: "search" };
+  if (kind === "progress") return { kind: "progress" };
+  return { kind: "home" };
+}
+
+function routeToHash(route) {
+  if (!route || route.kind === "home") return "#/";
+  if (route.kind === "week") return `#/week/${enc(route.id)}`;
+  if (route.kind === "lecture" || route.kind === "exercise") {
+    return `#/${route.kind}/${enc(route.id)}`;
+  }
+  if (route.kind === "presentation") return `#/presentation/${enc(route.id)}`;
+  if (route.kind === "page") return `#/page/${enc(route.id)}/${enc(route.pageId)}`;
+  if (route.kind === "search") return "#/search";
+  if (route.kind === "progress") return "#/progress";
+  return "#/";
+}
+
+function parseHash(hash) {
+  const h = (hash || "").replace(/^#/, "") || "/";
+  const parts = h.split("/").filter(Boolean);
+  // ["week", "week-0"] or ["lecture", "lecture:..."] or ["page", id, pageId]
+  if (!parts.length) return { kind: "home" };
+  const [a, b, c] = parts;
+  if (a === "week" && b) return { kind: "week", id: dec(b) };
+  if ((a === "lecture" || a === "exercise") && b) return { kind: a, id: dec(b) };
+  if (a === "presentation" && b) return { kind: "presentation", id: dec(b) };
+  if (a === "page" && b && c) return { kind: "page", id: dec(b), pageId: dec(c) };
+  if (a === "content" && b) return { kind: "lecture", id: dec(b) };
+  if (a === "item" && b) return { kind: "lecture", id: dec(b) };
+  if (a === "search") return { kind: "search" };
+  if (a === "progress") return { kind: "progress" };
+  return { kind: "home" };
+}
+
+function enc(s) {
+  return encodeURIComponent(s);
+}
+function dec(s) {
+  try { return decodeURIComponent(s); } catch { return s; }
+}
+
+function pushHistory(route, replace = false) {
+  const hash = routeToHash(route);
+  const url = hash;
+  const data = { route };
+  if (replace) {
+    history.replaceState(data, "", url);
+  } else {
+    // Avoid duplicate consecutive entries
+    const cur = history.state?.route;
+    if (cur && routeKey(cur) === routeKey(route)) {
+      history.replaceState(data, "", url);
+      return;
+    }
+    history.pushState(data, "", url);
+  }
+}
+
+function replaceHistory(route) {
+  history.replaceState({ route }, "", routeToHash(route));
+}
+
+function routeKey(r) {
+  if (!r) return "";
+  return [r.kind, r.id || "", r.pageId || ""].join("|");
+}
+
+function applyRoute(route) {
+  if (!route) {
+    navigate({ kind: "home" }, { skipHistory: true });
+    return;
+  }
+  // Resolve content kind: prefer item existence
+  if (route.kind === "lecture" || route.kind === "exercise") {
+    const item = state.itemsById.get(route.id);
+    if (item) {
+      navigate({ kind: item.kind, id: item.id }, { skipHistory: true });
+      return;
+    }
+  }
+  navigate(route, { skipHistory: true });
+}
+
+/* ── Tabs ──────────────────────────────────────────────── */
+
+const PINNED_HOME = {
+  id: "home",
+  kind: "home",
+  title: "Welcome",
+  itemId: null,
+  weekId: null,
+  pageId: null,
+  pinned: true,
+};
+
+/** Ensure the Welcome tab always exists as the first tab. */
+function ensurePinnedHome() {
+  const existing = state.tabs.find((t) => t.id === "home");
+  if (!existing) {
+    state.tabs.unshift({ ...PINNED_HOME });
+  } else if (state.tabs[0]?.id !== "home") {
+    state.tabs = [existing, ...state.tabs.filter((t) => t.id !== "home")];
+    existing.pinned = true;
+  } else {
+    existing.pinned = true;
+  }
+}
+
+function ensureTab(target) {
+  ensurePinnedHome();
+  const kind = target.kind;
+  let id, title, itemId, weekId, pageId, tabKind;
+
+  if (kind === "home") {
+    id = "home";
+    title = "Welcome";
+    tabKind = "home";
+  } else if (kind === "week") {
+    id = `week:${target.id}`;
+    weekId = target.id;
+    const w = state.weeksById.get(weekId);
+    title = w ? `W${w.week}: ${w.title}` : target.id;
+    tabKind = "week";
+  } else if (kind === "lecture" || kind === "exercise" || kind === "content") {
+    // Default: full lecture content
+    itemId = target.id;
+    const item = state.itemsById.get(itemId);
+    id = `content:${itemId}`;
+    title = item?.title || itemId;
+    tabKind = "content";
+  } else if (kind === "presentation") {
+    itemId = target.id;
+    const item = state.itemsById.get(itemId);
+    id = `presentation:${itemId}`;
+    title = item ? `${item.title} · slides` : itemId;
+    tabKind = "presentation";
+  } else if (kind === "page") {
+    itemId = target.id;
+    pageId = target.pageId;
+    const item = state.itemsById.get(itemId);
+    id = `page:${itemId}#${pageId}`;
+    const pages = item ? (state.pagesIndex[item.path] || []) : [];
+    const p = pages.find((x) => x.id === pageId);
+    title = p?.title || pageId;
+    if (item && title.length < 28) title = `${item.title} · ${title}`;
+    if (title.length > 42) title = (p?.title || pageId);
+    tabKind = "page";
+  } else if (kind === "search") {
+    id = "search";
+    title = "Search";
+    tabKind = "search";
+  } else if (kind === "progress") {
+    id = "progress";
+    title = "Progress";
+    tabKind = "progress";
+  } else {
+    id = "home";
+    title = "Welcome";
+    tabKind = "home";
+  }
+
+  let tab = state.tabs.find((t) => t.id === id);
+  if (!tab) {
+    tab = {
+      id,
+      kind: tabKind,
+      title,
+      itemId: itemId || null,
+      weekId: weekId || null,
+      pageId: pageId || null,
+      pinned: id === "home",
+    };
+    // Cap unpinned tabs (keep Welcome pinned at index 0)
+    const unpinned = state.tabs.filter((t) => t.id !== "home");
+    if (unpinned.length >= 13) {
+      const drop = unpinned[0];
+      state.tabs = state.tabs.filter((t) => t.id !== drop.id);
+    }
+    if (id === "home") {
+      state.tabs.unshift(tab);
+    } else {
+      state.tabs.push(tab);
+    }
+    ensurePinnedHome();
+  } else {
+    tab.title = title;
+    tab.pageId = pageId || tab.pageId;
+    tab.kind = tabKind;
+    if (id === "home") tab.pinned = true;
+  }
+  return tab;
+}
+
+function activateTab(tabId) {
+  state.activeTabId = tabId;
+}
+
+export function closeTab(tabId) {
+  // Welcome is pinned — never close
+  if (tabId === "home") {
+    navigate({ kind: "home" });
+    return;
+  }
+  const i = state.tabs.findIndex((t) => t.id === tabId);
+  if (i < 0) return;
+  const tab = state.tabs[i];
+  if (tab.pinned) return;
+  state.tabs.splice(i, 1);
+  ensurePinnedHome();
+  if (state.activeTabId === tabId) {
+    const next = state.tabs[i] || state.tabs[i - 1] || state.tabs[0] || null;
+    if (next) {
+      navigate(tabToTarget(next), { replace: true });
+    } else {
+      navigate({ kind: "home" }, { replace: true });
+    }
+  } else {
+    renderTabs();
+  }
+}
+
+function tabToTarget(tab) {
+  if (tab.kind === "home") return { kind: "home" };
+  if (tab.kind === "week") return { kind: "week", id: tab.weekId };
+  if (tab.kind === "content") {
+    const item = state.itemsById.get(tab.itemId);
+    return { kind: item?.kind || "lecture", id: tab.itemId };
+  }
+  if (tab.kind === "presentation") return { kind: "presentation", id: tab.itemId };
+  if (tab.kind === "page") return { kind: "page", id: tab.itemId, pageId: tab.pageId };
+  if (tab.kind === "search") return { kind: "search" };
+  if (tab.kind === "progress") return { kind: "progress" };
+  return { kind: "home" };
+}
+
+export function renderTabs() {
+  const list = document.getElementById("tabsList");
+  if (!list) return;
+  clear(list);
+  ensurePinnedHome();
+
+  for (const tab of state.tabs) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    const isActive = tab.id === state.activeTabId;
+    const isPinned = tab.pinned || tab.id === "home";
+    btn.className = "tab"
+      + (isActive ? " active" : "")
+      + (isPinned ? " tab-pinned" : "");
+    btn.setAttribute("role", "tab");
+    btn.setAttribute("aria-selected", String(isActive));
+    if (isPinned) {
+      btn.innerHTML = `
+        <span class="tab-pin" title="Pinned" aria-hidden="true">
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor"><path d="M8.5 1.5l.9 2.8 2.9.1-2.3 1.9.8 2.9L8.5 7.5 6.2 9.2l.8-2.9L4.7 4.4l2.9-.1.9-2.8z"/></svg>
+        </span>
+        <span class="tab-label" title="${escapeAttr(tab.title)}">${escape(tab.title)}</span>
+      `;
+    } else {
+      btn.innerHTML = `
+        <span class="tab-label" title="${escapeAttr(tab.title)}">${escape(tab.title)}</span>
+        <span class="tab-close" data-close="${escapeAttr(tab.id)}" title="Close">${svgClose()}</span>
+      `;
+    }
+    btn.addEventListener("click", (e) => {
+      const close = e.target.closest("[data-close]");
+      if (close) {
+        e.stopPropagation();
+        closeTab(close.getAttribute("data-close"));
+        return;
+      }
+      navigate(tabToTarget(tab));
+    });
+    list.appendChild(btn);
+  }
+}
+
+function renderView(tab) {
+  if (!tab) {
+    showHome();
+    return;
+  }
+  switch (tab.kind) {
+    case "home":
+      showHome();
+      break;
+    case "week":
+      showWeek(tab.weekId);
+      break;
+    case "content":
+      showFullContent(tab.itemId);
+      break;
+    case "presentation":
+      showPresentation(tab.itemId);
+      break;
+    case "page":
+      showPage(tab.itemId, tab.pageId);
+      break;
+    case "search":
+      showSearchResults(state.filters.text);
+      break;
+    case "progress":
+      showProgress();
+      break;
+    default:
+      showHome();
+  }
+}
+
+export function renderBreadcrumb(tab) {
+  const nav = document.getElementById("breadcrumb");
+  if (!nav) return;
+  clear(nav);
+
+  const parts = [];
+  parts.push(crumbBtn("Course", () => navigate({ kind: "home" })));
+
+  if (!tab || tab.kind === "home") {
+    parts.push(sep());
+    parts.push(crumbCurrent("Welcome"));
+  } else if (tab.kind === "week") {
+    const w = state.weeksById.get(tab.weekId);
+    parts.push(sep());
+    parts.push(crumbCurrent(w ? `Week ${w.week}` : tab.weekId));
+  } else if (tab.itemId) {
+    const item = state.itemsById.get(tab.itemId);
+    if (item) {
+      parts.push(sep());
+      parts.push(crumbBtn(`W${item.weekNum}`, () => navigate({ kind: "week", id: item.weekId })));
+      parts.push(sep());
+      if (tab.kind === "page") {
+        parts.push(crumbBtn(item.title, () => navigate({ kind: item.kind, id: item.id })));
+        parts.push(sep());
+        const pages = state.pagesIndex[item.path] || [];
+        const p = pages.find((x) => x.id === tab.pageId);
+        parts.push(crumbCurrent(p?.title || tab.pageId));
+      } else if (tab.kind === "presentation") {
+        parts.push(crumbBtn(item.title, () => navigate({ kind: item.kind, id: item.id })));
+        parts.push(sep());
+        parts.push(crumbCurrent("Presentation"));
+      } else {
+        parts.push(crumbCurrent(item.title));
+      }
+    }
+  } else if (tab.kind === "search") {
+    parts.push(sep());
+    parts.push(crumbCurrent("Search"));
+  } else if (tab.kind === "progress") {
+    parts.push(sep());
+    parts.push(crumbCurrent("Progress"));
+  }
+
+  for (const p of parts) nav.appendChild(p);
+}
+
+function crumbBtn(label, onClick) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = label;
+  b.addEventListener("click", onClick);
+  return b;
+}
+function crumbCurrent(label) {
+  const s = document.createElement("span");
+  s.className = "current";
+  s.textContent = label;
+  return s;
+}
+function sep() {
+  const s = document.createElement("span");
+  s.className = "sep";
+  s.textContent = "›";
+  s.setAttribute("aria-hidden", "true");
+  return s;
+}
+
+function updateChrome(tab) {
+  const titlePath = document.getElementById("titlePath");
+  const sbPath = document.getElementById("sbPath");
+  let path = "python-course";
+  if (tab?.itemId) {
+    const item = state.itemsById.get(tab.itemId);
+    if (item) path = item.path;
+  } else if (tab?.weekId) {
+    path = tab.weekId;
+  } else if (tab?.kind === "search") {
+    path = "search";
+  } else if (tab?.kind === "progress") {
+    path = "progress";
+  }
+  if (titlePath) titlePath.textContent = " — " + (tab?.title || "C/Java → Python");
+  if (sbPath) sbPath.textContent = path;
+}
+
+function escape(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function escapeAttr(s) {
+  return escape(s).replace(/"/g, "&quot;");
+}
+
+/** Re-render current tab view (e.g. after filter change on week/search) */
+export function refreshActiveView() {
+  const tab = state.tabs.find((t) => t.id === state.activeTabId);
+  if (tab) renderView(tab);
+  else showHome();
+}

@@ -1,0 +1,162 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Jak na rychlost – Numba
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Jak na rychlost – Numba</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">9</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Poznámka k instalaci</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">„@jit“</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">„@jit“ s typovou anotací</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">„@jit(nopython=True)“</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">„@jit“ – souhrn</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">„@vectorize“</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">„@guvectorize“</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text"></span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2016-12-21</span></div><h1 class="lecture-title">Jak na rychlost – Numba</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        <a href="http://numba.pydata.org" class="external"><strong>Numba</strong></a> patří mezi alternativní interpretry Python'u s několika dodanými velmi výraznými vylepšeními. Použít se dá v podstatě dvěma způsoby:
+    </p>
+    <ul>
+        <li>
+            méně často  pouze jako interpretr pythoního kódu;
+        </li>
+        <li>
+            jako knihovna sloužící k relativně snadnému zrychlení pythoních kódů, obzvláště pokud používají knihovnu <em>Numpy</em>.
+        </li>
+    </ul>
+    <p>
+        Vývoj <em>Numby</em> probíhá dosti rychle, přesto mezi podporovanými <a href="http://numba.pydata.org/numba-doc/latest/reference/pysupported.html" class="external">pythoními</a> a <a href="http://numba.pydata.org/numba-doc/latest/reference/numpysupported.html" class="external">numpyovskými</a> vlastnostmi může zatím chybět to, co zrovna potřebujete. Ale za pokus to vždy stojí.
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Poznámka k instalaci"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Poznámka k instalaci</h2></div><div class="section-body">
+
+    <p>
+        Nainstalovat <em>Numbu</em> není vůbec jednoduché – mimo jiné vyžaduje instalaci správné verze <em>LLVM</em> a jeho pro potřeby Numby upraveného rozhraní pro Python <em>llvmlite</em> plus samozřejmě <em>Numpy</em> (se všemi jeho závislostmi) a ještě několik dalších balíčků.
+    </p>
+    <p>
+        Kde se nezadaří klasické <code>pip install numba</code>, zabere téměř určitě <code>conda install numba</code> (musíte ovšem pracovat minimálně pod <a href="/materialy/python/packages/conda_overview.xml">Minicondou</a>).
+    </p>
+    <p>
+        PS: Podpora CUDA se musí doinstalovat a nastavit zvlášť (viz <a href="https://github.com/numba/numba" class="external">oficiální dokumentace</a>). S <em>Condou</em> to jde jako vždy výrazně jednodušeji.
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="„@jit“"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">„@jit“</h2></div><div class="section-body">
+
+    <p>
+        Mezi nejzajímavější prostředky, které <em>Numba</em> nabízí, patří dekorátor <strong><code>@jit</code></strong>. Jeho základní použití je triviální:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        from numba import jit
+
+        @jit
+        def funkce(parametr):
+            ...
+    </pre>
+    <p>
+        <em>Numba</em> se v tomto případě pokusí vstupní i návratové typy odhadnout sama a odekorovanou funkci zJITovat. Ve většině případů je to asi to nejlepší (a rozhodně to nejjednodušší), co můžete udělat.
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="„@jit“ s typovou anotací"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">„@jit“ s typovou anotací</h2></div><div class="section-body">
+
+    <p>
+        Nechcete-li z nejrůznějších důvodů nechat odhadování typů na <em>Numbě</em>, můžete použít <strong>typovou anotaci</strong>, kterou řeknete, o jaké typy se u dané funkce jedná. Jednoduchý příklad upravený <a href="http://numba.pydata.org/numba-doc/latest/user/jit.html#eager-compilation" class="external">podle dokumentace</a>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        from numba import jit, int16
+
+        @jit(int16(int16, int16))
+        def fn(x, y):
+            return x + y
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Zatímco <em>Numba</em> samotná se snaží být co nejobecnější, u vlastních kódů musíte vědět, co děláte, jinak vás čekají překvapení o něco dříve, než s obecným řešením:
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            &gt;&gt;&gt; fn(1, 2)
+            3
+
+            &gt;&gt;&gt; fn(2**15, 0)
+            -32768
+            &gt;&gt;&gt; fn(2**15, -1)
+            32767
+        </pre>
+    </div></div>
+    <p>
+        PS: Anotace nemusí být úplná, můžete vynechat typ návratové hodnoty. Podobně se jich dá použít vícero (tedy vyjmenovat více možných <em>otisků funkce</em> pro různé typy), pak už ale záleží na jejich pořadí.
+    </p>
+
+</div></section><section class="slide-section" id="id5" data-title="„@jit(nopython=True)“"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">„@jit(nopython=True)“</h2></div><div class="section-body">
+
+    <p>
+        <em>Numba</em> se pokusí odekorovanou funkci zJITovat nejvhodnějším možným způsobem (tzv. <em>nopython mode</em>), ale ne vždy se to podaří, v kterémžto případě automaticky spadne do mnohem pomalejšího – ale na druhou stranu zcela Python C API kompatibilního – módu kompilace <em>object mode</em>.
+    </p>
+    <p>
+        Chcete-li uvedenému automatickému překladu předejít, stačí doplnit dekorátor na tvar <code>@jit(nopython=True)</code> – objeví-li <em>Numba</em> při kompilaci konstrukci, se kterou není optimálně proveditelná, místo přechodu na <em>object mode</em> vyhodí výjimku a zpracování kódu zastaví.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Co pak provedete, je na vás. Ideální je pokusit se dekorovanou funkci upravit tak, aby šla zJITovat a <em>Numba</em> přestala házet výjimku, ale nemusí se to vždy snadno podařit.
+    </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="„@jit“ – souhrn"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">„@jit“ – souhrn</h2></div><div class="section-body">
+
+    <p>
+        Plná varianta dekorátoru <strong>@jit</strong> jest:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        @numba.jit(
+            signature=None,
+            nopython=False,
+            nogil=False,
+            cache=False,
+            forceobj=False,
+            locals={}
+        )
+    </pre>
+    <p>
+        Odtud je mimo jiné vidět, proč může být typová anotace zadána beze jména parametru – je totiž první. Podobně přepínač <em>nopython</em> má – především asi pro ladicí účely – doplněk <em>forceobj</em>. A ty další:
+    </p>
+    <ul>
+        <li>
+            <code>nogil</code> – možnost vypnutí nechvalně proslulého <a href="http://vyuka/materialy/python/parallelism/overview.xml?slajd=3">GIL</a>u, ovšem se všemi důsledky z toho plynoucími (tedy pozor na paměť!);
+        </li>
+        <li>
+            <code>cache</code> – možnost uložení již dříve zkompilovaných funkcí na disk;
+            <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                    Může-li, skončí výsledek této kompilace v tradičním adresáři <code>__pycache__</code> vedle kódu.
+                </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                    Ne pro všechny funkce lze uložení provést – chcete-li vidět zprávu o neúspěchu, nastavte proměnnou prostředí <em>NUMBA_WARNINGS</em> na nenulovou hodnotu.
+                </div></div></div>
+        </li>
+        <li>
+            <code>locals</code> – může být použito pro vnucení typů lokálních proměnných funkce (ale nedoporučuje se používat).
+        </li>
+    </ul>
+    <p>
+    </p>
+
+</div></section><section class="slide-section" id="id7" data-title="„@vectorize“"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">„@vectorize“</h2></div><div class="section-body">
+
+    <p>
+        TODO
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+    </pre>
+
+</div></section><section class="slide-section" id="id8" data-title="„@guvectorize“"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">„@guvectorize“</h2></div><div class="section-body">
+
+    <p>
+        TODO
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+    </pre>
+
+</div></section><section class="slide-section" id="id9" data-title=""><div class="section-header"><span class="section-num">9</span><h2 class="section-title"></h2></div><div class="section-body">
+
+    <p>
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+    </pre>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 9 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

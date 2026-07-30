@@ -1,0 +1,215 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Pandas
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Pandas</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">13</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Poznámka – Pandas je moloch</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">„DataFrame“ je slovník hodnot typu „Series“</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Instalace a import modulu „pandas“</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Příklad – práce s tabulárními daty v CSV</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">PS: Technické informace o datech – „info()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Rychlý náhled na data – „head()“ a „tail()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Výpis vybraných sloupečků – „[[]]“</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Výběr hodnot – „[]“, „unique()“, „value_counts()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Numpy „fancy indexing“</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Logické skládání podmínek – „&amp;“ (AND), „|“ (OR) a „~“ (NOT)</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Vektorizované operace přes sloupce</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">PS: Konkrétní řádka(y) – „iloc[]“</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2025-04-23</span></div><h1 class="lecture-title">Pandas</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Modul <a href="https://pandas.pydata.org" class="external">Pandas</a> je specializovaný nástroj na práci se dvěma typy dat:
+    </p>
+    <ul>
+        <li>
+            1D-pole dat libovolného typu (objekt <code>Series</code>);
+        </li>
+        <li>
+            2D-tabulky dat libovolného typu (objekt <code>DataFrame</code>).
+        </li>
+    </ul>
+    <p>
+        Oboje využívá možností knihovny <a href="/materialy/python/numpy/overview.xml">Numpy</a>, konkrétně tedy její schopnosti zavedení libovolně složitého <a href="/materialy/python/numpy/arrays.creation.xml?slajd=38">strukturovaného typu</a>.
+    </p>
+    <p>
+        PS: Asi úplně nejčastěji se tak s Pandas setkáte při zpracování tabulárních dat z Excelu, případně v podobě souborů CSV.
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Poznámka – Pandas je moloch"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Poznámka – Pandas je moloch</h2></div><div class="section-body">
+
+    <p>
+        Abychom si hned na začátku uvědomili, s jak velikým molochem se potkáváme, zde je kupříkladu plná verze funkce pro otevření CSV-souboru:
+    </p>
+    <pre>
+pandas.read_csv(
+    filepath_or_buffer, *, sep=&lt;no_default&gt;, delimiter=None, header='infer', names=&lt;no_default&gt;,
+    index_col=None, usecols=None, dtype=None, engine=None, converters=None, true_values=None,
+    false_values=None, skipinitialspace=False, skiprows=None, skipfooter=0, nrows=None,
+    na_values=None, keep_default_na=True, na_filter=True, verbose=&lt;no_default&gt;,
+    skip_blank_lines=True, parse_dates=None, infer_datetime_format=&lt;no_default&gt;,
+    keep_date_col=&lt;no_default&gt;, date_parser=&lt;no_default&gt;, date_format=None, dayfirst=False,
+    cache_dates=True, iterator=False, chunksize=None, compression='infer', thousands=None,
+    decimal='.', lineterminator=None, quotechar='"', quoting=0, doublequote=True, escapechar=None,
+    comment=None, encoding=None, encoding_errors='strict', dialect=None, on_bad_lines='error',
+    delim_whitespace=&lt;no_default&gt;, low_memory=True, memory_map=False, float_precision=None,
+    storage_options=None, dtype_backend=&lt;no_default&gt;
+) </pre>
+    <p>
+        Asi už jenom z tohohle je celkem jasné, proč se na <em>Pandas</em> běžně vypisují (draze) placené kurzy, po jejichž úspěšném absolvování (snad) může účastník říci, že umí pomocí Pandas zpracovat libovolná tabulková data.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        S tím bohužel souvisí, že často účastníci kurzu získají pocit, že se zároveň s tím naučili i programovat v Python'u. A většinou to není pravda… (Často ani netuší, jak funguje a jak se píše smyčka <em>for-in</em>, protože zrovna ta se totiž v <em>Pandas</em> prakticky rozumně ani používat nedá.)
+    </div></div>
+    <p>
+        Není tudíž divu, že v této sérii přednášek o knihovně <em>Pandas</em> si ukážeme jenom naprosté základy. Pro řešení konkrétních problémů si budete muset pomoci s vyhledáváním (s pomocí AI) nebo čtením <a href="https://pandas.pydata.org/docs/index.html#" class="external">originální dokumentace</a>.
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="„DataFrame“ je slovník hodnot typu „Series“"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">„DataFrame“ je slovník hodnot typu „Series“</h2></div><div class="section-body">
+
+    <p>
+        Jakkoliv to zní proti klasickému chápání 2D-tabulky kontraintuitivně, tak <strong><code>DataFrame</code> je v podstatě slovník sloupců, kde každý sloupec je pandí <code>Series</code></strong>. Klíči tohoto slovníku jsou názvy sloupečků a všechny sloupečky přitom sdílejí stejný (přístupový) index.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        S tím souvisí, že přidat sloupec je triviálně náročné (ekvivalent přidání nového klíče s hodnotou do slovníku), zatímco přidat řádek je masakr – vlastně musíme pro každý klíč ve slovníku přidat na konkrétní místo odpovídající <code>Series</code> další prvek. 
+    </div></div>
+    <p>
+        Z toho je asi už jasné, že <strong>iterovat</strong> (ať už pomocí <em>for-in</em> nebo třeba metody <code>iterrows()</code>) <strong>po řádcích <em>DataFrame</em>u je těžce kontraproduktivní</strong> – snažíte se najednou vytáhnout hodnoty na stejném místě (konkrétní řádek <code>DataFrame</code>) z mnoha různých <code>Series</code> (sloupečky).
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Takže vlastně děláte něco jako <code>zip()</code> nad sloupečky, ale s konkrétním indexem daného <em>DataFrame</em>u.
+    </div></div>
+    <p>
+        Pro většinu takových potřeb existuje v <em>Pandas</em> lepší řešení, většinou v podobě nějaké vektorizované (ve smyslu <em>Numpy</em>) metody. Naučit se efektivně používat <em>Pandas</em> pak v podstatě znamená naučit se myslet, jak se typické úlohy v <em>Pandas</em> nejlépe řeší. V dalším si ukážeme pár jednoduchých příkladů, ale na reálnou  práci s (velkými) daty to stačit nebude, to už si budete muset nastudovat sami.
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Instalace a import modulu „pandas“"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Instalace a import modulu „pandas“</h2></div><div class="section-body">
+
+    <p>
+        Modul <em>pandas</em> se instaluje klasicky, ať už <em>pip</em>em nebo třebas pomocí <em>Condy</em>:
+    </p>
+    <pre class="brush: cmd; gutter: false; toolbar: false; ">
+        # instalace pomocí CheeseShop
+        pip install pandas
+
+        # instalace pomocí Condy
+        conda install pandas
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Mezi instalované závislosti patří <em>numpy</em>, <em>python-dateutil</em>, <em>pytz</em>, <em>tzdata</em> a <em>six</em>. Pokud budete chtít pracovat se soubory MS Excel, vyžádá si <em>Pandas</em> i doinstalaci dalších závislostí (přinejmenším <em>openpyxl</em> a <em>et-xmlfile</em>).
+    </div></div>
+    <p>
+        Do programů je pak zvykem importovat <em>Pandas</em> následujícím způsobem pod jménem <em>pd</em>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        import pandas as pd
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+         Tedy podobně jako u <em>Numpy</em>, kde používáme <code>import numpy as np</code> .
+    </div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="Příklad – práce s tabulárními daty v CSV"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Příklad – práce s tabulárními daty v CSV</h2></div><div class="section-body">
+
+    <p>
+        Základy práce s knihovnou <em>Pandas</em> si ukážeme na následujících jednoduchých datech ve formátu CSV:
+    </p>
+    <example lang="txt" src="_files/overview/HP.csv"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Společný začátek názvů všech filmů <em>„Harry Potter and the“</em> pro přehlednost vynechán.
+    </div></div>
+    <p>
+        Data se do programu načtou velmi jednoduše následujícím způsobem:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overview/01a.py"><em>overview/01a.py</em></a></div><example src="_files/overview/01a.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overview/01a.out" lang="text"></example></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Tato ukázková data jsou maličká a jsou tak vypsána celá, větší data by byla ořezána a vidět by byl pouze výřez jejich okrajů. Stejně jako u velkých polí v <em>Numpy</em>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="PS: Technické informace o datech – „info()“"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">PS: Technické informace o datech – „info()“</h2></div><div class="section-body">
+
+    <p>
+        Pokud byste potřebovali informace o načtených datech a jak je <em>Pandas</em> pochopil a zpracoval, pomůže vám metoda <code>info()</code>. Její výstup jde přímo na terminál:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overview/01b.py"><em>overview/01b.py</em></a></div><example src="_files/overview/01b.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overview/01b.out" lang="text"></example></div></div>
+    <p>
+        Vidíme, že <em>Pandas</em> správně naparsoval hlavičkovou řádku a příslušných pět sloupečků, přičemž odpovídajícím pěti <em>Series</em> přiřadil vyhovující <em>numpy</em>-typy (čtyřikrát obecný objekt, tedy řetězec, a jednou – pro rok – celé číslo v rozsahu <em>int64</em>).
+    </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Rychlý náhled na data – „head()“ a „tail()“"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Rychlý náhled na data – „head()“ a „tail()“</h2></div><div class="section-body">
+
+    <p>
+        Jelikož typicky budete pomocí <em>Pandas</em> zpracovávat opravdu veliké datové soubory, často se budete chtít podívat, jak vypadá hlavička a její okolí a konec načtených dat. Metody <code>head()</code> a <code>tail()</code> vypisují pět řádek z odpovídajícího konce dat (plus pro přehlednost i hlavičku):
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overview/02.py"><em>overview/02.py</em></a></div><example src="_files/overview/02.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overview/02.out" lang="text"></example></div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="Výpis vybraných sloupečků – „[[]]“"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Výpis vybraných sloupečků – „[[]]“</h2></div><div class="section-body">
+
+    <p>
+        Chcete-li ze všech dostupných dat vypsat pouze některé sloupečky, píše se to trochu překvapivě pomocí dvojtých hranatých závorek:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overview/07.py"><em>overview/07.py</em></a></div><example src="_files/overview/07.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overview/07.out" lang="text"></example></div></div>
+    <p>
+        Přitom, jak je vidět, na pořadí originálních dat nezáleží – co si zadáte, to se vypíše.
+    </p>
+
+</div></section><section class="slide-section" id="id9" data-title="Výběr hodnot – „[]“, „unique()“, „value_counts()“"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Výběr hodnot – „[]“, „unique()“, „value_counts()“</h2></div><div class="section-body">
+
+    <p>
+        O sloupečcích můžeme snadno zjišťovat spoustu zajímavých věcí:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overview/04.py"><em>overview/04.py</em></a></div><example src="_files/overview/04.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overview/04.out" lang="text"></example></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Výstupem metody <code>unique()</code> není pythonovský seznam, ale numpyovské <em>ndarray</em>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="Numpy „fancy indexing“"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Numpy „fancy indexing“</h2></div><div class="section-body">
+
+    <p>
+        Stejně jako v <em>Numpy</em> můžeme při výběru s výhodou využít <a href="/materialy/python/numpy/arrays.slicing.xml?slajd=7">„fancy indexing“</a>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overview/05.py"><em>overview/05.py</em></a></div><example src="_files/overview/05.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overview/05.out" lang="text"></example></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        A stejně jako v <em>Numpy</em> to není úplně nejrychlejší a paměťově nejméně náročný způsob.
+    </div></div>
+
+</div></section><section class="slide-section" id="id11" data-title="Logické skládání podmínek – „&amp;“ (AND), „|“ (OR) a „~“ (NOT)"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Logické skládání podmínek – „&amp;“ (AND), „|“ (OR) a „~“ (NOT)</h2></div><div class="section-body">
+
+    <p>
+        Podmínky pro výběr (nejen u „<em>fancy indexing</em>“) se dají skládat <a href="/materialy/python/types/numbers.xml?slajd=14">operátory pro bitovou logiku</a>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overview/06.py"><em>overview/06.py</em></a></div><example src="_files/overview/06.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overview/06.out" lang="text"></example></div></div>
+    <p>
+        PS: Vlastnost <code>.str</code> na objektu typu <em>Series</em> je vektorizovaný (tedy přes všechny položky) přístup k řetězcovým operacím na příslušném (zde) sloupečku.
+    </p>
+
+</div></section><section class="slide-section" id="id12" data-title="Vektorizované operace přes sloupce"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Vektorizované operace přes sloupce</h2></div><div class="section-body">
+
+    <p>
+        Než náš rychloúvod opustíme, ukažme si ještě jednu pro <em>Pandas</em> zcela typickou operaci – skládání hodnot z vícero sloupců do výsledného nového sloupce:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overview/08.py"><em>overview/08.py</em></a></div><example src="_files/overview/08.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overview/08.out" lang="text"></example></div></div>
+    <p>
+        PS: Na těchto datech jde o zcela umělý příklad, ale pokud by to byly kupříkladu číselné řady a mohli byste takto třebas sečíst nebo vynásobit některé sloupce mezi sebou a výsledek zaznamenat do sloupce nového, hned by to dávalo větší smysl. O tom ale více až <a href="">v další přednášce</a>.
+    </p>
+
+</div></section><section class="slide-section" id="id13" data-title="PS: Konkrétní řádka(y) – „iloc[]“"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">PS: Konkrétní řádka(y) – „iloc[]“</h2></div><div class="section-body">
+
+    <p>
+        Konkrétní řádku (či řádky) – tedy vlastně výřezy ze všech odpovídajících sloupečků <em>Series</em> – získáte úplně stejně jako u výřezů v samotném Python'u pomocí pořadového čísla a výřezové notace <code>[:]</code>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overview/03.py"><em>overview/03.py</em></a></div><example src="_files/overview/03.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overview/03.out" lang="text"></example></div></div>
+    <p>
+        Jak jsem ale <a href="?slajd=3">zmiňoval na začátku</a>, iterace po řádcích je v <em>Pandas</em> tzv. <strong>antipattern</strong>, takže chtít po <code>iloc[]</code> něco víc než občasný pohled na konkrétní data je cesta do pekel.
+    </p>
+    <p>
+        PS: Kromě toho se můžete k datům dostat i jen pomocí <code>[]</code>, pak ale často operujete nad jejich kopií, nebo také pseudometody <code>.loc[]</code>, která operuje přímo nad originálními daty. Více viz <a href="https://stackoverflow.com/questions/48409128/what-is-the-difference-between-using-loc-and-using-just-square-brackets-to-filte" class="external">tato debata na SO</a>.
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 13 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

@@ -1,0 +1,366 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Objekty „namedtuple“ – n-tice se jmény pro prvky
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Objekty „namedtuple“ – n-tice se jmény pro prvky</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">11</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Příklad</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Jména prvků</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Jména prvků – parametr „_fields“</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Zavedení I</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Přístup k prvkům</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Zavedení II</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Přiřazení hodnot</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Přiřazení hodnot pomocí „_make()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">„_replace()“ – záměna hodnot</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Další příklady</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2015-02-18</span></div><h1 class="lecture-title">Objekty „namedtuple“ – n-tice se jmény pro prvky</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Mezi n-ticemi, slovníky a třídami zeje velká mezera pro typy, které nějakým způsobem kombinují vlastnosti všech tří. Jedním z nich jsou <strong>n-tice se jmény pro své prvky</strong> (též asi také <em>pojmenované n-tice</em>):
+    </p>
+    <ul>
+        <li>
+            z jedné strany se chovají jako n-tice, tzn. že jsou neproměnným sekvenčním typem;
+        </li>
+        <li>
+            z druhé strany se podobají slovníkům, protože k jejich prvkům se dá přistupovat nejen podle pořadí, ale i podle jména;
+        </li>
+        <li>
+            a ze třetí strany se chovají ještě více spíše jako třídy bez metod, jejichž atributy neměníme.
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id2" data-title="Příklad"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Příklad</h2></div><div class="section-body">
+
+    <p>
+        Příklad je (nejen) v tomto případě asi výmluvnější:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; from collections import namedtuple
+        &gt;&gt;&gt; def bod(x, y, z):
+        ...     bod = namedtuple('bod_3D', 'x y z r')
+        ...     from math import sqrt
+        ...     return bod(x, y, z, sqrt(x*x + y*y + z*z))
+         
+        &gt;&gt;&gt; b = bod(2, 1, 3)
+        &gt;&gt;&gt; b
+        bod_3D(x=2, y=1, z=3, r=3.7416573867739413)
+        &gt;&gt;&gt; b.z
+        3
+    </pre>
+    <p>
+        Proměnná <em>b</em> je tedy objektem o čtyřech prvcích (přičemž čtvrtý je dopočítán z prvních tří během zavedení), k nimž je možno přistupovat podle jejich jména.
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Jména prvků"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Jména prvků</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Z předchozího příkladu je vidět, že:
+    </p>
+    <blockquote>
+        K prvkům pojmenované n-tice se podle jména přistupuje stejně jako u atributů tříd přes tečkovou notaci, tzn. že <strong>jméno prvku musí být validní pythoní identifikátor s výjimkou těch, jejichž jméno začíná na podtržítko</strong>.
+    </blockquote>
+    <p>
+        Omezení na jména bez podtržítka je založené na tom, že podtržítkovaná jména jsou typicky vyhrazena pro pracovní či skryté vlastnosti objektů, a právě proto všechny pomocné metody objektu <em>namedtuple</em> začínají na podtržítka.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Dvě metody toto omezení nesplňují – <em>count()</em> a <em>index()</em>. Jsou to pochopitelně právě <a href="/materialy/python/types/tuples.xml?slajd=7">jediné dvě metody</a> vlastní typu <em>n-tice</em>.
+    </div></div>
+    
+    <p class="enumerate">
+        Z prakticky stejného důvodu musí být pochopitelně <strong>jednotlivá jména jedinečná</strong> (bez duplikátů).
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Jména prvků – parametr „_fields“"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Jména prvků – parametr „_fields“</h2></div><div class="section-body">
+
+    <p data-diff="newconcept">
+        Jména jednotlivých prvků je možno jak z konstruktoru pojmenované n-tice, tak přímo z konkrétní instance vytáhnout pomocí parametru <strong><code>_fields</code></strong>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
+        &gt;&gt;&gt; Bod._fields
+        ('x', 'y', 'z')
+        
+        &gt;&gt;&gt; bod = Bod(x=1, y=2, z=3)
+        &gt;&gt;&gt; bod
+        Bod3D(x=1, y=2, z=3)
+        &gt;&gt;&gt; bod._fields
+        ('x', 'y', 'z')
+    </pre>
+    <p>
+        Vrácený objekt je n-tice, což umožňuje se jmény dále snadno pracovat.
+    </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Zavedení I"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Zavedení I</h2></div><div class="section-body">
+
+    <p>
+        Zavést novou pojmenovanou n-tici znamená určit jméno jejího typu a jména jejích prvků:
+    </p>
+    <blockquote>
+        nt = collections.namedtuple('JménoTypu', 'jména jednotlivých prvků')
+    </blockquote>
+    <p>
+        Přitom jména prvků lze zadat několika různými způsoby:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # řetězec jmen oddělených mezerami
+        &gt;&gt;&gt; NT = namedtuple('Bod3D', 'x y z')
+        &gt;&gt;&gt; NT._fields
+        ('x', 'y', 'z')
+        
+        # řetězec jmen oddělených čárkou
+        &gt;&gt;&gt; NT = namedtuple('Bod3D', 'x,y,z')
+        &gt;&gt;&gt; NT._fields
+        ('x', 'y', 'z')
+        &gt;&gt;&gt; NT = namedtuple('Bod3D', 'x, y, z')
+        &gt;&gt;&gt; NT._fields
+        ('x', 'y', 'z')
+        
+        # ze sekvence řetězců
+        &gt;&gt;&gt; NT = namedtuple('Bod3D', ['x', 'y', 'z'])
+        &gt;&gt;&gt; NT._fields
+        ('x', 'y', 'z')
+        &gt;&gt;&gt; NT = namedtuple('Bod3D', ('x', 'y', 'z'))
+        &gt;&gt;&gt; NT._fields
+        ('x', 'y', 'z')
+    </pre>
+
+</div></section><section class="slide-section" id="id6" data-title="Přístup k prvkům"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Přístup k prvkům</h2></div><div class="section-body">
+
+    <p data-diff="basics">
+        Přístup pomocí jmen je jeden z hlavních důvodů pro existenci pojemnovaných n-tic, ale celkově se k jednotlivým prvkům dá přistupovat mnoha způsoby:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; NT = namedtuple('Bod3D', 'x y z')
+        &gt;&gt;&gt; bod = NT(x=1, y=2, z=3)
+        &gt;&gt;&gt; bod
+        Bod3D(x=1, y=2, z=3)
+        
+        # jménem jako u tříd
+        &gt;&gt;&gt; bod.x
+        1
+        
+        # pořadím jako u n-tic
+        &gt;&gt;&gt; bod[0]
+        1
+        
+        # z řetězce pomocí funkce „getattr()“
+        &gt;&gt;&gt; getattr(bod, 'x')
+        1
+        &gt;&gt;&gt; jméno = 'x'
+        &gt;&gt;&gt; getattr(bod, jméno)
+        1
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Pro srovnání – u slovníků je přístup <code>xs[KLÍČ]</code>, kde <em>KLÍČ</em>em může být libovolný hešovatelný typ.
+    </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Zavedení II"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Zavedení II</h2></div><div class="section-body">
+
+    <p>
+        Konstruktor pojmenované n-tice může dostat ještě jeden (pojmenovaný) parametr – <strong>rename</strong>. Jeho výchozí nastavení je <code>False</code> a nijak se neprojevuje, ale při přepnutí na <code>True</code> způsobí, že nevyhovující jména prvků budou automaticky přejmenována:
+    </p>
+    <ul>
+        <li>
+            a) nepovolená jména
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                &gt;&gt;&gt; student = namedtuple('Student', 'name class age gender')
+                Traceback (most recent call last):
+                  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+                  File "/usr/lib/python3.4/collections/__init__.py", line 341, in namedtuple
+                    'keyword: %r' % name)
+                ValueError: Type names and field names cannot be a keyword: 'class'
+                
+                &gt;&gt;&gt; student = namedtuple('Student', 'name class age gender', rename=True)
+                &gt;&gt;&gt; student._fields
+                ('name', '_1', 'age', 'gender')
+            </pre>
+        </li>
+        <li>
+            b) duplikace jmen
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                &gt;&gt;&gt; student = namedtuple('Student', 'name age gender age')
+                Traceback (most recent call last):
+                  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+                  File "/usr/lib/python3.4/collections/__init__.py", line 348, in namedtuple
+                    raise ValueError('Encountered duplicate field name: %r' % name)
+                ValueError: Encountered duplicate field name: 'age'
+                
+                &gt;&gt;&gt; student = namedtuple('Student', 'name age gender age', rename=True)
+                &gt;&gt;&gt; student._fields
+                ('name', 'age', 'gender', '_3')
+            </pre>
+        </li>
+    </ul>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Podle <a href="http://pymotw.com/2/collections/namedtuple.html" class="external">PyMOTW</a>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="Přiřazení hodnot"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Přiřazení hodnot</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Jak jsme viděli na předchozích slajdech, instance pojmenovaných n-tic se typicky vyrábí pomocí volání konstruktoru s pojmenovanými parametry, ale jde to i pozičně:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
+        
+        # a) pozičně
+        &gt;&gt;&gt; bod = Bod(1, 2, 3)
+        &gt;&gt;&gt; bod
+        Bod3D(x=1, y=2, z=3)
+        
+        # a) přeze jména
+        &gt;&gt;&gt; bod = Bod(x=1, y=2, z=3)
+        &gt;&gt;&gt; bod
+        Bod3D(x=1, y=2, z=3)
+    </pre>
+    
+    <p class="enumerate">
+        Díky tomu lze ovšem s výhodou použít i triky s rozbalováním vhodných struktur za pomoci operátorů <strong><code>*</code></strong> a <strong><code>**</code></strong>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
+        
+        # a) pozičně
+        &gt;&gt;&gt; hodnoty = [1, 2, 3]
+        &gt;&gt;&gt; bod = Bod(*hodnoty)
+        &gt;&gt;&gt; bod
+        Bod3D(x=1, y=2, z=3)
+        
+        # a) přeze jména
+        &gt;&gt;&gt; hodnoty = {'x': 1, 'y': 2, 'z': 3}
+        &gt;&gt;&gt; bod = Bod(**hodnoty)
+        &gt;&gt;&gt; bod
+        Bod3D(x=1, y=2, z=3)
+    </pre>
+
+</div></section><section class="slide-section" id="id9" data-title="Přiřazení hodnot pomocí „_make()“"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Přiřazení hodnot pomocí „_make()“</h2></div><div class="section-body">
+
+    <p>
+        Na přiřazování podle pozice je k dispozici ještě metoda <strong><code>_make(ITERABLE)</code></strong>, která je schopna zpracovat téměř libovolný vstupní iterovatelný objekt:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
+        
+        &gt;&gt;&gt; bod = Bod._make([1, 2, 3])
+        &gt;&gt;&gt; bod
+        Bod3D(x=1, y=2, z=3)
+    </pre>
+    <p>
+        Čehož se s velkou výhodou používá například při načítání hodnot z CSV-souborů nebo databází:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        EmployeeRecord = namedtuple('EmployeeRecord', 'name, age, title, department, paygrade')
+        
+        import csv
+        for emp in map(EmployeeRecord._make, csv.reader(open("employees.csv", "rb"))):
+            print(emp.name, emp.title)
+        
+        import sqlite3
+        conn = sqlite3.connect('/companydata')
+        cursor = conn.cursor()
+        cursor.execute('SELECT name, age, title, department, paygrade FROM employees')
+        for emp in map(EmployeeRecord._make, cursor.fetchall()):
+            print(emp.name, emp.title)
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Bez invence opsáno z dokumentace. Snad to funguje :-)
+    </div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="„_replace()“ – záměna hodnot"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">„_replace()“ – záměna hodnot</h2></div><div class="section-body">
+
+    <p>
+        Ačkoli se pojmenované n-tice na venek stále tváří jako skutečné n-tice, to znamená jako neproměnné objekty, pomocí metody <strong><code>_replace(kwargs)</code></strong> lze na základě původní pojmenované n-tice vyrobit pojmenovanou n-tici novou, jejíž některé prvky budou obsahovat hodnoty nové:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
+        &gt;&gt;&gt; bod = Bod(1, 2, 3)
+        &gt;&gt;&gt; bod
+        Bod3D(x=1, y=2, z=3)
+        
+        # záměnou je vrácena nová pojmenovaná n-tice
+        &gt;&gt;&gt; bod._replace(y=6)
+        Bod3D(x=1, y=6, z=3)
+        
+        # původní objekt zůstal nezměněn
+        &gt;&gt;&gt; bod
+        Bod3D(x=1, y=2, z=3)
+    </pre>
+    <br>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Tudíž provedete-li přiřazení <code>bod = bod._replace(y=6)</code>, ve výsledku nahradíte původní n-tici n-ticí novou:
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            # původní „bod“
+            &gt;&gt;&gt; bod
+            Bod3D(x=1, y=2, z=3)
+            &gt;&gt;&gt; id(bod)
+            140361685120808
+            
+            # nový „bod“
+            &gt;&gt;&gt; bod = bod._replace(y=6)
+            &gt;&gt;&gt; bod
+            Bod3D(x=1, y=6, z=3)
+            &gt;&gt;&gt; id(bod)
+            140361685121608
+        </pre>
+    </div></div>
+
+</div></section><section class="slide-section" id="id11" data-title="Další příklady"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Další příklady</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Výpisu jmen prvků pomocí <em>_fields</em> jde použít k „subklásování“:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; Bod2D = namedtuple('Bod2D', 'x y')
+        &gt;&gt;&gt; Bod2D._fields
+        ('x', 'y')
+        
+        &gt;&gt;&gt; Bod3D = namedtuple('Bod3D', Bod2D._fields + ('z',))
+        &gt;&gt;&gt; Bod3D._fields
+        ('x', 'y', 'z')
+    </pre>
+    
+    <p class="enumerate">
+        Pomocí <em>_replace()</em> zase můžete simulovat výchozí hodnoty:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; Account = namedtuple('Account', 'owner balance transaction_count')
+        
+        # výchozí pojmenovaná n-tice s předpřipravenými hodnotami
+        &gt;&gt;&gt; default_account = Account('&lt;owner name&gt;', 0.0, 0)
+        &gt;&gt;&gt; default_account
+        Account(owner='&lt;owner name&gt;', balance=0.0, transaction_count=0)
+        
+        # výroba nového objektu – část hodnot výchozí, část nová
+        &gt;&gt;&gt; johns_account = default_account._replace(owner='John')
+        &gt;&gt;&gt; johns_account
+        Account(owner='John', balance=0.0, transaction_count=0)
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Podle dokumentace.
+    </div></div>
+    
+    <p class="enumerate">
+        A konečně můžete pojmenovanou n-tici natvrdo podědit a upravit její funkcionalitu:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; class Point(namedtuple('Point', 'x y')):
+        ...   __slots__ = ()
+        ...   @property
+        ...   def hypot(self):
+        ...     return (self.x ** 2 + self.y ** 2) ** 0.5
+        ...   def __str__(self):
+        ...     return 'Point: x=%6.3f  y=%6.3f  hypot=%6.3f' % (self.x, self.y, self.hypot)
+        ... 
+        &gt;&gt;&gt; for p in Point(3, 4), Point(14, 5/7):
+        ...   print(p)
+        ... 
+        Point: x= 3.000  y= 4.000  hypot= 5.000
+        Point: x=14.000  y= 0.714  hypot=14.018
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Přímo z dokumentace.
+    </div></div>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 11 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

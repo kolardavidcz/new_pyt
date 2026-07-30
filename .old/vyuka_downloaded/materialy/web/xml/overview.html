@@ -1,0 +1,422 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Základy XML
+      —
+      Texty vybavené sémantikou</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Základy XML</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">19</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Struktura XML-souboru I</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Struktura XML-souboru II</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Struktura XML-souboru III</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Elementy</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Obsah elementů a prázdné elementy</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Bílé znaky a smíšený obsah I</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Bílé znaky a smíšený obsah II</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Atributy</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">K použití atributů</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Komentáře</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Kódování</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">XML jako metajazyk</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">Jmenné prostory</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">Poznámka – URI</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">„Řídicí“ sekvence</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">Struktura dokumentu a jeho validace</span></a></li><li class="toc-item"><a class="toc-link" href="#id18"><span class="toc-num">18</span><span class="toc-text">Navigace po dokumentu a jeho reprezentace</span></a></li><li class="toc-item"><a class="toc-link" href="#id19"><span class="toc-num">19</span><span class="toc-text">Vzhled a transformace dokumentu</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Texty vybavené sémantikou</span><span class="lecture-date">2012-09-26</span></div><h1 class="lecture-title">Základy XML</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Základním principem za XML je snaha doplnit „obyčejný“ text o další (s ním svázané) významy, nebo jinak řečeno doplnit text o <strong>sémantiku</strong>.
+    </p>
+    <p>
+        Texty vybavené sémantikou jsou samozřejmě mnohem starší, než XML – vezměme si za příklad konfigurační soubory <em>ini</em> nebo <em>config</em> nebo průmyslový standard <em>SGML</em>. Ve všech těchto <em>textových</em> souborech je nějakým způsobem přidán jednotlivým částem textu dodatečný význam (pozicí a závorkováním u konfiguračních souborů, sadou velmi mocných a zároveň i volných pravidel u SGML).
+    </p>
+    <p>
+        Význam XML tkví v tom, že byla vybrána jedna dostatečně obecná a přitom velmi jednoduchá metoda (v podstatě velmi specifická a velmi „ořezaná“ podmnožina standardu SGML), jak textu tento dodatečný význam přidávat. Hlavní přínos XML pak tkví asi v následujícím:
+    </p>
+    <p>
+    </p>
+    <ul>
+        <li>
+            Protože struktura XML je jednoduchá a standardizovaná, je poměrně snadné vytvořit pro ni nástroje, které spolu budou (alespoň v principu) dobře spolupracovat.
+        </li>
+        <li>
+            XML může (ale také vůbec nemusí) být velmi přehledné pro člověka. Což byl zřejmě i jeden z původních dyzajnových cílů návrhu.
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id2" data-title="Struktura XML-souboru I"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Struktura XML-souboru I</h2></div><div class="section-body">
+
+    <p>
+        Strukturu XML-souboru, kerý je jinak v podstatě <strong>zakořeněným stromem elementů</strong>, asi nejlépe vystihuje následující přirovnání Míly Niče:
+    </p>
+    <blockquote>
+        „XML-soubor je tvořen různě oštítkovanými (<em>atributy</em>) krabicemi (<em>elementy</em>) zanořenými navzájem do sebe bez proboření stěn (<em>well-formed</em>), přičemž vnější krabice je právě jedna (<em>kořenový element</em>).”
+    </blockquote>
+    <p>
+        Pokud navíc tyto „krabice“ odpovídají nějaké předem nadefinované struktuře, říkáme navíc, že uvedené XML je <em>validní</em> (<em>valid</em>).
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Struktura XML-souboru II"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Struktura XML-souboru II</h2></div><div class="section-body">
+
+    <p>
+        Pro následující ukázkový XML-soubor..
+    </p>
+    <example src="../_files/xml-stromecek.xml" lang="xml"></example>
+    <p>
+        ..tak máme:
+    </p>
+    <ul>
+        <li>
+            právě jeden <strong>kořenový element</strong> („<em>vnější krabice</em>“) – <code>&lt;kořen&gt;</code>
+        </li>
+        <li>
+            čtyři další někořenové <strong>elementy</strong> („<em>krabice</em>“) – <code>&lt;hlavička&gt;</code>, <code>&lt;para&gt;</code>, <code>&lt;obrázek&gt;</code>, <code>&lt;zvýraznění&gt;</code>
+        </li>
+        <li>
+            dva z elementů mají na sobě <strong>atributy</strong> („<em>štítky</em>“) – element <code>&lt;hlavička&gt;</code> s atributem <code>@jazyk</code> a element <code>&lt;obrázek&gt;</code> s atributy <code>@zdroj</code> a <code>@název</code>
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Podle vzoru z <a href="?slajd=18">XPath'u</a> názvy elementů uvozuji znakem <code>@</code>.
+            </div></div>
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id4" data-title="Struktura XML-souboru III"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Struktura XML-souboru III</h2></div><div class="section-body">
+
+    <p>
+        Požadavek „neprobořených stěn krabic“ – tedy <strong>nepřekřížených elementů</strong> – ústící v tzv. <strong>dobře naformátovaný XML-dokument</strong> (<em>well-formed document</em>) je vlastně základem pro to, aby struktura XML-souboru byla vůbec rozumně reprezentovatelná jako strom. Pro příklad <a href="?slajd=3">z předchozího slajdu</a>:
+    </p>
+    <img src="../_files/xml-stromecek.smaller.png" width="580" height="304" alt="" title="">
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Hranaté obdélníky jsou elementy („krabice“), elipsy atributy těchto elementů („štítky“) a zakulacené obdélníky jsou koncové textové listy stromu.
+    </div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="Elementy"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Elementy</h2></div><div class="section-body">
+
+    <p>
+        Funkcí <strong>element</strong>u je pomocí svého počátečního (<code>&lt;název-elementu&gt;</code>) a koncového (<code>&lt;/název-elementu&gt;</code>) prvku označit v něm zanořenou podčást stromu XML-dokumentu.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Jaký význam se tímto příslušnému podstromu přiřadí záleží na způsobu, jakým bude dalšími nástroji zpracovávána. Z hlediska člověka se dá mnohé odhadnout již z názvu elementu (který je ovšem stroji zcela ukraden).
+    </div></div>
+    <p>
+        Přitom platí:
+    </p>
+    <ul>
+        <li>
+            XML-dokument musí obsahovat přinejmenším jeden element – kořenový. Tento element musí být nejvýše právě jeden.
+        </li>
+        <li>
+            Elementy se navzájem nesmějí křížit (přesahovat).
+        </li>
+        <li>
+            Koncové jméno musí být stejné jako počáteční. Velikost písmen se rozlišuje.
+        </li>
+        <li>
+            Povolené znaky ve jméně jsou písmena, číslice, pomlčka (mínus), podtržítko a tečka. Jméno elementu přitom smí začínat pouze na písmeno a není povolena počáteční kombinace znaků <em>xml</em> (v libovolné velikosti; tato sekvence je vyhrazena pro vnitřní použití standardem). Pouze pro označení jmenného prostoru slouží dvojtečka.
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id6" data-title="Obsah elementů a prázdné elementy"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Obsah elementů a prázdné elementy</h2></div><div class="section-body">
+
+    <p>
+        Uvnitř elementu se mohou nacházet další elementy (správně zanořené) nebo textové řetězce (byť to s sebou přináší nečekané komplikace, jak uvidíme na dalším slajdu).
+    </p>
+    <p>
+        Stejně tak dobře ale může element nést význam sám o sobě, bez jakéhokoliv dalšího zanořeného obsahu. Principielně je možné <strong>prázdné elementy</strong> zapsat dvěma různými způsoby, které však <em>nejsou vždy zcela vzájemně zaměnitelné</em>:
+    </p>
+    <ol>
+        <li>
+            <code>&lt;element /&gt;</code> – skutečně prázdný, <strong>nepárový element</strong> (před ukončovacím lomítkem nemusí být mezera, ale pro přehlednost se tam často dělá)
+        </li>
+        <li>
+            <code>&lt;element&gt;&lt;/element&gt;</code> – <strong>párový element</strong>, zrovna prázdný
+        </li>
+    </ol>
+    <p>
+        Rozdíl mezi oběma zápisy se může fakticky projevit pouze v tom případě, že používané XML má k dispozici popis své povolené struktury – první varianta je pak skutečně prázdný nepárový element, který nemůže mít žádný obsah, zatímco druhá varianta je párový element, který jen prostě zrovna v danou chvíli žádný obsah nemá.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Asi „nejslavnějším“ případem tohoto rozdílu je HTML-element <code>&lt;script&gt;</code>, který je nadefinován jako párový, ale dlouhá léta u spousty prohlížečů v případě prázdného obsahu procházelo jeho zapsání jako nepárového.
+    </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Bílé znaky a smíšený obsah I"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Bílé znaky a smíšený obsah I</h2></div><div class="section-body">
+
+    <p>
+        Ač to na první pohled může být překvapivé, následující dvě ukázky XML-souboru nejsou stejné:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;kořen&gt;&lt;jméno&gt;Pirát&lt;/jméno&gt;&lt;příjmení&gt;Pirátovič&lt;/příjmení&gt;&lt;/kořen&gt;
+        
+        &lt;kořen&gt;
+            &lt;jméno&gt;Pirát&lt;/jméno&gt;
+            &lt;příjmení&gt;Pirátovič&lt;/příjmení&gt;
+        &lt;/kořen&gt;
+    </pre>
+    <p>
+        Ve druhé z nich je totiž navíc kolem elementů <code>&lt;jméno&gt;</code> a <code>&lt;příjmení&gt;</code> ještě několik odřádkování a mezer (případně též tabulátorů). Těmto znakům se souhrnně říká <strong>bílé znaky</strong> (<em>white spaces</em>) a chování XML-parserů vůči nim je jednou z nejsložitějších částí zpracování XML-dokumentů.
+    </p>
+
+</div></section><section class="slide-section" id="id8" data-title="Bílé znaky a smíšený obsah II"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Bílé znaky a smíšený obsah II</h2></div><div class="section-body">
+
+    <p>
+        Člověku je na první pohled jasné, že v našem ukázkovém příkladu jsou všechny přebytečné mezery a nové řádky jen pro usnadnění čtení (člověku). Ale z následujícího fragmentu HTML, který obsahuje tzv. <strong>smíšený obsah</strong> (<em>mixed content</em>; elementy a textové listy na stejné úrovni zanoření v rámci stromu a hned vedle sebe)..
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;p&gt;
+            Tohle je &lt;em&gt;zvýrazněný&lt;/em&gt; text a &lt;a href="/"&gt;tohle je odkaz&lt;/a&gt;.
+        &lt;/p&gt;
+    </pre>
+    <p>
+        ..je vidět, že někdy (a poměrně často :-) jsou bílé znaky důležité.
+    </p>
+    <p>
+        Zpracování smíšeného obsahu a bílých znaků je obecně velmi složité a problematické, ale z praktického hlediska pro běžné použití se dá shrnout do celkem jednoduché zásady:
+    </p>
+    <blockquote>
+        Není-li někde (ve schématu pro daný XML-dokument, v přepínači DOM-stroje zpracovávajícího daný XML-dokument…) řečeno jinak, <strong>všechny bílé znaky ve zdrojovém XML-dokumentu jsou významné</strong>.
+    </blockquote>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        V praxi (a podle příslušného schématu) jsou pak často bílé znaky na některých místech zcela zahozeny (jako zjevně v našem ukázkovém příkladu), jinde zase naopak „scucnuty“ do mezery jediné a ještě jinde jsou ponechány zcela beze změny.
+    </div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="Atributy"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Atributy</h2></div><div class="section-body">
+
+    <p>
+        Uvozovací elementy párových nebo elementy nepárové mohou být doplněny o tzv. <strong>atributy</strong>:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;element atribut="hodnota atributu"&gt;
+            …
+        &lt;/element&gt;
+        
+        &lt;element atribut='hodnota atributu' /&gt;
+    </pre>
+    <p>
+        Pro jejich použití platí následující pravidla:
+    </p>
+    <ul>
+        <li>
+            Pro jména atributů platí stejná omezení jako pro jména elementů – povoleny jsou pouze písmena, číslice, pomlčky (mínus), podtržítka a tečky, dvojtečka pouze při označení jmenného prostoru, jméno může začínat pouze na písmeno a nesmí začínat sekvencí <em>xml</em> (v libovolné kombinaci velikostí písmen).
+        </li>
+        <li>
+            Atribut je od své hodnoty oddělen znakem <code>=</code> (rovnítko).
+        </li>
+        <li>
+            Hodnota atributu je uzavřena v jednoduchých (<code>'</code>) nebo dvojtých (<code>"</code>) uvozovkách. (Obsahuje-li sama uvozovky, musí pro uzavření hodnoty atributu býti použity ty druhé.)
+        </li>
+        <li>
+            Počet atributů na elementu není nijak omezen.
+        </li>
+    </ul>
+    <p>
+        Co se bílých znaků v hodnotách atributů týká, není situace o moc jednodušší než u elementů. Stručně se dá říci, že čím jednodušší hodnoty atributů budete mít (pokud atributy vůbec použijete), tím lépe pro vás.
+    </p>
+
+</div></section><section class="slide-section" id="id10" data-title="K použití atributů"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">K použití atributů</h2></div><div class="section-body">
+
+    <p>
+        Co se atributů týká, tak nejvyhraněnější názor na ně má skupina, která tvrdí, že by vůbec neměly existovat a veškerou jejich práci by na sebe měly kompletně převzít elementy. To jest asi něco takovéhoto (či podobného):
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;!-- a) s atributy --&gt;
+        &lt;para lang="cze"&gt;
+            Toto jest věta v jazyce českém.
+        &lt;/para&gt;
+        
+        &lt;!-- b) bez atributů --&gt;
+        &lt;para&gt;
+            &lt;lang&gt;cze&lt;/lang&gt;
+            &lt;content&gt;Toto jest věta v jazyce českém.&lt;/content&gt;
+        &lt;/para&gt;
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        K použití komentářů v XML-kódu viz <a href="?slajd=11">následující slajd</a>.
+    </div></div>
+    <p>
+        Jelikož zakázání atributů vede ke značnému zjednodušení procesování XMLčka, můžeme se s tímto poměrně extrémním přístupem setkat v praxi až překvapivě často. Ale už na druhý pohled je vidět, že atributy mají své místo – především pro jednodušší, upřesňující prvky a také pro čitelnost.
+    </p>
+
+</div></section><section class="slide-section" id="id11" data-title="Komentáře"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Komentáře</h2></div><div class="section-body">
+
+    <p>
+        V případě potřeby je možno do XML doplnit komentář pomocí sekvence znaků <code>&lt;!--</code> pro začátek a <code>--&gt;</code> pro konec:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;kořen&gt;
+            &lt;jméno&gt;Pirát&lt;/jméno&gt;
+            &lt;!--příjmení&gt;Pirátovič&lt;/příjmení--&gt;
+            &lt;práce&gt;příprava přednášek&lt;!-- a snaha nezbláznit se z toho--&gt;&lt;/práce&gt;
+        &lt;/kořen&gt;
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Konec komentáře signalizuje sekvence <code>--</code> (asi trošku překvapivě tedy nikoli sekvence <code>--&gt;</code>), tato se tudíž nesmí vyskytovat nikde uvnitř zakomentované části dokumentu.
+    </div></div>
+    <p>
+        Prakticky takto můžete velkou část dokumentu „schovat“ před zpracováním, byť XML-parser se může rozhodnout poskytnout přístup i k obsahu komentářů.
+    </p>
+
+</div></section><section class="slide-section" id="id12" data-title="Kódování"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Kódování</h2></div><div class="section-body">
+
+    <p>
+        Podle první verze standardu nemusí mít XML-dokument žádnou hlavičku, stačí tedy pouze kořenový element (a to klidně i nepárový a tudíž bez obsahu). Automaticky to však znamená, že dokument <em>musí být</em> v kódování UTF-8 (viz též <a href="/materialy/text/encoding_xML.xml?slajd=4">zde</a>).
+    </p>
+    <p>
+        Chcete-li použít kódování jiné nebo jinou verzi standardu, musíte už hlavičku uvést:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;?xml version="1.0" encoding="ISO-8859-2"?&gt;
+    </pre>
+    <p>
+        PS: Konstrukce typu <code>&lt;?název … _&gt;</code> jsou tzv. <a href="?slajd=16">procesní instrukce</a>.
+    </p>
+
+</div></section><section class="slide-section" id="id13" data-title="XML jako metajazyk"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">XML jako metajazyk</h2></div><div class="section-body">
+
+    <p>
+        Zatím jsme v ukázkách viděli jakási nepravděpodobná uskupení elementů (a atributů), která se však řídila jistými pravidly zápisu. A o tom XML právě je:
+    </p>
+    <blockquote>
+        XML není přímo jeden konkrétní jazyk – je to tak zvaný <strong>metajazyk</strong>, tedy jazyk sloužící k navrhování jiných jazyků (které pak už jsou přímo těmi XML-jazyky).
+    </blockquote>
+    <p>
+        Příkladem konkrétních jazyků postavených na základech XML budiž třeba:
+    </p>
+    <ul>
+        <li>
+            <em>SVG</em> – jazyk sloužící k deklarativnímu zápisu vektorové grafiky;
+        </li>
+        <li>
+            <em>MathML</em> – jazyk určený pro zápis matematických rovnic;
+        </li>
+        <li>
+            <em>XHTML</em> – striktní varianta HTML postavená na pravidlech parsování XML;
+        </li>
+        <li>
+            …
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id14" data-title="Jmenné prostory"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">Jmenné prostory</h2></div><div class="section-body">
+
+    <p>
+        XML jako metajazyk tedy popisuje, jak vytvářet nové XML-jazyky. Výhodou je, že tyto různé dialekty („různobarevné krabice”) můžeme navzájem pomocí tzv. <strong>jmenných prostorů</strong> míchat – elementy/atributy z jiného XML-dialektu jsou prostě označeny identifikátorem tohoto dialektu (tj. jmenným prostorem, „barvou”):
+    </p>
+    <example src="../_files/xml-stromecek-ns.xml" lang="xml"></example>
+    <br>
+    <img src="../_files/xml-stromecek-ns.smaller.png" width="580" height="304" alt="" title="">
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Řečeno Mílovým poetickým přirovnáním jsou elementy z různých jazyků „různobarevné krabice“ a podobně atributy z různých jazyků jsou „různobarevné štítky“ na těchto krabicích.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Ač to působí poněkud nepřirozeně, atributy bez výslovně uvedeného jmenného prostoru nepatří nikam, resp. patří do tzv. <em>nulového jmenného prostoru</em>.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id15" data-title="Poznámka – URI"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">Poznámka – URI</h2></div><div class="section-body">
+    
+    <p>
+        Je třeba poznamenat, že na označení jmenného prostoru existuje poměrně restriktivní omezení (ze standardu <a href="https://www.w3.org/TR/REC-xml-names/#iri-use" class="external">Namespaces in XML 1.0 (Third Edition)</a>), na které ale v praxi málokdo hleděl, díky kterému je příklad z předchozího slajdu špatně ^_^
+    </p>
+    <p>
+        Správně by totiž označení jmenného prostoru mělo vyhovovat standardu pro zadávání tzv. <a href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Syntax" class="external">URI</a> (= <em>Uniform Resource Identifier</em>), což především znamená, že musí obsahovat označení schematu následované dvojtečkou a teprve po ní vlastní bližší označení jmenného prostoru. Navíc se to celé dá zapsat v podstatě pouze pomocí ASCII a označení schematu by mělo spadat do schválených podle <a href="https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml" class="external">IANA</a> (což se v praxi ignoruje ještě víc).
+    </p>
+    <p>
+        Správněji by tudíž kořenový element z příkladu vypadal spíše kupříkladu takto:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;kořen xmlns="urn:mojePracovniXML"
+               xmlns:xhtml="http://www.w3.org/1999/xhtml"&gt;
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Kde <code>urn</code> jako jedno ze schválených schemat označuje <em>Uniform Resource Names</em>. (Klidně si tam místo něj dejte třeba <em>hafhaf</em>, taky to bude správně :-)
+    </div></div>
+    
+</div></section><section class="slide-section" id="id16" data-title="„Řídicí“ sekvence"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">„Řídicí“ sekvence</h2></div><div class="section-body">
+
+    <p>
+        Už jsme viděli, jak se do XML přidávají <a href="?slajd=11">komentáře</a> a <a href="?slajd=12">hlavička</a>. Oba jsou to konkrétní příklady obecných <em>„řídicích“ sekvencí</em>:
+    </p>
+    
+    <p class="enumerate">
+        Řídicí sekvence typu <code>&lt;!…&gt;</code> slouží například pro:
+    </p>
+    <ul>
+        <li>
+            zadávání komentářů: <code>&lt;!--…--&gt;</code>
+        </li>
+        <li>
+            definice typu dokumentu: <code>&lt;!DOCTYPE …&gt;</code>
+        </li>
+        <li>
+            vkládání textů, které obsahují značky (<em>markup</em>), ale nemají se tak vyhodnotit: <code>&lt;![CDATA[…]]&gt;</code>
+        </li>
+    </ul>
+    
+    <p class="enumerate">
+        Řídicí sekvence typu <code>&lt;?…?&gt;</code> jsou tak zvané <strong>procesní instrukce</strong>. Slouží k předávání doplňujících informací zpracovávající aplikaci a existuje jich několik standardních (jako je výše uvedená hlavička nebo <a href="xml.xml?slajd=12">připojení stylopisu</a>) a neurékom proprietárních podle použitých nástrojů.
+    </p>
+
+</div></section><section class="slide-section" id="id17" data-title="Struktura dokumentu a jeho validace"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">Struktura dokumentu a jeho validace</h2></div><div class="section-body">
+
+    <p>
+        Je zjevné, že abychom mohli XML-jazyky více využívat (a třeba je vyměňovat mezi aplikacemi), tak musíme vědět, jakou strukturu ten který jazyk má, tedy jaké elementy a atributy a s jakým obsahem jsou kde povolené. K tomu potřebujeme dvě věci:
+    </p>
+    
+    <p class="enumerate">
+        Za prvé způsob, jak popsat strukturu dokumentu. Prakticky se to řeší několika dalšími standardními jazyky:
+    </p>
+    <ul>
+        <li>
+            <a href="/materialy/web/xml/dtd.xml">DTD</a> – historicky nejstarší, v jistých ohledech nejjednodušší, ne příliš mocný a stále ještě možná nejpoužívanější způsob;
+        </li>
+        <li>
+            <a href="/materialy/web/xml/xmlschema.xml">XMLSchema</a> – oficiální moderní standard; neuvěřitelně komplikovaný a zbytečně rozsáhlý – jeho snad jedinou užitečnou vlastností je výčet mnoha různých datových typů;
+        </li>
+        <li>
+            <a href="/materialy/web/xml/relaxng.xml">RelaxNG</a> – alternativní způsob popisu struktury XML-dokumentů, který ovšem díky své jednoduchosti, eleganci a rozšiřitelnosti strčí všechny ostatní do kapsy;
+        </li>
+        <li>
+            <a href="/materialy/web/xml/schematron.xml">Schematron</a> – zcela odlišný (a také velice elegantní) způsob popisu struktury dokumentu; díky svému přístupu dokáže popsat řádově větší množinu vlastností dokumentů než všechny ostatní.
+        </li>
+    </ul>
+    
+    <p class="enumerate">
+        A za druhé pak nástroje, které jsou schopné zkontrolovat, zda se vytvořený XML-dokument drží struktury mu předepsané (takovýto dokument se pak nazývá <strong>validní</strong>):
+    </p>
+    <ul>
+        <li>
+            existují nástroje, které na vyžádání provedou zvolený způsob validace (např. <em>xmllint</em>);
+        </li>
+        <li>
+            některé dedikované XML-editory (např. <em>Oxygen</em>) mají validaci zabudovanou.
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id18" data-title="Navigace po dokumentu a jeho reprezentace"><div class="section-header"><span class="section-num">18</span><h2 class="section-title">Navigace po dokumentu a jeho reprezentace</h2></div><div class="section-body">
+
+    <p>
+        Při zpracování XML-dokumentu, jeho případném zobrazování, ale též už při popisu jeho struktury, musíme být schopni pronášet (a nějak zapisovat) tvrzení o jeho různých částech. V závislosti na daném použití existuje mnoho způsobů, jak daný problém řešit:
+    </p>
+    <ul>
+        <li>
+            <a href="/materialy/web/xml/xpath.xml">XPath</a> – speciální jazyk sloužící k navigaci po jednotlivých částech stromové reprezentace XML-dokumentu; kromě navigačních schopností je vybaven velmi velkou a mocnou skupinou funkcí, které umožňují o daných místech XML pronášet velmi specifická prohlášení;
+        </li>
+        <li>
+            <a href="/materialy/web/css/selectors.xml">CSS-selektory</a> – v užití se podobá navigační části XPath'u, ale svojí strukturou je zcela jiný;
+        </li>
+        <li>
+            <a href="/materialy/web/xml_html_dom.xml">DOM</a> – standardizovaná objektová reprezentace stromové struktury XML;
+        </li>
+        <li>
+            <a href="/materialy/python/xml/sax.xml">SAX</a> – specializovaný transformační jazyk určený ke zpracování velmi velkých XML-dokumentů sekvenčním přístupem; umí vlastně jen jedinou věc – rozlišit počáteční a koncové elementy, zato ji umí ale velmi dobře a efektivně.
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id19" data-title="Vzhled a transformace dokumentu"><div class="section-header"><span class="section-num">19</span><h2 class="section-title">Vzhled a transformace dokumentu</h2></div><div class="section-body">
+
+    <p>
+        XML-dokumenty v prostředí webu nemají obecně předepsáno, jak by se měly zobrazit (pokud se samozřejmě nedíváte na konkrétní formát odpovídajícím programem, např. SVG-obrázek v prohlížeči). Záleží samozřejmě na cílovém použití daného dokumentu (často vůbec nemusí být určen k přímému „dívání“), ale v principu jsou k dispozici dvě metody:
+    </p>
+    <ul>
+        <li>
+            přiřazení vzhledu pro daný zobrazovač některým z jazyků k tomu určeným (např. <a href="/materialy/web/css/overview.xml">CSS</a>);
+        </li>
+        <li>
+            transformací XML-dokumentu do jiného formátu (např. pomocí <a href="/materialy/web/xml/xslt.xml">XSL</a> – zatímco jeho podmnožina <em>XSLT</em> dokáže vytvořit mimo jiné i HTML, <em>XSL-FO</em> je specificky určeno pro tvorbu PDF).
+        </li>
+    </ul>
+    <p>
+        PS: Obecný XML-dokument bez přiložené informace o zobrazení by se měl na webu zobrazit pouze v podobě textového obsahu svých elementů. V praxi však skoro všechny prohlížeče místo toho zobrazí pěkně přehledně naformátovanou stromovou strukturu. Důvod je asi ten, že pokud se člověk dívá na nějaké XML, tak chce skutečně spíše vidět jeho strukturu než jen texty bez sémantiky.
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 19 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

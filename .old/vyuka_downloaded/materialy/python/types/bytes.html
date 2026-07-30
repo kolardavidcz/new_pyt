@@ -1,0 +1,378 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Bajtové objekty
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Bajtové objekty</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">10</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Zavedení – přímou notací</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">„Řetězce“ bajtů</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Zavedení – konstruktorem „bytes()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Bajtové řetězce jako sekvence</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Poznámka</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Bajtové řetězce jako sekvence – „for-in“</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Bajtové řetězce jako neměnitelné sekvence</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Interpolace v bajtových řetězcích pomocí „%“</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Dekódování textových řetězců – „BYTES.decode()“ vs „STR.encode()“</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2011-11-10</span></div><h1 class="lecture-title">Bajtové objekty</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    <strong>Bajtové řetězce</strong> jsou <em>neproměnný</em> <a href="/materialy/python/types/_sequences.xml">sekvenční</a> datový typ, jehož prvky jsou <em>celá čísla</em> v rozmezí <code>&lt;0, 255&gt;</code> (tedy vlastně sekvence bajtů).
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Existuje k nim i příslušný proměnný protějšek – <a href="bytearrays.xml">bajtová pole</a> (vlastně seznamy bajtů). Rozdíl mezi těmito dvěma objekty je podobný, jako mezi <em>řetězci</em> na jedné straně a <em>seznamy znaků</em> na straně druhé – oboje vypsané po prvcích dá to samé, ale do řetězců nemůžeme „hrabat“, zatímco se seznamy si můžeme dělat, co chceme.
+  </div></div>
+  <p>
+    PS: Narozdíl od <em>Python'u 2.x</em>, kde jste si práci s unicodovými řetězci museli explicitně vyžádat a jinak bylo všechno jakýmsi tajemně se konvertujícím bajtovým objektem, musíte si naopak v <em>Python'u 3.x</em> explicitně vyžádat práci s bajtovými objekty a k žádným konverzím bez vašeho zapřičinění nedochází. <em>*SLÁVA*</em>
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Zavedení – přímou notací"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Zavedení – přímou notací</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Bajtový řetězec je v podstatě „řetězec bajtů“, a tak ho nepřekvapivě nejsnáze zavedeme pomocí přímé (<em>literal</em>) notace jako řetězec s identifikátorem <code>b</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xb = b"ahoj"
+&gt;&gt;&gt; xb
+b'ahoj'
+&gt;&gt;&gt; type(xb)
+&lt;class 'bytes'&gt;
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Jelikož různých znaků vyjádřitelných pomocí jednoho bajtu je právě 256 a znich pouze část spodní poloviny představuje tisknutelné znaky (stará dobrá ASCII-tabulka), setkáte se s bajtovými literály spíše v podobě hexadecimální, např. <code>b'\xf0\xf1\xf2'</code>.
+  </div></div>
+  
+  <p class="enumerate">
+    Podobně jako u tzv. „raw-řetězců“ můžete k identifikaci bajtových řetězců použít i velké písmeno <code>B</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xb = B"ahoj"
+&gt;&gt;&gt; xb
+b'ahoj'
+&gt;&gt;&gt; type(xb)
+&lt;class 'bytes'&gt;
+  </pre>
+</div></section><section class="slide-section" id="id3" data-title="„Řetězce“ bajtů"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">„Řetězce“ bajtů</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Řetězce obsahují unicodové znaky, tj. sekvence bajtů, které daným kódováním určují odkazy do tabulky unicodových znaků:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; [x for x in 'ahoj']
+['a', 'h', 'o', 'j']
+  </pre>
+  <p>
+    Bajtové řetězce na druhou stranu obsahují pouze bajty, tj. čísla 0-255:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; [x for x in b'ahoj']
+[97, 104, 111, 106]
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    A nepřekvapivě tedy platí například následující srovnání:
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        b'\x61\x68\x6f\x6a' == b'ahoj'  # hexadecimálně
+        b'\141\150\157\152' == b'ahoj'  # oktalově
+    </pre>
+  </div></div>
+
+  <p class="enumerate">
+    S výjimkou metod <em>encode()</em>, <em>format()</em> a <em>isidentifier()</em> sdílejí bajtové řetězce s řetězci unicodovými také stejné atributy:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; dir(xb)
+['__add__', '__class__', '__contains__', '__delattr__', '__doc__', '__eq__', 
+'__format__', '__ge__', '__getattribute__', '__getitem__', '__getnewargs__', 
+'__gt__', '__hash__', '__init__', '__iter__', '__le__', '__len__', '__lt__', 
+'__mul__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', 
+'__rmul__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', 
+'capitalize', 'center', 'count', 'decode', 'endswith', 'expandtabs', 'find', 
+'fromhex', 'index', 'isalnum', 'isalpha', 'isdigit', 'islower', 'isspace', 
+'istitle', 'isupper', 'join', 'ljust', 'lower', 'lstrip', 'maketrans', 
+'partition', 'replace', 'rfind', 'rindex', 'rjust', 'rpartition', 'rsplit', 
+'rstrip', 'split', 'splitlines', 'startswith', 'strip', 'swapcase', 'title', 
+'translate', 'upper', 'zfill']
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Většina z nich nám ale pro práci s bajtovými objekty moc užitečná není. Pokud ovšem nepracujete třebas na úrovni ASCII (síťové protokoly a podobně), kde se pak k bajtovým řetězcům můžete chovat jako ke skutečným a ušetříte si odbočku do UTF-8 se všemi z toho plynoucími komplikacemi.
+  </div></div>
+
+</div></section><section class="slide-section" id="id4" data-title="Zavedení – konstruktorem „bytes()“"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Zavedení – konstruktorem „bytes()“</h2></div><div class="section-body">
+
+  <p>
+    Druhou variantou zavedení bajtového řetězce je pomocí funkce <code>bytes()</code>. Narozdíl od <em>přímé notace</em> její použití už není tak snadné a přímočaré – výsledek totiž závisí na typu vstupního parametru:
+  </p>
+  
+  <p class="enumerate">
+    Při volání <strong>bez parametru</strong> zavede funkce <em>bytes()</em> bajtový řetězec o nulové délce:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xb = bytes()
+&gt;&gt;&gt; xb
+b''
+  </pre>
+  
+  <p class="enumerate">
+    Je-li vstupním parametrem <strong>řetězec</strong>, musíme navíc přidat i kódování, které bude řídit jeho transformaci na bajtový řetězec:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xb = bytes('Ahoj!', 'utf-8')
+&gt;&gt;&gt; xb
+b'Ahoj!'
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Na pozadí se zavolá metoda řetězce <code>'Ahoj!'.encode('utf-8')</code>, která provede příslušnou konverzi.
+  </div></div>
+  
+  <p class="enumerate">
+    Při vstupním parametru <strong>celé číslo</strong> je vytvořen bajtový řetězec odpovídající délky obsahující samé nuly:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xb = bytes(7)
+&gt;&gt;&gt; xb
+b'\x00\x00\x00\x00\x00\x00\x00'
+  </pre>
+  
+  <p class="enumerate">
+    Další možností je zadat na vstupu <strong>iterovatelný objekt</strong> (<em>iterable</em>), který vrací čísla v rozmezí <code>&lt;0, 255&gt;</code>. Tato čísla budou následně použita pro inicializaci (bajtového) řetězce.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Tohle je mimochodem způsob, jak převést <em>jedno konkrétní číslo</em> na bajt – kód <code>bytes([123])</code> převede číslo <code>123</code> na odpovídající bajtovou hodnotu <code>0x7b</code> (která se umí zobrazit jako <code>b'{'</code>, protože náleží do tisknutelné části spodní poloviny ASCII-tabulky).
+  </div></div>
+  
+  <p class="enumerate">
+    Poslední možností je použít na vstupu <strong>bafr</strong> (<em>buffer</em>), v klasickém případě tedy odkaz na otevřený soubor. V takovém případě se pro inicializaci bajtového řetězce použijí data (jednotlivé bajty) z bafru.
+  </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Bajtové řetězce jako sekvence"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Bajtové řetězce jako sekvence</h2></div><div class="section-body">
+
+  <p>
+    Stejně jako unicodové řetězce podporují bajtové řetězce tradiční sekvenční operace:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xb = b'ahoj'
+
+# délka sekvence
+&gt;&gt;&gt; len(xb)
+4
+
+# konkrétní prvek
+&gt;&gt;&gt; xb[3]
+106
+&gt;&gt;&gt; xb[-3]
+104
+
+# různé výřezy
+&gt;&gt;&gt; xb[1:3]
+b'ho'
+&gt;&gt;&gt; xb[1::2]
+b'hj'
+&gt;&gt;&gt; xb[2:]
+b'oj'
+&gt;&gt;&gt; xb[-3:]
+b'hoj'
+
+# dotaz na výskyt prvku
+&gt;&gt;&gt; 111 in xb
+True
+&gt;&gt;&gt; 110 in xb
+False
+&gt;&gt;&gt; b'a' in xb
+True
+&gt;&gt;&gt; b'\xf1' in xb
+False
+&gt;&gt;&gt; xb.index(b'h')
+1
+&gt;&gt;&gt; xb.index(b'D')
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+ValueError: substring not found
+&gt;&gt;&gt; xb.count(b'a')
+1
+
+# dvě spojené kopie
+&gt;&gt;&gt; xb * 2
+b'ahojahoj'
+  </pre>
+
+</div></section><section class="slide-section" id="id6" data-title="Poznámka"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Poznámka</h2></div><div class="section-body">
+
+    <p>
+        Na <a href="?slajd=5">předchozím slajdu</a> jste si mohli všimnout, že přístup k prvkům bajtového řetězce není tak úplně konzistentní s pojmenováním „řetězec“ – pro více prvků obdržíte (bajtový) řetězec, pro jeden prvek ovšem dostanete číslo:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; xb = b'ahoj'
+        &gt;&gt;&gt; type(xb)
+        &lt;class 'bytes'&gt;
+
+        # víceprvkový výřez
+        &gt;&gt;&gt; xb[0:2]
+        b'ah'
+        &gt;&gt;&gt; type(xb[0:2])
+        &lt;class 'bytes'&gt;
+
+        # jednoprvkový výřez
+        &gt;&gt;&gt; xb[0]
+        97
+        &gt;&gt;&gt; type(xb[0])
+        &lt;class 'int'&gt;
+    </pre>
+    <p>
+        U (normálního) řetězce je jeden prvek prostě zase jen řetězec, byť jednoprvkový, takže má stejné vlastnosti. U bajtového řetězce se vlastnosti jednoprvkového výřezu těžce odlišují od vlastností výřezu delšího – prostě je to úplně jiný typ (celé číslo). Tak pozor na to.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        <em>„Well, it's not a bug, it's a feature.“</em>
+    </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Bajtové řetězce jako sekvence – „for-in“"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Bajtové řetězce jako sekvence – „for-in“</h2></div><div class="section-body">
+
+  <p>
+    A samozřejmě máme k dispozici i oblíbenou smyčku <em>for-in</em> ve všech jejích variantách:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xb = b'ahoj'
+
+&gt;&gt;&gt; for x in xb:
+...     print(x)
+...
+97
+104
+111
+106
+
+&gt;&gt;&gt; for i, x in enumerate(xb):
+...     print(i, x)
+...
+0 97
+1 104
+2 111
+3 106
+
+&gt;&gt;&gt; for x in reversed(xb):
+...   print(x)
+...
+106
+111
+104
+97
+
+&gt;&gt;&gt; for x in sorted(xb):
+...   print(x)
+...
+97
+104
+106
+111
+  </pre>
+
+</div></section><section class="slide-section" id="id8" data-title="Bajtové řetězce jako neměnitelné sekvence"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Bajtové řetězce jako neměnitelné sekvence</h2></div><div class="section-body">
+
+  <p>
+    Stejně jako „obyčejné“ unicodové řetězce jsou řetězce bajtové <strong>neměnné</strong> (<em>immutable</em>):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xb = b'ahoj'
+
+&gt;&gt;&gt; xb[1]
+104
+
+&gt;&gt;&gt; xb[1] = b'H'
+Traceback (most recent call last):
+  File "&lt;pyshell#42&gt;", line 1, in &lt;module&gt;
+    xb[1] = b'H'
+TypeError: 'bytes' object does not support item assignment
+  </pre>
+
+</div></section><section class="slide-section" id="id9" data-title="Interpolace v bajtových řetězcích pomocí „%“"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Interpolace v bajtových řetězcích pomocí „%“</h2></div><div class="section-body">
+
+  <p>
+    Jedna z užitečných metod, která bajtovým řetězcům oproti jejich unicodovým bráškům chybí, je <code>format()</code> (a s ní i formátované řetězce – <code>fb''</code> bohužel opravdu neprojde). Světe ale div se, funguje interpolace pomocí starší varianty s operátorem <code>%</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    # jeden bajt
+    &gt;&gt;&gt; b'%c' % 66
+    b'B'
+    &gt;&gt;&gt; b'%c' % b'B'
+    b'B'
+
+    # delší bajtový řetězec
+    &gt;&gt;&gt; b'%b' % b'abc'
+    b'abc'
+    &gt;&gt;&gt; b'%b' % bytearray([65, 66, 67])
+    b'ABC'
+
+    # reprezentace objektu
+    &gt;&gt;&gt; b'%a' % 3.14
+    b'3.14'
+    &gt;&gt;&gt; b'%a' % 'abc'
+    b"'abc'"
+    &gt;&gt;&gt; b'%a' % b'abc'
+    b"b'abc'"
+  </pre>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      <code>%a</code> je vlastně ekvivalentem <code>repr(OBJEKT).encode('ascii', 'backslashreplace')</code>. Příklady převzaty <a href="https://www.python.org/dev/peps/pep-0461/" class="external">z dokumentace</a>.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Kromě uvedených formátovacích kódů (a několika dalších kvůli kompatibilitě s řadou 2.x) podporuje procentítková interpolace <a href="/materialy/python/cmd/print.xml?slajd=7">všechny ostatní existující</a>.
+    </div></div></div>
+  <p>
+    PS: Popravdě to ale ve trojkové řadě funguje až od verze 3.5, kdy byly konečně vyslyšeny hlasy pythoních nízkoúrovňových programátorů (ne všichni kvůli tomu jedou Céčko ;-) a do Python'u byla vrácena funkcionalita dvojkové řady. Ostatně to byla jedna z velkých kritik a hlavních důvodů, proč v těchto případech zůstat u Python'u 2.x.
+  </p>
+
+</div></section><section class="slide-section" id="id10" data-title="Dekódování textových řetězců – „BYTES.decode()“ vs „STR.encode()“"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Dekódování textových řetězců – „BYTES.decode()“ vs „STR.encode()“</h2></div><div class="section-body">
+
+  <p>
+    Na úrovni binárních dat představují textové řetězce jisté sekvence bajtů. Přitom typicky podle <em>zvoleného kódování</em> zabírají různé znaky různý počet bajtů. Python poskytuje metody pro konverzi mezi řetězci a jejich odpovídajícím bajtovým vyjádřením.
+  </p>
+  
+  <p class="enumerate">
+    Konverzi řetězce na odpovídající bajtový řetězec zajišťuje <em>metoda řetězce</em> <code>encode(KÓDOVÁNÍ)</code>. Ukažme si pro příklad tři různé způsoby bajtového zakódování téhož řetězce:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# Testovací řetězec o délce čtyř (unicodových) znaků:
+&gt;&gt;&gt; xs = '狼.cz'
+&gt;&gt;&gt; len(xs)
+4
+
+# a) v kódování UTF-8 zabírá šest bajtů
+&gt;&gt;&gt; xs.encode('utf-8')
+b'\xe7\x8b\xbc.cz'
+&gt;&gt;&gt; len( xs.encode('utf-8') )
+6
+# b) v kódování GB18030 zabírá pět bajtů
+&gt;&gt;&gt; xs.encode('gb18030')
+b'\xc0\xc7.cz'
+&gt;&gt;&gt; len( xs.encode('gb18030') )
+5
+# c) v kódování Big5 zabírá jiných pět bajtů než v předchozím kódování
+&gt;&gt;&gt; xs.encode('big5')
+b'\xafT.cz'
+&gt;&gt;&gt; len( xs.encode('big5') )
+5
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Metoda <em>encode()</em> tedy vezme řetězec a znak po znaku ho při <em>zvoleném kódování</em> převede na odpovídající sekvenci bajtů (často delší).
+  </div></div>
+  
+  <p class="enumerate">
+    Zpětnou konverzi z bajtového řetězce na textový řetězec (při daném kódování) zajišťuje <em>metoda bajtového řetězce</em> <code>decode(KÓDOVÁNÍ)</code>. Příklad:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# Testovací řetězec:
+&gt;&gt;&gt; xs = '狼.cz'
+
+# Převod „tam a zpět“ je pochopitelně jednoznačný:
+# řetězec → bajtový řetězec → řetězec
+&gt;&gt;&gt; xs.encode('big5').decode('big5')
+'狼.cz'
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Metoda <em>decode()</em> tedy vezme bajtový řetězec a podle <em>zvoleného kódování</em> ho po odpovídajících skupinách bajtů převede na odpovídající sekvenci znaků (často kratší).
+  </div></div>
+  
+  <hr>
+  
+  <p>
+    PS: Častěji ale budou bajtové objekty představovat „skutečná“ binární data, např. obrázek nebo zvuk. Pak jsou samozřejmě výše uvedené konverze k ničemu, protože takováto data málokdy budou mít rozumnou textovou podobu.
+  </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 10 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

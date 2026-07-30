@@ -1,0 +1,321 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Příklady
+      —
+      Regulární výrazy</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Příklady</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">10</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Syntaxe regexpů</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">. &amp; \.</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">* &amp; DOTALL</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">„Chamtivost“</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Výběr znaků</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Podskupiny</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Speciální sekvence</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Vyjmenování znaků</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Na závěr</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Regulární výrazy</span><span class="lecture-date">2011-10-27</span></div><h1 class="lecture-title">Příklady</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    Na <a href="overview.xml">předchozím slajdu</a> jsme viděli, že <em>regulární výrazy</em> v počítačovém smyslu slova jsou spíše <strong>vyhledávací vzory</strong> v řetězcích. Jako takové se ve svém výrazivu a obsažnosti liší podle použitého programového prostředku (ačkoli většina z nich je minimálně jistou podmnožinou <em>regexpů</em> z jazyka <em>Perl</em>).
+  </p>
+  <p>
+    V dalším si z praktických důvodů ukážeme příklady regexpů v jazyce <em>Python</em>, a to za pomoci grafického nástroje <a href="http://code.google.com/p/kiki-re/" class="external">kiki-re</a>.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Syntaxe regexpů"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Syntaxe regexpů</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Formálně je regexp skupina <em>znaků</em> a tzv. <em>řídicích znaků</em>, které dohromady popisují množinu <em>vyhovujících řetězců</em>.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Tak třeba regexp <code>[1-9]\.[A-Z]</code> bude v zadaném textu hledat názvy školních tříd (ve tvaru <em>číslo.písmeno</em>).
+  </div></div>
+  
+  <p class="enumerate">
+    Regexpy se dají skládat, tzn. že máme-li dva regexpy <code>A</code> a <code>B</code>, tak jejich složení (<em>konkatenace</em>) <code>AB</code> je také regexp.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Například máme-li regexp <code>ab</code>, který vyhledává řetězce <em>ab</em>, tak jeho složeni s regexpem <code>c</code>, který vyhledává řetězec <em>c</em>, bude regexp <code>abc</code>, který bude hledat právě tyto třípísmenné sekvence <em>abc</em>.
+  </div></div>
+  
+  <p class="enumerate">
+    Přitom řídicí znaky jsou také obyčejné znaky (nebo jejich sekvence), takže pokud je chceme použít v jejich původním (znakovém) významu, musíme je tak označit. Většinou se tak děje pomocí speciálního znaku <code>\</code> („zpětné lomítko“, <em>backslash</em>).
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Kupříkladu znak <code>.</code> („tečka“) slouží k namapování (téměř) libovolného znaku, takže chceme-li namapovat skutečně právě pouze tečku, musíme použít sekvenci <code>\.</code>.
+  </div></div>
+
+</div></section><section class="slide-section" id="id3" data-title=". &amp; \."><div class="section-header"><span class="section-num">3</span><h2 class="section-title">. &amp; \.</h2></div><div class="section-body">
+
+  <p>
+    V následujících příkladech budeme pomocí <em>kiki-re</em> zjišťovat, jaké podřetězce vyhovují v rámci následujícího jednoduchého fragmentu HTML...
+  </p>
+  <pre class="brush: text; gutter: false; toolbar: false; ">
+&lt;p&gt;
+  Jednoduchý HTML-odstavec se &lt;em&gt;zvýrazněným&lt;/em&gt; textem
+  a více řádkami.
+&lt;/p&gt;
+  </pre>
+  <p>
+    ..zadaným vstupním <em>regexpům</em>.
+  </p>
+  
+  <p class="enumerate">
+    regexp: <strong>.</strong> (jeden jakýkoli znak, všechny zásahy)
+    <br>
+    <img src="_files/examples/kiki-1a.png" width="" height="" alt="" title="">
+  </p>
+  
+  <p class="enumerate">
+    regexp: <strong>.</strong> (jeden jakýkoli znak, první zásah)
+    <br>
+    <img src="_files/examples/kiki-1b.png" width="" height="" alt="" title="">
+  </p>
+  
+  <p class="enumerate">
+    regexp: <strong>\.</strong> (tečka, všechny zásahy)
+    <br>
+    <img src="_files/examples/kiki-1c.png" width="" height="" alt="" title="">
+  </p>
+
+</div></section><section class="slide-section" id="id4" data-title="* &amp; DOTALL"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">* &amp; DOTALL</h2></div><div class="section-body">
+
+  <p>
+    Nad stejným textem zkusme něco dalšího. Přitom pro zjednodušení budeme vždy uvažovat všechny zásahy.
+  </p>
+  
+  <p class="enumerate">
+    regexp: <strong>e.</strong> (písmeno <em>e</em> následované právě jedním libovolným znakem)
+    <br>
+    <img src="_files/examples/kiki-2a.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Zde jsme „natvrdo“ určili začátek hledaného řetězce na písmeno <em>e</em>. Tečka za ním pak zastupuje libovolný znak, tedy i mezeru. Ve výsledku hledáme dvouznakové řetězce, které začínají na písmeno <em>e</em>.
+  </div></div>
+  
+  <p class="enumerate">
+    regexp: <strong>e.*</strong> (písmeno <em>e</em> následované libovolným počtem libovolných znaků, výchozí chování příznaku <code>DOTALL</code>)
+    <br>
+    <img src="_files/examples/kiki-2b.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Vidíme, že <em>speciální řídicí znak</em> <code>*</code> („hvězdička“) způsobil libovolný počet opakování předchozího znaku v regexpu. Zde jím je tečka, tedy „cokoliv“, proto regexp našel od prvního výskytu písmena <em>e</em> na každém řádku vše až do konce řádku. Důvodem je výchozí chování příznaku <code>DOTALL</code> – řídicí znak „tečka“ nezahrnuje odřádkování, proto sekvenci <code>.*</code> není možno aplikovat „přes okraj“ řádků.
+  </div></div>
+  
+  <p class="enumerate">
+    regexp: <strong>e.*</strong> (písmeno <em>e</em> následované libovolným počtem libovolných znaků, příznak <code>DOTALL</code> aktivován)
+    <br>
+    <img src="_files/examples/kiki-2c.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Oproti předchozímu příkladu jsme provedli jedinou změnu – přepnuli jsme chování příznaku <code>DOTALL</code>. Nyní „tečka“ zahrnuje i odřádkování, proto regexp našel první výskyt písmena <em>e</em> a od něj doslova „sežral“ vše až po konec prohledávaného textu. Sekvenci <code>.*</code> je totiž nyní dovoleno expandovat i přes odřádkování, a tak také učiní.
+  </div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="„Chamtivost“"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">„Chamtivost“</h2></div><div class="section-body">
+
+  <p>
+    Zkusme nyní něco praktičtějšího – najít všechny tagy v ukázkovém HTML:
+  </p>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;.*&gt;</strong>
+    <br>
+    <img src="_files/examples/kiki-3a.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Tohle vypadá zdánlivě správně. Ale podívejme se pořádně – co to provedlo s elementem <em>&lt;em&gt;</em>? To asi není to, co jsme chtěli. Než si toto podivné chování regexpu vysvětlíme, podíváme se, co se stane, zachováme-li regexp stejný, ale aktivujeme nevýchozí chování příznaku <code>DOTALL</code>:
+  </div></div>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;.*&gt;</strong> (plus přepnutý <code>DOTALL</code>)
+    <br>
+    <img src="_files/examples/kiki-3b.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Teď už je to jasné: Regexpy jsou ve výchozím nastavení „chamtivé“ až hrůza – „sežerou“ všechno, co můžou. Zde sice znak <em>&lt;</em> správně našel začátek prvního tagu, jenže sekvence řídicích znaků <code>.*</code> způsobila zachycení libovolného znaku libovolněkrát (a v tomto případě i včetně odřádkování), takže regexp prostě našel <em>úplně všechno</em> až po poslední možnou uzavírací závorku <em>&gt;</em>, kterou má předepsanou ve vzoru.
+  </div></div>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;.*?&gt;</strong> (a stále přepnutý <code>DOTALL</code>, i když tady a teď už na něm nezáleží)
+    <br>
+    <img src="_files/examples/kiki-3c.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Teď už je to konečně správně – znak <code>?</code> přepnul chování regexpu z výchozího „chamtivého“ na „nechamtivé“. Sekvence <code>.*</code> proto nyní zachytí  už pouze <em>nejmenší možnou vyhovující skupinu znaků</em>.
+  </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="Výběr znaků"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Výběr znaků</h2></div><div class="section-body">
+
+  <p>
+    Zkusme naši ukázku ještě více zpraktičnit – zajímají nás přece hlavně <em>jména</em> použitých elementů a pro to určitě nepotřebujeme koncové tagy. Regexp <code>&lt;.*?&gt;</code> správně zachytává všechny tagy, tudíž nějak potřebujeme z této množiny vynechat ty koncové. A ty se liší právě znakem <em>/</em>.
+  </p>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;[^/].*?&gt;</strong>
+    <br>
+    <img src="_files/examples/kiki-4a.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Hledáme prakticky totéž, co dříve – špičaté závorky s textem mezi nimi. Ale nyní jsme navíc pomocí sekvence <code>[^/]</code> předepsali, že za otvírací závorkou nesmí být znak <em>/</em>.
+  </div></div>
+  <p>
+    Formálně sekvence <code>[^]</code> předepisuje, že všechny znaky vyjmenované mezi <code>[^</code> a <code>]</code> se nemají v tomto místě regexpu nacházet. Komplementární sekvence <code>[]</code> naopak říká, že všechny znaky mezi <code>[</code> a <code>]</code> se tam nacházet mají, jak ukazuje následující triviální příklad pro zachycení <em>koncových</em> tagů:
+  </p>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;[/].*?&gt;</strong>
+    <br>
+    <img src="_files/examples/kiki-4b.png" width="" height="" alt="" title="">
+  </p>
+  <p>
+    Pro výčet s jedním prvek je však zcela zbytečné používat výčet, takže k dosažení stejného výsledku samozřejmě postačí pouhé uvedení znaku <em>/</em> na správném místě regexpu:
+  </p>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;/.*?&gt;</strong>
+    <br>
+    <img src="_files/examples/kiki-4c.png" width="" height="" alt="" title="">
+  </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Podskupiny"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Podskupiny</h2></div><div class="section-body">
+
+  <p>
+    Dosud jsme hledali elementy v textu včetně jejich závorek. Jelikož závorky tyto elementy určují, v regulárním výrazu se bez nich neobejdeme. Na výstupu je pak můžeme z nalezených řetězců odstranit řetězcovými operacemi, ale stejně tak si můžeme pomoci už přímo v regexpu.
+  </p>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;(.*?)&gt;</strong>
+    <br>
+    <img src="_files/examples/kiki-5a.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Závorky <em>()</em> v regexpu efektivně „vyrobí“ novou zapamatovanou podskupinu v rámci celé nadřazené nalezené skupiny. Jak barevná čísílka okolo napovídají, jsou tyto podskupiny přístupné dále po hierarchii nalezených řetězců. (Dokonce jsou přístupné už v rámci regexpu pod svým pořadovým číslem, ale na to se podíváme jindy.)
+  </div></div>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;([^/].*?)&gt;</strong>
+    <br>
+    <img src="_files/examples/kiki-5b.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Tohle je triviální úprava předchozího řešení pouze pro otvírací elementy. Tímto tedy získáme (v tomto případě) právě už jen názvy všech otvíracích elementů.
+  </div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="Speciální sekvence"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Speciální sekvence</h2></div><div class="section-body">
+
+  <p>
+    Doplňme náš testovací HTML-fragment o definici atributu:
+  </p>
+  <pre class="brush: text; gutter: false; toolbar: false; ">
+&lt;p class="para1"&gt;
+  Jednoduchý HTML-odstavec se &lt;em&gt;zvýrazněným&lt;/em&gt; textem
+  a více řádkami.
+&lt;/p&gt;
+  </pre>
+  <p>
+    Jak hned uvidíme, přítomnost atributu na elementu náš vycizelovaný regexp pro zjišťování jména elementu beznadějně rozhodí:
+  </p>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;([^/].*?)&gt;</strong>
+    <br>
+    <img src="_files/examples/kiki-6a.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Regexp se chová stále konzistentně – sekvence <code>.*?</code> stále odchytí všechny znaky mezi oběma uzavíracími závorkami elementu. Jen bohužel pro nás to v tomto případě není u paragrafu jen jeho jméno, ale i všechno ostatní.
+  </div></div>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;(\w+).*?&gt;</strong>
+    <br>
+    <img src="_files/examples/kiki-6b.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Tohle si zaslouží trochu vysvětlení. <em>Speciální sekvence</em> <code>\w</code> odchytí všechny alfanumerické znaky (v základním nastavení podle ASCII, jinak podle aktuálního <code>LOCALE</code> nebo <code>UNICODE</code>). Speciální znak <code>+</code> znamená „alespoň jedno opakování předchozího regexpu“. Dohromady tedy uvedený regexp bude hledat všechny řetězce, které budou začínat na levou špičatou závorku (<code>&lt;</code>) následovanou alespoň jedním alfanumerickým znakem (<code>\w+</code>), který/é si navíc zapamatujeme (<code>()</code>), a dále libovolnou sadou znaků až po nejbližší pravou špičatou závorku (<code>.*?&gt;</code>).
+  </div></div>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;(\w*).*?&gt;</strong>
+    <br>
+    <img src="_files/examples/kiki-6c.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    To je ale překvapení – vyměnili jsme „alespoň jeden“ (<code>+</code>) za „klidně i žádný“ (<code>*</code>) a najednou se nám odchytávají i koncové elementy. Ale bližší pohled odhalí, proč to tak je – všimněte si prázdných zelených skupin číslo 1 před uzavíracím lomítkem koncových elementů. Skupina <code>\w*</code> totiž odchytila „nic“, jak jí dovolil speciální znak <code>*</code>, a o zachycení zbytku znaků už se postaral „univerzální požírač“ <code>.*</code> (tedy „sežer cokoliv libovolněkrát“).
+  </div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="Vyjmenování znaků"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Vyjmenování znaků</h2></div><div class="section-body">
+
+  <p>
+    Zatím jsme hledali jméno elementu pomocí operátoru <code>.</code>, který akceptuje („sežere“) prakticky cokoliv, případně pomocí specální sekvence <code>\w</code>, která akceptuje alfanumerické znaky. V důsledku bychom tak mohli akceptovat i jména elementů, která by se ve skutečném HTML neměla vyskytovat – jako třeba jména začínající na číslici nebo obsahující zakázané znaky.
+  </p>
+ <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    PS: Pro jednoduchost budeme dále předpokládat, že jméno elementu se může skládat pouze z písmen a číslic, přičemž číslice nemůže být na prvním místě.
+  </div></div>
+  <p>
+    Zkusme proto najít vhodnější verzi regexpu, která zvládne správně i následující HTML-fragment:
+  </p>
+  <pre class="brush: text; gutter: false; toolbar: false; ">
+&lt;p class="para1"&gt;
+  Jednoduchý HTML-odstavec se &lt;em&gt;zvýrazněným&lt;/em&gt; textem
+  a &lt;9a&gt;více&lt;/9a&gt; řádkami.
+&lt;/p&gt;
+  </pre>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;([a-zA-Z]\w*).*?&gt;</strong>
+    <br>
+    <img src="_files/examples/kiki-7a.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Řídicí sekvencí <code>[a-zA-Z]</code> regexpu říkáme, že v daném místě musí být právě jedno písmeno (správné elementy totiž začínají písmenem), a to z celé ASCII-abecedy (pro vyjmenování tedy můžeme použít rozsahy). Za ní pak mohou následovat čísla nebo písmena další, ale také klidně žádné (<code>\w*</code>).
+  </div></div>
+  
+  <p class="enumerate">
+    regexp: <strong>&lt;([A-Z]\w*).*?&gt;</strong> (plus nastaven příznak <code>IGNORECASE</code>)
+    <br>
+    <img src="_files/examples/kiki-7b.png" width="" height="" alt="" title="">
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Ve výchozím stavu regexpy rozeznávají velikost písmen, ale nastavení příznaku <code>IGNORECASE</code> toto vypne. Proto v tomto příkladu řídicí sekvence <code>[A-Z]</code> zachytí názvy elementů, které jsou zde psané malými písmeny.
+  </div></div>
+  
+  <p class="enumerate">
+    K uvedenéme problému můžeme přistoupit i opačně – místo povolených znaků na prvním místě za závorkou <em>&lt;</em> můžeme naopak vyjmenovat znaky zakázané, tedy kupříkladu číslice a ukončovací lomítko <em>/</em>:
+  </p>
+  <p>
+    regexp: <strong>&lt;([^0-9/]\w*).*?&gt;</strong>
+    <br>
+    <img src="_files/examples/kiki-7c.png" width="" height="" alt="" title="">
+  </p>
+  <p>
+    Podívat se na problém z „druhé strany“ je někdy velmi výhodné (vzpomeňte si třebas na důkazy sporem), ale zrovna v tomhle případě to funguje jenom proto, že víme, co v našem souboru zakazujeme. Pro obecný soubor by tenhle konkrétní přístup beznadějně selhal, protože by povolil <em>všechny nezakázané</em> znaky, a těch je rozhodně více než písmen abecedy, která mají být v tomto případě jediná povolena.
+  </p>
+
+</div></section><section class="slide-section" id="id10" data-title="Na závěr"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Na závěr</h2></div><div class="section-body">
+
+  <p>
+    Ukončeme naši seznamovací procházku po regexpech pár (neuspořádanými) poznámkami:
+  </p>
+  <ul>
+    <li>
+      Regexp je sekvence <em>znaků</em> a <em>řídicích znaků</em>, které dohromady vytváří <strong>vzor</strong>, který se regexp pokouší najít v prohledávaném textu.
+    </li>
+    <li>
+      Vzor z regexpu je hledán ve své celistvosti – nalezené vyhovující řetězce jsou zaznamenány do tzv. <em>skupin</em> (<em>groups</em>), které je pak možné procházet.
+    </li>
+    <li>
+      Kromě celých vyhledaných skupin je možné vybrat a zapamatovat si, případně též použít uvnitř regexpu samotného, další dodatečné <em>podskupiny</em> uvnitř vyhledaných.
+    </li>
+    <li>
+      Chování regexpů je možné řídit několika globálními <em>přepínači</em>. Týká se to konkrétního chování speciálních řídicích sekvencí plus celého regexpu vůči takovým věcem, jako jsou nové řádky, kódování textu a podobně.
+    </li>
+    <li>
+      Ke stejným výsledkům je možné často dojít různými cestami. Ne vždy jsou tyto cesty navzájem zaměnitelné pro všechny (krajní) případy.
+    </li>
+    <li>
+      A v neposlední řadě – regexpy pro různé programové prostředky se dosti často vzájemně podstatně liší.
+    </li>
+  </ul>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 10 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>
