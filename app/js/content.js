@@ -823,7 +823,19 @@ export function showProgress() {
   const corePct = coreItems.length ? Math.round((coreDone / coreItems.length) * 100) : 0;
 
   const level = progressLevel(pct);
-  const vibe = progressVibe(pct, studiedN, total);
+  const wrap = el("div", { className: "progress-view" });
+
+  // View toggle bar
+  const toggleRow = el("div", { className: "progress-view-toggle-row" });
+  toggleRow.innerHTML = `
+    <div class="view-toggle-group">
+      <button type="button" class="btn view-toggle-btn active" id="btnViewBoard">Deska (Study Board)</button>
+      <button type="button" class="btn view-toggle-btn" id="btnViewChecklist">Studijní plán 📋</button>
+    </div>
+  `;
+  wrap.appendChild(toggleRow);
+
+  getEl("#btnViewChecklist", toggleRow)?.addEventListener("click", () => showChecklist());
 
   // Hero
   const hero = el("div", { className: "progress-hero" });
@@ -1121,4 +1133,160 @@ function progressLevel(pct) {
   if (pct < 75) return { badge: "Lv 4", name: "Path runner" };
   if (pct < 100) return { badge: "Lv 5", name: "Almost legend" };
   return { badge: "Lv MAX", name: "Course complete" };
+}
+
+let activeChecklistLvl = "all";
+
+function getItemLevel(item) {
+  const w = item.weekNum || 1;
+  if (w <= 2) return "LVL1";
+  if (w <= 5) return "LVL2";
+  if (w <= 8) return "LVL3";
+  return "LVL4";
+}
+
+function getItemBadges(item) {
+  const badges = [];
+  const rel = (item.relevance || 5) * 10;
+  if (rel >= 90) badges.push({ text: "MEGA EPIC", cls: "bg-mega-epic" });
+  else if (rel >= 70) badges.push({ text: "EPIC", cls: "bg-epic" });
+
+  const tags = item.tags || [];
+  if (tags.includes("WOW")) badges.push({ text: "INSIGHT", cls: "bg-insight" });
+  if (tags.includes("Legendary")) badges.push({ text: "CHALLENGE", cls: "bg-challenge" });
+
+  if (item.kind === "exercise") badges.push({ text: "PRACTICE", cls: "bg-practice" });
+  else badges.push({ text: "SHOWCASE", cls: "bg-showcase" });
+
+  return badges;
+}
+
+function showChecklist() {
+  const main = getEl("main");
+  if (!main) return;
+  main.replaceChildren();
+
+  const wrap = el("div", { className: "progress-view checklist-view" });
+
+  // View toggle bar
+  const toggleRow = el("div", { className: "progress-view-toggle-row" });
+  toggleRow.innerHTML = `
+    <div class="view-toggle-group">
+      <button type="button" class="btn view-toggle-btn" id="btnViewBoard">Deska (Study Board)</button>
+      <button type="button" class="btn view-toggle-btn active" id="btnViewChecklist">Studijní plán 📋</button>
+    </div>
+  `;
+  wrap.appendChild(toggleRow);
+
+  getEl("#btnViewBoard", toggleRow)?.addEventListener("click", () => showProgress());
+
+  // Hero header
+  const hero = el("div", { className: "checklist-hero" });
+  hero.innerHTML = `
+    <div class="chk-hero-title">
+      <h1>Studijní plán & 4-Úrovňový Checklist 📋</h1>
+      <p class="chk-hero-subtitle">Přehled všech lekcí a cvičení Python kurzu rozdělený do 4 úrovní náročnosti (LVL1–LVL4).</p>
+    </div>
+    <div class="chk-print-actions">
+      <button type="button" class="btn primary btn-print-all" title="Vytisknout všechny úrovně (Ctrl+P)">Vytisknout všechny úrovně 🖨</button>
+      <button type="button" class="btn secondary btn-print-lvl" title="Vytisknout vybranou úroveň">Vytisknout aktivní úroveň 🖨</button>
+    </div>
+  `;
+  wrap.appendChild(hero);
+
+  getEl(".btn-print-all", hero)?.addEventListener("click", () => window.print());
+  getEl(".btn-print-lvl", hero)?.addEventListener("click", () => window.print());
+
+  // Level Filter Tabs
+  const tabsRow = el("div", { className: "chk-lvl-tabs" });
+  const levels = [
+    { id: "all", label: "Všechny úrovně (All)" },
+    { id: "LVL1", label: "1. TÝDEN - 2. TÝDEN · LVL1 Core" },
+    { id: "LVL2", label: "3. TÝDEN - 5. TÝDEN · LVL2 Idiomy" },
+    { id: "LVL3", label: "6. TÝDEN - 8. TÝDEN · LVL3 OOP & Mechaniky" },
+    { id: "LVL4", label: "9. TÝDEN - 12. TÝDEN · LVL4 Dojo & System" },
+  ];
+
+  for (const lvl of levels) {
+    const btn = el("button", {
+      type: "button",
+      className: `chk-lvl-tab${activeChecklistLvl === lvl.id ? " active" : ""}`,
+      onClick: () => {
+        activeChecklistLvl = lvl.id;
+        showChecklist();
+      },
+    }, lvl.label);
+    tabsRow.appendChild(btn);
+  }
+  wrap.appendChild(tabsRow);
+
+  // Render Weeks & Cards
+  const board = el("div", { className: "chk-board" });
+
+  for (const week of state.course?.weeks || []) {
+    const weekItems = [...(week.lectures || []), ...(week.exercises || [])]
+      .map((it) => state.itemsById.get(it.id) || it)
+      .filter((it) => activeChecklistLvl === "all" || getItemLevel(it) === activeChecklistLvl);
+
+    if (!weekItems.length) continue;
+
+    const wBlock = el("section", { className: "chk-week-block" });
+    const weekLvl = getItemLevel(weekItems[0]);
+
+    wBlock.innerHTML = `
+      <header class="chk-week-head">
+        <h2><span class="sw-num">${week.week}. TÝDEN</span> ${escapeHtml(week.title)} <span class="chk-lvl-badge">${weekLvl}</span></h2>
+      </header>
+    `;
+
+    const grid = el("div", { className: "chk-card-grid" });
+
+    for (const item of weekItems) {
+      const isDone = done(item.id);
+      const relPct = (item.relevance || 5) * 10;
+      const badges = getItemBadges(item);
+
+      const card = el("div", {
+        className: `chk-card${isDone ? " studied" : ""}`,
+      });
+
+      card.innerHTML = `
+        <label class="chk-checkbox-label">
+          <input type="checkbox" class="chk-box" ${isDone ? "checked" : ""} />
+          <span class="chk-title">${escapeHtml(item.title)}</span>
+        </label>
+        <div class="chk-badges">
+          ${badges.map(b => `<span class="chk-badge ${b.cls}">${b.text}</span>`).join("")}
+        </div>
+        <div class="chk-sub">
+          <span>${item.kind === "exercise" ? "Exercise" : "Lecture"} · ${item.path || ""}</span>
+          <div class="chk-rel-wrap" title="Relevance: ${relPct}%">
+            <span class="chk-rel-num">${relPct}%</span>
+            <div class="chk-rel-bar"><div class="chk-rel-fill" style="width:${relPct}%"></div></div>
+          </div>
+        </div>
+      `;
+
+      // Checkbox click handler
+      const chkInput = card.querySelector(".chk-box");
+      chkInput?.addEventListener("change", (e) => {
+        if (e.target.checked) state.studied.add(item.id);
+        else state.studied.delete(item.id);
+
+        try {
+          localStorage.setItem("pcs-studied-v1", JSON.stringify(Array.from(state.studied)));
+        } catch { /* */ }
+
+        card.classList.toggle("studied", e.target.checked);
+      });
+
+      grid.appendChild(card);
+    }
+
+    wBlock.appendChild(grid);
+    board.appendChild(wBlock);
+  }
+
+  wrap.appendChild(board);
+  main.appendChild(wrap);
 }
