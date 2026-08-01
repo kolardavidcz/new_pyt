@@ -536,6 +536,7 @@ function renderExerciseView(item, data, main) {
   main.className = "lecture-view exercise-view";
 
   const hero = lectureHero(item);
+  hero.appendChild(lectureToolbar(item, "full"));
   const meta = el("div", { className: "exercise-meta-line" });
   meta.innerHTML = `<span class="task-count-chip">${data.tasks.length} úkolů</span>`;
   hero.appendChild(meta);
