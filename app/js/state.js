@@ -49,10 +49,31 @@ export const state = {
   focusedTreeKey: null,
 };
 
-const SEEN_KEY = "pcs-seen-v1";
-const STUDIED_KEY = "pcs-studied-v1";
-const CHECKLIST_KEY = "pcs-checklist-v1";
-const SIDEBAR_W_KEY = "pcs-sidebar-w";
+const KV_URL = "https://tough-husky-101028.upstash.io";
+const KV_TOKEN = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
+
+async function kvGet(key) {
+  try {
+    const res = await fetch(`${KV_URL}/get/${key}`, {
+      headers: { Authorization: `Bearer ${KV_TOKEN}` },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.result ? JSON.parse(data.result) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function kvSet(key, val) {
+  try {
+    await fetch(`${KV_URL}/set/${key}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${KV_TOKEN}` },
+      body: JSON.stringify(val),
+    });
+  } catch { /* ignore */ }
+}
 
 export function loadPersisted() {
   try {
@@ -80,24 +101,53 @@ export function loadPersisted() {
     const w = parseInt(localStorage.getItem(SIDEBAR_W_KEY) || "", 10);
     if (w >= 180 && w <= 520) state.sidebarWidth = w;
   } catch { /* ignore */ }
+
+  syncCloudProgress();
+}
+
+export async function syncCloudProgress() {
+  try {
+    const remoteStudied = await kvGet(STUDIED_KEY);
+    if (Array.isArray(remoteStudied) && remoteStudied.length > 0) {
+      let changed = false;
+      for (const id of remoteStudied) {
+        if (!state.studied.has(id)) {
+          state.studied.add(id);
+          state.seen.add(id);
+          changed = true;
+        }
+      }
+      if (changed) {
+        localStorage.setItem(STUDIED_KEY, JSON.stringify([...state.studied]));
+        localStorage.setItem(SEEN_KEY, JSON.stringify([...state.seen]));
+        window.__pcsUpdateStatus?.();
+      }
+    }
+  } catch { /* ignore */ }
 }
 
 export function persistSeen() {
+  const arr = [...state.seen];
   try {
-    localStorage.setItem(SEEN_KEY, JSON.stringify([...state.seen]));
+    localStorage.setItem(SEEN_KEY, JSON.stringify(arr));
   } catch { /* ignore */ }
+  kvSet(SEEN_KEY, arr);
 }
 
 export function persistStudied() {
+  const arr = [...state.studied];
   try {
-    localStorage.setItem(STUDIED_KEY, JSON.stringify([...state.studied]));
+    localStorage.setItem(STUDIED_KEY, JSON.stringify(arr));
   } catch { /* ignore */ }
+  kvSet(STUDIED_KEY, arr);
 }
 
 export function persistChecklist() {
+  const arr = [...state.checklist];
   try {
-    localStorage.setItem(CHECKLIST_KEY, JSON.stringify([...state.checklist]));
+    localStorage.setItem(CHECKLIST_KEY, JSON.stringify(arr));
   } catch { /* ignore */ }
+  kvSet(CHECKLIST_KEY, arr);
 }
 
 export function isChecklistChecked(id) {
