@@ -204,7 +204,7 @@ function lectureToolbar(item, mode) {
   } else {
     bar.appendChild(el("button", {
       type: "button",
-      className: "btn primary",
+      className: "btn",
       title: "Scrollable full lecture",
       onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
     }, "Open full lecture"));
@@ -216,6 +216,27 @@ function lectureToolbar(item, mode) {
     title: "Print or export to PDF",
     onClick: () => window.print(),
   }, "Tisk 🖨"));
+
+  // Pinned right after Tisk 🖨: Mark studied button
+  const studied = isStudied(item.id);
+  const studyBtn = el("button", {
+    type: "button",
+    className: "btn study-btn" + (studied ? " is-studied" : ""),
+    title: studied ? "Click to unmark as studied" : "Click to mark as studied for progress",
+    onClick: () => {
+      const now = toggleStudied(item.id);
+      studyBtn.classList.toggle("is-studied", now);
+      studyBtn.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
+      studyBtn.title = now ? "Click to unmark as studied" : "Click to mark as studied for progress";
+      document.querySelectorAll(".bottom-nav-study-btn").forEach((b) => {
+        b.classList.toggle("is-studied", now);
+        b.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
+      });
+      try { renderTree(); } catch { /* */ }
+      window.__pcsUpdateStatus?.();
+    },
+  }, studied ? "✓ Studied" : "☐ Mark studied");
+  bar.appendChild(studyBtn);
 
   return bar;
 }
@@ -233,31 +254,6 @@ function lectureHero(item, { compact = false } = {}) {
     ${!compact && item.desc ? `<p class="desc">${escapeHtml(item.desc)}</p>` : ""}
     ${!compact && item.compare ? `<p class="compare">${escapeHtml(item.compare)}</p>` : ""}
   `;
-
-  // Manual “Studied” toggle — progress source of truth
-  const studyRow = el("div", { className: "study-row" });
-  const studied = isStudied(item.id);
-  const btn = el("button", {
-    type: "button",
-    className: "btn study-btn" + (studied ? " is-studied" : " primary"),
-    title: studied ? "Click to unmark as studied" : "Click to mark as studied for progress",
-    onClick: () => {
-      const now = toggleStudied(item.id);
-      btn.classList.toggle("is-studied", now);
-      btn.classList.toggle("primary", !now);
-      btn.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
-      btn.title = now ? "Click to unmark as studied" : "Click to mark as studied for progress";
-      document.querySelectorAll(".bottom-nav-study-btn").forEach((b) => {
-        b.classList.toggle("is-studied", now);
-        b.classList.toggle("primary", !now);
-        b.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
-      });
-      try { renderTree(); } catch { /* tree may not care */ }
-      window.__pcsUpdateStatus?.();
-    },
-  }, studied ? "✓ Studied" : "☐ Mark studied");
-  studyRow.appendChild(btn);
-  hero.appendChild(studyRow);
   return hero;
 }
 
@@ -287,22 +283,20 @@ function buildBottomNavBar(item) {
     bar.appendChild(disabledPrev);
   }
 
-  // 2. Mark Studied Button
+  // 2. Mark Studied Button (default grey when not studied)
   const studyBtn = el("button", {
     type: "button",
-    className: "btn bottom-nav-study-btn" + (studied ? " is-studied" : " primary"),
+    className: "btn bottom-nav-study-btn" + (studied ? " is-studied" : ""),
     title: studied ? "Click to unmark as studied" : "Click to mark as studied for progress",
     onClick: () => {
       const now = toggleStudied(item.id);
       studyBtn.classList.toggle("is-studied", now);
-      studyBtn.classList.toggle("primary", !now);
       studyBtn.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
       studyBtn.title = now ? "Click to unmark as studied" : "Click to mark as studied for progress";
-      // Update top hero study buttons if present on page
+      // Update top study buttons if present on page
       document.querySelectorAll(".study-btn").forEach((b) => {
         b.classList.toggle("is-studied", now);
-        b.classList.toggle("primary", !now);
-        b.textContent = now ? "✓ Studied" : "Mark studied";
+        b.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
       });
       try { renderTree(); } catch { /* */ }
       window.__pcsUpdateStatus?.();
