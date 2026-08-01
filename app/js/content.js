@@ -184,6 +184,14 @@ if (typeof document !== "undefined") {
   });
 }
 
+function updatePageStudyButtons(now) {
+  document.querySelectorAll(".study-btn, .bottom-nav-study-btn").forEach((b) => {
+    b.classList.toggle("is-studied", now);
+    b.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
+    b.title = now ? "Click to unmark as studied" : "Click to mark as studied for progress";
+  });
+}
+
 function lectureToolbar(item, mode) {
   // mode: "full" | "presentation" | "page"
   const pages = pagesFor(item.path);
@@ -225,13 +233,7 @@ function lectureToolbar(item, mode) {
     title: studied ? "Click to unmark as studied" : "Click to mark as studied for progress",
     onClick: () => {
       const now = toggleStudied(item.id);
-      studyBtn.classList.toggle("is-studied", now);
-      studyBtn.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
-      studyBtn.title = now ? "Click to unmark as studied" : "Click to mark as studied for progress";
-      document.querySelectorAll(".bottom-nav-study-btn").forEach((b) => {
-        b.classList.toggle("is-studied", now);
-        b.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
-      });
+      updatePageStudyButtons(now);
       try { renderTree(); } catch { /* */ }
       window.__pcsUpdateStatus?.();
     },
@@ -290,14 +292,7 @@ function buildBottomNavBar(item) {
     title: studied ? "Click to unmark as studied" : "Click to mark as studied for progress",
     onClick: () => {
       const now = toggleStudied(item.id);
-      studyBtn.classList.toggle("is-studied", now);
-      studyBtn.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
-      studyBtn.title = now ? "Click to unmark as studied" : "Click to mark as studied for progress";
-      // Update top study buttons if present on page
-      document.querySelectorAll(".study-btn").forEach((b) => {
-        b.classList.toggle("is-studied", now);
-        b.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
-      });
+      updatePageStudyButtons(now);
       try { renderTree(); } catch { /* */ }
       window.__pcsUpdateStatus?.();
     },
