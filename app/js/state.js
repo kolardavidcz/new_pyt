@@ -3,6 +3,11 @@
 export const TAGS = ["Core", "WOW", "Legendary", "Tricky", "Skip"];
 export const FLAVORS = ["basics", "resyntax", "newconcept", "pythonic", "paradigm"];
 
+const SEEN_KEY = "pcs-seen-v1";
+const STUDIED_KEY = "pcs-studied-v1";
+const CHECKLIST_KEY = "pcs-checklist-v1";
+const SIDEBAR_W_KEY = "pcs-sidebar-w";
+
 export const state = {
   course: null,
   slides: {},
@@ -49,32 +54,6 @@ export const state = {
   focusedTreeKey: null,
 };
 
-const KV_URL = "https://tough-husky-101028.upstash.io";
-const KV_TOKEN = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
-
-async function kvGet(key) {
-  try {
-    const res = await fetch(`${KV_URL}/get/${key}`, {
-      headers: { Authorization: `Bearer ${KV_TOKEN}` },
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.result ? JSON.parse(data.result) : null;
-  } catch {
-    return null;
-  }
-}
-
-async function kvSet(key, val) {
-  try {
-    await fetch(`${KV_URL}/set/${key}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${KV_TOKEN}` },
-      body: JSON.stringify(val),
-    });
-  } catch { /* ignore */ }
-}
-
 export function loadPersisted() {
   try {
     const raw = localStorage.getItem(SEEN_KEY);
@@ -107,21 +86,20 @@ export function loadPersisted() {
 
 export async function syncCloudProgress() {
   try {
+    const rawLocal = localStorage.getItem(STUDIED_KEY);
     const remoteStudied = await kvGet(STUDIED_KEY);
     if (Array.isArray(remoteStudied) && remoteStudied.length > 0) {
-      let changed = false;
-      for (const id of remoteStudied) {
-        if (!state.studied.has(id)) {
-          state.studied.add(id);
-          state.seen.add(id);
-          changed = true;
-        }
-      }
-      if (changed) {
+      if (!rawLocal) {
+        state.studied = new Set(remoteStudied);
+        for (const id of remoteStudied) state.seen.add(id);
         localStorage.setItem(STUDIED_KEY, JSON.stringify([...state.studied]));
         localStorage.setItem(SEEN_KEY, JSON.stringify([...state.seen]));
+        try { renderTree(); } catch {}
         window.__pcsUpdateStatus?.();
       }
+    } else if (state.studied.size > 0) {
+      kvSet(STUDIED_KEY, [...state.studied]);
+      kvSet(SEEN_KEY, [...state.seen]);
     }
   } catch { /* ignore */ }
 }

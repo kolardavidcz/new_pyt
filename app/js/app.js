@@ -25,6 +25,7 @@ async function boot() {
   setTreeSelectHandler(handleNavigate);
   window.__pcsNavigate = handleNavigate;
   window.__pcsUpdateStatus = updateStatus;
+  window.__pcsState = state;
   initHistory();
 
   try {
