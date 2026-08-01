@@ -184,11 +184,13 @@ if (typeof document !== "undefined") {
   });
 }
 
-function updatePageStudyButtons(now) {
+export function updatePageStudyButtons(now) {
+  const currentTab = state.tabs.find((t) => t.id === state.activeTabId);
+  const isStudiedNow = now !== undefined ? now : (currentTab?.itemId ? isStudied(currentTab.itemId) : false);
   document.querySelectorAll(".study-btn, .bottom-nav-study-btn").forEach((b) => {
-    b.classList.toggle("is-studied", now);
-    b.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
-    b.title = now ? "Click to unmark as studied" : "Click to mark as studied for progress";
+    b.classList.toggle("is-studied", isStudiedNow);
+    b.innerHTML = isStudiedNow ? "✓ Studied" : "☐ Mark studied";
+    b.title = isStudiedNow ? "Click to unmark as studied" : "Click to mark as studied for progress";
   });
 }
 
