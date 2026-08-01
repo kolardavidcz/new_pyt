@@ -113,6 +113,24 @@ function kvSet(key, val) {
   syncCloudProgress();
 }
 
+const listeners = new Set();
+
+/** Subscribe to state changes. Returns unsubscribe function. */
+export function onStateChange(fn) {
+  listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+
+export function notifyStateChange(changeType, detail) {
+  for (const fn of listeners) {
+    try {
+      fn(state, changeType, detail);
+    } catch (err) {
+      console.error("State listener error:", err);
+    }
+  }
+}
+
 export async function syncCloudProgress() {
   try {
     const rawLocal = localStorage.getItem(STUDIED_KEY);
@@ -123,8 +141,7 @@ export async function syncCloudProgress() {
         for (const id of remoteStudied) state.seen.add(id);
         localStorage.setItem(STUDIED_KEY, JSON.stringify([...state.studied]));
         localStorage.setItem(SEEN_KEY, JSON.stringify([...state.seen]));
-        try { renderTree(); } catch {}
-        window.__pcsUpdateStatus?.();
+        notifyStateChange("cloudSync");
       }
     } else if (state.studied.size > 0) {
       kvSet(STUDIED_KEY, [...state.studied]);
@@ -163,14 +180,17 @@ export function isChecklistChecked(id) {
 
 export function toggleChecklist(id) {
   if (!id) return false;
+  let now = false;
   if (state.checklist.has(id)) {
     state.checklist.delete(id);
-    persistChecklist();
-    return false;
+    now = false;
+  } else {
+    state.checklist.add(id);
+    now = true;
   }
-  state.checklist.add(id);
   persistChecklist();
-  return true;
+  notifyStateChange("checklist", { id, now });
+  return now;
 }
 
 export function resetChecklistState() {
@@ -178,6 +198,7 @@ export function resetChecklistState() {
   try {
     localStorage.removeItem(CHECKLIST_KEY);
   } catch { /* ignore */ }
+  notifyStateChange("checklist");
 }
 
 export function calculateChecklistProgress(items = []) {
@@ -224,6 +245,7 @@ export function markSeen(itemId) {
   if (!itemId || state.seen.has(itemId)) return;
   state.seen.add(itemId);
   persistSeen();
+  notifyStateChange("seen", { itemId });
 }
 
 export function isStudied(itemId) {
@@ -233,16 +255,18 @@ export function isStudied(itemId) {
 /** Toggle manual “studied” flag. Returns new studied state. */
 export function toggleStudied(itemId) {
   if (!itemId) return false;
+  let now = false;
   if (state.studied.has(itemId)) {
     state.studied.delete(itemId);
-    persistStudied();
-    return false;
+    now = false;
+  } else {
+    state.studied.add(itemId);
+    markSeen(itemId);
+    now = true;
   }
-  state.studied.add(itemId);
-  // also count as seen
-  markSeen(itemId);
   persistStudied();
-  return true;
+  notifyStateChange("studied", { itemId, now });
+  return now;
 }
 
 export function setStudied(itemId, on) {
@@ -254,6 +278,7 @@ export function setStudied(itemId, on) {
     state.studied.delete(itemId);
   }
   persistStudied();
+  notifyStateChange("studied", { itemId, now: on });
 }
 
 export function buildIndexes(course) {

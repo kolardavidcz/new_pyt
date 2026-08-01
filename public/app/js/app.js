@@ -3,12 +3,12 @@
  */
 import {
   state, loadPersisted, buildIndexes, clearFilters, filtersActive,
-  filteredItems, persistSidebarW, pagesFor,
+  filteredItems, persistSidebarW, pagesFor, onStateChange,
 } from "./state.js";
 import { renderTree, setTreeSelectHandler, expandAll, collapseAll } from "./tree.js";
 import { navigate, refreshActiveView, closeTab, initHistory, getInitialRoute } from "./router.js";
 import { openPalette, closePalette, isPaletteOpen, initPalette, setPaletteHandler } from "./palette.js";
-import { toggleFullscreen } from "./content.js";
+import { toggleFullscreen, updatePageStudyButtons } from "./content.js";
 
 async function loadJson(url) {
   const res = await fetch(url, { cache: "no-store" });
@@ -27,6 +27,19 @@ async function boot() {
   window.__pcsUpdateStatus = updateStatus;
   window.__pcsState = state;
   initHistory();
+
+  // Reactive Event Bus listener: auto-update UI components when state mutates
+  onStateChange((_, changeType) => {
+    if (changeType === "studied" || changeType === "cloudSync" || changeType === "seen") {
+      updatePageStudyButtons();
+      try { renderTree(); } catch {}
+      updateStatus();
+      const tab = state.tabs.find((t) => t.id === state.activeTabId);
+      if (tab && (tab.kind === "progress" || tab.kind === "week" || tab.kind === "search" || tab.kind === "home")) {
+        refreshActiveView();
+      }
+    }
+  });
 
   try {
     const [course, slides, pages, exercises] = await Promise.all([
