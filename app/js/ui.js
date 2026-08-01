@@ -56,7 +56,6 @@ export function starsHtml(n, max = 10, variant = "compact") {
     return `<div class="rel-meter rel-full rel-${level} rel-n-${r}" title="Relevance ${r}/10">` +
       `<div class="rel-full-label"><span>Relevance</span><strong>${r}<span class="rel-max">/10</span></strong></div>` +
       `<span class="rel-segs rel-segs-full" aria-hidden="true">${segs}</span>` +
-      `<div class="rel-full-hint">${heatHint}</div>` +
       `</div>`;
   }
   // bar — cards
