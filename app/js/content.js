@@ -240,22 +240,23 @@ function lectureHero(item, { compact = false } = {}) {
   const btn = el("button", {
     type: "button",
     className: "btn study-btn" + (studied ? " is-studied" : " primary"),
-    title: studied ? "Unmark as studied" : "Mark as studied (manual progress)",
+    title: studied ? "Click to unmark as studied" : "Click to mark as studied for progress",
     onClick: () => {
       const now = toggleStudied(item.id);
       btn.classList.toggle("is-studied", now);
       btn.classList.toggle("primary", !now);
-      btn.textContent = now ? "✓ Studied" : "Mark studied";
-      btn.title = now ? "Unmark as studied" : "Mark as studied (manual progress)";
+      btn.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
+      btn.title = now ? "Click to unmark as studied" : "Click to mark as studied for progress";
+      document.querySelectorAll(".bottom-nav-study-btn").forEach((b) => {
+        b.classList.toggle("is-studied", now);
+        b.classList.toggle("primary", !now);
+        b.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
+      });
       try { renderTree(); } catch { /* tree may not care */ }
-      // refresh status counts if progress open
       window.__pcsUpdateStatus?.();
     },
-  }, studied ? "✓ Studied" : "Mark studied");
+  }, studied ? "✓ Studied" : "☐ Mark studied");
   studyRow.appendChild(btn);
-  studyRow.appendChild(el("span", { className: "study-hint" },
-    studied ? "Counts toward Progress" : "Manual — does not auto-check when you only open",
-  ));
   hero.appendChild(studyRow);
   return hero;
 }
