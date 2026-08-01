@@ -1,101 +1,72 @@
-# Antigravity Developer Guide — Python Overview Project
+# Antigravity Developer Guide — Python Overview Project (`new_pyt`)
 
-Welcome to the `new_PYT` workspace. This guide outlines the project structure, design system rules, and compilation workflows for future agent development.
+Welcome to the `new_PYT` workspace. This guide serves as the comprehensive single source of truth for the codebase architecture, state management, build pipelines, design rules, and development workflows.
 
 ---
 
 ## 🏗️ Project Architecture
 
-This is a web-based learning dashboard for developers transitioning from Java/C++ to Python.
+This application is a high-density, web-based learning dashboard for developers transitioning from C/C++/Java to Python.
 
-- **Main Dashboard**: [new_order.html](new_order.html)
-  - Features collapsible weekly topics, progress tracking (with metrics chips), filters (by status/difficulty), and global text search.
-- **Source Lectures & Exercises**: Stored as `.xml` files in `vyuka_downloaded/`.
-  - **Lectures**: Under `vyuka_downloaded/materialy/python/`
-  - **Exercises**: Under `vyuka_downloaded/priklady/python/`
-- **Output Static Pages**: Compiled `.html` versions of the XML slides stored alongside their sources.
-- **Global Search Index**: [search_index.json](search_index.json) containing extracted plaintext slide snippets for client-side search.
-
----
-
-## 🛠️ HTML Compilation Workflow
-
-To eliminate rendering delays and flashes, pages are precompiled to static HTML. **Do not modify the XSL files expecting live browser-side compilation.**
-
-### Compilation Scripts
-1. **Recompile Everything**:
-   ```bash
-   uv run python build_html.py
-   ```
-   - Compiles all `.xml` slides/exercises into `.html` files.
-   - Re-indexes all text snippets and outputs `search_index.json` to the root directory.
-   - Adjusts references inside `new_order.html` to target compiled `.html` files.
-2. **Watch for Changes (Auto-compile Loop)**:
-   ```bash
-   uv run python watch_html.py
-   ```
-   - Polls XML, XSLT, CSS, and JS files for changes and automatically invokes the compiler.
-
-### Version Control Rules
-- **Git Tracks HTML**: The generated `.html` files must be committed to Git so that Vercel serves them directly.
-- **Git Ignores XML**: Raw `.xml` files are ignored in Git to keep remote repositories clean. Keep editing them locally.
+- **Production URL**: [https://newpyt.vercel.app](https://newpyt.vercel.app)
+- **GitHub Repository**: [https://github.com/kolardavidcz/new_pyt](https://github.com/kolardavidcz/new_pyt)
+- **Primary Shell & Application**:
+  - `app/index.html`: Main Single Page Application (SPA) entry point (VS Code Dark Modern layout).
+  - `app/js/`: Modular ES JavaScript modules (`app.js`, `state.js`, `router.js`, `content.js`, `tree.js`, `palette.js`, `ui.js`, `highlight.js`).
+  - `app/css/`: Modular stylesheets (`tokens.css`, `shell.css`, `content.css`).
+- **Structured Data Stores**:
+  - `data/course.json`: Core curriculum manifest (weekly topics, lectures, exercises).
+  - `data/slides.json`: Extracted slide sections per lecture.
+  - `data/exercises.json`: Structured exercise tasks with difficulty metadata (Technical score $T1-T5$, Logical score $L1-L5$), prompt HTML, nápověda (hint) HTML, and řešení (solution) HTML.
+  - `data/pages-index.json`: Slide outline index for presentation mode navigation.
 
 ---
 
-## 🎨 Styling & Component Rules
+## ⚡ Single Page Application (SPA) & State Architecture
 
-- **Theme Key**: Theme mode (light/dark) is stored under the `'python-course-theme'` key in `localStorage`. 
-- **Subpage Themes**: When designing or editing slides, the blocking inline script in the `<head>` of the HTML files applies background colors to the `<html>` root directly to avoid flash of unstyled content (FOUC).
-- **Console Session Code Blocks**:
-  - Code cells are styled using SyntaxHighlighter (`div.syntaxhighlighter`).
-  - To add margins/padding to the text inside code containers without breaking full-width layouts, target the line wrapper:
-    ```css
-    div.syntaxhighlighter td.code .container {
-      padding: 12px 16px !important;
-    }
-    ```
-- **Metadata Escaping**:
-  - Card fields (title, description, comparison text) are rendered dynamically via JavaScript in `new_order.html`.
-  - **Always escape metadata** using `escapeHtml(text)` before placing it in the DOM. Raw XML values can contain mathematical operators (like `<` or `>`) which can corrupt the HTML DOM tree and render buttons invisible.
+### 1. State Management (`app/js/state.js`)
+- `state.seen`: Set of item IDs auto-marked as seen when opened.
+- `state.studied`: Set of item IDs manually marked as studied (the primary progress metric).
+- `state.filters`: Active search query, tag filters (`Core`, `WOW`, `Legendary`, `Tricky`, `Skip`), difficulty flavor filters, relevance threshold ($1-10$), and sorting.
+- `state.tabs`: Active editor tabs.
 
----
+### 2. Dual Local & Cloud Persistence
+- **Local Storage Keys**: `pcs-seen-v1`, `pcs-studied-v1`, `pcs-sidebar-w`.
+- **Cloud Database (Vercel KV / Upstash Redis)**:
+  - Endpoint: `https://tough-husky-101028.upstash.io`
+  - Helpers: `kvGet(key)` and `kvSet(key, val)` in `app/js/state.js`.
+  - Non-blocking execution: Cloud network requests run asynchronously in the background so local UI state toggles remain sub-millisecond fast.
 
-## ⚡ Single Page Application (SPA) & Routing
-
-To completely prevent browser `about:blank` repaint white flashes when clicking links or switching tabs, the site functions as a client-side SPA.
-
-- **Routing Interceptor**: [spa_router.js](cjs/spa_router.js) intercepts all same-origin navigation clicks.
-- **Dynamic Content Injection**:
-  - Replaces `<div id="layout-root">` inside the body dynamically via `fetch` and `DOMParser`.
-  - Scans and loads new stylesheets or script elements on demand.
-  - Re-triggers page initializers (`window.initDashboard()` for dashboard, `window.initSubpage()` for slides/exercises).
-- **Navigation Controls**:
-  - Primary navigation links (e.g. "Lokální snímky" buttons or slide search links) **must not use target="_blank"** so they route smoothly within the SPA context.
-- **Scroll Settings Override**:
-  - Slide layouts scroll the main window viewport, whereas the dashboard uses scrollable side-by-side columns.
-  - The compiler/router toggles the `spa-subpage-active` class on the `<html>` root node, which triggers CSS overrides in `dashboard.css` to allow standard body scrolling on slide pages.
+### 3. Instant UI Toggle & Button Synchronization
+- Clicking **`☐ Mark studied`** / **`✓ Studied`** invokes `updatePageStudyButtons(now)` in `app/js/content.js`.
+- Both top (`.study-btn`) and bottom (`.bottom-nav-study-btn`) buttons update DOM classes, text content, tooltips, and the sidebar tree simultaneously without requiring page reloads or triggering DOM re-renders.
+- CSS rule `transition: none !important;` on study buttons guarantees 0ms visual feedback latency on click.
 
 ---
 
-## 📦 Styling Assets Single Source of Truth
+## 🛠️ Vercel Deployment & Build Pipeline
 
-To avoid duplication of assets:
-- **Source of Truth**: The root `/cjs/` folder is the single source of truth for all stylesheets (`.css`), scripts (`.js`), and XSLT templates (`.xsl`).
-- **Git Tracking**: Only the root `/cjs/` folder is committed to Git. The duplicate folder `vyuka_downloaded/cjs/` is ignored in Git.
-- **Auto-Syncing**:
-  - `build_html.py` and `start_course.py` automatically clear and synchronize `vyuka_downloaded/cjs/` from the root `/cjs/` folder at compile or startup to maintain relative paths compatibility for local XML previewing.
-  - **Always edit style and script files in the root `/cjs/` directory**, NOT inside `vyuka_downloaded/cjs/`.
+### 1. Static Export Script (`tools/prepare_vercel.mjs`)
+- Prepares the `public/` export directory for Vercel deployment by assembling `app/`, `data/`, `cjs/`, and `vyuka_downloaded/`.
+- Uses `optionalCopyDir()` so missing local `.old` paths on Vercel build servers do not fail the build.
 
----
-
-## 🔍 Full-Text Search Engine
-
-- **Minified Index**: `build_html.py` generates a minified `search_index.json` containing plaintext slide content and external program source files to optimize bandwidth.
-- **Lazy Loading**: The dashboard does not load the search index on page instantiation. It is fetched lazily on-demand once the user focuses or types a query in the search bar.
+### 2. Version Control & Git Rules (`.gitignore`)
+- **Tracked in Git**: Root code (`app/`, `data/`, `tools/`), build configuration (`vercel.json`), and precompiled static output (`public/`) so Vercel serves static files cleanly.
+- **Ignored in Git**: `.env.local` (Upstash credentials), `.venv/`, `__pycache__/`, `.old/`, and temporary `scratch/` files.
 
 ---
 
-## 🌐 Dev Server & DevTools Navigation Rules
+## 🖨️ Printable PDF Layout (`@media print`)
 
-- **Do NOT navigate DevTools to non-existent URLs**: When inspecting or testing the application with DevTools (`chrome-devtools-mcp`), always check state/router data or verify the active local server port (`http://127.0.0.1:8765/app/index.html`) before attempting `navigate_page`. Never guess routes or trigger invalid URL navigation.
+- **Trigger**: Single-click **"Tisk 🖨"** button (`window.print()`).
+- **CSS Overrides**: `@media print` in `app/css/content.css` forces high contrast black-on-white text for slides and exercise cards.
+- **Clean Footer**: `.bottom-nav-bar`, `.lecture-toolbar`, `.sidebar`, `.titlebar`, and `.statusbar` are set to `display: none !important;` in print mode to eliminate empty outline boxes at the bottom of printed pages.
 
+---
+
+## 🌐 Dev Server & DevTools MCP Guidelines
+
+- **Dev Server Command**: `python serve.py 8765` running on `http://127.0.0.1:8765/app/index.html`.
+- **DevTools MCP Navigation**:
+  - Always check `window.__pcsState` or active route data before attempting `navigate_page`.
+  - **Do NOT navigate to guessed or non-existent URLs** to prevent `net::ERR_EMPTY_RESPONSE` or broken frame states.

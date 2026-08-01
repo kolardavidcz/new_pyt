@@ -1,0 +1,295 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Více o XML
+      —
+      Texty vybavené sémantikou</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Více o XML</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">17</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Začátek XML-dokumentu I</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Začátek XML-dokumentu II</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Povolené znaky I</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Povolené znaky II</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Iskejpování znaků – předdefinované entity</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Iskejpování znaků – číselné entity</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Komentáře v XML</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Iskejpování značek</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Zanoření DTD</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Procesní instrukce</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Procesní instrukce XML-parseru</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">Jiné procesní instrukce</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">Kontrola správnosti XML</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">Validátor „xmllint“</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">Základní kontrola pomocí webových prohlížečů</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">Základní kontrola pomocí webových prohlížečů – „Mozilla Firefox“</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Texty vybavené sémantikou</span><span class="lecture-date">2014-08-23</span></div><h1 class="lecture-title">Více o XML</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        V přednášce <a href="overview.xml">základy XML</a> jsme se dozvěděli prakticky všechno, co je potřeba k práci s XML. XML ale kromě toho obsahuje i další, podstatně exotičtější prvky (zakopli jsme kupříkladu o tzv. <a href="overview.xml?slajd=16">řídicí sekvence</a>), se kterými se nemusíte potkat moc často, ale je třeba o nich vědět.
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Začátek XML-dokumentu I"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Začátek XML-dokumentu I</h2></div><div class="section-body">
+
+    <p>
+        Na začátek zdánlivě jednoduché, ale často problémové pravidlo:
+    </p>
+    <blockquote>
+        Pokud prvním elementem XML-dokumentu je XML-hlavička <code>&lt;?xml version="…" encoding="…"?&gt;</code>, nesmí před ní být žádné tisknutelné znaky.
+    </blockquote>
+    <p>
+        Po pravdě ve standardu je použito <em>neměly by být</em>, ale spousta nástrojů se na jiném začátku XML-dokumentu beznadějně zasekne, takže je bezpečnější se tohoto pravidla držet. Ostatně <a href="?slajd=14">validační nástroje</a> vás na to upozorní.
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Začátek XML-dokumentu II"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Začátek XML-dokumentu II</h2></div><div class="section-body">
+
+    <p>
+        Na druhou stranu pokud má XML-dokument hlavičku <code>&lt;?xml …?&gt;</code>, mezi ní a kořenovým elementem může být hromada dalších řídicích instrukcí typu <code>&lt;!…&gt;</code> i <code>&lt;?…?&gt;</code>, jak dokazuje například tento soubor ze zdrojových kódů prohlížeče <em>Mozilla Firefox</em>:
+    </p>
+    <example lang="xml" src="_files/selectDialog.xul"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Konkrétně jde o soubor <code>omni.ja/chrome/toolkit/content/global/selectDialog.xul</code>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id4" data-title="Povolené znaky I"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Povolené znaky I</h2></div><div class="section-body">
+
+    <p>
+        Jednodušší varianta:
+    </p>
+    <blockquote>
+        Obsahem XML-dokumentu (a to i názvů elementů a atributů) může být téměř libovolný smysluplný tisknutelný unicodový znak. Pochopitelně na názvy elementů a atributů jsou kladena jistá (celkem standardní) omezení.
+    </blockquote>
+    <p>
+        Konkrétně (vaše vlastní) názvy nesmí začínat na libovolně zkapitalizovanou verzi řetězce <code>xml</code>, kromě označení jmenného prostoru nesmí obsahovat dvojtečku a název smí začínat (a z větší části obsahovat) pouze na „písmeno“.
+    </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Povolené znaky II"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Povolené znaky II</h2></div><div class="section-body">
+
+    <p>
+        Komplikovanější varianta:
+    </p>
+    <ul>
+        <li>
+            <strong>XML 1.0</strong> povoluje znaky U+09, U+0A, U+0D, U+20 až U+D7FF, U+E000 až U+FFFD a U+10000 až U+10FFFF;
+        </li>
+        <li>
+            <strong>XML 1.1</strong> navíc povoluje použít i všechny zbývající znaky z U+01 až U+1F, ale kromě U+09, U+0A, U+0D a U+85 pouze v jejich <em>iskejpované</em> formě.
+        </li>
+    </ul>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Takže mezi zakázané znaky patří především U+00 a všechny <em>surrogates</em>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="Iskejpování znaků – předdefinované entity"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Iskejpování znaků – předdefinované entity</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Následující dva znaky jsou klíčové syntaktické prvky XML, a pokud se mají objevit v jeho obsahu (textu), musí být náležitým způsobem odiskejpovány:
+    </p>
+    <ul>
+        <li>
+            <strong>&lt;</strong> se přepisuje jako <code>&amp;lt;</code>
+        </li>
+        <li>
+            <strong>&amp;</strong> se přepisuje jako <code>&amp;amp;</code>
+        </li>
+    </ul>
+    
+    <p class="enumerate">
+        Z důvodů symetrie a použití ve speciálních případech (např. uvozovky uvnitř uvozovek) jsou definovány i následující iskejp-sekvence:
+    </p>
+    <ul>
+        <li>
+            <strong>&gt;</strong> přepisováno jako <code>&amp;gt;</code>
+        </li>
+        <li>
+            <strong>"</strong> přepisováno jako <code>&amp;quot;</code>
+        </li>
+        <li>
+            <strong>'</strong> přepisováno jako <code>&amp;apos;</code>
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id7" data-title="Iskejpování znaků – číselné entity"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Iskejpování znaků – číselné entity</h2></div><div class="section-body">
+
+    <p>
+        Kromě toho je možné každý jiný povolený znak zapsat jako tzv. <strong>číselnou entitu</strong> pomocí schematu
+    </p>
+    <blockquote>
+        <code><b>&amp;#</b>DecimálníČíslo<b>;</b></code> respektive <code><b>&amp;#x</b>HexadecimálníČíslo<b>;</b></code>
+    </blockquote>
+    <p>
+        kde uvedené číslo je odkaz do unicodové tabulky na příslušný znak.        
+    </p>
+    <p>
+        To mimo jiné umožňuje používat i znaky, které zrovna nemáte možnost napsat přímo – například japonský znak pro „ookami“ ve všech třech podobách vypadá takto:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        狼
+        &amp;#29436;
+        &amp;#x72fc;
+    </pre>
+    
+
+</div></section><section class="slide-section" id="id8" data-title="Komentáře v XML"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Komentáře v XML</h2></div><div class="section-body">
+
+    <p>
+        Komentáře v XML se zapisují pomocí řídicí sekvence <code>&lt;!--…--&gt;</code>. Přitom ukončovacím znakem komentáře není sekvence <code>--&gt;</code>, ale pouze sekvence <code>--</code>, proto se uvedené dva znaky nesmí nikde v komentáři vyskytnout!
+    </p>
+    <p>
+        Jelikož komentář kompletně „odstřelí“ svůj vnitřek od procesování pomocí XML-parserů, jsou v něm snad nepřekvapivě povoleny i jinak zakázané znaky <code>&lt;</code> a <code>&amp;</code>:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;!-- &lt;značky&gt; &amp; podobné věci není třeba uvnitř komentářů iskejpovat --&gt;
+    </pre>
+    <p>
+        PS: XML-parser může podle svého uvážení komentáře buď zcela zahodit nebo je uživateli poskytnout (typicky jako dále nijak nezpracovaný řetězec).
+    </p>
+
+</div></section><section class="slide-section" id="id9" data-title="Iskejpování značek"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Iskejpování značek</h2></div><div class="section-body">
+
+    <p>
+        Specifickým použitím řídicí sekvence <code>&lt;!…&gt;</code> je blok <code>&lt;![CDATA[…]]&gt;</code>. Stručně řečeno umožňuje uvnitř sebe zapsat XML jako XML (tj. bez iskejpování), aniž by se ovšem jako XML vyhodnotilo. Narozdíl od XML-komentářů jsou ale CDATA-bloky předávány k dalšímu zpracování. Příklad:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;example&gt;
+            &lt;![CDATA[ &lt;aaa&gt;bb&amp;cc&lt;&lt;&lt;]]&gt;
+        &lt;/example&gt;
+    </pre>
+    <p>
+        Za uzavírací sekvenci je považován celý řetězec <code>]]&gt;</code>, proto se nesmí nikde uvnitř bloku CDATA vyskytnout.
+    </p>
+
+</div></section><section class="slide-section" id="id10" data-title="Zanoření DTD"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Zanoření DTD</h2></div><div class="section-body">
+
+    <p>
+        Z historických důvodů (návaznost na SGML) obsahuje standard XML i základní popis jeho struktury pomocí tzv. DTD a způsob, jak tento popis připojit přímo k dokumentu. Toto vše je popsáno pomocí sady speciálních příkazů využívajích také řídicí sekvenci <code>&lt;!…&gt;</code>, přičemž je vše zanořeno v řídicím „elementu“ <code>&lt;!DOCTYPE …&gt;</code>.
+    </p>
+    <p>
+        Jelikož DTD je věnována <a href="dtd.xml">samostatná kapitola</a>, zde se o něm nebudeme více zmiňovat.
+    </p>
+
+</div></section><section class="slide-section" id="id11" data-title="Procesní instrukce"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Procesní instrukce</h2></div><div class="section-body">
+
+    <p>
+        Procesní instrukce <code>&lt;?…?&gt;</code> (tzv. <em>PIs</em>) se používají ve dvou základních případech:
+    </p>
+    <ul>
+        <li>
+            jako <a href="?slajd=12">řídicí instrukce pro XML-parser</a>;
+        </li>
+        <li>
+            jako dodatečné <a href="?slajd=13">instrukce pro libovolné jiné aplikace</a>.
+        </li>
+    </ul>
+    <p>
+        Ty první z nich je třeba znát a jsou definovány buď přímo ve standardu XML nebo ve standardech s ním souvisejících. Ty druhé se liší aplikaci od aplikace a možná je nikdy ani neuvidíte.
+    </p>
+
+</div></section><section class="slide-section" id="id12" data-title="Procesní instrukce XML-parseru"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Procesní instrukce XML-parseru</h2></div><div class="section-body">
+
+    <p>
+        Samotný standard XML definuje jedinou procesní instrukci, a to XML-hlavičku:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;?xml version="1.1" encoding="win-1250"?&gt;
+    </pre>
+    <p>
+        Standardy související pak definují další, například:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;!-- připojení stylopisu uvedeného formátu --&gt;
+        &lt;?xml-stylesheet href="stylopis.css" type="text/css"?&gt;
+        
+        &lt;!-- připojení validačního stylu uvedeného formátu --&gt;
+        &lt;?xml-model href="xhtml.rnc" type="application/relax-ng-compact-syntax"?&gt;
+    </pre>
+    <p>
+        PS: Celkem pochopitelně byste mohli býti v pokušení hledat procesní instrukci na připojení programu (kupříkladu v jazyce JavaScript). Jenže nic takového není, <strong>XML je primárně datový formát</strong>. Ovšem pomocí jmenných prostorů se k němu skript přesto přidat dá, a to zápůjčkou z XHTML:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;script xmlns="http://www.w3.org/1999/xhtml" src="skript.js" /&gt;
+    </pre>
+
+</div></section><section class="slide-section" id="id13" data-title="Jiné procesní instrukce"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">Jiné procesní instrukce</h2></div><div class="section-body">
+
+    <p>
+        Všechny další možné procesní instrukce už spolupracují přímo s konkrétními aplikacemi, které zpracovávají dané XML, pro jejich význam se tedy musíte podívat tam. Ukázka:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        &lt;?perl lower-to-upper-case ?&gt;
+        
+        &lt;?web-server add-header="university"?&gt;
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Neinvenčně obšlehnuto ze ZVONu. Kdo ví, jestli jsou vymyšlené nebo opravdu nějaké aplikaci patří ^_^
+    </div></div>
+
+</div></section><section class="slide-section" id="id14" data-title="Kontrola správnosti XML"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">Kontrola správnosti XML</h2></div><div class="section-body">
+
+    <p>
+        Z předchozího je možná zřejmé, že kontrola správnosti XML-dokumentu je dvoustupňová:
+    </p>
+    <ol>
+        <li>
+            <strong>správné formátování</strong> (<em>well formedness</em>) – kontrola správnosti dokumentu z hlediska standardu;
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Aneb zda dokument vyhovuje základním pravidlům pro zápis XML – správně ukončené a v sobě pozanořované elementy, v neiskejpované podobě výskyt pouze povolených znaků a podobně.
+            </div></div>
+        </li>
+        <li>
+            <strong>validace</strong> – kontrola správnosti dokumentu z hlediska (jinde) nadefinované struktury.
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Aneb zda dokument svojí strukturou vyhovuje svému popisu v příslušném schematu (většinou externím, ale v případě DTD může být i interní).
+            </div></div>
+        </li>
+    </ol>
+    <p>
+        Uvedenou kontrolu zvládá přímo spousta XML-editorů (ať už dedikovaných nebo třeba i typu <em>Emacs</em>) a samozřejmě také spousta dalších externích nástrojů (typicky <a href="?slajd=15">xmllint</a>, ale třeba i takový <a href="?slajd=16">Firefox</a>).
+    </p>
+
+</div></section><section class="slide-section" id="id15" data-title="Validátor „xmllint“"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">Validátor „xmllint“</h2></div><div class="section-body">
+
+    <p>
+        Validátor <strong>xmllint</strong> umí oba výše uvedené kroky (přičemž v tom druhém zvládá validaci proti DTD, RelaxNG, WXS a Schematronu). V tuto chvíli nás bude však zajímat především ten první.
+    </p>
+    <p>
+        Nejjednodušším způsobem volání je:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        xmllint moje.xml
+    </pre>
+    <p>
+        Protože však <em>xmllint</em> opisuje na výstup vstupní dokument (za použití některých přepínačů případně nějakým způsobem zpracovaný), je ve většině základních použití lepší zavolat kontrolu takto:
+    </p>
+    <pre class="brush: xml; gutter: false; toolbar: false; ">
+        xmllint --noout moje.xml
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        V tomto provedení <em>xmllint</em> buď nenahlásí vůbec nic (dokument je v pořádku), nebo naopak vyplivne příslušné chyby.
+    </div></div>
+
+</div></section><section class="slide-section" id="id16" data-title="Základní kontrola pomocí webových prohlížečů"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">Základní kontrola pomocí webových prohlížečů</h2></div><div class="section-body">
+
+    <p>
+        Zobrazit nějakým způsobem XML zahrnuje také dva kroky:
+    </p>
+    <ol>
+        <li>
+            Základní požadavek standardu – při <strong>jakékoliv</strong> chybě ve struktuře XML zastavit jeho parsování, XML dále nezpracovávat a nijak nezobrazovat a nahlásit na výstup uvedenou chybu.
+            
+        </li>
+        <li>
+            Použít nějakých externě nadefinovaných pravidel (DSSSL, CSS, XSL…) pro převod XML na výstupní formát a ten zobrazit, jinak – pochopitelně – zobrazit pouze vlastní textové uzly.
+            
+        </li>
+    </ol>
+    <p>
+        Zatímco první požadavek splňují všechny webové prohlížeče (a většina nástrojů pro zpracování XML vůbec), druhého se drží čestná (a v tomto případě nepříliš užitečná) výjimka <em>Safari</em>. Všechny ostatní prohlížeče se shodly na tom, že chce-li uživatel (člověk!) vidět XML, bude ho spíše zajímat jeho (téměř) skutečná struktura, a proto aplikují na XML jistý výchozí způsob zobrazování.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Konkrétně zobrazují XML v podobě poodsazovaných elementů, čímž se snadno mohou od vlastní podoby XML dosti vzdálit (doplněním hromady odsazení a bílých znaků navíc), ale dosti dobře takto reprodukují jeho vlastní logickou strukturu. Nezapomeňte také, že při tom často schovávají některé prvky XML (hlavičky, procesní instrukce…).
+    </div></div>
+
+</div></section><section class="slide-section" id="id17" data-title="Základní kontrola pomocí webových prohlížečů – „Mozilla Firefox“"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">Základní kontrola pomocí webových prohlížečů – „Mozilla Firefox“</h2></div><div class="section-body">
+
+    <p>
+        Díky na <a href="?slajd=16">předchozím slajdu</a> popsanému chování můžeme webové prohlížeče s výhodou použít pro jednodušší základní kontrolu XML-dokumentů. Kupříkladu <em>Mozilla Firefox</em> zobrazí XML bez chyb (při nejmenším ve smyslu <em>well-formed</em>) takto..
+    </p>
+    <div class="example-block example-horizontal"><div class="example-col"><div class="example-label">→ Input: <a href="_files/mozilla/test-ok.xml"><em>mozilla/test-ok.xml</em></a></div><example src="_files/mozilla/test-ok.xml" lang="xml"></example></div><div class="example-col"><div class="example-label">▶ Output</div><img src="_files/mozilla/test-ok.png" width="586" height="237" alt="„well-formed“ XML ve Firefoxu" class="example-img"></div></div>
+    <p>
+        ..a v případě nějaké chyby vrátí hlášení o ní:
+    </p>
+    <div class="example-block example-horizontal"><div class="example-col"><div class="example-label">→ Input: <a href="_files/mozilla/test-nok.xml"><em>mozilla/test-nok.xml</em></a></div><example src="_files/mozilla/test-nok.xml" lang="xml"></example></div><div class="example-col"><div class="example-label">▶ Output</div><img src="_files/mozilla/test-nok.png" width="584" height="232" alt="„not-well-formed“ XML ve Firefoxu" class="example-img"></div></div>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 17 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

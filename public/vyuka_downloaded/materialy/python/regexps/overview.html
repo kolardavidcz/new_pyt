@@ -1,0 +1,380 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Regulární výrazy
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Regulární výrazy</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">18</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Modul „re“</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Kompilace regexpů – compile()</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Vyhledávání – finditer()</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Objekty zásahu</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Vyhledávání – findall()</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Vyhledávání – search()</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Vyhledávání – match()</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Více o skupinách zásahů</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Použití metody „group()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Modifikace – split()</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Modifikace – sub()</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">Modifikace – sub() a skupiny</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">Modifikace – subn()</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">Možnosti zápisu složitějších regexpů</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">Zkrácený přístup k metodám</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">PS: Překrývající se vzory</span></a></li><li class="toc-item"><a class="toc-link" href="#id18"><span class="toc-num">18</span><span class="toc-text">Poznámka</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2011-10-27</span></div><h1 class="lecture-title">Regulární výrazy</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    <strong>Regexpy</strong> uvnitř Python'u můžeme použít v zásadě ke dvěma rozdílným operacím:
+  </p>
+  <ul>
+    <li>
+        zjišťování informací o řetězci
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">Typicky například zda vstupní řetězec vyhovuje předepsané struktuře a podobně.</div></div>
+    </li>
+    <li>
+        úprava (obsahu) řetězců
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">Používáme hlavně všude tam, kde vlastní metody typu <em>řetězec</em> již neposkytují potřebnou funkcionalitu.</div></div>
+    </li>
+  </ul>
+  
+  <hr>
+  
+  <p>
+    Poznámka: Následující slajdy předpokládají alespoň základní znalost regexpů. Pro rychlé zopakování či seznámení se se základními principy viz <a href="/materialy/regexp/examples.xml">tuto přednášku</a>.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Modul „re“"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Modul „re“</h2></div><div class="section-body">
+
+  <p>
+    Regexpové nástroje jsou v Python'u uschovány v modulu <code>re</code>. Ten definuje především:
+  </p>
+  <ul>
+    <li>
+        <strong>konstanty</strong> – definice kompilačních příznaků, tedy např. <em>re.I</em> aka <em>re.IGNORECASE</em> apod.
+    </li>
+    <li>
+        <strong>metody</strong> – vlastní metody pro aplikaci regexpů na vstupní řetězce, jako např. <em>re.finditer()</em>
+    </li>
+  </ul>
+  <p>
+    Kromě toho je v něm definována regexpová výjimka <em>re.error</em> a další podobné záležitosti.
+  </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Kompilace regexpů – compile()"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Kompilace regexpů – compile()</h2></div><div class="section-body">
+
+  <p>
+    Ač můžeme regepxy používat tak říkajíc „přímo“, mnohem častější (zvláště u opakovaně používaných regexpů) je jejich zavedení v podobě předkompilovaného objektu (tzv. <em>pattern object</em>), operace na němž jsou rychlejší (právě proto, že řetězcový popis regexpu byl již převeden do interní podoby uzpůsobené vyhledávání vzorů).
+  </p>
+  <p>
+    Ke kompilaci slouží metoda <em>re.compile()</em>. Její použití je následující:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    # bez kompilačních příznaků
+    pattern = re.compile(r'&lt;([a-zA-Z]\w*).*?&gt;')
+    
+    # s kompilačními příznaky
+    pattern = re.compile(r"&lt;([a-z]\w*).*?&gt;", re.IGNORECASE | re.M)
+  </pre>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Označením řetězců jako <em>raw</em> (tj. použitím <code>r''</code> nebo <code>r""</code>) se vyhneme problémům s vyhodnocováním některých sekvencí znaků (typicky všechny uvozené zpětným lomítkem <code>\</code>) jiným způsobem, než bychom mohli zrovna potřebovat.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Kompilační příznaky se skládají dohromady pomocí operátoru <code>|</code> binárního <em>or</em>. Každá z možných konstant totiž nastavuje svůj příslušný jeden bit na celkovém kompilačním příznaku.
+    </div></div></div>
+  <p>
+    Na takto zavedeném objektu <em>pattern</em> máme k dispozici celou armádu regexpových metod. S vybranými se seznámíme na následujících slajdech.
+  </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Vyhledávání – finditer()"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Vyhledávání – finditer()</h2></div><div class="section-body">
+
+  <p>
+    Nejpřirozenějším python-trojkovským způsobem, jak v zadaném řetězci vyhledat všechny (nepřekrývající se) výskyty podřetězce zadaného daným regexpem, je použít metodu <strong>finditer()</strong>. Najde-li tato vyhovující zásahy (v podobě <em>match</em>-objektů), vrátí nad nimi <a href="/materialy/python/iterators/iterators.xml">iterátor</a>, takže je můžeme snadno prozkoumat například pomocí smyčky <em>for-in</em>:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_finditer.py"><em>re_finditer.py</em></a></div><example src="_files/re_finditer.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_finditer.out" lang="text"></example></div></div>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Uvedený regexp hledá názvy HTML-elementů v zadaném řetězci. Takové jsou v něm právě dva, <em>p</em> a <em>em</em>, proto jsou na výstupu ukázány dva <em>SRE_Match</em>-objekty.
+      </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Funkci můžeme v úplnosti volat <code>finditer(string, pos, endpos)</code>, kde nepovinný druhý a třetí parametr určují, odkud až kam bude řetězec prohledáván.
+      </div></div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="Objekty zásahu"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Objekty zásahu</h2></div><div class="section-body">
+
+  <p>
+    Návratové <em>match</em>-objekty z metody <em>finditer()</em> mají svoji poměrně složitou vnitřní strukturu. Podívejme se jim trochu na zoubek:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/match-object.py"><em>match-object.py</em></a></div><example src="_files/match-object.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/match-object.out" lang="text"></example></div></div>
+  <p>
+    Tři použité metody mají zjevně následující význam:
+  </p>
+  <ul>
+    <li>
+        <strong>group()</strong> – zachycený podřetězec vyhovující danému regexpu
+    </li>
+    <li>
+        <strong>span()</strong> – pozice umístění zásahu v celém textu
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">Oba údaje se dají získat i samostatně pomocí metod <em>start()</em> a <em>end()</em>.</div></div>
+    </li>
+    <li>
+        <strong>groups()</strong> – n-tice podskupin regexpu
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">Náš regexp obsahuje jednu podskupinu – název elementu.</div></div>
+    </li>
+  </ul>
+  <p>
+    Poznámka: Objekt zásahu má vlastností daleko více, než jsme si zde ukázali.
+  </p>
+
+</div></section><section class="slide-section" id="id6" data-title="Vyhledávání – findall()"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Vyhledávání – findall()</h2></div><div class="section-body">
+
+  <p>
+    Na první pohled se funkce <em>findall()</em> tváří jako klasická neiterátorová varianta k funkci <em>finditer()</em>, která prostě mímo iterátoru vrací starý klasický seznam všech zásahů. Jenže to není tak úplně pravda, protože její výstup se liší podle toho, zda regexp obsahuje nebo neobsahuje podskupiny.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Funkci můžeme v úplnosti volat <code>findall(string, pos, endpos)</code>, kde nepovinný druhý a třetí parametr určují, odkud až kam bude řetězec prohledáván.
+  </div></div>
+  
+  <p class="enumerate">
+    Bez podskupin se nám vrátí seznam všech podřetězců vyhovujících danému regexpu:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_findall.1.py"><em>re_findall.1.py</em></a></div><example src="_files/re_findall.1.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_findall.1.out" lang="text"></example></div></div>
+  <p class="enumerate">
+    S podskupinami se nám vrátí seznam n-tic všech nalezených podskupin z podřetězců vyhovujících danému regexpu:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_findall.2.py"><em>re_findall.2.py</em></a></div><example src="_files/re_findall.2.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_findall.2.out" lang="text"></example></div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Vyhledávání – search()"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Vyhledávání – search()</h2></div><div class="section-body">
+
+  <p>
+    Pokud nás zajímá pouze první zásah (nebo ekvivalentně zda se daný regexp v řetězci prostě vůbec někde vyskytuje), použijeme nejspíše funkci <em>search()</em>:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_search.py"><em>re_search.py</em></a></div><example src="_files/re_search.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_search.out" lang="text"></example></div></div>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Není-li nalezen žádný zásah, bude vrácena hodnota <code>None</code>.
+      </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Funkci můžeme v úplnosti volat <code>search(string, pos, endpos)</code>, kde nepovinný druhý a třetí parametr určují, odkud až kam bude řetězec prohledáván.
+      </div></div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="Vyhledávání – match()"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Vyhledávání – match()</h2></div><div class="section-body">
+
+  <p>
+    Velmi podobně jako <em>search()</em> se chová metoda <em>match()</em>. Jediným rozdílem oproti <em>search()</em> je, že hledá zásahy pouze od začátku prohledávaného textu, takže pro stejný příklad jako na předchozím slajdu nenajde nic:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_match.py"><em>re_match.py</em></a></div><example src="_files/re_match.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_match.out" lang="text"></example></div></div>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Typicky se tedy <em>match()</em> používá, pokud má zkoumaný řetězec vyhovovat nějaké předepsané struktuře, kterou právě daný regexp kontroluje.
+      </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Funkci můžeme v úplnosti volat <code>match(string, pos, endpos)</code>, kde nepovinný druhý a třetí parametr určují, odkud až kam bude řetězec prohledáván.
+      </div></div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="Více o skupinách zásahů"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Více o skupinách zásahů</h2></div><div class="section-body">
+
+  <p>
+    Podívejme se podrobněji na práci s návratovým <em>objektem zásahu</em>. V následujícím příkladu se pokusíme rozložit vstupní adresu na jednotlivé významové prvky:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_groups.1.py"><em>re_groups.1.py</em></a></div><example src="_files/re_groups.1.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_groups.1.out" lang="text"></example></div></div>
+  <p>
+    Vidíme, že máme k dispozici standardní přehledy zásahů <em>group()</em> a <em>groups()</em> a navíc, jelikož jsme v regexpu zavedli <a href="/materialy/regexp/extensions.xml?slajd=7">pojmenované skupiny</a>, máme k dispozici i jejich velmi šikovný slovník:
+  </p>
+  <ul>
+    <li>
+        <code>groupdict()</code> – slovník jmen pojmenovaných skupin jako klíčů a jim odpovídajících podřetězců jako hodnot
+    </li>
+  </ul>
+  <p>
+    Poznámka: Metody <em>groups()</em> a <em>groupdict()</em> se dají zavolat s jedním nepovinným parametrem <em>default</em>. Ten se uplatní v případě, že některá z hledaných skupin se v řetězci nevyskytla – bez jeho uvedení bude taková skupina ve výpise nahrazena hodnotou <code>None</code>, s jeho uvedením právě jeho hodnotou.
+  </p>
+
+</div></section><section class="slide-section" id="id10" data-title="Použití metody „group()“"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Použití metody „group()“</h2></div><div class="section-body">
+
+  <p>
+    Zůstaňme ještě chvíli u předchozího příkladu a podívejme se více na metodu <em>group()</em>:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_groups.2.py"><em>re_groups.2.py</em></a></div><example src="_files/re_groups.2.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_groups.2.out" lang="text"></example></div></div>
+  <p>
+    Zjevně platí:
+  </p>
+  <ul>
+    <li>
+        <code>group()</code> zavolaná bez parametru je totéž, jako volání <code>group(0)</code>. Přitom vrácenou hodnotou je řetězec zachycený celým regexpem.
+    </li>
+    <li>
+        Předáním pořadového čísla podskupiny (např. <code>group(1)</code>), resp. odpovídajícího jména (např. <code>group('host')</code>), zavedli-li jsme skupiny jako pojmenované, nám metoda vrátí pouze odpovídající řetězec zásahu.
+    </li>
+    <li>
+        Pořadových čísel, respektive jmen, podskupin můžeme metodě <em>group()</em> poslat více – vrátí se nám pak n-tice odpovídajících zásahů.
+    </li>
+  </ul>
+  <p>
+    Poznámka: Nebyla-li příslušná skupina zachycena, vrátí se místo ní <code>None</code>. Pokus o získání neexistující skupiny vyvolá výjimku <code>IndexError</code>.
+  </p>
+
+</div></section><section class="slide-section" id="id11" data-title="Modifikace – split()"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Modifikace – split()</h2></div><div class="section-body">
+
+  <p>
+    Podobně jako řetězcová metoda <em>split()</em> i regexpová varianta slouží k rozdělení řetězce na místech určených svým argumentem. Jen pochopitelně pro regexpovou metodu je argumentem regexp, takže je mnohem flexibilnější a mocnější.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    V úplnosti se funkce volá jako <code>split(string, maxsplit=0)</code>, kde druhý parametr určuje, ke kolika nejvýše rozdělením má dojít.
+  </div></div>
+  <p>
+    Podobně jako funkce <em>findall()</em> se její návratové hodnoty poněkud liší podle toho, obsahuje-li regexp podskupiny nebo ne.
+  </p>
+  
+  <p class="enumerate">
+    Bez podskupin se nám vrátí seznam podřetězců oddělených podle částí vyhovujících danému regexpu:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_split.1.py"><em>re_split.1.py</em></a></div><example src="_files/re_split.1.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_split.1.out" lang="text"></example></div></div>
+  <p class="enumerate">
+    S podskupinami se nám vrátí stejný seznam, ale navíc včetně těchto oddělovačů:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_split.2.py"><em>re_split.2.py</em></a></div><example src="_files/re_split.2.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_split.2.out" lang="text"></example></div></div>
+
+</div></section><section class="slide-section" id="id12" data-title="Modifikace – sub()"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Modifikace – sub()</h2></div><div class="section-body">
+
+  <p>
+    Podobně jako u předchozí metody <em>split()</em> je metoda <em>sub()</em> regexpovým zobecněním řetězcových metod <em>replace()</em> a <em>translate()</em>. Jinými slovy – kde nebudou pro záměnu stačit (podstatně rychlejší) řetězcové metody se svými pevnými vstupními argumenty, tam použijeme <em>sub()</em> s regexpovým vstupem:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_sub.py"><em>re_sub.py</em></a></div><example src="_files/re_sub.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_sub.out" lang="text"></example></div></div>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Regexp jsme zde použili pro vyhledání elementů, které nevyhovují pravidlům pro pojmenovávání, a jejich nahrazení řetězcem <code>XXX</code>.
+      </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Úplné volání funkce jest <code>sub(repl, string, count=0)</code>, kde nepovinný parametr <em>count</em> určuje nejvyšší počet výměn, ke kterým může dojít.
+      </div></div></div>
+
+</div></section><section class="slide-section" id="id13" data-title="Modifikace – sub() a skupiny"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">Modifikace – sub() a skupiny</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        V nahrazovaném textu můžete použít i reference na pojmenované skupiny, a to ve tvaru <code>\g&lt;JMÉNO&gt;</code>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_sub_group.2.py"><em>re_sub_group.2.py</em></a></div><example src="_files/re_sub_group.2.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_sub_group.2.out" lang="text"></example></div></div>
+
+    <p class="enumerate">
+        U reference podle čísel skupin je tvar stejný – také dlouze <code>\g&lt;ČÍSLO&gt;</code>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_sub_group.1.py"><em>re_sub_group.1.py</em></a></div><example src="_files/re_sub_group.1.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_sub_group.1.out" lang="text"></example></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        To proto, aby se mohly správně vyhodnotit záludnosti typu <code>\g&lt;2&gt;0</code>, které by ve tvaru <code>\20</code> hledaly skupinu číslo 20 (a ne požadovanou 2).
+    </div></div>
+
+</div></section><section class="slide-section" id="id14" data-title="Modifikace – subn()"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">Modifikace – subn()</h2></div><div class="section-body">
+
+  <p>
+    Úplně totéž jako <em>sub()</em> zařídí i metoda <em>subn()</em>, pouze spolu s pozměněným řetězcem vrátí v podobě dvojce i počet záměn, ke kterým došlo:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/re_subn.py"><em>re_subn.py</em></a></div><example src="_files/re_subn.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/re_subn.out" lang="text"></example></div></div>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Úplné volání funkce jest <code>subn(repl, string, count=0)</code>, kde nepovinný parametr <em>count</em> určuje nejvyšší počet výměn, ke kterým může dojít.
+  </div></div>
+
+</div></section><section class="slide-section" id="id15" data-title="Možnosti zápisu složitějších regexpů"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">Možnosti zápisu složitějších regexpů</h2></div><div class="section-body">
+
+  <p>
+    Jelikož regexpy se mohou velmi snadno stát značně složitými a zcela nepřehlednými, vyplatí se vědět, jak si v takovém případě poradit. Srovnejme klasický způsob parsování numerické entity z XML..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    charref = re.compile("&amp;#(0[0-7]+|[0-9]+|x[0-9a-fA-F]+);")
+  </pre>
+  <p>
+    ..se dvěma alternativními možnými zápisy jinak úplně stejného regexpu.
+  </p>
+  
+  <p class="enumerate">
+    Předně si můžete rozložit složitější regexp na logické podčásti a využít pythoního triku s automatickým skládáním řetězců:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    charref = re.compile("&amp;#(0[0-7]+"
+                         "|[0-9]+"
+                         "|x[0-9a-fA-F]+);")
+  </pre>
+  
+  <p class="enumerate">
+    Druhou možností pak je využít přímo regexpí možnost <strong>zápisu pomocí uvolněné syntaxe</strong> (aka <em>verbose mode</em>). V tomto módu jsou totiž ignorovány všechny bílé znaky, pokud nejsou součástí <em>skupiny znaků</em> <code>[]</code> nebo pokud nejsou uvozeny <em>zpětným lomítkem</em> (jehož speciální význam ovšem není zrovna dalším zpětným lomítkem zrušen), plus se v něm dají psát klasické komentáře pomocí znaku <code>#</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    charref = re.compile(r"""
+      &amp;[#]                # začátek numerické entity
+      (
+         0[0-7]+         # číslo oktalově
+       | [0-9]+          # číslo decimálně
+       | x[0-9a-fA-F]+   # číslo hexadecimálně
+      )
+      ;                   # středník ukončující numerickou entitu
+    """, re.VERBOSE)
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Zdroj: <a href="http://docs.python.org/py3k/howto/regex.html" class="external">Python Regular Expression HOWTO</a>
+  </div></div>
+
+</div></section><section class="slide-section" id="id16" data-title="Zkrácený přístup k metodám"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">Zkrácený přístup k metodám</h2></div><div class="section-body">
+
+  <p>
+    Z praktických důvodů se dají všechny výše uvedené metody zavolat nikoli až na <em>zkompilovaném objektu vzorů</em>, nýbrž už přímo na úrovni modulu <em>re</em>. Pochopitelně jim pak ještě musíme nějak předhodit samotný regexp a případné kompilační příznaky. Děje se tak v podobě prvního parametru pro regexp a posledního pojmenovaného (<em>flags</em>) pro příznaky:
+  </p>
+  <ul>
+    <li>
+        <code>re.finditer(pattern, string, flags=0)</code>
+    </li>
+    <li>
+        <code>re.findall(pattern, string, flags=0)</code>
+    </li>
+    <li>
+        <code>re.search(pattern, string, flags=0)</code>
+    </li>
+    <li>
+        <code>re.match(pattern, string, flags=0)</code>
+    </li>
+    <li>
+        <code>re.split(pattern, string, maxsplit=0, flags=0)</code>
+    </li>
+    <li>
+        <code>re.sub(pattern, repl, string, count=0, flags=0)</code>
+    </li>
+    <li>
+        <code>re.subn(pattern, repl, string, count=0, flags=0)</code>
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id17" data-title="PS: Překrývající se vzory"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">PS: Překrývající se vzory</h2></div><div class="section-body">
+
+    <p>
+        Někdy můžete potřebovat najít skutečně všechny výskyty nějakého vzoru, a to i když se ve zdrojovém textu překrývají. Jako například pětipísmenný podřetězec začínající na znaky <code>abc</code> v řetězci <code>'abcabc12345'</code>. Obě odpovědi jsou jasné – <code>'abcab'</code> a <code>'abc12'</code>. Nicméně knihovní modul <em>re</em> si to nemyslí:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overlap.1.py"><em>overlap.1.py</em></a></div><example src="_files/overlap.1.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overlap.1.out" lang="text"></example></div></div>
+
+    <p class="enumerate">
+        Myšlenkově nejsnažší je použít alternativní regexpový modul <a href="https://pypi.org/project/regex/" class="external"><em>regex</em></a>, který na svých metodách <em>findall()</em> a <em>finditer()</em> podporuje přepínač pro vyhledávání překrývajících se vzorů:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overlap.2.py"><em>overlap.2.py</em></a></div><example src="_files/overlap.2.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overlap.2.out" lang="text"></example></div></div>
+
+    <p class="enumerate">
+        Jste-li omezeni na standardní knihovnu, můžete využít <a href="https://stackoverflow.com/questions/5616822/python-regex-find-all-overlapping-matches" class="external">triku</a> s <a href="/materialy/regexp/extensions.xml?slajd=3">vyhlížením</a>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/overlap.3.py"><em>overlap.3.py</em></a></div><example src="_files/overlap.3.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/overlap.3.out" lang="text"></example></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Tento kód doslova a dopísmene hledá „nic“ před vyhlížecím vzorem (tedy ono nic mezi <code>r'</code> a <code>(?=</code>) a prázdné množiny se technicky vzato nepřekrývají, takže poslušně najde všechny výskyty vyhlížecího vzoru, který je označen jako skupina a probublá tudíž do výsledných zásahů.
+    </div></div>
+
+</div></section><section class="slide-section" id="id18" data-title="Poznámka"><div class="section-header"><span class="section-num">18</span><h2 class="section-title">Poznámka</h2></div><div class="section-body">
+
+  <p>
+    Vidíme, že regexpy jsou velmi mocný nástroj pro práci s řetězci. Ale jak řekl klasik:
+  </p>
+  <blockquote>
+    Programátor vidí problém a řekne si: „Ha, na to použiji regexpy!“<br>V tu chvíli má problémy dva.
+  </blockquote>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Aplaus! Aplaus! :D
+  </div></div>
+  <p>
+    Jinak řečeno: Rozumíte-li regexpům a umíte-li je, jako když bičem mrská, směle do nich. Není-li tomu tak, připravte se na spoustu frustrujících okamžiků, kdy zdánlivě zcela jasný regexp bude dělat něco úplně jiného, než jste od něj čekali ^_^
+  </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 18 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

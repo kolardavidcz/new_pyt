@@ -1,0 +1,310 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Distributed Version Control Systems – Overview
+      —
+      DVCS</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Distributed Version Control Systems – Overview</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">9</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">VCS</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">DVCS</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Ignorované soubory</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Paralelní vývojové větve</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Příklad</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Git vs Mercurial – architektura</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Git vs Mercurial – práce</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Git vs Mercurial – závěr</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">DVCS</span><span class="lecture-date">2011-xx-xx</span></div><h1 class="lecture-title">Distributed Version Control Systems – Overview</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    Pokud chcete znát vývoj své práce na nějakém projektu v čase, označit jisté okamžiky v historii jako význačné nebo dokonce spolupracovat na stejném projektu s více vývojáři, budete – mimo jiné – potřebovat nějakou formu <strong>správy verzí</strong> (<em>VCS = Version Control System</em>).
+  </p>
+  <p>
+    V dalším se stručně podíváme na historii vývoje takovýchto systémů a na základy práce s některými z nich.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="VCS"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">VCS</h2></div><div class="section-body">
+
+  <p>
+    Historicky nejstaršími systémy pro správu verzí byly systémy <strong>centralizované</strong>. Asi celkem logicky odpovídaly tehdejšímu stavu počítačové techniky – výkonný centrální počítač s mnoha terminály připojenými na něj. Práce v takovém systému se vyznačuje především tím, že:
+  </p>
+  <ul>
+    <li>
+      Existuje <strong>jeden centrální repozitář</strong> s veškerým kódem a jeho historií.
+    </li>
+    <li>
+      Každý vývojář si z centrálního repozitáře <em>vytáhne</em> (<em>checkout</em>) tu část kódu (a z té doby), na které chce právě pracovat. (Vedlejší efekt: <em>Příkazy VCS operují pouze na té části podstromu, ve které se právě nacházíte.</em>)
+    </li>
+    <li>
+      Po skončení práce vývojář <em>nahraje</em> (<em>commit</em>) svoje úpravy zpátky na centrální server, aby se k nim mohli dostat i ostatní.
+    </li>
+  </ul>
+  <p>
+    Mezi typické zástupce takovýchto systémů patří <strong>CVS</strong> a jeho duchovní potomek <strong>Subversion</strong> (<strong>SVN</strong>).
+  </p>
+
+</div></section><section class="slide-section" id="id3" data-title="DVCS"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">DVCS</h2></div><div class="section-body">
+
+  <p>
+    S rozvojem internetu – tedy hlavně se vzrůstem možností komunikace po síti mezi lidmi navzájem – se začaly objevovat systémy pro správu verzí <strong>decentralizované</strong>. Jejich hlavními význačnými body je:
+  </p>
+  <ul>
+    <li>
+      Nemusí existovat (a často také neexistuje) žádný centrální počítač, který by držel „tu jedinou správnou verzi projektu a jeho historie“. Naopak každý z uživatelů si drží <strong>kompletní historii projektu</strong> sám u sebe a pouze ji s ostatními může sdílet.
+    </li>
+    <li>
+      Asi to z předchozího bodu není úplně jasné, ale každý uživatel má u sebe <strong>projekt úplně celý</strong>, tzn. narozdíl od nedistribuovaných VCS nemůže pracovat pouze s jeho podčástí. (Vedlejší efekt: <em>Příkazy DVCS fungují globálně na celý projekt nezávisle na tom, ve které části podstromu se zrovna nacházíte</em>.)
+    </li>
+    <li>
+      Zároveň z toho vyplývá, že každý z účatníků stejného projektu u sebe může mít (a v naprosté většině případů také má) projekt v dosti rozdílném stavu od ostatních, a to včetně jeho historie.
+    </li>
+  </ul>
+  <p>
+    Typickými představiteli těchto systémů jsou např. <strong>GIT</strong> a <strong>Mercurial</strong>, se kterými se dále více seznámíme.
+  </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Ignorované soubory"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Ignorované soubory</h2></div><div class="section-body">
+
+  <p>
+    Z mnoha různých důvodů se ve vašem pracovním stromě repozitáře mohou (pravidelně) objevovat soubory, které ale nepatří do historie projektu.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Typicky jde o záložní soubory editorů nebo zkompilované verze programů, na kterých zrovna pracujete.
+  </div></div>
+  <p>
+    Verzovací systém se k takovýmto souborům chová různě – v lepším případě vás s nimi jen pokaždé bude otravovat, zda je nechcete přidat do historie, v horším je tam v rámci nějakého obecnějšího příkazu rovnou přidá (a vy pak budete mít problém je z ní nějak čistě odpreparovat).
+  </p>
+  <p>
+    K řešení těchto situací se používají tzv. <em>seznamy</em> nebo <strong>vzory ignorovaných souborů</strong>. Jsou to „obyčejné“ textové soubory (se speciálním jménem a umístěním), v nichž se vyjmenují buď přímo jednotlivé soubory, které nechcete v rámci verzovacího systému uvažovat, nebo v obecnějším případě nějaká (často regexpová) pravidla pro jejich rozpoznávání.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Často je vytvoření tohoto tzv. <em>ignore-list</em>u specializovaného pro daný projekt dokonce vůbec prvním počinem, který při přípravě projektu a jeho prvním komitu provedete.
+  </div></div>
+  <p>
+    Verzovací systém pak všechny soubory, které vyhovují předpisům uvedeným v těchto konfiguračních souborech, jednoduše ignoruje – nikdy vám nejsou nabídnuty ke správě, ani se nikdy automaticky „samy od sebe“ v historii neobjeví.
+  </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Paralelní vývojové větve"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Paralelní vývojové větve</h2></div><div class="section-body">
+
+  <p>
+    Velkou předností (alespoň některých) verzovacích systémů je možnost práce ve více paralelních vývojových větvích najednou.
+  </p>
+  <p>
+    Základní myšlenkou (alespoň v případě gitu) je, že jedna z větví je hlavní – provádíme v ní minumum úprav, aby veškerý kód byl co nejstabilnější a s co nejméně chybami. Potřebujeme-li vyzkoušet či připravit nějakou větší změnu, pracujeme na ní paralelně s hlavní vývojovou větví ve větvi vedlejší a teprve ve chvíli, kdy je nový kód připraven a odladěn, provedeme jeho začlenění (<em>merge</em>) do větve hlavní.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Jelikož na hlavní větvi jsme mezitím také pracovali, musíme si dát trochu větší pozor, pokud jsme v obou větvích změnili stejné soubory na stejných místech rozdílným způsobem – automatické nástroje si s takovou situací pochopitelně poradit nemůžou (a nesmí).
+  </div></div>
+  <p>
+    Poznámka: Zatímco pro <em>git</em> jsou paralelní vývojové větve především nástrojem pro rychlé testování nových myšlenek („Nešlo by to třeba takhle?“) a je snadné je vytvořit i zase zrušit, <em>mercurial</em> je naopak používá v prvé řadě pro stabilní paralelní verze repozitáře („aktuální verze pro zákazníky, příští verze pro zákazníky…“).
+  </p>
+
+</div></section><section class="slide-section" id="id6" data-title="Příklad"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Příklad</h2></div><div class="section-body">
+
+  <p>
+    Podívejme se na následující ukázku z vývoje slajdovacího systému tohoto webu (výřez ze screenshotu nástroje <em>gitk</em>):
+  </p>
+  <img src="_files/git-branches.png" width="434" height="170" alt="" title="branches in git">
+  <p>
+    Vidíme, že v uvedeném časovém období, z něhož pochází náš výřez, probíhala práce s repozitářem ve dvou větvích zároveň – ve větvi <em>hlavní</em> (zvané <em>master</em>) a v jedné větvi vedlejší (zde pojmenované <em>JS</em>).
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Odkaz XBL je na konec starší větve. Úkolem větve <em>JS</em> bylo přepsat načítání externích příkladů z původně použité implementace pomocí XBL na sice méně elegantní, leč obecněji podporovanou technologii ECMAScript.
+  </div></div>
+  <p>
+    V čase probíhal přepis následujícím způsobem (od nejstarších nahoře po nejnovější dole; v grafu z <em>gitk</em> je to přesně naopak):
+  </p>
+  <table border="1" cellspacing="0">
+    <tr>
+        <th>master</th>
+        <th>JS</th>
+    </tr>
+    <tr>
+        <td>byl položen základ těchto slajdů</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>začal přepis XBL do JavaScriptu, zabral celkem tři samostatné komity</td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align: center;">změny z větve <em>JS</em> byly (po odzkoušení) promítnuty do <em>master</em>a</td>
+    </tr>
+    <tr>
+        <td>přidány příklady na <em>git merge</em></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>drobnější úpravy</td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align: center;">změny z větve <em>JS</em> byly (po odzkoušení) promítnuty do <em>master</em>a</td>
+    </tr>
+    <tr>
+        <td>v <em>master</em>ovi jsou připravené nové změny, část z nich bude komitována, část nikoli</td>
+        <td></td>
+    </tr>
+  </table>
+
+</div></section><section class="slide-section" id="id7" data-title="Git vs Mercurial – architektura"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Git vs Mercurial – architektura</h2></div><div class="section-body">
+
+  <p>
+    Oba tyto DVCS vznikly jako reakce na uzavření volné verze nástroje <em>BitKeeper</em> v roce 2005, díky čemuž bylo třeba pro správu linuxového jádra najít náhradu za něj. Od té doby hoří na internetu debaty, který z nich je lepší.
+  </p>
+  
+  <p>
+    Podívejme se nejdříve na rozdíl mezi nimi z hlediska jejich architektury:
+  </p>
+  <ul>
+    <li>
+      <em>Mercurial</em> je víceméně jediný spustitelný soubor, který zajišťuje veškerou práci s repozitářem. (Na Windows zabírá jeho instalace asi 20 MB.) Navíc je převážně napsaný v Pythonu.
+    </li>
+    <li>
+      <em>Git</em> je obrovská sada jednotlivých příkazů, které všechny v duchu unixové tradice spolupracují na výsledném efektu.  (Na Windows zabírá jeho typická instalace asi 200 MB, tedy 10x více než Mercurial!)
+    </li>
+  </ul>
+  
+  <p>
+    K tomu je třeba dodat následující:
+  </p>
+  <ul>
+    <li>
+      Většina příkazů v <em>Mercurialu</em> byla navržena tak, aby co nejvíce odpovídaly způsobu práce se systémem SVN (a tedy snadno přitáhly jeho uživatele).
+    </li>
+    <li>
+      <em>Git</em> je podstatně „nízkoúrovňovější“ než Mercurial, budete se toho muset více naučit, ale na druhou stranu získáte nástroj, ve kterém se nějak dá „napáchat“ skoro všechno.
+    </li>
+  </ul>
+  <p>
+    Popravdě je <em>git</em> spíše nadmnožina verzovacích systémů obecně (občas se ne až tak moc žertem říká, že v gitu můžete napsat nové verzovací systémy), takže je jednoduše mocnější než ostatní nástroje, ale ruku v ruce s tím je také patřičně rozsáhlejší a složitější.
+  </p>
+
+</div></section><section class="slide-section" id="id8" data-title="Git vs Mercurial – práce"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Git vs Mercurial – práce</h2></div><div class="section-body">
+
+  <p>
+    Teď se podívejme na srovnání typických pracovních úkonů v obou systémech:
+  </p>
+  <table border="1" cellspacing="0" align="center">
+    <tr>
+      <td></td>
+      <th>Mercurial</th>
+      <th>Git</th>
+    </tr>
+    <tr>
+      <th>přímý komit změněných a nových souborů</th>
+      <td>ano</td>
+      <td>ne</td>
+    </tr>
+    <tr>
+      <th>preferovaný způsob práce s větvemi</th>
+      <td>klonování repozitáře</td>
+      <td>přepínání uvnitř pracovního adresáře</td>
+    </tr>
+    <tr>
+      <th>přímá propagace všech větví do vzdáleného repozitáře</th>
+      <td>ano</td>
+      <td>ne</td>
+    </tr>
+    <tr>
+      <th>podpora „indexu“ (<em>staging area</em>)</th>
+      <td>ne</td>
+      <td>ano</td>
+    </tr>
+    <tr>
+      <th>podpora „záplatování“ (<em>patches</em>)</th>
+      <td>pomocí rozšíření</td>
+      <td>ano</td>
+    </tr>
+    <tr>
+      <th>„historie je svatá“</th>
+      <td>(většinou) ano</td>
+      <td>přepsat se dá skoro všechno</td>
+    </tr>
+    <tr>
+      <th>(s historií související) likvidace nepotřebných větví</th>
+      <td>téměř nemožná, případně s rozšířením</td>
+      <td>ano</td>
+    </tr>
+    <tr>
+      <th>(s historií související) <em>rebase</em></th>
+      <td>jako rozšíření</td>
+      <td>ano</td>
+    </tr>
+  </table>
+  
+  <p>
+    Nyní pár komentářů k předchozím bodům:
+  </p>
+  <ul>
+    <li>
+      <em>přímý komit změněných a nových souborů</em>: Jestliže v pracovním repozitáři změníte nějaké soubory či adresáře, přidáte nové nebo naopak staré smažete, <em>Mercurial</em> je při příštím komitu automaticky zanese do historie. <em>Git</em> tak udělá pouze na vyžádání, jinak je musíte nejdříve přidat do tzv. <em>indexu</em> (<em>staging area</em>) – na jednu stranu je fajn, že si můžete vybrat soubory pro komit, na druhou se ovšem předpokládá, že do repozitáře komitujete tehdy, když je pracovní stromeček v použitelném stavu, což se asi blbě zjišťuje, když některé soubory nechcete úmyslně nakomitovat.
+    </li>
+    <li>
+      <em>preferovaný způsob práce s větvemi</em>: Ačkoli oba systémy umožňují téměř stejnou práci s paralelními vývojovými větvemi, už samotní výrobci obou systémů preferují zcela opačné strategie – <em>Mercurial</em> klonování repozitáře do nového adresáře, <em>Git</em> přepínání na jinou větev v rámci stejného pracovního adresáře. Největší rozdíl však spočívá v něčem jiném – u <em>Mercurialu</em> je označení větve součástí popisu komitované změny, takže se dá kdykoliv dohledat (pokud ovšem nepoužijete nějaké nedoporučované rozšíření na manipulaci historie), kdežto u <em>Gitu</em> je označení větve pouze metainformace, kterou můžete kdykoli zahodit a nikde v kódu není zanesena.
+    </li>
+    <li>
+      <em>přímá propagace všech větví do vzdáleného repozitáře</em>: Jelikož postoj obou systémů k paralelním vývojovým větvím je od základu zcela odlišný, nepřekvapuje ani přístup k jejich propagaci na vzdálené repozitáře. Pro <em>Git</em> slouží větve ve většině případů pro testování nových variant kódu či opravám chyb stranou od hlavní vývojové větve – jako takové je bude mít nejspíše každý vývojář jiné, a tak se ve výchozím nastavení propaguje pouze aktuální pracovní větev (i když se dá složitě zařídit, aby se propagovaly všechny). Naopak pro <em>Mercurial</em> jsou větve primárně místem pro vývoj dlouho běžících souběžných variant projektu – jako takové je všichni vývojáři mezi sebou sdílí, a tak se ve výchozím nastavení propagují na vzdálený repozitář všechny najednou.
+    </li>
+    <li>
+      <em>likvidace nepotřebných větví</em>: Zcela v duchu své filozofie v <em>Gitu</em> nepotřebnou větev zahodíte jedním snadným příkazem a pokud se neupíšete, tak se o její existenci ani nikdo jiný nedozví. Naopak v <em>Mercurialu</em> dlouhodobější vývojová větev s vlastním jménem (nemluvíme teď o větvích anonymních) se vypropaguje úplně všude a zbavit se jí z historie je prakticky nemožné.
+    </li>
+    <li>
+      <em>podpora „indexu“ (<em>staging area</em>)</em>: <em>Git</em> je asi jediný verzovací systém, který nabízí podporu pro <em>staging area</em> – místo, kam můžete odložit soubory ke komitování, a přitom na nich dál pracovat, aniž byste se báli, že komitnete něco, co jste nechtěli. Praktické využití je například pro rychlý a malý experiment, ze kterého se můžete případně stejně rychle navrátit k původní verzi, nebo pro komitnutí rozpracovaných kódů po částech tedy každou část s jinou komit-zprávou.
+    </li>
+    <li>
+      <em>podpora „záplatování“ (<em>patches</em>)</em>: Potřebujete-li pracovat se „záplatami“ a to obzvláště po imejlu, <em>Git</em> asi netrumfnete. V <em>Mercurialu</em> to jde sice také, ale pouze s rozšířením.
+    </li>
+    <li>
+      <em>historie je svatá</em>: Primárně člověk většinou chce, aby celá historie vývoje nějakého projektu byla dostupná a viditelná. Občas se však může hodit historii trošku „pročistit“ – např. uveřejňujete-li volnou verzi projektu a nechcete ostatní zatěžovat se všemi „úkroky stranou“ a zaškobrtnutími při vývoji. <em>Git</em> vám dovolí historii upravit k obrazu vašemu, <em>Mercurial</em> se vás naopak bude pokoušet přesvědčit, že byste na ni neměli pokud možno vůbec sahat.
+    </li>
+    <li>
+      <em>rebase</em>: Umožňuje přesunout vývoj z vedlejší větve do hlavní takovým způsobem, že se tváří jako nepřerušená lineární historie (tedy nikoli jako <em>merge</em> dvou paralelních vývojových větví). Zcela v duchu zcela rozdílného náhledu na historii u obou systémů je <em>rebase</em> v <em>Gitu</em> k dispozici rovnou jako jeden ze základních příkazů, zatímco v <em>Mercurialu</em> si na něj musíte doinstalovat a povolit externí rozšíření.
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id9" data-title="Git vs Mercurial – závěr"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Git vs Mercurial – závěr</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Podle <a href="http://draketo.de/proj/hg-vs-git-server/" class="external">hg vs. git for server applications - performance test</a> se dají další rozdíly mezi oběma systémy shrnout přibližně takto:
+  </p>
+  <ul>
+    <li>
+      Git pro větší repozitáře s mnoha komity dokáže být rychlejší než Mercurial, ale pouze tehdy, pokud se o repozitář budete trochu starat (např. pomocí volání <em>garbage collection</em>). Jinak bude časem – a nečekaně – pomalejší a jeho nároky na obsazené místo porostou občas neuvěřitelně.
+    </li>
+    <li>
+      Mercurial od základu poskytuje solidní výkon, byť výjimečně srovnatelný nebo dokonce větší než Git. Zároveň jeho nároky na zabrané diskové místo jsou předvídatelné a řiditelné.
+    </li>
+  </ul>
+  
+  <p class="enumerate">
+    Jiné <a href="http://importantshock.wordpress.com/2008/08/07/git-vs-mercurial/" class="external">vtipné srovnání</a> nabízí tento pohled:
+  </p>
+  <ul>
+    <li>
+      <em>Git je jako MacGyver</em> – nějakým (často vysoce nepravděpodobným) způsobem v něm uděláte úplně všechno, občas i takové věci nebo takovým způsobem, že ostatní budou jenom zírat (ať už hrůzou nebo úžasem);
+    </li>
+    <li>
+      <em>Mercurial je jako James Bond</em> – nedělá úplně všechno, ale to, co dělá, dělá velmi dobře a s nenucenou elegancí.
+    </li>
+  </ul>
+  
+  <p class="enumerate">
+    V neposlední řadě je obrovský rozdíl mezi dostupnými službami pro hostování vašich projektů na internetu, je-li to vaše parketa:
+  </p>
+  <ul>
+    <li>
+      <em>Git</em> má <a href="http://GitHub.com" class="external">GitHub.com</a>. Tím je řečeno vše. Cokoliv ostatního se na <em>GitHub</em> dívá s velkým, opravdu velkým odstupem.
+    </li>
+    <li>
+      Nejlepší pro <em>Mercurial</em> je asi <a href="http://BitBucket.org" class="external">BitBucket.org</a>. Ostatní viz bod výše.
+    </li>
+  </ul>
+  
+  <hr>
+  
+  <p>
+    Nejen z mého hlediska se tak rozdíl mezi oběma systémy redukuje převážně na rozdílný přístup k historii a ruku v ruce s tím práci s paralelními vývojovými větvemi. My si z praktických důvodů ukážeme práci s oběma systémy, ale co si pro sebe vyberete vy, je zcela na vás. Klidně to může být i nějaký úplně jiný DVCS-systém, na výběr je jich dnes opravdu dost.
+  </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 9 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

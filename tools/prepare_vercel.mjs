@@ -65,21 +65,34 @@ function countFiles(dir) {
   return n;
 }
 
+function optionalCopyDir(srcRel, destRel) {
+  const src = join(ROOT, srcRel);
+  const dest = join(PUB, destRel);
+  if (existsSync(src)) {
+    mkdirSync(dest, { recursive: true });
+    cpSync(src, dest, { recursive: true });
+    console.log(`  ✓ ${srcRel} → public/${destRel}`);
+  } else {
+    console.log(`  - ${srcRel} not present (preserving prebuilt public/${destRel})`);
+  }
+}
+
 console.log("Preparing public/ for Vercel …");
 
-if (existsSync(PUB)) {
-  rmSync(PUB, { recursive: true, force: true });
-}
 mkdirSync(PUB, { recursive: true });
 
 copyDir("app", "app");
 copyDir("data", "data");
-copyDir(join(".old", "cjs"), "cjs");
-copyDir(join(".old", "vyuka_downloaded"), "vyuka_downloaded");
+optionalCopyDir(join(".old", "cjs"), "cjs");
+optionalCopyDir(join(".old", "vyuka_downloaded"), "vyuka_downloaded");
+optionalCopyDir("cjs", "cjs");
+optionalCopyDir("vyuka_downloaded", "vyuka_downloaded");
 
 // Root index so `/` works without rewrites (rewrites still set as backup)
-cpSync(join(PUB, "app", "index.html"), join(PUB, "index.html"));
-console.log("  ✓ app/index.html → public/index.html");
+if (existsSync(join(PUB, "app", "index.html"))) {
+  cpSync(join(PUB, "app", "index.html"), join(PUB, "index.html"));
+  console.log("  ✓ app/index.html → public/index.html");
+}
 
 // Favicon if present
 const fav = join(PUB, "app", "favicon.ico");

@@ -1,0 +1,519 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Výjimky, aserce
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Výjimky, aserce</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">17</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Ošetření výjimek</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Příklad</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Více výjimek v jedné větvi</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">„Univerzální“ zachytávání výjimek</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Vyvolání výjimky</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Objekt výjimky</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Hierarchie standardních výjimek</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Pozor na hierarchii! I</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Pozor na hierarchii! II</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Další standardní výjimky</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Vlastní výjimky</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">„assert“</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">„assert“ – použití</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">„assert“ – příklad</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">„assert“ jako hlídač typů</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">Varování</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2011-03-24|2013-03-26</span></div><h1 class="lecture-title">Výjimky, aserce</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  
+  <p>
+    Python patří k jazykům, kde je na reportování (a obsluhu) chyb, ke kterým může v kódu na nejrůznějších místech dojít, vyhrazena mašinérie <em>výjimek</em>. Pár typických příkladů (přímo podle dokumentace):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; 10 * (1/0)
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+ZeroDivisionError: int division or modulo by zero
+
+&gt;&gt;&gt; 4 + spam*3
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+NameError: name 'spam' is not defined
+
+&gt;&gt;&gt; '2' + 2
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: Can't convert 'int' object to str implicitly
+  </pre>
+  
+  <p>
+    Výjimky standardně „probublávají“ postupně po hierarchii programu, ale každopádně na konci trasovacího výpisu (<em>stack traceback</em>) bude, kdo a jakou výjimku vyvolal.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Ošetření výjimek"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Ošetření výjimek</h2></div><div class="section-body">
+
+  <p>
+    Výjimky je možné ošetřovat několika různými způsoby. Ukažme si základní z nich:
+  </p>
+
+  <p class="enumerate">
+    Základní použití – odchyť jednotlivé typy výjimek, ke kterým může dojít v <em>BLOKu-1</em>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+try:
+  BLOK-1
+except VÝJIMKA-1:
+  BLOK-2
+except VÝJIMKA-2:
+  BLOK-3
+  </pre>
+
+  <p class="enumerate">
+    Odchycení výjimky a předání jejího objektu pod vybraným jménem:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+try:
+  BLOK-1
+except VÝJIMKA as ex:
+  BLOK-2   # zde je nyní možné použít objekt odchycené výjimky pod jménem 'ex'
+  </pre>
+
+  <p class="enumerate">
+    Nevyvolá-li kód v <em>BLOKu-1</em> žádnou výjimku, provede se kód v <em>BLOKu-3</em>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+try:
+  BLOK-1
+except:
+  BLOK-2
+else:
+  BLOK-3
+  </pre>
+
+  <p class="enumerate">
+    Kód v <em>BLOKu-3</em> bude vykonán vždy při opouštění větve <em>try</em>, ať už vyvolala výjimku nebo ne:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+try:
+  BLOK-1
+except:
+  BLOK-2
+finally:
+  BLOK-3
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Větve <em>finally</em> se tak používají často pro „vyčišťovací“ kód, typicky pro uzavření otevřených zdrojů apod.
+  </div></div>
+
+</div></section><section class="slide-section" id="id3" data-title="Příklad"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Příklad</h2></div><div class="section-body">
+
+  <p>
+    Následující příklad ukazuje základní použití výjimek:
+  </p>
+  <example lang="python" src="_files/try_except.py"></example>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Upraveno podle <a href="http://www.swaroopch.com/notes/Python_en:Exceptions">http://www.swaroopch.com/notes/Python_en:Exceptions</a>
+  </div></div>
+
+  <ul>
+    <li>
+        Zadáme-li nějaký text a poté odentrujeme, obdržíme následující výsledek:
+    </li>
+  </ul>
+  <pre class="brush: text; gutter: false; toolbar: false; ">
+Enter something --&gt; ahoj
+You entered "ahoj".
+Completed.
+  </pre>
+
+  <ul>
+    <li>
+        Přerušíme-li zadávání textu pomocí ^C, výstup se změní:
+    </li>
+  </ul>
+  <pre class="brush: text; gutter: false; toolbar: false; ">
+Enter something --&gt; ahoj^C
+You cancelled the operation.
+Completed.
+  </pre>
+
+  <ul>
+    <li>
+        Konečně zadáme-li místo vstupního textu rovnou EOF, uplatní se ještě jiná větev:
+    </li>
+  </ul>
+  <pre class="brush: text; gutter: false; toolbar: false; ">
+Enter something --&gt; 
+Why did you do an EOF on me?
+Completed.
+  </pre>
+  
+  
+  <p>
+    Souhrnně tedy platí, že větev <em>finally</em> se provede vždy při opouštění větve <em>try</em>, zatímco větev <em>else</em> se provede pouze tehdy, nedojde-li ve větvi <em>try</em> k vyvolání výjimky.
+  </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Více výjimek v jedné větvi"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Více výjimek v jedné větvi</h2></div><div class="section-body">
+
+  <p>
+    Je též možné odchytit více výjimek najednou v podobě n-tice:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+try:
+  BLOK-1
+except (VÝJIMKA-1, VÝJIMKA-2, ...):
+  BLOK-2
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Tohle je v ostrém kontrastu s chováním v Python'u 2.x, kde uvedená konstrukce sloužila k zachycení výjimky pod jistým jménem (čili k tomu, co teď mnohem průhledněji a srozumitelněji dělá operátor <code>as</code>).
+  </div></div>
+  <p>
+    Samozřejmě zachycení více různých výjimek jedním společným „řešícím“ (problémy) kódem je už speciální aplikace, častěji bude každý typ výjimky obsluhovat tomu určený kód.
+  </p>
+
+</div></section><section class="slide-section" id="id5" data-title="„Univerzální“ zachytávání výjimek"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">„Univerzální“ zachytávání výjimek</h2></div><div class="section-body">
+
+  <p>
+    Ve skutečnosti nemusíte typ zachycené výjimky ani předepisovat:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+try:
+  BLOK-1
+except:
+  BLOK-2
+  </pre>
+  <p>
+    Uvedený kód má ale dvě (navzájem spřažené) nevýhody:
+  </p>
+  <ul>
+    <li>
+        Dojde-li v <em>BLOKu-1</em> k <strong>jakékoli</strong> výjimce, bude zpracování předáno do <em>BLOKu-2</em>, který si s tím bude muset poradit (tj. rozhodnout se, co vlastně zhavarovalo, a podle toho se zařídit).
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Pokud se tak někdy stane, použijte <code>sys.exc_info()</code>, které vrací trojci <code>(TypVýjimky, InstanceVýjimky, Traceback)</code>.
+        </div></div>
+    </li>
+    <li>
+        Kód se značně znečitelní, protože místo sice „armády“, ale jasně pojmenovaných výjimek, najednou budeme mít pouze jediný „opravný“ blok, který bude muset obsahovat sofistikovanou logiku rozpoznávání chyb.
+    </li>
+  </ul>
+  <p>
+    Samozřejmě pokud píšete rychlý skript sami pro sebe a potřebujete pouze chybu rozpoznat, je tohle použití zachytávání výjimek nejrychlejší i relativně rozumné. Pokud však budete psát kód <em>produkční</em>, tak do něj nic takového nepatří!
+  </p>
+
+</div></section><section class="slide-section" id="id6" data-title="Vyvolání výjimky"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Vyvolání výjimky</h2></div><div class="section-body">
+
+  <p>
+    Ač to může na první pohled vypadat nečekaně, poměrně často nebudete chtít ponechat vyvolávání výjimek pouze na vlastním virtuálním počítači, ale budete chtít na základě nějakých událostí vyvolávat výjimky sami (často dokonce i výjimky vlastní a ne pouze předdefinované). K tomu slouží příkaz <code>raise</code>, jehož použití je celkem standardní (přímo podle dokumentace):
+  </p>
+
+  <p class="enumerate">
+    Konkrétní výjimku můžete uměle vyvolat:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; raise NameError('HiThere')
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+NameError: HiThere
+  </pre>
+
+  <p class="enumerate">
+    Výjimku můžete po jejím odchycení a částečném zpracování předat po hierarchii dále:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; try:
+...     raise NameError('HiThere')
+... except NameError:
+...     print('An exception flew by!')
+...     raise
+An exception flew by!
+Traceback (most recent call last):
+  File "&lt;pyshell#23&gt;", line 2, in &lt;module&gt;
+    raise NameError('HiThere')
+NameError: HiThere
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    PS: V praxi se ukázalo, že odchytávání výjimek v metodách vlastních objektů a předávání jich dále se bohužel nechová vždy zcela očekávaným způsobem…
+  </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Objekt výjimky"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Objekt výjimky</h2></div><div class="section-body">
+
+  <p>
+    Jelikož odchycená výjimka je objekt, má jistou vnitřní strukturu (ať už výchozí nebo uživatelem předefinovanou). Ukažme si několik příkladů:
+  </p>
+
+  <p class="enumerate">
+    Standardní výjimky mají nadefinované chování při pokusu o jejich výpis:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; try:
+...     raise NameError('HiThere')
+... except NameError as ex:
+...     print(ex)
+HiThere
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    To zajišťuje přítomnost „magické“ metody <em>__str__()</em>.
+  </div></div>
+
+  <p class="enumerate">
+    Struktura objektu výjimek je ale mnohem složitější:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; try:
+...     raise NameError('HiThere')
+... except NameError as ex:
+...     print( dir(ex) )
+['__cause__', '__class__', '__context__', '__delattr__', '__dict__', '__doc__',
+ '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__',
+ '__init__', '__le__', '__lt__', '__ne__', '__new__', '__reduce__',
+ '__reduce_ex__', '__repr__', '__setattr__', '__setstate__', '__sizeof__',
+ '__str__', '__subclasshook__', '__traceback__', 'args', 'with_traceback']
+  </pre>
+  <p>
+    Především vidíme, že (standardní) výjimky mohou dostávat argumenty:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; try:
+...    raise Exception('spam', 'eggs')
+... except Exception as inst:
+...    print(type(inst))    # instance výjimky
+...    print(inst.args)     # argumenty výjimky jsou uloženy v parametru '.args'
+...    print(inst)          # díky '__str__' můžeme argumenty vytisknout přímo
+...    x, y = inst.args     # n-ticové rozbalení argumentů
+...    print('x =', x)
+...    print('y =', y)
+&lt;class 'Exception'&gt;
+('spam', 'eggs')
+('spam', 'eggs')
+x = spam
+y = eggs
+  </pre>
+
+  
+
+</div></section><section class="slide-section" id="id8" data-title="Hierarchie standardních výjimek"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Hierarchie standardních výjimek</h2></div><div class="section-body">
+
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Viz <a href="http://docs.python.org/py3k/library/exceptions.html">http://docs.python.org/py3k/library/exceptions.html</a>
+  </div></div>
+  <example src="_history/Python310" lang="txt"></example>
+  
+  <p>
+    PS: Struktura standardních výjimek se čas od času mění (výše uvedená je pro verzi 3.10). Například Python 3.2 postrádal celou větev <em>OSError</em> a měl místo ní k dispozici naopak následující větev <em>EnvironmentError</em>:
+  </p>
+  <pre>      +-- EnvironmentError
+           +-- IOError
+           +-- OSError
+                +-- WindowsError (Windows)
+                +-- VMSError (VMS)
+  </pre>
+
+</div></section><section class="slide-section" id="id9" data-title="Pozor na hierarchii! I"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Pozor na hierarchii! I</h2></div><div class="section-body">
+
+    <p>
+        Spousta výjimek je zjevně vyrobena jako potomci jiných výjimek, například:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; issubclass(ZeroDivisionError, ArithmeticError)
+        True
+        &gt;&gt;&gt; issubclass(ArithmeticError, ZeroDivisionError)
+        False
+    </pre>
+    <p>
+        Vypadá to zdánlivě nevinně, ale jen do té chvíle, než budete v rámci jednoho <em>try</em>-bloku zachytávat výjimky, které jsou na sobě závislé – rodičovská totiž zvítězí, pokud bude uvedena dříve:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/hierarchy.py"><em>hierarchy.py</em></a></div><example src="_files/hierarchy.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/hierarchy.out" lang="text"></example></div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="Pozor na hierarchii! II"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Pozor na hierarchii! II</h2></div><div class="section-body">
+
+    <p>
+        V čem je problém? Kdyby náhodou každá z výjimek definovala jinou sadu atributů – pak se vám totiž může stát, že budete chtít pracovat s něčím, co vůbec nedostanete. Standardní výjimky se takhle naštěstí nechovají – potomci funkčnost rodičů jen rozšiřují<sup>*</sup>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; from urllib.error import HTTPError, URLError
+
+&gt;&gt;&gt; issubclass(HTTPError, URLError)
+True
+&gt;&gt;&gt; issubclass(URLError, HTTPError)
+False
+
+&gt;&gt;&gt; hs, us = set(dir(HTTPError)), set(dir(URLError))
+&gt;&gt;&gt; hs - us
+{'headers', '__enter__', 'close', '__iter__', '__getattr__', '__exit__',
+'getcode', 'reason', 'geturl', '_HTTPError__super_init', 'info'}
+&gt;&gt;&gt; us - hs
+set()
+    </pre>
+    
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        <sup>*</sup> Aspoň doufám ^_^'
+    </div></div>
+
+</div></section><section class="slide-section" id="id11" data-title="Další standardní výjimky"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Další standardní výjimky</h2></div><div class="section-body">
+
+    <p>
+        Kromě výjimek ve standardní hierarchii je další hromada výjimek poschovávaná u svých knihovních modulů, které musíte nejdříve naimportovat, abyste je mohli používat. Jedním příkladem za všechny budižtež právě výjimky modulu <a href="/materialy/python/net/overview.xml"><code>urllib</code></a> z předchozího slajdu:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; import urllib.error
+&gt;&gt;&gt; dir(urllib.error)
+['ContentTooShortError', 'HTTPError', 'URLError', '__all__',
+ '__builtins__', '__cached__', '__doc__', '__file__', '__loader__',
+ '__name__', '__package__', '__spec__', 'urllib']
+    </pre>
+    <p>
+        PS: Jich se upozornění na hierarchii <a href="/materialy/python/net/overview.xml?slajd=7">týkalo v historii také</a> – zde je rodičem (a tedy obecnější výjimkou) <em>URLError</em> a potomkem (specifičtější výjimkou) s jinými atributy <em>HTTPError</em>.
+    </p>
+
+</div></section><section class="slide-section" id="id12" data-title="Vlastní výjimky"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Vlastní výjimky</h2></div><div class="section-body">
+
+  <p>
+    Samozřejmě kromě výše uvedených předdefinovaných výjimek si můžete nadefinovat výjimky vlastní. Typicky to budou potomci třídy <em>Exception</em> a není-li třeba, postačí velmi jednoduché, např.:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+class MyError(Exception):
+    pass
+  </pre>
+  
+  <p>
+    Ve složitějších případech můžete nadefinovat vlastní hierarchii výjimek a i předefinovat jejich výchozí chování. Konstruktor základní výjimky <code>Exception</code> má totiž zcela generický tvar <code>__init__(self, /, *args, **kwargs)</code>, přičemž <strong>výchozí chování metody <code>__str__()</code> je přepsat na výstup vstupní parametry instance výjimky</strong> (jako n-tici).
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Ukázka <a href="https://docs.python.org/3.9/tutorial/errors.html#user-defined-exceptions" class="external">přímo z dokumentace</a>:
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+      class Error(Exception):
+          """Base class for exceptions in this module."""
+          pass
+
+      class InputError(Error):
+          """Exception raised for errors in the input.
+
+          Attributes:
+              expression -- input expression in which the error occurred
+              message -- explanation of the error
+          """
+
+          def __init__(self, expression, message):
+              self.expression = expression
+              self.message = message
+
+      class TransitionError(Error):
+          """Raised when an operation attempts a state transition that's not
+          allowed.
+
+          Attributes:
+              previous -- state at beginning of transition
+              next -- attempted new state
+              message -- explanation of why the specific transition is not allowed
+          """
+
+          def __init__(self, previous, next, message):
+              self.previous = previous
+              self.next = next
+              self.message = message
+    </pre>
+  </div></div>
+
+</div></section><section class="slide-section" id="id13" data-title="„assert“"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">„assert“</h2></div><div class="section-body">
+
+    <p>
+        Kromě výjimek, které slouží především k odchytávání chyb v běžících a již nasazených programech, máme v Python'u k dispozici i standardní ladicí prostředek – příkaz <code>assert</code>. Kromě plného použití v rámci testování nachází uplatnění i při rychlém odchytávání chyb při ladění programu.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Při spuštění interpretru s parametrem <code>-O</code> jsou příkazy <em>assert</em> „odstraněny“.
+    </div></div>
+    <p>
+        Struktura příkazu <em>assert</em> je..
+    </p>
+    <blockquote lang="python">
+        assert VÝRAZ [, ARGUMENT]
+    </blockquote>
+    <p>
+        ..a v podstatě odpovídá následujícímu kódu:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        if not VÝRAZ:
+            raise AssertionError(ARGUMENT)
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Ve skutečnosti jeho vykonání řídí ještě obsah proměnné <code>__debug__</code> – při spuštění interpretru s parametrem <code>-O</code> je do ní uloženo <code>False</code> a uvedené asertovací části kódu jsou pak vynechány.
+    </div></div>
+
+</div></section><section class="slide-section" id="id14" data-title="„assert“ – použití"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">„assert“ – použití</h2></div><div class="section-body">
+
+    <p>
+        Použití ilustruje následující příklad:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = [1, 2, 3]
+
+# A) Tohle je pravda, není co řešit:
+&gt;&gt;&gt; assert len(xs) == 3
+
+# B1) Tohle pravda ale není:
+&gt;&gt;&gt; assert len(xs) == 2
+Traceback (most recent call last):
+  File "&lt;pyshell#31&gt;", line 2, in &lt;module&gt;
+    assert len(xs) == 2
+AssertionError
+
+# B2) Tohle také není pravda. Navíc přidáme komentář:
+&gt;&gt;&gt; assert len(xs) == 2, 'Špatný počet argumentů!'
+Traceback (most recent call last):
+  File "&lt;pyshell#32&gt;", line 2, in &lt;module&gt;
+    assert len(xs) == 2, 'Špatný počet argumentů!'
+AssertionError: Špatný počet argumentů!
+
+# B2) Nebo ještě víc údajů:
+&gt;&gt;&gt; assert len(xs) == 2, ('Špatný počet argumentů!', len(xs) )
+Traceback (most recent call last):
+  File "&lt;pyshell#33&gt;", line 2, in &lt;module&gt;
+    assert len(xs) == 2, ('Špatný počet argumentů!', len(xs) )
+AssertionError: ('Špatný počet argumentů!', 3)
+    </pre>
+
+</div></section><section class="slide-section" id="id15" data-title="„assert“ – příklad"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">„assert“ – příklad</h2></div><div class="section-body">
+
+    <p>
+        Příklad – kontrola vstupních parametrů:
+    </p>
+    <div class="example-block example-horizontal"><div class="example-col"><div class="example-label">📄 Program: <a href="_files/debug_assert.py"><em>debug_assert.py</em></a></div><example src="_files/debug_assert.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/debug_assert.out" lang="text"></example></div></div>
+
+</div></section><section class="slide-section" id="id16" data-title="„assert“ jako hlídač typů"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">„assert“ jako hlídač typů</h2></div><div class="section-body">
+
+    <p>
+        Obecně jsou funkce v Python'u psány tak, aby příslušný kód vykonaly pro jakýkoliv vstup, pro který dává smysl (aka <em>„duck-typing“</em>). Ale někdy můžete potřebovat vstupní typy omezit na úzkou podmnožinu. Ve staticky typovaném jazyce by tato kontrola byla automatická, ale v Python'u ji musíme nějak dopsat. S výhodou k tomu můžeme využít právě příkaz <code>assert</code>.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Samozřejmě před pádem programu ve chvíli, kdy interpretr při vykonávání programu narazí na špatný vstup, nás to nezachrání. Ale usnadní nám to ladění nebo alespoň dá uživateli srozumitelnější formou najevo, kde a proč došlo k chybě.
+    </div></div>
+    
+    <p>
+        Pár příkladů:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # vracet druhou mocninu má smysl pouze číselné typy
+        def druhá_mocnina(x):
+            assert type(x) == int or type(x) == float or type(x) == complex
+            return x*x
+    </pre>
+    <br>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # 'fn' musí být volatelný typ (typicky funkce)
+        # 'xs' musí být iterovatelný typ (typicky seznam)
+        def mymap(fn, xs):
+            assert callable(fn) == True     # isinstance(fn, collections.Callable)
+            assert isinstance(xs, collections.Iterable)
+            return [fn(x) for x in xs]
+    </pre>
+    <br>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # vektor ve 3D-prostoru musí mít právě tři souřadnice
+        def délka_3D_vektoru(vektor):
+            assert len(vektor) == 3
+            x, y, z = vektor
+            return math.sqrt( x**2 + y**2 + z**2 )
+    </pre>
+
+</div></section><section class="slide-section" id="id17" data-title="Varování"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">Varování</h2></div><div class="section-body">
+
+    <p>
+        Kromě výjimek obsahuje Python i jejich „vyměkčenou“ verzi v podobě <strong>varování</strong>. Ta v základním nastavení nezpůsobí havárii programu, pouze na výstup (typicky chybový) nahlásí příslušnou informaci.
+    </p>
+    <p>
+        Protože jejich obsluha je dosti obsáhlá a z principu z větší části jiná než u výjimek, je jim věnována <a href="warnings.xml">samostatná kapitola</a>.
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 17 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

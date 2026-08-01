@@ -1,0 +1,273 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Knihovna „MatPlotLib“ – kreslení grafů
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Knihovna „MatPlotLib“ – kreslení grafů</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">18</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Přehled</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Instalace</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Ia – „pyplot()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Ib – styl grafu, osy</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Ic – popisky</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">IIa – více grafů v jednom</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">IIb – legenda</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">IIc – popisky os a mřížka</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">IId – vlastnosti textů</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">III – více obrázků v jednom</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">IVa – více os (kopie)</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">IVb – více os (změna měřítka)</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">V – časová osa</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">VI – histogram</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">VII – pokročilé funkce</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">Animace</span></a></li><li class="toc-item"><a class="toc-link" href="#id18"><span class="toc-num">18</span><span class="toc-text">Kam dál?</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2015-04-09</span></div><h1 class="lecture-title">Knihovna „MatPlotLib“ – kreslení grafů</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Knihovna <a href="http://matplotlib.org" class="external"><em>matplotlib</em></a> slouží především k tvorbě dvourozměrných grafů v publikační kvalitě. Podle vlastního popisu se snaží „jednoduché věci ponechat jednoduchými a složité možnými“, což se jí dosti dobře daří.
+    </p>
+    <p>
+        Z praktického hlediska její instalace přinese do Python'u přes 100 MB kódu a modulů v několika dalších knihovnách, tudíž si dobře rozmyslete, kam ji chcete umístit, abyste se vyhnuli případným komplikacím kvůli verzím balíčků.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        PS: V září 2018 se objevila trojková verze <em>Matplotlib</em>u, ve které spousta věcí funguje lépe než kdy dřív, ale jiná spousta věcí, které dříve fungovaly, teď už nejde ^_~ Především se renderovací backend vybírá automaticky při startu (na použitý se můžete zeptat pomocí <code>matplotlib.get_backend()</code>) a občas vás může volba překvapit a nést s sebou své mouchy.
+    </div></div>
+
+</div></section><section class="slide-section" id="id2" data-title="Přehled"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Přehled</h2></div><div class="section-body">
+
+    <p>
+        Knihovna <em>matplotlib</em> je <strong>neuvěřitelně rozsáhlá</strong>. Navíc každý z podmodulů je typicky ovládán armádou několika desítek metod, počet jejichž vstupních parametrů je podobného řádu a povolené hodnoty těchto parametrů dokonce často ještě větší:
+    </p>
+    <ul>
+        <li> grafy (včetně os a popisek); </li>
+        <li> matematický text; </li>
+        <li> animace; </li>
+        <li> GUI-widžety; </li>
+        <li> … </li>
+    </ul>
+    <p>
+        Z pochopitelných důvodů si tak ukážeme jenom absolutní základ, jak nakreslit nejjednodušší graf, a všechno ostatní už je na vás a čtení dokumentace a prohledávání webu :-)
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Instalace"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Instalace</h2></div><div class="section-body">
+
+    <p>
+        Pokud jste na dobře nastaveném systému (typicky Linux se všemi vývojovými knihovnami), je instalace <em>Matplotlib</em>u jednoduchá:
+    </p>
+    <pre class="brush: bash; gutter: false; toolbar: false; ">
+        pip install [--user] matplotlib
+    </pre>
+    <p>
+        Samotný <em>Matplotlib</em> obsahuje (celkem pochopitelně) několik binárních komponent, ale závisí mimo jiné i na knihovně <em>NumPy</em>, a ta je skutečný binární „král“, takže nezdaří-li se plná instalace najednou, zkuste ji po krocích:
+    </p>
+    <ol>
+        <li>
+            čisté pythoní knihovny (tohle by nemělo selhat) – <a href="https://pypi.python.org/pypi/six/" class="external"><em>six</em></a> (utility pro usnadnění tvorby kódu pro Python 2.x a 3.x zároveň; instalujte je první, protože <em>dateutil</em> na nich závisí), <a href="https://pypi.python.org/pypi/python-dateutil/" class="external"><em>python-dateutil</em></a> (rozšíření standardního modulu pro datum a čas), <a href="https://pypi.python.org/pypi/pytz/" class="external"><em>pytz</em></a> (definice světových časových zón), <a href="https://pypi.python.org/pypi/pyparsing/" class="external"><em>pyparsing</em></a> (alternativní parser textů) a v posledních verzích také <a href="https://pypi.python.org/pypi/cycler/" class="external"><em>Cycler</em></a> (nadstavba pro opakované a skládané cyklení nad prvky objektu);
+        </li>
+        <li>
+            kandidát na zadrhnutí <a href="http://numpy.org" class="external"><em>NumPy</em></a> (knihovna numerické matematiky);
+        </li>
+        <li>
+            <a href="http://matplotlib.org" class="external"><em>Matplotlib</em></a> (po <em>NumPy</em> už by s ním neměl být žádný problém).
+        </li>
+    </ol>
+    <p>
+        Výše vyjmenované jsou základní závislosti, bez kterých <em>Matplotlib</em> nenainstalujete. Ale pro specifické vlastnosti (třeba export do některých formátů) mohou být potřeba další knihovny.
+    </p>
+    <p>
+        PS: Ještě jednodušší je samozřejmě instalace v rámci systému <a href="/materialy/python/packages/conda_overview.xml">Conda</a>, kde nemusíte závislosti vůbec řešit (protože jsou v rámci daného kanálu už vyřešené za vás).
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Ia – „pyplot()“"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Ia – „pyplot()“</h2></div><div class="section-body">
+
+    <p>
+        Modul <a href="http://matplotlib.org/api/pyplot_summary.html" class="external"><em>matplotlib.pyplot</em></a> je kandidátem na asi nejpoužívanější část knihovny. Bez jakéhokoli nastavení vytvoří spojitý graf pro zadané <em>y</em>-hodnoty veliký tak akorát pro ně a s osou <em>x</em> číslovanou podle počtu zadaných hodnot:
+    </p>
+    <img src="_files/matplotlib/plot-01.png" width="50%" height="50%" alt="plot-01.py">
+    <example lang="python" src="_files/matplotlib/plot-01.py"></example>
+
+</div></section><section class="slide-section" id="id5" data-title="Ib – styl grafu, osy"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Ib – styl grafu, osy</h2></div><div class="section-body">
+
+    <p>
+        Stejný příklad s poněkud užitečnějšími nastaveními (řetězcový parametr funkce <em>plot()</em> je mocný):
+    </p>
+    <img src="_files/matplotlib/plot-02.png" width="50%" height="50%" alt="plot-02.py">
+    
+    <example lang="python" src="_files/matplotlib/plot-02.py"></example>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Pro dvě vstupní sekvence hodnot je již chování zcela očekávané – první je osa <em>x</em>, druhá osa <em>y</em>. Ale pozor – obě sekvence musí být stejně dlouhé!
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Třetí řetězcový parametr je tuším namodelovaný podle MatLabu – zde říká, že uvedené body se mají zobrazit jako červené (<em>r</em>) kroužky (<em>o</em>).
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Rozsahy os se dají nastavit pochopitelně i nezávisle na zadaných hodnotách pro osy. Metoda <em>axis()</em> je pouze jedním z mnoha možných způsobů.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Názvy os se zadávají pomocí <em>xlabel()</em> a <em>ylabel()</em>.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="Ic – popisky"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Ic – popisky</h2></div><div class="section-body">
+
+    <p>
+        Nyní přidejme ještě popisky jednotlivých bodů grafu. Ve výchozím umístění začínají svým levým spodním rohem v příslušném bodě:
+    </p>
+    <img src="_files/matplotlib/plot-03.png" width="50%" height="50%" alt="plot-03.py">
+    <example lang="python" src="_files/matplotlib/plot-03.py"></example>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Popisky k bodům přidává metoda <code>annotate()</code>. Prvním parametrem je text popisku (jak je vidět, <em>matplotlib</em> si dělá konverzi na řetězec sám), parametr <code>xy</code> pak určuje, ke kterému bodu v grafu (podle souřadnic) popisek patří.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Pro umístění popisek jsem s výhodou použil funkce <a href="/materialy/python/functions/functional.xml?slajd=7"><em>zip()</em></a> – souřadnice jsem tak dostal prakticky zadarmo.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="IIa – více grafů v jednom"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">IIa – více grafů v jednom</h2></div><div class="section-body">
+
+    <p>
+        V jednom grafu můžeme zobrazit libovolné množství podgrafů. Varianta na předchozí příklad zobrazení prvočísel:
+    </p>
+    <img src="_files/matplotlib/plot-04a.png" width="50%" height="50%" alt="plot-04a.py">
+    <example lang="python" src="_files/matplotlib/plot-04a.py"></example>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Nebo jinak řečeno – sám od sebe „plotí“ <em>matplotlib</em> vždy do stejného výstupního obrázku, takže výstup každého volání funkce <em>plot()</em> skončí ve stejném grafu. Dá se to samozřejmě změnit.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Funkci <em>annotate()</em> jsem zde doplnil o posun zobrazeného popisku vůči výchozímu místu pomocí atributu <code>xytext</code> – výsledek je (snad) čitelnější. Obecně to ale zjevně nepůjde napočítat pro všechny popisky stejně. (A <em>zip()</em> vás už pak nebude zachraňovat. Na druhou stranu málokdy budete popisovat všechno a ještě stejným způsobem.)
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Druhý graf používá pro zobrazení bodů zelené křížky (<em>g+</em>), ať si vyzkoušíme také něco jiného.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="IIb – legenda"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">IIb – legenda</h2></div><div class="section-body">
+
+    <p>
+        Když už máme v jednom grafu vyneseno vícero různých věcí, sluší se je popsat:
+    </p>
+    <img src="_files/matplotlib/plot-04b.png" width="50%" height="50%" alt="plot-04b.py">
+    <example lang="python" src="_files/matplotlib/plot-04b.py"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Popis jednotlivých grafů zajistí parametr <em>label</em> příslušné funkce <code>plt.plot()</code>. Nicméně teprve volání <code>plt.legend()</code> způsobí jejich zobrazení.
+    </div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="IIc – popisky os a mřížka"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">IIc – popisky os a mřížka</h2></div><div class="section-body">
+
+    <p>
+        Ještě upravíme popisky hodnot na osách a přidáme mřížku pro snažsí orientaci v grafu (ne že by to tedy tento jednoduchý potřeboval):
+    </p>
+    <img src="_files/matplotlib/plot-04c.png" width="50%" height="50%" alt="plot-04c.py">
+    <example lang="python" src="_files/matplotlib/plot-04c.py"></example>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Rozumnější popisky hodnot zajistily metody <code>plt.xticks()</code> a <code>plt.yticks()</code> ve spolupráci s uvedením rozsahů os <code>plt.axis()</code> – spočítejte si uvedené <em>range</em>, abyste viděli proč.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Mřížku v grafu nastavuje metoda <code>plt.grid()</code>. Její parametr <em>linestyle</em> je pouze jeden z mnoha.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="IId – vlastnosti textů"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">IId – vlastnosti textů</h2></div><div class="section-body">
+
+    <p>
+        V případě potřeby (typicky třebas u datumů) je možno (nejen) popisky os zarotovat či jim vůbec změnit písmo. Ne že by to byl vždycky dobrý nápad ^_~
+    </p>
+    <img src="_files/matplotlib/plot-04d.png" width="50%" height="50%" alt="plot-04d.py">
+    <example lang="python" src="_files/matplotlib/plot-04d.py"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        U rotace kromě číselné hodnoty úhlu otočení můžete též použít řetězce <code>"horizontal"</code> (neboli 0; výchozí nastavení) a <code>"vertical"</code>. U velikosti fontu zase kromě čísel typicky CSSkové řetězcové hodnoty. Blíže viz <a href="https://matplotlib.org/stable/tutorials/text/text_props.html" class="external">dokumentace</a>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id11" data-title="III – více obrázků v jednom"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">III – více obrázků v jednom</h2></div><div class="section-body">
+
+    <p>
+        Jednotlivé výstupní obrázky je také možno rozdělit na (obdélníkovou) síť a umísťovat grafy na konkrétní místo metodou <em>subplot(ŘÁDKŮ, SLOUPCŮ, ČísloBuňky)</em>, jak ukazuje následující příklad mírně upravený <a href="http://matplotlib.org/examples/subplots_axes_and_figures/subplot_demo.html" class="external">podle dokumentace</a>:
+    </p>
+    <img src="_files/matplotlib/example_subplot.png" width="50%" height="50%" alt="example_subplot.py">
+    <example lang="python" src="_files/matplotlib/example_subplot.py"></example>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Nejzajímavější novinkou v tomto kódu je umístění dvou grafů do jednoho výstupního obrázku pomocí metody <em>subplot()</em>. K ní jedno upozornění – dá se zavolat i poněkud šíleným zkráceným způsobem bez čárek mezi parametry, zde tedy jako <em>subplot(211)</em> a <em>subplot(212)</em> 0_o
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Další novinkou je doplnění grafu o spojnicovou čáru mezi body použitím parametrů plotu <code>yo-</code>, resp. <code>r.-</code>.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Jinak uvedený graf používá pro výpočet požadovaných hodnot knihovnu <a href="/materialy/python/numpy/overview.xml">NumPy</a> (která zjevně zvládá mimo jiné i výpočet celé množiny hodnot najednou jedním příkazem), ale to je další obrovská kapitola sama pro sebe.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id12" data-title="IVa – více os (kopie)"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">IVa – více os (kopie)</h2></div><div class="section-body">
+
+    <p>
+        Někdy se může hodit zopakovat osu s popiskami i na druhé straně grafu. Je pak ale třeba příslušné dvě osy řešit přímo na podčásti grafu věnované osám, proto ono volání <code>plt.subplots()</code> v následujícím kódu:
+    </p>
+    <img src="_files/matplotlib/plot-05a.png" width="50%" height="50%" alt="plot-05a.py">
+    <example lang="python" src="_files/matplotlib/plot-05a.py"></example>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Čistě teoreticky stačí na zobrazení osy jen samotné volání <code>secondary_xaxis()</code>, ale popisky jsou pak <a href="?slajd=8">nevyhovující</a>.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Kdo ví proč mají všechny metody pro nastavení popisek u sebe předponu <em>set_</em>, ačkoli se jinak jmenují stejně (a dělají prakticky totéž) jako metody přímo na grafu.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id13" data-title="IVb – více os (změna měřítka)"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">IVb – více os (změna měřítka)</h2></div><div class="section-body">
+
+    <p>
+        A ještě jindy má zopakovaná osa význam v tom, že na ní můžeme třeba uvést údaje v jiných jednotkách:
+    </p>
+    <img src="_files/matplotlib/plot-05b.png" width="50%" height="50%" alt="plot-05b.py">
+    <example lang="python" src="_files/matplotlib/plot-05b.py"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Čistě teoreticky by to mělo jít i pomocí druhého konverzního parametru <em>functions</em>, nějak jako..
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            def deg2rad(x):
+                return x * np.pi / 180
+
+            def rad2deg(x):
+                return x * 180 / np.pi
+
+            osax2 = osy.secondary_xaxis('top', functions=(rad2deg, deg2rad))
+        </pre>
+        ..nicméně s pozměněnými popiskami prvotní osy jsem chování této úpravy ve svém věku již jaksi nelousknul… (A <a href="https://matplotlib.org/stable/gallery/subplots_axes_and_figures/secondary_axis.html" class="external">oficiální příklad</a> nepomohl.)
+    </div></div>
+
+</div></section><section class="slide-section" id="id14" data-title="V – časová osa"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">V – časová osa</h2></div><div class="section-body">
+
+    <p>
+        Jednou ze silných stránek <em>matplotlib</em>'u je velmi dobrá podpora zobrazování grafů s údajem o datu či čase:
+    </p>
+    <img src="_files/matplotlib/example_time.png" width="50%" height="50%" alt="example_subplot.py">
+    <example lang="python" src="_files/matplotlib/example_time.py"></example>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Údaje o datumu se zadávají třeba přímo jako pythoní objekt <em>datetime</em>. Interně je <em>matplotlib</em> přepočítá na počet dní od začátku letopočtu (plus minus nějaká ta chyba podle kalendáře), který použije jako číslo pro umístění bodu. Pro zájemce více viz metoda <em>matplotlib.strpdate2num()</em>.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Údaj o magnitudě si <em>matplotlib</em> ve dvojkové verzi ještě dokázal naparsovat z řetězce do reálného čísla sám, ale trojková verze vyžaduje explicitní přetypování (asi v duchu trojkového Python'u, protože na dvojkovém už neběží).
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Stejně tak mu nevadí pořadí údajů v datech – jen jich musí být stejný počet a x-ová a y-ová data na stejných místech si musí odpovídat.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Popisky zemětřesení (pouze dvě jsou k dispozici) byly umístěny relativně vůči bodu (<em>textcoords='offset points'</em>), posunutí (<em>xytext</em>) bylo trefeno zkusmo.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Popisky osy <em>x</em> jsou také nagenerovány přímo z pythoního objektu pro datum.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id15" data-title="VI – histogram"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">VI – histogram</h2></div><div class="section-body">
+
+    <p>
+        Matplotlib umí i histogramy, zde je příklad upravený ze <a href="http://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.hist" class="external">staré a nové dokumentace</a>:
+    </p>
+    <img src="_files/matplotlib/example_histogram.png" width="50%" height="50%" alt="example_histogram.py">
+    <example lang="python" src="_files/matplotlib/example_histogram.py"></example>
+
+</div></section><section class="slide-section" id="id16" data-title="VII – pokročilé funkce"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">VII – pokročilé funkce</h2></div><div class="section-body">
+
+    <p>
+        Ukažme si ještě jeden (upravený) <a href="http://matplotlib.org/examples/showcase/integral_demo.html" class="external">demo-příklad z dokumentace</a>:
+    </p>
+    <img src="_files/matplotlib/showcase_integral.png" width="50%" height="50%" alt="showcase_integral.py">
+    <example lang="python" src="_files/matplotlib/showcase_integral.py"></example>
+
+</div></section><section class="slide-section" id="id17" data-title="Animace"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">Animace</h2></div><div class="section-body">
+
+    <p>
+        Kromě toho umí matplotlib také animace, ale úvodu do nich jsem věnoval <a href="MatPlotLib_animace.xml">samostatnou přednášku</a>.
+    </p>
+
+</div></section><section class="slide-section" id="id18" data-title="Kam dál?"><div class="section-header"><span class="section-num">18</span><h2 class="section-title">Kam dál?</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Plná dokumentace knihovny <em>matplotlib</em> je <a href="http://matplotlib.org/contents.html" class="external">dostupná na webu</a> i ve variantě PDF a dokonce i jako <a href="http://matplotlib.org/downloads.html" class="external">CHM</a>.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Tak bohužel to CHM už dnes (-2019) není pravda, což je velká škoda.
+    </div></div>
+    <p>
+        Nicméně ač obsahuje skoro vše potřebné, je děsivě nepřehledná. Nejfatálnější její chybou je asi nedokonalá prolinkovanost, takže často budete hledat, na jaké <em>Notes</em> se daný text zrovna odkazuje a podobně, a to už vůbec nemluvím o dohledávání popisu všech parametrů dostupných na třídách a funkcích.
+    </p>
+    
+    <p class="enumerate">
+        Kromě toho najdete hromadu dalších tutoriálů všude po webu, protože <em>matplotlib</em> je opravdu hodně používaný. Pozor ovšem, pro kterou verzi byl tutoriál napsán!
+    </p>
+
+    <p class="enumerate">
+        Nu a především díky jisté „nízkoúrovňovosti“ Matplotlibu je pro Python k dispozici <strong>hromada dalších grafických knihoven</strong>, které sice prakticky všechny na Matplotlibu staví, ale práci s tvorbou grafů výrazně zlidšťují. Jmenujme alespoň <a href="">ggplot</a> a <a href="">Seaborn</a>.
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 18 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

@@ -1,0 +1,409 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>WSGI
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><style>
+    pre.scroll { overflow: scroll; }
+  </style><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — WSGI</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">19</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">WSGI-klient</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">WSGI-klient a WSGI-server</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Proměnné prostředí I</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Proměnné prostředí II</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Získání dat z GETu a POSTu</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">GET I</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">GET II</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">GET III – „urllib.parse.parse_qs()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">POST</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">POST „application/x-www-form-urlencoded“</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">POST „multipart/form-data“ I</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">MIME-zpráva I</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">MIME-zpráva II</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">MIME-zpráva III</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">MIME-zpráva IV</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">POST „multipart/form-data“ II</span></a></li><li class="toc-item"><a class="toc-link" href="#id18"><span class="toc-num">18</span><span class="toc-text">Externí knihovna „multipart“</span></a></li><li class="toc-item"><a class="toc-link" href="#id19"><span class="toc-num">19</span><span class="toc-text">Poznámky</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2023-04-20</span></div><h1 class="lecture-title">WSGI</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        WSGI (= <em>Web Server Gateway Interface</em>) je pythonovský standard (definovaný v <a class="external" href="http://python.org/dev/peps/pep-3333/">PEP 3333</a>) pro komunikaci mezi serverem a klientem.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Přičemž uvedená rozhraní mohou být libovolně zřetězena, takže vnitřní části řetězce (tzv. <em>middleware</em>) fungují na jednu stranu jako server a na druhou jako klient.
+    </div></div>
+    <p>
+        Běžného uživatele nemusí prakticky vůbec zajímat, protože se s nimi setká pouze v podobě již hotových frejmworků (např. servrová část <em>mod_wsgi</em> pro Apache a klientský balík <em>Django</em>), ale jelikož ne vždy je potřeba jít s kanónem na komára a navíc je ve standardní instalaci Python'u referenční implementace, stojí za to se se základy WSGI seznámit.
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="WSGI-klient"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">WSGI-klient</h2></div><div class="section-body">
+
+    <p>
+        Okomentovaná jednoduchá WSGI-aplikace vracející obligátní <em>„Ahoj, světe!“</em> by tak mohla vypadat třeba takto:
+    </p>
+    <example lang="python" src="_files/wsgi.0.py"></example>
+    <ul>
+        <li>
+            WSGI-standard předepisuje pouze to, že klient je <strong>volatelný objekt s <a href="/materialy/python/functions/decorators.xml?slajd=10"><em>otiskem</em></a></strong> <code>(environ, start_response)</code>, kde první poziční parametr přebírá nastavení prostředí a druhý dostane od serveru odkaz na volatelný objekt, který zahájí odpověď.
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Jméno volatelného objektu aplikace (zde funkce) v podobě <em>application</em> vyžaduje pouze <em>mod_wsgi</em> pro servery Apache, u ostatních si můžete wsgi-aplikaci pojmenovat podle libosti. Podobně jména obou pozičních argumentů mohou být zcela libovolná.
+            </div></div>
+        </li>
+        <li>
+            Vlastní tělo zprávy je v rámci HTTP posíláno jako bajty. (Což bylo v Python'u 2.x víceméně výchozí chování řetězců…)
+        </li>
+        <li>
+            Uvedené dvě hlavičky HTTP-odpovědi jsou asi rozumné minimum, které byste měli posílat – bez typu není zaručené, jak se poslaná data zobrazí, a bez délky není možné znát stav přijímání dat.
+        </li>
+        <li>
+            Hlavičky spolu s textem HTTP-stavu poslouží k zahájení přenosu odpovědi na dotaz zavoláním volatelného objektu <em>start_response</em>, který nám poskytl server.
+        </li>
+        <li>
+            Vlastní tělo odpovědi je posíláno po jednotlivých prvcích iterovatelného objektu – proto i obyčejný (bajtový) řetězec budete chtít poslat právě takto, jinak se bude odesílat po jednotlivých bajtech (pokud to vůbec projde – v Python'u 3.2 nikoli).
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id3" data-title="WSGI-klient a WSGI-server"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">WSGI-klient a WSGI-server</h2></div><div class="section-body">
+
+    <p>
+        Jelikož Python obsahuje referenční implementaci WSGI, můžeme si zároveň pustit i server:
+    </p>
+    <example lang="python" src="_files/wsgi.1.py"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Metoda <em>handle_request()</em> zajistí, že server počká pouze na jeden dotaz, který vyřídí, a po něm se ukončí. Chcete-li, aby server běžel neustále (dokud ho „nezabijete“ nebo nespadne), použijte místo ní metodu <em>serve_forever()</em>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id4" data-title="Proměnné prostředí I"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Proměnné prostředí I</h2></div><div class="section-body">
+
+    <p>
+        <strong>Proměnné prostředí</strong> si můžeme vypsat například takto:
+    </p>
+    <example lang="python" src="_files/wsgi.2.py"></example>
+
+</div></section><section class="slide-section" id="id5" data-title="Proměnné prostředí II"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Proměnné prostředí II</h2></div><div class="section-body">
+
+    <p>
+        Kromě úplně obecných systémových proměnných prostředí (jako je třebas <code>PATH</code>, <code>JAVA_HOME</code>, <code>CLASSPATH</code>, <code>PROMPT</code>, <code>TEMP</code>, <code>TMP</code> a podobné) se ve slovníku <em>environ</em> nachází především následující důležité hlavičky HTTP-dotazu:
+    </p>
+    <ul>
+        <li>
+            <code>REQUEST_METHOD</code> – typ HTTP-dotazu
+        </li>
+        <li>
+            <code>PATH_INFO</code> – adresa/cesta HTTP-dotazu (začíná na znak <code>/</code>!)
+        </li>
+        <li>
+            <code>QUERY_STRING</code> – datová část URL (tedy ten řetězec za znakem <code>?</code>) při dotazech typu <code>GET</code> a jemu odpovídajících
+        </li>
+        <li>
+            <code>CONTENT_LENGTH</code> – počet bajtů těla HTTP-dotazu (pro dotaz typu <code>GET</code> je prázdná!)
+        </li>
+        <li>
+            <code>CONTENT_TYPE</code> – MIME-typ předávaných dat
+        </li>
+        <li>
+            <code>HTTP_*</code> – sada hlaviček přímo z protokolu HTTP (např. aktuální „sušenky“ <code>HTTP_COOKIE</code>)
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+<pre class="scroll">HTTP_ACCEPT: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+HTTP_ACCEPT_ENCODING: gzip, deflate
+HTTP_ACCEPT_LANGUAGE: en-US,en;q=0.5
+HTTP_CACHE_CONTROL: no-cache
+HTTP_CONNECTION: keep-alive
+HTTP_COOKIE: csrftoken=8ed7fccc4353a3f30bfdac32b928b2b8; sessionid=0354edf546a74cf98d353cfb2b07f851
+HTTP_DNT: 1
+HTTP_HOST: localhost:8080
+HTTP_PRAGMA: no-cache
+HTTP_USER_AGENT: Mozilla/5.0 (Windows NT 5.1; rv:20.0) Gecko/20100101 Firefox/20.0 </pre>
+            </div></div>
+        </li>
+        <li>
+            <code>wsgi.*</code> – hlavičky specifické pro WSGI (obzvláště tělo HTTP-dotazu při <em>POST</em>u <code>wsgi.input</code>)
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+<pre>wsgi.errors: &lt;_io.TextIOWrapper name='&lt;stderr&gt;' mode='w' encoding='utf_8'&gt;
+wsgi.file_wrapper: &lt;class 'wsgiref.util.FileWrapper'&gt;
+wsgi.input: &lt;_io.BufferedReader name=1608&gt;
+wsgi.multiprocess: False
+wsgi.multithread: True
+wsgi.run_once: False
+wsgi.url_scheme: http
+wsgi.version: (1, 0) </pre>
+            </div></div>
+        </li>
+        <li>
+            a další hlavičky serveru a komunikace s ním
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+<pre>GATEWAY_INTERFACE: CGI/1.1
+REMOTE_ADDR: 127.0.0.1
+REMOTE_HOST: localhost
+SERVER_NAME: localhost
+SERVER_PORT: 8080
+SERVER_PROTOCOL: HTTP/1.1
+SERVER_SOFTWARE: WSGIServer/0.2 </pre>
+            </div></div>
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id6" data-title="Získání dat z GETu a POSTu"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Získání dat z GETu a POSTu</h2></div><div class="section-body">
+    
+    <p>
+        Z přednášky o <a href="/materialy/net/http.xml">protokolu HTTP</a> si možná pamatujete, že <strong>dotaz obsahující i data</strong> se dá poslat (v zásadě) dvěma rozdílnými způsoby:
+    </p>
+    <ul>
+        <li>
+            <a href="?slajd=7">metodou <code>GET</code></a> jako součást URL za znakem <code>?</code>
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Což má na jednu stranu tu výhodu, že je můžete snadno konstruovat ručně, můžete si je uložit do záložek a jsou schovány v historii prohlížení, ale na druhou stranu tu nevýhodu, že jsou volně viditelná úplně každému plus je dosti omezená jejich velikost (bývalo bratru kolem 250 znaků, v podstatě staré omezení délky cest na Windows, ale dnes už to často dá i opravdu hodně, například v podobě <a href="https://en.wikipedia.org/wiki/Data_URI_scheme" class="external"><em>data URI</em></a>, nicméně netřeba to přehánět) a binární data musí být překódována do znaků.
+            </div></div>
+        </li>
+        <li>
+            <a href="?slajd=10">metodou <code>POST</code></a> jako součást těla dotazu
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Výhody jsou asi jasné – poslat se dá prakticky cokoliv v jakémkoliv (rozumném) množství a nikdo to nevidí a nedostane se k tomu, pokud je komunikace šifrovaná. S hlavní nevýhodou už jste se asi někdy potkali také – vrácení se v historii na stránku s formulářem si může vyžádat jeho znovuodeslání a někdy to skončí nechtěnými duplikáty dat v aplikaci.
+            </div></div>
+        </li>
+    </ul>
+    <p>
+        Začneme GETem, protože je výrazně jednodušší :-)
+    </p>
+    
+</div></section><section class="slide-section" id="id7" data-title="GET I"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">GET I</h2></div><div class="section-body">
+
+    <p>
+        Hodnota (tedy <strong>řetězec</strong>!) dotazu GET se na straně serveru objeví jako proměnná prostředí <strong>QUERY_STRING</strong>. Konkrétně:
+    </p>
+    <ul>
+        <li>
+            <pre>http://localhost:8080/?Ahoj, světe!</pre>
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Kterýžto dotaz prohlížeč automaticky zakóduje do podoby <code>Ahoj,%20světe!</code>. (Kdybyste to zkoušeli o pár let dříve, asi by tam místo <code>%20</code> bylo <code>+</code> nebo by tam ta mezera možná i zůstala.)
+            </div></div>
+            ⇒
+            <pre>QUERY_STRING: Ahoj,%20sv%C4%9Bte!</pre>
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Pro potřeby komunikace se serverem došlo tedy k dalšímu zakódování do ASCII-podoby – k mezeře přibylo ještě písmeno <em>ě</em> (zde zakódováno v UTF-8). URL (nebo <a href="/materialy/net/http.xml?slajd=13">URI obecně</a>) totiž musí být pouze ASCII.
+            </div></div>
+        </li>
+        <li>
+            <pre>http://localhost:8080/?par1=ahoj&amp;par2=123&amp;par1=456</pre>
+            ⇒
+            <pre>QUERY_STRING: par1=ahoj&amp;par2=123&amp;par1=456</pre>
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Nedošlo tedy k žádnému automagickému rozložení dotazu na klíče a hodnoty, vše zůstává nadále jedním řetězcem!
+            </div></div>
+        </li>
+    </ul>
+    <p>
+    </p>
+
+</div></section><section class="slide-section" id="id8" data-title="GET II"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">GET II</h2></div><div class="section-body">
+
+    <p>
+        Z <a href="?slajd=7">předchozího</a> je vidět, že co se v rámci GETu pošle, to na server dorazí, nanejvýš se neASCII-hodnoty (plus vybrané ASCII, jako např. mezera) zakódují pomocí vybrané podmnožiny ASCII (tzv. <a href="https://en.wikipedia.org/wiki/URL_encoding" class="external"><em>URL encoding</em></a>). Pravda, podoba slovníků (za pomoci znaků <code>=</code> a <code>&amp;</code>) je nejčastější a třebas vývojářské nástroje prohlížečů ji v podobě tzv. <em>payload</em>u automaticky rozkládají na dvojice klíč-hodnota.
+    </p>
+    <p>
+        Existuje tudíž mnoho způsobů, jak z <em>query-string</em>u dostat jednotlivé údaje (v podstatě závisí na tom, co aplikace očekává a chce dostat). Pro všechny však platí základní bezpečnostní pravidlo:
+    </p>
+    <h1>Nikdy nevěřte uživatelskému vstupu!</h1>
+    <p>
+        Jinak vám zlý uživatel předhodí kus kódu, který při troše smůly provede v systému ultimátní paseku...
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Vaše servrové API totiž může zavolat kdokoli odkudkoli a s jakýmikoliv údaji, takže spoléhat na to, že do aplikace „přiteče“ pouze to, s čím jste počítali, je do nebe volající hloupost.
+    </div></div>
+    
+
+</div></section><section class="slide-section" id="id9" data-title="GET III – „urllib.parse.parse_qs()“"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">GET III – „urllib.parse.parse_qs()“</h2></div><div class="section-body">
+
+    <p>
+        Pro získání „slovníkových“ hodnot z GETu je přímo určena metoda <em>parse_qs()</em> z modulu <em>urllib.parse</em>. Mimo jiné si poradí třebas i s rozložením více hodnot ke stejným klíčům:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">http://localhost:8080/?par1=ahoj&amp;par2=123&amp;par1=456</pre></div><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/wsgi.3.py"><em>wsgi.3.py</em></a></div><example src="_files/wsgi.3.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/wsgi.3.out" lang="text"></example></div></div>
+    <p>
+        PS: Nezapomeňte však, že <strong>takto získané hodnoty jsou stále neošetřeny!</strong>
+    </p>
+
+</div></section><section class="slide-section" id="id10" data-title="POST"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">POST</h2></div><div class="section-body">
+
+    <p>
+        Data odeslaná metodou <em>POST</em> jsou také dostupná v rámci <em>environ</em>, ale na jiném místě – uvnitř objektu <em>wsgi.input</em>, který se tváří jako binární proud. <strong>Data v tomto proudu však mohou míti úplně rozdílnou strukturu podle toho, jakým způsobem byl formulář odeslán.</strong> Konkrétně podle toho jakou hodnotu má atribut <code>@enctype</code> elementu <code>&lt;form&gt;</code> (či s jakými hlavičkami poslal dotaz jiný původce):
+    </p>
+    <ul>
+        <li>
+            <em>application/x-www-form-urlencoded</em> – výchozí nastavení, při němž data z formuláře dorazí ve stejné podobě jako při dotazu GET, akorát v binární podobě (tedy jako <code>b''</code> a ne jako <code>''</code>);
+        </li>
+        <li>
+            <em>multipart/form-data</em> – pokud formulář obsahuje alespoň jeden element typu <code>&lt;input type="file"&gt;</code>, jsou zadaná data odeslána ve strukturované podobě tzv. <a href="?slajd=13">MIME-dokumentu</a>;
+        </li>
+        <li>
+            <em>text/plain</em> – běžně používané pouze pro ladění.
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                V podstatě je to jako getový POST (<em>application/x-www-form-urlencoded</em>), jen tam nejsou ampersandy <em>&amp;</em> a každá dvojce <em>parametr=hodnota</em> je na samostatné řádce (oddělovačem je <code>\r\n</code>)
+            </div></div>
+        </li>
+    </ul>
+    <p>
+        K jejich extrakci se v rámci standardní pythoní knihovny léta letoucí používal objekt <a href="cgi.xml"><code>FieldStorage()</code></a> z modulu <em>cgi</em>, který však má býti v Python'u 3.13 vyřazen<sup>*</sup>. Oficiální knihovní náhradou – a to ještě jenom za část jeho funkcionality! – jest modul <em>email</em> (sic!), protože v rámci zpracování pošty pochopitelně implementuje obsluhu MIME-dokumentů.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        <sup>*</sup> A také se tak opravdu stalo…
+    </div></div>
+
+</div></section><section class="slide-section" id="id11" data-title="POST „application/x-www-form-urlencoded“"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">POST „application/x-www-form-urlencoded“</h2></div><div class="section-body">
+    
+    <p>
+        Pro formuláře bez binárních dat se nám oproti GETu kód zesložití o získání dat z umístění <em>wsgi.input</em>. Je třeba si pamatovat, že <strong>podle standardu WSGI metoda <code>read()</code> na proudu musí dostat přesný počet bajtů k načtení!</strong> Ty zjistíte z odpovídající HTTP-hlavičky <code>environ['CONTENT_LENGTH']</code>:
+    </p>
+    <example src="_files/wsgi.4.py" lang="python"></example>
+    <p>
+        PS: Objekt <code>Message</code> je označený jako <em>legacy</em>, takže by v kódu měl být použitý spíš <code>EmailMessage</code>, který má na spoustu věcí samozřejmě jiné metody. Ale za prvé to u formuláře zní fakt divně a za druhé je celý balík <em>email</em> stejně (pořád) v nějakém rozpracovaném stavu.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Pokud víte, že ve vašem formuláři se budou vyskytovat pouze „rozumná“ jména a hodnoty, můžete bajtový řetězec vrácený z proměnné prostředí <em>wsgi.input</em> prostě převést na obyčejný řetězec (<code>decode()</code>) a ten nechat <a href="?slajd=9">zpracovat funkcí <code>parse_qs()</code> stejně jako u GETu</a>. Ale je asi jasné, že to je kapku nekonformní řešení.
+    </div></div>
+    
+</div></section><section class="slide-section" id="id12" data-title="POST „multipart/form-data“ I"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">POST „multipart/form-data“ I</h2></div><div class="section-body">
+    
+    <p>
+        Obsahuje-li formulář komunikující se serverem alespoň jeden element <code>&lt;input type="file"&gt;</code>, budou data odeslána v podobě těla dokumentu <em>MIME</em>. Než z něj budeme data tahat ven, podíváme se, jak vlastně vypadá.
+    </p>
+    <p>
+        Kód níže při plném vyplnění formuláře..
+    </p>
+    <example src="_files/wsgi.5.py" lang="python"></example>
+    <p>
+        ..vyprodukuju následující (binární) data:
+    </p>
+    <example src="_files/wsgi.5.out" lang="text"></example>
+
+</div></section><section class="slide-section" id="id13" data-title="MIME-zpráva I"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">MIME-zpráva I</h2></div><div class="section-body">
+    
+    <p>
+        To pochopitelně nebylo moc čitelné, ale jelikož jde z větší části o text, můžeme si ho pro přehlednost trochu pozalamovat (podle <code>\r\n</code>; ne samozřejmě v binárních datech obrázku):
+    </p>
+    <pre class="brush: text; gutter: false; toolbar: false; ">
+b'-----------------------------123504625239007772824141014506
+  Content-Disposition: form-data; name="jmeno"
+
+  Alisa
+  -----------------------------123504625239007772824141014506
+  Content-Disposition: form-data; name="jazyky"
+
+  eng
+  -----------------------------123504625239007772824141014506
+  Content-Disposition: form-data; name="jazyky"
+
+  rus
+  -----------------------------123504625239007772824141014506
+  Content-Disposition: form-data; name="jazyky"
+
+  jap
+  -----------------------------123504625239007772824141014506
+  Content-Disposition: form-data; name="soubor"; filename="sachovnice.png"
+  Content-Type: image/png
+
+  \x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x03\x00\x00\x00\x03\x08\x02\x00\x00\x00\xd9J"\xe8\x00\x00\x00\x1cIDATx\x9c%\xc3\xb1\r\x00\x00\x0c\xc3 &gt;\xcf\xe9\xeeP$\x84_m\x83\x92\xd4\x01\xb4\xd2\rr\xa6|\xffu\x00\x00\x00\x00IEND\xaeB`\x82
+  -----------------------------123504625239007772824141014506--
+'
+    </pre>
+    
+</div></section><section class="slide-section" id="id14" data-title="MIME-zpráva II"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">MIME-zpráva II</h2></div><div class="section-body">
+    
+    <p>
+        Vidíme, že jednotlivé části formuláře jsou od sebe odděleny oddělovacím řetězcem, v našem případě tímto:
+    </p>
+    <pre>---------------------------123504625239007772824141014506</pre>
+    <p>
+        Pozor – pro zmatení nepřítele <strong>je v tomto případě <em>oddělovací řetězec</em> o dvě mínuska kratší</strong>! Ta první dvě mínuska <code>--</code> totiž ukončují<sup>*</sup> každou část zprávy. Oddělovací řetězec (<em> encapsulation boundary</em>) se jinak pro každou zprávu generuje nový a nemusí vypadat nutně zrovna takhle zmatečně (ani dlouze) ^_^
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        <sup>*</sup> Nebo – dohromady s předchozím odřádkováním – začínají. Pro podrobnosti viz <a href="https://www.w3.org/Protocols/rfc1341/7_2_Multipart.html" class="external">RFC1341</a>.
+    </div></div>
+    <p>
+        Po něm následují hlavičky příslušné části, např. obrázek má hned dvě:
+    </p>
+    <pre>Content-Disposition: form-data; name="soubor"; filename="sachovnice.png"
+Content-Type: image/png</pre>
+    <p>
+        Po hlavičkách je jeden prázdný řádek (vzpomeňte si na <a href="/materialy/net/http.xml">komunikaci protokolem HTTP</a>) a po něm konečně data příslušné části zprávy.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        A binární data jsou pochopitelně zakódována do podoby vhodné pro přenos v textu.
+    </div></div>
+    <p>
+        Konec poznáte tak, že po posledním oddělovacím řetězci následuje sekvence <code>b'--\r\n'</code>, tedy (obligátní) dvě mínuska označující konec aktuální části zprávy a odřádkování, a pak už nic dalšího.
+    </p>
+    
+</div></section><section class="slide-section" id="id15" data-title="MIME-zpráva III"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">MIME-zpráva III</h2></div><div class="section-body">
+    
+    <p>
+        Drobným problémkem je, že tato MIME-zpráva obsahuje několik částí, ale není tak označena. V použitelné podobě by měla vypadat třebas takto (opět pro přehlednost textově pozalamováno):
+    </p>
+    <pre class="brush: text; gutter: false; toolbar: false; ">
+b'Content-Type: multipart/form-data; boundary=---------------------------123504625239007772824141014506
+
+  -----------------------------123504625239007772824141014506
+  Content-Disposition: form-data; name="jmeno"
+
+  Alisa
+  -----------------------------123504625239007772824141014506
+  Content-Disposition: form-data; name="jazyky"
+
+  eng
+  -----------------------------123504625239007772824141014506
+  Content-Disposition: form-data; name="jazyky"
+
+  rus
+  -----------------------------123504625239007772824141014506
+  Content-Disposition: form-data; name="jazyky"
+
+  jap
+  -----------------------------123504625239007772824141014506
+  Content-Disposition: form-data; name="soubor"; filename="sachovnice.png"
+  Content-Type: image/png
+
+  \x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x03\x00\x00\x00\x03\x08\x02\x00\x00\x00\xd9J"\xe8\x00\x00\x00\x1cIDATx\x9c%\xc3\xb1\r\x00\x00\x0c\xc3 &gt;\xcf\xe9\xeeP$\x84_m\x83\x92\xd4\x01\xb4\xd2\rr\xa6|\xffu\x00\x00\x00\x00IEND\xaeB`\x82
+  -----------------------------123504625239007772824141014506--
+'
+    </pre>
+    <p>
+        K datům z POSTu tedy potřebujeme přidat (jakžtakž) správnou hlavičku<sup>*</sup>, tedy alespoň označení typu <em>multipart/form-data</em> a aktuální oddělovací řetězec.
+    </p>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            <sup>*</sup> „Validní“ MIME-dokument podle <a href="https://datatracker.ietf.org/doc/html/rfc2045.html" class="external">RFC2045</a> by měl v hlavičce ještě správně obsahovat i (první) řádku <code>MIME-Version: 1.0</code>, ale k dalšímu zpracování modulem <em>email</em> není potřeba.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            PS: Všimněte si opět prázdné řádky po hlavičce. Ve skutečnosti jsou příslušná RFC poměrně vágní a před první částí a za poslední částí může být nějaký další text, který však MIME-procesory není běžně ukazován. V Python'u máte možnost se k němu dostat přes parametry zprávy <em>preamble</em> a <em>epilogue</em>.
+        </div></div></div>
+    
+</div></section><section class="slide-section" id="id16" data-title="MIME-zpráva IV"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">MIME-zpráva IV</h2></div><div class="section-body">
+    
+    <p>
+        Že už je takto MIME-zpráva funkční, si můžete snadno ověřit následujícím kódem pro výpis jejích částí:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/mime.2.py"><em>mime.2.py</em></a></div><example src="_files/mime.2.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/mime.2.out" lang="text"></example></div></div>
+    
+</div></section><section class="slide-section" id="id17" data-title="POST „multipart/form-data“ II"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">POST „multipart/form-data“ II</h2></div><div class="section-body">
+    
+    <p>
+        Po takovéto úpravě je možno již POST-zprávu z formuláře možno rozkódovat nástroji z modulu <em>email</em>:
+    </p>
+    <example src="_files/wsgi.6.py" lang="python"></example>
+    
+</div></section><section class="slide-section" id="id18" data-title="Externí knihovna „multipart“"><div class="section-header"><span class="section-num">18</span><h2 class="section-title">Externí knihovna „multipart“</h2></div><div class="section-body">
+
+    <p>
+        Nevím jak vám, ale mně se teda tahle „náhrada“ za <a href="cgi.xml"><code>cgi.FieldStorage()</code></a> od Python'u 3.13 moc nelíbí. Pomocí externí knihovny <a href="https://github.com/defnull/multipart" class="external"><em>multipart</em></a> je kód pro zprávy typu <em>multipart/form-data</em> totiž MNOHEM jednodušší:
+    </p>
+    <example src="_files/multipart_example.py" lang="python"></example>
+    <p>
+        I filozoficky je to vlastně úplná náhrada za <code>cgi.FieldStorage()</code> – na získání dat stačí jediná metoda (<code>parse_form_data()</code>) a získané objekty opět nejsou úplně standardní (instance velmi pozměněného slovníku <code>MultiDict</code> a v případě souborů je klíči odpovídající hodnotou instance <code>MultipartPart</code> zase se svými atributy).
+    </p>
+
+</div></section><section class="slide-section" id="id19" data-title="Poznámky"><div class="section-header"><span class="section-num">19</span><h2 class="section-title">Poznámky</h2></div><div class="section-body">
+
+    <ul>
+        <li>
+            Bývá zvykem hlavní vstupní bod WSGI-aplikace – přestože to je pythoní skript – pojmenovat s koncovkou <em>wsgi</em>.
+        </li>
+        <li>
+            Kompletní aplikace by se samozřejmě musela – kromě jiného – postarat o zjištění a zaslání správných návratových kódů, došlo-li by k nějaké chybě, vyčištění uživatelských vstupů (opět – nezapomeňte, že vaše API může většinou volat kdokoli odkudkoli a jakkoli) a jejich správné zpracování (typicky správně vyplněný formulář je většinou nahrazen jinou stránkou) a spoustu dalších věcí.
+        </li>
+        <li>
+            „Startovací funkci“ odpovědi můžete poslat ještě třetí poziční (nepovinný) parametr, který slouží k předání hlášení o chybě. Volání pak vypadá asi následovně: <code>start_response(STATUS, HEADERS, sys.exc_info())</code>
+        </li>
+    </ul>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 19 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

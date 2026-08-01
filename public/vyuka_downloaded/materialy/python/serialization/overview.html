@@ -1,0 +1,73 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Serializace pyhonovských dat/struktur
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Serializace pyhonovských dat/struktur</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">4</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Motivace</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Řešení</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Dostupné serializační nástroje</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Veledůležitá poznámka</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2011-04-07</span></div><h1 class="lecture-title">Serializace pyhonovských dat/struktur</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Motivace"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Motivace</h2></div><div class="section-body">
+
+  <p>
+    Práce s textovými a binárními daty je denní chleba programátora. Ale co kdybyste chtěli totéž spáchat například s datovými strukturami Python'u? Například proto, že:
+  </p>
+  <ul>
+    <li>
+        provádíte složitý a dlouhý výpočet a průběžně ukládat data v nějakém binárním nebo textovém formátu, který byste při ukládání a načítání museli „přeložit“ z a do pracovní podoby, by představovalo zbytečnou (a třeba i velkou) penalizaci;
+    </li>
+    <li>
+        nechcete ukládat na disk (nebo třeba posílat po síti) průběh hry v nějakém snadno čitelném tvaru, ale přitom chcete zachovat snadnou práci s ním (na úrovni datových struktur jazyka);
+    </li>
+    <li>
+        z nejrůznějších jiných důvodů si potřebujete uložit pro pozdější analýzu aktuální stav některých datových struktur…
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id2" data-title="Řešení"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Řešení</h2></div><div class="section-body">
+
+    <p>
+        Vzhledem k tomu, že Python obsahuje nesmírně užitečnou, ale ruku v ruce s tím <strong>extrémně nebezpečnou</strong> funkci <em>eval()</em>, mohl by si nakonec každý, kdo by potřeboval nějaký kus pythoního programu zaserializovat, napsat serializační nástroje pracující na úrovni textových řetězců sám.
+    </p>
+    <p>
+        Ale jelikož se jedná o úlohu alespoň v některých oblastech poměrně častou, jsou v Python'u k dispozici i nástroje, které to dělají za nás. Navíc nepracují (alespoň ne ve výchozím stavu) na potenciálně snadno zranitelném textovém základu, ale používají pro zaznamenání zvolených dat binární formáty.
+    </p>
+    <p>
+        Jejich společným rysem je, že dokážou vzít prakticky libovolnou vstupní pythonovskou strukturu (především datovou, ale i celé programy) a zaznamenat ji pro pozdější použití, nejčastěji do externího souboru v jistém binárním formátu.
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Dostupné serializační nástroje"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Dostupné serializační nástroje</h2></div><div class="section-body">
+
+    <p>
+        Python nabízí v zásadě tři základní nástroje pro serializaci dat:
+    </p>
+    <ul>
+        <li>
+            modul <a href="/materialy/python/serialization/pickle.xml"><code>pickle</code></a> – zvládá uložit a načíst téměř libovolnou (nejen) datovou strukturu Python'u
+        </li>
+        <li>
+            modul <a href="/materialy/python/serialization/shelve.xml"><code>shelve</code></a> – za pomoci modulu <em>pickle</em> a databázového nástroje na pozadí poskytuje vlastně perzistentní slovník (tj. piklí datové struktury a ukládá je jako hodnoty slovníku, který je realizován nejčastěji databázovým souborem na souborovém systému)
+        </li>
+        <li>
+            modul <a href="/materialy/python/serialization/marshal.xml"><code>marshal</code></a> – určen prakticky jen a pouze pro čtení a zápis pseudozkompilovaných souborů <em>*.pyc</em>
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id4" data-title="Veledůležitá poznámka"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Veledůležitá poznámka</h2></div><div class="section-body">
+
+    <p>
+        Při práci se serializačními nástroji vždy mějte na paměti, že ani piklící formát modulů <em>pickle</em> a <em>shelve</em>, ani maršalovací formát modulu <em>marshal</em> není nijak zabezpečen proti nebezpečným datům =&gt;
+    </p>
+    <h1 class="security">Nikdy přímo neotvírejte cizí data!</h1>
+    <p>
+        Jinak se vám může snadno stát, že si do systému pustíte trojského koně…
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 4 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

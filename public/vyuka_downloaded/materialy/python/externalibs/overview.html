@@ -1,0 +1,112 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>„Foreign Functions Interface“
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — „Foreign Functions Interface“</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">6</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Knihovny (nejen) v jazyce C/C++</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Příklad</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Poznámky</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Srovnání rychlosti</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Knihovny v jiných jazycích</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2013-05-01</span></div><h1 class="lecture-title">„Foreign Functions Interface“</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Python umožňuje poměrně snadno volat funkce ve sdílených knihovnách. Principiálně můžete buď načíst najednou prakticky všechny systémové knihovny nebo libovolnou konkrétní vybranou, samozřejmě pak i nesystémovou. Toho se často užívá pro přímý přístup k vybraným funkcím systému z Python'u nebo například pro přepis časově kritických operací v nějakém rychlejším jazyce.
+    </p>
+    <p>
+        Python pro tyto účely poskytuje modul <a href="ctypes_basics.xml"><code>ctypes</code></a>, který umožňuje volat externí sdílené knihovny vyhovující standardu jazyka C. Pro jiné jazyky je třeba doplnit odpovídající céčkovský „wrapper“.
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Knihovny (nejen) v jazyce C/C++"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Knihovny (nejen) v jazyce C/C++</h2></div><div class="section-body">
+
+    <p>
+        S externími knihovnami napsanými v jazyce C, respektive C++, je práce nejsnažší, protože Python pro ně poskytuje přímou podporu pomocí modulu <a href="ctypes_basics.xml"><code>ctypes</code></a>. Ten poskytuje datové typy kompatibilní s Céčkem a umožňuje pomocí klasické tečkové notace volat dostupné funkce na externí sdílené knihovně.
+    </p>
+    <p>
+        V praxi tedy stačí napsat požadované části kódu v Céčku, příslušným způsobem je přeložit do podoby sdílené knihovny (<em>shared library</em>), vhodným způsobem tuto knihovnu v rámci Python'u načíst a s takto získaným objektem pracovat, jako kdyby to byl obyčejný pythoní objekt.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Tedy pouze <em>téměř</em>, protože přímo operovat můžeme pouze s typy <code>None</code>, <code>int</code>, <code>bytes</code>, <code>bytearray</code> a <code>string</code> (a u něj to není ve trojkovém Python'u vůbec přímočaré); cokoliv jiného je třeba nejdříve „přetypovat“ vhodným typem z kolekce modulu <em>ctypes</em>.
+    </div></div>
+    
+
+</div></section><section class="slide-section" id="id3" data-title="Příklad"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Příklad</h2></div><div class="section-body">
+
+    <p>
+        Zkusme pro ukázku přesunout do Céčka vykonání dlouhé smyčky <em>while</em>. Zdrojový kód..
+    </p>
+    <example lang="python" src="_files/c_smycka/mylib.c"></example>
+    <p>
+        ..přeložíme do podoby sdílené knihovny např. pomocí příkazu:
+    </p>
+    <pre class="brush: cmd; gutter: false; toolbar: false; ">
+        gcc -O -shared mylib.c -o mylib.dll
+    </pre>
+    <p>
+        Se získaným souborem <em>mylib.dll</em> pak z Python'u můžeme pracovat např. takto:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/c_smycka/test.py"><em>c_smycka/test.py</em></a></div><example src="_files/c_smycka/test.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/c_smycka/test.out" lang="text"></example></div></div>
+
+</div></section><section class="slide-section" id="id4" data-title="Poznámky"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Poznámky</h2></div><div class="section-body">
+
+    <ul>
+        <li>
+            Pod <strong>Windows</strong> je možné odkázat na sdílenou knihovnu <em>relativně vůči umístění skriptu</em>, pod <strong>Linuxem</strong> je však třeba <em>absolutní cesta</em>. Windows naštěstí absolutní cestu zvládnou též, takže principielně postačí nahradit jméno modulu třeba tímto kouskem kódu:
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                os.path.join( os.getcwd(), 'mylib.slib' )
+            </pre>
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">A samozřejmě vybrat knihovnu podle aktuální platformy.</div></div>
+        </li>
+        <li>
+            Podle jazyka, překladače a platformy může – ale také nemusí – býti nutné (nebo jindy přinejmenším vhodné) označit, které funkce budou exportovány vně sdílené knihovny a které jsou určeny pouze pro její vnitřní potřebu.
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Jelikož závisí nejen na jazyce a překladači, ale též i platformě, je v tuto chvíli zpravidla čas uplatnit vhodné makro (pokud je jazyk podporuje), pomocí něhož se daný export pro více funkcí zapíše podstatně snáze.
+            </div></div>
+        </li>
+        <li>
+            Je vřele doporučováno nepokoušet se přenášet a zachytávat výjimky mezi jazyky na obou stranách výše uvedeným způsobem vyrobeného spojení.
+        </li>
+        <li>
+            Názvy exportovaných funkcí mohou být zamanglovány takovým způsobem, že nejde o validní pythoní identifikátory a nemůžete tudíž použít klasickou tečkovou notaci. Vždycky je tady ale možnost použít funkci <code>getattr(KNIHOVNA, "FUNKCE")</code>.
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id5" data-title="Srovnání rychlosti"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Srovnání rychlosti</h2></div><div class="section-body">
+
+    <p>
+        Vyrobme pomocí..
+    </p>
+    <example lang="cmd" src="_files/c_smycka/compile.cmd"></example>
+    <p>
+        ..dvě různě optimalizované verze této smyčky a porovnejme je jak mezi sebou, tak se stejnou smyčkou v čistém Python'u:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/c_smycka/timing.py"><em>c_smycka/timing.py</em></a></div><example src="_files/c_smycka/timing.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/c_smycka/timing.out" lang="text"></example></div></div>
+    <p>
+        Vidíme, že – nepřekvapivě – obě smyčky v Céčku jsou enormně rychlejší než smyčka v Python'u. Pythoní kód je v tomto případě pomalejší než základním způsobem optimalizované Céčko v řádu stonásobků, ale „drsnější“ optimalizace Céčka tento už tak obrovský rozdíl zvýší na doslova propastný v řádu ještě dalších tisícinásobků.
+    </p>
+
+</div></section><section class="slide-section" id="id6" data-title="Knihovny v jiných jazycích"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Knihovny v jiných jazycích</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Některé jazyky umí vyrobit sdílené knihovny s céčkovským rozhraním (<em>interface</em>), ale jejich obsluha z Python'u často nemusí být stejně přímočará jako u Céčkovských knihoven.
+    </p>
+    <p>
+        Mezi takovéto jazyky patří například <em>Ada</em>, kdy je třeba importované moduly pro použití v pythoním skriptu inicializovat pomocí <code>ada_moduleinit()</code> a dalších prostředků.
+    </p>
+    
+    <p class="enumerate">
+        Jiné jazyky sice poskytují sdílené knihovny, ale jejich rozhraní buď nekopíruje kompletně rozhraní knihoven jazyka C nebo vyžaduje pro práci s nimi některé nestandardní prostředky.
+    </p>
+    <p>
+        Mezi takové jazyky patří například <em>Haskell</em> nebo <em>D</em>, které vyžadují slinkování vlastního zdrojového kódu knihovny s „wrapperem“, který doplní požadované rozhraní.
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 6 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

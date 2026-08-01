@@ -1,0 +1,839 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Řetězce
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Řetězce</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">26</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Zavedení řetězce</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Poznámka – možnosti zápisu řetězců</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Uvozovky, apostrofy a speciální znaky</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">„Syrové“ řetězce</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Prázdný řetězec – „''“, „""“ a „str()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Řetězce jako sekvence</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Řetězce jako sekvence – smyčka „for-in“</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Řetězce jako neměnitelné sekvence</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Formátování výstupu – „f''“, „format()“ a „%“</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Formátování výstupu – „center()“, „ljust()“, „rjust()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Analýza obsahu – „isXXX()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Poznámka</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">Analýza obsahu – „count()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">Analýza obsahu – „startswith()“ a „endswith()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">Analýza obsahu – „[r]index()“ a „[r]find()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">Úprava obsahu – velikost písmen („upper()“, „lower()“, …)</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">Úprava obsahu – odstraňování znaků „remove[prefix|suffix]()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id18"><span class="toc-num">18</span><span class="toc-text">Úprava obsahu – odstraňování znaků „[l|r]strip()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id19"><span class="toc-num">19</span><span class="toc-text">Úprava obsahu – záměna znaků „replace()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id20"><span class="toc-num">20</span><span class="toc-text">Úprava obsahu – záměna znaků „translate()“ I</span></a></li><li class="toc-item"><a class="toc-link" href="#id21"><span class="toc-num">21</span><span class="toc-text">Úprava obsahu – záměna znaků „translate()“ II</span></a></li><li class="toc-item"><a class="toc-link" href="#id22"><span class="toc-num">22</span><span class="toc-text">Úprava obsahu – záměna znaků „translate()“ III</span></a></li><li class="toc-item"><a class="toc-link" href="#id23"><span class="toc-num">23</span><span class="toc-text">splitting &amp; joining I</span></a></li><li class="toc-item"><a class="toc-link" href="#id24"><span class="toc-num">24</span><span class="toc-text">splitting &amp; joining II</span></a></li><li class="toc-item"><a class="toc-link" href="#id25"><span class="toc-num">25</span><span class="toc-text">splitting &amp; joining III</span></a></li><li class="toc-item"><a class="toc-link" href="#id26"><span class="toc-num">26</span><span class="toc-text">ord() &amp; chr()</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2011-10-20</span></div><h1 class="lecture-title">Řetězce</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Zavedení řetězce"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Zavedení řetězce</h2></div><div class="section-body">
+
+    <p>
+        Řetězce nejsnadněji zavedeme jako <em>string literal</em> pomocí uvozovek či apostrofů. Platí přitom pravidlo, že pro krátké řetězce na jednu řádku stačí uvozovky jednoduché, pro dlouhé řetězce na řádek více uvozovky trojté:
+    </p>
+    <div class="example-block example-horizontal"><div class="example-col"><div class="example-label">📄 Program: <a href="_files/strings1.py"><em>strings1.py</em></a></div><example src="_files/strings1.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/strings1.out" lang="text"></example></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Všimněte si přenosu zalomení řádku a mezer na začátku pro dvouřádkové ukázky!
+    </div></div>
+
+</div></section><section class="slide-section" id="id2" data-title="Poznámka – možnosti zápisu řetězců"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Poznámka – možnosti zápisu řetězců</h2></div><div class="section-body">
+
+    <p>
+        Delší řetězce (bez formátování pomocí trojtých uvozovek) můžete zapsat i jinými způsoby, ale většinou to neprospívá čitelnosti:
+    </p>
+    <ul>
+        <li>
+            Řetězce napsané hned za sebou jsou implicitně spojeny do jednoho:
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                &gt;&gt;&gt; xs = "Ahoj, " "světe!"
+                &gt;&gt;&gt; xs
+                'Ahoj, světe!'
+            </pre>
+        </li>
+        <li>
+            Předchozí můžete dokonce rozložit na více řádek, pokud použijete vnější uzavírací (kulaté) závorky:
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                &gt;&gt;&gt; xs = (
+                ...     "Ahoj, "
+                ...     "světe!"
+                ... )
+                &gt;&gt;&gt; xs
+                'Ahoj, světe!'
+            </pre>
+        </li>
+        <li>
+            Také můžete řetězce „slepit“ operátorem <code>+</code> a na více řádek je roztáhnout pomocí iskejpovacího znaku <code>\</code> před koncem řádku:
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                &gt;&gt;&gt; xs = "Ahoj, " + \
+                ...      "světe!"
+                &gt;&gt;&gt; xs
+                'Ahoj, světe!'
+            </pre>
+        </li>
+    </ul>
+
+    <p>
+        PS: Poslední dva triky platí i pro jiné kusy kódu než jen řetězce.
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Uvozovky, apostrofy a speciální znaky"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Uvozovky, apostrofy a speciální znaky</h2></div><div class="section-body">
+
+    <p>
+        Mezi uvozovkami dvojtými a jednoduchými (apostrofy) není z hlediska použití v Python'u žádný rozdíl. Můžete je tudíž libovolně míchat, avšak kolizní uvozovky uvnitř řetězců je samozřejmě třeba iskejpovat (a to standardně pomocí zpětného lomítka <code>\</code>; které samotné pak tudíž musíte zapsat jako <code>\\</code>).
+    </p>
+    <p>
+        Jinak můžete použít (téměř) klasické céčkovské řídící sekvence (<em>escape sequences</em>):
+    </p>
+    <div class="example-block example-horizontal"><div class="example-col"><div class="example-label">📄 Program: <a href="_files/strings2.py"><em>strings2.py</em></a></div><example src="_files/strings2.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/strings2.out" lang="text"></example></div></div>
+
+</div></section><section class="slide-section" id="id4" data-title="„Syrové“ řetězce"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">„Syrové“ řetězce</h2></div><div class="section-body">
+
+    <p>
+        Pokud naopak <strong>ne</strong>chcete, aby se řídící sekvence uvnitř řetězců vyhodnocovaly (jako třeba uvnitř <a href="/materialy/python/regexps/overview.xml">regexpů</a>), musíte řetězec označit jako <em>raw</em>:
+    </p>
+    <div class="example-block example-horizontal"><div class="example-col"><div class="example-label">📄 Program: <a href="_files/strings3.py"><em>strings3.py</em></a></div><example src="_files/strings3.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/strings3.out" lang="text"></example></div></div>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Prefix <code>r</code> i <code>R</code> fungují stejně.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Technicky vzato je to celé kapku složitější – Python se k nim dál chová jako k řetězcům, jen interně odiskejpuje zpětné lomítko, takže speciální znaky jimi přestanou být:
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                &gt;&gt;&gt; xs = '123\n456'
+                &gt;&gt;&gt; rxs = r'123\n456'
+
+                &gt;&gt;&gt; xs
+                '123\n456'
+                &gt;&gt;&gt; len(xs)           # '\n' je jeden znak
+                7
+                &gt;&gt;&gt; xs.count('\n')
+                1
+
+                &gt;&gt;&gt; rxs
+                '123\\n456'
+                &gt;&gt;&gt; len(rxs)          # '\n' jsou dva znaky
+                8
+                &gt;&gt;&gt; rxs.count('\n')   # hledáme jeden znak (odřádkování)
+                0
+                &gt;&gt;&gt; rxs.count(r'\n')  # hledáme dva znaky (zpětné lomítko a písmeno n)
+                1
+                &gt;&gt;&gt; rxs.count('\\n')  # hledáme, co je skutečně uvnitř zapsáno
+                1
+            </pre>
+            Jde o to, že sekvence <code>\\</code> se z hlediska zacházení s ní dál chová jako jedno zpětné lomítko, jen je zrušeno provázání s následujícím znakem do podoby <a href="/materialy/python/cmd/print.xml?slajd=3">speciálního kódu</a>.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="Prázdný řetězec – „''“, „&quot;&quot;“ a „str()“"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Prázdný řetězec – „''“, „""“ a „str()“</h2></div><div class="section-body">
+
+    <p>
+        <strong>Prázdný řetězec</strong> můžete vyrobit přímou notací (i když radši bez trojuvozovkové varianty :-)..
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; s = ''
+        &gt;&gt;&gt; s = ""
+        
+        &gt;&gt;&gt; s = ''''''
+        &gt;&gt;&gt; s = """"""
+    </pre>
+    <p>
+         ..nebo též pomocí funkce <code>str()</code>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; s = str()
+        
+        &gt;&gt;&gt; type(s)
+        &lt;class 'str'&gt;
+    </pre>
+
+</div></section><section class="slide-section" id="id6" data-title="Řetězce jako sekvence"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Řetězce jako sekvence</h2></div><div class="section-body">
+
+  <p>
+    Řetězce v Python'u 3.X jsou automaticky unicodové =&gt; každý jeden viditelný znak je reprezentován proměnným počtem bajtů. Ale z hlediska běžné práce s řetězci jako <em>sekvenčními typy</em> (kterými řetězce jsou) nás to nemusí zajímat, protože se chovají právě tak, jak bychom čekali – nejmenší podjednotkou řetězce je právě jeden znak:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "Ahoj, světe!"
+
+# délka sekvence
+&gt;&gt;&gt; len(xs)
+12
+
+# konkrétní prvek
+&gt;&gt;&gt; xs[3]
+'j'
+&gt;&gt;&gt; xs[-3]
+'t'
+
+# různé výřezy
+&gt;&gt;&gt; xs[3:9]
+'j, svě'
+&gt;&gt;&gt; xs[3:9:2]
+'j v'
+&gt;&gt;&gt; xs[3:]
+'j, světe!'
+&gt;&gt;&gt; xs[-3:]
+'te!'
+
+# dotaz na výskyt prvku
+&gt;&gt;&gt; 'a' in xs
+False
+&gt;&gt;&gt; 'A' in xs
+True
+&gt;&gt;&gt; 'Ah' in xs
+True
+
+# dvě spojené kopie
+&gt;&gt;&gt; xs * 2
+'Ahoj, světe!Ahoj, světe!'
+  </pre>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Mimochodem „násobit“ řetězec můžete i nulou – výsledkem je nepřekvapivě řetězec prázdný.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      PS: Komentáře zde pochopitelně nejsou součástí výstupu interaktivního interpretru, slouží pouze k popisu zde zapsaného kódu.
+    </div></div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Řetězce jako sekvence – smyčka „for-in“"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Řetězce jako sekvence – smyčka „for-in“</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Po řetězcích se pak přirozeně prochází smyčkou:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; xs = "ahoj"
+        &gt;&gt;&gt; for x in xs:
+        ...   print(x)
+        ... 
+        a
+        h
+        o
+        j
+    </pre>
+    
+    <p class="enumerate">
+        Případně pokud je důležitá i pozice výskytu znaku:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; xs = "ahoj"
+        &gt;&gt;&gt; for i, x in enumerate(xs):
+        ...   print(i, x)
+        ... 
+        0 a
+        1 h
+        2 o
+        3 j
+    </pre>
+    
+    <p class="enumerate">
+        Jde to ale i obráceně:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; xs = "ahoj"
+        &gt;&gt;&gt; for x in reversed(xs):
+        ...   print(x)
+        ... 
+        j
+        o
+        h
+        a
+    </pre>
+    
+    <p class="enumerate">
+        A dokonce i seřazeně:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; xs = "ahoj"
+        &gt;&gt;&gt; for x in sorted(xs):
+        ...   print(x)
+        ... 
+        a
+        h
+        j
+        o
+    </pre>
+
+</div></section><section class="slide-section" id="id8" data-title="Řetězce jako neměnitelné sekvence"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Řetězce jako neměnitelné sekvence</h2></div><div class="section-body">
+
+  <p>
+    Řetězce patří mezi sekvence <strong>neměnitelné</strong> (<i>immutable</i>), což znamená, že jejich obsah po vytvoření již není možné měnit:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "řetězec"
+&gt;&gt;&gt; xs[3]
+'ě'
+&gt;&gt;&gt; xs[3] = 'X'
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+TypeError: 'str' object does not support item assignment
+  </pre>
+
+  <p>
+    Spojením dvou řetězců však vzniká řetězec zcela nový, proto následující kód je v pořádku:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = xs + " ukázkový"
+&gt;&gt;&gt; xs
+'řetězec ukázkový'
+  </pre>
+  
+  <p>
+      PS: Pojmenování následujících slajdů 9-12 je tedy poněkud zavádějící – všechny tam uvedené metody samozřejmě ponechávají originální řetězec netknut, pouze vezmou jeho textový „obsah“, pozmění ho uvedeným způsobem a vrátí ho jako řetězec zbrusu nový.
+  </p>
+
+</div></section><section class="slide-section" id="id9" data-title="Formátování výstupu – „f''“, „format()“ a „%“"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Formátování výstupu – „f''“, „format()“ a „%“</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Počínaje Python'em 3.6, máme k dispozici velmi jednoduché a mocné formátování pomocí tak zvaných <strong>f-řetězců</strong> (tedy <em>formátovaných řetězců</em>). Prakticky ve všech ohledech se chová jako starší formátování pomocí funkce <em>format()</em>, jen je výrazně přehlednější:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; jméno, průměr = 'X', 1/3
+&gt;&gt;&gt; f"Prvek {jméno} by měl mít průměr {průměr:.3} cm."
+'Prvek X by měl mít průměr 0.333 cm.'
+  </pre>
+
+  <p class="enumerate">
+    Výše zmíněnou metodu <code>format()</code> je možno použít jak pozičně, tak za pomoci pojmenovaných argumentů (což je ukecanější, ale může to být v některých situacích přehlednější):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; "Prvek {0} by měl mít průměr {1:.3} cm.".format( 'X', 1/3 )
+'Prvek X by měl mít průměr 0.333 cm.'
+
+&gt;&gt;&gt; "Prvek {} by měl mít průměr {:.3} cm.".format( 'X', 1/3 )
+'Prvek X by měl mít průměr 0.333 cm.'
+
+&gt;&gt;&gt; "Prvek {jmeno} by měl mít průměr {prumer:.3} cm.".format( jmeno='X', prumer=1/3 )
+'Prvek X by měl mít průměr 0.333 cm.'
+  </pre>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Možnost vynechat označení pozice, pokud použijeme argumenty v zadaném pořadí, s sebou přinesl Python 3.1.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Formátování pomocí <code>format()</code> je mocné – jako parametr do <code>{}</code> můžete poslat prakticky cokoliv (seznam, slovník, instanci třídy...) a celkem rozumně s tím pak pracovat.
+    </div></div></div>
+
+  <p class="enumerate">
+      Starší způsob formátování, dosud podporovaný, ale určen k (pravděpodobnému) vyřazení, vypadá pro srovnání takto:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+      &gt;&gt;&gt; '%(language)s has %(#)03d quote types.' % {'language': "Python", "#": 2}
+      'Python has 002 quote types.'
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Kromě (původně) slabé podpory vstupních typů je jeho největším problémem předávání jedné složené hodnoty – výraz <code>'%s' % msg</code> selže, není-li proměnná <em>msg</em> jednoduchý typ, protože se ji pokusí rozdělit na prvky, které pak ale nebude mít kam přiřadit. Opraví to zápis s explicitní n-ticí <code>'%s' % (msg, )</code> (byť má samozřejmě své mouchy), ale myslete na to, že.
+  </div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="Formátování výstupu – „center()“, „ljust()“, „rjust()“"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Formátování výstupu – „center()“, „ljust()“, „rjust()“</h2></div><div class="section-body">
+
+  <p>
+    Při zarovnávání textu pro výstup nejen na konzoli se vám asi budou hodit následující tři řetězcové metody:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "AHOJ"
+
+&gt;&gt;&gt; xs.center(40)
+'                  AHOJ                  '
+&gt;&gt;&gt; xs.center(40, '*')
+'******************AHOJ******************'
+
+&gt;&gt;&gt; xs.ljust(40)
+'AHOJ                                    '
+&gt;&gt;&gt; xs.ljust(40, '-')
+'AHOJ------------------------------------'
+
+&gt;&gt;&gt; xs.rjust(40)
+'                                    AHOJ'
+&gt;&gt;&gt; xs.rjust(40, '+')
+'++++++++++++++++++++++++++++++++++++AHOJ'
+  </pre>
+
+</div></section><section class="slide-section" id="id11" data-title="Analýza obsahu – „isXXX()“"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Analýza obsahu – „isXXX()“</h2></div><div class="section-body">
+
+  <p>
+    Pro obecné posouzení vybraných vlastností řetězce dobře poslouží následující metody (pouze výběr):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; '123'.isalnum()
+True
+&gt;&gt;&gt; '123abc'.isalnum()
+True
+&gt;&gt;&gt; '123abc+-*/'.isalnum()
+False
+
+&gt;&gt;&gt; 'abc'.isalpha()
+True
+&gt;&gt;&gt; 'abc123'.isalpha()
+False
+
+&gt;&gt;&gt; '123'.isdigit()
+True
+&gt;&gt;&gt; '123 '.isdigit()
+False
+
+&gt;&gt;&gt; '   '.isspace()
+True
+&gt;&gt;&gt; ' baf       '.isspace()
+False
+  </pre>
+  <br>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; 'abc'.islower()
+True
+&gt;&gt;&gt; 'aBc'.islower()
+False
+
+&gt;&gt;&gt; 'ABC'.isupper()
+True
+&gt;&gt;&gt; 'AbC'.isupper()
+False
+
+&gt;&gt;&gt; 'Svět'.istitle()
+True
+&gt;&gt;&gt; 'Svět Je'.istitle()
+True
+&gt;&gt;&gt; 'Svět je'.istitle()
+False
+  </pre>
+  <br>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; 'ahoj'.isidentifier()
+True
+&gt;&gt;&gt; '123ahoj'.isidentifier()
+False
+  </pre>
+
+</div></section><section class="slide-section" id="id12" data-title="Poznámka"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Poznámka</h2></div><div class="section-body">
+  
+    <p>
+        Je poměrně „zajímavé“, že přes armádu metod na rozpoznávání, zda řetězec obsahuje jen a pouze čísla (<em>isdecimal()</em>, <em>isdigit()</em>, <em>isnumeric()</em>; mezi <em>čísla</em> se totiž počítají i všemozné historické zápisy zahrnuté do <em>Unicode</em>u), neexistuje na řetězci metoda, která by řekla, zda představuje reálné číslo.
+    </p>
+    <p>
+        Nejuniverzálnějším – a také zdaleka nepřímočařejším – řešením tak zůstává starý klasický pokus o převod řetězce na číslo:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        try:
+            float('-123.4')
+        except ValueError:
+            pass
+    </pre>
+    <p>
+        PS: Pokud jste si s tvarem řetězce poměrně jistí, můžete místo toho někdy použít specializovanější postupy na jednu řádku jako například:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; '-123.4'.lstrip('-').replace('.', '', 1).isdigit()
+        True
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Ta jednička v nahrazení je tam kvůli nečíslům typu <code>12.3.4</code> ^_~
+    </div></div>
+  
+</div></section><section class="slide-section" id="id13" data-title="Analýza obsahu – „count()“"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">Analýza obsahu – „count()“</h2></div><div class="section-body">
+
+  <p>
+    Kromě metod na zjišťování „globálních“ vlastností řetězce z předchozího slajdu máme k dispozici i několik dalších metod zaměřených na vyhledávání podřetězců. První z nich umí počítat výskyty podřetězce v řetězci:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; 'řetězec'.count('t')
+1
+&gt;&gt;&gt; 'řetězec'.count('e')
+2
+&gt;&gt;&gt; 'řetězec'.count('W')
+0
+
+&gt;&gt;&gt; xs = "Nesnesu se se sestrou."
+&gt;&gt;&gt; xs.count('se')
+3
+  </pre>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+          Zde konkrétně <em>nepřekrývajících se</em> podřetězců.
+      </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+          Metoda <em>count(sub[, start[, end]]))</em> má další dva nepovinné parametry určující výřez řetězce, v němž se má zadaný podřetězec hledat. Význam indexů je opět stejný jako u <a href="/materialy/python/overview.2.xml?slajd=23">rozsahů</a>.
+      </div></div></div>
+
+</div></section><section class="slide-section" id="id14" data-title="Analýza obsahu – „startswith()“ a „endswith()“"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">Analýza obsahu – „startswith()“ a „endswith()“</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Druhá skupina se umí vyjadřovat k poměrům na začátku a na konci řetězce:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    &gt;&gt;&gt; xs = "Nesnesu se se sestrou."
+    &gt;&gt;&gt; xs.startswith('Nes')
+    True
+    &gt;&gt;&gt; xs.startswith('Nest')
+    False
+    &gt;&gt;&gt; xs.endswith('ou.')
+    True
+    &gt;&gt;&gt; xs.endswith('ou')
+    False
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Funguje to samozřejmě pro libovolně dlouhé podřetězce, takže třeba i pro jeden znak.
+  </div></div>
+
+  <p class="enumerate">
+    Potřebujete-li otestovat více možných začátků (či konců), obě metody akceptují i n-tici řetězců:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    &gt;&gt;&gt; xs.startswith(('xyz', 'Nes'))
+    True
+    &gt;&gt;&gt; xs.endswith(('xyz', 'ou.'))
+    True
+  </pre>
+
+  <p class="enumerate">
+    A tak trochu překvapivě umožnují obě metody i určení rozsahu, v jakém má k vyhledávání dojít:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    str.startswith(prefix[, začátek[, konec]])
+    str.endswith(suffix[, začátek[, konec]])
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Jde o klasické určení výřezu z řetězce <code>str[začátek:konec]</code> s nepovinným koncem.
+  </div></div>
+
+</div></section><section class="slide-section" id="id15" data-title="Analýza obsahu – „[r]index()“ a „[r]find()“"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">Analýza obsahu – „[r]index()“ a „[r]find()“</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Konkrétně vyhledávat podřetězce pak umožňuje metoda <em>index</em> a její pravostranná varianta <em>rindex</em>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "There were 42 monkeys in the airplane."
+
+&gt;&gt;&gt; xs.index('e')   # najdi první výskyt
+2
+&gt;&gt;&gt; xs.rindex('e')   # najdi poslední výskyt
+36
+
+&gt;&gt;&gt; xs.index('e', 10)   # hledej v xs[10:]
+18
+&gt;&gt;&gt; xs.index('e', 10, 17)   # hledej v xs[10:17]
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+ValueError: substring not found
+
+&gt;&gt;&gt; xs = "Nesnesu se se sestrou."
+&gt;&gt;&gt; xs.index('se')
+8
+&gt;&gt;&gt; xs.rindex('se')
+14
+&gt;&gt;&gt; xs.index('se', 12)
+14
+  </pre>
+  <p>
+      Neúspěch se projevuje tradičním pythoním způsobem, tedy výjimkou (zde <em>ValueError</em>). A <em>slice</em>-notace (tedy výběr podsekvence) funguje samozřejmě i pro <code>rindex</code> (který hledá vyhovující prvky směrem od konce, ale vrácené indexy jsou možná trochu překvapivě počítány standardně od začátku).
+  </p>
+
+  <p class="enumerate">
+      Pro tradicionalisty jsou zde i metody <em>find</em> a <em>rfind</em>, které pro záporný výsledek vrací tradiční <code>-1</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "There were 42 monkeys in the airplane."
+
+&gt;&gt;&gt; xs.find('e')   # najdi první výskyt
+2
+&gt;&gt;&gt; xs.rfind('e')   # najdi poslední výskyt
+36
+
+&gt;&gt;&gt; xs.find('e', 10)   # hledej v xs[10:]
+18
+&gt;&gt;&gt; xs.find('e', 10, 17)   # hledej v xs[10:17]
+-1
+
+&gt;&gt;&gt; xs = "Nesnesu se se sestrou."
+&gt;&gt;&gt; xs.find('se')
+8
+&gt;&gt;&gt; xs.rfind('se')
+14
+&gt;&gt;&gt; xs.find('se', 12)
+14
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      <em>Slice</em>-notace (tedy výběr podsekvence) funguje i pro <code>rfind</code>.
+  </div></div>
+  <p>
+      Podle potřeby jejich problémem nebo výhodou je, že v případě neúspěšného vyhledávání vrácená <code>-1</code> je validní index do sekvence – její poslední prvek. Když se to zrovna hodí – fajn. Když ne, je pythoničtější vyhazovat výjimky, tedy použít spíše <em>index</em> a <em>rindex</em>.
+  </p>
+
+</div></section><section class="slide-section" id="id16" data-title="Úprava obsahu – velikost písmen („upper()“, „lower()“, …)"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">Úprava obsahu – velikost písmen („upper()“, „lower()“, …)</h2></div><div class="section-body">
+
+  <p>
+    Několik metod je zaměřených na práci s velikostí písmen:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "Ahoj, světe!"
+
+&gt;&gt;&gt; xs.swapcase()
+'aHOJ, SVĚTE!'
+&gt;&gt;&gt; xs.upper()
+'AHOJ, SVĚTE!'
+&gt;&gt;&gt; xs.lower()
+'ahoj, světe!'
+
+&gt;&gt;&gt; xs.title()
+'Ahoj, Světe!'
+
+&gt;&gt;&gt; 'ahoj, světe!'.capitalize()
+'Ahoj, světe!'
+  </pre>
+
+</div></section><section class="slide-section" id="id17" data-title="Úprava obsahu – odstraňování znaků „remove[prefix|suffix]()“"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">Úprava obsahu – odstraňování znaků „remove[prefix|suffix]()“</h2></div><div class="section-body">
+  
+  <p>
+    Od Python'u verze 3.9 máme pro úpravu konců řetězců dvě nové metody s předvídatelným chováním:
+  </p>
+
+  <p class="enumerate">
+    Odstranění předpon pomocí <code>removeprefix()</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    &gt;&gt;&gt; 'tmpMůjSoubor.txt'.removeprefix('tmp')
+    'MůjSoubor.txt'
+    &gt;&gt;&gt; 'tmpMůjSoubor.txt'.removeprefix('abc')
+    'tmpMůjSoubor.txt'
+  </pre>
+
+  <p class="enumerate">
+    Odstranění přípon pomocí <code>removesuffix()</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    &gt;&gt;&gt; 'tmpMůjSoubor.txt'.removesuffix('.txt')
+    'tmpMůjSoubor'
+    &gt;&gt;&gt; 'tmpMůjSoubor.txt'.removesuffix('.zip')
+    'tmpMůjSoubor.txt'
+  </pre>
+
+  <p>
+    PS: Všimněte si především, že ve shodě se staršími metodami typu <em>startswith()</em> a podobně jsou – trošku nepřehledně – všechna písmena v názvu malá.
+  </p>
+  
+</div></section><section class="slide-section" id="id18" data-title="Úprava obsahu – odstraňování znaků „[l|r]strip()“"><div class="section-header"><span class="section-num">18</span><h2 class="section-title">Úprava obsahu – odstraňování znaků „[l|r]strip()“</h2></div><div class="section-body">
+
+    <p>
+        Historicky výrazně starší metody pro likvidaci nechtěných znaků na koncích řetězce se proti <a href="?slajd=17">předchozím dvěma</a> chovají poněkud neprůhledněji – odstraňují totiž všechny vyjmenované znaky nezávisle na jejich pořadí.
+    </p>
+
+  <p class="enumerate">
+    S udaným parameterm se Python pokusí z konců řetězce odstranit vyjmenované znaky. Zarazí se přitom na prvním, který mezi nimi není (níže v příkladech je jím mezera):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = '12 to by nešlo 24'
+
+&gt;&gt;&gt; xs.strip('1234')
+' to by nešlo '
+&gt;&gt;&gt; xs.lstrip('1234')
+' to by nešlo 24'
+&gt;&gt;&gt; xs.rstrip('1234')
+'12 to by nešlo '
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    PS: Pro představu funkce si můžete zkusit v duchu nahradit operaci <em>strip()</em> za opakující se smyčku nad všemi prvky jejího parametru a pokus o odstranění každého z nich z konce řetězce.
+  </div></div>
+  
+  <p class="enumerate">
+    Bez udání parametru jsou výchozí hodnotou do všech tří funkcí prázdné znaky (<em>whitespace</em>):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = '    to by nešlo    '
+
+&gt;&gt;&gt; xs.strip()
+'to by nešlo'
+&gt;&gt;&gt; xs.lstrip()
+'to by nešlo    '
+&gt;&gt;&gt; xs.rstrip()
+'    to by nešlo'
+  </pre>
+
+</div></section><section class="slide-section" id="id19" data-title="Úprava obsahu – záměna znaků „replace()“"><div class="section-header"><span class="section-num">19</span><h2 class="section-title">Úprava obsahu – záměna znaků „replace()“</h2></div><div class="section-body">
+
+  <p>
+    Výskyty nějakého podřetězce můžeme snadno nahradit podřetězcem jiným:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "dog,cat,pig,hippo,chicken"
+
+# všechny výskyty..
+&gt;&gt;&gt; xs.replace(',', ' - ')
+'dog - cat - pig - hippo - chicken'
+
+# ..nebo jen udanou (maximální) část
+&gt;&gt;&gt; xs.replace(',', ' - ', 2)
+'dog - cat - pig,hippo,chicken'
+  </pre>
+  <br>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "333 stříbrných stříkaček stříkalo přes 333 stříbrných střech"
+&gt;&gt;&gt; xs.replace('333', 'třistatřiatřicet')
+'třistatřiatřicet stříbrných stříkaček stříkalo přes třistatřiatřicet stříbrných střech'
+  </pre>
+
+</div></section><section class="slide-section" id="id20" data-title="Úprava obsahu – záměna znaků „translate()“ I"><div class="section-header"><span class="section-num">20</span><h2 class="section-title">Úprava obsahu – záměna znaků „translate()“ I</h2></div><div class="section-body">
+
+    <p>
+        Pro některé typy úloh se hodí nahrazovat znaky pomocí <strong>překladové tabulky</strong>. Tu je třeba nejdříve vyrobit (statickou) metodou řetězce <em>maketrans()</em> a následně pak aplikovat na požadovaný text. Příklad odstranění (některých) ne-ASCII znaků:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # příprava překladové tabulky
+        nonASCII = "áâàǎăãäāåąčĉçċćďđéêèěėëēęġğĝģĥħíîìīĩĭıïįĵķľĺŀłňńņŉŋñóôòŏöőōõøřŕŗšśŝşťţŧúûùůŭüűūũųŵýŷÿžżźÁÀǍĂÃÄĀÅĄČĈÇĊĆĎĐÉÊÈĚĖËĒĘĠĞĜĢĤĦÍÎÌĪĨĬİÏĮĴĶĽĹĿŁŇŃŅŊÓÔÒŎÖŐÕŌØŘŔŖŠŚŜŞŤŢŦÚÛÙŮŬÜŰŪŨŲŴÝŶŸŽŻŹ"
+        ASCII    = "aaaaaaaaaacccccddeeeeeeeegggghhiiiiiiiiijkllllnnnnnnooooooooorrrsssstttuuuuuuuuuuwyyyzzzAAAAAAAAACCCCCDDEEEEEEEEGGGGHHIIIIIIIIIJKLLLLNNNNOOOOOOOOORRRSSSSTTTUUUUUUUUUUWYYYZZZ"
+        transtab = ''.maketrans(nonASCII, ASCII)
+        
+        # aplikace překladové tabulky
+        ys = xs.translate(transtab)
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        PS: Zrovna odnabodeníčkování řeší kupříkladu i knihovní funkce <code>unicodedata.normalize('NFD', 'svět').encode('ascii', 'ignore').decode('ascii')</code>, nicméně to je hodně oklikou a musíte vědět něco o normalizaci v Unicodu a vůbec.
+    </div></div>
+
+</div></section><section class="slide-section" id="id21" data-title="Úprava obsahu – záměna znaků „translate()“ II"><div class="section-header"><span class="section-num">21</span><h2 class="section-title">Úprava obsahu – záměna znaků „translate()“ II</h2></div><div class="section-body">
+
+    <p>
+        Znaky, které nejsou zanesené v překladové tabulce, projdou procesem beze změny:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; transtab = ''.maketrans('abc', '123')
+        &gt;&gt;&gt; 'abcDabcEabc'.translate(transtab)
+        '123D123E123'
+    </pre>
+    <p>
+        Pokud je ovšem nevyjmenujete ve třetím (nepovinném) parametru, pak jsou „zmizeny“:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; transtab = ''.maketrans('abc', '123', 'DE')
+        &gt;&gt;&gt; 'abcDabcEabc'.translate(transtab)
+        '123123123'
+    </pre>
+
+</div></section><section class="slide-section" id="id22" data-title="Úprava obsahu – záměna znaků „translate()“ III"><div class="section-header"><span class="section-num">22</span><h2 class="section-title">Úprava obsahu – záměna znaků „translate()“ III</h2></div><div class="section-body">
+
+    <p>
+        Metoda <em>translate()</em> umí také převádět vstupní znaky na libovolně dlouhé řetězce! Překladovou tabulku je v tomto případě nutno zadat pouze jedním parametrem – slovníkem, jehož klíči jsou jednotlivé znaky (nebo jejich <a href="/materialy/text/encoding.xml?slajd=6">unicodové číselné ekvivalenty</a>):
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; transtab = ''.maketrans({
+                'a': 'A',
+                'b': '-b-',
+                99: '123',  # chr(99) -&gt; 'c'
+            })
+        &gt;&gt;&gt; 'aDbc'.translate(transtab)
+        'AD-b-123'
+    </pre>
+
+</div></section><section class="slide-section" id="id23" data-title="splitting &amp; joining I"><div class="section-header"><span class="section-num">23</span><h2 class="section-title">splitting &amp; joining I</h2></div><div class="section-body">
+
+  <p>
+    Řetězec můžeme podle zadaného podřetězce rozdělit na více částí. Nejobecnější metodou je <code>split()</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "Ahoj, světe! Jak se máš?"
+
+&gt;&gt;&gt; xs.split()
+['Ahoj,', 'světe!', 'Jak', 'se', 'máš?']
+&gt;&gt;&gt; xs.split(' ')
+['Ahoj,', 'světe!', 'Jak', 'se', 'máš?']
+&gt;&gt;&gt; xs.split(' ', 2)
+['Ahoj,', 'světe!', 'Jak se máš?']
+
+&gt;&gt;&gt; xs.split(',')
+['Ahoj', ' světe! Jak se máš?']
+
+&gt;&gt;&gt; xs.split(' s')
+['Ahoj,', 'věte! Jak', 'e máš?']
+  </pre>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Bez udání parametrů rozdělí <code>split()</code> zadaný řetězec podle prázdných znaků (<em>whitespaces</em>).
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Druhý nepovinný parametr určuje maximální počet rozdělení, ke kterým dojde.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        <code>split()</code> vrací <em>seznam</em>.
+    </div></div></div>
+  <p>
+    Pro srovnání ještě metoda <code>rsplit()</code> – chová se téměř úplně stejně jako <code>split()</code>, pouze rozřezává řetězce zprava doleva:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs.split(' ', 2)
+['Ahoj,', 'světe!', 'Jak se máš?']
+&gt;&gt;&gt; xs.rsplit(' ', 2)
+['Ahoj, světe! Jak', 'se', 'máš?']
+  </pre>
+
+</div></section><section class="slide-section" id="id24" data-title="splitting &amp; joining II"><div class="section-header"><span class="section-num">24</span><h2 class="section-title">splitting &amp; joining II</h2></div><div class="section-body">
+
+  <p>
+    Doplňkovou metodou ke <code>split()</code> je metoda <code>join()</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "Ahoj, světe! Jak se máš?"
+
+&gt;&gt;&gt; ys = xs.split()
+&gt;&gt;&gt; ys
+['Ahoj,', 'světe!', 'Jak', 'se', 'máš?']
+
+&gt;&gt;&gt; ' '.join(ys)
+'Ahoj, světe! Jak se máš?'
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Syntaxe je tedy <code>'SEPARÁTOR'.join( ITERABLE )</code> (kde ITERABLE je jakýkoli objekt schopný vracet své členy po jednom, v tomto případě seznam).
+  </div></div>
+
+  <p>
+    Nic nám samozřejmě nebrání použít jiný separátor:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; '-|-'.join(ys)
+'Ahoj,-|-světe!-|-Jak-|-se-|-máš?'
+  </pre>
+
+  <p>
+    Typické je použití k normalizaci řetězce:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "    Hello    World,    I       am   here.  "
+&gt;&gt;&gt; xs
+'    Hello    World,    I       am   here.  '
+&gt;&gt;&gt; ' '.join( xs.split() )
+'Hello World, I am here.'
+  </pre>
+
+</div></section><section class="slide-section" id="id25" data-title="splitting &amp; joining III"><div class="section-header"><span class="section-num">25</span><h2 class="section-title">splitting &amp; joining III</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Metodě <em>[r]split()</em> trochu podobná metoda <code>partition()</code>, resp. <code>rpartition()</code>, rozdělí zadaný řetězec podle podle <strong>prvního, resp. posledního</strong>, výskytu udaného separátoru:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = "Ahoj, světe! Jak se máš?"
+
+&gt;&gt;&gt; xs.partition('e')
+('Ahoj, svět', 'e', '! Jak se máš?')
+&gt;&gt;&gt; xs.rpartition('e')
+('Ahoj, světe! Jak s', 'e', ' máš?')
+
+&gt;&gt;&gt; xs.partition('Jak')
+('Ahoj, světe! ', 'Jak', ' se máš?')
+  </pre>
+  <p>
+    Narozdíl od <code>split()</code> tedy <code>partition</code> nezahodí separátor a navíc vrací vždycky jen a pouze <em>trojci</em>.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    A to i když se separátor v řetězci nevyskytuje!
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+      &gt;&gt;&gt; xs.partition('E')
+      ('Ahoj, světe! Jak se máš?', '', '')
+    </pre>
+  </div></div>
+  
+  <p class="enumerate">
+    K dispozici máme ještě metodu specializovanou na rozdělování řetězců obsahujících odřádkování:
+  </p>
+  <div class="example-block example-horizontal"><div class="example-col"><div class="example-label">📄 Program: <a href="_files/splitlines.py"><em>splitlines.py</em></a></div><example src="_files/splitlines.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/splitlines.out" lang="text"></example></div></div>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Všimněte si odlišného chování k poslednímu <em>\n</em>!
+  </div></div>
+
+</div></section><section class="slide-section" id="id26" data-title="ord() &amp; chr()"><div class="section-header"><span class="section-num">26</span><h2 class="section-title">ord() &amp; chr()</h2></div><div class="section-body">
+
+  <p>
+    Pro operaci s řetězci <strong>na úrovni jednotlivých znaků</strong> slouží dvě standardní funkce <code>ord()</code> a <code>chr()</code>.
+  </p>
+
+  <p class="enumerate">
+    Funkce <code>ord()</code> převede zadaný jeden znak (tedy řetězec o délce jedna) na <em>codepoint</em>-číslo odpovídající tomuto znaku v Unicode-tabulce:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; ord('a')
+97
+&gt;&gt;&gt; ord('ř')
+345
+  </pre>
+  <p class="enumerate">
+    Komplementární funkce <code>chr()</code> převádí naopak zadané celé číslo představující unicodový <em>codepoint</em> na odpovídající znak (tedy řetězec délky jedna):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; chr(97)
+'a'
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Pro více o Unicode'u viz <a href="../../text/encoding.xml">Kódování, Unicode</a>.
+  </div></div>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 26 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>
