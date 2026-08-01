@@ -81,6 +81,35 @@ export function loadPersisted() {
     if (w >= 180 && w <= 520) state.sidebarWidth = w;
   } catch { /* ignore */ }
 
+const KV_URL = "https://tough-husky-101028.upstash.io";
+const KV_TOKEN = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
+
+async function kvGet(key) {
+  try {
+    const res = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
+      headers: { Authorization: `Bearer ${KV_TOKEN}` },
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data || !data.result) return null;
+    return typeof data.result === "string" ? JSON.parse(data.result) : data.result;
+  } catch {
+    return null;
+  }
+}
+
+function kvSet(key, val) {
+  try {
+    fetch(`${KV_URL}/set/${encodeURIComponent(key)}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${KV_TOKEN}` },
+      body: JSON.stringify(val),
+    }).catch(() => {});
+  } catch {
+    /* ignore */
+  }
+}
+
   syncCloudProgress();
 }
 

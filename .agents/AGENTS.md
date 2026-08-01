@@ -92,3 +92,10 @@ To avoid duplication of assets:
 
 - **Minified Index**: `build_html.py` generates a minified `search_index.json` containing plaintext slide content and external program source files to optimize bandwidth.
 - **Lazy Loading**: The dashboard does not load the search index on page instantiation. It is fetched lazily on-demand once the user focuses or types a query in the search bar.
+
+---
+
+## 🌐 Dev Server & DevTools Navigation Rules
+
+- **Do NOT navigate DevTools to non-existent URLs**: When inspecting or testing the application with DevTools (`chrome-devtools-mcp`), always check state/router data or verify the active local server port (`http://127.0.0.1:8765/app/index.html`) before attempting `navigate_page`. Never guess routes or trigger invalid URL navigation.
+
