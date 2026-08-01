@@ -2,7 +2,7 @@
 
 import {
   state, pagesFor, slideDiff, weekVisibleItems, filteredItems, markSeen,
-  isStudied, toggleStudied,
+  isStudied, toggleStudied, setStudied,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot } from "./highlight.js";
@@ -1021,17 +1021,10 @@ function studyTile(item, studied, size) {
   const chk = btn.querySelector(".st-chk-box");
   chk?.addEventListener("change", (e) => {
     e.stopPropagation();
-    if (e.target.checked) state.studied.add(item.id);
-    else state.studied.delete(item.id);
-    try {
-      localStorage.setItem("pcs-studied-v1", JSON.stringify(Array.from(state.studied)));
-    } catch { /* */ }
-    btn.classList.toggle("studied", e.target.checked);
-    const metaCheck = btn.querySelector(".st-check, .st-pending");
-    if (metaCheck) {
-      metaCheck.className = e.target.checked ? "st-check" : "st-pending";
-      metaCheck.textContent = e.target.checked ? "✓ SPLNĚNO" : "☐ KE STUDIU";
-    }
+    setStudied(item.id, e.target.checked);
+    try { renderTree(); } catch { /* */ }
+    window.__pcsUpdateStatus?.();
+    showProgress();
   });
 
   return btn;
@@ -1047,13 +1040,12 @@ function detailedExerciseCard(item, studied) {
 
   const head = el("div", {
     className: "sec-head",
-    onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
   });
   head.innerHTML = `
     <div class="sec-title-row">
-      <span class="st-status-check">${studied ? "✓" : "○"}</span>
-      <h3 class="sec-title">${escapeHtml(item.title)}</h3>
-      <span class="sec-status-pill">${studied ? "✓ SPLNĚNO" : "KE STUDIU"}</span>
+      <span class="st-status-check" style="cursor:pointer" title="Toggle studied status">${studied ? "✓" : "○"}</span>
+      <h3 class="sec-title" style="cursor:pointer">${escapeHtml(item.title)}</h3>
+      <button type="button" class="sec-status-pill" style="cursor:pointer;border:none;font:inherit;background:rgba(110,118,129,0.2);color:var(--text-faint)">${studied ? "✓ SPLNĚNO" : "KE STUDIU"}</button>
     </div>
     <div class="sec-meta-row">
       ${badgesHtml(item.tags)}
@@ -1061,6 +1053,22 @@ function detailedExerciseCard(item, studied) {
       ${starsHtml(item.relevance || 5, 10, "compact")}
     </div>
   `;
+
+  head.querySelector(".sec-title")?.addEventListener("click", () => {
+    window.__pcsNavigate?.({ kind: item.kind, id: item.id });
+  });
+
+  const toggleBtn = (e) => {
+    e.stopPropagation();
+    toggleStudied(item.id);
+    try { renderTree(); } catch { /* */ }
+    window.__pcsUpdateStatus?.();
+    showProgress();
+  };
+
+  head.querySelector(".sec-status-pill")?.addEventListener("click", toggleBtn);
+  head.querySelector(".st-status-check")?.addEventListener("click", toggleBtn);
+
   card.appendChild(head);
 
   if (tasks.length) {
