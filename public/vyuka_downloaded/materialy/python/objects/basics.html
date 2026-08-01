@@ -1,0 +1,761 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Třídy a objekty v Python'u
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Třídy a objekty v Python'u</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">27</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Zavedení třídy</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Alias na třídu</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Instance třídy I</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Instance třídy II</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Funkce jako atributy tříd I</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Funkce jako atributy tříd II</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Funkce jako atributy tříd III</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Funkce jako atributy tříd IV</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Instanční metody – jak to mělo být</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Instanční metody – jak to bohužel je</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Třídní metody I</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Třídní metody II</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">Statické metody</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">Emulace typu „record“ z jazyka Pascal</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">Metody I</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">Metody – „self“</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">Poznámka: Alias na atribut</span></a></li><li class="toc-item"><a class="toc-link" href="#id18"><span class="toc-num">18</span><span class="toc-text">Inicializace atributů</span></a></li><li class="toc-item"><a class="toc-link" href="#id19"><span class="toc-num">19</span><span class="toc-text">Dědičnost I</span></a></li><li class="toc-item"><a class="toc-link" href="#id20"><span class="toc-num">20</span><span class="toc-text">Příklad</span></a></li><li class="toc-item"><a class="toc-link" href="#id21"><span class="toc-num">21</span><span class="toc-text">Dědičnost II</span></a></li><li class="toc-item"><a class="toc-link" href="#id22"><span class="toc-num">22</span><span class="toc-text">Dědičnost III</span></a></li><li class="toc-item"><a class="toc-link" href="#id23"><span class="toc-num">23</span><span class="toc-text">Metody II</span></a></li><li class="toc-item"><a class="toc-link" href="#id24"><span class="toc-num">24</span><span class="toc-text">Třídní atributy</span></a></li><li class="toc-item"><a class="toc-link" href="#id25"><span class="toc-num">25</span><span class="toc-text">Třídní metody</span></a></li><li class="toc-item"><a class="toc-link" href="#id26"><span class="toc-num">26</span><span class="toc-text">PS: Poznámka k dekorátorům metod</span></a></li><li class="toc-item"><a class="toc-link" href="#id27"><span class="toc-num">27</span><span class="toc-text">„Privátní“ atributy</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2010-11-24</span></div><h1 class="lecture-title">Třídy a objekty v Python'u</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Zavedení třídy"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Zavedení třídy</h2></div><div class="section-body">
+
+  <p>
+    Zcela v duchu <a href="overview.xml">úvodu</a> můžeme nejjednodušší třídu vyrobit jako zobecnění <em>pojmenované n-tice</em>. Narozdíl od n-tice však u třídy můžeme měnit hodnoty jejích prvků:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; class MyClass:
+...     a, b, c = 1, 2, 3
+... 
+&gt;&gt;&gt; MyClass
+&lt;class '__main__.MyClass'&gt;
+
+&gt;&gt;&gt; MyClass.a
+1
+&gt;&gt;&gt; MyClass.a = 'ahoj'
+&gt;&gt;&gt; MyClass.a
+'ahoj'
+  </pre>
+  <p>
+    Tím jsme získali <em>jeden</em> pojmenovaný objekt, který umožňuje přístup ke svým prvkům pomocí tečkové notace (nebo jinými slovy – zavedli jsme nový jmenný prostor). To jsme si zase tak moc nepomohli...
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Alias na třídu"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Alias na třídu</h2></div><div class="section-body">
+
+  <p>
+     ...a přiřazení jiného jména třídě to samozřejmě nijak nevylepší:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; mc = MyClass
+&gt;&gt;&gt; mc
+&lt;class '__main__.MyClass'&gt;
+
+&gt;&gt;&gt; MyClass.a
+1
+&gt;&gt;&gt; mc.a
+1
+
+# Tam..
+&gt;&gt;&gt; MyClass.a = 'ahoj'
+&gt;&gt;&gt; MyClass.a
+'ahoj'
+&gt;&gt;&gt; mc.a
+'ahoj'
+
+# ..i zpět to samozřejmě funguje stejně.
+&gt;&gt;&gt; mc.b
+2
+&gt;&gt;&gt; MyClass.b
+2
+&gt;&gt;&gt; mc.b = 'svete'
+&gt;&gt;&gt; mc.b
+'svete'
+&gt;&gt;&gt; MyClass.b
+'svete'
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Provedením <code>mc = MyClass</code> jsme pouze objektu v paměti „přilepili“ další identifikátor.
+  </div></div>
+  
+  <p>
+    Tímto způsobem jsme vlastně zavedli <em>alias</em> na základní třídu, což nám bude v budoucnu k užitku.
+  </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Instance třídy I"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Instance třídy I</h2></div><div class="section-body">
+
+  <p>
+    Operování přímo s konkrétními třídami jako na předchozím slajdu je sice možné, ale dost by omezovalo jejich použití. Zajímavější je, pokud uvedenou třídu použijeme jako <em>konstruktor</em> pro jednotlivé její <em>instance</em>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; class MyClass:
+...     a, b, c = 1, 2, 3
+... 
+&gt;&gt;&gt; MyClass
+&lt;class '__main__.MyClass'&gt;
+&gt;&gt;&gt; dir(MyClass)
+['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__',
+ '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__le__',
+ '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__',
+ '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__',
+ '__weakref__', 'a', 'b', 'c']
+
+# A) Instance 'mc1' třídy 'MyClass' podědí vlastnosti svého rodiče:
+&gt;&gt;&gt; mc1 = MyClass()
+&gt;&gt;&gt; mc1
+&lt;__main__.MyClass object at 0xb75dda0c&gt;
+&gt;&gt;&gt; MyClass.a
+1
+&gt;&gt;&gt; mc1.a
+1
+
+# B) Pokud na potomkovi ale něco změníme, rodič se to nedozví:
+&gt;&gt;&gt; mc1.a = 'ahoj'
+&gt;&gt;&gt; mc1.a
+'ahoj'
+&gt;&gt;&gt; MyClass.a
+1
+
+# C) Podobně pokud nyní změníme něco na rodiči,
+#    potomek bude taktéž zanechán v blahé nevědomosti:
+&gt;&gt;&gt; MyClass.a = 'svete'
+&gt;&gt;&gt; MyClass.a
+'svete'
+&gt;&gt;&gt; mc1.a
+'ahoj'
+
+# D) Nový potomek 'mc2' ale nyní podědí i nový stav rodiče:
+&gt;&gt;&gt; mc2 = MyClass()
+&gt;&gt;&gt; mc2
+&lt;__main__.MyClass object at 0xb75ddd6c&gt;
+&gt;&gt;&gt; mc2.a
+'svete'
+  </pre>
+  
+  <p>
+    Všimněte si, že při použití třídy jako <em>konstruktoru</em> ji <strong>voláme</strong>, tedy se závorkami – <code>MyClass()</code>.
+  </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Instance třídy II"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Instance třídy II</h2></div><div class="section-body">
+
+  <p>
+    Situace se „kapku“ změní, pokud <strong>atribut je proměnného typu</strong> a použijeme operace pro úpravu hodnot tohoto typu:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; class MyClass:
+...     a, b = 1, [2, 3]
+
+# A) Instance třídy podědí vlastnosti svého rodiče:
+&gt;&gt;&gt; mc1 = MyClass()
+&gt;&gt;&gt; mc1.a
+1
+&gt;&gt;&gt; mc1.b
+[2, 3]
+
+# B) A pokud na potomkovi přesměrujeme odkaz na jiný typ, rodič se to nedozví:
+&gt;&gt;&gt; mc1.b = 'ahoj'
+&gt;&gt;&gt; mc1.b
+'ahoj'
+&gt;&gt;&gt; MyClass.b
+[2, 3]
+
+# C1) Když se ale místo změny hodnoty začneme přehrabovat ve vnitřnostech
+#     proměnného datového typu, začnou se dít věci:
+&gt;&gt;&gt; mc2 = MyClass()
+&gt;&gt;&gt; mc2.b
+[2, 3]
+&gt;&gt;&gt; mc3 = MyClass()
+&gt;&gt;&gt; mc3.b
+[2, 3]
+&gt;&gt;&gt; mc2.b.append(4)
+&gt;&gt;&gt; mc2.b
+[2, 3, 4]
+&gt;&gt;&gt; mc3.b
+[2, 3, 4]
+&gt;&gt;&gt; MyClass.b
+[2, 3, 4]
+
+# C2) A to samozřejmě nezávisle na místě způsobení změny:
+&gt;&gt;&gt; mc3.b.append(5)
+&gt;&gt;&gt; mc3.b
+[2, 3, 4, 5]
+&gt;&gt;&gt; mc2.b
+[2, 3, 4, 5]
+&gt;&gt;&gt; MyClass.b
+[2, 3, 4, 5]
+
+# C3) Nepřekvapivě na potomka, který zaměnil typ za jiný, to ale nemá vliv:
+&gt;&gt;&gt; mc1.b
+'ahoj'
+  </pre>
+
+</div></section><section class="slide-section" id="id5" data-title="Funkce jako atributy tříd I"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Funkce jako atributy tříd I</h2></div><div class="section-body">
+
+    <p>
+        Kromě „obyčejných“ proměnných můžeme do tříd schovat samozřejmě i funkce. A dokud se ke třídě chováme jako ke jmennému prostoru, všechno funguje přesně tak, jak bychom čekali:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; class T:
+        ...     
+        ...     a = 'Ahoj!'
+        ...     
+        ...     def fn(x):
+        ...         return f'Zavoláno: fn({x})'
+
+        &gt;&gt;&gt; T.a
+        'Ahoj!'
+        &gt;&gt;&gt; T.fn
+        &lt;function T.fn at 0x000001F4751C0D60&gt;
+        &gt;&gt;&gt; T.fn(666)
+        'Zavoláno: fn(666)'
+        &gt;&gt;&gt; T.fn('Baf!')
+        'Zavoláno: fn(Baf!)'
+    </pre>
+
+</div></section><section class="slide-section" id="id6" data-title="Funkce jako atributy tříd II"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Funkce jako atributy tříd II</h2></div><div class="section-body">
+
+    <p>
+        Jakmile ale začneme třídy používat jako konstruktory instancí, vystrčí na nás nos podle mě kardinálně špatné rozhodnutí tvůrců Python'u:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; class T:
+        ...     
+        ...     a = 'Ahoj!'
+        ...     
+        ...     def fn(x):
+        ...         return f'Zavoláno: fn({x})'
+
+        &gt;&gt;&gt; t = T()
+        &gt;&gt;&gt; t.fn
+        &lt;bound method T.fn of &lt;__main__.T object at 0x000001F4749AB830&gt;&gt;
+        &gt;&gt;&gt; t.fn(666)
+        Traceback (most recent call last):
+          File "&lt;pyshell#7&gt;", line 1, in &lt;module&gt;
+            t.fn(666)
+        TypeError: T.fn() takes 1 positional argument but 2 were given
+    </pre>
+    <p>
+        Dva poziční argumenty? Jenom proto, že jsem funkci zavolal na instanci? Co to má znamenat?
+    </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Funkce jako atributy tříd III"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Funkce jako atributy tříd III</h2></div><div class="section-body">
+
+    <p>
+        Dobře, zkusme se tomu přizpůsobit:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; class T:
+        ...     
+        ...     a = 'Ahoj!'
+        ...     
+        ...     def fn(x, y):
+        ...         return f'Zavoláno: fn({x}, {y})'
+
+        &gt;&gt;&gt; t = T()
+        &gt;&gt;&gt; t.fn(666)
+        'Zavoláno: fn(&lt;__main__.T object at 0x000001F47518C920&gt;, 666)'
+
+        &gt;&gt;&gt; t
+        &lt;__main__.T object at 0x000001F47518C920&gt;
+    </pre>
+    <p>
+        Aha, takže funkce na instanci (neboli tedy <em>metoda instance</em>) dostane jako první parametr referenci na tuto instanci. Nezvyklé, ale dává to smysl asi tak stejně dobře, jako automagické objevování se této reference v podobě klíčového slova <code>this</code> v jiných jazycích.
+    </p>
+
+</div></section><section class="slide-section" id="id8" data-title="Funkce jako atributy tříd IV"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Funkce jako atributy tříd IV</h2></div><div class="section-body">
+
+    <p>
+        Jenže to má ten důsledek, že <em>jedna a ta samá funkce</em> se v rámci instance volá s jiným počtem parametrů než v rámci jmenného prostoru třídy:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; class T:
+        ...     
+        ...     a = 'Ahoj!'
+        ...     
+        ...     def fn(x, y):
+        ...         return f'Zavoláno: fn({x}, {y})'
+
+        &gt;&gt;&gt; T.fn(666)
+        Traceback (most recent call last):
+          File "&lt;pyshell#13&gt;", line 1, in &lt;module&gt;
+            T.fn(666)
+        TypeError: T.fn() missing 1 required positional argument: 'y'
+        &gt;&gt;&gt; T.fn('Baf!', 666)
+        'Zavoláno: fn(Baf!, 666)'
+    </pre>
+
+</div></section><section class="slide-section" id="id9" data-title="Instanční metody – jak to mělo být"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Instanční metody – jak to mělo být</h2></div><div class="section-body">
+
+    <p>
+        Kdyby bývaly byly tyto funkce, co se chovají jinak v rámci třídy a jinak v rámci instance, nějak označeny, například takovýmto <a href="/materialy/python/functions/decorators.xml">dekorátorem</a>..
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        class T:
+            
+            a = 'Ahoj!'
+            
+            @instancemethod
+            def fn(x, y):
+                return f'Zavoláno: fn({x}, {y})'
+    </pre>
+    <p>
+        ..neřekl bych ani slovo – znalí dekorátorů by věděli, že daná funkce se nejspíš bude chovat úplně jinak, než je napsána, neznalí by díky tomu označení zase alespoň tušili, že to nebude jen tak nějaká obyčejná funkce.
+    </p>
+    <p>
+        Nejhorší na tom je, že to tak mohlo být (ostatně vizte dále <a href="?slajd=11"><em>třídní metody</em></a>)! Ale tvůrci jazyka se rozhodli, že když už někdo používá třídy, chce je především kvůli instančním metodám, tak mu přece ušetříme psaní a nebudeme je nijak označovat. Výsledek je chmurný – <code>def</code> v bloku <code>class</code> se chová podle toho, kde a jak ji použijete :-(
+    </p>
+
+</div></section><section class="slide-section" id="id10" data-title="Instanční metody – jak to bohužel je"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Instanční metody – jak to bohužel je</h2></div><div class="section-body">
+
+    <p>
+        Nakonec tedy bohužel, <strong>funkce bez dekorátoru v bloku třídy jsou automaticky brány jako <em>instanční</em> a při svém volání na instanci automaticky dostanou navíc referenci na tuto instanci jako svůj první poziční parametr</strong> (což je přesně práce dekorátoru, kdyby tam býval byl!):
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        class T:
+            
+            a = 'Ahoj!'
+            
+            def fn(self, y):
+                return f'Zavoláno: fn({self}, {y})'
+    </pre>
+    <p>
+        Nemusí se nám to líbit (mně ani trochu), ale prostě to tak je :-(
+    </p>
+    <p>
+        PS: Název <em>self</em> se pro tento první atribut používá čistě dohodou, aby se zdůraznilo, že jde o referenci na instanci. Ve vlastním zájmu tuto dohodu neporušujte – je to jediná nápověda, že se tyto funkce chovají jinak, než by člověk z jejich zápisu čekal.
+    </p>
+
+</div></section><section class="slide-section" id="id11" data-title="Třídní metody I"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Třídní metody I</h2></div><div class="section-body">
+
+    <p>
+        Důvod, proč jsem ze stavu instančních metod tak nakvašený, je v tom, že existují i třídní metody – které očekávaně operují nad atributy třídy, nikoli instance – a ty se samozřejmě pomocí dedikovaného dekorátoru zavádí:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; class T:
+        ...     
+        ...     a = 'Ahoj!'
+        ...     
+        ...     @classmethod
+        ...     def fn(x, y):
+        ...         return f'Zavoláno: fn({x}, {y})'
+
+        &gt;&gt;&gt; t = T()
+        &gt;&gt;&gt; t.fn(666)
+        "Zavoláno: fn(&lt;class '__main__.T'&gt;, 666)"
+        &gt;&gt;&gt; T
+        &lt;class '__main__.T'&gt;
+    </pre>
+    <p>
+        <strong>Třídní metody tedy při svém volání také automaticky dostávají navíc (první) poziční parametr, ale je jím reference na příslušnou třídu.</strong> A nikoho toto chování nepřekvapí, protože před funkcí je v definici napsaný dekorátor, který na to upozorňuje.
+    </p>
+
+</div></section><section class="slide-section" id="id12" data-title="Třídní metody II"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Třídní metody II</h2></div><div class="section-body">
+
+    <p>
+        Z pochopitelných důvodů se tento atribut prozměnu dohodou označuje jako <em>cls</em>..
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        class T:
+            
+            a = 'Ahoj!'
+            
+            @classmethod
+            def fn(cls, y):
+                return f'Zavoláno: fn({cls}, {y})'
+    </pre>
+    <p>
+        ..a každý vidí, že má smysl se tím řídit – hned na první pohled je jasné, že jde o reterenci na třídu (<em>class</em>).
+    </p>
+
+</div></section><section class="slide-section" id="id13" data-title="Statické metody"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">Statické metody</h2></div><div class="section-body">
+
+    <p>
+        Abychom kyselý koláč dojedli rovnou celý, tak existuje ještě jeden dekorátor pro metody tříd:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        class T:
+            
+            a = 'Ahoj!'
+            
+            @staticmethod
+            def fn(x, y):
+                return f'Zavoláno: fn({x}, {y})'
+    </pre>
+    <p>
+        Ano, hádáte správně – takto označené funkce se chovají při volání ve jmenném prostoru třídy a na instanci stejně, tj. očekávají přesně stejný počet parametrů, s jakým jsou zapsány (zde tedy dva). Člověk se nemůže zbavit pocitu, proč se funkce, která se chová přesně tak, jak byste čekali, musí označovat nějakým dekorátorem…
+    </p>
+
+</div></section><section class="slide-section" id="id14" data-title="Emulace typu „record“ z jazyka Pascal"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">Emulace typu „record“ z jazyka Pascal</h2></div><div class="section-body">
+
+  <p>
+    Nehledě na (podle mě) nevhodný a matoucí zápis, když už jsme se s tímto rozdílem mezi atributy <em>instančními</em> a <em>třídními</em> seznámili, můžeme tu vlastnost, že atributy instance nemají s atributy třídy nic společného, využít ještě o kus dál – na každé instanci si můžeme dodefinovat libovolné další atributy, které potřebujeme.
+  </p>
+  <p>
+    Prakticky úplnou obdobu pascalovského typu <em>záznam</em> (<em>record</em>) tak získáme například takto:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+class Zaměstnanec:
+    pass
+
+jan = Zaměstnanec()   # vyrobení prázdného záznamu o zaměstnanci
+
+# naplnění polí (atributů) záznamu
+jan.jméno = 'Jan Novák'
+jan.oddělení = 'počítačová laboratoř'
+jan.plat = 15000
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Upraveno podle dokumentace.
+  </div></div>
+  <p>
+    Prostě jsme vytvořili prázdný objekt, z něj vyrobili taktéž zcela prázdnou instanci a do ní jsme „naházeli“ všechna potřebná data.
+  </p>
+
+</div></section><section class="slide-section" id="id15" data-title="Metody I"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">Metody I</h2></div><div class="section-body">
+
+  <p>
+    Většinou (alespoň v programování obecně) se tedy třídy používají tak, že spolu s daty zapouzdřují i funkce, které umí s příslušnými daty správně pracovat. Těmto funkcím, které operují na datech dané instance (případně i třídy), se říká <em>metody</em>.
+  </p>
+
+  <p>
+    Vyrobme si ukázkovou třídu <em>Člověk</em> s jednou metodou <em>identifikace()</em>:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/alisa.py"><em>alisa.py</em></a></div><example src="_files/alisa.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/alisa.out" lang="text"></example></div></div>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Zatímco v rámci třídy je <em>identifikace</em> „obyčejnou“ funkcí, v rámci instance se již jedná o metodu dané instance (<em>bound method</em>).
+  </div></div>
+  <p>
+    Až na parametr <code>self</code> voláme tuto metodu standardně – předáváme pouze další dodatečné parametry (což v tomto případě znamená parametr žádný).
+  </p>
+
+</div></section><section class="slide-section" id="id16" data-title="Metody – „self“"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">Metody – „self“</h2></div><div class="section-body">
+
+  <p>
+    <a href="?slajd=7">Jak už víme</a>, pokusíme-li se metodu <em>identifikace()</em> zavolat přímo na třídě, se zlou se potážeme..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+Člověk.identifikace()
+  --&gt;
+TypeError: identifikace() takes exactly 1 argument (0 given)
+  </pre>
+  <p>
+    ..zatímco volání na instanci nečiní žádné potíže:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+alisa.identifikace()
+  --&gt;
+"Dobrý den! Jmenuji se Алиса Селезнева."
+  </pre>
+  <p>
+    Celý „vtip“  je schován v tom, že parametr <code>self</code> metody <em>identifikace()</em> odkazuje na právě zavedenou instanci třídy, která je při volání příslušné metody předána Python'em automaticky jako její první parametr, tj.:
+  </p>
+  <blockquote>
+    Při zavolání této metody ve výše uvedeném tvaru <code>alisa.identifikace()</code> se tak vlastně ve skutečnosti volá kód <code>Člověk.identifikace(alisa)</code>.
+  </blockquote>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Tady je důvod pro pojmenování <em>self</em> asi vidět nejjasněji.
+  </div></div>
+
+</div></section><section class="slide-section" id="id17" data-title="Poznámka: Alias na atribut"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">Poznámka: Alias na atribut</h2></div><div class="section-body">
+
+  <p>
+    PS: V Python'u můžete atributy třídy/instance vesele aliasovat a volat pod těmito novými jmény, např.:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# Po zavedení..
+fn = alisa.identifikace
+# ..pak můžeme volat:
+fn()  --&gt;  "Dobrý den! Jmenuji se Алиса Селезнева."
+  </pre>
+  <p>
+    V principu jde o úplně stejnou techniku jako u <a href="?slajd=2">aliasů tříd</a> – prostě jen konkrétnímu objektu (zde metodě) přiřadíme další jméno („nálepku“), pod kterým se na něj nadále můžeme odkazovat.
+  </p>
+
+</div></section><section class="slide-section" id="id18" data-title="Inicializace atributů"><div class="section-header"><span class="section-num">18</span><h2 class="section-title">Inicializace atributů</h2></div><div class="section-body">
+
+  <p>
+    Většinou nebudeme chtít vyrobit instanci třídy (pouze) s hodnotami, jaké jí poskytla rodičovská třída. V takovém případě doplníme třídu o metodu <code>__init__()</code>. Ta zaručuje, že každá nově vytvořená instance bude obsahovat též takové hodnoty, které pošleme jako parametr do třídního konstruktoru:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# Při zavedení třídy..
+class Člověk():
+    """Objektová reprezentace člověka."""
+
+    def __init__(self, jméno, datum_narození, krevní_skupina):
+        self.jméno = jméno
+        self.datum_narození = datum_narození
+        self.krevní_skupina = krevní_skupina
+
+# ..pro konkrétní instanci..
+alisa = Člověk(
+    'Алиса Селезнева',
+    '2065-11-17',
+    '0',
+  )
+
+# ..dostaneme:
+alisa.jméno --&gt; Алиса Селезнева
+alisa.krevní_skupina --&gt; 0
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Výrazy typu <code>self.jméno = jméno</code> nedělají nic magického – prostě na dané instanci (<em>self</em>) zavedou nový atribut (zde <em>jméno</em>), kterému přiřadí příslušnou výchozí hodnotu. Že se daný atribut jmenuje stejně jako příslušný parametr konstruktoru (tedy funkce <em>__init__()</em>), je pouze úzus. Klidně by se mohl jmenovat úplně jinak, ale z důvodů čitelnosti se to nedělá – na první pohled je takto jasné, kde příslušný parametr z inicializace instance skončí.
+  </div></div>
+  
+  <p>
+    Všimněte si (a zapamatujte), že <code>__init__()</code> je zase pouze „obyčejná“ instanční metoda a jako taková dostává automaticky implicitní první parametr v podobě odkazu na právě zaváděnou instanci třídy. Při inicializaci se tedy vlastně volá kód <code>Člověk.__init__(alisa, 'Алиса Селезнева', '2065-11-17', '0')</code>.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    PS: Až na to, že narozdíl od jiných metod instance v případě <em>init</em>u to takto přímo zavolat nejde – objekt <code>alisa</code> by totiž už musel existovat (což se sice dá zařídit a také se tak děje, ale <a href="meta.xml?slajd=3">je to výrazně složitější</a> a mimo rámec této přednášky).
+  </div></div>
+  
+  <p>
+    PS: Na parametry konstruktoru se nepřekvapivě vztahují podobná pravidla jako na parametry funkcí. Můžete tedy používat pojmenované parametry s výchozí hodnotou apod.
+  </p>
+
+</div></section><section class="slide-section" id="id19" data-title="Dědičnost I"><div class="section-header"><span class="section-num">19</span><h2 class="section-title">Dědičnost I</h2></div><div class="section-body">
+  
+  <p>
+    Dědičnost v rámci Python'u vyjádříme jako parametr při zavádění třídy. <em>Školáka</em> jako upraveného <em>Člověka</em> tak vyrobíme třeba takto:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+  class Školák(Člověk):
+    """Objektová reprezentace školáka."""
+    
+    def __init__(self, jméno, datum_narození, krevní_skupina, třída, předměty):
+        Člověk.__init__(self, jméno, datum_narození, krevní_skupina)
+        self.třída = třída
+        self.předměty = předměty
+  </pre>
+  <p>
+    A podobně i pro <em>Učitele</em>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+  class Učitel(Člověk):
+    """Objektová reprezentace učitele."""
+    
+    def __init__(self, jméno, datum_narození, krevní_skupina, třída, předměty, výplata):
+        Člověk.__init__(self, jméno, datum_narození, krevní_skupina)
+        self.třída = třída
+        self.předměty = předměty
+        self.výplata = výplata
+  </pre>
+
+  <p>
+    <strong><code>__init__()</code> nadřazené třídy s příslušnými parametry tedy musíme v potomkovi zavolat sami</strong>, nikdo jiný to za nás neudělá!
+  </p>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Přesněji řečeno – nadřazený <em>__init__()</em> musíte explicitně zavolat, měníte-li způsob inicializace dané instance (tedy například počet parametrů či jejich význam). <strong>Pokud ho na potomkovi vůbec nezavedete, volá se na příslušném rodičovi automaticky sám.</strong>
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Při dědění z jednoho rodiče je velmi vhodné explicitní volání jménem rodičovské třídy nahradit voláním <strong>funkce <em>super()</em> bez parametrů</strong>: <code>super().__init__(jméno, datum_narození, krevní_skupina)</code>. To je totiž v tomto jednoduchém případě ekvivalentní volání <code>super(Školák, self).__init__(jméno, datum_narození, krevní_skupina)</code> .
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Python podporuje i vícenásobnou dědičnost, „rodičů“ tudíž může být víc jak jeden. Při vyhledávání atributů jsou pak zjednodušeně řečeno prohledávány třídy v zadaném pořadí a do šířky.
+    </div></div></div>
+
+</div></section><section class="slide-section" id="id20" data-title="Příklad"><div class="section-header"><span class="section-num">20</span><h2 class="section-title">Příklad</h2></div><div class="section-body">
+
+  <p>
+    Budeme-li pokračovat v příkladu, bude upravené zavedení objektu typu <em>Školák</em> vypadat takto:
+  </p>  
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+  alisa = Školák(
+        'Алиса Селезнева',
+        '2065-11-17',
+        '0',
+        '3. A',
+        {'matematika': 1, 'zeměpis': 1, }
+      )
+
+  alisa.jméno --&gt; Алиса Селезнева
+  alisa.třída --&gt; 3. A
+  </pre>
+  <p>
+    Zde se tedy prozměnu (jakoby) volá: <code>Školák.__init__(alisa, 'Алиса Селезнева', '2065-11-17', '0', '3. A', {'matematika': 1, 'zeměpis': 1, })</code>.
+  </p>
+
+</div></section><section class="slide-section" id="id21" data-title="Dědičnost II"><div class="section-header"><span class="section-num">21</span><h2 class="section-title">Dědičnost II</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    I když použijeme <em>super()</em>, pořád se na rodičovskou třídu odkazujeme jejím jménem při zavedení poděděné třídy a při případné refaktorizaci kódu nás tak čeká spousta práce s přepisováním (a nezapomenutím na nějaký výskyt).
+  </p>
+  <p>
+    Tento problém je ovšem možné snadno vyřešit – stačí zavést <em>alias</em> na rodičovskou třídu a v kódu používat dále pouze ten (což jsme ostatně viděli už na <a href="?slajd=2">druhém slajdu</a>):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+  class Člověk():
+    ...
+  
+  AliasČlověk = Člověk
+  
+  class Školák(AliasČlověk):
+    ...
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Samozřejmě nezáleží na tom, jak svůj alias pojmenujete, je to normální „proměnná“.
+  </div></div>
+  <p>
+    Při refaktorizaci pak stačí zaměnit jediné místo kódu.
+  </p>
+
+  <p class="enumerate">
+    Mimochodem něco podobného se týká i rodičovských tříd definovaných v jiných <em>modulech</em>. Chcete-li z takové třídy dědit, musíte ji nejdříve do aktuálního modulu naimportovat. A jestli ji naimportujete jako součást celého modulu, nebo pouze ji, nebo pod nějakým jiným jménem, je zcela na vás.
+  </p>
+
+</div></section><section class="slide-section" id="id22" data-title="Dědičnost III"><div class="section-header"><span class="section-num">22</span><h2 class="section-title">Dědičnost III</h2></div><div class="section-body">
+
+  <p>
+    Neupravuje-li potomek chování rodičovské inicializace, metodu <em>__init__()</em> pak na něm dokonce ani nemusíme definovat a Python zavolá příslušnou rodičovskou sám. Pokud však jakoukoli rodičovskou instanční metodu (tedy i <em>__init__()</em>) na potomkovi předefinujeme, příslušný rodičovský originál musíme – vyžaduje-li to logika kódu – zavolat sami:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+class Rodič:
+    ...
+    def fn(self, atr1):
+        ...
+    ...
+
+class Potomek(Rodič):
+    ...
+    # upravená metoda 'fn()'
+    def fn(self, atr1, atr2):
+        # případné volání rodičovské metody
+        Rodič.fn(self, atr1)
+        # následuje kód, kde (snad :) využijeme i 'atr2'
+        ...
+    ...
+  </pre>
+  <p>
+      PS: Tohle je přesně místo, kde budete chtít použít <code>super()</code>. Jelikož tato funkce toho ale umí mnohem víc, než by člověk na první pohled čekal, je jí věnována <a href="super.xml">samostatná přednáška</a>.
+  </p>
+
+</div></section><section class="slide-section" id="id23" data-title="Metody II"><div class="section-header"><span class="section-num">23</span><h2 class="section-title">Metody II</h2></div><div class="section-body">
+
+  <p>
+    Potomek podědí z rodiče jeho atributy i metody. Obé z toho může přepsat vlastní definicí (nebo pouze nějak doplnit). Ale stejně tak si samozřejmě může zavést atributy a metody zcela vlastní.
+  </p>
+
+  <p>
+    Doplňme naši ukázkovou třídu <em>Školák</em> o metodu pro výpočet průměrné známky ze všech předmětů (ostatní kód zůstává stejný):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+  class Školák(Člověk):
+    ...
+    def průměrná_známka(self):
+        """Vrací průměr všech známek studenta."""
+        součet = 0
+        for předmět in self.předměty:
+            součet += self.předměty[předmět]
+        return součet / len(self.předměty)
+  </pre>
+  <p>
+    Nyní budou instance třídy <em>Školák</em> obsahovat oproti instancím třídy <em>Člověk</em> navíc i metodu <em>průměrná_známka()</em>.
+  </p>
+  
+  <p>
+    PS: Jak už víme z dřívějška, pro volání metody platí následující ekvivalence:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+  # Volání..
+  alisa.průměrná_známka() --&gt; 1
+  # ..je ekvivalentní volání:
+  Školák.průměrná_známka(alisa)
+  </pre>
+
+</div></section><section class="slide-section" id="id24" data-title="Třídní atributy"><div class="section-header"><span class="section-num">24</span><h2 class="section-title">Třídní atributy</h2></div><div class="section-body">
+
+  <p>
+    Někdy se nám ale může hodit operovat nikoli s atributy konkrétní instance třídy, nýbrž s atributy rodiče. Vzpomeneme-li si na první slajd, je implementace jasná – stačí vynechat slovíčko <em>self</em> a odkazovat se přímo na uvedenou rodičovskou třídu (neuvedený kód se opět zachovává):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+  class Školák(Člověk):
+    ...
+    školáků = 0
+    ...
+    def __init__(self, ...):
+        ...
+        Školák.školáků += 1
+  </pre>
+  <p>
+    Síla <em>třídních atributů</em> tkví v tom, že jsou sdíleny všemi instancemi třídy mezi sebou navzájem (jak už jsme viděli), takže jakákoli změna v nich je viditelná ve všech jednotlivých instancích/objektech vytvořených z dané třídy.
+  </p>
+  <p>
+    PS: Zjevně místo <em>Školák</em>a můžete dosadit libovolný jiný dostupný objekt, ale to už by daný kód dělal něco úplně jiného, než jste zamýšleli… Proto je mnohem lepší napsat to rovnou jako dále pomocí <em>třídní metody</em>.
+  </p>
+
+</div></section><section class="slide-section" id="id25" data-title="Třídní metody"><div class="section-header"><span class="section-num">25</span><h2 class="section-title">Třídní metody</h2></div><div class="section-body">
+
+  <p>
+    Na třídních atributech operují komplementární <em>třídní metody</em> (označené dekorátorem <code>@classmethod</code>)..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+  class Školák(Člověk):
+    ...
+    školáků = 0
+    ...
+    
+    def __init__(self, ...):
+        ...
+        self.přidej_školáka()
+  
+    @classmethod
+    def přidej_školáka(cls):
+        cls.školáků += 1
+  </pre>
+  <p>
+    ..které prozměnu jako první implicitní parametr dostávají referenci na celou příslušnou třídu. Zavedení nové instance v tomto případě tedy způsobí následující řetěz volání:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    alisa = Školák(…)
+    ⇒ Školák.__init__(alisa, …)
+    ⇒ alisa.přidej_školáka()
+    ⇒ přidej_školáka(Školák)
+    ⇒ Školák.školáků += 1
+  </pre>
+
+</div></section><section class="slide-section" id="id26" data-title="PS: Poznámka k dekorátorům metod"><div class="section-header"><span class="section-num">26</span><h2 class="section-title">PS: Poznámka k dekorátorům metod</h2></div><div class="section-body">
+
+    <p>
+        Jak už jsem říkal, podle mého by bývalo bylo mnohem lepší, kdyby se dekorátory metod zavedly opačným způsobem:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        class Třída:
+        
+            def statická_metoda(...):
+                ...
+        
+            @classmethod
+            def třídní_metoda(cls, ...):
+                ...
+        
+            @instancemethod
+            def instanční_metoda(self, ...):
+                ...
+    </pre>
+    <p>
+        Neoznačené metody by se volaly jako normální funkce se správným počtem parametrů a u dekorovaných by každému na první pohled bylo jasné, že je něco jinak, a dal by si pozor, co píše. Bohužel zvítězil názor, že: <em>„Třídy chtějí lidé především kvůli instancím, tak instanční metody zavedeme bez dekorátoru, ať ušetříme psaní.“</em> Psaní jsme sice ušetřili, ale jako bonus jsme získali solidní guláš…
+    </p>
+
+</div></section><section class="slide-section" id="id27" data-title="„Privátní“ atributy"><div class="section-header"><span class="section-num">27</span><h2 class="section-title">„Privátní“ atributy</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Python nemá koncepci skutečně soukromých, privátních atributů. Ale jakýkoliv atribut, jehož <em>jméno začíná alespoň dvěma podtržítky a končí podtržítkem nejvýše jedním</em> se bude jako privátní tvářit – nebude totiž na třídě (ani instanci) pod tímto jménem dostupný:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; class MyClass:
+...     a = 1
+...     __b = 2
+
+# Na atribut 'a' se dostaneme normálně:
+&gt;&gt;&gt; MyClass.a
+1
+
+# S atributem '__b' už to nejde:
+&gt;&gt;&gt; MyClass.__b
+Traceback (most recent call last):
+  File "&lt;pyshell#12&gt;", line 1, in &lt;module&gt;
+    MyClass.__b
+AttributeError: type object 'MyClass' has no attribute '__b'
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Technicky dojde k nahrazení jména atributu <code>__atribut</code> za <code>_classname__atribut</code>, kde <em>classname</em> je vytvořeno ze jména příslušné třídy (z něhož jsou nejdříve odstraněna případná začáteční podtržítka). V tomto příkladě bude tedy třída obsahovat atribut <code>MyClass._MyClass__b</code> (který se takto i bude vypisovat v rámci <code>dir(MyClass)</code>).
+  </div></div>
+  
+  <p class="enumerate">
+    Podobně atributy (data i metody) začínající na <em>jedno</em> podtržítko jsou konvencí brány za <em>neveřejnou část</em> API (rozhraní třídy). Narozdíl od dvojpodtržítkových jsou vidět a jsou normálně přístupné, ale všichni by se jim měli vyhýbat jako čert kříži ^_~
+  </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 27 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

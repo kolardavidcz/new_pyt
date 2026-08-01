@@ -1,0 +1,130 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>SAX
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — SAX</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">7</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Výhody a nevýhody DOMu</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Enter SAX</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Princip</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Načítání XML v Python'u</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Ukázka</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Poznámky</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Příklad – reprodukce stromečkové struktury</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2010-11-03</span></div><h1 class="lecture-title">SAX</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Výhody a nevýhody DOMu"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Výhody a nevýhody DOMu</h2></div><div class="section-body">
+  
+  <p>
+    DOM má jednu ohromnou nevýhodu a zároveň i výhodu – zpracovávaný dokument musí být celý načten do paměti (byť třeba poodkládané na disk). Jakákoliv část dokumentu totiž musí být při zpracování dostupná.
+  </p>
+  <p>
+    To na jedné straně umožňuje provozovat operace, které by jinak nešly (XPath-dotazy nad strukturou, XSLT-transformace, aplikace na struktuře závislých CSS-pravidel…), na druhé straně se však může vyznačovat až prohibitivními nároky na paměť.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Enter SAX"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Enter SAX</h2></div><div class="section-body">
+  
+  <p>
+    V případech, kdy nepotřebujeme přístup k celé struktuře dokumentu najednou (např. získání zapsaných údajů z XML nebo výměna přesně určených elementů/atributů za předem známé jiné), můžeme s výhodou použít paměťově méně náročný (a nejen díky tomu často i mnohem rychlejší) <strong>lineární přístup ke XML-dokumentu</strong> pomocí (skoro)standardu <strong>SAX</strong> (<em>Simple API for XML</em>).
+  </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Princip"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Princip</h2></div><div class="section-body">
+  
+  <p>
+    Princip SAXu spočívá v tom, že SAX-parser načítá dokument po (malých) částech a signalizuje, pokud narazí na XML-významnou strukturu:
+  </p>
+  <ul>
+    <li>textové listy</li>
+    <li>elementy včetně jejich atributů</li>
+    <li>komentáře</li>
+    <li>procesní instrukce</li>
+  </ul>
+  <p>
+    Vy jako uživatel pak můžete SAX-parseru předepsat, co má při daných událostech vykonat.
+  </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Načítání XML v Python'u"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Načítání XML v Python'u</h2></div><div class="section-body">
+  
+  <p>
+    V Pythonu v typických případech stačí vytvořit potomka třídy <code>xml.sax.ContentHandler</code>, kterého vybavíte metodami pro ošetření začátku a konce elementu a textového obsahu:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+class MyHandler(xml.sax.ContentHandler):
+
+  def startElement(self, name, attrs):
+    ...
+
+  def endElement(self, name):
+    ...
+
+  def characters(self, data):
+    ...
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Přitom nemusíte vždy implementovat všechny metody, stačí pouze ty, které se vám zrovna hodí. Zajímá-li vás tudíž například zrovna pouze hodnota nějakého atributu, stačí nadefinovat pouze metodu <code>startElement()</code>.
+  </div></div>
+  
+  <p>
+    Zatímco <code>name</code> a <code>data</code> jsou řetězce (název elementu a jeho textový obsah), objekt <code>attrs</code> představující atributy daného elementu se na oko tváří jako slovník, ale není to tak úplně pravda, viz seznam jeho vlastností:
+  </p>
+  <blockquote lang="python">
+    [ '__contains__', '__doc__', '__getitem__', '__init__', '__len__', '__module__', '_attrs', 'copy', 'get', 'getLength', 'getNameByQName', 'getNames', 'getQNameByName', 'getQNames', 'getType', 'getValue', 'getValueByQName', 'has_key', 'items', 'keys', 'values' ]
+  </blockquote>
+  <p>
+    Typický cyklus přes atributy a jejich hodnoty tak bude nejspíše v této podobě:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    for key, item in attrs.items():
+  </pre>
+
+</div></section><section class="slide-section" id="id5" data-title="Ukázka"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Ukázka</h2></div><div class="section-body">
+
+  <p>
+    Konkrétní použití vámi napsaného SAX-handleru pak může vypadat například takto:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+import xml.sax
+
+
+class MyHandler(xml.sax.ContentHandler):
+
+  def startElement(self, name, attrs):
+    print( 'START:', name )
+
+  def endElement(self, name):
+    print( 'END:', name )
+
+  def characters(self, data):
+    print( data )
+
+
+filename = "soubor.xml"
+handler = MyHandler()
+xml.sax.parse( filename, handler )
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Uvedený kód uvodí na výpise každý počáteční element nápisem <em>START</em>, každý koncový <em>END</em> a texty uvnitř elementů jednoduše přetiskne.
+  </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="Poznámky"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Poznámky</h2></div><div class="section-body">
+  
+  <ul>
+    <li>Z principu věci je ale SAX zřejmě jednosměrný – pokud cestou zjistíte, že potřebujete nějakou předchozí informaci a nezapamatovali jste si ji, máte smůlu a musíte začít dokument parsovat znovu od začátku.</li>
+    <li>Navíc SAX nemá ani nejmenší tušení o kontextu – jestli chcete sledovat třeba úroveň aktuálního zanoření (v rámci stromečku elementů), musíte se o to postarat sami.</li>
+  </ul>
+  
+  <p>
+    PS: Rozhraní SAX v Python'u podporuje i jmenné prostory nebo tvorbu výstupních XML-dokumentů.
+  </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Příklad – reprodukce stromečkové struktury"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Příklad – reprodukce stromečkové struktury</h2></div><div class="section-body">
+
+  <p>
+    V následujícím příkladu si s každým novým elementem zapamatujeme i jeho aktuální úroveň, kterou ve formě kódu <code>_level * "  "</code> použijeme k odsazení výstupu. Při uzavírání elementu zase vždy snížíme úroveň o jedničku dolů. Zároveň u elementů, které mají nějaké atributy, tyto vypíšeme (včetně jejich hodnot).
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            → Input: <a href="_files/stromecek.xml"><em>stromecek.xml</em></a></div><example src="_files/stromecek.xml" lang="xml"></example></div><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/sax.1.py"><em>sax.1.py</em></a></div><example src="_files/sax.1.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/sax.1.out" lang="text"></example></div></div>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 7 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

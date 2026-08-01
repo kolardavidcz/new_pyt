@@ -1,0 +1,288 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Zpracování vstupu
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Zpracování vstupu</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">10</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">„input()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Zpracování parametrů skriptu</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">„sys.argv“</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">„sys.argv“ – argumenty s mezerami</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">„sys.argv“ – příklad</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">„getopt“</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">„optparse“ – příklad</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">„optparse“ – použití</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">„optparse“ – poznámky</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2011-03-10</span></div><h1 class="lecture-title">Zpracování vstupu</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+  
+  <p>
+    Uživatelský vstup do programu můžeme v zásadě rozdělit na dva druhy:
+  </p>
+  <ul>
+    <li>
+        přímý vstup z klávesnice do běžícího programu
+    </li>
+    <li>
+        vstup do programu v podobě parametrů
+    </li>
+  </ul>
+  <p>
+    Python nabízí několik různých způsobů, jak zařídit obě možnosti vstupu. V dalším se seznámíme se základními z nich.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="„input()“"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">„input()“</h2></div><div class="section-body">
+  
+  <p class="enumerate">
+    Nejzákladnějším způsobem, jak z běžícího programu vyvolat interakci s uživatelem, je pomocí metody <code>input()</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; answer = input()
+Ahoj, světe!
+&gt;&gt;&gt; answer
+'Ahoj, světe!'
+  </pre>
+  <p>
+    Uvedený kód čeká na zadání vstupního <em>řetězce</em> ukončeného klávesou <code>↵</code>. Zadaný <em>řetězec</em> (bez odřádkování, to jen potvrdilo vstup) je předán jako návratová hodnota funkce (v našem případě tedy do proměnné <em>answer</em>).
+  </p>
+  <p>
+    Má-li vstupem být třeba celé číslo, je třeba vrácený řetězec na celé číslo převést, tj. provést např. <code>answer = int(answer)</code>.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    V Python'u 2.x se tímto způsobem chovala globální funkce <code>raw_input()</code>.
+  </div></div>
+
+  <p class="enumerate">
+    Metoda <code>input([PROMPT])</code> má jeden velmi užitečný nepovinný řetězcový parametr, tzv. <em>výzvu</em> (<em>prompt</em>):
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; answer = input('Zadej text: ')
+Zadej text: Ahoj, světe!
+&gt;&gt;&gt; answer
+'Ahoj, světe!'
+  </pre>
+
+  <p>
+    PS: Chcete-li chování této uživatelské výzvy vylepšit, můžete před jejím použitím naimportovat modul <code>readline</code> (dostupný pouze na platformě Unix!). Vstupní řádka pak „získá“ mimo jiné historii a větší možnosti editace (některé klávesové zkratky apod.).
+  </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Zpracování parametrů skriptu"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Zpracování parametrů skriptu</h2></div><div class="section-body">
+  
+  <p>
+    Co se vstupních parametrů skriptu týká, máme v Python'u k dispozici kromě jednoho zcela základního modulu:
+  </p>
+  <ol start="0">
+    <li>
+        <code class="em">sys.argv</code> – přístup k parametrům skriptu na nejnižší úrovni
+    </li>
+  </ol>
+  <p>
+    ...také několik „generací“ modulů vyšší úrovně:
+  </p>
+  <ol>
+    <li>
+        <code class="em">getopt</code> – nejstarší (a nejklasičtější) nadstavba pro práci s argumenty příkazové řádky
+    </li>
+    <li>
+        <code class="em">optparse</code> – vylepšení předchozího modulu; dostupné od verze Python'u 2.3
+    </li>
+    <li>
+        <code class="em">argparse</code> – poslední generace modulů pro zpracování argumentů příkazové řádky; dostupné od Python'u 3.2
+    </li>
+  </ol>
+  <p>
+    Zatímco modul <code>sys.argv</code> je zcela základní a veškerou práci s parsováním vstupních agumentů na potřebné hodnoty si musíte obstarat sami, další moduly poskytují nejrůznější vylepšení, jak téhož dosáhnout snadněji. Z praktických důvodů je modulu <code>argparse</code> věnována <a href="argparse.xml">samostatná přednáška</a>.
+  </p>
+
+</div></section><section class="slide-section" id="id4" data-title="„sys.argv“"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">„sys.argv“</h2></div><div class="section-body">
+
+  <p>
+    Nejjednodušším způsobem, jak předat právě spouštěnému programu (skriptu) nějaké údaje, je využít <em>vstupních parametrů skriptu</em>.
+  </p>
+  
+  <p class="enumerate">
+    Bez argumentů:
+  </p>
+  <div class="example-block example-horizontal"><div class="example-row-full"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python3 argvs.py</pre></div><div class="example-col"><div class="example-label">📄 Program: <a href="_files/argvs.py"><em>argvs.py</em></a></div><example src="_files/argvs.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/argvs.out1" lang="text"></example></div></div>
+  
+  <p class="enumerate">
+    S argumenty:
+  </p>
+  <div class="example-block example-horizontal"><div class="example-row-full"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python3 argvs.py arg1 arg2 arg3</pre></div><div class="example-col"><div class="example-label">📄 Program: <a href="_files/argvs.py"><em>argvs.py</em></a></div><example src="_files/argvs.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/argvs.out2" lang="text"></example></div></div>
+  <p>
+    Vidíme, že jméno spouštěného programu je předáno jako první prvek v seznamu argumentů, zatímco vše ostatní je „rozsekáno“ podle mezer a předáno jako další prvky seznamu.
+  </p>
+  
+  <p>
+    PS: Nezkoušejte míchat parametry s <em>wildcard</em>-znaky, výsledky by vás nejspíš poněkud překvapily...
+  </p>
+  
+
+</div></section><section class="slide-section" id="id5" data-title="„sys.argv“ – argumenty s mezerami"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">„sys.argv“ – argumenty s mezerami</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Pokud bychom chtěli předat jako jeden parametr text, který obsahuje mezery, muzíme ho buď zuvozovkovat (což funguje všude):
+  </p>
+  <div class="example-block example-horizontal"><div class="example-row-full"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python3 argvs.py "arg1a arg1b" arg2</pre></div><div class="example-col"><div class="example-label">📄 Program: <a href="_files/argvs.py"><em>argvs.py</em></a></div><example src="_files/argvs.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/argvs.out3" lang="text"></example></div></div>
+  
+  <p class="enumerate">
+    ..nebo mezery odiskejpovat (což nezabere pod Windows, ale pod UNIXem je to standard):
+  </p>
+  
+  <div class="example-block example-horizontal"><div class="example-row-full"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python3 argvs.py arg1a\ arg1b arg2</pre></div><div class="example-col"><div class="example-label">📄 Program: <a href="_files/argvs.py"><em>argvs.py</em></a></div><example src="_files/argvs.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/argvs.out3" lang="text"></example></div></div>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Pokud budou vaše vstupní parametry obsahovat nějaké „nebezpečné“ znaky, jejichž zadání je třeba ošetřit speciálním způsobem, skončíte v praxi nejspíš s různými spouštěcími skripty podle cílového operačního systému (<em>*.cmd</em> nebo <em>*.bat</em> pro Windows, <em>*.sh</em> pro Linux a možná i Mac OS), protože tyto znaky se liší systém od systému (obzvláště Windows jsou velmi restriktivní).
+  </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="„sys.argv“ – příklad"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">„sys.argv“ – příklad</h2></div><div class="section-body">
+
+  <p>
+    Typické použití v programu bude vypadat asi následovně:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+import sys
+
+if len( sys.argv ) != 2:
+    print( "Usage: {} ARGUMENT".format( sys.argv[0] ) )
+    sys.exit()
+  </pre>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Tedy: Očekáváme-li na vstupu argument(y) a nedostaneme je, vypíšeme uživateli správný způsob volání skriptu a pomocí <code>sys.exit()</code> ukončíme jeho vykonávání, aby mohl být znovu zavolán (a tentokrát už snad správně).
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Alternativně můžete vyrobit nekonečnou smyčku a v ní čekat na správný vstup, ale to už je spíš pro hodně interaktivní program určený „běžným“ uživatelům.
+    </div></div></div>
+  <p>
+    Samozřejmě si musíte pohlídat, že uživatel zadal potřebný počet parametrů a ve správném tvaru. Pokud ne, dejte mu o tom vědět a ukončete provádění skriptu. (Respektive použijte nějaké výchozí hodnoty, je-li to možné, ale pak o tom též nějakým způsobem informujte. Alespoň v README :)
+  </p>
+
+</div></section><section class="slide-section" id="id7" data-title="„getopt“"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">„getopt“</h2></div><div class="section-body">
+
+    <p>
+        Smyslem tohoto modulu je víceméně jediné – lidem, kteří jsou zvyklí na céčkovskou funkci <em>getopt()</em>, nabídnout její funkčně podobnou obdobu i v Python'u:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python getopt.mod.py -c stylopis.css --xhtml test.html</pre></div><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/getopt.mod.py"><em>getopt.mod.py</em></a></div><example src="_files/getopt.mod.py" lang="text"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/getopt.mod.out" lang="text"></example></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Upraveně podle dokumentace.
+    </div></div>
+    
+    <p>
+        Výstupem funkce je seznam dvojic za všechny přítomné přepínače (<code>:</code> a <code>=</code> označují přepínače, které vyžadují vstup) a seznam argumentů. Veškeré testy na povinné přepínače a argumenty a správné hodnoty zadání, stejně jako podrobnou nápovědu si tak musíte kompletně napsat sami, protože <em>getopt</em> za vás zkontroluje prakticky jediné – zda mezi přepínači není nějaký neznámý.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Typický rozhodovací kód vypadá následovně:
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+                for o, a in opts:
+                    if o in ("-h", "--help"):
+                        usage()
+                        sys.exit()
+                    elif o in …:
+                        …
+        </pre>
+    </div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="„optparse“ – příklad"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">„optparse“ – příklad</h2></div><div class="section-body">
+
+  <p>
+    Ukažme si nejdříve chování kódu vybaveného modulem <em>optparse</em> při různých voláních skriptu z příkazové řádky. Daný skript pouze (přehledně) vypisuje, jaké argumenty na příkazové řádce obdržel:
+  </p>
+  
+  <p class="enumerate">
+    Nevíme, jak program vůbec zavolat, tak to zkusíme bez parametrů:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python optparse.mod.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/optparse.mod.out1" lang="text"></example></div></div>
+
+  <p class="enumerate">
+    Aha, takže přepínače nejsou povinné, ale jméno souboru ano. Tak ho zkusíme přidat (<em>test.html</em>):
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python optparse.mod.py test.html</pre></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/optparse.mod.out2" lang="text"></example></div></div>
+
+  <p class="enumerate">
+    Vida, přepínače mají nějaké výchozí hodnoty. Nebyla by k nim nějaká nápověda?
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python optparse.mod.py --help</pre></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/optparse.mod.out3" lang="text"></example></div></div>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    A jak je dobrým zvykem, téhož výsledku dosáhneme zavoláním: <code>python3 optparse.mod.py -h</code>
+  </div></div>
+
+  <p class="enumerate">
+    Tak to zkusme všechno najednou:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python optparse.mod.py -x -c stylopis.css test.html</pre></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/optparse.mod.out4" lang="text"></example></div></div>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Přepínačem <code>-c</code> jsme změnili stylopisový soubor (klíč <em>cssfile</em>) z výchozího <em>style.css</em> na <em>stylopis.css</em> a přepínačem <code>-x</code> jsme změnili výchozí hodnotu klíče <em>xhtml_flag</em> z <code>False</code> na <code>True</code>. <em>test.html</em> je jméno souboru (určeného ke zpracování).
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        V „dlouhém“ provedení by volání vypadalo: <code>python.exe optparse.mod.py --xhtml --cssfile=stylopis.css test.html</code> (znak <code>=</code> tam sice není povinný, ale lépe se to s ním čte)
+    </div></div></div>
+
+  <p class="enumerate">
+    Aby se neřeklo, tak ještě obligátní dotaz na verzi programu :)
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python optparse.mod.py --version</pre></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/optparse.mod.out5" lang="text"></example></div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="„optparse“ – použití"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">„optparse“ – použití</h2></div><div class="section-body">
+  
+  <p>
+    Příklad na předchozím slajdu je upraven podle ukázky na <a class="external" href="http://www.saltycrane.com/blog/2009/09/python-optparse-example/">http://www.saltycrane.com/blog/2009/09/python-optparse-example/</a> (originální dokumentace k modulu <code>optparse</code> je velmi „výživná“):
+  </p>
+  <example src="_files/optparse.mod.py" lang="python"></example>
+  
+
+</div></section><section class="slide-section" id="id10" data-title="„optparse“ – poznámky"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">„optparse“ – poznámky</h2></div><div class="section-body">
+  
+  <p>
+    Už na první pohled je modul <code>optparse</code> poměrně mocný. Pro podrobnosti se podívejte přímo do dokumentace, tady už jen několik poznámek:
+  </p>
+  <ul>
+    <li>
+        Přestože se návratová hodnota <em>options</em> z kódu <code>options, args = parser.parse_args()</code> tváří jako slovník, slovník to není :-( Naštěstí to spraví jedno volání funkce <code>vars()</code>, která převádí svůj argument na slovník (alespoň pokud je to objekt vybavený atributem <em>__dict__</em>):
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            options, args = parser.parse_args()
+            options_dict = vars(options)
+        </pre>
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Použití <code>vars()</code> není úplně bez problémů, ale pokud pouze „vytáhnete“ hodnoty z parseru, nemělo by se nic zvláštního stát.
+        </div></div>
+    </li>
+    <li>
+        Parametr <em>action</em> má k dispozici následující standardní operace: <code>store</code> (výchozí), <code>store_const</code> (uloží hodnotu parametru <em>const</em>), <code>store_true</code>, <code>store_false</code>, <code>append</code> (přidej nalezenou hodnotu do seznamu), <code>append_const</code>, <code>count</code> (inkrementuje odpovídající počitadlo), <code>callback</code> (vyvolá uvedenou funkci s danými parametry), <code>help</code>.
+    </li>
+    <li>
+        S výhodou můžete použít též parametr <em>type</em> – určuje typ argumentu, který příslušný přepínač očekává. Jeho výchozí hodnotou je nepřekvapivě <em>"string"</em> (uvozovky jsou důležité), dále můžete použít <em>"int"</em>, <em>"float"</em>, <em>"complex"</em> a <em>"choice"</em> (viz další bod). Nestačí-li vám to, můžete <em>optparse</em> rozšířit o další typy.
+    </li>
+    <li>
+        Pokud má mít nějaký přepínač pouze jistou množinu povolených hodnot, použijte kombinaci parametrů <em>type="choice" choices=VÝBĚR</em>:
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_option('-e', '--env',
+                              action='store',
+                              dest='environment',
+                              type='choice',   # přepínač je výběrem z definované množiny hodnot
+                              choices=['production', 'staging', 'testing',],   # možné hodnoty přepínače
+                              default='production',
+                              help='Environment to run on',)
+        </pre>
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Upraveno opět podle <a class="external" href="http://www.saltycrane.com/blog/2009/09/python-optparse-example/">http://www.saltycrane.com/blog/2009/09/python-optparse-example/</a> .
+        </div></div>
+    </li>
+    <li>
+        Přepínače můžete seskupit do více skupin pomocí <code>optparse.OptionGroup</code>:
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            # import potřebných konstruktorů
+            from optparse import OptionParser, OptionGroup
+
+            # zavedení vlastního parseru a (vizuálních) skupin přepínačů
+            parser = OptionParser(..)
+            group1 = OptionGroup(parser, 'NÁZEV', 'POPISEK')
+            ..
+
+            # A) ke každé skupině se chováme stejně, jako dříve k samotnému parseru – přidáváme do ní vlastní přepínače
+            group1.add_option(..)
+            ..
+            # B) na konci pak skupinu přepínačů přidáme jako celek do parseru
+            parser.add_option_group(group1)
+        </pre>
+    </li>
+  </ul>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 10 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

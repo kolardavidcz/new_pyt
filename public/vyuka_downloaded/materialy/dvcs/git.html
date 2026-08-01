@@ -1,0 +1,512 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Git
+      —
+      DVCS</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Git</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">18</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Identifikace</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">„.gitconfig“</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Adresář „.git“</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Globální versus lokální nastavení</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Ignorované soubory</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">„clone“ &amp; „init“</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">„add“, „commit“ a tzv. index</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">„status“</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">„rm“</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">„mv“</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Náprava běžných chyb</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Náprava (méně) běžných chyb</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">gitk</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">„log“</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">„diff“ &amp; „whatchanged“</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">Práce se vzdáleným repozitářem</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">PS: Řešení problémů se spojením přes SSH</span></a></li><li class="toc-item"><a class="toc-link" href="#id18"><span class="toc-num">18</span><span class="toc-text">„help“</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">DVCS</span><span class="lecture-date">2015-03-02</span></div><h1 class="lecture-title">Git</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Identifikace"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Identifikace</h2></div><div class="section-body">
+
+  <p>
+    První věc, kterou musíte udělat, aby byl <em>git</em> vůbec ochotný se s vámi bavit, je identifikovat se. Provádět změny v repozitáři totiž můžete pouze tehdy, když je možné je s někým svázat.
+  </p>
+  <p class="enumerate">
+    Tuto identifikaci můžete provést z příkazové řádky:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    $ git config --global user.name "Pirat Piratovic"
+    $ git config --global user.email Pirat.Piratovic@example.com
+  </pre>
+  <p class="enumerate">
+    Druhou možností je objevit, kde se na vašem systému schovává soubor konfigurací gitu <em>.gitconfig</em> a upravit v něm příslušnou část <em>[user]</em>:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    [user]
+        name = Pirat Piratovic
+        email = Pirat.Piratovic@example.com
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Na Linuxu bude cesta <code>/home/UserName/.gitconfig</code>, na (novějších) Windows <code>c:\Users\UserName\.gitconfig</code>.
+  </div></div>
+
+</div></section><section class="slide-section" id="id2" data-title="„.gitconfig“"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">„.gitconfig“</h2></div><div class="section-body">
+
+  <p>
+    Soubor <em>.gitconfig</em> toho ale může obsahovat mnohem více. Ukažme si příklad:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    [user]
+        name = Pirat Piratovic
+        email = Pirat.Piratovic@example.com
+    [core]
+        editor = Notepad2.exe
+        excludesfile = .gitignore
+    [color]
+        ui = true
+    [alias]
+        unstage = reset HEAD --
+        last = log -1 HEAD
+        visual = gitk
+  </pre>
+  <p>
+    Význam uvedených bloků je následující:
+  </p>
+  <ul>
+    <li>
+        <strong>[user]</strong> : vaše identifikace (jako uživatele gitu)
+    </li>
+    <li>
+        <strong>[core]</strong> : několik významných nastavení pro git (např. vyžádá-li si git použití editoru, bude díky tomuto nastavení použit program <em>Notepad2.exe</em>)
+    </li>
+    <li>
+        <strong>[color]</strong> : velmi užitečné nastavení, které šikovně obarví výstupy jednotlivých příkazů
+    </li>
+    <li>
+        <strong>[alias]</strong> : velmi užitečná část sloužící k zavedení zkratek za složitější příkazy gitu (s tímto nastavením snadno odsunu soubor z <em>indexu</em> pomocí příkazu <code>git unstage SOUBOR</code>)
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id3" data-title="Adresář „.git“"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Adresář „.git“</h2></div><div class="section-body">
+
+  <p>
+    Veškerá „magie“ gitu se schovává ve speciálním podadresáři <code>.git</code> kořenového adresáře vašeho projektu.
+  </p>
+  <p>
+    Tento adresář – kromě dodatečných nastavení a řídicích souborů – totiž především obsahuje (v podobě binární databáze) veškerý obsah daného projektu, a to včetně jeho kompletní historie.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Má-li váš projekt dlouhou historii nebo obsahuje-li mnoho velmi rozdílných vývojových větví, nedivte se, že tento adresář bude velmi veliký – musí v sobě všechny tyto údaje zaznamenat. Pravděpodobně poměrně brzo překročí jeho velikost velikost samotného projektu.
+  </div></div>
+  <p>
+      PS: Git narozdíl od většiny ostatních verzovacích systémů neukládá rozdíly ve změněných souborech (tzv. <em>delta-based</em> přístup), ale celkový stav celého projektu v podobě tzv. <em>snapshot</em>ů (snad „snímků“?). Komit u Gitu tak znamená vytvoření SHA-součtů všech souborů a adresářů a uložení záznamu (opět označeného pomocí SHA-heše) o všech těchto součtech a jejich provázání s příslušnými binárními podobami souborů v lokální „databázi“. Vlastní <em>komit</em> je pak zase jenom SHA-označený ukazatel na tento přehledový záznam. (A těchto ukazatelů můžete mít, co hrdlo ráčí. Proto se v Gitu tak dobře pracuje s <a href="git.advanced.xml?slajd=2">vedlejšími vývojovými větvemi</a>.)
+  </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Globální versus lokální nastavení"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Globální versus lokální nastavení</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Nastavení z předchozích slajdů jsou <strong>globální</strong>, platí pro vaši veškerou komunikaci s libovolnými repozitáři a nachází se v globálním konfiguračním souboru <em>.gitconfig</em>.
+  </p>
+  
+  <p class="enumerate">
+    Kromě toho si však každý repozitář drží ve svém <em>.git</em>-adresáři také tzv. <strong>lokální</strong> konfiguraci, v souboru <em>config</em>. Její struktura je úplně stejná, takže ji buď můžete přepisovat přímo nebo pomocí nastavení z příkazové řádky, jen s vynecháním přepínače <code>--global</code>, tj. například:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    $ git config user.name "Pirat Piratovic"
+    $ git config user.email Pirat.Piratovic@example.com
+  </pre>
+  <p>
+    Zde uvedená nastavení jsou platná <em>pouze pro uvedený repozitář</em>. Hodí se tedy například, potřebujete-li pro daný projekt používat jinou identifikaci nebo třeba jiný seznam ignorovaných souborů.
+  </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Ignorované soubory"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Ignorované soubory</h2></div><div class="section-body">
+
+  <p>
+    Narozdíl od Mercurialu umožňuje git jméno a cestu k souboru pro uložení vzorů ignorovaných souborů <a href="?slajd=2">konfigurovat</a>. Na jednu stranu bezva, na druhou bez pohledu do konfigurace nevíte, která bije.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Dále se proto budeme držet úmluvy, že uvedený soubor se nachází na stejném místě jako hlavní konfigurační soubor <em>.git</em> a bude se jmenovat <em>.gitignore</em>.
+  </div></div>
+  <p>
+    Příklad: Následující jednoduchý <em>.gitignore</em>-soubor..
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    *~
+    *.pyc
+  </pre>
+  <p>
+    ..způsobí, že git nebude záložní soubory (unixových) textových editorů (vzor <code>*~</code>) a zkompilované pythoní moduly (vzor <code>*.pyc</code>) vůbec uvažovat za hodny své pozornosti ^_~
+  </p>
+
+</div></section><section class="slide-section" id="id6" data-title="„clone“ &amp; „init“"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">„clone“ &amp; „init“</h2></div><div class="section-body">
+
+  <p>
+    Vytvořit repozitář můžete dvojím způsobem:
+  </p>
+  <ul>
+    <li>
+        <strong>naklonováním</strong> již existujícího repozitáře příkazem <code>git clone</code>:
+        <pre class="brush: bash; gutter: false; toolbar: false; ">
+            git clone &lt;ADRESA&gt;
+        </pre>
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Výsledkem bude nový podadresář klonovaného projektu v aktuálním adresáři.
+        </div></div>
+    </li>
+    <li>
+        <strong>založením</strong> nového repozitáře příkazem <code>git init</code>:
+        <pre class="brush: bash; gutter: false; toolbar: false; ">
+            git init &lt;ADRESÁŘ&gt;
+        </pre>
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Také můžete adresář vytvořit dopředu, přepnout se do něj a zavolat pouze <code>git init</code>, výsledek bude stejný.
+        </div></div>
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id7" data-title="„add“, „commit“ a tzv. index"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">„add“, „commit“ a tzv. index</h2></div><div class="section-body">
+
+  <p>
+    Soubory, jejichž aktuální stav chcete do repozitáře přidat, musíte nejprve <em>označit</em> příkazem <code>git add</code> a následně pomocí příkazu <code>git commit</code> do repozitáře zanést:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git add &lt;SOUBOR-1 SOUBOR-2 …&gt;
+    git commit                       # vyvolá externí editor pro zadání zprávy
+    git commit -m "ZPRÁVA PRO LOG"   # zpráva přímo na příkazové řádce
+  </pre>
+  <p>
+    Týká se to jak souborů zcela nových (jimž tedy chcete začít udržovat jejich historii), tak ale i souborů již verzovaných, ale nedávno změněných (čímž se git liší prakticky od všech jiných DVCS). Z technického hlediska se u gitu mezi <em>přidáním</em> a <em>komitem</em> do repozitáře nachází ještě tzv. <em>index</em> (<em>staging area</em>), což prakticky vlastně znamená, že výchozí chování příkazů <strong>add</strong> i <strong>commit</strong> je:
+  </p>
+  <blockquote>
+    „Nedělej nic, co si uživatel výslovně nevyžádal.“
+  </blockquote>
+  <p>
+    Příkaz <strong>commit</strong> tak do repozitáře (historie) <em>zanese pouze ty změny, které byly uživatelem nejdříve zaneseny do indexu</em> pomocí příkazu <strong>add</strong>, který je tak narozdíl od jiných DVCS používaný mnohem častěji (pro každou změnu každého souboru). Pro pohodlí uživatele však existují některé užitečné zkratky:
+  </p>
+  <ul>
+    <li>
+        <code>git add .</code> – přidá do <em>indexu</em> všechny změněné soubory (či adresáře) v aktuálním adresáři a jeho podadresářích;
+        <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">Můžete napsat třeba i <code>../.</code> pro přidání všeho od nadřazeného adresáře. Tudíž pouze v kořenovém adresáři repozitáře budou přidány opravdu všechny změny.</div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">PS: Do verze 2 se mezi změny nepočítaly smazané soubory, ale tak starou už snad nikde nepotkáte.</div></div></div>
+    </li>
+    <li>
+        <code>git commit -a</code> – nejdříve přidá do <em>indexu</em> všechny provedené změny a poté je rovnou nakomituje.
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+          Ale to se týká pouze v repozitáři již zanesených souborů, úplně nové musíte přidat ručně.
+        </div></div>
+    </li>
+  </ul>
+  <p>
+    Poznámka: Verze <code>git commit</code> s externím editorem (tedy bez přepínače <em>-m</em>) má jednu výhodu – rozhodnete-li se při psaní komit-zprávy, že vlastně ještě nic komitovat nechcete, stačí editor prostě bez ukládání zapsané zprávy zavřít a ke komitu nedojde.
+  </p>
+
+</div></section><section class="slide-section" id="id8" data-title="„status“"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">„status“</h2></div><div class="section-body">
+
+  <p>
+    Rozdíl mezi novými či upravenými soubory/adresáři v kódu a soubory či adresáři, které budou zaneseny do historie, je nejlépe vidět pomocí příkazu <strong>status</strong>..
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git status [-s|--short]
+  </pre>
+  <p>
+    ..který obě skupiny změn – provedené změny versus změny zanesené do indexu (a tudíž připravené pro příští komit) – od sebe striktně rozlišuje.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    A to tím spíš, pokud jste si ve svém <em>.gitconfig</em> povolili obarvování výstupu (které je podobně jako u samotné linuxové příkazové řádky podle mě zcela nesmyslně z historicko-ideologických důvodů ve výchozím nastavení vypnuté) – provedené změny jsou označeny červeně, změny navíc zanesené do indexu jsou označeny zeleně.
+  </div></div>
+  <p>
+    Je však třeba si zapamatovat následující:
+  </p>
+  <blockquote>
+    Změníte-li soubor již zanesený do indexu, nakomitována bude jeho verze z indexu, nikoli jakákoli změna provedená po jeho přidání do indexu.
+  </blockquote>
+  <p>
+    Chcete-li nakomitovat verzi novější, musíte nejdříve přidat verzi novou (<code>git add SOUBOR</code>) a teprve poté ji nakomitovat (<code>git commit</code>).
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    PS: A dřív jste dokonce museli nejdřív starší verzi z <em>indexu</em> odstranit (viz alias <a href="?slajd=2"><code>git unstage SOUBOR</code></a>).
+  </div></div>
+  <p>
+    PS: Git tedy zcela netradičně umožňuje v rámci jednoho komitu zanést (a stejnou komitovací zprávou označit) pouze část změněných souborů. To může být velmi mocný nástroj, ale ruku v ruce s tím i velmi nebezpečný (stačí si představit třebas neúmyslný komit pouze části upravených souborů potřebných pro běh programu a jejich propagaci do cizího repozitáře).
+  </p>
+
+</div></section><section class="slide-section" id="id9" data-title="„rm“"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">„rm“</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Zbavit se souborů již zaznamenaných v historii (tedy <em>nakomitovaných</em>) je na první pohled trochu obtížnější úkol. Smažete-li totiž soubor/adresář „jen tak“ v souborovém systému, budete muset git přesvědčit (pomocí <code>git add</code>), že to myslíte vážně a že to nebyla jen nějaká náhoda (což je ostatně ten hlavní důvod, proč to funguje právě takhle). Chcete-li tedy nějaký soubor(y) při příštím komitu smazat, použijte rovnou příkaz <em>git rm</em>, který soubor odstraní na souborovém systému a rovnopu změnu zanese i do <em>indexu</em>:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git rm SOUBOR1 [SOUBOR2 …]
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Navzdory své úmyslné „ukecanosti“ následuje v tomto případě git linuxovou příkazovou řádku, takže příkaz <em>git remove</em> není k dispozici.
+  </div></div>
+  
+  <p class="enumerate">
+    Při odstraňování souborů pomocí <em>git rm</em> (tedy zároveň ze souborového systému i se zanesením do <em>indexu</em>) však git kontroluje, zda jste mezitím uvedený soubor nějak nezměnili (případně už danou změnu i nezanesli do <em>indexu</em>), a změněný soubor odmítne odstranit. Přepínač <code>-f</code>, resp. <code>--force</code>, pomůže:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git rm -f soubor
+  </pre>
+  
+  <p class="enumerate">
+    K dispozici je (mimo jiné) ještě další užitečný přepínač:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git rm -n
+    git rm --dry-run
+  </pre>
+  <p>
+    Ten prozměnu žádné odstranění neporovede, ale ukáže vám, co by bylo odstraněno, pokud byste tento přepínač vynechali. Velmi užitečné pro hromadné odstraňování více souborů či adresářů.
+  </p>
+
+</div></section><section class="slide-section" id="id10" data-title="„mv“"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">„mv“</h2></div><div class="section-body">
+
+  <p>
+      A to samé se pochopitelně týká i přejmenovávání. Potřebujete-li nějaký soubor nebo adresář přesunout či přejmenovat, můžete rovnou použít příkaz..
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git mv Cesta1 Cesta2
+  </pre>
+  <p>
+    ..který uvedenou změnu rovnou promítne i do <em>indexu</em> (takže na vás zbývá už jen potvrzující komit).
+  </p>
+  <p>
+    Na druhou stranu – git je často natolik schopný, že provedete-li uvedené změny na souborovém systému, pozná přesunutí/přejmenování v naprosté většině případů sám a před komitem vám je správně přiřadí a nahlásí.
+  </p>
+
+</div></section><section class="slide-section" id="id11" data-title="Náprava běžných chyb"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Náprava běžných chyb</h2></div><div class="section-body">
+
+  <p>
+    Někdy se neubráníte a uděláte nechtěně nějakou chybu, typicky nenakomitujete všechny soubory, které jste měli (obzvlástě snadné opomenutí v gitu s jeho <em>index</em>em). Pro tyto případy existuje mnoho různých náprav, od relativně bezpečných až po zcela katastrofální. Ukažme si pár z nich:
+  </p>
+  
+  <p class="enumerate">
+    Naprosto typickou chybou při používání gitu (kde máme k dispozici <em>index</em>) je přidání více souborů k příštímu komitu, než jsme chtěli. Náprava je jednoduchá a git nám ji dokonce hlásí ve výchozí nápovědě příkazu <code>status</code>:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git reset HEAD SOUBOR
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Celkem doporučuji zavést si na tohle alias <em>unstage</em>.
+  </div></div>
+  
+  <p class="enumerate">
+    Poměrně bezpečná je také náprava úvodního příkladu – komitovali jste příliš brzo a zbrkle. Dokud na nic jiného nesáhnete, můžete doplnit <em>index</em> o zapomenuté soubory (pomocí <code>git add</code>) a následně zavolat:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git commit --amend
+  </pre>
+  <p>
+    Výsledkem této operace je na první pohled jediný komit – ten poslední, opravený.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Pokud o to budete hodně stát, dá se k „zapomenutému“ komitu ale také dostat.
+  </div></div>
+  <p>
+    Naprosto úžasné použití pro tento příkaz je obzvláště ve chvíli, kdy se upíšete při psaní komitovací zprávy – prostě komitnete znovu, tentokrát (snad :-) už se zprávou správnou.
+  </p>
+  
+  <p class="enumerate">
+    Na druhou stranu někdy si pracovní adresář tak rozvrtáte, že byste nejradši všechno zahodili a začali znova od posledního komitu. To už je dost nebezpečná operace – přijdete o všechny změny, které jste od posledního komitu udělali! Proto si aplikaci následujících příkazů (zvláště toho druhého!) nejdříve dobře rozmyslete:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    # pro jeden konkrétní soubor (a nesmí být v indexu)
+    git checkout -- SOUBOR
+
+    # pro všechny změny v celém repozitáři
+    git reset --hard
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Správnější postup, jak tohle zařídit, je dělat nové změny v <a href="git.advanced.xml?slajd=2">testovací větvi</a> a do hlavní je promítat pouze při jejich úspěšném zvládnutí. Na to ostatně byl Git mimo jiné vymyšlen.
+  </div></div>
+  
+  
+
+</div></section><section class="slide-section" id="id12" data-title="Náprava (méně) běžných chyb"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Náprava (méně) běžných chyb</h2></div><div class="section-body">
+
+    <p>
+        Někdy ovšem uděláte komit, který je z podstatné části správně, ale z hodně velké také ne. Nejradši byste se vrátili zpátky před něj a nakomitovali tentokrát pouze to, co si to skutečně zaslouží. Světe (ne)div se, jde to:
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Velké díky za <a href="http://stackoverflow.com/questions/927358/how-do-you-undo-the-last-commit">Stack Overflow</a>.
+    </div></div>
+    <p>
+        Ve všech případech budeme začínat od následující struktury komitů:
+    </p>
+    <pre class="brush: text; gutter: false; toolbar: false; ">
+         (F)
+    A—B—C—D
+          ↑
+        master
+    </pre>
+    <p>
+        To jest: Ze stavu C jsme provedli (uspěchaný) komit do stavu D. Tento stav je tudíž aktuálním <em>master</em>em a naše pracovní soubory (F) vypadají podle něj.
+    </p>
+
+    <p class="enumerate">
+        Pokud se chcete vrátit do stavu před komitem D, ale přitom nepřijít o změny z tohoto komitu, tedy chcete vlastně udělat toto..
+    </p>
+    <pre class="brush: text; gutter: false; toolbar: false; ">
+         (F)
+    A—B—C—D
+        ↑
+      master
+    </pre>
+    <p>
+        ..náprava je naštěstí jednoduchá:
+    </p>
+    <pre class="brush: cmd; gutter: false; toolbar: false; ">
+        git reset HEAD~1
+    </pre>
+    <p>
+        Po provedení tohoto příkazu budou vaše soubory vypadat přesně tak, jak vypadaly, než jste je začali přidávat do indexu a komitovat.
+    </p>
+
+    <p class="enumerate">
+        Mimochodem existuje dokonce varianta předchozího příkazu, která se vrátí v čase o kousek blíže – „zahodí“ sice komit D s ponecháním souborů v rozpracovaném stavu, ale nesáhne na index, který komitu D příslušel:
+    </p>
+    <pre class="brush: cmd; gutter: false; toolbar: false; ">
+        git reset --soft HEAD~1
+    </pre>
+    <p>
+        Z hlediska souborů je výsledek tedy stejný jako bez parametru <em>--soft</em>, ale <em>staging area</em> zůstala zachovaná ve stavu pro komit D.
+    </p>
+
+    <p class="enumerate">
+        Pokud chcete zahodit nejen nepovedený komit, ale i celou rozpracovanou práci, stačí napsat..
+    </p>
+    <pre class="brush: cmd; gutter: false; toolbar: false; ">
+        git reset --hard HEAD~1
+    </pre>
+    <p>
+        ..jak jsem zmiňoval už na předchozím slajdu.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Zajímavé na gitu je, že ani v tomto případě jste o komit D nepřišli (alespoň po nějakou dobu) – git si totiž pamatuje veškerou provedenou historii (alespoň do příští údržby repozitáře), i když ji neukazuje ve stromečku provedených komitů (protože z něj jsme ji vlastně tímto příkazem odstranili). Chcete-li se ke komitu D dostat, musíte ho nejdříve najít v kompletní historii příkazem <em>git reflog</em> a následně ho příkazem <em>git checkout -b NováVětev SHAOdstraněnéhoKomitu</em> „vytáhnout“ (zde tedy pochopitelně do jiné větve).
+    </div></div>
+
+    
+
+</div></section><section class="slide-section" id="id13" data-title="gitk"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">gitk</h2></div><div class="section-body">
+
+  <p>
+    Narozdíl od mercurialu (<em>hg serve</em>) nemá git žádný vlastní jednoduše přístupný interní webový server s grafickým rozhraním. Na druhou stranu je ale zase téměř nemožné nainstalovat git bez dedikovaného GUI-nástroje <strong>gitk</strong>, jehož obdoba je v mercurialu dostupná jenom jako rozšíření, a ještě ke všemu nepodporované. Doporučuji pouštět ho z příkazové řádky uvnitř projektu na pozadí, tj.:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    gitk &amp;
+  </pre>
+
+</div></section><section class="slide-section" id="id14" data-title="„log“"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">„log“</h2></div><div class="section-body">
+
+  <p>
+    Na historii repozitáře se samozřejmě můžete podívat i z příkazové řádky. K tomu slouží příkaz <em>git log</em>. Nejzákladnější použití spočívá ve výpisu logu pro celý repozitář..
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git log
+  </pre>
+  <p>
+    ..nebo pouze pro vybraný soubor:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git log SOUBOR/ADRESÁŘ
+  </pre>
+  
+  <p>
+    Poznámka: Příkaz <em>git log</em> má k dispozici neuvěřitelnou spoustu doplňujících přepínačů, kterými můžete jeho výstup velmi ovlivnit. Kupříkladu přepínačem <code>-n ČÍSLO</code> (resp. <code>--max-count ČÍSLO</code>) říkáte, jak daleko do historie se má při výpisu zajít (obzvláště užitečné pro dlouhé historie).
+  </p>
+
+</div></section><section class="slide-section" id="id15" data-title="„diff“ &amp; „whatchanged“"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">„diff“ &amp; „whatchanged“</h2></div><div class="section-body">
+
+  <p>
+    Druhým základním příkazem pro prozkoumávání stavu repozitáře z příkazové řádky je příkaz <strong>git diff</strong>. Jeho použití je podobně jako u <em>git log</em> mnohostranné, ale mezi základní patří:
+  </p>
+  
+  <p class="enumerate">
+    Porovnání aktuálního stavu souboru vůči poslednímu stavu v historii je díky existenci <em>indexu</em> trojí:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git diff SOUBOR             # pracovní dosud nepřidané v indexu
+    git diff --cached SOUBOR    # index versus repozitář
+    git diff HEAD SOUBOR        # pracovní versus repozitář
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Prostě si musíte dávat pozor na to, že git komituje pouze věci přidané do indexu. I když jste třeba ty samé soubory mezitím ještě víc rozhrabali.
+  </div></div>
+  
+  <p class="enumerate">
+    Často se hodí porovnat dvě historické verze jistého souboru nebo adresáře:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git diff StaráRevize..NováRevize SOUBOR
+  </pre>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Pro rozlišení revizí je třeba zadat jejich číselné označení v historii, které zjistíte třeba z příkazu <em>git log SOUBOR</em>. Vzhledem k charakteru těchto čísel často stačí vzít prvních pár znaků, nemusíte je kopírovat celá.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Pro některé historické „milníky“ jsou k dispozici speciální pojmenování. Např. <code>HEAD^..HEAD</code> porovná poslední komit s jeho prvním rodičem. Více viz <a href="git.advanced.xml?slajd=">samostatná kapitola</a>.
+    </div></div></div>
+  
+  <p class="enumerate">
+    <code>git diff</code> se dá použít i bez udání konkrétního souboru, pak se použije na změny v celém projektu. Ale lepší je pak použít speciální příkaz <strong>git whatchanged</strong>:
+  </p>
+  <pre class="brush: bash; gutter: false; toolbar: false; ">
+    git whatchanged StaráRevize..NováRevize
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Pro rozlišení revizí je třeba zadat jejich číselné označení v historii, které zjistíte třeba z příkazu <em>git log</em>.
+  </div></div>
+
+</div></section><section class="slide-section" id="id16" data-title="Práce se vzdáleným repozitářem"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">Práce se vzdáleným repozitářem</h2></div><div class="section-body">
+
+  <p>
+    Git by nebyl distribuovaným systémem, kdyby neumožňoval spolupráci s externími repozitáři (a také práci s vývojovými větvemi, ale to je námět <a href="git.advanced.xml?slajd=2">příslušné části samostatné kapitoly</a>).
+  </p>
+  <p>
+    Základním předpokladem je mít v konfiguraci nastavenu cestu k externímu repozitáři a způsob provázání externích a místních větví (položky <code>[remote …]</code> a <code>[branch …]</code> v <em>.git/config</em>). Pro repozitář naklonovaný z externího zdroje není co řešit, uvedené informace bude automaticky obsahovat.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Přidáváte-li <em>remote</em> dodatečně, použijete nejspíš příkaz <a href="git.advanced.xml?slajd=13"><code>git remote</code></a> s některými z jeho mnoha přepínačů.
+  </div></div>
+  
+  <p>
+    Po splnění tohoto požadavku můžete používat především následující příkazy:
+  </p>
+  <ul>
+    <li>
+        <code>git pull</code> – stáhne změny z externího repozitáře k vám (<em>git fetch</em>) a rovnou je promítne do pracovního adresáře (<em>git merge FETCH_HEAD</em>)
+        <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">Dejte si pozor na stav vašeho a externího repozitáře a také na jména větví, která se budou spojovat – je velmi snadné dostat se do problematického konfliktu ^_^</div></div></div>
+    </li>
+    <li>
+        <code>git push</code> – vypropaguje vaše lokální změny (ty již nakomitované) do externího repozitáře
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">Aby to fungovalo, váš lokální repozitář musí obsahovat všechny změny repozitáře externího. A vzdálený repozitář musí být typu <a href="git.advanced.xml?slajd=22"><em>bare</em></a>.</div></div>
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id17" data-title="PS: Řešení problémů se spojením přes SSH"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">PS: Řešení problémů se spojením přes SSH</h2></div><div class="section-body">
+
+    <p>
+        Komunikace se vzdáleným repozitářem bude dosti pravděpodobně probíhat pomocí zabezpečeného protokolu SSH. A když selže, je někdy dosti pracné zjistit, co se vlastně porouchalo. Samotné <em>ssh</em> na to má přepínače <code>-v</code> až <code>-vvv</code>, v případě <em>Git</em>u je to velmi podobné, jen kapku složitější na zadání:
+    </p>
+    <pre class="brush: bash; gutter: false; toolbar: false; ">
+        GIT_SSH_COMMAND="ssh -v" git …
+    </pre>
+    <p>
+        Opět podle potřeby můžete příznak <code>-v</code> (aneb <em>verbose</em>) namnožit až na trojnásobek, ale často už první úroveň odhalí problém.
+    </p>
+    
+
+</div></section><section class="slide-section" id="id18" data-title="„help“"><div class="section-header"><span class="section-num">18</span><h2 class="section-title">„help“</h2></div><div class="section-body">
+
+  <p>
+    Cítíte-li se ztraceni, nezoufejte – příkaz <em>git help</em> je tu vždy k vašim službám! Pár příkladů:
+  </p>
+  <ul>
+    <li>
+        Vypiš nejdůležitější, respektive všechny příkazy gitu:
+        <pre class="brush: bash; gutter: false; toolbar: false; ">
+            git help        # základní
+            git help -a     # všechny; též „git help --all“
+        </pre>
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Samotný příkaz <code>git</code> zafunguje úplně stejně jako <code>git help</code>, vypíše tedy základní nápovědu.
+        </div></div>
+    </li>
+    <li>
+        Vypiš plnou nápovědu pro konkrétní příkaz gitu:
+        <pre class="brush: bash; gutter: false; toolbar: false; ">
+            git help PŘÍKAZ
+        </pre>
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Způsob výpisu se dá volit mezi klasickými <em>man-pages</em>, ne tak klasickými <em>info-pages</em> a výstupem v HTML-podobě na web. Pod Windows je k dispozici pouze výstup na web.
+        </div></div>
+    </li>
+  </ul>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 18 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

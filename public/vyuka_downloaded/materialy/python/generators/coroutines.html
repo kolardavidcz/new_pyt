@@ -1,0 +1,333 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Generátory a korutiny
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Generátory a korutiny</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">12</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Mnoho podob „yield“</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">„yield“ jako výraz</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Posílání hodnot do korutiny – „send()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">„yield from“ – sem</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">„yield from“ – tam</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Korutiny = „obrácené funkce“?</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Inicializace („priming“) korutiny dekorátorem</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Výjimky v korutinách</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Zavření korutiny – „close()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">K čemu jsou?</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Závěrečná poznámka – obousměrná komunikace</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2015-03-26</span></div><h1 class="lecture-title">Generátory a korutiny</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Již <a href="/materialy/python/functions/generators.xml">generátory</a> jsou svým způsobem základem <em>asynchronního programování</em> – pokud nejsou zrovna volány, čekají v „zamraženém“ stavu, než po nich bude znovu někdo něco chtít, v kterémžto okamžiku se „odmrazí“ a pokračují ve výpočtu od posledního místa.
+    </p>
+    <p>
+        Ale mají jedno omezení – posílají hodnoty pouze ven, neumí je přijímat (s výjimkou vstupních parametrů svého „konstruktoru“). Nepřekvapivě tak byla po čase jejich funkcionalita doplněna tak, aby při jejich „odmražení“ bylo možné do nich poslat hodnoty (a výjimky), tedy udělat z nich (téměř) skutečné <strong>korutiny</strong>.
+    </p>
+    
+
+</div></section><section class="slide-section" id="id2" data-title="Mnoho podob „yield“"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Mnoho podob „yield“</h2></div><div class="section-body">
+
+    <p>
+        Aby bylo možné posílat informace oběma směry, musela se upravit funkcionalita příkazu <em>yield</em> – stručně řečeno se z něj stal <strong>výraz</strong>:
+    </p>
+    <ul>
+        <li>
+            vrácení hodnoty (ať už je jí cokoliv) z generátoru
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                yield HODNOTA
+            </pre>
+        </li>
+        <li>
+            převzetí hodnoty do korutiny
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                proměnná = (yield)
+            </pre>
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Striktně vzato závorky kolem <code>yield</code> zde nejsou nutné, ale je <em>vřele doporučováno</em> je v tomto případě psát, aby bylo vidět, že používáme <code>yield</code> pro získání hodnoty
+            </div></div>
+        </li>
+    </ul>
+    <p>
+        <code>yield</code> se tedy chová podle toho, jak ho použijete. Nebo spíš – chová se pořád stejně, totiž vrací nějakou hodnotu, ale pokud mu neřeknete jakou, tak ji načte z rutiny, která ho zavolala (a to přes metodu korutiny/generátoru <code>send()</code>, respektive přes volání z <code>next()</code>).
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="„yield“ jako výraz"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">„yield“ jako výraz</h2></div><div class="section-body">
+
+    <p>
+        Zatímco <em>yield</em> jako příkaz je celkem jasný z <a href="/materialy/python/functions/generators.xml">generátorů</a> – funguje prakticky stejně jako <em>return</em> (a to nyní včetně varianty <code>yield</code> bez hodnoty, která je prostě úplně stejně jako u <em>return</em> ekvivalentní zavolání <code>yield None</code>), <em>yield</em> jako výraz je novinka a zasluhuje si trochu upřesnění.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Mimo jiné vzhledem k tomu, že je možno vracet n-tici (tj. např. <code>yield 12, 42</code>), je možné <strong><em>yield</em> jako výraz</strong> psát bez závorek pouze v případě, že je prvním výrazem na straně přiřazení. Tedy je povoleno..
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            x = yield 42
+            x = yield
+            x = 12 + (yield 42)
+            x = 12 + (yield)
+            foo(yield 42)
+            foo(yield)
+        </pre>
+        ..ale je zakázáno:
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            x = 12 + yield 42
+            x = 12 + yield
+            foo(yield 42, 12)
+            foo(yield, 12)
+        </pre>
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Přímo podle <a href="https://www.python.org/dev/peps/pep-0342/" class="external">PEP'u 342</a>.
+        </div></div>
+    </div></div>
+
+</div></section><section class="slide-section" id="id4" data-title="Posílání hodnot do korutiny – „send()“"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Posílání hodnot do korutiny – „send()“</h2></div><div class="section-body">
+
+    <p>
+        Generátor, který umí hodnoty i přebírat (v místě následujícího <em>yield</em>u), se pak nazývá <strong>korutina</strong><sup>*</sup>. Pro zasílání hodnot do korutiny slouží metoda generátoru <strong><code>send()</code></strong>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # zavedení korutiny – věčně čeká a tiskne hodnoty, které dostane
+        def korutina():
+            while True:
+                hodnota = (yield)
+                print(hodnota)
+        
+        # vytvoření korutiny (je to generátorový objekt)
+        k = korutina()
+        # „nastartování“ korutiny (alternativně možno také zavolat „next(k)“)
+        k.send(None)
+        # zasílání hodnot korutině
+        for x in range(5):
+            k.send(x)
+    </pre>
+    <p>
+        Stejně jako u „běžných“ generátorů, první zavolání korutiny vykoná všechen kód po první <code>(yield)</code> – proto ono podivné <code>k.send(None)</code> (respektive <code>next(k)</code>) na začátku. Korutina se tímto dostane k <code>(yield)</code>, čímž začne čekat na zasílání hodnot.
+    </p>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            * Skutečná korutina nemusí po <em>yield</em>u předat řízení tomu, kdo ji zavolal. Ale jinak pythoní zobecněné generátory definici korutiny celkem vyhovují – mohou vracet vícekrát, mají vícero vstupních bodů a mezi voláními čekají v zamraženém stavu.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Mimochodem – zavolat generátor/korutinu pomocí funkce <code>next()</code> (tedy ekvivalentně zavolat na ní/něm metodu <code>__next__()</code>) znamená poslat <em>yield</em>u hodnotu <code>None</code>. Podobně <code>yield</code> vrací <code>None</code>, pokud mu nebylo přes <code>send()</code> posláno něco jiného.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="„yield from“ – sem"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">„yield from“ – sem</h2></div><div class="section-body">
+
+    <p>
+        Než budeme pokračovat v zasílání hodnot do korutiny, připomeňme si znovu způsob, jakým se (od Python'u 3.3) řeší delegace přeposílání hodnot z podgenerátoru:
+    </p>
+    <div class="example-block example-horizontal"><div class="example-col"><div class="example-label">📄 Program: <a href="_files/generators.1.py"><em>generators.1.py</em></a></div><example src="_files/generators.1.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/generators.1+2.out" lang="text"></example></div></div>
+    <br>
+    <div class="example-block example-horizontal"><div class="example-col"><div class="example-label">📄 Program: <a href="_files/generators.2.py"><em>generators.2.py</em></a></div><example src="_files/generators.2.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/generators.1+2.out" lang="text"></example></div></div>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Možná to není na první pohled zřejmé, ale takto můžeme snadno generátory řetězit.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            PS: Pokud se vám to moc nezdá, tak můžete o <code>yield from iterátor</code> přemýšlet jako o <a href="https://snarky.ca/how-the-heck-does-async-await-work-in-python-3-5/" class="external">zkratce za konstrukci</a>
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                for x in iterátor:
+                    yield x
+            </pre>
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="„yield from“ – tam"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">„yield from“ – tam</h2></div><div class="section-body">
+
+    <p>
+        Stejná konstrukce <code>yield from</code> se totiž používá – byť by to z názvu nikdo neřekl – i na úplně opačný směr komunikace, totiž přeposílání hodnot do korutiny! Jak ukazuje následující příklad delegování komunikace s korutinou přes mezičlánek:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        # zavedení korutiny – věčně čeká a tiskne hodnoty, které dostane
+        def korutina():
+            while True:
+                hodnota = (yield)
+                print(hodnota)
+        
+        # „wrapper“ nad korutinou/generátorem
+        def obalovač(čeho):
+            yield from čeho
+        
+        # inicializace korutiny
+        k = korutina()
+        # inicializace „wrapper'u“
+        o = obalovač(k)
+        # „nastartování“ „wrapper'u“
+        next(o)
+        # zasílání hodnot korutině přes „wrapper“
+        for x in range(5):
+            o.send(x)
+    </pre>
+    <p>
+        <strong>Tedy kromě komunikace směrem „ven z generátoru“ slouží <em>yield from</em> také ke komunikaci směrem „dovnitř do korutiny“</strong>!
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Kdybychom neměli <em>yield from</em>, celé by se to zkomplikovalo – funkce <em>obalovač()</em> by totiž musela řešit „nastartování“ korutiny, přebírání hodnot z vnější smyčky a jejich přeposílání do ní a správné zareagování na ukončení vnější iterace, asi nějak takto:
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            def obalovač(čeho):
+                čeho.send(None)
+                while True:
+                    try:
+                        x = (yield)
+                        čeho.send(x)
+                    except StopIteration:
+                        pass
+        </pre>
+        PS: Volně podle <a href="http://stackoverflow.com/questions/9708902/in-practice-what-are-the-main-uses-for-the-new-yield-from-syntax-in-python-3" class="external">SO</a>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Korutiny = „obrácené funkce“?"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Korutiny = „obrácené funkce“?</h2></div><div class="section-body">
+
+    <p>
+        Na první pohled je vidět, že pro generátory konstrukce <em>yield from</em> dává smysl, zatímco u korutin je poněkud (dosti :-) zavádějící. Původně pro ni byla navrhována jiná řešení (např. <em>delegate</em>), ale nakonec před zavedením nového klíčového slova do jazyka zvítězila kombinace již existujících slov. Shrňme si to:
+    </p>
+    <ul>
+        <li>
+            <code>next(g)</code> → <code>yield HODNOTA</code> nebo <code>yield from GENERÁTOR</code> – vrací do nadřazeného kontextu hodnoty z generátoru;
+        </li>
+        <li>
+            <code>k.send(HODNOTA)</code> → <code>hodnota = (yield)</code> nebo <code>yield from KORUTINA</code> – posílá do korutiny hodnoty z nadřazeného kontextu.
+        </li>
+    </ul>
+    <p>
+        Na jednu stranu se aspoň oba směry komunikace řeší prakticky stejně. Na tu druhou ovšem už letmý pohled na internet i literaturu ukáže, že korutiny patří mezi nejméně pochopené a asi i nejhůře popsané vlastnosti Python'u. Pokusme se to trochu napravit.
+    </p>
+    
+    <p>
+        PS: Je ovšem třeba poznamenat, že pythoní korutiny mají svá omezení – nemůžete zavolat <em>send()</em> na korutinu, která právě běží, a nemůžete je cyklit (tedy <em>send</em>out si na předchozí korutinu v řetězci).
+    </p>
+
+</div></section><section class="slide-section" id="id8" data-title="Inicializace („priming“) korutiny dekorátorem"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Inicializace („priming“) korutiny dekorátorem</h2></div><div class="section-body">
+
+    <p>
+        Pamatovat si, že člověk musí nejdříve korutinu „nastavit“ na první <em>yield</em> pomocí <code>next(k)</code> nebo <code>k.send(None)</code>, je docela otrava. Napsat na příslušnou akci dekorátor je však jednoduché:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        def coroutine(func):
+            def wrapper(*args,**kwargs):
+                gen = func(*args, **kwargs)
+                next(gen)
+                return gen
+            wrapper.__name__ = func.__name__
+            wrapper.__dict__ = func.__dict__
+            wrapper.__doc__  = func.__doc__
+            return wrapper
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Princip tohoto dekorátoru je jasný. Tato varianta, která se navíc úplně pokouší schovat, že jde o dekorátor (viz kopírování <em>__name__</em>, <em>__dict__</em> a <em>__doc__</em>), je přímo upravená z příslušného <a href="https://www.python.org/dev/peps/pep-0342/" class="external">PEP'u 342</a>.
+    </div></div>
+    <p>
+        Základní příklad z předchozích slajdů pak při jeho použití vypadá takto:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        @coroutine
+        def korutina():
+            while True:
+                hodnota = (yield)
+                print(hodnota)
+        
+        k = korutina()
+        for x in range(5):
+            k.send(x) 
+    </pre>
+
+</div></section><section class="slide-section" id="id9" data-title="Výjimky v korutinách"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Výjimky v korutinách</h2></div><div class="section-body">
+
+    <p>
+        Korutiny mohou vesele výjimky generovat, ale dokonce i přijímat (skrze svoji metodu <code>throw()</code>):
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; class MojeVýjimka(Exception):
+        ...     pass
+        ... 
+        ... def korutina():
+        ...     try:
+        ...         while True:
+        ...             hodnota = (yield)
+        ...             print('korutina:', hodnota)
+        ...     except MojeVýjimka:
+        ...         print('Zachycena MojeVýjimka!')
+        ...  
+        ... k = korutina()
+        ... next(k)
+        
+        &gt;&gt;&gt; k.send('Ahoj!')
+        korutina: Ahoj!
+        
+        &gt;&gt;&gt; k.throw(MojeVýjimka)
+        Zachycena MojeVýjimka!
+        Traceback (most recent call last):
+          File "&lt;pyshell#27&gt;", line 1, in &lt;module&gt;
+            k.throw(MojeVýjimka)
+        StopIteration
+    </pre>
+    <p>
+        Zavolání metody <em>throw(VÝJIMKA)</em> nejdříve způsobí návrat do korutiny/generátoru na příslušné místo, kde teprve je zaslaná výjimka vyvolána.
+    </p>
+
+</div></section><section class="slide-section" id="id10" data-title="Zavření korutiny – „close()“"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Zavření korutiny – „close()“</h2></div><div class="section-body">
+
+    <p>
+        Chcete-li zastavit existující korutinu/generátor (<a href="generators.xml?slajd=8">jak už víme</a>, vyrobit nekonečný generátor je hračka), použijte její/jeho metodu <strong><code>close()</code></strong>. Příklad pro známý nekonečný generátor lichých čísel (ve variantě s počátkem):
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def lichá_čísla(od):
+        ...     číslo = od - 2
+        ...     while True:
+        ...         číslo += 2
+        ...         yield číslo
+        
+        &gt;&gt;&gt; g = lichá_čísla(11)
+        
+        &gt;&gt;&gt; next(g)
+        9: 11
+        &gt;&gt;&gt; next(g)
+        10: 13
+        
+        &gt;&gt;&gt; g.close()
+        &gt;&gt;&gt; next(g)
+        Traceback (most recent call last):
+          File "&lt;pyshell#33&gt;", line 1, in &lt;module&gt;
+            next(g)
+        StopIteration
+    </pre>
+    <p>
+        Zavolání této metody způsobí odeslání výjimky <strong><code>GeneratorExit</code></strong> do korutiny/generátoru.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Stejná metoda je volána mimo jiné <em>garbage collector'em</em>, když počet odkazů (<em>reference count</em>) na korutinu/generátor klesne na nulu.
+    </div></div>
+
+</div></section><section class="slide-section" id="id11" data-title="K čemu jsou?"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">K čemu jsou?</h2></div><div class="section-body">
+
+    <p>
+        Kardinální otázka zní, k čemu všemu tedy generátory a především korutiny používat. Podle <a href="http://www.dabeaz.com/coroutines/" class="external">Davida Beazleyho</a> má <em>yield</em> <strong>tři základní místa použití, která by se v žádném případě neměla míchat dohromady</strong>:
+    </p>
+    <ol>
+        <li>
+            <strong>iterace</strong> – <em>yield</em> jako producent dat;
+        </li>
+        <li>
+            <strong>příjem zpráv</strong> – <em>yield</em> jako konzument údajů;
+        </li>
+        <li>
+            <strong>přerušení</strong> (<em>trap</em>) – pro kooperativní multitasking.
+        </li>
+    </ol>
+    <p>
+        Zatímco první bod je relativně znám (klasické generátory), byť asi ani náhodou není zdaleka využíván, druhý je velmi zatemněn a prakticky nepoužíván a třetí už je úplně někde jinde. Ostatně jak David poznamenává – korutiny byly vymyšleny v šedesátých letech, a pak potichu umřely a možná pro to byl i důvod.
+    </p>
+
+</div></section><section class="slide-section" id="id12" data-title="Závěrečná poznámka – obousměrná komunikace"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Závěrečná poznámka – obousměrná komunikace</h2></div><div class="section-body">
+
+    <p>
+        Zopakujme si znovu dříve uvedené obecné doporučení (a zapomeňme pro tuto chvíli úplně na přerušení):
+    </p>
+    <blockquote>
+        Generátory hodnoty produkují, zatímco korutiny mají tendenci hodnoty požírat.
+    </blockquote>
+    <p>
+        A přestože metoda <code>send()</code> kromě předávání hodnoty do generátoru také přebírá a vrací případnout další hodnotu generátorem vrácenou, opravdu není dobrý nápad oba tyto koncepty míchat dohromady:
+    </p>
+    <div class="example-block example-horizontal"><div class="example-row-full"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">\n\n\n\n\n</pre></div><div class="example-col"><div class="example-label">📄 Program: <a href="_files/bothways.py"><em>bothways.py</em></a></div><example src="_files/bothways.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/bothways.out" lang="text"></example></div></div>
+    <p>
+        Vysvětlení:
+        Korutina po nastartování čeká na prvním <em>yield</em>, takže při prvním zavolání vše proběhne očekávaně – je načteno písmeno <code>'a'</code> a vráceno jeho ztrojnásobení. Jenže pozor – nyní se korutina zamrazila po tomto druhém <em>yield</em>! Tudíž následující zavolání <code>k.send('b')</code> způsobí všeho všudy pouze návrat na první <em>yield</em>, odkud se řízení vrátí zpátky do smyčky <em>for</em>! A protože korutina žádný výstup nevyprodukovala (dokonce vlastně ani to písmeno <code>'b'</code> nenačetla), je návratová hodnota pochopitelně <code>None</code>. Ovšem nyní je korutina zase ve stejném stavu, jako byla na začátku, takže další volání (pro písmeno <code>'c'</code>) skončí zase „očekávaně“. Ale další pro písmeno <code>'d'</code> opět ne. A tak dál.
+    </p>
+    <p>
+        Ne, tohle opravdu není dobré zkoušet míchat dohromady ^_~
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 12 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

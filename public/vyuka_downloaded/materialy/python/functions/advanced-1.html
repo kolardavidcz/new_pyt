@@ -1,0 +1,224 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Uzávěry &amp; lambda-funkce
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Uzávěry &amp; lambda-funkce</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">10</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Uzávěry (closures) I</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Uzávěry (closures) II</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Poznámka</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Co je to uzávěr?</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Lambda-funkce</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Lambda-funkce v uzávěrech</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Použití</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Příklady použití – řazení pomocí „sorted()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Příklady použití – funkce jako parametr funkce</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Příklady použití – vytvořující funkce pro „defaultdict“</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2010-11-10</span></div><h1 class="lecture-title">Uzávěry &amp; lambda-funkce</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Uzávěry (closures) I"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Uzávěry (closures) I</h2></div><div class="section-body">
+
+  <p>
+    Funkce definované uvnitř jiných funkcí mají jednu podivuhodnou vlastnost – <em>jsou-li z nadřazené funkce vráceny, nesou s sebou kontext platný v době jejich vrácení</em>. Nejlépe osvětlí příklad:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# toto je vnější funkce, „generující“ uzávěr
+def přičti(kolik):
+
+    # tato vnitřní funkce vidí na proměnné nadřazené funkce,
+    #    tj. i na argument 'kolik'
+    def vnitřní_fce(k_čemu):
+        return kolik + k_čemu
+    
+    # vnitřní funkci vrátíme „upravenou“ o argument 'kolik'
+    #    z doby jejího vrácení
+    return vnitřní_fce
+
+
+# „Vyrobme“ funkci, která bude ke svému argumentu přičítat 5:
+&gt;&gt;&gt; přičti_5 = přičti(5)
+# Je to opravdu funkce, a to ta očekávaná (vnitřní):
+&gt;&gt;&gt; přičti_5
+&lt;function vnitřní_fce at 0x00E2D108&gt;
+
+# Vyzkoušejme to:
+&gt;&gt;&gt; přičti_5(3)
+8
+
+# Na věci nic nezmění, když vyrobíme další funkci s jiným číslem:
+&gt;&gt;&gt; přičti_3 = přičti(3)
+&gt;&gt;&gt; přičti_3
+&lt;function vnitřní_fce at 0x00E2D0C0&gt;
+&gt;&gt;&gt; přičti_3(3)
+6
+&gt;&gt;&gt; přičti_5(10)
+15
+  </pre>
+
+</div></section><section class="slide-section" id="id2" data-title="Uzávěry (closures) II"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Uzávěry (closures) II</h2></div><div class="section-body">
+
+  <p>
+    Jelikož každá z vnitřních funkcí si sebou nese kontext platný v okamžiku jejich vrácení, tedy i hodnoty proměnných (a tudíž i argumentů) v nadřazené funkci v tu chvíli, odpovídají přičítací funkce z předchozího slajdu vlastně následujícím definicím:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+def přičti_5(k_čemu):
+    return 5 + k_čemu
+
+def přičti_3(k_čemu):
+    return 3 + k_čemu
+  </pre>
+  <p>
+    Takovéto funkce jsou v Python'u velmi často používány (nejkřiklavější příklad nabízí asi <a href="/materialy/python/functions/decorators.xml">dekorátory</a>) a říká se jim, případně i takovémuto chování obecně, právě <strong>uzávěry</strong> (<em>closures</em>).
+  </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Poznámka"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Poznámka</h2></div><div class="section-body">
+
+    <p>
+        Jelikož volání funkce <em>přičti()</em> vrací funkci, můžete samozřejmě napsat třeba i tohle:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; přičti(5)(3)
+        8
+    </pre>
+    <p>
+        Ne že by to tedy bylo dvakrát čitelné, zvlášť kdybyste uzávěrů za sebou zřetězili vícero…
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Co je to uzávěr?"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Co je to uzávěr?</h2></div><div class="section-body">
+
+    <p>
+        Ačkoli předchozí (hodně umělý) příklad snad osvětlil, jak se uzávěr chová, pro vyškolené paradigmatem OOP vymyslel před lety Steve Majewski krásný příměr:
+    </p>
+    <blockquote>
+        Objekt je balík dat, ke kterému jsou přidané metody.<br>
+        Uzávěr je procedura, ke které jsou přidána data.
+    </blockquote>
+    <p>
+        Jejich poměrná neznalost je asi v přímé úměře k rozšíření OOP – jejich hájemstvím jsou totiž převážně <em>funkcionální programovací jazyky</em> a těžko si představit něco víc ortogonálního k OOP než právě je.
+    </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Lambda-funkce"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Lambda-funkce</h2></div><div class="section-body">
+
+  <p>
+    Lambda-funkce v Python'u jsou anonymní (tj. bezejmenné) funkce definované typicky v rámci jednoho řádku a skládající se pouze z jednoho výrazu, který je vyhodnocen a automaticky vrácen ve chvíli volání funkce:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+lambda [ARGUMENT[Y]]: VÝRAZ
+  </pre>
+  <p>
+    Pythonovské <em>lambda-funkce</em> tedy nemají jméno, jejich argumenty nejsou uzavřeny v závorkách a spočítaná hodnota (či objekt) jejich těla je automaticky vrácena, aniž by bylo třeba použít příkaz <code>return</code>.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Přesněji řečeno je tato definice platná pouze pro Python, protože v něm jsou lambda-funkce oproti běžně chápanému pojetí tohoto termínu velmi „osekány“. Typicky totiž těla lambda-funkcí nejsou omezena pouze na jeden jediný výraz – ve většině jazyků, které je obsahují, jsou lambda-funkce plnohodnotné funkce, které prostě jen nemají vlastní záznam v tabulce jmen programu a vyskytují se na místě, kde by jinak stál odkaz na „běžnou“ funkci.
+  </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="Lambda-funkce v uzávěrech"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Lambda-funkce v uzávěrech</h2></div><div class="section-body">
+
+  <p>
+    Příklad z prvního slajdu o uzávěrech..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+def přičti(kolik):
+    def vnitřní_fce(k_čemu):
+        return kolik + k_čemu
+    return vnitřní_fce
+  </pre>
+  <p>
+    ..by šel pomocí lambda-funkce přepsat takto:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+def přičti(kolik):
+    return lambda k_čemu: kolik + k_čemu
+
+&gt;&gt;&gt; přičti_5 = přičti(5)
+&gt;&gt;&gt; přičti_5
+&lt;function &lt;lambda&gt; at 0x00DC9CD8&gt;
+&gt;&gt;&gt; přičti_5(3)
+8
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Asi to není na první pohled tak pěkný zápis, ale má dvě výhody:
+    <ul>
+      <li>
+        Bez dalšího zkoumání každý vidí, že návratovým typem funkce <em>přičti()</em> je <em>funkce</em>.
+      </li>
+      <li>
+        Do tabulky lokálních objektů funkce <em>přičti()</em> není potřeba zavádět další funkci (zde <em>vnitřní_fce()</em>), čímž se ušetří dost prostředků z „režije“ programu.
+      </li>
+    </ul>
+  </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Použití"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Použití</h2></div><div class="section-body">
+
+    <p>
+        Lambda-funkce nachází použití všude tam, kde je požadována funkce, ale přitom není potřeba kvůli tomu zavádět pojmenovanou funkci na obecnější úrovni.
+    </p>
+    <p>
+        Vzhledem k „osekanosti“ lambda-funkcí v Python'u se s nimi tedy většinou setkáme na místech parametrů funkcí, kde je uvedené omezení na jednu řádku a jeden výraz nakonec ještě i celkem vítáno. Několik klasických případů ilustrují následující příklady.
+    </p>
+
+</div></section><section class="slide-section" id="id8" data-title="Příklady použití – řazení pomocí „sorted()“"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Příklady použití – řazení pomocí „sorted()“</h2></div><div class="section-body">
+
+    
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        sorted( xs, key = lambda x: x[2] )     # 
+
+        sorted( xs, key = lambda x: len(x) )   # sorted( xs, key=len )
+    </pre>
+    <br>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Pro srovnání – první z příkladů by se pomocí pojmenované funkce zapsal takto:
+        <pre class="brush: python; gutter: false; toolbar: false; "> 
+            def fn(x):
+                return x[2]
+            sorted(xs, key=fn)
+        </pre>
+    </div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="Příklady použití – funkce jako parametr funkce"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Příklady použití – funkce jako parametr funkce</h2></div><div class="section-body">
+
+    
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        def mymap(xs, fn=lambda x: x):
+            return [fn(x) for x in xs]
+
+        # Výchozí chování pojmenovaného argumentu 'fn' je „identita“:
+        &gt;&gt;&gt; mymap( ['a', 'b', 'c', ] )
+        ['a', 'b', 'c']
+
+        # „Přepišme“ identitu vestavěnou funkcí 'ord':
+        &gt;&gt;&gt; mymap( ['a', 'b', 'c', ], ord )
+        [97, 98, 99]
+
+        # Podstrčme funkci nějakou naši vlastní „šílenost“:
+        &gt;&gt;&gt; mymap( ['a', 'b', 'c', ], lambda x: chr(ord(x)+3) )
+        ['d', 'e', 'f']
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Funkci můžete samozřejmě volat i jako <code>mymap('abc', ord)</code> a podobně.
+    </div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="Příklady použití – vytvořující funkce pro „defaultdict“"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Příklady použití – vytvořující funkce pro „defaultdict“</h2></div><div class="section-body">
+
+    
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; from collections import defaultdict
+        &gt;&gt;&gt; xs = "abrakadabra"
+        &gt;&gt;&gt; xd = defaultdict(
+              lambda: ['samohláska', 0] if x in 'aeiouy' else ['souhláska', 0]
+            )
+        &gt;&gt;&gt; for x in xs:
+        ...   xd[x][1] += 1
+        ... 
+        &gt;&gt;&gt; xd
+        defaultdict(&lt;function &lt;lambda&gt; at 0x7fc7473b96a8&gt;,
+          {'b': ['souhláska', 2], 
+           'd': ['souhláska', 1],
+           'r': ['souhláska', 2],
+           'a': ['samohláska', 5],
+           'k': ['souhláska', 1]}
+        )
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        (Pozalamováno pro lepší čitelnost.)
+    </div></div>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 10 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

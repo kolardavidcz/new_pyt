@@ -1,0 +1,150 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>„Želví“ grafika – úvod
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — „Želví“ grafika – úvod</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">8</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Základní principy I</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Základní principy II</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Příklad – čtverec</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Komentář</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Příklad – hvězda</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Poznámky</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Na závěr</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2015-10-06</span></div><h1 class="lecture-title">„Želví“ grafika – úvod</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Asi naprostá většina zobrazovacích nástrojů v běžném užití spočívá v kreslení čar a primitivních obrazců (v samém základu často trojúhelníků) ve vybrané soustavě souřadné. Dokonce dnes už často ani není jednoduše možné vykreslovat do vymezené plochy (běžně zvané <em>plátno</em> aneb <em>canvas</em>) jednotlivé body – snad z důvodů vnitřní implementace grafických operací, snad i kvůli náročnosti na větších displejích.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        V porovnání s dnešním stavem bylo kupříkladu v osmdesátých letech dvacátého století na osmibitech „vlastnoruční“ kreslení o několik řádů jednodušší. Podle mého jeden z velkých nedostatků dnešního stavu výpočetní techniky.
+    </div></div>
+    <p>
+        V kontrastu s tím užívá <em>želví grafika</em> (vymyšlená pravděpodobně pro jazyk LOGO už v šedesátých letech) převážně vektorové povely pro řízení kurzoru v ploše (často také vybavené kartézskými souřadnicemi, které nicméně nejsou primárním prvkem). Kromě hraní si pro děti je její velkou výhodou možnost kreslit rekurzivní algoritmy tak říkajíc přímo, bez potřeby počítání a přenášení mezivýsledků.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Ač je to možná překvapivé, nějakou knihovnu na práci se želví grafikou nalezneme dodnes skoro ve všech rozšířenějších programovacích jazycích.
+    </div></div>
+
+</div></section><section class="slide-section" id="id2" data-title="Základní principy I"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Základní principy I</h2></div><div class="section-body">
+
+    <p>
+        Vykreslovací kurzor, naprosto vážně zvaný <strong>želva</strong>, je řízen především následujícími příkazy:
+    </p>
+    <ul>
+        <li>
+            <strong>pozice</strong> – posun vpřed (nebo vzad) o zadaný počet „kroků“;
+        </li>
+        <li>
+            <strong>orientace</strong> – otočení směru „chůze“ o zadaný úhel daným směrem;
+        </li>
+        <li>
+            <strong>stav kreslicího pera</strong> – je-li zvednuté či nikoli (tedy zda kreslí nebo ne), jak tlustou čáru a jakou barvou vykresluje.
+        </li>
+    </ul>
+    <p>
+        Tuto základní sadu vektorově orientovaných příkazů doplňují podle implementace nejrůznější další, takže kromě uschování stavu „želvy“ ji také často můžete přímo posouvat na určené souřadnice a podobně.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Mimochodem tyto kreslicí „želvičky“ existovaly i jako reálná počítačově-mechanická zařízení.
+    </div></div>
+
+</div></section><section class="slide-section" id="id3" data-title="Základní principy II"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Základní principy II</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Výchozí pozicí „želvy“ po startu systému je počátek soustavy souřadné (střed okna) a otočení směrem na východ (tedy vpravo):
+    </p>
+    <img src="_files/ss.png" width="213" height="213" alt="" title="Želví soustava souřadná">
+    <p class="enumerate">
+        Pokud jí neřeknete jinak, „želva“ za sebou kreslí cestu během každého svého pohybu!
+    </p>
+    <p class="enumerate">
+        V procedurálně orientovaném přístupu můžete „želvu“ ovládat přímo voláním příslušných příkazů na modulu <code>turtle</code>. Chcete-li však v obrázku (singletonová instance objektu <code>Screen</code>) najednou více různých „želv“, musíte si každou z nich vyrobit jako instanci objektu <code>Turtle</code> (či <code>Pen</code>) a ovládat ji jejími metodami.
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Příklad – čtverec"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Příklad – čtverec</h2></div><div class="section-body">
+
+    <example lang="python" src="_files/ctverec.py"></example>
+    <img src="_files/ctverec.png" width="124" height="119" alt="" title="čtverec">
+    <p>
+        Vidíme, že „želva“ nakreslí poměrně rychle – přesto ale viditelně – postupně všechny strany čtverce a to zjevně od počátku kartézské soustavy souřadné v prvním kvadrantu.
+    </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Komentář"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Komentář</h2></div><div class="section-body">
+
+    <p>
+        Než budeme pokračovat složitějšími vlastnostmi a příklady želví grafiky, pár poznámek:
+    </p>
+    <ul>
+        <li>
+            Jakožto výukový nástroj kreslí „želva“ ve výchozím nastavení jen tak rychle, aby bylo vidět, co dělá. Rychlost vykreslování se ale dá v jistém rozmezí ovládat a dokonce se dá zařídit, aby se objevil až celý výsledný obrázek.
+        </li>
+        <li>
+            Umístění soustavy souřadné ve vykreslovací ploše je možno řídit. Dokonce ani souřadné osy nemusí býti stejného měřítka. (Příkaz pro kružnici pak ale samozřejmě bude kreslit elipsu :-)
+        </li>
+        <li>
+            „Želva“ se pohybuje po kanvasu grafického nástroje <em>tkinter</em>, tudíž se k ní musíme chovat jako ke GUI – nemá-li se pythoní program ukončit na poslední řádce interpretovaného kódu, musíme naskočit do klasické udržovací/čekací smyčky GUI (proto onen příkaz <code>turtle.mainloop()</code> na konci příkladu, ale jde to i jinak).
+        </li>
+    </ul>
+    <p>
+        Postupně si ukážeme, co všechno dalšího se se „želvou“ dá dělat, ale pro netrpělivé je tu <a href="https://docs.python.org/3/library/turtle.html" class="external">odkaz do oficiální dokumentace</a>.
+    </p>
+
+</div></section><section class="slide-section" id="id6" data-title="Příklad – hvězda"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Příklad – hvězda</h2></div><div class="section-body">
+
+    <p>
+        Nepřekvapivě je „želva“ úplně skvělá na kreslení opakovaných jednoduchých částí kresby, které složené dohromady dají něco úplně jiného (upraveno z <a href="https://docs.python.org/3/library/turtle.html" class="external">dokumentace</a>):
+    </p>
+    <img src="_files/hvezda.png" width="220" height="214" alt="" title="hvězdička">
+    <example lang="python" src="_files/hvezda.py"></example>
+
+</div></section><section class="slide-section" id="id7" data-title="Poznámky"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Poznámky</h2></div><div class="section-body">
+
+    <ul>
+        <li>
+            <code>color(BarvaPera, BarvaVýplně)</code> – zkratka za samostatné nastavení obou barev (příkazy <code>pencolor()</code> a <code>fillcolor()</code>).
+        </li>
+        <li>
+            <code>begin_fill()</code>, <code>end_fill()</code> – obrazec vykreslený mezi spolu souvisejícími těmito dvěma příkazy bude vyplněn dříve vybranou barvou.
+        </li>
+        <li>
+            <code>forward(KROKŮ)</code> – posune „želvu“ o KROKŮ směrem, kterým je právě natočena.
+        </li>
+        <li>
+            <code>left(ÚHEL)</code> – otočí směr, kterým se želva dívá, o ÚHEL stupňů doleva.
+        </li>
+        <li>
+            <code>pos()</code> – zkratka za plný příkaz <code>position()</code>; vrací aktuální souřadnice „želvy“ ve tvaru dvojce <em>(x, y)</em>. Uvedená dvojce je rozšíření obecné pythoní n-tice do podoby objektu <em>turtle.Vec2D</em>, který podporuje mimo jiné i skalární součin (operátor <code>*</code>) a rotaci (metoda <code>rotate(ÚHEL)</code>).
+        </li>
+        <li>
+            <code>done()</code> – nepřekvapivě další zkratka/alias, tentokrát na funkci <code>mainloop()</code>.
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id8" data-title="Na závěr"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Na závěr</h2></div><div class="section-body">
+
+    <p>
+        Ačkoli byla želví grafika vymyšlena jako vizuální doplněk převážně výukového programovacího jazyka LOGO (kterážto kombinace tak plní podobnou úlohu jako jazyk KAREL, byť s jinými výrazovými prostředky), našla brzy využití i v úplně jiných a nečekaných oblastech:
+    </p>
+    <ul>
+        <li>
+            zobrazování simulací růstu živých organismů (v podobě tzv. <a href="/materialy/techs/L-systems/overview.xml">L-systémů</a>);
+        </li>
+        <li>
+            <a href="recursion.xml">kreslení fraktálních obrazců</a>;
+        </li>
+        <li>
+            grafický výstup programů (a to včetně jednoduchých her);
+        </li>
+        <li>
+            …
+        </li>
+    </ul>
+    <p>
+        V podstatě se dá říci, že kde je úloha snadno popsatelná relativními pohyby kreslicího kurzoru, tam je želví grafika vhodná. Tím spíš, jde-li úloha zapsat rekurzivně.
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 8 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

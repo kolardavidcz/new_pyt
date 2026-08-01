@@ -1,0 +1,436 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Programování v jazyce brainfuck
+      —
+      brainfuck</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Programování v jazyce brainfuck</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">8</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Principy programování I</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Smyčky</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Principy programování II</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">„Hello World!“ podruhé</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Programování – základní konstrukce</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Programování – aritmetické operace</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Programování – vstup a výstup</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Poznámky k implementaci</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">brainfuck</span><span class="lecture-date">2011-03-31</span></div><h1 class="lecture-title">Programování v jazyce brainfuck</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Principy programování I"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Principy programování I</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Jelikož <em>brainfuck</em> umí vytisknout znak, jehož ASCII-kód se nachází v aktuální paměťové pozici, princip vypsání např. slova <code>AHOJ</code> by mohl vypadat třeba takto (nezapomeňte, že po spuštění programu jsou v „paměti“ všude nuly):
+  </p>
+  <ol>
+    <li>
+        inkrementuj aktuální buňku na hodnotu 65 (ASCII-hodnota písmene <code>A</code>) a vytiskni ji
+    </li>
+    <li>
+        posuň se o buňku dál, tu inkrementuj na hodnotu 72 (aneb <code>H</code>) a vytiskni ji
+    </li>
+    <li>
+        posuň se o buňku dál, tu inkrementuj na hodnotu 79 (aneb <code>O</code>) a vytiskni ji
+    </li>
+    <li>
+        posuň se o buňku dál, tu inkrementuj na hodnotu 74 (aneb <code>J</code>) a vytiskni ji
+    </li>
+  </ol>
+  <p>
+    Takový kód bude pochopitelně příšerně neefektivní a doslova šílený:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# Kód pro zápis písmene A:
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.
+# Kód pro zápis písmene H:
+&gt;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.
+# Kód pro zápis písmene O:
+&gt;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.
+# Kód pro zápis písmene J:
+&gt;++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.
+  </pre>
+
+  <p class="enumerate">
+    Velmi rychle vás asi napadne, jak program zjednodušit – místo přičítání jedničky vždy v nové buňce od nuly budeme postupně přičítat a odčítat potřebné hodnoty v rámci buňky jediné:
+  </p>
+  <ol>
+    <li>
+        inkrementuj aktuální buňku na hodnotu 65 (ASCII-hodnota písmene <code>A</code>) a vytiskni ji
+    </li>
+    <li>
+        inkrementuj aktuální buňku z hodnoty 65 na hodnotu 72 (aneb <code>H</code>) a vytiskni ji
+    </li>
+    <li>
+        inkrementuj aktuální buňku z hodnoty 72 na hodnotu 79 (aneb <code>O</code>) a vytiskni ji
+    </li>
+    <li>
+        dekrementuj aktuální buňku z hodnoty 79 na hodnotu 74 (aneb <code>J</code>) a vytiskni ji
+    </li>
+  </ol>
+  <p>
+    Takový kód už bude mnohem „hezčí“, přestože pořád žádná sláva ^_^
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# Kód pro zápis písmene A:
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.
+# Upravený kód pro zápis písmene H:
++++++++.
+# Upravený kód pro zápis písmene O:
++++++++.
+# Upravený kód pro zápis písmene J:
+-----.
+  </pre>
+  
+  <p class="enumerate">
+    Další zjednodušení umožňují pochopitelně smyčky, ale na ty se musíme nejdříve podívat.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Smyčky"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Smyčky</h2></div><div class="section-body">
+
+  <p>
+    Podstatu smyček si ukážeme na vytisknutí znaku <code>A</code>, jehož ASCII-hodnota je – jak už víme – 65:
+  </p>
+  
+  <p class="enumerate">
+    Jelikož např. <code>65 = 8*8 + 1</code>, můžeme evidentně spoustu práce ušetřit osminásobným opakováním inkrementace o osm (nebo třeba šestkrát po deseti a vůbec). Jak na to? Následujícím kódem:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+++++++++[&gt;++++++++&lt;-]
+  </pre>
+  <p>
+    Rozeberme si ho podrobně:
+  </p>
+  <ol>
+    <li>
+        Nejdříve jsme aktuální paměťovou buňku nastavili z hodnoty 0 (předpokládáme, že takovou právě měla; stejně jako všechny ostatní) na hodnotu 8: <code>++++++++</code>
+    </li>
+    <li>
+        Nyní následuje „magická“ část kódu:
+        <ol>
+          <li>
+            Příkaz <code>[</code> se podívá na aktuální buňku – jelikož je v ní 8 (právě jsme je tam zanesli), předá vykonávání programu na další znak.
+          </li>
+          <li>
+            Zde natrefíme na příkaz <code>&gt;</code>, který přesune ukazatel o jednu buňku dále. Na tomto místě je zatím 0, ale sekvence navazujících příkazů <code>++++++++</code> tam zanese také 8.
+          </li>
+          <li>
+            Následuje příkaz <code>&lt;</code>, který vrátí ukazatel o jednu buňku zpět. Následující příkaz <code>-</code> tuto buňku dekrementuje, takže z původních 8 dostaneme 7. Stav těchto dvou sousedních buněk je v dané chvíli tedy: <code>7 8</code>
+          </li>
+          <li>
+            Poslední příkaz <code>]</code> zkontroluje stav aktuální buňky – jelikož je tam 7 (právě jsme provedli dekrementaci), zařídí příkaz <code>]</code> přesun vykonávání kódu na znak následující po odpovídajícím začátku smyčky <code>[</code>, tj. opět na začátek sekvence příkazů <code>&gt;++++++++&lt;-</code>.
+          </li>
+        </ol>
+    </li>
+    <li>
+        Další běh kódu už je nyní jasný: Ukazatel se díky <code>&gt;</code> posune o buňku dále (kde je zatím 8), kde se pomocí <code>++++++++</code> přičte k aktuálnímu obsahu dalších 8 (takže tam bude už 16), poté se ukazatel díky <code>&lt;</code> vrátí na předchozí buňku (kde je zatím 7) a odtud je za pomoci <code>-</code> odečtena jednička (takže se zde objeví 6). Před dalším vyhodnocením podmínky konce cyklu <code>]</code> je tedy stav obou paměťových buněk: <code>6 16</code>
+    </li>
+    <li>
+        Kód takto pokračuje v postupné inkrementaci druhé buňky o 8 v každém kroku, přičemž počet kroků určuje první buňka, na jejíž hodnotu se ptá podmínka cyklu. Následující posuny ve zdrojovém kódu na příkaz <code>]</code> tak naleznou obě buňky postupně v následujících stavech: <code>5 24</code> → <code>4 32</code> → <code>3 40</code> → <code>2 48</code> → <code>1 56</code> → <code>0 64</code>
+    </li>
+    <li>
+        Až do stavu <code>1 56</code> se na běhu programu nic nezmění. Ale po poslední inkrementaci druhé buňky o 8 je první buňka příkazem <code>&lt;-</code> dekrementována na nulu a tak se změní chování následujícího příkazu <code>]</code>, který až dosud vracel cyklus na začátek – jelikož na aktuální buňce je 0, předá příkaz <code>]</code> v tuto chvíli běh programu na další znak zdrojového kódu po sobě. A jelikož tam v tomto programu již žádný další příkaz není, končí běh programu se stavem buněk <code>0 64</code>.
+    </li>
+  </ol>
+
+  <p class="enumerate">
+    Nyní už stačí doplnit předchozí smyčku..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+++++++++[&gt;++++++++&lt;-]
+  </pre>
+  <p>
+    ..o přesun (z buňky cyklu na následující buňku písmene) a jednu inkrementaci..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+++++++++[&gt;++++++++&lt;-] &gt; +
+  </pre>
+  <p>
+    ..aby se ve druhé buňce nacházela požadovaná hodnota 65, kterou pomocí příkazu <code>.</code> (tečka)..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+++++++++[&gt;++++++++&lt;-] &gt; + .
+  </pre>
+  <p>
+    ..vytiskneme na výstup jako znak <code>A</code>. Jak jednoduché, milý Watsone ^_~
+  </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Principy programování II"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Principy programování II</h2></div><div class="section-body">
+
+  <p>
+    Náš ukázkový program pro výpis slova <code>AHOJ</code>..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# Kód pro zápis písmene A:
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++.
+# Upravený kód pro zápis písmene H:
++++++++.
+# Upravený kód pro zápis písmene O:
++++++++.
+# Upravený kód pro zápis písmene J:
+-----.
+  </pre>
+  <p>
+    ..tak můžeme podstatně zjednodušit nahrazením první velké inkrementace o 65 smyčkou:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# Kód pro zápis písmene A pomocí smyčky:
+++++++++[&gt;++++++++&lt;-] &gt; + .
+# Upravený kód pro zápis písmene H:
++++++++ .
+# Upravený kód pro zápis písmene O:
++++++++ .
+# Upravený kód pro zápis písmene J:
+----- .
+  </pre>
+  
+  <p>
+    Bez komentářů a v jedné řádce tak celkově dostaneme krásný ^_^ výsledný program:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+++++++++[&gt;++++++++&lt;-]&gt;+.+++++++.+++++++.-----.
+  </pre>
+
+</div></section><section class="slide-section" id="id4" data-title="„Hello World!“ podruhé"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">„Hello World!“ podruhé</h2></div><div class="section-body">
+
+  <p>
+    Pochopit dříve uvedený program pro výpis <em>Hello World!</em> je nyní, navíc za pomoci komenentářů v kódu, určitě snadné – jeho základní trik spočívá v tom, že si buněk pro tisk připraví více a operuje s hodnotami na tom paměťovém místě, kde je to zrovna jednodušší z hlediska požadovaného výstupu:
+  </p>
+  <example src="_files/hello_world.b" lang="python"></example>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Zdroj: <a href="http://en.wikipedia.org/wiki/Brainfuck">http://en.wikipedia.org/wiki/Brainfuck</a>
+  </div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="Programování – základní konstrukce"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Programování – základní konstrukce</h2></div><div class="section-body">
+
+  <p>
+    Ukažme si několik užitečných konstrukcí, které nám – snad – usnadní čtení (a možná i psaní :) skutečných brainfuckovských programů:
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Volně podle různých zdrojů na internetu.
+  </div></div>
+
+  <p class="enumerate">
+    <u>Nastavení</u> aktuální buňky <u>na 0</u>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+[-]
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Tady není co řešit – aktuální paměťová buňka se bude dekrementovat o jedničku tak dlouho, dokud na ní nebude nula.
+  </div></div>
+
+  <p class="enumerate">
+    Mírná modifikace předchozího algoritmu – <u>vynulování</u> všech <u>předchozích</u> buněk:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+[
+    [-]
+    &lt;
+]
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Je-li aktuální paměťová buňka nenulová, „pustí“ nás vnější smyčka dovnitř. Tamější kód pak provede vynulování aktuální buňky (podle předchozího postupu) a provede přesun doleva o jedno místo. Je-li tato buňka také nenulová, celý proces se zopakuje. Vše poběží tak dlouho, dokud nenatrefíme na první nulovou buňku.
+  </div></div>
+
+  <p class="enumerate">
+    Ve velmi podobném duchu zvládneme i operace <u>„rewind“</u> a <u>„fast-forward“</u>, tedy přesun na první nulovou buňku vlevo či vpravo od aktuální:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# rewind
+[&lt;]
+
+# fast/forward
+[&gt;]
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    V obou případech se obsah smyčky, tj. posun daným směrem po paměťové pásce, provádí tak dlouho, dokud se nepřesuneme na buňku obsahující 0.
+  </div></div>
+
+  <p class="enumerate">
+    Velmi podobným způsobem můžeme hledat první buňku dané hodnoty. Např. pro nalezení první buňky s hodnotou 1 směrem doprava použijeme kód:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+-[+&gt;-]+
+  </pre>
+  <p>
+    Pro totéž doleva vyměníme příkaz posunu <code>&gt;</code> za opačný <code>&lt;</code>. A pro vyhledání jiné hodnoty než právě 1 patřičně „zmnožíme“ všechny plusy a mínusy.
+  </p>
+
+  <p class="enumerate">
+    S trochou disciplíny zvládneme i rozhodovací konstrukci <u>if-then-else</u>. Nejde o nic jiného, než o určení, zda se provede aktuální smyčka nebo až následující kód:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# nastavení podmínky
+kód vyhodnocení podmínky (tedy nastavení aktuální buňky na 0 nebo nikoli)
+# IF
+[kód větve IF]
+# ELSE
+kód větve ELSE
+  </pre>
+  <p>
+    Příklad na přepis vstupních malých písmen na výstupní velká, upraveně podle <a href="http://en.wikipedia.org/wiki/Brainfuck">Wikipedie</a>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+,----------[----------------------.,----------]
+  </pre>
+  <ul>
+    <li>
+        Za předpokladu, že začínáme s vynulovanou buňkou, způsobí první část <code>,----------</code> <em>ne</em>vykonání následující smyčky, pokud stiskneme <em>ENTER</em>: Solidní implementace <em>brainfuck</em>u by totiž v tomto případě měla vrátit číslo 10 (viz následující slajdy), které bude kódem vynulováno.
+    </li>
+    <li>
+        Nestiskli-li jsme <em>ENTER</em>, smyčka naopak <em>bude</em> vykonána: To způsobí odečtení dalších 22 od jejího aktuálního obsahu, celkem tedy 32, což je právě rozdíl mezi stejnými písmeny ve velkém a malém provedení v ASCII-tabulce. Výsledné velké písmeno bude vytištěno.
+    </li>
+    <li>
+        Kód uvnitř smyčky dále načte další vstupní hodnotu, od které opět odečte 10, a na konci s takto získanou hodnotou provede test na ukončení smyčky.
+    </li>
+  </ul>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Nečeká-li kód konkrétního překladače <em>brainfuck</em>u při vstupu na ENTER (v Python'u např. pomocí <code>msvcrt.getch()</code>), bude se smyčka neustále opakovat, dokud <em>ENTER</em> nestiskneme. Čeká-li zadání na vstup (v Python'u např. pomocí <code>input()</code> nebo <code>sys.stdin.read()</code>), smyčka proběhne pro celý vstupní řetězec před příslušným <em>ENTER</em>em (který způsobí zadání konce řádku <code>\n</code>, tedy 10).
+  </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="Programování – aritmetické operace"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Programování – aritmetické operace</h2></div><div class="section-body">
+
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Volně podle různých zdrojů na internetu.
+  </div></div>
+
+  <p class="enumerate">
+    <u>Přesun (přičtení)</u> obsahu aktuální buňky do buňky následující:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+[&gt;+&lt;-]
+  </pre>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        V první buňce tedy bude po provedení smyčky 0.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Ve druhé buňce bude buď kopie obsahu první buňky (to tehdy, byla-li v ní původně 0), nebo součet jejího vlastního původního obsahu s obsahem buňky první.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Změnou počtu posunů snadno určíme, o kolik buněk dále se má obsah aktuální buňky přesnunout. Například pro tři by kód byl:
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+[&gt;&gt;&gt;+&lt;&lt;&lt;-]
+        </pre>
+    </div></div></div>
+
+  <p>
+    Nedestruktivní <u>kopie (přičtení)</u> obsahu aktuální buňky do buňky následující je poněkud složitější:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+[&gt;+&gt;+&lt;&lt;-]&gt;&gt;[&lt;&lt;+&gt;&gt;-]
+  </pre>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        V první buňce tedy zůstane zachován původní obsah: První smyčka zajistí přesun první buňky do druhé a třetí, přičemž je první buňka vynulována. Druhá smyčka pak přesune obsah třetí buňky zpátky do první, aby bylo zadání učiněno zadost. Celé to takto funguje samozřejmě pouze tehdy, byla-li v obou následujících buňkách původně nula.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Pro kopii do vzdálenějšího místa platí podobná poznámka jako u předchozího bodu. Jen si musíme hlídat, kam umístíme buňku dočasnou.
+    </div></div></div>
+
+  <p class="enumerate">
+    Podobně se dá implementovat i <u>odčítání</u> – operaci <code>+</code> na příslušném místě zaměníme za operaci <code>-</code>. Obsah aktuální buňky odečteme od buňky následující destruktivním způsobem následujícím kódem:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+[&gt;-&lt;-]
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Tedy: Z následující buňky se odečítá 1 tak dlouho, dokud je aktuální buňka (při postupné dekrementaci o jedničku) nenulová.
+  </div></div>
+
+  <p class="enumerate">
+    Nejsnadnější <u>násobení</u> je násobení <u>dvěma</u> – „vem sám sebe a zdvoj se“. Implementace může použít „triku“ – buňku zkopíruj do vedlejšího paměťového místa, které poté přesunutím „přičti“ k první buňce. Přibližně tedy:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# A) Zkopíruj buňku 1 do buněk 2 a 3 (buňka 1 se přitom smaže):
+[&gt;+&gt;+&lt;&lt;-]
+
+# B) Přesuň se na buňku 3 a tu přičti k buňce 2 (buňka 3 se přitom smaže):
+&gt;&gt;[&lt;+&gt;-]
+# Nyní je v buňce 2 dvojnásobek původního obsahu buňky 1.
+
+# C) Přesuň se na buňku 2 a její obsahu přesuň do buňky 1 (buňka 2 se přitom smaže):
+&lt;[&lt;+&gt;-]
+# Nyní už je v buňce 1 dvojnásobek její původní hodnoty.
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Celé to takto funguje samozřejmě pouze tehdy, byla-li v obou následujících buňkách původně nula.
+  </div></div>
+  <p>
+    <u>Násobení</u> jinými <u>čísly</u> (a případně i umocňování) jsou vcelku názorné operace – v principu jde o přičítání různých čísel různým počtem krát.
+  </p>
+
+  <p class="enumerate">
+    <u>Dělení</u> je ovšem netriviální. V principu jde o něco podobného jako u kombinace odčítání a násobení – od obsahu jedné buňky budeme opakovaně odečítat obsah buňky jiné. Musíme si při tom ovšem ještě někde jinde počítat, kolikrát jsme dané odčítání provedli. A navíc nezapomenout na to, že čísla začínají v ASCII-tabulce až na pozici 48 decimálně.
+  </p>
+  <p>
+    Příklad na dělení dvou jednociferných čísel, upraveně podle <a href="http://en.wikipedia.org/wiki/Brainfuck">Wikipedie</a>:
+  </p>
+  <example src="_files/deleni_jednocifernych_cisel.b" lang="python"></example>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Protrasujete-li si kód, zjistíte, že nejvnitřnější smyčka <code>[&lt; [&gt;&gt;&gt;-&lt;&lt;&lt;[-]] &gt;&gt;]</code> se prakticky celou dobu výpočtu ignoruje. Nastoupí teprve ve chvíli, kdy se se postupným odčítáním konečně vynuluje buňka číslo 0. Její jedinou funkcí je zajistit, že kód následující po smyčce již znovu nezmění výsledek dělení (on ho totiž o jedničku zvýší, ale tato smyčka ho právě proto preventivně o jedničku sníží).
+  </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Programování – vstup a výstup"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Programování – vstup a výstup</h2></div><div class="section-body">
+
+  <p>
+    Vstup do <em>brainfuck</em>ovských programů zajišťuje příkaz <code>,</code> (tedy <em>čárka</em>), výstup pak příkaz <code>.</code> (tedy <em>tečka</em>). Jsou celkem pochopitelným zdrojem problémů, zvláště při konstrukci přenositelných programů, protože mimo jiné se každý systém ke konci řádku chová jinak. Souhrnně se to dá sepsat do dvou bodů:
+  </p>
+  
+  <ul>
+    <li>
+        Při zpracování konce řádky se většina <em>brainfuck</em>ovských programů řídí nepsaným pravidlem, že při načtení konce řádky uloží 10 (ať už obdržely <code>CRLF</code>, tedy <code>\r\n</code>, tedy 13 a 10, nebo cokoliv jiného) a podobně při jeho zápisu také 10 zapíše.
+    </li>
+  </ul>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    V Python'u máme situaci (alespoň jedním směrem) ulehčenou – jelikož je tento problém poměrně rozšířený, řeší ho Python interně automatickým překladem čehokoliv ze vstupu na <code>\n</code> (čili právě požadovaných 10) a zase zpět.
+  </div></div>
+  
+  <ul>
+    <li>
+        Podobným problémem je určení chování příkazu <code>,</code> pro čtení, pokud už není odkud číst (tj. nastala situace EOF, <em>end of file</em>). Zde bohužel žádný konsenzus není – některé programy nedělají nic, jiné do aktuálního paměťového místa zapíší 0 a ještě jiné -1.
+    </li>
+  </ul>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Některým programům to možná bude vadit, ale doporučením asi bude nedělat nic (tj. ponechat na aktuální paměťové buňce původní hodnotu).
+  </div></div>
+  
+  <hr>
+  
+  <p>
+    PS: Druhý bod v praxi znamená, že implementace programu <em>cat</em>, který přepisuje svůj vstup na výstup, je právě trojí:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# EOF returns 0
+,[.,]
+
+# EOF returns minus 1
+,+[-.,+]
+
+# no change on EOF
+,[.[-],]
+  </pre>
+
+</div></section><section class="slide-section" id="id8" data-title="Poznámky k implementaci"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Poznámky k implementaci</h2></div><div class="section-body">
+
+  <p>
+    Snad je zřejmé, že narozdíl od běžných programovacích jazyků, u kterých už letmý pohled do libovolného místa programu vám dá alespoň přibližnou představu, co se zde bude dít, je <em>brainfuck</em> úplně jiný – pokud neznáte do nejmenších podrobností aktuální stav programu (tj. obsazení jednotlivých paměťových buněk), nemáte prakticky žádnou šanci dobrat se byť mizivého chápání funkce programu.
+  </p>
+  
+  <p>
+    Naštěstí vás to nemusí zas až tak moc trápit, protože <em>psát</em> programy v <em>brainfuck</em>u po vás nikdo nechce, vy je máte pouze vykonat ^_~ Následuje několik poznámek, které by vám mohly s implementací pomoci:
+  </p>
+  <ul>
+    <li>
+        Díky automatickému překladu konců řádek na <em>\n</em>, tj. 10, máte část práce ulehčenou. Použijete-li pro vstup <code>sys.stdin.read(1)</code>, bude se skoro vše chovat tak, jak má.
+    </li>
+    <li>
+        S výstupem je to podobné. Jen si při použití <code>print()</code> dejte pozor, abyste toho netiskli víc, než chcete, a při použití <code>sys.stdout.write()</code> (ale <code>print()</code> také, pokud nejste na novějším Python'u, kde už je parametr <em>flush</em>) zase nezapomeňte vždy hned zavolat i <code>sys.stdout.flush()</code>, aby se zapsaný řetězec skutečně objevil i na obrazovce (Python bafruje řádky, případně bloky kódu po 8 kB).
+    </li>
+    <li>
+        Smyčky <code>[]</code> můžete „hardcorově“ řešit prohledáváním zdrojového souboru za běhu, ale spousta implementací si je připraví dopředu proskenováním zdrojového kódu před jeho vlastním vykonáním.
+    </li>
+    <li>
+        Omezení paměťové pásky na původních 30 000 míst vám může být u dynamického programovacího jazyka a na dnešním hardwaru vcelku ukradené. Spíše si dejte pozor na to, že některé programy vyžadují na první buňce pevnou zarážku (tj. páska se nemůže rozšiřovat doleva od nulté buňky).
+    </li>
+    <li>
+        Pokud nebudete <em>brainfuck</em>ovskými programy zpracovávat binární data nebo něco podobného, budou vám stačit osmibitové paměťové buňky (tj. schopné pojmout pouze čísla 0 až 255). Spousta programů s tím dokonce počítá a pokud se tomu nepřizpůsobíte, nebudou chodit správně.
+    </li>
+    <li>
+        Docela velké množství implementací <em>brainfuck</em>u tradičně rozšiřuje základní sadu příkazů o následující dva: <code>#</code> („vytiskni debugovací informace“) a <code>!</code> („odděl kód od jeho vstupu“). Můžete se s nimi v některých programech setkat.
+    </li>
+  </ul>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 8 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

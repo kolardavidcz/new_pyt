@@ -1,0 +1,330 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Funkce čtené podruhé
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Funkce čtené podruhé</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">16</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Zavedení funkce</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Návratová hodnota</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Parametry poziční</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Volný počet pozičních parametrů</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Parametry pojmenované</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Volný počet pojmenovaných parametrů</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Mix parametrů</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Vynucení použití jména parametru</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Parametry zadávané pouze pozičně</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Výchozí hodnota parametru I</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Výchozí hodnota parametru II</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">Funkce jako parametry</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">Funkce jako návratové hodnoty</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">Funkce jako návratové hodnoty – uzávěry</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">Místo závěru</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2017-05-10</span></div><h1 class="lecture-title">Funkce čtené podruhé</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Funkce v Python'u jsou – spolu s n-ticemi – bez diskuse jedním z jeho nejdůležitějších prvků. Komu něco říká pojem <em>first class citizen</em>, dokáže si představit proč ^_~
+    </p>
+    <p>
+        Nicméně nic není nikdy tak růžové, jak to na první (a někdy i na druhý) pohled vypadá, takže tuto přehledovou přednášku by si měli přečíst – a vyzkoušet! – všichni bez rozdílu.
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Zavedení funkce"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Zavedení funkce</h2></div><div class="section-body">
+
+    <p>
+        Funkce v Python'u se zavádí pomocí klíčového slova <em>def</em> a za dvojtečkou následuje odsazený blok kódu (vlastní tělo funkce):
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        def fn():
+            pass
+    </pre>
+
+</div></section><section class="slide-section" id="id3" data-title="Návratová hodnota"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Návratová hodnota</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Návratovou hodnotu není potřeba výslovně uvádět, pokud žádná není potřeba. Python pak automaticky vrátí hodnotu <code>None</code>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn():
+        ...     pass
+
+        &gt;&gt;&gt; a = fn()
+        &gt;&gt;&gt; print(a)
+        None
+    </pre>
+
+    <p class="enumerate">
+        Na druhou stranu z funkce můžeme kdykoliv vrátit naprosto libovolně, co nás zrovna napadne:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn():
+        ...     return 'Ahoj!', 123, {'xyz': 666}
+        
+        &gt;&gt;&gt; fn()
+        ('Ahoj!', 123, {'xyz': 666})
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Celý „trik“ spočívá v datovém typu n-tice – potřebujeme-li vrátit víc než jeden prvek, prostě napíšeme čárku, čímž zavedeme n-tici, a vesele přidáváme tolik prvků, kolik zrovna potřebujeme.
+    </div></div>
+
+</div></section><section class="slide-section" id="id4" data-title="Parametry poziční"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Parametry poziční</h2></div><div class="section-body">
+
+    <p>
+        Funkce v Python'u samozřejmě dokážou přejímat vstupní parametry:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn(a, b, c):
+        ...     print(a, b, c)
+
+        &gt;&gt;&gt; fn(1, 'abc', [1, None, ('1', 'b')])
+        1 abc [1, None, ('1', 'b')]
+    </pre>
+
+</div></section><section class="slide-section" id="id5" data-title="Volný počet pozičních parametrů"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Volný počet pozičních parametrů</h2></div><div class="section-body">
+
+    <p>
+        A to dokonce libovolný počet:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn(*args):
+        ...     print(args)
+        
+        &gt;&gt;&gt; fn()
+        ()
+        &gt;&gt;&gt; fn(1)
+        (1,)
+        &gt;&gt;&gt; fn(1, 'a', {'zzz': 333})
+        (1, 'a', {'zzz': 333})
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Zde se o „trik“ prozměnu postaraĺ operátor <code>*</code>, který provedl převod libovolného počtu vstupních parametrů funkce do jedné jediné proměnné typu n-tice (já jsem říkal, že bez n-tic by Python nebyl Python!).
+    </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="Parametry pojmenované"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Parametry pojmenované</h2></div><div class="section-body">
+
+    <p>
+        Python však také obsahuje jednu velmi příjemnou „vychytávku“ – parametry s výchozí hodnotou (a tudíž také jménem). Když je nevyplníte při volání, použije se přednastavená hodnota:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn(y=3):
+        ...     print(2**y)
+        
+        &gt;&gt;&gt; fn()
+        8
+        &gt;&gt;&gt; fn(2)
+        4
+    </pre>
+
+</div></section><section class="slide-section" id="id7" data-title="Volný počet pojmenovaných parametrů"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Volný počet pojmenovaných parametrů</h2></div><div class="section-body">
+
+    <p>
+        Nepřekvapivě i jich může být libovolný počet:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn(**kwargs):
+        ...     print(kwargs)
+        
+        &gt;&gt;&gt; fn()
+        {}
+        &gt;&gt;&gt; fn(a=1, xyz='666')
+        {'a': 1, 'xyz': '666'}
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Zde se o „kouzlo“ překladu na datový typ slovník stará prozměnu operátor <code>**</code>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="Mix parametrů"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Mix parametrů</h2></div><div class="section-body">
+
+    <p>
+        Oba druhy parametrů – poziční i pojmenované – je samozřejmě možno míchat dohromady. Dokud budou pojmenované použity jako poslední, vše bude krásně fungovat (a dokonce je můžete i volat jako poziční):
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn(x, y=3):
+        ...   print(x**y)
+        ... 
+        
+        &gt;&gt;&gt; fn()
+        Traceback (most recent call last):
+          File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+        TypeError: fn() missing 1 required positional argument: 'x'
+        &gt;&gt;&gt; fn(2)
+        8
+        &gt;&gt;&gt; fn(2, 4)
+        16
+        &gt;&gt;&gt; fn(2, y=4)
+        16
+        &gt;&gt;&gt; fn(x=2, y=4)
+        16
+        &gt;&gt;&gt; fn(x=2, 4)
+          File "&lt;stdin&gt;", line 1
+        SyntaxError: positional argument follows keyword argument
+    </pre>
+
+</div></section><section class="slide-section" id="id9" data-title="Vynucení použití jména parametru"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Vynucení použití jména parametru</h2></div><div class="section-body">
+
+    <p>
+        Přidáním <code>*</code> do definice funkce si můžete vynutit závazné použití jména u – vybraných! – parametrů s výchozí hodnotou:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn(a, b, x=2, *, y=3):
+        ...     print(a, b, x, y)
+
+        &gt;&gt;&gt; fn()
+        Traceback (most recent call last):
+          File "&lt;pyshell#128&gt;", line 1, in &lt;module&gt;
+            fn()
+        TypeError: fn() missing 2 required positional arguments: 'a' and 'b'
+        &gt;&gt;&gt; fn(7, 8)
+        7 8 2 3
+        &gt;&gt;&gt; fn(7, 8, 'x')
+        7 8 x 3
+        &gt;&gt;&gt; fn(7, 8, 'x', 'y')
+        Traceback (most recent call last):
+          File "&lt;pyshell#131&gt;", line 1, in &lt;module&gt;
+            fn(7, 8, 'x', 'y')
+        TypeError: fn() takes from 2 to 3 positional arguments but 4 were given
+        &gt;&gt;&gt; fn(7, 8, 'x', y='y')
+        7 8 x y
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        PS: Kdo by přemýšlel, k čemu je to dobré, vzpomeň si na funkci <code>print()</code> – jak jinak řídit její chování, když vstupních objektů k vytištění může být libovolný počet?
+    </div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="Parametry zadávané pouze pozičně"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Parametry zadávané pouze pozičně</h2></div><div class="section-body">
+
+    
+    <p>
+        Od verze Python'u 3.8 si už můžete pomocí <code>/</code> vynutit i zadávání parametrů pouze pozicí:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        def fn(x, y, /, t, u, v=3, *, z='basta fidli'):
+            ...
+    </pre>
+    <p>
+        Parametry <em>x</em> a <em>y</em> je nyní možné zadat jen a pouze jako první a druhý (to jest <code>fn(1, 2, ...)</code>) a nikoli pomocí jejich interního implementačního jména (tedy jako <code>fn(x=1, y=2, ...)</code>).
+    </p>
+
+</div></section><section class="slide-section" id="id11" data-title="Výchozí hodnota parametru I"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Výchozí hodnota parametru I</h2></div><div class="section-body">
+
+    <p>
+        Ne vždy se ale všechno chová očekávaným způsobem, jako zde při odkazu na globální proměnnou:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; x = 3
+        ... 
+        ... def fn(y=x):
+        ...     print(y)
+        
+        &gt;&gt;&gt; fn(5)
+        5
+        &gt;&gt;&gt; fn()
+        3
+        &gt;&gt;&gt; x = 2
+        &gt;&gt;&gt; fn()
+        3
+        &gt;&gt;&gt; fn(4)
+        4
+    </pre>
+    <p>
+        Python totiž hlavičku funkce zpracuje pouze při jejím prvním čtení, a v tu chvíli měla proměnná <em>x</em> hodnotu 3, která jí tak poněkud neintuitivně zůstane i nadále.
+    </p>
+
+</div></section><section class="slide-section" id="id12" data-title="Výchozí hodnota parametru II"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Výchozí hodnota parametru II</h2></div><div class="section-body">
+
+    <p>
+        Pokud je výchozí hodnota parametru proměnného datového typu, čeká nás podobné překvapení:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn(x, y=[]):
+        ...     y.append(x)
+        ...     print(y)
+        
+        &gt;&gt;&gt; fn(1, [])
+        [1]
+        &gt;&gt;&gt; fn(1, [])
+        [1]
+        &gt;&gt;&gt; fn(1)
+        [1]
+        &gt;&gt;&gt; fn(1)
+        [1, 1]
+        &gt;&gt;&gt; fn(1, [])
+        [1]
+        &gt;&gt;&gt; fn(1)
+        [1, 1, 1]
+    </pre>
+    <p>
+        Nezvyklé, není-liž pravda? Nicméně dá se to využít třebas pro jednoduchou memoizaci bez potřeby zavádět na zapamatování vstupních parametrů a spočítaných výsledků vlastní globální proměnnou.
+    </p>
+
+</div></section><section class="slide-section" id="id13" data-title="Funkce jako parametry"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">Funkce jako parametry</h2></div><div class="section-body">
+
+    <p>
+        Jelikož funkce v Python'u je „jenom další objekt“, asi už nepřekvapí, že ji můžeme předat na vstupu:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn(x, f):
+        ...     print(f(x))
+
+        &gt;&gt;&gt; fn('abc', len)
+        3
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        A samozřejmě nejen funkce vestavěné můžeme předávat. To jsem jenom nechtěl zaneřádit příklad definicí další vlastní funkce.
+    </div></div>
+
+</div></section><section class="slide-section" id="id14" data-title="Funkce jako návratové hodnoty"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">Funkce jako návratové hodnoty</h2></div><div class="section-body">
+
+    <p>
+        Stejně dobře můžeme funkci z funkce také vrátit:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn():
+        ...     def f():
+        ...         print('Ahoj!')
+        ...     return f
+
+        &gt;&gt;&gt; fn()
+        &lt;function fn.&lt;locals&gt;.f at 0x7fa1cf9ce730&gt;
+        &gt;&gt;&gt; fn()()
+        Ahoj!
+    </pre>
+
+</div></section><section class="slide-section" id="id15" data-title="Funkce jako návratové hodnoty – uzávěry"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">Funkce jako návratové hodnoty – uzávěry</h2></div><div class="section-body">
+
+    <p>
+        Na funkcích vrácených z funkcí je krásné to, že si drží okolní kontext ze chvíle svého vrácení (tedy vytvoření):
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        &gt;&gt;&gt; def fn(x):
+        ...     def f():
+        ...         print('Ahoj,', x, '!')
+        ...     return f
+        
+        &gt;&gt;&gt; fn('brachu')()
+        Ahoj, brachu !
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Tomuto chování se odborně říká <strong>uzávěr</strong> aneb <em>closure</em>. Python nepodporuje uzávěry v celé jejich šíři (například funkce zavolané z funkcí do kontextu volající funkce přístup nemají), nicméně na většinu použití to stačí i tak.
+    </div></div>
+
+</div></section><section class="slide-section" id="id16" data-title="Místo závěru"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">Místo závěru</h2></div><div class="section-body">
+
+    <p>
+        Spoustu věcí o funkcích jsem v této přednášce samozřejmě vůbec nezmínil, namátkou:
+    </p>
+    <ul>
+        <li>
+            funkce v Python'u jsou vlastně jenom jistý druh objektu, který se vyznačuje tím, že se dá zavolat (je na něm nadefinována metoda <code>__call__()</code>);
+        </li>
+        <li>
+            jmenný prostor funkce – který souvisí s <a href="/materialy/python/functions/scope.xml">viditelností proměnných a dohledáváním jmen objektů</a> – se dá volně rozšiřovat (tedy můžete na existující funkci provést třebas <code>funkce.parametr = cokoliv</code>, čímž do jejího prostoru známých lokálních objektů přidáte objekt <em>parametr</em>);
+        </li>
+        <li>
+            uzávěry se používají při konstrukci tzv. <a href="/materialy/python/functions/decorators.xml">dekorátorů</a>, bez jejichž pochopení budete trochu „plavat“ nejen při používání tříd;
+        </li>
+        <li>
+            záměnou za <code>return</code> nebo doplněním funkce o klíčové slovo <code>yield</code> z ní vyrobíte tzv. <a href="/materialy/python/generators/generators.xml">generátor</a>, což je neuvěřitelně mocný koncept, který prostupuje celý (trojkový) Python;
+        </li>
+        <li>
+            …
+        </li>
+    </ul>
+    <p>
+        Nicméně je snad jasné, že funkce v Python'u jsou velmi mocné (spousta vlastností jazyka na nich závisí; podobně jako na n-ticích ;-), ale také na nás mají připraveno pár velmi překvapivých a ne úplně očekávaných vlastností, které si při práci s nimi musíme dobře hlídat, aby nám nepodrazily nohy.
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 16 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

@@ -1,0 +1,131 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Conda
+      —
+      Conda</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Conda</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">7</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">„Enter Conda!“</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Ekosystém „Condy“</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Kanály a balíčky</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Dokumentace</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">PS: Licence a cena</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Poznámka, rok 2016</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Conda</span><span class="lecture-date">2016-08-02</span></div><h1 class="lecture-title">Conda</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Stav balíčkovacího systému – nebo spíš v množném čísle systémů – velmi dlouhou dobu nebyl ani zdaleka ideální. Uveďme několik známějších zádrhelů:
+    </p>
+    <ul>
+        <li>
+            nemožnost odinstalace nainstalovaného balíčku;
+        </li>
+        <li>
+            konflitky mezi požadavky na konkrétní závislosti a jejich verze;
+        </li>
+        <li>
+            problém binárních komponent jinak pythoních balíčků (platformy, distribuce…);
+        </li>
+        <li>
+            problém externích závislostí (aneb co s pythoními balíčky, které potřebují úplně externí program zcela mimo Python);
+        </li>
+        <li>
+            nejasný způsob nejlepší přípravy balíčků;
+        </li>
+        <li>
+            …
+        </li>
+    </ul>
+    <p>
+        Asi není vůbec divu, že pomalu kdo mohl, napsal si balíčkovací systém vlastní. A jedním z takových systémů je právě <strong>Conda</strong>.
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="„Enter Conda!“"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">„Enter Conda!“</h2></div><div class="section-body">
+
+    <p>
+        <a href="http://conda.pydata.org/docs/" class="external"><em>Conda</em></a> původně vznikla z potřeby snadno instalovat a starat se o potřebné pythoní balíčky včetně všech svých – <strong>a to i externích!</strong> – závislostí. Dnes platí, že:
+    </p>
+    <blockquote>
+        <strong>Conda</strong> je jazykově (Python, R, C, Java…) a systémově (Linux, Windows, OS X) nezávislý systém pro správu softwarových balíčků, jejich závislostí a virtuálních prostředí.
+    </blockquote>
+    <p>
+        Kdyby se <em>Conda</em> omezovala pouze na pythoní balíčky, nebyl by již dnes moc důvod ji používat, ale její velikou výhodou je právě to, že je prakticky univerzálně použitelná nejen pro Python, ale i pro jiné jazyky a dokonce i téměř systémové komponenty. A samozřejmě pro správu virtuálních prostředí.
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Ekosystém „Condy“"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Ekosystém „Condy“</h2></div><div class="section-body">
+
+    <p>
+        <em>Condu</em> můžete získat ve dvou různých podobách:
+    </p>
+    <ol>
+        <li>
+            <a href="http://conda.pydata.org/miniconda.html" class="external"><strong>Miniconda</strong></a> – <em>Conda</em> doplněná o Python;
+        </li>
+        <li>
+            <a href="https://www.continuum.io/downloads" class="external"><strong>Anaconda</strong></a> – <em>Miniconda</em> doplněná o několik set (převážně pythoních, ale ne zcela) balíčků pro práci s daty a vědecké výpočty.
+        </li>
+    </ol>
+    <p>
+        Pokročilý uživatel si tak asi nainstaluje <em>Minicondu</em>, aby si vytvořil prostředí přesně podle svých potřeb, běžný uživatel pak <em>Anacondu</em>, aby se nemusel prakticky o nic starat.
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Kanály a balíčky"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Kanály a balíčky</h2></div><div class="section-body">
+
+    <p>
+        Společnost <a href="https://continuum.io" class="external"><em>Continuum Analytics</em></a> udržuje (kromě vlastních instalací <em>Anacondy</em> a <em>Minicondy</em>) především hlavní repozitář balíčků <a href="http://anaconda.org" class="external">Anaconda.org</a>.
+    </p>
+    <p>
+        V něm najdeme <a href="https://docs.continuum.io/anaconda/pkg-docs" class="external">jí podporované součásti balíku <em>Anaconda</em></a>, ale také balíky v dalších, uživateli vytvořených tzv. <strong>kanálech</strong> (<em>channels</em>).
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Jako příklad uveďme notoricky těžko instalovatelný balík pro chemoinformatiku <a href="http://anaconda.org/rdkit" class="external"><em>RDKit</em></a> – díky tomu, že jeho tvůrci v rámci <em>Condy</em> uvěřejnili a spravují i veškeré závislosti, které jsou k jeho provozu potřeba, změnila se noční můra jeho instalace na jednoduchý příkaz <code>conda install -c rdkit rdkit</code>, tedy „nainstaluj balíček rdkit z kanálu rdkit“ ^_~ (Tedy pravda pouze do té doby, než potřebujete přidat nějakou další závislost a zjistíte, že autoři buildují RDKit proti vlastní verzi Boostů…)
+    </div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="Dokumentace"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Dokumentace</h2></div><div class="section-body">
+
+    <p>
+        Jak používat <em>Condu</em> se dočtete v:
+    </p>
+    <ul>
+        <li>
+            <a href="conda.xml">úvodní přednášce</a> od Jirky Novotného;
+        </li>
+        <li>
+            <a href="http://conda.pydata.org/docs/" class="external">oficiální dokumentaci</a>.
+        </li>
+    </ul>
+    <p>
+        PS: <em>Conda</em> se neustále vyvíjí a co je pravda dnes, nemusí být pravda zítra. (Kupříkladu <em>Conda</em> dlouho umožňovala doplňování svých příkazů na příkazové řádce, ale od verze 4.4.0 už to nebylo tak jednoduché a dnes je to ještě mnohem těžší.) Proto, nebude-li vám něco fungovat, nejdříve se podívejte rovnou do aktuální oficiální dokumentace.
+    </p>
+    
+
+</div></section><section class="slide-section" id="id6" data-title="PS: Licence a cena"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">PS: Licence a cena</h2></div><div class="section-body">
+
+    <p>
+        Kdo si dá tu práci a přečte si Anakondí <a href="https://legal.anaconda.com/policies/en/" class="external"><em>Terms of Service</em></a>, asi s překvapením zjistí, že přístup do veřejného repozitáře balíčků nemusí být úplně zadarmo. Specificky:
+    </p>
+    <blockquote>
+        Jakákoliv organizace o dvou stech a více zaměstnancích je za využívání veřejného repozitáře povinna platit.
+    </blockquote>
+    <p>
+        Jedinou výjimku představují vzdělávací instituce, ale i tam se <a href="https://www.anaconda.com/pricing/terms-of-service-faqs" class="external">mohou vyskytnout situace</a>, kdy je za používání specifických částí třeba platit.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Ono přeci jenom udržovat repozitář v konzistentním stavu pro takovou hromadu uživatelů něco stojí, takže není divu. <em>Anaconda</em> tyto podmínky změnila původně v roce 2020, ale na jaře 2024 v tom především pro školy udělala menší bordel. Takže uvidíme, jak se to vyvrbí. Každopádně kanálů, o jejichž správu balíčků se <em>Anaconda</em> <b>ne</b>stará (kupříkladu <code>conda-forge</code>), se to netýká.
+    </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Poznámka, rok 2016"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Poznámka, rok 2016</h2></div><div class="section-body">
+
+    <p>
+        Nutno samozřejmě poznamenat, že situace ve správě <strong>pythoních</strong> balíčků a projektů dnes už zdaleka není tak bezradná jako ještě před pár lety. Zahrnutí balíčkovacího systému <a href="pip.xml"><code>pip</code></a> spolu s podporou pro binární komponenty <a href="pip.xml?slajd=9"><code>wheel</code></a> a virtuální prostředí <a href="venv.xml"><code>venv</code></a> nás posunulo velký kus cesty ke kýženému cíli. Jen v přípravě balíčků se na lepší časy bohužel teprve snad blýská…
+    </p>
+    <p>
+        Kde je ovšem <em>Conda</em> nezastupitelná, to je právě správa i všech ostatních jazykových balíčků a jejich externích závislostí. Což je ostatně něco, co bychom po vlastním Python'u ani chtít neměli, protože to je zcela mimo jeho účel.
+    </p>
+    <p>
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 7 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

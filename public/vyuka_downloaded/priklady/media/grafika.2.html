@@ -1,0 +1,115 @@
+<html><head><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>
+          Příklady k procvičení – Základní grafické operace – Numpy a Pillow</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/examples.screen.js"></script><script src="/cjs/spa_router.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><link rel="stylesheet" href="/cjs/mathscribe/jqmath-0.4.3.css"><script src="/cjs/mathscribe/jquery-1.4.3.min.js"></script><script src="/cjs/mathscribe/jqmath-etc-0.4.6.min.js" charset="utf-8"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><link href="/cjs/examples.screen.css" media="screen, print" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Příklady: Základní grafické operace – Numpy a Pillow</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"><button id="exportHtml" class="btn-icon" title="Exportovat do statického HTML" aria-label="Export to HTML">
+              💾
+            </button></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Úkoly</span><span class="toc-count">10</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#task-1"><span class="toc-num">1</span><span class="toc-text">Úkol 1</span></a></li><li class="toc-item"><a class="toc-link" href="#task-2"><span class="toc-num">2</span><span class="toc-text">Úkol 2</span></a></li><li class="toc-item"><a class="toc-link" href="#task-3"><span class="toc-num">3</span><span class="toc-text">Úkol 3</span></a></li><li class="toc-item"><a class="toc-link" href="#task-4"><span class="toc-num">4</span><span class="toc-text">Úkol 4</span></a></li><li class="toc-item"><a class="toc-link" href="#task-5"><span class="toc-num">5</span><span class="toc-text">Úkol 5</span></a></li><li class="toc-item"><a class="toc-link" href="#task-6"><span class="toc-num">6</span><span class="toc-text">Úkol 6</span></a></li><li class="toc-item"><a class="toc-link" href="#task-7"><span class="toc-num">7</span><span class="toc-text">Úkol 7</span></a></li><li class="toc-item"><a class="toc-link" href="#task-8"><span class="toc-num">8</span><span class="toc-text">Úkol 8</span></a></li><li class="toc-item"><a class="toc-link" href="#task-9"><span class="toc-num">9</span><span class="toc-text">Úkol 9</span></a></li><li class="toc-item"><a class="toc-link" href="#task-10"><span class="toc-num">10</span><span class="toc-text">Úkol 10</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Cvičení</span></div><h1 class="lecture-title">Základní grafické operace – Numpy a Pillow</h1></header><div class="slides-container"><div class="theory">
+      <p>
+          V těchto cvičeních budeme opět pracovat s obrázkem: <img src="_files/kvetina/kvetina.jpg" width="500" height="375" alt="květina" style="vertical-align: top;">
+      </p>
+      <p>
+          Byl vyfocen digitálním fotoaparátem a uložen v barvovém prostoru sRGB ve formátu JPEG. (A samozřejmě také výrazně zmenšen.) Jelikož úkolem tohoto cvičení je naučit se používat <em>Numpy</em> a další dostupné nástroje, pro načítání a ukládání už budeme používat metody knihovny <em>Pillow</em>.
+      </p>
+      
+      <p>
+          Jsou-li k práci potřeba nějaké rovnice, jsou uvedeny v nápovědě (a také odkázány na zdroj), proto se jí nevyhýbejte ^_~
+      </p>
+  </div><div class="priklad" id="task-1"><div class="zadani">
+        Převeďte uvedený obrázek z pozitivu do negativu: <img src="grafika.2/negativ.Numpy.jpg" width="500" height="375" alt="květina negativně" style="vertical-align: top;">
+    </div><div class="reseni"><details class="exercise-details"><summary class="exercise-summary"> nápověda </summary><div class="exercise-details-content">
+        Tohle je asi první cvičení na <a href="/materialy/python/numpy/broadcasting.xml"><em>broadcasting</em></a> – potřebujeme všechny barvové složky v každém pixelu odečíst od 255 a nemusíme kvůli tomu vyrábět matici 375×500×3.
+    </div></details></div></div><div class="priklad" id="task-2"><div class="zadani">
+        S negativem úzce souvisí tzv. <em>solarizace</em> – převod do negativních barev pouze vybraných barevných odstínů. Toto je například výstup, v němž jsou převedeny pouze barvy o indexu větším než 77 (tedy vlastně ty světlejší): <img src="grafika.2/solarized_A-1.Numpy.jpg" width="500" height="375" alt="květina solarizovaně" style="vertical-align: top;">
+    </div><div class="reseni"><details class="exercise-details"><summary class="exercise-summary"> nápověda </summary><div class="exercise-details-content">
+        Tohle je pravděpodobně první cvičení na <a href="/materialy/python/numpy/arrays.slicing.xml"><em>výřezy z polí</em></a> – ze všech pixelů potřebujeme zpracovat pouze ty, které mají určitou hodnotu.
+    </div></details></div></div><div class="priklad" id="task-3"><div class="zadani">
+        Převeďte uvedený obrázek do odstínů šedi: <img src="grafika.2/grayscale.Numpy-2.jpg" width="500" height="375" alt="květina v odstínech šedi" style="vertical-align: top;">
+    </div><div class="reseni"><details class="exercise-details"><summary class="exercise-summary"> nápověda </summary><div class="exercise-details-content">
+        Protože se správným – a překvapivě náročným – postupem jsme se už seznámili v <a href="grafika.1.xml">předchozím cvičení</a>, použijeme nyní jednodušší konverzní výraz podle <em>ITU-R 601-2 luma transform</em> pro převod z nelineárních hodnot R, G a B na tzv. <em>lumu</em> (nikoli tedy <em>luminanci</em>!):
+        $$Y^'_{601} = 0.299 * R^' + 0.587 * G^' + 0.114 * B^'$$
+        PS: Pro podrobnosti viz <a href="http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html#RTFToC11" class="external">What is "luma"?</a>.
+    </div></details></div></div><div class="priklad" id="task-4"><div class="zadani">
+        Nyní v rámci procvičení výřezů numpyovských polí vyextrahujte z originálního obrázku jednotlivé barevné kanály:<br>
+        <center>
+            <img src="grafika.2/R.jpg" width="250" _height="375" alt="květina – složka R">
+            <img src="grafika.2/G.jpg" width="250" _height="375" alt="květina – složka G">
+            <img src="grafika.2/B.jpg" width="250" _height="375" alt="květina – složka B">
+        </center>
+    </div><div class="reseni"><details class="exercise-details"><summary class="exercise-summary"> nápověda </summary><div class="exercise-details-content">
+        Jedna barvová složka představuje světlost v příslušném jednom barevném kanálu, proto se zobrazují v odstínech šedi. Čistě teoreticky si můžete dát tu práci a pokusit se je zobrazit v „přirozené“ barvě, ale jelikož to na webu umíme jenom přes plné RGB-spektrum, není to vůbec jednoduché.
+    </div></details></div></div><div class="priklad" id="task-5"><div class="zadani">
+        Jelikož už z předchozího příkladu umíte vzít světlosti příslušné jednotlivým barvám, zkuste nyní popřehazovat barvové kanály mezi sebou a uložit výsledek:<br>
+        <center>
+            <img src="grafika.2/swap-RGB.jpg" width="250" _height="375" alt="květina RGB" title="RGB">
+            <img src="grafika.2/swap-RBG.jpg" width="250" _height="375" alt="květina RBG" title="RBG">
+            <br>
+            <img src="grafika.2/swap-GRB.jpg" width="250" _height="375" alt="květina GRB" title="GRB">
+            <img src="grafika.2/swap-GBR.jpg" width="250" _height="375" alt="květina GBR" title="GBR">
+            <br>
+            <img src="grafika.2/swap-BRG.jpg" width="250" _height="375" alt="květina BRG" title="BRG">
+            <img src="grafika.2/swap-BGR.jpg" width="250" _height="375" alt="květina BGR" title="BGR">
+        </center>
+    </div><div class="reseni"><details class="exercise-details"><summary class="exercise-summary"> nápověda </summary><div class="exercise-details-content">
+        Softwaru je samozřejmě šumák, co hodnoty v poli představují – RGB-matice rozměru <code>m×n×3</code> je vyhodnocena jako RGB pouze proto, že se k ní tak chováme.
+    </div></details></div></div><div class="priklad" id="task-6"><div class="zadani">
+        Jako další procvičení na výřezy numpyovských polí zmenšete vstupní obrázek třebas na polovinu:
+        <img src="grafika.2/subsample.jpg" width="250" height="188" alt="květina poloviční (výřezem)" style="vertical-align: top;">
+    </div><div class="reseni"><details class="exercise-details"><summary class="exercise-summary"> nápověda </summary><div class="exercise-details-content">
+        Při zmenšování jde o ztrátu informace a překvapivě se dá rozumných (tedy koukatelných) výsledků dosáhnout pouhým výběrem podmnožiny všech pixelů, což je smyslem této úlohy. Správně by se „zahazované“ pixely měly nějakým způsobem průměrovat, ale to je bonus.
+    </div></details></div></div><div class="priklad" id="task-7"><div class="zadani">
+        Jako další operaci na <em>broadcasting</em> zkuste originální obrázek ztmavit:
+        <img src="grafika.2/darker.jpg" width="500" height="375" alt="květina ztmavená" style="vertical-align: top;">
+    </div><div class="reseni"><details class="exercise-details"><summary class="exercise-summary"> nápověda </summary><div class="exercise-details-content">
+        Ztmavit obrázek znamená zmenšit světlost v jeho jednotlivých barvových kanálech. V nejjednodušším případě ve všech stejně, jedná se tedy o <em>broadcasting</em> skaláru. Reálně by se spíše počítal každý kanál jiným koeficientem a šlo by tak o <em>broadcasting</em> vektorem, ale to si také necháme na jindy. (Natožpak pak ztmavování pomocí vhodné nelineární funkce.)
+        <br>
+        Mimochodem – při ztmavování obrázku pochopitelně začneme přicházet o informace, především ve stínech. Za prvé menší rozdíly asi nerozeznáme tak dobře a za druhé zmenšováním čísel blízko nuly můžeme informaci prostě ztratit i díky konečné přesnosti výpočtu. V praxi se snadno a rychle stane, že se tmavé plochy začnou za chvíli všechny mapovat na jednolitou černou.
+    </div></details></div></div><div class="priklad" id="task-8"><div class="zadani">
+        Doplňkovou operací ke ztmavení je zesvětlání:
+        <img src="grafika.2/lighter.jpg" width="500" height="375" alt="květina XXX" style="vertical-align: top;">
+        <br>
+        Pozor – tato úloha už není tak přímočará jako předchozí na ztmavení!
+    </div><div class="reseni"><details class="exercise-details"><summary class="exercise-summary"> nápověda </summary><div class="exercise-details-content">
+        Zcela naopak k předchozí úloze musíme nyní světlost v jednotlivých barvových kanálech zvětšit (a zase v zájmu zjednodušení použijeme pouze <em>broadcasting</em> skalárem místo vektorem nebo dokonce rovnou nějakou nelineární funkcí). Jenomže zatímco přibližovat se k nule jsme mohli bez nesnází, jen tak si zvětšovat čísla dost dobře nemůžeme – typický výstupní obrázek má na jeden barvový kanál vyhrazen pouze jeden bajt a do něj se vleze nejvyšší číslo 255.
+        <br>
+        Je jasné, že vypočítané hodnoty musíme držet v rozmezí 0-255 a že tak při zesvětlování začneme ztrácet informace nejdříve z těch světlejších míst – prostě se dřív všechny namapují na čistou bílou. (A když to přeženete, tak tam kromě čisté černé namapujete úplně všechno ;-)
+    </div></details></div></div><div class="priklad" id="task-9"><div class="zadani">
+        Ať si vyzkoušíme také něco složitějšího než jen násobení skalárem – „vypněte“ ve výstupních obrázcích vždy jeden kanál a druhé dva zachovejte:
+        <center>
+            <img src="grafika.2/GB.jpg" width="250" _height="375" alt="květina – složky GB">
+            <img src="grafika.2/RB.jpg" width="250" _height="375" alt="květina – složky RB">
+            <img src="grafika.2/RG.jpg" width="250" _height="375" alt="květina – složky RG">
+        </center>
+        Zdejší výsledky jsou tmavší, protože jsem „vypínaný“ kanál namapoval na 0. Můžete ale zkusit všelicos a všelijak, tohle samozřejmě není jediné možné řešení.
+    </div><div class="reseni"></div></div><div class="priklad" id="task-10"><div class="zadani">
+        Na závěr si zahrajeme na analogového fotografa vybaveného digitální technikou ^_~ Dostali jste <a href="_files/kvetina/kvetina.negativ.png">barevný negativ</a> a máte za úkol ho zkopírovat (tedy zachovat velikost) pomocí zvětšovacího přístroje se zeleným filtrem. Jelikož ale nemáte možnost změřit osvit pozitivu, musíte provést klasickou proužkovou zkoušku – rozdělit pozitiv na několik (obdélníkových) oblastí a postupným posouváním krycí masky po nich vyzkoušet, jak se délka osvitu projeví (samozřejmě pouze v dané části obrazu). Programově tedy:
+        <ul>
+            <li>
+                Výstupem je pozitiv, musíte proto barvy převést z negativu.
+            </li>
+            <li>
+                Zelený filtr je ideální, ze tří barvových složek originálu tak použijete pouze zelený kanál.
+            </li>
+            <li>
+                „Osvit“ testujte v pěti oblastech následujícím způsobem – prostřední část prostě zkopírujte, dvě krajní na jedné straně „podsviťte“ (tedy ztmavte) a druhé dvě krajní naopak „přesviťte“ (tedy zesvětlete). V zájmu procvičení práce s numpy-poli spočítejte výstup pro horizontální i vertikální směr.
+            </li>
+        </ul>
+        Při „osvitové řadě“ 0.25, 0.5, 1, 2, 4 byste mohli obdržet něco takovéhoto:
+        <center>
+            <img src="grafika.2/osvit.V.jpg" width="500" height="375" alt="zkouška osvitu vodorovně">
+            <img src="grafika.2/osvit.S.jpg" width="500" height="375" alt="zkouška osvitu svisle">
+        </center>
+    </div><div class="reseni"><details class="exercise-details"><summary class="exercise-summary"> nápověda </summary><div class="exercise-details-content">
+        Možná trochu zamotané, ale relativně přímočaré cvičení. Jen si dejte pozor, abyste nepřišli o originální obrázek – potřebujete ho pro dva výpočty.
+    </div></details></div></div></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 10 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

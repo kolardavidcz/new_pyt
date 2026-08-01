@@ -1,0 +1,395 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Základní řídicí konstrukce
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Základní řídicí konstrukce</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">20</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Větvení „if-elif-else“</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Podmíněný výraz („ternární operátor“)</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Větvení „match-case“ [3.10+]</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Příklady na „match-case“</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Cyklus „for-in“</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Cyklus „for-in &amp; range()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Cyklus „for-in-else“</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Cyklus „while“</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Cyklus „while-else“</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">A co „repeat-until“?</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Předčasné ukončení smyčky – „continue &amp; break“</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">Výjimky „try-except“ I</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">Výjimky „try-except“ II</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">Výjimky „raise &amp; assert“</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">Výjimky „try-except-else“</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">Výjimky „try-except-finally“</span></a></li><li class="toc-item"><a class="toc-link" href="#id18"><span class="toc-num">18</span><span class="toc-text">Výjimky „try-except-else-finally“</span></a></li><li class="toc-item"><a class="toc-link" href="#id19"><span class="toc-num">19</span><span class="toc-text">Funkce „def“</span></a></li><li class="toc-item"><a class="toc-link" href="#id20"><span class="toc-num">20</span><span class="toc-text">Funkce „def“ – argumenty a návratové hodnoty</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2015-10-16</span></div><h1 class="lecture-title">Základní řídicí konstrukce</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Ačkoliv většina následujícího materiálu je už různě roztroušena po několika dalších přednáškách, chtěl jsem ho združit na jedno místo, aby se na něj za prvé snáze odkazovalo a za druhé aby byly (snad) lépe vidět souvislosti.
+    </p>
+    <ul>
+        <li><a href="?slajd=2">větvení <em>if</em></a></li>
+        <li><a href="?slajd=4">větvení <em>match-case</em></a> (Python 3.10+)</li>
+        <li><a href="?slajd=6">cyklus <em>for</em></a></li>
+        <li><a href="?slajd=9">cyklus <em>while</em></a></li>
+        <li><a href="?slajd=13">výjimky</a></li>
+        <li><a href="?slajd=19">funkce</a></li>
+    </ul>
+
+</div></section><section class="slide-section" id="id2" data-title="Větvení „if-elif-else“"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Větvení „if-elif-else“</h2></div><div class="section-body">
+
+    <p>
+        Podmíněný příkaz <em>větvení</em> je v Python'u celkem standardní:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        if PODMÍNKA1:
+           BLOK
+        elif PODMÍNKA2:
+           BLOK
+        else:
+           BLOK
+    </pre>
+    <p>
+        Přitom:
+    </p>
+    <ul>
+        <li>
+            větve <code>elif</code> a <code>else</code> nejsou povinné;
+        </li>
+        <li>
+            <em>elifů</em> může být libovolně mnoho.
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id3" data-title="Podmíněný výraz („ternární operátor“)"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Podmíněný výraz („ternární operátor“)</h2></div><div class="section-body">
+
+    <p>
+        Narozdíl od mnoha jiných věcí bylo volání po <strong>podmíněném výrazu</strong> vyslyšeno a od Python'u 2.5 je k dispozici v následující podobě:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        výstup = VÝRAZ1 if PODMÍNKA else VÝRAZ2
+    </pre>
+    <p>
+        Pořadí zápisu je tedy mezi programovacími jazyky velmi nezvyklé (typicky bývá pomínka první, viz např. <code>PODMÍNKA ? VÝRAZ1 : VÝRAZ2</code>), ale z hlediska Python'u nakonec docela přirozené.
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Větvení „match-case“ [3.10+]"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Větvení „match-case“ [3.10+]</h2></div><div class="section-body">
+
+    <p>
+        Python 3.10 s sebou přinesl obdobu klasických „switch/case“ konstrukcí z jiných programovacích jazyků:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        match SUBJEKT:
+            case VZOR-1:
+                BLOK-1
+            case VZOR-2:
+                BLOK-2
+            case VZOR-3:
+                BLOK-3
+            case _: # „wildcard“, který zabere vždy, když všechno ostatní selže
+                ZÁCHYTNÝ-BLOK
+    </pre>
+    <p>
+        Jako vždy je to ale všechno s pythoní omáčkou – jednotlivé větve totiž kromě dodatečných podmínek <em>if</em> a přiřazení zásahů pomocí <em>as</em> především umožňují klasické pythoní rozbalování pomocí n-tic a hvězdiček. Kromě pár příkladů na <a href="?slajd=5">dalším slajdu</a> se podívejte především do <a href="https://www.python.org/dev/peps/pep-0636" class="external">oficiálního tutoriálu</a>, protože fungují i zásahy podle typu objektů, na které jsem příklad nereprodukoval.
+    </p>
+
+    
+
+</div></section><section class="slide-section" id="id5" data-title="Příklady na „match-case“"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Příklady na „match-case“</h2></div><div class="section-body">
+
+    <p>
+        Níže uvedené varianty zásahů se navíc dají kombinovat:
+    </p>
+
+    <p class="enumerate">
+        Více zásahů můžete spojit do jedné větve pomocí „ořítka“:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        case VZOR-1 | VZOR-2 | VZOR-3:
+            ...
+    </pre>
+
+    <p class="enumerate">
+        Zásahy mohou obsahovat proměnné k přiřazení:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        match point:
+            case (x, 0):
+                print(f'Bod {x} na ose x.')
+    </pre>
+
+    <p class="enumerate">
+        Hodnoty přiřazené v zásahu můžete ještě navíc testovat (tzv. <em>guard</em>):
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        match point:
+            case (x, y) if x == y:
+                print('Bod na ose kvadrantu.')
+    </pre>
+
+    <p class="enumerate">
+        Celý zásah můžete přiřadit do proměnné:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        case VZOR as vzor:
+            ...
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        A to se týká i (pod)částí složitějších zásahů.
+    </div></div>
+
+    <p class="enumerate">
+        Zásahy zachytí i sekvence s proměnným počtem parametrů pomocí operátoru <code>*</code>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        case (x, y, *_):
+            ...
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        A totéž i pro pojmenované parametry ze slovníků kódem <code>**zbytek</code>.
+    </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="Cyklus „for-in“"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Cyklus „for-in“</h2></div><div class="section-body">
+
+    <p>
+        Narozdíl od snad naprosté většiny programovacích jazyků se v Python'u cyklí průchodem po prvcích nějakého objektu, ve většině případů sekvence:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        for i in SEKVENCE:
+           BLOK
+    </pre>
+    <p>
+        Navíc narozdíl od většiny ostatních jazyků je proměnná cyklu (zde <code>i</code>) definována na stejné úrovni kódu jako sama smyčka, takže po skončení cyklu bude stále existovat a mít právě tu hodnotu, jíž během provádění cyklu dosáhla (zde poslední prvek procházené sekvence).
+    </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Cyklus „for-in &amp; range()“"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Cyklus „for-in &amp; range()“</h2></div><div class="section-body">
+
+    <p>
+        Přímou obdobou klasického <em>for</em>-cyklu je průchod po prvcích odpovídajícího rozsahu:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        for i in range(INTERVAL):
+            BLOK
+    </pre>
+
+</div></section><section class="slide-section" id="id8" data-title="Cyklus „for-in-else“"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Cyklus „for-in-else“</h2></div><div class="section-body">
+
+    <p>
+        Naopak zcela neklasickou je varianta s větví <em>else</em>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        for i in SEKVENCE:
+           BLOK 1
+        else:
+           BLOK 2
+    </pre>
+    <p>
+        Větev s <code>else</code> se provede pouze tehdy, je-li cyklus ukončen normálně, tedy dojde-li k proiterování všech prvků vstupní sekvence. Naopak je-li cyklus v <em>BLOKu 1</em> ukončen násilně pomocí <code>break</code>, kód v <em>BLOKu 2</em> nebude vůbec vykonán. 
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Jinými slovy – pokud potřebujete nějak zareagovat na úspěšné provedení <em>for</em>-cyklu nad všemi jeho prvky, netřeba na to zavádět další proměnnou a připisovat podmínku za jeho konec.
+    </div></div>
+    
+
+</div></section><section class="slide-section" id="id9" data-title="Cyklus „while“"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Cyklus „while“</h2></div><div class="section-body">
+
+    <p>
+        Cyklus <em>while</em> je na první pohled obdobný jako všude jinde:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        while PODMÍNKA:
+            BLOK
+    </pre>
+    <p>
+        Od verze Python'u 3.8 pak už můžeme v rámci podmínky provést i přiřazení pomocí speciálního operátoru <code>:=</code> (tzv. <em>walrus</em>), takže i iterace přes struktury, které nepodporují <em>for-in</em>, je už celkem „normální“.
+    </p>
+    <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Historická poznámka: Python byl původně navržen jako jazyk se striktním rozdělením konstrukcí na příkazy a výrazy, a i když to postupně byla pravda na méně a méně místech, přiřazení stále odolávalo. Jelikož zrovna v tomto místě se to zdůvodňovalo jen a pouze snadnou záměnou <code>==</code> za <code>=</code>, nepřekvapivě – když nakonec BDFL (a polovina ostatních) povolil – byl pro tento a jiné specifické případy vybrán právě „mrož“.
+        </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            PS: Za jazykem nerozlišujícím mezi výrazy a příkazy je ovšem stejně třeba podívat se někam úplně jinam.
+        </div></div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="Cyklus „while-else“"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Cyklus „while-else“</h2></div><div class="section-body">
+
+    <p>
+        Podobně jako u příkazu <em>for-in</em> i pro <em>while</em> existuje velmi neklasická varianta s větví <em>else</em>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        while PODMÍNKA:
+            BLOK 1
+        else:
+            BLOK 2
+    </pre>
+    <p>
+        Větev s <code>else</code> se provede pouze tehdy, je-li smyčka <em>BLOKu 1</em> ukončena normálně na <em>PODMÍNKu</em>, a je vynechána při jejím násilném ukončení (příkazem <code>break</code>).
+    </p>
+
+</div></section><section class="slide-section" id="id11" data-title="A co „repeat-until“?"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">A co „repeat-until“?</h2></div><div class="section-body">
+
+    <p>
+        Další z klasických řídicích konstrukcí, která se do Python'u nedostala – cyklus <em>repeat</em>. Nahrazuje se použitím následující konstrukce:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        while True:
+            BLOK
+            if PODMÍNKA: break
+    </pre>
+
+</div></section><section class="slide-section" id="id12" data-title="Předčasné ukončení smyčky – „continue &amp; break“"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Předčasné ukončení smyčky – „continue &amp; break“</h2></div><div class="section-body">
+
+  <p>
+    Jak už jsme viděli na předchozím slajdu, Python umožňuje cyklus předčasně ukončit. Slouží k tomu dva klasické příkazy:
+  </p>
+  <ul>
+    <li>
+        <pre class="brush: python; gutter: false; toolbar: false; ">continue</pre>
+        ukončí aktuální smyčku cyklu a pokračuje následující;
+    </li>
+    <li>
+        <pre class="brush: python; gutter: false; toolbar: false; ">break</pre>
+        ukončí celý aktuální cyklus a přejde na kód následující po něm.
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id13" data-title="Výjimky „try-except“ I"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">Výjimky „try-except“ I</h2></div><div class="section-body">
+
+    <p>
+        Pro odchycení a zpracování „havarijních“ situací za běhu programu máme k dispozici výjimky:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        try:
+            BLOK-1
+        except VÝJIMKA-1:
+            BLOK-2
+        except VÝJIMKA-2:
+            BLOK-3
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Kde <em>VÝJIMKA</em> je některá z hromady předdefinovaných nebo naše vyrobená např. jako potomek třídy <em>Exception</em>:
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            class MyError(Exception):
+                pass
+        </pre>
+    </div></div>
+
+</div></section><section class="slide-section" id="id14" data-title="Výjimky „try-except“ II"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">Výjimky „try-except“ II</h2></div><div class="section-body">
+
+    <p>
+        K bloku <em>try</em> existuje několik dalších užitečných variant:
+    </p>
+    <ul>
+        <li>
+            odchycení výjimky jako pojmenovaného objektu
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                try:
+                    BLOK-1
+                except VÝJIMKA as ex:
+                    BLOK-2   # zde je možné použít objekt odchycené výjimky pod jménem 'ex'
+            </pre>
+        </li>
+        <li>
+            odchycení více výjimek v jedné větvi
+            <pre class="brush: python; gutter: false; toolbar: false; ">
+                try:
+                    BLOK-1
+                except (VÝJIMKA-1, VÝJIMKA-2, ...):
+                    BLOK-2
+            </pre>
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id15" data-title="Výjimky „raise &amp; assert“"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">Výjimky „raise &amp; assert“</h2></div><div class="section-body">
+
+    <p>
+        Kdybyste potřebovali výjimkou přeposlat dál, slouží k tomu příkaz <code>raise</code>.
+    </p>
+    <p>
+        Kromě toho můžete minimálně pro lepší čitelnost (v neoptimalizovaném<sup>*</sup>) kódu použít příkaz <code>assert</code>.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        <sup>*</sup> V optimalizovaném (např. interpret spuštěný s parametrem <code>-o</code>) jsou totiž příkazy <em>assert</em> ignorovány.
+    </div></div>
+
+</div></section><section class="slide-section" id="id16" data-title="Výjimky „try-except-else“"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">Výjimky „try-except-else“</h2></div><div class="section-body">
+
+    <p>
+        Kromě výše uvedených nabízí výjimky ještě další možnosti, zde je použití větve <em>else</em>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        try:
+            BLOK-1
+        except:
+            BLOK-2
+        else:
+            BLOK-3
+    </pre>
+    <p>
+        <em>BLOK-3</em> bude proveden pouze tehdy, nevyvolal-li kód v <em>BLOKu-1</em> výjimku (jinak tedy že byl přeskočen <em>BLOK-2</em>).
+    </p>
+
+</div></section><section class="slide-section" id="id17" data-title="Výjimky „try-except-finally“"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">Výjimky „try-except-finally“</h2></div><div class="section-body">
+
+    <p>
+        A zde použití větve <em>finally</em>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        try:
+            BLOK-1
+        except:
+            BLOK-2
+        finally:
+            BLOK-3
+    </pre>
+    <p>
+        Kód v <em>BLOKu-3</em> bude proveden <strong>vždy</strong>, naprosto nezávisle na nastalých výjimkách a jejich odchycení.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Nepřekvapivě se tento způsob zápisu používá nejen pro „skutečné“ výjimky, ale také pro části programu, po nichž je třeba zajistit „vyčišťovací“ operace (např. uzavírání souborů neotevřených pomocí <em>with</em>, vrácení terminálu do výchozího nastavení apod.).
+    </div></div>
+
+</div></section><section class="slide-section" id="id18" data-title="Výjimky „try-except-else-finally“"><div class="section-header"><span class="section-num">18</span><h2 class="section-title">Výjimky „try-except-else-finally“</h2></div><div class="section-body">
+
+    <p>
+        A samozřejmě to jde všechno spojit dohromady, jak názorně ukazuje následující krásný příklad:
+    </p>
+    <example lang="python" src="exceptions/_files/try_except.py"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Upraveno podle <a href="http://www.swaroopch.com/notes/Python_en:Exceptions">http://www.swaroopch.com/notes/Python_en:Exceptions</a>
+    </div></div>
+
+</div></section><section class="slide-section" id="id19" data-title="Funkce „def“"><div class="section-header"><span class="section-num">19</span><h2 class="section-title">Funkce „def“</h2></div><div class="section-body">
+
+    <p>
+        Python poskytuje velkou podporu pro definici a používání funkcí.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Aby ne, když jsou v něm <em>first class object</em>. (A kromě toho máme také k dispozici hodně ořezané, ale přeci <em>lambda-funkce</em>.)
+    </div></div>
+    <p>
+        Novou funkci (v nejjednodušším možném tvaru) zavedeme pomocí klíčového slova <code>def</code> takto:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+    def jméno_nové_funkce():
+        BLOK
+    </pre>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Odsazení <em>BLOKu</em> jako těla funkce už snad netřeba zdůrazňovat.
+    </div></div>
+
+</div></section><section class="slide-section" id="id20" data-title="Funkce „def“ – argumenty a návratové hodnoty"><div class="section-header"><span class="section-num">20</span><h2 class="section-title">Funkce „def“ – argumenty a návratové hodnoty</h2></div><div class="section-body">
+
+    <p>
+        Funkce (samozřejmě) mohou mít vstupní parametry a vracet nějaké objekty, jak ukazuje třebas následující příklad:
+    </p>
+    <div class="example-block example-horizontal"><div class="example-col"><div class="example-label">📄 Program: <a href="_files/funkce4.py"><em>funkce4.py</em></a></div><example src="_files/funkce4.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/funkce4.out" lang="text"></example></div></div>
+    <p>
+        Přitom:
+    </p>
+    <ul>
+        <li>
+            Vstupních parametrů může být dokonce proměnný počet.
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">Klasickým příkladem je vestavěná funkce <em>print()</em>.</div></div>
+        </li>
+        <li>
+            Část (nebo i všechny) parametry mohou mít jméno a výchozí hodnotu.
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">Pozor pak na předávání proměnných datových typů...</div></div>
+        </li>
+        <li>
+            Díky datovému typu <em>n-tice</em> může funkce (zdánlivě) vracet více než jednu hodnotu či objekt.
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">Což obzvláště v kombinaci s operátory <code>*</code> a <code>**</code> působí občas jako magie.</div></div>
+        </li>
+    </ul>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 20 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

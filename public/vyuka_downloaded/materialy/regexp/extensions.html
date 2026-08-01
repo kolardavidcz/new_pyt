@@ -1,0 +1,236 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Rozšíření
+      —
+      Regulární výrazy</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Rozšíření</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">9</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Zavedení</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">(?=…) &amp; (?!…)</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">(?&lt;=…) &amp; (?&lt;!…)</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">(?:…)</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">(?#…)</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">(?P&lt;jméno&gt;…) &amp; (?P=jméno)</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">(?(id)ano|ne)</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">(?aiLmsux)</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Regulární výrazy</span><span class="lecture-date">2011-10-27</span></div><h1 class="lecture-title">Rozšíření</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    Jak už jsme viděli ve <a href="overview.xml?slajd=13">formálním úvodu</a>, regulární výrazy v původním smyslu slova sice dokázaly mnohé, ale jejich zápis nebyl zrovna krátký a jednoduchý. Záhy proto začala vznikat nejrůznější rozšíření regulárních výrazů, která jejich zápis, resp. možnosti, podstatně zjednodušovala, resp. zvětšovala.
+  </p>
+  <p>
+    S mnoha rozšířeními regulárních výrazů za hranice původních jsme se již seznámili (namátkou <a href="groups.xml">skupiny</a> nebo <a href="metaseqs.xml">speciální řídicí znaky</a>), ale jednu velkou množinu jsme si nechali až do této samostatné kapitoly. Jedná se o rozšíření typu <code>(?…)</code>.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Zavedení"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Zavedení</h2></div><div class="section-body">
+
+  <p>
+    S rozšířeními typu <code>(?…)</code> přišli vývojáři jazyka Perl. Důvodem výběru právě tohoto označení bylo, že dvojce metaznaků <code>(?</code> hned po sobě totiž v rámci regexpů nedává smysl. 
+  </p>
+  <p>
+    Obecně tedy všechny řetězce typu <code>(?…)</code> jsou vyhodnoceny jako rozšíření regexpu a záleží pouze na obsahu části <code>…</code> (resp. na nejvýše několika prvních znacích z této části), o jaké konkrétní rozšíření se jedná.
+  </p>
+  <p>
+    Některá z těchto rozšíření (převážně původní perlovská) jsou sdílena mnoha implementacemi regexpů, jiná používají zvláštní rozpoznávací syntaxi a jsou určena pouze pro konkrétní implementaci.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Třebas čistě pythonovská rozšíření poznáte podle tvaru <code>(?P…)</code>. V dané chvíli jsou právě dvě a slouží pro použití v rámci <a href="groups.xml?slajd=7">pojmenovaných skupin</a>.
+  </div></div>
+  <p>
+    A ač syntaxe pro rozšíření používá závorky, skoro nikdy rozšíření nevyrábí skupinu.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Jedinou výjimkou je právě jedno ze dvou pythonovských rozšíření – <code>(?P&lt;jmeno&gt;…)</code> slouží k vytvoření pojmenované skupiny.
+  </div></div>
+
+</div></section><section class="slide-section" id="id3" data-title="(?=…) &amp; (?!…)"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">(?=…) &amp; (?!…)</h2></div><div class="section-body">
+
+  <p>
+    Prvním a nejklasičtějším případem rozšíření regexpů je takzvané <strong>vyhlížení</strong> (<em>čmuchání dopředu</em>, <em>lookahead assertion</em>). Stručně řečeno zajišťuje, že regexp v daném místě bude splněn pouze tehdy, pokud řetězec od tohoto místa dále bude (nebo naopak nebude) vyhovovat jistému jinému regexpu.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Přitom tato „dopředu osahaná“ část řetězce nemá s vlastním zpracováním regexpu nic společného, ukazatel na zpracovávanou pozici zůstává stále na původním místě. Tedy ověření podmínky je zajištěno „bokem“ od vlastního vyhledávání zásahů.
+  </div></div>
+  <p>
+    Vyhlížení se vyskytuje ve dvou variantách – potvrzovací (vedlejší regexp musí být splněn) a zamítací (vedlejší regexp nesmí být splněn):
+  </p>
+  <p class="enumerate">
+    Obecný kód pro <strong>pozitivní vyhlížení</strong> (<em>positive lookahead assertion</em>) jest <code>…<sub>H</sub>(?=…<sub>V</sub>)</code>. Hlavní regexp <code>…<sub>H</sub></code> bude zachycen jen a pouze tehdy, pokud řetězec <em>těsně za ním</em> bude splňovat vedlejší regexp <code>…<sub>V</sub></code>:
+  </p>
+  <img src="_files/extensions/cmuchani-dopredu.plus.png" width="" height="" alt="" title="">
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Zde tedy regexp <code>Karel</code> nalezne zásah pouze na první řádce, protože pouze na ní je slovo <em>Karel</em> následováno mezerou a slovem <em>Hynek</em>, jak předepisuje regexp <code>(?= Hynek)</code> (a ještě jednou výslovně upozorňuji na to, že mezera je součástí daného regexpu a nikoli rozšíření :-).
+  </div></div>
+  <p class="enumerate">
+    <strong>Negativní vyhlížení</strong> (<em>negative lookahead assertion</em>) <code>…<sub>H</sub>(?!…<sub>V</sub>)</code> je doplňkem k vyhlížení pozitivnímu – hlavní regexp <code>…<sub>H</sub></code> bude zachycen jen a pouze tehdy, pokud řetězec <em>těsně za ním</em> <strong>ne</strong>bude splňovat vedlejší regexp <code>…<sub>V</sub></code>:
+  </p>
+  <img src="_files/extensions/cmuchani-dopredu.minus.png" width="" height="" alt="" title="">
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Zde tedy regexp prozměnu zachytí Karla až ve druhém řádku, protože pouze v něm není řetězec <em>Karel</em> následován řetězcem vyhovujícím regexpu <code>(?! Hynek)</code> (a pro mezeru platí stejná poznámka jako výše).
+  </div></div>
+
+</div></section><section class="slide-section" id="id4" data-title="(?&lt;=…) &amp; (?&lt;!…)"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">(?&lt;=…) &amp; (?&lt;!…)</h2></div><div class="section-body">
+
+  <p>
+    Nepřekvapivě k <em>vyhlížení směrem dopředu</em> existuje i <strong>nahlížení směrem dozadu</strong> (<em>čmuchání dozadu</em>, <em>lookbehind assertion</em>) s přesně opačným významem – regexp v daném místě bude splněn pouze tehdy, pokud řetězec těsně před tímto místem bude (nebo naopak nebude) vyhovovat jistému jinému regexpu. 
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Z implementačních důvodů je povoleno pouze dohledávání přesně známého počtu znaků.
+  </div></div>
+  <p>
+    Stejně jako vyhlížení i nahlížení se vyskytuje ve variantě potvrzovací a zamítací:
+  </p>
+  <p class="enumerate">
+    Obecný kód pro <strong>pozitivní nahlížení</strong> (<em>positive lookbehind assertion</em>) jest <code>(?&lt;=…<sub>V</sub>)…<sub>H</sub></code>. Hlavní regexp <code>…<sub>H</sub></code> bude zachycen jen a pouze tehdy, pokud řetězec <em>těsně před ním</em> bude splňovat vedlejší regexp <code>…<sub>V</sub></code>:
+  </p>
+  <img src="_files/extensions/cmuchani-dozadu.plus.png" width="" height="" alt="" title="">
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Zde tedy poměrně složitě hledáme devítimístné telefonní číslo, jehož národní kód je právě dvoumístný.
+  </div></div>
+  <p class="enumerate">
+    Obecný kód pro <strong>negativní nahlížení</strong> (<em>negative lookbehind assertion</em>) jest <code>(?&lt;!…<sub>V</sub>)…<sub>H</sub></code>. Hlavní regexp <code>…<sub>H</sub></code> bude zachycen jen a pouze tehdy, pokud řetězec <em>těsně před ním</em> <strong>ne</strong>bude splňovat vedlejší regexp <code>…<sub>V</sub></code>:
+  </p>
+  <img src="_files/extensions/cmuchani-dozadu.minus.png" width="" height="" alt="" title="">
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Zde naopak (opět poměrně složitě) hledáme devítimístné telefonní číslo, jehož národní kód není právě dvoumístný.
+  </div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="(?:…)"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">(?:…)</h2></div><div class="section-body">
+
+  <p>
+    Kód <code>(?:…)</code> označuje skupinu, kterou jako skupinu bereme (takže na ni třeba můžeme aplikovat opakovací operátory a podobně), ale nepotřebujeme si ji zapamatovat.
+  </p>
+  <p>
+    Toto rozšíření jsme <a href="groups.xml?slajd=8">probírali již u skupin</a>. Ukažme si tentokrát jiný příklad – nalezení kódu země v telefonním čísle:
+  </p>
+  <img src="_files/extensions/bez-zapamatovani.png" width="" height="" alt="" title="">
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Samozřejmě by bylo lepší napsat pro devítimístné číslo rovnou regexp <code>\d{9}</code>, ale to bych pak musel vymýšlet jiný příklad *_* :-)
+  </div></div>
+
+</div></section><section class="slide-section" id="id6" data-title="(?#…)"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">(?#…)</h2></div><div class="section-body">
+
+  <p>
+    Velmi osobitým rozšířením je <strong>komentář</strong> <code>(?#…)</code> – text na místě <code>…</code> se jednoduše z hlediska regexpu vůbec neuvažuje. Šikovné u dlouhých a složitých regexpů, které nemůžeme napsat v <a href="" class="TODO">uvolněné syntaxi</a>.
+  </p>
+  <img src="_files/extensions/komentare.png" width="" height="" alt="" title="">
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Aneb příklad z předchozího slajdu, pouze navíc okomentovaný.
+  </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="(?P&lt;jméno&gt;…) &amp; (?P=jméno)"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">(?P&lt;jméno&gt;…) &amp; (?P=jméno)</h2></div><div class="section-body">
+
+  <p>
+    Rozšířením specifickým pro Python jsou <strong>pojmenované skupiny</strong>. Každá skupina (s výjimkou <a href="groups.xml?slajd=8">nepamatovaných</a>) má přiřazeno pořadové číslo, pod kterým je možné se na ni dále v regexpu <a href="groups.xml?slajd=5">odvolat</a>. To je sice šikovné, ale má to své mouchy:
+  </p>
+  <ul>
+    <li> při větším počtu skupin se stává dopočítání pořadí složitějším </li>
+    <li> při jakékoliv změně regexpu, která přidá či ubere nějakou skupinu, dojde k přečíslování skupin (a tím pádem k rozbití většiny odkazů na ně) </li>
+  </ul>
+  <p>
+    Stručně řečeno jsou tedy pojmenované skupiny způsob, jak ve dlouhém regexpu nemuset počítat (a při každé úpravě hlídat a přepočítávat) závorky, abyste se zpětným odkazem odvolali na správnou skupinu. Nehledě na to, že při další práci s kódem je mnohem přehlednější odvolávat se na vhodné názvy než na nic neříkající čísla.
+  </p>
+  <p>
+    PS: Z implementačních důvodů musí být jména skupin v podstatě ASCII, ač dokumentace tvrdí „validní pythonovské identifikátory“.
+  </p>
+  <hr>
+  <p>
+    S pojmenovanými skupinami jsme se už <a href="groups.xml?slajd=7">také setkali dříve</a>. Vyrobme si však na tomto místě další variantu předchozího příkladu:
+  </p>
+  <img src="_files/extensions/pojmenovavani.png" width="" height="" alt="" title="">
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Daný regexp tedy rozeznává telefonní čísla, přičemž si pod jménem <em>kod</em> uloží kód oblasti a pod jménem <em>cislo</em> vlastni telefonni cislo.
+  </div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="(?(id)ano|ne)"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">(?(id)ano|ne)</h2></div><div class="section-body">
+
+  <p>
+    Tahle hodně specifická záležitost se odvolává na existenci předchozí skupiny <em>id</em> (ať už pod jejím pořadovým číslem nebo jménem) – pokud uvedená skupina v regexpu existuje, aplikuje se podregexp v části <em>ano</em>, jinak se pokusí dohledat podregexp z části <em>ne</em>.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Část <em>ne</em> přitom není povinná a můžeme ji tedy vynechat. Navíc skupina <code>(?(id)…)</code> se jako celek nezapamatuje, takže chceme-li z ní dostat obsaženou informaci, musíme ji ještě navíc uzávorkovat.
+  </div></div>
+  <p>
+    Zkusme radši rovnou vymyslet názornější příklady:
+  </p>
+  
+  <p>
+    <b>Příklad 1:</b> V seznamu adres rozpoznejme adresy protokolu FTP a jen u nich si zapamatujme jméno stroje a cestu ke zdroji na něm:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/extensions/podminka.1.py"><em>extensions/podminka.1.py</em></a></div><example src="_files/extensions/podminka.1.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/extensions/podminka.1.out" lang="text"></example></div></div>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    První skupina <code>(?P&lt;ftp&gt;ftp://)</code> bude zaznamenána (pod jménem <em>ftp</em>) pouze tehdy, bude-li adresa odpovídat protokolu FTP. A pouze tehdy bude díky <code>(?(ftp)…)</code> vyhodnocena i druhá část regexpu <code>(\w+\.\w{2,3})(/.*)?</code>, která jako první podskupinu odchytí adresu stroje a jako druhou cestu ke zdroji na něm.
+  </div></div>
+  
+  <p>
+    <b>Příklad 2</b> (podle dokumentace)<b>:</b> Najděme správně uvozené imejlové adresy:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/extensions/podminka.2.py"><em>extensions/podminka.2.py</em></a></div><example src="_files/extensions/podminka.2.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/extensions/podminka.2.out" lang="text"></example></div></div>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    „Vtip“ regexpu je v tom, že pokud testovaný řetězec začíná na levou špičatou závorku <em>&lt;</em> (kód <code>(&lt;)?</code>), bude se na konci testovat přítomnost odpovídající pravé závorky <em>&gt;</em> (<em>ano</em>-část v kódu <code>(?(1)&gt;|$)</code>). Nezačíná-li řetězec na <em>&lt;</em>, bude na konci testován na prostý konec řetězce <em>$</em> (<em>ne</em>-část v kódu <code>(?(1)&gt;|$)</code>).
+  </div></div>
+  
+  
+
+</div></section><section class="slide-section" id="id9" data-title="(?aiLmsux)"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">(?aiLmsux)</h2></div><div class="section-body">
+
+  <p>
+    Globální chování regexpů běžně řídíme zadáním <a href="flags.xml">příslušných příznaků</a> při kompilaci regexpu. Je však možné tyto příznaky zadat pomocí speciální notace <code>(?aiLmsux)</code> přímo do zápisu regexpu. Odpovídající mapování zkratek je následující:
+  </p>
+  <table class="center">
+    <tr>
+      <th> zkratka </th>
+      <th> plná forma </th>
+      <th> význam </th>
+    </tr>
+    <tr>
+      <td> <code>a</code> </td>
+      <td> ASCII </td>
+      <td> uvažuj pouze ASCII-vyhledávání </td>
+    </tr>
+    <tr>
+      <td> <code>i</code> </td>
+      <td> IGNORECASE </td>
+      <td> ignoruj velikost písmen </td>
+    </tr>
+    <tr>
+      <td> <code>L</code> </td>
+      <td> LOCALE </td>
+      <td> uvažuj aktuální nastavení <em>locale</em> </td>
+    </tr>
+    <tr>
+      <td> <code>m</code> </td>
+      <td> MULTILINE </td>
+      <td> neomezuj se na jeden řádek </td>
+    </tr>
+    <tr>
+      <td> <code>s</code> </td>
+      <td> DOTALL </td>
+      <td> tečka odchytí skutečně všechno </td>
+    </tr>
+    <tr>
+      <td> <code>x</code> </td>
+      <td> VERBOSE </td>
+      <td> použití uvolněné notace </td>
+    </tr>
+  </table>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Použití příznaku <code>x</code> je pochopitelně trochu problematické – mění totiž, jakým způsobem se bude celý regexp vyhodnocovat. Proto pokud ho chcete použít, udělejte to hned na začátku.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Příznak <code>u</code> aka <code>UNICODE</code> je v Python'u 3.x přebytečný, protože v něm všechny řetězce jsou automaticky unicodové. Byl zachován kvůli zpětné kompatibilitě.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Při zadávání samozřejmě ze všech příznaků uvedete pouze ty, jejichž funkcionalitu chcete zrovna použít.
+    </div></div></div>
+  <hr>
+  <p>
+    Jednoduchý příklad:
+  </p>
+  <img src="_files/extensions/priznaky.png" width="" height="" alt="" title="">
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Regexp <code>ahoj</code> našel jak <em>ahoj</em>, tak i <em>Ahoj</em>, protože jsme pomocí <code>(?i)</code> zapnuli přepínač <em>IGNORECASE</em>, tedy nerozlišování mezi malými a velkými písmeny.
+  </div></div>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 9 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

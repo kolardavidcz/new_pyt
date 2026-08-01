@@ -1,0 +1,892 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Modul „argparse“
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Modul „argparse“</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">37</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Příklad</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Příklad – zdrojový kód</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Několik poznámek</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Vytvoření parseru</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Přidávání argumentů I</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Přidávání argumentů II</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Získání argumentů I</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Získání argumentů II</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Získání argumentů III</span></a></li><li class="toc-item"><a class="toc-link" href="#id11"><span class="toc-num">11</span><span class="toc-text">Vlastnosti argumentů</span></a></li><li class="toc-item"><a class="toc-link" href="#id12"><span class="toc-num">12</span><span class="toc-text">Parametr „default“</span></a></li><li class="toc-item"><a class="toc-link" href="#id13"><span class="toc-num">13</span><span class="toc-text">Parametr „required“</span></a></li><li class="toc-item"><a class="toc-link" href="#id14"><span class="toc-num">14</span><span class="toc-text">Parametr „dest“</span></a></li><li class="toc-item"><a class="toc-link" href="#id15"><span class="toc-num">15</span><span class="toc-text">Parametr „type“</span></a></li><li class="toc-item"><a class="toc-link" href="#id16"><span class="toc-num">16</span><span class="toc-text">Vyrobení vlastního typu</span></a></li><li class="toc-item"><a class="toc-link" href="#id17"><span class="toc-num">17</span><span class="toc-text">Parametr „choices“</span></a></li><li class="toc-item"><a class="toc-link" href="#id18"><span class="toc-num">18</span><span class="toc-text">Parametr „action“</span></a></li><li class="toc-item"><a class="toc-link" href="#id19"><span class="toc-num">19</span><span class="toc-text">action='store'</span></a></li><li class="toc-item"><a class="toc-link" href="#id20"><span class="toc-num">20</span><span class="toc-text">action='store_const'</span></a></li><li class="toc-item"><a class="toc-link" href="#id21"><span class="toc-num">21</span><span class="toc-text">action='store_true' &amp; action='store_false'</span></a></li><li class="toc-item"><a class="toc-link" href="#id22"><span class="toc-num">22</span><span class="toc-text">action='append'</span></a></li><li class="toc-item"><a class="toc-link" href="#id23"><span class="toc-num">23</span><span class="toc-text">action='append_const'</span></a></li><li class="toc-item"><a class="toc-link" href="#id24"><span class="toc-num">24</span><span class="toc-text">action='version'</span></a></li><li class="toc-item"><a class="toc-link" href="#id25"><span class="toc-num">25</span><span class="toc-text">Parametr „nargs“</span></a></li><li class="toc-item"><a class="toc-link" href="#id26"><span class="toc-num">26</span><span class="toc-text">nargs=N</span></a></li><li class="toc-item"><a class="toc-link" href="#id27"><span class="toc-num">27</span><span class="toc-text">nargs='?'</span></a></li><li class="toc-item"><a class="toc-link" href="#id28"><span class="toc-num">28</span><span class="toc-text">nargs='*'</span></a></li><li class="toc-item"><a class="toc-link" href="#id29"><span class="toc-num">29</span><span class="toc-text">nargs='+'</span></a></li><li class="toc-item"><a class="toc-link" href="#id30"><span class="toc-num">30</span><span class="toc-text">Parametr „const“</span></a></li><li class="toc-item"><a class="toc-link" href="#id31"><span class="toc-num">31</span><span class="toc-text">Parametr „help“</span></a></li><li class="toc-item"><a class="toc-link" href="#id32"><span class="toc-num">32</span><span class="toc-text">Parametr „metavar“</span></a></li><li class="toc-item"><a class="toc-link" href="#id33"><span class="toc-num">33</span><span class="toc-text">Skupiny argumentů</span></a></li><li class="toc-item"><a class="toc-link" href="#id34"><span class="toc-num">34</span><span class="toc-text">Navzájem se vylučující argumenty</span></a></li><li class="toc-item"><a class="toc-link" href="#id35"><span class="toc-num">35</span><span class="toc-text">Výchozí hodnoty argumentů</span></a></li><li class="toc-item"><a class="toc-link" href="#id36"><span class="toc-num">36</span><span class="toc-text">Částečné zpracování</span></a></li><li class="toc-item"><a class="toc-link" href="#id37"><span class="toc-num">37</span><span class="toc-text">„Argumenty argumentů“</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2012-12-18</span></div><h1 class="lecture-title">Modul „argparse“</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Modul <strong>argparse</strong> je poslední inkarnací nadstavbových modulů pro <a href="overview.xml">zpracování argumentů příkazové řádky skriptu</a>.
+    </p>
+    <p>
+        Názory na jeho uspořádání a použití se různí, ale za sebe mohu říct, že pro člověka, který potřebuje příležitostně zpracovat pár argumentů na příkazové řádce, je na použití zdaleka nejprůhlednější a nejpříjemnější. Proto jsem mu věnoval samostatnou kapitolu, ve které se pokusím to důležité z oficiální dokumentace převyprávět na menší ploše.
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Příklad"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Příklad</h2></div><div class="section-body">
+
+  <p>
+    Ukažme si nejdříve chování kódu vybaveného modulem <em>argparse</em> při různých voláních skriptu z příkazové řádky. Daný skript pouze (přehledně) vypisuje, jaké argumenty na příkazové řádce obdržel:
+  </p>
+  
+  <p class="enumerate">
+    Nevíme, jak program vůbec zavolat, tak to zkusíme bez parametrů:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python3 argparse.mod.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/argparse/argparse.mod.out1" lang="text"></example></div></div>
+
+  <p class="enumerate">
+    Aha, takže přepínače nejsou povinné, ale jméno souboru ano. Tak ho zkusíme přidat (<em>test.html</em>):
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python3 argparse.mod.py test.html</pre></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/argparse/argparse.mod.out2" lang="text"></example></div></div>
+
+  <p class="enumerate">
+    Vida, přepínače mají nějaké výchozí hodnoty. Nebyla by k nim nějaká nápověda?
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python3 argparse.mod.py --help</pre></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/argparse/argparse.mod.out3" lang="text"></example></div></div>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    A jak je dobrým zvykem, téhož výsledku dosáhneme zavoláním: <code>python3 argparse.mod.py -h</code>
+  </div></div>
+
+  <p class="enumerate">
+    Tak to zkusme všechno najednou:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python3 argparse.mod.py -x -c stylopis.css test.html</pre></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/argparse/argparse.mod.out4" lang="text"></example></div></div>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Přepínačem <code>-c</code> jsme změnili stylopisový soubor (klíč <em>cssfile</em>) z výchozího <em>style.css</em> na <em>stylopis.css</em> a přepínačem <code>-x</code> jsme změnili výchozí hodnotu klíče <em>xhtml_flag</em> z <code>False</code> na <code>True</code>. <em>test.html</em> je jméno souboru (určeného ke zpracování).
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        V „dlouhém“ provedení by volání vypadalo: <code>python3 argparse.mod.py --xhtml --cssfile=stylopis.css test.html</code> (znak <code>=</code> tam sice není povinný, ale lépe se to s ním čte)
+    </div></div></div>
+
+  <p class="enumerate">
+    Aby se neřeklo, tak ještě obligátní dotaz na verzi programu :)
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python3 argparse.mod.py --version</pre></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/argparse/argparse.mod.out5" lang="text"></example></div></div>
+
+</div></section><section class="slide-section" id="id3" data-title="Příklad – zdrojový kód"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Příklad – zdrojový kód</h2></div><div class="section-body">
+
+  
+  <example src="_files/argparse/argparse.mod.py" lang="python"></example>
+
+</div></section><section class="slide-section" id="id4" data-title="Několik poznámek"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Několik poznámek</h2></div><div class="section-body">
+
+  <ul>
+    <li>
+        Mnoho atributů nastavení je nepovinných, potřebné hodnoty se v běžných případech doplní celkem logicky.
+    </li>
+    <li>
+        Mezi přepínači a pozičními argumenty není z hlediska zavedení prakticky žádný rozdíl.
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Díky čemuž je uvedení pozičních hlídáno automaticky a nemusíte je pracně ručně ověřovat a vyhazovat výjimku, když se nedopočítáte potřebného počtu.
+        </div></div>
+    </li>
+    <li>
+        Návratový objekt je pouze jeden, jednotlivé argumenty (a to i poziční) jsou v něm přístupné pod svými jmény.
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Také z něj jde udělat slovník pomocí funkce <em>vars()</em>. Jinak sám o sobě je to v podstatě pouze objekt s pojmenovanými atributy.
+        </div></div>
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id5" data-title="Vytvoření parseru"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Vytvoření parseru</h2></div><div class="section-body">
+
+    <p>
+        Nový objekt pro zpracování argumentů příkazové řádky založíme pomocí třídy <strong>ArgumentParser</strong>. Ta má hafo nepovinných parametrů, z nichž nejužitečnější jsou asi následující dva:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser = ArgumentParser(description="", epilog="")
+    </pre>
+    <ul>
+        <li>
+            <code>description</code> – text v nápovědě mezi vzorem příkazové řádky a popisem jednotlivých argumentů
+        </li>
+        <li>
+            <code>epilog</code> – text úplně na konci nápovědy
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id6" data-title="Přidávání argumentů I"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Přidávání argumentů I</h2></div><div class="section-body">
+
+    <p>
+        O přidávání argumentů do parseru se stará metoda <strong>add_argument()</strong>. Ta má jediný povinný parametr (nebo skupinu parametrů) – řetězec (řetězce) zadávající jména argumentů. Přitom nepovinné parametry (tzv. <em>přepínače</em>) se od povinných (<em>pozičních</em>) liší přítomností znaménka <code>„-“</code> (v základním nastavení) před svým jménem:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-x', '--xhtml')
+        parser.add_argument('file')
+    </pre>
+    <br>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Znak(y) použité pro identifikaci přepínačů je možno předepsat při zavádění parseru:
+        <pre class="brush: python; gutter: false; toolbar: false; ">
+            parser = argparse.ArgumentParser(prefix_chars='-+/')
+        </pre>
+    </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Přidávání argumentů II"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Přidávání argumentů II</h2></div><div class="section-body">
+
+    <p>
+        Zadané argumenty z příkazové řádky skončí ve výstupním objektu <code>Namespace</code> přímo pod svými „dlouhými“ jmény:
+    </p>
+    <ul>
+        <li>
+            Nezadaný přepínač získá výchozí hodnotu <em>None</em>:
+            <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py baf</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+                    Namespace(file='baf', xhtml=None)
+                </pre></div></div>
+        </li>
+        <li>
+            Přepínače se mohou vyskytovat na libovolném místě zadání a se svojí hodnotou mohou – ale také nemusí (v případě „krátké“ varianty) – být spojeny pomocí znaku <code>=</code> nebo mezery:
+            <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py baf -x haf</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+                    Namespace(file='baf', xhtml='haf')
+                </pre></div></div>
+            <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py baf -xhaf</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+                    Namespace(file='baf', xhtml='haf')
+                </pre></div></div>
+            <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x=haf baf</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+                    Namespace(file='baf', xhtml='haf')
+                </pre></div></div>
+            <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                    Pro „dlouhou“ variantu jsou tedy ale možné pouze varianty <code>--xhtml haf</code> a <code>--xhtml=haf</code>.
+                </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                    Naopak více <em>přepínačů</em> (z nichž nejvýše ten poslední očekává nějaký vstup) může být spojeno dohromady, tj. může být pravda například: <code>test.py -x -y -z ⇔ test.py -xyz</code>
+                </div></div></div>
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id8" data-title="Získání argumentů I"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Získání argumentů I</h2></div><div class="section-body">
+
+    <p>
+        Za „vytažení“ argumentů z příkazové řádky je zodpovědná metoda parseru <code>parse_args()</code>.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Ve výchozím nastavení bere svůj vstup ze <code>sys.argv</code>, ale podle potřeby jí stačí přeposlat jako vstup seznam řetězců (tedy v principu stejný seznam jako vrátí <code>sys.argv[1:]</code>).
+    </div></div>
+    <p>
+        Ta se pokusí podle předpisů z metod <em>add_argument()</em> získat odpovídající hodnoty, kterými naplní návratový objekt <code>Namespace</code>, kde jsou přístupné pod klasickou tečkovou notací:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x soubor</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x', '--xhtml', action='store_true')
+            parser.add_argument('file')
+            args = parser.parse_args()
+            print(args)
+            print('xhtml:', args.xhtml)
+            print('file:', args.file)
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file='soubor', xhtml=True)
+            xhtml: True
+            file: soubor
+        </pre></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Potřebujete-li místo toho přidat naparsované argumenty do jiného již existujícího objektu, stačí použít parametr <em>namespace</em>:
+        <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x soubor</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+                class MojeArgumenty:
+                    pass
+                ma = MojeArgumenty()
+                
+                parser.parse_args(namespace=ma)
+                print(ma)
+                print('xhtml:', ma.xhtml)
+                print('file:', ma.file)
+            </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+                &lt;__main__.MojeArgumenty object at 0x00C2B110&gt;
+                xhtml: True
+                file: soubor
+            </pre></div></div>
+    </div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="Získání argumentů II"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Získání argumentů II</h2></div><div class="section-body">
+
+    <p>
+        Zároveň se metoda <em>parse_args()</em> pokusí pohlídat většinu chyb, ke kterým může dojít, a v případě výskytu jakékoli z nich běh programu zastaví:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x', '--xhtml', action='store_true')
+            parser.add_argument('file')
+            args = parser.parse_args()
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-x] file
+            test.py: error: too few arguments
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="Získání argumentů III"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Získání argumentů III</h2></div><div class="section-body">
+
+    <p>
+        Poziční argument, který začíná na označovač přepínače (ve výchozím nastavení tedy znak <code>-</code>), může pochopitelně v některých případech při načítání způsobit pěkné trable. Chcete-li zdůraznit, že od jistého místa v zadání dále se vyskytují již pouze poziční argumenty, použijte <em>pseudorozdělovač</em> <code>--</code>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x -- soubor</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x', '--xhtml', action='store_true')
+            parser.add_argument('file')
+            args = parser.parse_args()
+            print(args)
+            print('xhtml:', args.xhtml)
+            print('file:', args.file)
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file='soubor', xhtml=True)
+            xhtml: True
+            file: soubor
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id11" data-title="Vlastnosti argumentů"><div class="section-header"><span class="section-num">11</span><h2 class="section-title">Vlastnosti argumentů</h2></div><div class="section-body">
+
+    <p>
+        Konkrétní chování argumentů předepisuje armáda nepovinných parametrů, které jsou však všechny užitečné a proto si je postupně probereme:
+    </p>
+    <ul>
+        <li>
+            <a href="?slajd=12"><code>default</code></a> – výchozí hodnota pro nezadaný argument
+        </li>
+        <li>
+            <a href="?slajd=13"><code>required</code></a> – je daný argument vyžadován?
+        </li>
+        <li>
+            <a href="?slajd=14"><code>dest</code></a> – alternativní název pro uložení argumentu
+        </li>
+        <li>
+            <a href="?slajd=15"><code>type</code></a> – typ argumetu
+        </li>
+        <li>
+            <a href="?slajd=17"><code>choices</code></a> – množina možných hodnot argumentu
+        </li>
+        <li>
+            <a href="?slajd=18"><code>action</code></a> – operace k vykonání při zadání argumentu
+        </li>
+        <li>
+            <a href="?slajd=25"><code>nargs</code></a> – násobnost argumentu
+        </li>
+        <li>
+            <a href="?slajd=30"><code>const</code></a> – konstanta (vyžadována některými kombinacemi <em>action</em> a <em>nargs</em>)
+        </li>
+        <li>
+            <a href="?slajd=31"><code>help</code></a> – nápověda pro argument
+        </li>
+        <li>
+            <a href="?slajd=32"><code>metavar</code></a> – alternativní označení argumentu do nápovědy
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id12" data-title="Parametr „default“"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">Parametr „default“</h2></div><div class="section-body">
+
+    <p>
+        Výchozí hodnotou pro nepovinné argumenty je <code>None</code>. Chceme-li jinou výchozí hodnotu, použijeme parametr <em>default</em>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x', default="x.py")
+            parser.add_argument('-y')
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x='x.py', y=None)
+        </pre></div></div>
+    <p>
+        Poznámka 1: Nepovinné argumenty jsou především všechny přepínače (není-li pomocí <em>required</em> řečeno jinak), ale patří mezi ně i poziční s možnou násobností 0 (tedy při <em>nargs="?"</em> a <em>nargs="*"</em>).
+    </p>
+    <p>
+        Poznámka 2: Nebude-li nepovinný argument zadán, můžeme místo „probublání“ výchozí hodnoty též úplně zamezit jeho objevení ve výsledném objektu pomocí volby <code>default=argparse.SUPPRESS</code>.
+    </p>
+
+</div></section><section class="slide-section" id="id13" data-title="Parametr „required“"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">Parametr „required“</h2></div><div class="section-body">
+
+    <p>
+        Potřebujeme-li si přítomnost nějakého <strong>přepínače</strong> vynutit, použijeme atribut <em>required</em>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-x', required=True)
+        parser.add_argument('-y')
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] -x X [-y Y]
+            test.py: error: argument -x is required
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x=haf</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x='haf', y=None)
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id14" data-title="Parametr „dest“"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">Parametr „dest“</h2></div><div class="section-body">
+
+    <p>
+        Pokud z nejrůznějších důvodů potřebujeme uložit zadaný <strong>přepínač</strong> pod jiným názvem než je jeho „dlouhá“ hodnota z metody <em>add_argument()</em>, použijeme parametr <em>dest</em>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x', '--xhtml', dest="metajazyk")
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(metajazyk=None)
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id15" data-title="Parametr „type“"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">Parametr „type“</h2></div><div class="section-body">
+
+    <p>
+        Modul <em>argparse</em> umí pohlídat typ zadávaných parametrů a provést příslušnou automatickou konverzi <em>z výchozího řetězce</em>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x=2 -y=2</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x')
+            parser.add_argument('-y', type=int)
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x='2', y=2)
+            x: &lt;class 'str'&gt;
+            y: &lt;class 'int'&gt;
+        </pre></div></div>
+    <p>
+        Jelikož typem může být odkaz na libovolný <em>callable</em>-objekt, tedy např. funkci nebo metodu, jsou možnosti zadání vskutku veliké – projde kupříkladu i zadání typu <code>type=open</code>.
+    </p>
+
+</div></section><section class="slide-section" id="id16" data-title="Vyrobení vlastního typu"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">Vyrobení vlastního typu</h2></div><div class="section-body">
+
+    <p>
+        Vyrobení alternativního typu je směšně jednoduché – stačí např. předat odkaz na funkci, jejímž jediným vstupem bude příslušný řetězec z příkazové řádky. A s ním si pak už můžete dělat, co chcete.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Funkce přitom musí vracet svůj vstupní argument (podrobený případné transformaci), nebo vyhodit výjimku <code>argparse.ArgumentTypeError</code> .
+    </div></div>
+    <p>
+        Kupříkladu zadání hexadecimálního čísla v intervalu <code>0x00</code> až <code>0xff</code> by mohla hlídat například takováto funkce:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        from argparse import ArgumentTypeError
+        
+        def rozsah(val):
+            try:
+                n = int(val, base=16)
+                if 0 &lt;= n &lt;= 255:
+                    return n
+                else:
+                    msg = 'Uvedené číslo nespadá do povoleného rozsahu!'
+                    raise ArgumentTypeError(msg)
+            except ValueError:
+                msg = 'Zadaný vstup se nepodařilo převést na číslo!'
+                raise ArgumentTypeError(msg)
+         
+         # zadání příslušného argumentu
+         parser.add_argument('-r', '--rozsah', type=rozsah)
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -r ff</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(rozsah=255)
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -r 100</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-r ROZSAH]
+            test.py: error: argument -r/--rozsah: Uvedené číslo nespadá do povoleného rozsahu!
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id17" data-title="Parametr „choices“"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">Parametr „choices“</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Pokud má mít nějaký přepínač pouze jistou množinu povolených hodnot, přidejte parametr <em>choices=VÝBĚR</em>, kde <em>VÝBĚR</em>em může být jakýkoliv typ, který podporuje operátor <code>in</code>, zde například seznam:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-e', '--env',
+                            dest='environment',
+                            choices=['production', 'staging', 'testing',],
+                            default='production',
+                            help='Environment to run on')
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(environment='production')
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -e testing</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(environment='testing')
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -e run</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-e {production,staging,testing}]
+            test.py: error: argument -e/--env: invalid choice: 'run' (choose from 'production', 'staging', 'testing')
+        </pre></div></div>
+    
+    <p class="enumerate">
+        Stejně tak dobře můžete ale napsat klidně i toto:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-n', '--number',
+                            type=int,
+                            choices=range(1, 10),
+                            help="Celočíselný multiplikátor v rozsahu 1-9")
+    </pre>
+    
+
+</div></section><section class="slide-section" id="id18" data-title="Parametr „action“"><div class="section-header"><span class="section-num">18</span><h2 class="section-title">Parametr „action“</h2></div><div class="section-body">
+
+    <p>
+        Parametr <em>action</em> určuje, co bude provedeno s hodnotou příslušného argumentu na příkazové řádce. Má k dispozici následující hlavní standardní operace..
+    </p>
+    <ul>
+        <li>
+            <code>store</code> – uloží zadanou hodnotu (ve výchozím nastavení jako řetězec) pod daným jménem; toto je výchozí chování metody <em>add_argument()</em>
+        </li>
+        <li>
+            <code>store_const</code> – je-li odpovídající přepínač přítomen, uloží hodnotu parametru <em>const=</em> na tomto argumentu
+        </li>
+        <li>
+            <code>store_true</code> &amp; <code>store_false</code> – uloží boolovskou hodnotu <code>True</code> nebo <code>False</code>
+        </li>
+        <li>
+            <code>append</code> – přidá zadanou hodnotu do seznamu (využití u opakujících se argumentů)
+        </li>
+        <li>
+            <code>append_const</code> – je-li odpovídající přepínač přítomen, přidá do seznamu hodnotu parametru <em>const=</em> na tomto argumentu
+        </li>
+    </ul>
+    <p>
+        ..plus jednu specializovanou:
+    </p>
+    <ul>
+        <li>
+            <code>version</code> – vypíše hodnotu parametru <code>version=</code> na tomto argumentu
+        </li>
+    </ul>
+    <p>
+        Navíc si můžete připsat další vlastní operace rozšířením objektu <code>argparse.Action</code>, budete-li potřebovat.
+    </p>
+
+</div></section><section class="slide-section" id="id19" data-title="action='store'"><div class="section-header"><span class="section-num">19</span><h2 class="section-title">action='store'</h2></div><div class="section-body">
+
+    <p>
+        Uložení zadané hodnoty pod příslušným jménem je výchozí chování parseru argumentů:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x ahoj</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x')
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x='ahoj')
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x ahoj</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x', action='store')
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x='ahoj')
+        </pre></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Nezapomeňte, že pokud neurčíte jiný typ, je hodnota uložena jako řetězec přímo převzaný z příkazové řádky.
+    </div></div>
+
+</div></section><section class="slide-section" id="id20" data-title="action='store_const'"><div class="section-header"><span class="section-num">20</span><h2 class="section-title">action='store_const'</h2></div><div class="section-body">
+
+    <p>
+        Pro přepínače je možné použít specifický způsob zadání hodnoty – je-li nastaveno <code>action='store_const'</code>, signalizuje přítomnost přepínače na příkazové řádce, že pod dané jméno se má uložit hodnota odpovídajícího parametru <code>const=</code>:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-x', action='store_const', const='text')
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x=None)
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x='text')
+        </pre></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Ukládané hodnoty nejsou pochopitelně typem omezeny na řetězce, klidně to mohou být třeba odkazy na funkce.
+    </div></div>
+
+</div></section><section class="slide-section" id="id21" data-title="action='store_true' &amp; action='store_false'"><div class="section-header"><span class="section-num">21</span><h2 class="section-title">action='store_true' &amp; action='store_false'</h2></div><div class="section-body">
+
+    <p>
+        Tyto dvě akce představují speciální variantu <code>store_const</code>, pouze pod příslušné jméno je uložena odpovídající pravdivostní hodnota:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-x', action='store_true')
+        parser.add_argument('-y', action='store_false')
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x=False, y=True)
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x -y</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x=True, y=False)
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id22" data-title="action='append'"><div class="section-header"><span class="section-num">22</span><h2 class="section-title">action='append'</h2></div><div class="section-body">
+
+    <p>
+        Parametr <code>action='append'</code> je velmi výhodný například v případě, kdy se příkazová řádka skládá z více nezávislých kusů a některé z přepínačů se navzájem nepřebíjí (metodou „poslední vítězí“), ale naopak skládají dohromady:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-x', action='append')
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x 1</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x=['1'])
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x 1 -x=2</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x=['1', '2'])
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id23" data-title="action='append_const'"><div class="section-header"><span class="section-num">23</span><h2 class="section-title">action='append_const'</h2></div><div class="section-body">
+
+    <p>
+        Parametr <code>action='append_const'</code> se chová velmi podobně jako parametr <em>append</em>, jen místo zadané hodnoty se ukládá hodnota z parametru <code>const=</code>. Obzvláště šikovné, pokud má více argumentů stejný cíl:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('--str', dest='types', action='append_const', const=str)
+        parser.add_argument('--int', dest='types', action='append_const', const=int)
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(types=None)
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py --str</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(types=[&lt;class 'str'&gt;])
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py --str --int</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(types=[&lt;class 'str'&gt;, &lt;class 'int'&gt;])
+        </pre></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Naprosto neinvenčně (téměř) opsáno přímo z dokumentace.
+    </div></div>
+
+</div></section><section class="slide-section" id="id24" data-title="action='version'"><div class="section-header"><span class="section-num">24</span><h2 class="section-title">action='version'</h2></div><div class="section-body">
+
+    <p>
+        Při zadání příslušného přepínače vypíše hodnotu parametru <code>version=</code> na tomto argumentu. V nejjednodušším případě jako prostý řetězec..
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py --version</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('--version', action='version', version='2.1')
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            2.1
+        </pre></div></div>
+    <p>
+        ..ale můžete použít i hodnoty nadefinované jinde:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py --version</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('--version', action='version', version='%(prog)s 2.1')
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            test.py 2.1
+        </pre></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        A kdybyste potřebovali, jméno programu můžete zadat „natvrdo“ při zavádění parseru pomocí <code>parser = ArgumentParser(prog='TestovaciProgram')</code> .
+    </div></div>
+
+</div></section><section class="slide-section" id="id25" data-title="Parametr „nargs“"><div class="section-header"><span class="section-num">25</span><h2 class="section-title">Parametr „nargs“</h2></div><div class="section-body">
+
+    <p>
+        Obecně určuje počet argumentů příslušejících pod stejné jméno příslušná akce (tj. parametr <em>action</em>) a většinou to znamená právě jednu hodnotu (a ve výchozím nastavení jako řetězec). Potřebujete-li ale jiné chování, parametr <em>nargs</em> umožňuje určit násobnost (počet výskytů) příslušného argumentu (převážně – ale ne vždy – přepínače). Pro rozlišení používá standardní označení <code>N?*+</code>, konkrétní chování však záleží na typu argumentu:
+    </p>
+    <ul>
+        <li>
+            <code>N</code> – uvedený počet (<em>N</em>) argumentů z příkazové řádky bude složen dohromady do seznamu
+        </li>
+        <li>
+            <code>?</code> – je-li přítomna, je z příkazová řádky načtena jedna hodnota
+        </li>
+        <li>
+            <code>*</code> – z příkazové řádky řádky jsou všechny odpovídající argumenty zahrnuty do jednoho seznamu
+        </li>
+        <li>
+            <code>+</code> – stejně jako <code>*</code>, ale narozdíl od ní je alespoň jeden argument vyžadován, jinak dojde k chybě
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id26" data-title="nargs=N"><div class="section-header"><span class="section-num">26</span><h2 class="section-title">nargs=N</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Složí uvedený počet (<em>N</em>) argumentů z příkazové řádky do seznamu:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-y', nargs=3)
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -y 1</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-y Y Y Y]
+            test.py: error: argument -y: expected 3 arguments
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -y 1 2 3</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(y=['1', '2', '3'])
+        </pre></div></div>
+    
+    <p class="enumerate">
+        Pozor – vytvoření seznamu se týká i jednoho argumentu!
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x a</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x', nargs=1)
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x=['a'])
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id27" data-title="nargs='?'"><div class="section-header"><span class="section-num">27</span><h2 class="section-title">nargs='?'</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Je-li na příkazové řádce přítomna, načte právě jednu hodnotu. Není-li, pak se chování liší podle typu parametru:
+    </p>
+    <ul>
+        <li>
+            pro <em>poziční</em> argument doplní hodnotu z <code>default</code>
+        </li>
+        <li>
+            pro <em>přepínač</em> doplní hodnotu z <code>const</code>
+        </li>
+    </ul>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-x', nargs='?', const='ahoj')
+        parser.add_argument('file', nargs='?', default='text')
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file='text', x=None)
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file='text', x='ahoj')
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x baf</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file='text', x='baf')
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x baf soubor</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file='soubor', x='baf')
+        </pre></div></div>
+    
+    <p class="enumerate">
+        Typické použití u pozičních argumentů je například pro volitelné vstupní/výstupní soubory:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('infile', nargs='?', type=argparse.FileType('r'),
+                                default=sys.stdin)
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(infile=&lt;_io.textIOWrapper name='&lt;stdin&gt;' mode='r' encoding='UTF-8'&gt;)
+        </pre></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Na základě experimentování typ <em>FileType</em> zjevně otevře uvedené soubory vždy v kódování UTF-8 nezávisle na platformě.
+    </div></div>
+
+</div></section><section class="slide-section" id="id28" data-title="nargs='*'"><div class="section-header"><span class="section-num">28</span><h2 class="section-title">nargs='*'</h2></div><div class="section-body">
+
+    <p>
+        Načte z příkazové řádky všechny odpovídající argumenty a zahrne je do jednoho seznamu. Ale když nakombinujete dohromady poziční argumenty a přepínače, musíte si dát pozor na jejich počet i pořadí:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-x', nargs='*')
+        parser.add_argument('-y', nargs='*')
+        parser.add_argument('file', nargs='*', default='text')
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file1='text', x=None, y=None)
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x 1 2 3</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file='text', x=['1', '2', '3'], y=None)
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x 1 2 3 -y a</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file='text', x=['1', '2', '3'], y=['a'])
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py vrr haf -x 1 2 3 -y a</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file=['vrr', 'haf'], x=['1', '2', '3'], y=['a'])
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id29" data-title="nargs='+'"><div class="section-header"><span class="section-num">29</span><h2 class="section-title">nargs='+'</h2></div><div class="section-body">
+
+    <p>
+        Parametr <em>nargs='+'</em> se chová z větší části stejně jako <em>nargs='*'</em>, ale narozdíl od něj je alespoň jeden argument na vstupu vyžadován, jinak dojde k chybě:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-x', nargs='+')
+        parser.add_argument('file', nargs='+', default='text')
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-x X [X ...]] file [file ...]
+            test.py: error: too few arguments
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py vrr haf</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file=['vrr', 'haf'], x=None)
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py vrr haf -x</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-x X [X ...]] file [file ...]
+            test.py: error: argument -x: expected at least one argument
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py vrr haf -x 1 2</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(file=['vrr', 'haf'], x=['1', '2'])
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id30" data-title="Parametr „const“"><div class="section-header"><span class="section-num">30</span><h2 class="section-title">Parametr „const“</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Jak jsme viděli na příkladu akcí <a href="?slajd=20"><code>store_const</code></a> a <a href="?slajd=23"><code>append_const</code></a>, určuje parametr <code>const</code> hodnotu, která bude uložena/přidána pod příslušné jméno:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-x', action='store_const', const='vrr')
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x=None)
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x='vrr')
+        </pre></div></div>
+    
+    <p class="enumerate">
+        Kromě toho pro přepínače s násobností <code>?</code> (tedy nulakrát nebo právě jednou) dodává výchozí hodnotu, nejsou-li uvedeny:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        parser.add_argument('-y', const='haf', nargs='?')
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(y=None)
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -y</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(y='haf')
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -y vrr</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(y='vrr')
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id31" data-title="Parametr „help“"><div class="section-header"><span class="section-num">31</span><h2 class="section-title">Parametr „help“</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Do parametru help se uvádí text, který se vypíše uživateli při vyžádání nápovědy (typicky tedy jako odpověď na <em>-h</em> nebo <em>--help</em>):
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -h</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x', '--xhtml',
+                                help='Proveď parsování podle standardu XHTML.')
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-x XHTML]
+            
+            optional arguments:
+              -h, --help            show this help message and exit
+              -x XHTML, --xhtml XHTML
+                                    Proveď parsování podle standardu XHTML.
+        </pre></div></div>
+    
+    <p class="enumerate">
+        Při zadávání (nejen) nápovědních textů můžete s výhodou využít některé předdefinované (rozuměno zavedením parseru) formátovací konstanty jako například:
+    </p>
+    <ul>
+        <li>
+            <code>%(prog)s</code> – jméno skriptu (nebo hodnota parametru <em>prog=</em> na konstruktoru <code>argparse.ArgumentParser()</code>)
+        </li>
+        <li>
+            hodnoty prakticky všech možných parametrů na metodě <code>add_argument()</code>, tj. <code>%(prog)s</code>, <code>%(dest)s</code>, <code>%(nargs)s</code>, <code>%(const)s</code>, <code>%(default)s</code>, <code>%(type)s</code>, <code>%(choices)s</code> a <code>%(metavar)s</code> (a dokonce i <code>%(help)s</code> :-)
+        </li>
+        
+    </ul>
+
+</div></section><section class="slide-section" id="id32" data-title="Parametr „metavar“"><div class="section-header"><span class="section-num">32</span><h2 class="section-title">Parametr „metavar“</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Při výpisu nápovědy (jak v popisu <em>usage:</em> tak v celé nápovědě <em>--help</em>) jsou použita jistým způsobem upravená jména cílových proměnných pro jednotlivé argumenty:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x', '--xhtml', action='store_true')
+            parser.add_argument('-n', '--numbers', nargs=3)
+            parser.add_argument('file')
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-x] [-n NUMBERS NUMBERS NUMBERS] file
+            test.py: error: too few arguments
+        </pre></div></div>
+    <p>
+        Tyto <strong>zobrazené</strong> názvy (a pouze je, nic jiného!) můžete změnit pomocí parametru <code>metavar=</code>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x', '--xhtml', action='store_true')
+            parser.add_argument('-n', '--numbers', nargs=3, metavar='N')
+            parser.add_argument('file')
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-x] [-n N N N] file
+            test.py: error: too few arguments
+        </pre></div></div>
+    
+    <p class="enumerate">
+        Co je šikovné, tak v součinnosti s hodnotou parametru <em>nargs</em> můžete zadat <em>metavars</em> jako n-tici:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument('-x', '--xhtml', action='store_true')
+            parser.add_argument('-n', '--numbers', nargs=3, metavar=('N1', 'N2', 'N3'))
+            parser.add_argument('file')
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-x] [-n N1 N2 N3] file
+            test.py: error: too few arguments
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id33" data-title="Skupiny argumentů"><div class="section-header"><span class="section-num">33</span><h2 class="section-title">Skupiny argumentů</h2></div><div class="section-body">
+
+    <p>
+        Ve výchozím nastavení rozděluje nápověda při výpisu argumenty na dvě skupiny – přepínače a poziční. Chcete-li, můžete si ale provést vlastní rozdělení do skupin za pomoci metody <strong>add_argument_group()</strong> příslušného parseru. Argumenty se pak přidávají místo parseru do těchto nově zavedených skupin:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">python3 argparse_groups.py --help</pre></div><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/argparse/argparse_groups.py"><em>argparse/argparse_groups.py</em></a></div><example src="_files/argparse/argparse_groups.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/argparse/argparse_groups.out" lang="text"></example></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Argumenty nepřiřazené explicitně do těchto nových skupin skončí na původních místech (tedy ve skupinách <em>positional arguments</em> a/nebo <em>optional arguments</em>).
+    </div></div>
+
+</div></section><section class="slide-section" id="id34" data-title="Navzájem se vylučující argumenty"><div class="section-header"><span class="section-num">34</span><h2 class="section-title">Navzájem se vylučující argumenty</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Někdy můžete potřebovat, aby z nějaké skupiny či skupin šel vybrat pouze a jenom právě jeden argument. <em>argparse</em> má pro tento případ k dispozici metodu <strong>add_mutually_exclusive_group()</strong>. Navzdory podobnosti s metodou <em>add_argument_group()</em> nevytváří (alespoň zatím) žádné v nápovědě viditelné skupiny – uvedené argumenty jsou pouze svázány poutem exkluzivity:
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+        group1 = parser.add_mutually_exclusive_group()
+        group1.add_argument("-x", action="store_true")
+        group1.add_argument("-y", action="store_true")
+        group1.add_argument("-z", action="store_true")
+    </pre>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -xyz</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-x | -y | -z]
+            test.py: error: argument -y: not allowed with argument -x
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -yz</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] [-x | -y | -z]
+            test.py: error: argument -z: not allowed with argument -y
+        </pre></div></div>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -z</pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x=False, y=False, z=True)
+        </pre></div></div>
+    
+    <p class="enumerate">
+        Zadání argumentu z exkluzivní skupiny lze vynutit pomocí parametru <code>required=True</code>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            group1 = parser.add_mutually_exclusive_group(required=True)
+            group1.add_argument("-x", action="store_true")
+            group1.add_argument("-y", action="store_true")
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            usage: test.py [-h] (-x | -y)
+            test2.py: error: one of the arguments -x -y is required
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id35" data-title="Výchozí hodnoty argumentů"><div class="section-header"><span class="section-num">35</span><h2 class="section-title">Výchozí hodnoty argumentů</h2></div><div class="section-body">
+
+    <p>
+        Argumenty mohou mít nějaku hodnotu, aniž bychom je vždy museli zadávat na příkazové řádce (pokud samozřejmě nepatří mezi argumenty vyžadované). Mohou ji získat:
+    </p>
+    <ul>
+        <li>
+            <a href="?slajd=12">při zavedení z parametru <code>default=</code></a> ;
+        </li>
+        <li>
+            z globálního nastavení pomocí metody parseru <strong>set_defaults()</strong>.
+        </li>
+    </ul>
+    <p>
+        Metoda <em>set_defaults()</em> zvítězí i nad parametrem <em>default=</em>, jak si snadno můžeme ověřit pomocí doplňkové metody <strong>get_default()</strong>:
+    </p>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -x 123</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument("-x", default="Monty")
+            parser.add_argument("-y", default="Python")
+            parser.set_defaults(y='not snake', z=42)
+            
+            args = parser.parse_args()
+            print( args )
+            
+            print( 'x default:', parser.get_default('x') )
+            print( 'y default:', parser.get_default('y') )
+            print( 'z default:', parser.get_default('z') )
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            Namespace(x='123', y='not snake', z=42)
+            x default: Monty
+            y default: not snake
+            z default: 42
+        </pre></div></div>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Vlastnost výstupního objektu <code>args.z</code> v tomto kódu přitom není zadatelná z příkazové řádky! Má tedy právě tu hodnotu, na jakou ji <em>set_defaults()</em> nastaví.
+    </div></div>
+
+</div></section><section class="slide-section" id="id36" data-title="Částečné zpracování"><div class="section-header"><span class="section-num">36</span><h2 class="section-title">Částečné zpracování</h2></div><div class="section-body">
+
+    <p>
+        Díky metodě <strong>parse_known_args()</strong> umožňuje modul <em>argparse</em> zpracovat i příkazovou řádku, která obsahuje neznámé argumenty (na kterých by se metoda <em>parse_args()</em> s hláškou „<em>unrecognized arguments</em>“ zastavila). Vrací přitom dvojici, jejímž:
+    </p>
+    <ol>
+        <li>
+            prvním prvkem je standardní návratový objekt rozpoznaných argumentů;
+        </li>
+        <li>
+            druhým prvkem je seznam nerozpoznaných argumentů.
+        </li>
+    </ol>
+    <div class="example-block example-vertical"><div class="example-part"><div class="example-label">💻 Command</div><pre class="brush: shell; gutter: false; toolbar: false; ">test.py -y -t --baf=vrr</pre></div><div class="example-part"><div class="example-label">📄 Program</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            parser.add_argument("-x", action="store_true")
+            parser.add_argument("-y", action="store_true")
+            
+            args = parser.parse_known_args()
+            print( args )
+        </pre></div><div class="example-part"><div class="example-label">▶ Output</div><pre class="brush: python; gutter: false; toolbar: false; ">
+            (Namespace(x=False, y=True), ['-t', '--baf=vrr'])
+        </pre></div></div>
+
+</div></section><section class="slide-section" id="id37" data-title="„Argumenty argumentů“"><div class="section-header"><span class="section-num">37</span><h2 class="section-title">„Argumenty argumentů“</h2></div><div class="section-body">
+
+    <p>
+    </p>
+    <pre class="brush: python; gutter: false; toolbar: false; ">
+    </pre>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 37 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

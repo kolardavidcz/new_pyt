@@ -1,0 +1,203 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Modul „tempfile“
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Modul „tempfile“</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">8</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Práce s dočasnými objekty</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Umístění dočasných souborů</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">„TemporaryFile“</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">„NamedTemporaryFile“</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">„SpooledTemporaryFile“</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">„TemporaryDirectory“</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Ukázka</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2012-xx-xx</span></div><h1 class="lecture-title">Modul „tempfile“</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    Často potřebujete ve svém programu někam odložit dočasná pracovní data. Existují standardní místa, která byste měli zkusit použít (např. <em>C:\TEMP</em> nebo <em>/tmp</em>) a která jsou k tomu např. svými právy pro zápis uzpůsobena.
+  </p>
+  <p>
+    Starat se o to všechno ale sám a navíc tak, aby to fungovalo na libovolné cílové platformě, je dosti otrava a navíc další bezvadné místo na zanešení chyb (a to nejen bezpečnostních). Python právě pro tyto potřeby obsahuje velmi univerzální modul <code>tempfile</code>.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Práce s dočasnými objekty"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Práce s dočasnými objekty</h2></div><div class="section-body">
+
+  <p>
+    Z pohledu uživatele se s <em>dočasnými objekty</em> (týká se to jak souborů, tak adresářů) pracuje téměř úplně stejně jako s normálními soubory a adresáři. Především to znamená, že výstupy příslušných konstruktorů můžete použít například v kontextu <code>with</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    with tempfile.TemporaryFile() as fp:
+        BLOK
+  </pre>
+  <p>
+    Snad jediným – zato ale důležitým – rozdílem je, že z důvodů co největší platformní nezávislosti jsou <em>dočasné soubory</em> ve výchozím nastavení otevírány zásadně jako <em>binární</em> (tedy v módu <code>b</code>).
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Výchozí mód otevření souborů je <code>w+b</code>, tedy binární otevřené pro čtení i zápis, přičemž případný již existující neprázdný soubor je při otevření nejdříve smazán.
+  </div></div>
+
+</div></section><section class="slide-section" id="id3" data-title="Umístění dočasných souborů"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Umístění dočasných souborů</h2></div><div class="section-body">
+
+  <p>
+    Ačkoli většině funkcí modulu <em>tempfile</em> můžete vnutit vlastní umístění dočasných souborů, opravdu to není dobrý nápad, pokud pro to nemáte skutečně dobrý důvod.
+  </p>
+  <p>
+    Python sám bude hledat vhodné místo podle následujícího algoritmu:
+  </p>
+  <ol>
+    <li>
+        Adresář uložený v proměnné prostředí <code>TMPDIR</code>.
+    </li>
+    <li>
+        Adresář uložený v proměnné prostředí <code>TEMP</code>.
+    </li>
+    <li>
+        Adresář uložený v proměnné prostředí <code>TMP</code>.
+    </li>
+    <li>
+        Platformně závislé umístění:
+        <ul>
+            <li>
+                <em>Windows</em>: postupně adresáře <code>C:\TEMP</code>, <code>C:\TMP</code>, <code>\TEMP</code> a <code>\TMP</code>
+            </li>
+            <li>
+                <em>všude jinde</em>: postupně adresáře <code>/tmp</code>, <code>/var/tmp</code> a <code>/usr/tmp</code>
+            </li>
+        </ul>
+    </li>
+    <li>
+        Jako místo poslední záchrany se Python pokusí použít aktuální pracovní adresář (tedy typicky místo spuštění programu).
+    </li>
+  </ol>
+
+</div></section><section class="slide-section" id="id4" data-title="„TemporaryFile“"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">„TemporaryFile“</h2></div><div class="section-body">
+
+  <p>
+    Ačkoli plný konstruktor <code>TemporaryFile</code> pro tvorbu <strong>dočasných nepojmenovaných souborů</strong>, které jsou před každým pokud možno schovány (tím je myšleno, že jejich jméno není dostupné v programu a podporuje-li to platforma, tak ani v ní), je dosti šílený..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    tempfile.TemporaryFile(mode='w+b', buffering=None, encoding=None,
+                           newline=None, suffix='', prefix='tmp', dir=None)
+  </pre>
+  <p>
+    ..pro běžné použití vzhledem k rozumnému výchozímu nastavení jednotlivých atributů není většinou potřeba používat složitější konstrukci než tuto:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    with tempfile.TemporaryFile() as fp:
+        BLOK
+  </pre>
+  <p>
+    Z hlediska snad všech standardních operací se s výstupním objektem <em>fp</em> zachází stejně jako s každým běžným souborem.
+  </p>
+
+</div></section><section class="slide-section" id="id5" data-title="„NamedTemporaryFile“"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">„NamedTemporaryFile“</h2></div><div class="section-body">
+
+  <p>
+    Konstruktor <code>NamedTemporaryFile</code> pro tvorbu <strong>dočasných pojmenovaných souborů</strong> je podobně šílený..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    tempfile.NamedTemporaryFile(mode='w+b', buffering=None, encoding=None,
+                                newline=None, suffix='', prefix='tmp', dir=None,
+                                delete=True)
+  </pre>
+  <p>
+    ..ale opět se s ním pracuje stejně jako s normálním souborem. Oproti <em>TemporaryFile</em> je tu však samozřejmě několik rozdílů:
+  </p>
+  <ul>
+    <li>
+        Vytvořený objekt má viditelné jméno. Je přístupné pod parametrem <em>file</em> na otevřeném proudu (<em>stream</em>u).
+    </li>
+    <li>
+        Změnou parametru <em>delete</em> můžete určit, zda se dočasný soubor po ukončení práce s ním má ihned smazat (výchozí nastavení) nebo ne.
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id6" data-title="„SpooledTemporaryFile“"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">„SpooledTemporaryFile“</h2></div><div class="section-body">
+
+  <p>
+    Třetí možností, jak zavést dočasný soubor, je konstruktor <code>SpooledTemporaryFile</code>. Na první pohled vypadá ještě šíleněji než oba předchozí..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    tempfile.SpooledTemporaryFile(max_size=0, mode='w+b', buffering=None,
+                                  encoding=None, newline=None, suffix='',
+                                  prefix='tmp', dir=None)
+  </pre>
+  <p>
+    ..ale ve skutečnosti je jen logickým završením řady dočasných souborů – dočasný soubor v jeho provedení je možno (za jistých podmínek) držet převážně pouze v paměti a fyzicky ho ukládat na disk až na vyžádání. Soubor přitom bude uložen z paměti na disk, pokud:
+  </p>
+  <ul>
+    <li>
+        Jeho velikost překročí hodnotu paramatru <em>max_size</em>.
+    </li>
+    <li>
+        Na otevřeném proudu (<em>stream</em>u) je zavolána metoda <code>fileno()</code> (sloužící ke zjištění popisovače souboru).
+    </li>
+    <li>
+        Je vynuceno jeho uložení na disk zavoláním metody <code>rollover()</code> (na otevřeném proudu).
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id7" data-title="„TemporaryDirectory“"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">„TemporaryDirectory“</h2></div><div class="section-body">
+
+  <p>
+    Posledním z objektů je <code>TemporaryDirectory</code> sloužící pro správu dočasných adresářů:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    tempfile.TemporaryDirectory(suffix='', prefix='tmp', dir=None)
+  </pre>
+  <p>
+    Návratový objekt může být (stejně jako všechny předchozí) přímo použit v kontextu <em>with</em>. Po jeho opuštění je obsah dočasného adresáře, jakož i adresář sám, smazán ze souborového systému. Přitom:
+  </p>
+  <ul>
+    <li>
+        Jméno adresáře je uloženo v atributu <em>name</em> vráceného objektu.
+    </li>
+    <li>
+        Dočasný adresář můžete úmyslně promazat zavoláním jeho metody <code>cleanup()</code>.
+    </li>
+  </ul>
+  <p>
+    Do takto vyvořeného adresáře můžete pak sázet soubory (nebo i adresáře) třebas i běžnými souborovými metodami – dočasný adresář je zlikviduje při svém uzavření (tedy odchodu z kontextu <em>with</em> nebo po ukončení skriptu).
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Výhodné, potřebujete-li vytvářet soubory sice dočasné, ale konkrétního jména.
+  </div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="Ukázka"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Ukázka</h2></div><div class="section-body">
+
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; import tempfile
+
+# A) create a temporary file and write some data to it
+&gt;&gt;&gt; fp = tempfile.TemporaryFile()
+&gt;&gt;&gt; fp.write(b'Hello world!')
+# read data from file
+&gt;&gt;&gt; fp.seek(0)
+&gt;&gt;&gt; fp.read()
+b'Hello world!'
+# close the file, it will be removed
+&gt;&gt;&gt; fp.close()
+
+# B) create a temporary file using a context manager
+&gt;&gt;&gt; with tempfile.TemporaryFile() as fp:
+...     fp.write(b'Hello world!')
+...     fp.seek(0)
+...     fp.read()
+b'Hello world!'
+&gt;&gt;&gt;
+# file is now closed and removed
+
+# C) create a temporary directory using the context manager
+&gt;&gt;&gt; with tempfile.TemporaryDirectory() as tmpdirname:
+...     print('created temporary directory', tmpdirname)
+&gt;&gt;&gt;
+# directory and contents have been removed
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Velmi mírně upraveno podle dokumentace.
+  </div></div>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 8 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

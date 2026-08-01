@@ -1,0 +1,129 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Kompilační příznaky
+      —
+      Regulární výrazy</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Kompilační příznaky</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">7</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">I – IGNORECASE</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">M – MULTILINE</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">S – DOTALL</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">A – ASCII</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">X – VERBOSE</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Poznámky</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Regulární výrazy</span><span class="lecture-date">2011-10-27</span></div><h1 class="lecture-title">Kompilační příznaky</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    Některé aspekty obecného chování regexpů je možné ovlivňovat použitím speciálních přepínačů. Klasickým příkladem budiž chování regexpů vůči velikosti písmen – v normálním nastavení jsou velká a malá písmena pochopitelně zcela rozdílné znaky (a tudíž i základní regexpy), ale je možné „přinutit“ regexpový stroj, aby je pokládal za znaky stejné.
+  </p>
+  <p>
+    Uvedené příznaky se dají zavést i <a href="extensions.xml?slajd=9">v rámci vlastního regexpu</a>, ale většinou se zadávají v podobě tzv. <em>kompilačních příznaků</em> při přípravě regexpu v příslušném regexpovém stroji. Ale ať tak nebo tak, důležité je, že se vyskytují ve dvou formách – krátké a dlouhé – a ne vždy se dají obě zaměňovat.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Například výše uvedený příznak ignorace velikosti písmen se dá zadat buď jako <code>IGNORECASE</code> nebo jako pouhé <code>I</code>, případně též <code>i</code>.
+  </div></div>
+
+</div></section><section class="slide-section" id="id2" data-title="I – IGNORECASE"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">I – IGNORECASE</h2></div><div class="section-body">
+
+  <p>
+    Základním a nejjednodušším příznakem je zapnutí <strong>ignorování rozdílu mezi velkými a malými písmeny</strong>.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Velká a malá písmena jsou pochopitelně zcela rozdílné znaky (a tudíž i základní regexpy), ale někdy se může při zpracování textů hodit, abychom mezi nimi nerozlišovali.
+  </div></div>
+  <p>
+    V důsledku se zjednoduší regexpy pro vyhledávání písmen, protože z variant pro velká i malá můžete ponechat pouze jednu z nich.
+  </p>
+  <img src="_files/flags/i.1.png" width="" height="" alt="" title="">
+  <br>
+  <img src="_files/flags/i.2.png" width="" height="" alt="" title="">
+
+</div></section><section class="slide-section" id="id3" data-title="M – MULTILINE"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">M – MULTILINE</h2></div><div class="section-body">
+
+  <p>
+    Dalším poměrně zásadním příznakem je <strong>zapnutí vyhodnocování začátků a konců řádek</strong>.
+  </p>
+  <p>
+    Uvedený příznak ovlivňuje metaznaky <code>^</code> pro začátek řetězce a <code>$</code> pro konec řetězce, které po zapnutí <em>MULTILINE</em> začnou odchytávat i začátek a konec každé řádky.
+  </p>
+  <img src="_files/flags/m.1.png" width="" height="" alt="" title="">
+  <br>
+  <img src="_files/flags/m.2.png" width="" height="" alt="" title="">
+
+</div></section><section class="slide-section" id="id4" data-title="S – DOTALL"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">S – DOTALL</h2></div><div class="section-body">
+
+  <p>
+    Veledůležitý přepínač způsobující, že regexp <strong><code>.</code> (tečka) zachytává i konce řádků</strong>, tedy opravdu všechno.
+  </p>
+  <img src="_files/flags/s.1.png" width="" height="" alt="" title="">
+  <br>
+  <img src="_files/flags/s.2.png" width="" height="" alt="" title="">
+
+</div></section><section class="slide-section" id="id5" data-title="A – ASCII"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">A – ASCII</h2></div><div class="section-body">
+
+  <p>
+    V Python'u 3.x řídicí sekvence <code>\w</code>, <code>\W</code>, <code>\b</code>, <code>\B</code>, <code>\s</code> a <code>\S</code> operují automaticky na unicodových řetězcích a podle unicodových pravidel. Uvedený příznak způsobí, že se začnou chovat podle pravidel pro ASCII-řetězce.
+  </p>
+  <p>
+    Uvedené ASCII-chování bylo vlastně základním a málem jediným skoro celou počítačovou historii, než se začal KONEČNĚ prosazovat Unicode. Ostatně Python 2.x má místo tohoto příznaku příznak <code>U, UNICODE</code> s prakticky opačnou funkcionalitou, díky čemuž si chování příznaku <code>A</code> můžeme nasimulovat i v <em>Kiki 0.5.6</em> (která je postavená nad Python'em 2.x):
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Zapnuté <em>U</em> v Python'u 2.x je vlastně výchozí stav v Python'u 3.x:
+  </div></div>
+  <img src="_files/flags/a.1.png" width="" height="" alt="" title="">
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Vypnuté <em>U</em> v Python'u 2.x je vlastně jako zapnuté <em>A</em> v Python'u 3.x:
+  </div></div>
+  <img src="_files/flags/a.2.png" width="" height="" alt="" title="">
+
+</div></section><section class="slide-section" id="id6" data-title="X – VERBOSE"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">X – VERBOSE</h2></div><div class="section-body">
+
+  <p>
+    Bezpochyby velmi užitečným přepínačem při tvorbě jen trochu složitějších regexpů je <strong>možnost zápisu pomocí uvolněné syntaxe</strong> (aka <em>verbose mode</em>).
+  </p>
+  <p>
+    V tomto módu jsou v rámci regexpu ignorovány všechny bílé znaky, pokud nejsou součástí <em>skupiny znaků</em> <code>[]</code> nebo pokud nejsou uvozeny <em>zpětným lomítkem</em> (jehož speciální význam ovšem není zrovna dalším zpětným lomítkem zrušen).
+  </p>
+  <hr>
+  <p>
+    Srovnejme tři různé způsoby zápisu stejného regexpu pro rozparsování numerické entity (např. v XML) v jazyce Python:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# vše v jednom řádku a řetězci
+charref = re.compile("&amp;#(0[0-7]+|[0-9]+|x[0-9a-fA-F]+);")
+  </pre>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# malá pomoc s využitím automatického skládání řetězců
+charref = re.compile("&amp;#(0[0-7]+"
+                     "|[0-9]+"
+                     "|x[0-9a-fA-F]+);")
+  </pre>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# pěkně naformátované a okomentované díky příznaku VERBOSE
+charref = re.compile(r"""
+ &amp;[#]                # začátek numerické entity
+ (
+     0[0-7]+         # číslo oktalově
+   | [0-9]+          # číslo decimálně
+   | x[0-9a-fA-F]+   # číslo hexadecimálně
+ )
+ ;                   # středník ukončující numerickou entitu
+""", re.VERBOSE)
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Zdroj: <a href="http://docs.python.org/py3k/howto/regex.html" class="external">Python Regular Expression HOWTO</a>
+  </div></div>
+
+</div></section><section class="slide-section" id="id7" data-title="Poznámky"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Poznámky</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    O nadbytečnosti příznaku <code>U, UNICODE</code> v Python'u 3.x, který však je z důvodů zpětné kompatibility regexpů stále k dispozici (i když pochopitelně už nic nedělá), jsme se <a href="?slajd=5">už zmínili</a> o pár slajdů dříve.
+  </p>
+  <p class="enumerate">
+    Ale ještě jsem zatajil existenci příznaku <code>L, LOCALE</code>, který podobně jako <em>A</em> nebo koneckonců i <em>U</em> ovlivňuje chování řídicích sekvencí <code>\w</code>, <code>\W</code>, <code>\b</code>, <code>\B</code>, <code>\s</code> a <code>\S</code>. Konkrétně způsobí to, že se budou řídit pravidly podle aktuálního <em>locale</em>. Což je ovšem natolik nespolehlivá a nepřenosná metoda, že zcela pochopitelně je jeho používání <strong>velmi nedoporučeno</strong>. Zvlášť když už v trojkovém Python'u máme KONEČNĚ k dispozici pořádnou podporu Unicodu.
+  </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 7 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

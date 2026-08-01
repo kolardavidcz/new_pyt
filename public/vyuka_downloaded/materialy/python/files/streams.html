@@ -1,0 +1,263 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Práce s fiktivními soubory
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Práce s fiktivními soubory</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">10</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">„IOBase“ aneb Jedna třída jim všem vládne</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Hierarchie ABC-tříd</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Třídy „užitkové“</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Skutečné „fyzické“ proudy</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Proudy v paměti</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Binární versus textové proudy</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Funkce „open()“ – parametry</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Funkce „open()“ – módy</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">Další proudy</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2014-01-30</span></div><h1 class="lecture-title">Práce s fiktivními soubory</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        <a href="texts.xml">Textové</a> a <a href="binary.xml">binární soubory</a> otevřené pro čtení/zápis jsou ve skutečnosti pouze dva z mnoha různých objektů, ke kterým je možno přistupovat podobným způsobem. Tyto objekty přitom dokonce ani nemusí „fyzicky“ existovat v souborovém systému – úplně stačí, aby nějaký objekt v paměti poskytoval odpovídající programátorské rozhraní (API).
+    </p>
+    <p>
+        Obecně se objektům umožňujícím čtení a zápis dat z/do „sebe“ říká <strong>proudy</strong> (<em>streams</em>).
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="„IOBase“ aneb Jedna třída jim všem vládne"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">„IOBase“ aneb Jedna třída jim všem vládne</h2></div><div class="section-body">
+
+    <p class="enumerate">
+        Na samém počátku všech proudových tříd stojí jejich nejzákladnější ABC-třída <strong>IOBase</strong>. Do jejího „veřejného“ API patří tyto metody:
+    </p>
+    <blockquote>
+        <code>close</code>, <code>closed</code>, <code>fileno</code>, <code>flush</code>, <code>isatty</code>, <code><em>read</em></code>, <code>readable</code>, <code><em>readinto</em></code>, <code>readline</code>, <code>readlines</code>, <code>seek</code>, <code>seekable</code>, <code>tell</code>, <code>truncate</code>, <code><em>write</em></code>, <code>writeable</code>, <code>writelines</code>
+    </blockquote>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Ačkoli metody <code>read()</code>, <code>readinto()</code> a <code>write()</code> v jejím rámci deklarovány (či přímo implementovány) nejsou, protože jejich <a href="/materialy/python/functions/decorators.xml?slajd=10">otisky</a> jsou různé pro každou ze tří dalších tříd, které z <em>IOBase</em> dědí.
+    </div></div>
+    
+    <p class="enumerate">
+        Samotnou <em>IOBase</em> v programech použít dost dobře nemůžete, ale z její „neveřejné“ části API je vidět, že:
+    </p>
+    <ul>
+        <li>
+            <code>__enter__</code>, <code>__exit__</code> – její instance je možno používat uvnitř kontextu <em>with</em>;
+        </li>
+        <li>
+            <code>__iter__</code>, <code>__next__</code> – přes otevřené proudy je možno iterovat.
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Například pomocí smyčky <em>for-in</em>. Iterace probíhá přes <em>řádky</em>, přičemž aktuální definice řádku záleží na typu proudu – bajty pro binární proudy, řetězce pro textové.
+            </div></div>
+        </li>
+    </ul>
+    <p>
+    </p>
+    <p>
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Hierarchie ABC-tříd"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Hierarchie ABC-tříd</h2></div><div class="section-body">
+
+    <p>
+        Ze základní ABC-třídy <em>IOBase</em> dědí následující tři ABC-třídy specializované na konkrétní typ proudů:
+    </p>
+    <table border="1">
+        <tr>
+            <th>ABC-třída</th>
+            <th>metody navíc oproti <em>IOBase</em></th>
+            <th>použití</th>
+        </tr>
+        <tr>
+            <td> <strong>RawIOBase</strong> </td>
+            <td> <code>read</code>, <code>readall</code>, <code>readinto</code>, <code>write</code> </td>
+            <td> nízkoúrovňový přístup k vlastnímu „železu“ (například) </td>
+        </tr>
+        <tr>
+            <td> <strong>BufferedIOBase</strong> </td>
+            <td> <code>detach</code>, <code>read</code>, <code>readinto</code>, <code>read1</code>, <code>write</code> </td>
+            <td> optimalizovaný přístup k binárním proudům </td>
+        </tr>
+        <tr>
+            <td> <strong>TextIOBase</strong> </td>
+            <td> <code>detach</code>, <code>encoding</code>, <code>errors</code>, <code>newlines</code>, <code>read</code>, <code>readline</code>, <code>write</code> </td>
+            <td> přístup k textovým proudům </td>
+        </tr>
+    </table>
+    <p>
+        Tyto tři třídy také ještě nejsou určeny k přímému použití v programech.
+    </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Třídy „užitkové“"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Třídy „užitkové“</h2></div><div class="section-body">
+
+    <p>
+        Z dříve uvedených ABC-tříd jsou pak odvozeny třídy, které už je možné používat pro programovou práci s proudy. Aniž bychom zabíhali do přílišných <a href="http://docs.python.org/3/library/io.html" class="external">detailů</a>, jedná se především o třídy pro práci se:
+    </p>
+    <ul>
+        <li>
+            <a href="?slajd=5">soubory v souborovém systému</a> – tedy „skutečnými fyzickými“ soubory, ať už binárními nebo textovými;
+        </li>
+        <li>
+            <a href="?slajd=6">proudy v paměti</a> – tedy objekty typu <em>proud</em>, které ale existují pouze v paměti.
+        </li>
+    </ul>
+    <p>
+    </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Skutečné „fyzické“ proudy"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Skutečné „fyzické“ proudy</h2></div><div class="section-body">
+
+    <p>
+        Nejběžnější způsob vytvoření „fyzického“ proudu je pomocí vestavěné funkce <code>open()</code>:
+    </p>
+    <table class="slim" width="100%">
+        <tr>
+            <th> typ proudu </th>
+            <th> způsob otevření </th>
+        </tr>
+        <tr>
+            <td> textový </td>
+            <td> <pre class="brush: python; gutter: false; toolbar: false; ">open('SOUBOR', mode='r', encoding='KÓDOVÁNÍ')</pre> </td>
+        </tr>
+        <tr>
+            <td> binární </td>
+            <td> <pre class="brush: python; gutter: false; toolbar: false; ">open('SOUBOR', mode='br')</pre> </td>
+        </tr>
+        <tr>
+            <td> <em>raw</em> </td>
+            <td> <pre class="brush: python; gutter: false; toolbar: false; ">open('SOUBOR', mode='br', buffering=0)</pre> </td>
+        </tr>
+    </table>
+    <p>
+        Přitom:
+    </p>
+    <ul>
+        <li>
+            U textových souborů (typicky načítaných po řádcích) dochází k automatické konverzi konců řádků na pythoní jednotné <code>\n</code> a čtené sekvence bajtů jsou překládány na znaky podle zvoleného kódování.
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+                Nevyberete-li kódování, použije se výchozí systémové. To můžete – ale ne vždy – zjistit voláním <code>locale.getpreferredencoding(False)</code> (a skutečně tam nedávejte <em>True</em>, to by způsobilo zavolání metody <code>setlocale()</code>).
+            </div></div>
+        </li>
+        <li>
+            Binární soubory jsou při výchozím nastavení čteny s pomocí <em>buffer</em>'u (typicky 4096 nebo 8192 bajtů dlouhého) a pochopitelně u nich narozdíl od textových souborů nedochází k žádným překladům ani konverzím čtených bajtů.
+        </li>
+        <li>
+            Málokdy přímo používané <em>raw</em>-proudy jsou prakticky binární čtené po jednom bajtu.
+        </li>
+    </ul>
+    <p>
+        Proud vytvořený pomocí funkce <em>open()</em> můžete buď „po staru“ přiřadit do nějaké proměnné a odtud s ním pracovat, nebo „po novu“ radši použít uvnitř kontextu <em>with</em>.
+    </p>
+
+</div></section><section class="slide-section" id="id6" data-title="Proudy v paměti"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Proudy v paměti</h2></div><div class="section-body">
+
+    <p>
+        Proudy v paměti vytvoříte pomocí následujících konstruktorů:
+    </p>
+    <table class="slim" width="100%">
+        <tr>
+            <th> typ proudu </th>
+            <th> způsob otevření </th>
+        </tr>
+        <tr>
+            <td> textový </td>
+            <td> <pre class="brush: python; gutter: false; toolbar: false; ">io.StringIO("výchozí textová data")</pre> </td>
+        </tr>
+        <tr>
+            <td> binární </td>
+            <td> <pre class="brush: python; gutter: false; toolbar: false; ">io.BytesIO(b"some initial binary data: \x00\x01")</pre> </td>
+        </tr>
+    </table>
+    <p>
+        Z hlediska práce s nimi se tyto objekty jinak tváří prakticky úplně stejně jako proudy „fyzické“.
+    </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Binární versus textové proudy"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Binární versus textové proudy</h2></div><div class="section-body">
+
+    <p>
+        Zdůrazněmež pro jistotu ještě jednou základní rozdíly mezi zpracováváním textových a binárních souborů (proudů):
+    </p>
+    <ul>
+        <li>
+            Proudy <strong>binární</strong> jsou čteny a zapisovány po jednotlivých bajtech (byť většinou po jejich větších úsecích) a s těmito bajty se během čtení/zápisu nic neděje.
+        </li>
+        <li>
+            Proudy <strong>textové</strong> vyhodnucují vstupní či výstupní sekvence bajtů na základě zvoleného nebo systémového kódování a v závislosti na něm provádějí příslušnou konverzi mezi znaky a odpovídajícími sekvencemi bajtů. Navíc jsou specielně ošetřovány konce řádků – Python (ve výchozím nastavení) provádí jejich automatickou konverzi z příslušného platformně závislého pozadí na jednotné pracovní <code>\n</code> uvnitř pythoních programů.
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id8" data-title="Funkce „open()“ – parametry"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Funkce „open()“ – parametry</h2></div><div class="section-body">
+
+    <p>
+        Funkce <em>open()</em> je ve své plné síle mnohem mocnější, než se na první pohled zdá:
+    </p>
+    <blockquote>
+        open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
+    </blockquote>
+    <p>
+        S většinou jsme se již setkali, zde je význam zbývajících:
+    </p>
+    <ul>
+        <li>
+            <code>errors</code> – u textových proudů umožňuje určit způsob reakce na chyby při (de)kódování;
+        </li>
+        <li>
+            <code>newline</code> – u textových proudů umožňuje přenastavit automatický překlad konců řádek na jiný;
+        </li>
+        <li>
+            <code>closefd</code> – pro soubor otevřený nikoli pomocí jména, ale přímo pomocí popisovače souboru umožňuje ponechat popisovač otevřený i po zavření souboru;
+        </li>
+        <li>
+            <code>opener</code> – umožňuje použít vlastní způsob otevření referencovaného souboru.
+        </li>
+    </ul>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Viz <a href="http://docs.python.org/3/library/functions.html#open" class="external">http://docs.python.org/3/library/functions.html#open</a> .
+    </div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="Funkce „open()“ – módy"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Funkce „open()“ – módy</h2></div><div class="section-body">
+
+    <p>
+        Pro pořádek ještě přehled možných nastavení módu pro práci se soubory:
+    </p>
+    <ul>
+        <li>
+            <strong>r</strong> – čtení;
+        </li>
+        <li>
+            <strong>w</strong> – zápis;
+        </li>
+        <li>
+            <strong>x</strong> – vytvoření (exkluzivně, pro existující soubor selže s výjimkou <em>FileExistsError</em>);
+        </li>
+        <li>
+            <strong>a</strong> – přidávání na konec pro existující soubor, jinak jako zápis;
+        </li>
+        <li>
+            <strong>b</strong> – binární;
+        </li>
+        <li>
+            <strong>t</strong> – textový;
+        </li>
+        <li>
+            <strong>+</strong> – kombinace čtení a zápisu (<em>r+</em> otevře <em>již existující</em> soubor a umístí popisovač na začátek, <em>w+</em> exisující soubor při otvírání smaže).
+        </li>
+    </ul>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Označení textových proudů <em>t</em> je implicitní a většinou se neuvádí (tj. místo <em>tr</em> nebo <em>rt</em> a podobně se píše jen <em>r</em>). Selže-li přístup k souboru, je vyhozena výjimka <em>OSError</em> (od verze 3.3, dříve <em>IOError</em>).
+    </div></div>
+
+</div></section><section class="slide-section" id="id10" data-title="Další proudy"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Další proudy</h2></div><div class="section-body">
+
+    <p>
+        Textové a binární soubory nejsou jediným místem, kde se v Python'u setkáme s objekty, které se chovají jako soubory (ať už „skutečné“ nebo paměťové). Mezi další patří například:
+    </p>
+    <ul>
+        <li>
+            zdroje z netu otevřené pomocí <code>urllib.request.urlopen('ADRESA')</code> jako binární proudy (s několik dalšími vlastnostmi navíc);
+        </li>
+        <li>
+            soubory otevřené pomocí <code>gzip.open('SOUBOR.gz', mode='wb')</code> (a podobně též i pro <em>bz2</em>, <em>lzma</em> a <em>zipfile</em>, vše většinou až od verze Python'u 3.3);
+        </li>
+        <li>
+            …
+        </li>
+    </ul>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 10 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

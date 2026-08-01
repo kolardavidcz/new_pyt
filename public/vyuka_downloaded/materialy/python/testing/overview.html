@@ -1,0 +1,60 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Testování kódu
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Testování kódu</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">3</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Užití testů</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Testování v Python'u</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Poznámka</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2012-03-27</span></div><h1 class="lecture-title">Testování kódu</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Užití testů"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Užití testů</h2></div><div class="section-body">
+
+  <p>
+    Souhrnně jsou pro psaní testů asi dva hlavní důvody:
+  </p>
+  <ol>
+    <li>
+        Napsat program, o kterém můžete dopředu rozhodnout, že je <em>(nějakým způsobem) správný</em>, je s výjimkou triviálních případů nemožné (byť funkcionální jazyky to velmi zjednodušují). Důkladné testy kódu tento nedostatek alespoň částečně nahrazují – čím více částí programu a čím více možností jeho běhu otestujete, tím větší je šance, že se k vysněnému správnému chování blíží.
+    </li>
+    <li>
+        Programy se většinou v čase vyvíjejí – po první verzi následuje verze další, která často přidává novou funkcionalitu a některou starou mění. Nepřekvapivě (spíš skoro zákonitě) při tomto připisování nových věcí nechtěně (a někdy i úmyslně) rozbijete nějaké věci starší. Pokud ovšem máte testy, můžete jimi „prohnat“ nový kód a podívat se, jestli jste něco rozbili nebo ne.
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+            Samosebou na novou funkcionalitu musí také připsat nové testy. Ale důležité je, že již existující testy vám – alespoň částečně – zaručí, že novými opravami a úpravami nerozbijete to, co už fungovalo.
+        </div></div>
+    </li>
+  </ol>
+
+</div></section><section class="slide-section" id="id2" data-title="Testování v Python'u"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Testování v Python'u</h2></div><div class="section-body">
+
+  <p>
+    V Python'u máme k dispozici testování několikerého druhu, a to jak přímo uvnitř standardní distribuce jazyka, tak z několik externích míst:
+  </p>
+  <ul>
+    <li>
+        <a href="unittests.xml"><code>unittest</code></a> – modul určený přímo na testování jednotek; filozoficky (i autorstvím) patří do rodiny testovacích nástrojů <em>xUnit</em> (také se mu někdy říká <em>PyUnit</em>) a je trošku „ukecanější“ než jiné frameworky, ale je k dispozici v každé instalaci Python'u;
+    </li>
+    <li>
+        <a href="doctests.xml"><code>doctest</code></a> – speciální pythoní modul určený k testování interaktivních příkladů z dokumentačních řetězců (ano, dokonce i ty je možné testovat!);
+    </li>
+    <li>
+        externí nástroje pro testování jako třeba <em>nose</em> nebo <em>py.test</em> – v principu buď doplňují interně dostupné testovací prostředky o některé vlastnosti nebo je úplně nahrazují prostředky s jinou filozofií testování.
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id3" data-title="Poznámka"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Poznámka</h2></div><div class="section-body">
+
+  <p>
+    Testy vám především pomohou zkontrolovat funkčnost vašeho kódu a také usnadňují jeho spolupráci s kódem cizím. Ale kupříkladu v případě přístupu k programování pomocí <em>vývoje řízeného testy</em> (<em>TDD, test-driven development</em>) vám též pomáhají v jeho lepším rozvržení (protože si musíte dopředu promyslet, co a jak přesně by vlastně váš program měl dělat, asi o něco důkladněji než normálně).
+  </p>
+  <p>
+    A i když k problému přistupujete z druhé strany, tj. napíšete testy až jako dodatek k již hotovému kódu, poslouží přinejmenším jako dokumentace funkcionality. A možná vás i donutí si problém znovu promyslet a třeba ho celý naimplementovat jinak.
+  </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 3 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

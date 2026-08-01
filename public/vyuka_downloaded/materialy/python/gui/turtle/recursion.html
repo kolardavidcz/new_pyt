@@ -1,0 +1,122 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>„Želví“ grafika – rekurzivní obrazce
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — „Želví“ grafika – rekurzivní obrazce</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">10</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Zadání příkladu</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Rozbor zadání I</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Rozbor zadání II – invariantní funkce</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Náčrt bez rekurze</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">A nyní s rekurzí</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Ukončení rekurze</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Reálněji vypadající strom I</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Reálněji vypadající strom II</span></a></li><li class="toc-item"><a class="toc-link" href="#id10"><span class="toc-num">10</span><span class="toc-text">L-systémy – simulace (nejen) růstu organismů</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2015-10-06</span></div><h1 class="lecture-title">„Želví“ grafika – rekurzivní obrazce</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+    <p>
+        Jedním z velmi zábavných (a navíc ještě užitečných :-) použití želví grafiky je kreslení fraktálních obrazců pomocí rekurze (nebo smyček). V této přednášce si na příkladu stromu rozebereme základní principy, a pak se je pokusíme ještě trochu vylepšit.
+    </p>
+    <p>
+        PS: Mimochodem existují i rozšíření želví grafiky do tří rozměrů, která se používají kupříkladu pro reálně vypadající imitace rostlin.
+    </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Zadání příkladu"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Zadání příkladu</h2></div><div class="section-body">
+
+    <p>
+        Naším úkolem je nakreslit přibližně následující „stromeček“:
+    </p>
+    <img src="_files/stromecek_0.png" width="319" height="245" alt="" title="Fraktální stromeček">
+    <p>
+        Na první pohled to vypadá asi skoro nemožně, leč už na ten druhý je jasné, že stromeček je tvořen vždy dvěma zmenšenými kopiemi svého kmene na jeho konci, a to tak dále na každé kopii až po nějakou mez.
+    </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Rozbor zadání I"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Rozbor zadání I</h2></div><div class="section-body">
+
+    <p>
+        Co musí naše „želva“ udělat, aby požadovaný stromeček nakreslila? Následující:
+    </p>
+    <ul>
+        <li>
+            z výchozího místa nakreslit kmen zadané délky;
+        </li>
+        <li>
+            na jeho konci nakreslit větev (= kmen kratší délky) pod jistým úhlem doleva;
+        </li>
+        <li>
+            na jeho konci nakreslit větev (= kmen kratší délky) pod jistým úhlem doprava;
+        </li>
+        <li>
+            na koncích obou větví zopakovat úplně to samé.
+        </li>
+    </ul>
+
+</div></section><section class="slide-section" id="id4" data-title="Rozbor zadání II – invariantní funkce"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Rozbor zadání II – invariantní funkce</h2></div><div class="section-body">
+
+    <p>
+        Rekurzivní krok je asi celkem jasný – na konci každého kmene/větve s želvou otočenou příslušným směrem ji necháme nakreslit kopii předchozí práce ve zmenšeném měřítku. A to hned dvakrát – jednou směrem vlevo, podruhé vpravo.
+    </p>
+    <p>
+        Zároveň je asi také jasné, že aby to mohlo fungovat, musí „želva“ po dokončení práce na příslušné (zmenšené) kopii stát opět na konci předchozí větve, jinak by pokus o vykreslení kopie druhým směrem začal na úplně špatném místě.
+    </p>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Což mimochodem znamená, že po dokončení kreslení stromu bude „želva“ stát ve výchozí pozici otočená stejným směrem jako na začátku!
+    </div></div>
+    <p>
+        Odborně se tomu říká, že (příslušná rekurzivní) funkce musí být <strong>stavovým invariantem</strong> (<em>state invariant</em>) – jejím voláním se sice něco stalo (nakreslily se další části stromu), nicméně po jejím ukončení se „želva“ nachází ve stejném stavu jako na jejím začátku.
+    </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Náčrt bez rekurze"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Náčrt bez rekurze</h2></div><div class="section-body">
+
+    <p>
+        Ukažme si vykreslení do druhé úrovně (tedy pouze kmen a první dvojce větví) procedurálním kódem bez jakékoliv rekurze:
+    </p>
+    <img src="_files/stromecek_1.png" width="151" height="179" alt="" title="Fraktální stromeček – náčrt">
+    <example lang="python" src="_files/stromecek_1.py"></example>
+
+</div></section><section class="slide-section" id="id6" data-title="A nyní s rekurzí"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">A nyní s rekurzí</h2></div><div class="section-body">
+
+    <p>
+        Zkusme to nyní celé zapsat rekurzivně:
+    </p>
+    <example lang="python" src="_files/stromecek_2.py"></example>
+    <p>
+        Tohle pochopitelně ještě nebude fungovat, protože rekurze se bude donekonečna zanořovat pořád na levou část stromu. Ale už je aspoň vidět, jak to celé vypadá.
+    </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Ukončení rekurze"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Ukončení rekurze</h2></div><div class="section-body">
+
+    <p>
+        Jelikož rekurze se musí někdy zarazit, nemá-li býti nekonečná, náš program se kapku zesložití o ukončovací podmínku (tou může být třebas jako zde vykreslovaná délka větví nebo počet zanoření do rekurze). Zároveň jsem přesunul spočítání délky nových větví do vlastní proměnné:
+    </p>
+    <img src="_files/stromecek_3.png" width="365" height="266" alt="" title="Fraktální stromeček">
+    <example lang="python" src="_files/stromecek_3.py"></example>
+
+</div></section><section class="slide-section" id="id8" data-title="Reálněji vypadající strom I"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Reálněji vypadající strom I</h2></div><div class="section-body">
+
+    <p>
+        Ačkoli jsem v předchozím příkladu trochu upravil úhly a vzdálenosti, výsledek je stejně takový nemastný neslaný – je totiž až příliš symetrický. A má málo listů ^_^ Ale nikdo nám vlastně nenakázal, že oba rekurzivní kroky musí být úplně stejné. Nebo že musí být právě jenom dva. A už vůbec ne, že všechny „větve“ musí vycházet ze stejného místa:
+    </p>
+    <img src="_files/stromecek_4.png" width="210" height="264" alt="" title="Fraktální stromeček">
+    <example lang="python" src="_files/stromecek_4.py"></example>
+    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+        Upraveno podle: <a href="https://www.cs.berkeley.edu/~bh/v1ch10/turtle.html" class="external"><em>Computer Science Logo Style -- Volume 1: Symbolic Computing</em></a>
+    </div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="Reálněji vypadající strom II"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Reálněji vypadající strom II</h2></div><div class="section-body">
+
+    <p>
+        Když už jsme v tom, přihodíme ještě i barvu. Jen nesmíme zapomenout dodržovat invarianci i pro ni:
+    </p>
+    <img src="_files/stromecek_4c.png" width="206" height="261" alt="" title="Fraktální stromeček barevně">
+    <example lang="python" src="_files/stromecek_4c.py"></example>
+
+</div></section><section class="slide-section" id="id10" data-title="L-systémy – simulace (nejen) růstu organismů"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">L-systémy – simulace (nejen) růstu organismů</h2></div><div class="section-body">
+
+    <p>
+        Po posledním příkladě asi nepřekvapí, že už dávno někoho napadlo použít želví grafiku, rekurzi a fraktály k simulaci skutečných rostlin, respektive obecně k simulaci růstu organismů. Konkrétně to byl Aristid Lindenmayer v roce 1968, který vymyslel tzv. <strong>L-systémy</strong> (aka <em>Lindenmayerovy systémy</em>). O těch ale <a href="/materialy/techs/L-systems/overview.xml">až jinde</a>.
+    </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 10 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

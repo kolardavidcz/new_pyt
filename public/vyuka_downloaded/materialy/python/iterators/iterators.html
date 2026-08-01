@@ -1,0 +1,253 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Iterátory
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Iterátory</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">9</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Chování iterátorů I</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Chování iterátorů II</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Poznámky</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Nekonečný generátor…</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">…a nekonečný iterátor</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Konečný generátor…</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">…a konečný iterátor</span></a></li><li class="toc-item"><a class="toc-link" href="#id9"><span class="toc-num">9</span><span class="toc-text">Poznámka – iterátory pozpátku</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2011-05-05</span></div><h1 class="lecture-title">Iterátory</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    Struktury, po kterých se dá iterovat, patří ke zcela základním stavebním kamenům jazyka Python. A iterovat se v Python'u dá opravdu skoro po všem, jak dokumentuje pár následujících příkladů:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+for znak in "ahoj":
+    ...
+
+for prvek in [1, 2, 3, 4, 5]:
+    ...
+
+for klíč in {'one': 1, 'two': 2, }:
+    ...
+
+for řádka in open('soubor.txt'):
+    ...
+  </pre>
+  <p>
+    V pozadí za touto pro jazyk zcela základní funkcionalitou stojí tzv. <em>iterátory</em>.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Chování iterátorů I"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Chování iterátorů I</h2></div><div class="section-body">
+
+  <p>
+    Prozkoumejme, co činí iterátor iterátorem. Na příkladu řetězce je výsledné chování známé a následující:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; text = "ahoj"
+&gt;&gt;&gt; for znak in text:
+...     print(znak)
+a
+h
+o
+j
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Smyčka <em>for-in</em> se stará o „výrobu“ iterátorů tak říkajíc „za běhu“.
+  </div></div>
+
+</div></section><section class="slide-section" id="id3" data-title="Chování iterátorů II"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Chování iterátorů II</h2></div><div class="section-body">
+
+  <p>
+    Ve skutečnosti se na pozadí smyčky <em>for-in</em> postupně provedou následující kroky:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# Vstupní objekt (zde řetězec), po kterém chceme iterovat:
+&gt;&gt;&gt; txt = "ahoj"
+
+# Řetězce mají k dispozici „magickou metodu“ __iter__()..
+&gt;&gt;&gt; txt.__iter__
+&lt;method-wrapper '__iter__' of str object at 0x00D682A0&gt;
+# ..která se používá pro konstrukci iterátoru:
+&gt;&gt;&gt; it = iter(txt)
+&gt;&gt;&gt; it
+&lt;str_iterator object at 0x00DAE030&gt;
+
+# Na iterátorech je pak definována „magická metoda“ __next__()..
+&gt;&gt;&gt; it.__next__
+&lt;method-wrapper '__next__' of str_iterator object at 0x00DAE030&gt;
+# ..která vrací následující prvek:
+&gt;&gt;&gt; next(it)
+'a'
+&gt;&gt;&gt; next(it)
+'h'
+&gt;&gt;&gt; next(it)
+'o'
+&gt;&gt;&gt; next(it)
+'j'
+
+# Je-li iterátor vyčerpán, obdržíme při pokusu o získání jeho dalšího prvku
+#    výjimku StopIteration:
+&gt;&gt;&gt; next(it)
+Traceback (most recent call last):
+  File "&lt;pyshell#10&gt;", line 1, in &lt;module&gt;
+    next(it)
+StopIteration
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Tedy funkce <code>iter()</code> zavolá metodu <code>__iter__()</code> daného objektu, zatímco funkce <code>next()</code> volá metodu <code>__next__()</code> vytvořeného iterátoru.
+  </div></div>
+  
+  <p>
+    Smyčka <em>for-in</em> tedy na pozadí pomocí funkce <code>iter()</code> vytvořila z „předhozeného“ objektu iterátor, po kterém následně pomocí volání <code>next()</code> postupně procházela prvek po prvku, dokud nenarazila na výjimku <code>StopIteration</code>, na které ukončila svoji činnost.
+  </p>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Pozor – <em>for-in</em> opravdu <code>__iter__()</code> potřebuje, samotné <code>__next__()</code> nestačí! (Ručně pomocí <code>next()</code> si ale můžete iterovat i bez něho.)
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      PS: V Python'u 2.x se metoda iterátoru pro vrácení dalšího prvku jmenovala zcela nekonzistentně pouze <em>next()</em> (tedy bez podtržítek) a volala se přímo na příslušné instanci.
+    </div></div></div>
+
+</div></section><section class="slide-section" id="id4" data-title="Poznámky"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Poznámky</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Je zřejmé, že aby se objekt choval jako iterátor, musí definovat metodu <em>__next__()</em> pro vrácení dalšího prvku sekvence. Ve většině případů je tato metoda definována přímo na příslušném objektu, pak tudíž stačí, aby metoda <em>__iter__()</em> vracela přímo tento objekt.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Někdy se může hodit, aby iterování po objektu definoval objekt jiný.
+  </div></div>
+  <p class="enumerate">
+    V případě konečného iterátoru se musí objekt postarat i o vrácení výjimky <em>StopIteration</em> ve správnou chvíli.
+  </p>
+  
+  <p>
+    <strong>Poznámka:</strong> Vytvořit iterátor na objektové úrovni tedy zahrnuje trochu víc práce. Pro mnoho aplikací si však vystačíme s použitím generátorů, které se o tvorbu iterátorů starají automaticky.
+  </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Nekonečný generátor…"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Nekonečný generátor…</h2></div><div class="section-body">
+
+  <p>
+    Pro srovnání se podívejme na příklad <em>nekonečného</em> generátoru a iterátoru pro generování sudých čísel. Začneme <strong>generátorem</strong>:
+  </p>
+  
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; def sudá_čísla():
+...     číslo = 0
+...     while True:
+...         číslo += 2
+...         yield číslo
+ 
+&gt;&gt;&gt; g = sudá_čísla()
+&gt;&gt;&gt; next(g)
+2
+&gt;&gt;&gt; next(g)
+4
+&gt;&gt;&gt; next(g)
+6
+  </pre>
+
+</div></section><section class="slide-section" id="id6" data-title="…a nekonečný iterátor"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">…a nekonečný iterátor</h2></div><div class="section-body">
+
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; class SudáČísla:
+...     "Iterátor generující sudá čísla."
+...     
+...     def __init__(self):
+...         self.číslo = 0
+...     
+...     def __iter__(self):
+...         return self
+...     
+...     def __next__(self):
+...         self.číslo += 2
+...         return self.číslo
+
+&gt;&gt;&gt; sc = SudáČísla()
+&gt;&gt;&gt; sc
+&lt;__main__.SudáČísla object at 0x00DC62B0&gt;
+
+&gt;&gt;&gt; it = iter(sc)
+&gt;&gt;&gt; it
+&lt;__main__.SudáČísla object at 0x00DC62B0&gt;
+
+&gt;&gt;&gt; next(it)
+2
+&gt;&gt;&gt; next(it)
+4
+&gt;&gt;&gt; next(it)
+6
+  </pre>
+
+  <p>
+    V porovnání velmi jednoduchá generátorová notace v sobě zahrnuje celou mašinérii, kterou je jinak pro vytvoření obdobně se chovajícího objektu potřeba vytvořit. V případě nekonečného generátoru sice odpadá vyvolání výjimky <code>StopIteration</code> po vyčerpání dat pro iteraci, ale zavedení obslužných metod iterace (<code>__iter__()</code> a <code>__next__()</code>) a uložení lokálních proměnných a aktuálního stavu (pomocí atributu <code>self.číslo</code>) si musíme zařídit sami.
+  </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Konečný generátor…"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Konečný generátor…</h2></div><div class="section-body">
+
+  <p>
+    Nyní ještě proveďme stejné srovnání pro <em>konečný</em> generátor a iterátor sloužící k výpisu sekvence v opačném pořadí. Začneme opět <strong>generátorem</strong>:
+  </p>
+
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; def reverse(data):
+...     for index in range(len(data)-1, -1, -1):
+...         yield data[index]
+...  
+
+&gt;&gt;&gt; for char in reverse('Ahoj!'):
+...     print(char)
+!
+j
+o
+h
+A
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Přímo podle dokumentace.
+  </div></div>
+
+</div></section><section class="slide-section" id="id8" data-title="…a konečný iterátor"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">…a konečný iterátor</h2></div><div class="section-body">
+
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; class Reverse:
+...     "Iterator for looping over a sequence backwards"
+...     
+...     def __init__(self, data):
+...         self.data = data
+...         self.index = len(data)
+...     
+...     def __iter__(self):
+...         return self
+...     
+...     def __next__(self):
+...         if self.index == 0:
+...             raise StopIteration
+...         self.index = self.index - 1
+...         return self.data[self.index]
+
+&gt;&gt;&gt; for char in Reverse('Ahoj!'):
+...     print(char)
+!
+j
+o
+h
+A
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Oproti nekonečnému iterátoru zde tedy přibylo hlídání konce sekvence a vyhození výjimky pro tento případ.
+  </div></div>
+
+</div></section><section class="slide-section" id="id9" data-title="Poznámka – iterátory pozpátku"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Poznámka – iterátory pozpátku</h2></div><div class="section-body">
+
+    <p>
+        Dlužno poznamenat, že aby iterátor fungoval i uvnitř vestavěné funkce <em>reversed()</em>, musí splňovat jednu z následujích dvou podmínek:
+    </p>
+    <ul>
+        <li>
+            definovat metodu <em>__reversed__()</em>, která by pochopitelně měla pokud možno vracet iterátor nad prvky uvedeného objektu v opačném pořadí;
+        </li>
+        <li>
+            splňovat <em>protokol sekvencí</em>, to znamená definovat metody <em>__len__()</em> a <em>__getitem__()</em>.
+            <div class="note-item"><span class="note-icon">📝</span><div class="note-content">Což zajistí použití vestavěné implementace chování metody <em>reversed()</em>.</div></div>
+        </li>
+    </ul>
+    
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 9 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

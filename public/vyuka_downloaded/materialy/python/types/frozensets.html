@@ -1,0 +1,212 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>„Zmražené/zamrzlé“ množiny
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — „Zmražené/zamrzlé“ množiny</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">7</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Zavedení – „frozenset()“</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Prázná „zmražená“ množina</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Základní vlastnosti</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">„Zmražené“ množiny jako neproměnný datový typ</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Množinové operace</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Kopie množiny</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2011-xx-xx</span></div><h1 class="lecture-title">„Zmražené/zamrzlé“ množiny</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    <em>„Zmražené“ či „zamrzlé“ množiny</em> jsou neproměnnou (<em>immutable</em>) variantou <a href="sets.xml">množin</a>. Dá se o nich tedy z větší části říci úplně to samé, co o množinách:
+  </p>
+  <blockquote>
+    <strong>Zmražená množina</strong> je neuspořádaná kolekce jedinečných a neměnných (<em>immutable</em>) hodnot.
+  </blockquote>
+  <p>
+    Narozdíl od množin však tuto kolekci nemůžeme žádným způsobem měnit.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Je mezi nimi tedy tak trochu podobná korespondence jako mezi seznamy a n-ticemi.
+  </div></div>
+
+</div></section><section class="slide-section" id="id2" data-title="Zavedení – „frozenset()“"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Zavedení – „frozenset()“</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    K vytvoření <em>zmražené množiny</em> slouží konstruktor <code>frozenset(ITERABLE)</code>, který přebírá na vstupu iterovatelný objekt <em>složený z prvků neproměnných</em> (<em>immutable</em>) typů, ze kterých složí výslednou zmraženou množinu:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = [1, 2, 'ahoj', 3, 'b', 'ahoj', 3, ]
+&gt;&gt;&gt; fs = frozenset(xs)
+
+&gt;&gt;&gt; fs
+frozenset({1, 2, 3, 'ahoj', 'b'})
+
+&gt;&gt;&gt; type(xs)
+&lt;class 'frozenset'&gt;
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Duplikáty ze vstupního objektu byly automaticky odstraněny, protože vyrábíme <em>množinu</em>.
+  </div></div>
+  
+  <p class="enumerate">
+    Vstupem do konstruktoru může být samozřejmě i „obyčejná“ množina – dá se procházet po jejích prvcích plus jsou prvky již automaticky neproměnné a každý je tam navíc již pouze jednou:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; s = { 1, 2, 'ahoj', 3, 'b', }
+&gt;&gt;&gt; frozenset(s)
+frozenset({'ahoj', 1, 2, 3, 'b'})
+  </pre>
+
+</div></section><section class="slide-section" id="id3" data-title="Prázná „zmražená“ množina"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Prázná „zmražená“ množina</h2></div><div class="section-body">
+
+  <p>
+    <strong>Prázdnou zmraženou množinu</strong> vytvoříme pomocí funkce <code>frozenset()</code>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; fs = frozenset()
+&gt;&gt;&gt; fs
+frozenset()
+
+&gt;&gt;&gt; type(fs)
+&lt;class 'frozenset'&gt;
+  </pre>
+  <p>
+    Žádná odpovídající přímá notace neexistuje, takže se sice upíšeme, ale zase se <a href="sets.xml?slajd=2&amp;par=2">vyhneme zmatení od množin</a>.
+  </p>
+
+</div></section><section class="slide-section" id="id4" data-title="Základní vlastnosti"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Základní vlastnosti</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Ačkoli zmražené množiny nepatří mezi sekvence, některé z vlastností mají – díky své struktuře „balíků na hodnoty“ – společné:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; fs = frozenset( { 1, 2, 'ahoj', 3, 'b', } )
+
+# dotaz na počet prvků
+&gt;&gt;&gt; len(fs)
+5
+
+# dotaz na výskyt prvku
+&gt;&gt;&gt; 'b' in fs
+True
+&gt;&gt;&gt; 5 in fs
+False
+  </pre>
+  
+  <p class="enumerate">
+    Podoba se vztahuje dokonce i na procházení prvků množiny smyčkou <em>for-in</em>, jen je příslušné procházení – podobně jako u slovníků – „náhodné“:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; fs = frozenset( { 1, 2, 'ahoj', 3, 'b', } )
+
+&gt;&gt;&gt; for x in fs:
+...     print(x)
+...
+ahoj
+1
+2
+3
+b
+  </pre>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Varianta s <em>enumerate()</em> funguje také, ale jelikož pořadí výpisu prvků je v podstatě „náhodné“, tak má poněkud omezenější použití, než u sekvenčních typů. Stejně tak samotný cyklus <em>for-in</em> najde využití spíše pro „množinové“ operace, kde nás zajímají vlastnosti či funkce prvků a nikoli jejich pořadí.
+  </div></div>
+
+</div></section><section class="slide-section" id="id5" data-title="„Zmražené“ množiny jako neproměnný datový typ"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">„Zmražené“ množiny jako neproměnný datový typ</h2></div><div class="section-body">
+
+  <p>
+    Protože <em>zmražené množiny</em> jsou neproměnný (<em>immutable</em>) datový typ, veškeré množinové operace, které sloužily k přidávání a odebírání prvků, u nich nejsou pochopitelně podporovány. Konkrétně se tedy jedná o následující operace:
+  </p>
+  <ul>
+    <li>
+      operace pro přidávání prvků – <code>add()</code>, <code>update()</code>
+    </li>
+    <li>
+      operace pro odebírání prvků – <code>discard()</code>, <code>remove()</code>, <code>pop()</code>, <code>clear()</code>
+    </li>
+  </ul>
+  <p>
+    Ostatně podívejme se na výpis podporovaných atributů u zmražené množiny:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; fs = frozenset()
+&gt;&gt;&gt; dir(fs)
+['__and__', '__class__', '__contains__', '__delattr__', '__doc__', '__eq__',
+ '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__',
+ '__iter__', '__le__', '__len__', '__lt__', '__ne__', '__new__', '__or__',
+ '__rand__', '__reduce__', '__reduce_ex__', '__repr__', '__ror__', '__rsub__',
+ '__rxor__', '__setattr__', '__sizeof__', '__str__', '__sub__',
+ '__subclasshook__', '__xor__', 'copy', 'difference', 'intersection',
+ 'isdisjoint', 'issubset', 'issuperset', 'symmetric_difference', 'union']
+  </pre>
+
+</div></section><section class="slide-section" id="id6" data-title="Množinové operace"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Množinové operace</h2></div><div class="section-body">
+
+  <p>
+    Jinak jsou ovšem <em>zmražené množiny</em> stále ještě <em>množinami</em>, takže podporují všechny množinové operace (jak jsme ostatně viděli ve výpisu na předchozím slajdu), a to v obou jejich variantách – operátorově i množinově. Pro jednoduchost si je pouze shrňme a na použití odkažme k příkladům u množin:
+  </p>
+  
+  <p class="enumerate">
+    Základní množinové operace:
+  </p>
+  <ul>
+    <li>
+      průnik – <a href="sets.xml?slajd=6&amp;par=1">&amp;</a>, <a href="sets.xml?slajd=7&amp;par=1">intersection()</a>
+    </li>
+    <li>
+      sjednocení – <a href="sets.xml?slajd=6&amp;par=1">|</a>, <a href="sets.xml?slajd=7&amp;par=1">union()</a>
+    </li>
+    <li>
+      rozdíl – <a href="sets.xml?slajd=6&amp;par=1">-</a>, <a href="sets.xml?slajd=7&amp;par=1">difference()</a>
+    </li>
+    <li>
+      symetrický rozdíl – <a href="sets.xml?slajd=6&amp;par=1">^</a>, <a href="sets.xml?slajd=7&amp;par=1">symmetric_difference()</a>
+    </li>
+  </ul>
+  
+  <p class="enumerate">
+    Dotazy na množiny:
+  </p>
+  <ul>
+    <li>
+      test (vlastní) podmnožiny – <a href="sets.xml?slajd=6&amp;par=2">&lt;= &lt;</a>, <a href="sets.xml?slajd=7&amp;par=2">issubset()</a>
+    </li>
+    <li>
+      test (vlastní) nadmnožiny – <a href="sets.xml?slajd=6&amp;par=2">&gt;= &gt;</a>, <a href="sets.xml?slajd=7&amp;par=2">issuperset()</a>
+    </li>
+    <li>
+      test výskytu prvku (pouze operátorově) – <a href="sets.xml?slajd=6&amp;par=2">in</a>, <a href="sets.xml?slajd=6&amp;par=2">not in</a>
+    </li>
+  </ul>
+  
+  <p class="enumerate">
+    Zjištění nulového průniku (nemá operátorovou variantu):
+  </p>
+  <ul>
+    <li>
+      <a href="sets.xml?slajd=7&amp;par=3">isdisjoint()</a>
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id7" data-title="Kopie množiny"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Kopie množiny</h2></div><div class="section-body">
+
+  <p>
+    Jako jedna z mála datových struktur nabízí zmražená množina i vlastní metodu pro tvorbu kopie – <code>copy()</code>. Narozdíl od slovníku však prvky množiny mohou být pouze <em>hešovatelné</em>, tedy <em>neproměnné</em> (<em>immutable</em>) typy, takže při kopírování nenarazíme na problém s <em>mělkou vs hlubokou kopií</em>:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+&gt;&gt;&gt; xs = frozenset( { 1, 2, 'ahoj', 3, 'b', } )
+&gt;&gt;&gt; xs
+frozenset({'ahoj', 1, 2, 3, 'b'})
+
+&gt;&gt;&gt; ys = xs.copy()
+&gt;&gt;&gt; ys
+frozenset({'ahoj', 1, 2, 3, 'b'})
+
+&gt;&gt;&gt; xs = frozenset()   # nahrazení původní zmražené množiny prázdnou
+&gt;&gt;&gt; xs
+frozenset()
+&gt;&gt;&gt; ys                 # zkopírovaná množina se zachovává
+frozenset({'ahoj', 1, 2, 3, 'b'})
+  </pre>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 7 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

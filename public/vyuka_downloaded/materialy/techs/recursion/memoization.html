@@ -1,0 +1,151 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Rekurze a memoizace
+      —
+      Rekurze</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Rekurze a memoizace</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">8</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Memoizace</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Příklad – faktoriál</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Příklad – fibonacci</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Pár poznámek</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Dynamické programování</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Příklad – fibonacci</span></a></li><li class="toc-item"><a class="toc-link" href="#id8"><span class="toc-num">8</span><span class="toc-text">Další příklady</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Rekurze</span><span class="lecture-date">2015-10-26</span></div><h1 class="lecture-title">Rekurze a memoizace</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    Jak jsme viděli v <a href="overview.xml">kapitole o rekurzi</a>, je rekurze sice často elegantní způsob algoritmizace problému, ale ve stejnou chvíli neskutečně náročný na systémové zdroje (a často dokonce ani v reálném čase nedopočítatelný). Naštěstí však existují způsoby, jak rekurzivní algoritmy zrychlit. Mezi ně patří mimo jiné:
+  </p>
+  <ul>
+    <li>
+      <a href="?slajd=2">memoizace</a> (aneb <em>dynamické programování shora dolů</em>);
+    </li>
+    <li>
+      <a href="?slajd=6">dynamické programování</a> (zdola nahoru).
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id2" data-title="Memoizace"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Memoizace</h2></div><div class="section-body">
+
+  <p>
+    Princip <strong>memoizace</strong> je tak jednoduchý, až to skoro bolí:
+  </p>
+  <blockquote>
+    Každou spočítanou hodnotu pro dané vstupy si uložíme pro pozdější použití.
+  </blockquote>
+  <p>
+    Jelikož – jak jsme viděli – se v průběhu rekurzivního výpočtu často řeší stejné zadání na několika různých místech, můžeme si ušetřit (až nečekaně!) výrazné množství času.
+  </p>
+
+</div></section><section class="slide-section" id="id3" data-title="Příklad – faktoriál"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Příklad – faktoriál</h2></div><div class="section-body">
+
+  <p>
+    Ideálním kandidátem pro použití v rámci memoizace v Python'u je datová struktura <a href="/materialy/python/types/dictionaries.xml">slovník</a> – jejími klíči totiž mohou být <a href="/materialy/python/types/tuples.xml">n-tice</a>, čímž se indexování vstupních parametrů do volání funkce významně zjednodušuje. Pro případ faktoriálu by program mohl vypadat třebas takto:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+# slovník zapamatovaných hodnot
+fakt = {}
+
+# upravená funkce pro výpočet faktoriálu
+def faktorial_s_memoizaci(n):
+    # Nepočítali jsme už žádanou hodnotu?
+    try:
+        return fakt[n]
+    # Ne, ještě ne:
+    except KeyError:
+        if n == 0:
+            return 1
+        else:
+            # ..spočítejme ji
+            val = n * faktorial_s_memoizaci(n-1)
+            # ..a nyní už ji jako známou uložme a vraťme
+            fakt[n] = val
+            return val
+  </pre>
+
+</div></section><section class="slide-section" id="id4" data-title="Příklad – fibonacci"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Příklad – fibonacci</h2></div><div class="section-body">
+
+  <p>
+    Výpočet členů Fibonacciho posloupnosti jakožto nelineárního problému je zajímavější. Pro srovnání následuje praktické změření výpočetního času pro obě varianty:
+  </p>
+  <div class="example-block example-vertical"><div class="example-part"><div class="example-label">
+            → Input: <a href="_files/memoization/memoization.py"><em>memoization/memoization.py</em></a></div><example src="_files/memoization/memoization.py" lang="python"></example></div><div class="example-part"><div class="example-label">
+            📄 Program: <a href="_files/memoization/test.memoization.py"><em>memoization/test.memoization.py</em></a></div><example src="_files/memoization/test.memoization.py" lang="python"></example></div><div class="example-part"><div class="example-label">▶ Output</div><example src="_files/memoization/test.memoization.out" lang="shell"></example></div></div>
+  <p>
+    Skoro neuvěřitelné, že?
+  </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Pár poznámek"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Pár poznámek</h2></div><div class="section-body">
+
+  <p class="enumerate">
+    Externí slovník je obzvláště výhodný, pokud uvedenou funkci budete volat vícekrát. Dokonce mohou snadno nastat situace, kdy bude mít smysl takto spočítaný slovník uložit na disk (v Python'u viz moduly <a href="/materialy/python/serialization/pickle.xml"><em>pickle</em></a> nebo <a href="/materialy/python/serialization/shelve.xml">shelve</a>) a používat ho (a průběžně doplňovat) během delší doby.
+  </p>
+  
+  <p class="enumerate">
+    Jinak samozřejmě i „pouhé“ použití slovníku uvnitř rekurzivní funkce (v Python'u pomocí <a href="/materialy/python/functions/parameters.xml?slajd=13">výchozích hodnot parametrů funkcí</a>) ji neuvěřitelně zrychlí – opakující se zadání jsou ve <em>stromu výpočtu</em> pravidlem<sup>*</sup>.
+  </p>
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    <sup>*</sup> Pokud zrovna nepočítáte něco typu faktoriál ^_~
+  </div></div>
+    <p>
+        Nicméně v tomto případě je asi pohodlnější – a určitě přehlednější – použít rovnou vestavěného dekorátoru <a href="/materialy/python/functions/advanced-3.xml?slajd=7"><code>functools.cache</code></a>, který zajistí totéž a prakticky bez práce:
+    </p>
+    <example lang="python" src="_files/memoization/memoization_with_cache.py"></example>
+
+</div></section><section class="slide-section" id="id6" data-title="Dynamické programování"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Dynamické programování</h2></div><div class="section-body">
+
+  <p>
+    Podle té které definice je <strong>dynamické programování</strong> vlastně nadmnožinou memoizace (jak jsem ostatně naznačil už na prvním slajdu):
+  </p>
+  <blockquote>
+    Úkolem <em>dynamického programování</em> je využít možnosti rozložení úlohy na (v nějakém smyslu) jednodušší podúlohy stejného typu a v pozdějším výpočtu využít výsledků těchto jednodušších podúloh.
+  </blockquote>
+  <p>
+    Přitom se dá postupovat dvěma různými způsoby:
+  </p>
+  <ul>
+    <li>
+        <strong>zhora dolů</strong> – počítat úlohu postupně od zadání a mezivýsledky si ukládat pro pozdější použití (aneb klasická <em>memoizace</em>);
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+          Postupovat na <em>stromu výpočtu</em> tedy od kořene stromu (zadání úlohy) ke koncovým listům (koncové body rekurze).
+        </div></div>
+    </li>
+    <li>
+        <strong>zdola nahoru</strong> – počítat úlohu od nejjednodušších částí postupně směrem ke složitějším za použití již takto spočítaných jednodušších mezivýsledků.
+        <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+          Z hlediska <em>stromu výpočtu</em> tedy naopak začít u koncových listů (kotvy rekurze) a postupně pokračovat směrem nahoru, až se dostaneme ke vstupu požadovanému zadáním.
+        </div></div>
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id7" data-title="Příklad – fibonacci"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Příklad – fibonacci</h2></div><div class="section-body">
+
+  <p>
+    N-tý člen Fibonacciho posloupnosti počítaný metodou <em>zdola nahoru</em> by se dal v Python'u napsat třeba takto:
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    def fibonacci(n):
+        if n == 0:
+            return 0
+        elif n == 1:
+            return 1
+        else:
+            n2, n1 = 0, 1
+            for x in range(n-1):
+                n1, n2 = n1 + n2, n1
+            return n1
+  </pre>
+  <p>
+    Vlastně je to stejný algoritmus, jen opačně a bez jakéhokoliv rekurzivního volání – veškerou „magii“ tu nahrazuje smyčka <em>for-in</em> a případné dotazy na konečné případy řeší rozhodování pomocí <em>if-elif-else</em>.
+  </p>
+
+</div></section><section class="slide-section" id="id8" data-title="Další příklady"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Další příklady</h2></div><div class="section-body">
+
+  <p>
+    TODO
+  </p>
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 8 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>

@@ -1,0 +1,125 @@
+<html lang="cs"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><script>
+            (function() {
+                const theme = localStorage.getItem('python-course-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                const bg = theme === 'light' ? '#f3f3f3' : '#181818';
+                document.documentElement.style.backgroundColor = bg;
+            })();
+          </script><style>
+          html, body {
+              background-color: #181818 !important;
+          }
+          html[data-theme="light"], html[data-theme="light"] body {
+              background-color: #f3f3f3 !important;
+          }
+        </style><title>Obsluha externích procesů – „os.system()“
+      —
+      Python</title><link rel="preload" href="/cjs/fonts/ibm-plex-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link rel="preload" href="/cjs/fonts/jetbrains-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous"><link href="/cjs/tokens.css" rel="stylesheet" type="text/css"><script src="/cjs/syntax-highlighter/shCore.min.js"></script><link rel="stylesheet" href="/cjs/syntax-highlighter/shCoreDefault.css"><script src="/cjs/syntax-highlighter/shBrushBash.js"></script><script src="/cjs/syntax-highlighter/shBrushBrainfuck.js"></script><script src="/cjs/syntax-highlighter/shBrushCmd.js"></script><script src="/cjs/syntax-highlighter/shBrushCss.js"></script><script src="/cjs/syntax-highlighter/shBrushJScript.js"></script><script src="/cjs/syntax-highlighter/shBrushKarel.js"></script><script src="/cjs/syntax-highlighter/shBrushPlain.js"></script><script src="/cjs/syntax-highlighter/shBrushPython.js"></script><script src="/cjs/syntax-highlighter/shBrushSql.js"></script><script src="/cjs/syntax-highlighter/shBrushXml.js"></script><script src="/cjs/bindings.js"></script><script src="/cjs/iframes.js"></script><script src="/cjs/cestina.js"></script><script src="/cjs/slide-classification.js"></script><script src="/cjs/slide-tags.js"></script><script src="/cjs/peek-data.js"></script><link href="/cjs/dashboard.css" rel="stylesheet" type="text/css"><link href="/cjs/obsah-panel.css" rel="stylesheet" type="text/css"><link href="/cjs/screen.css" rel="stylesheet" type="text/css"><script src="/cjs/course-data.js"></script><script src="/cjs/course-explorer.js"></script><script src="/cjs/screen.js"></script><script src="/cjs/spa_router.js"></script></head><body><div class="app-container"><div class="titlebar"><span class="dot red-dot"></span><span class="dot yellow-dot"></span><span class="dot green-dot"></span><span class="name">python-vscht — Obsluha externích procesů – „os.system()“</span></div><div class="tabbar" id="tabbar"><div class="tabs-list" id="tabsList"></div><div class="tabbar-actions"></div></div><div class="editor-body"><div class="activitybar slim"><button class="activity-btn active" id="tocToggle" title="Zobrazit/skrýt obsah"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"></path></svg></button><button class="activity-btn" id="themeToggle" title="Přepnout barevný motiv"><svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg><svg class="moon-icon" style="display:none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></button></div><div class="app-layout with-obsah page-layout" id="layout-root"><aside class="obsah-sidebar timeline-sidebar open-by-default" id="obsahSidebar"><div class="obsah-sidebar-header">Obsah</div><nav class="obsah-explorer timeline-track" id="timeline-track-root"></nav><div class="obsah-sections" id="slideTocSection"><div class="toc-header"><span class="toc-label">Sekce</span><span class="toc-count">7</span></div><nav class="toc-nav"><ol class="toc-list"><li class="toc-item"><a class="toc-link" href="#id1"><span class="toc-num">1</span><span class="toc-text">Úvod</span></a></li><li class="toc-item"><a class="toc-link" href="#id2"><span class="toc-num">2</span><span class="toc-text">Omezení</span></a></li><li class="toc-item"><a class="toc-link" href="#id3"><span class="toc-num">3</span><span class="toc-text">Základní použití</span></a></li><li class="toc-item"><a class="toc-link" href="#id4"><span class="toc-num">4</span><span class="toc-text">Ošetření výstupů</span></a></li><li class="toc-item"><a class="toc-link" href="#id5"><span class="toc-num">5</span><span class="toc-text">Ošetření chyb</span></a></li><li class="toc-item"><a class="toc-link" href="#id6"><span class="toc-num">6</span><span class="toc-text">Bezpečnostní upozornění</span></a></li><li class="toc-item"><a class="toc-link" href="#id7"><span class="toc-num">7</span><span class="toc-text">Další možnosti</span></a></li></ol></nav></div></aside><main class="content-main" id="contentMain"><header class="lecture-header"><div class="lecture-meta-row"><span class="lecture-tag">Python</span><span class="lecture-date">2011-04-07|2014-08-17</span></div><h1 class="lecture-title">Obsluha externích procesů – „os.system()“</h1><p class="lecture-author">by Jiří Znamenáček</p></header><div class="slides-container"><section class="slide-section" id="id1" data-title="Úvod"><div class="section-header"><span class="section-num">1</span><h2 class="section-title">Úvod</h2></div><div class="section-body">
+
+  <p>
+    <code>os.system()</code> je „nejbrutálnější“ a navíc platformně závislý způsob spouštění cizích programů. Při jeho použití jde v podstatě o následující:
+  </p>
+  <ol>
+    <li>
+      Python na pozadí otevře zcela nové běhové prostředí (neviditelnou konzoli) v základním nastavení.
+    </li>
+    <li>
+      V tomto nově otevřeném prostředí je zavolán uvedený program.
+    </li>
+    <li>
+      Pokud program skončí svůj běh, je řízení předáno zpět Python'u do původního prostředí.
+    </li>
+  </ol>
+  
+  <p>
+    PS: Jelikož (nejen) pro spouštění externích procesů je potřebná znalost aktuální pozice v rámci souborového systému, zopakujte si <a href="/materialy/python/modules/os.xml">práci s cestou v rámci modulu <em>os</em></a>.
+  </p>
+
+</div></section><section class="slide-section" id="id2" data-title="Omezení"><div class="section-header"><span class="section-num">2</span><h2 class="section-title">Omezení</h2></div><div class="section-body">
+
+  <p>
+    Jelikož takto spouštěný program „běží“ ve zcela jiném a na originále nezávislém prostředí, nese s sebou použití metody <em>os.system()</em> spoustu omezení:
+  </p>
+  <ul>
+    <li>
+      Prostředí spuštěné na pozadí má základní nastavení a naprosto nic nepodědí z případných změn provedených v prostředí, ve kterém jste volali původní pythoní program.
+      <div class="note-item"><span class="note-icon">📝</span><div class="note-content">Tudíž případná potřebná nastavení je potřeba zařídit jinak, například pomocí parametrů volaného programu (jde-li to).</div></div>
+    </li>
+    <li>
+      Úplně stejný problém máme při návratu – spouštěcí pythoní skript neví o případných výstupech volaného programu vůbec nic, takže předávání výsledků (je-li potřeba) musíme zařídit jinak.
+      <div class="note-item"><span class="note-icon">📝</span><div class="note-content">Specificky se třeba nemáme dost dobře šanci dozvědět, že volaný program zhavaroval. Pokud si při jeho volání nepřesměrujeme chybový výstup a po návratu ho neprozkoumáme.</div></div>
+    </li>
+    <li>
+      Pokud se externí volaný program na něčem zadrhne a zacyklí, jsme v podstatě „nahraní“.
+    </li>
+  </ul>
+
+</div></section><section class="slide-section" id="id3" data-title="Základní použití"><div class="section-header"><span class="section-num">3</span><h2 class="section-title">Základní použití</h2></div><div class="section-body">
+
+  <p>
+    Použití <em>os.system()</em> je ve většině případů extrémně jednoduché:
+  </p>
+  <blockquote>
+    <code>os.system(PŘÍKAZ)</code>
+  </blockquote>
+  <p>
+    ..kde <em>PŘÍKAZ</em> je <em>řetězec</em> obsahující kód pro příkazovou řádku, který chceme zavolat.
+  </p>
+  
+  <p>
+    Zkusme pro ukázku zavolat nějaký systémový program, např. <em>ls</em> (s uvedenou adresářovou strukturou):
+  </p>
+  <div class="example-block example-horizontal"><div class="example-col"><div class="example-label">→ Input: <a href="_files/execution/ls.test.in"><em>execution/ls.test.in</em></a></div><example src="_files/execution/ls.test.in" lang="text"></example></div><div class="example-col"><div class="example-label">📄 Program: <a href="_files/execution/ls.test.py"><em>execution/ls.test.py</em></a></div><example src="_files/execution/ls.test.py" lang="python"></example></div><div class="example-col"><div class="example-label">▶ Output</div><example src="_files/execution/ls.test.out" lang="text"></example></div></div>
+  <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Výstup programu směřuje na aktuální <em>sys.stdout</em>, čili nejspíš na terminál.
+    </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+      Typicky takto můžete použít pythoní skripty pro řízení běhu sady složitějších skriptů, které je třeba vykonat v uvedeném pořadí (aniž byste museli třeba zrovna sedět pod UNIXem a psát v bashi), například:
+      <pre class="brush: python; gutter: false; toolbar: false; ">
+        os.system( "saxon -o example.html example.xml example.xslt" )
+      </pre>
+    </div></div></div>
+
+</div></section><section class="slide-section" id="id4" data-title="Ošetření výstupů"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Ošetření výstupů</h2></div><div class="section-body">
+
+  <p>
+    Ve své přímočarosti <code>os.system()</code> „kašle“ na jakékoli změny v prostředí (např. <em>sys.stdout</em> a další), musíme se k němu tedy opravdu chovat, jako kdybychom příslušný program spouštěli přímo na vlastní příkazové řádce.
+  </p>
+  <p>
+    Třebas výstup příkazu <code>ls</code> z předchozího příkladu si můžete přesměrovat do externího souboru..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    os.system( "ls &gt;listing.txt" )
+  </pre>
+  <p>
+    ..odkud ho pak normálně pomocí <em>with open()</em> přečtete a dále zpracujete.
+  </p>
+
+</div></section><section class="slide-section" id="id5" data-title="Ošetření chyb"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Ošetření chyb</h2></div><div class="section-body">
+
+  <p>
+    A to samé se týká ošetření havárií a chybových hlášení volaného programu – prostě je přesměrujte do vlastního souboru..
+  </p>
+  <pre class="brush: python; gutter: false; toolbar: false; ">
+    os.system( "ls 1&gt;listing.txt 2&gt;listing_errors.log" )
+  </pre>
+  <p>
+    ..a následně pomocí <em>with open()</em> zpracujte.
+  </p>
+
+</div></section><section class="slide-section" id="id6" data-title="Bezpečnostní upozornění"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Bezpečnostní upozornění</h2></div><div class="section-body">
+
+  <p class="security">
+    Je vidět, že <code>os.system()</code> je celkem slušná bezpečnostní díra – cokoliv do něj pošlete, bude operačním systémem slepě vykonáno. A pošlete-li tam něco „ošklivého“, nedejbože z Python'u s vyššími právy, než měl mít, máte hodně velký problém.
+  </p>
+  <p>
+    Ostatně dnes už máme k dispozici lepší způsoby, <a href="execution_subprocess.xml">jak volat externí program</a>. (Ale i ty skrývají podobné bezpečnostní zádrhele, jen nejsou takhle úplně volně dostupné.)
+  </p>
+
+</div></section><section class="slide-section" id="id7" data-title="Další možnosti"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Další možnosti</h2></div><div class="section-body">
+
+  <p>
+    Asi je vám už celkem jasné, že <em>os.system()</em> nebudete používat zrovna často. Ale kdyby přece, dává Python (především z historických důvodů) k dispozici ještě několik dalších nástrojů podobného ražení, především rodinu metod <em>os.popen</em>, <em>os.spawn</em>, <em>os.exec</em> a modul <em>popen2</em>.
+  </p>
+  
+
+</div></section></div><footer class="lecture-footer"><a href="/new_order.html" class="footer-back">← Back to Course Dashboard</a><span class="footer-credit">vyuka @ 狼.cz</span></footer></main></div></div><div class="statusbar" id="statusbar"><span class="status-left">Sekce 1 z 7 · 0% dokončeno</span><span class="status-right">sync: local</span></div></div></body></html>
