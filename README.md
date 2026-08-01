@@ -1,44 +1,31 @@
-# Python Course Shell
+# Python Course Shell — C/Java → Python
 
-Greenfield **VS Code–themed** offline workspace for a Python course aimed at students who already know **C / Java**.
+Greenfield **VS Code–themed** offline workspace for a Python course tailored for students moving from **C / Java** to **Python**.
 
-Previous implementation lives in **`.old/`** (archive + educational content). The app at the repository root does **not** extend that code.
-
-| Path | Role |
-|------|------|
-| `app/` | Shell UI (HTML/CSS/JS modules) |
-| `data/course.json` | **Source of truth** — weeks, tags, relevance, flavors |
-| `data/slides.json` | Per-slide difficulty (`slug#idN`) |
-| `data/pages-index.json` | Page outlines (id + title) for the explorer |
-| `data/LABELING_CHANGELOG.md` | Phase 2 retag notes |
-| `tools/import_course_data.py` | Import metadata from `.old/` |
-| `tools/apply_phase2_labels.py` | Phase 2 retag / relabel |
-| `serve.py` | No-cache local server + path aliases |
-| `.old/vyuka_downloaded/` | Lecture/exercise HTML (served, not copied) |
-| `.old/cjs/` | Fonts, highlighters, legacy assets (served as `/cjs/`) |
+Previous implementation lives in **`.old/`** (archive + educational content). The app at the repository root serves the extracted learning content through a fast, modern shell.
 
 ---
 
-## Quick start
+## Quick Start
 
 ```bash
 # 1) Import / refresh metadata from the archive (optional if data/ already present)
 python tools/import_course_data.py
 
-# 2) Optional Phase 2 retag (rewrites data/course.json)
+# 2) Apply Phase 2 retag & relevance labels
 python tools/apply_phase2_labels.py
 
-# 3) Structure exercises into úkol cards (data/exercises.json)
+# 3) Structure exercises into úkol cards with T/L scores (data/exercises.json)
 python tools/transform_exercises.py
 
-# 4) Serve
+# 4) Serve locally
 python serve.py
 # → http://127.0.0.1:8765/
 ```
 
 Custom port: `python serve.py 9000`
 
-The server sends **Cache-Control: no-store** so rebuilds show without hard-refresh/Incognito.
+The server sends **`Cache-Control: no-store`** so updates take effect immediately without hard-refreshing.
 
 ---
 
@@ -47,121 +34,91 @@ The server sends **Cache-Control: no-store** so rebuilds show without hard-refre
 The site is a **static export**. Build copies the shell, data, and course assets into `public/`.
 
 ```bash
-# Preview build locally
+# Prepare static build directory
 node tools/prepare_vercel.mjs
-# then serve public/ with any static server, e.g.:
-# npx serve public
+
+# Deploy using Vercel CLI (or connect GitHub repository)
+npx vercel --prod
 ```
 
-| File | Role |
-|------|------|
-| `vercel.json` | Build command, `outputDirectory: public`, rewrites, cache headers |
-| `tools/prepare_vercel.mjs` | Assembles `public/` from `app/`, `data/`, `.old/cjs`, `.old/vyuka_downloaded` |
-| `.vercelignore` | Skips non-deploy junk from the upload |
-
-**Deploy**
-
-```bash
-# CLI (from repo root)
-npx vercel          # preview
-npx vercel --prod   # production
-```
-
-Or connect the GitHub repo in the Vercel dashboard — it will run `node tools/prepare_vercel.mjs` and publish `public/`.
-
-**Notes**
-
-- App URLs stay absolute: `/app/…`, `/data/…`, `/vyuka_downloaded/…`, `/cjs/…`
-- Hash routing (`#/lecture/…`) needs no server fallback
-- `public/` is generated and gitignored — do not commit it
-- Ensure course data exists before deploy (`data/course.json`, `data/exercises.json`, …)
+| File / Command | Role |
+|----------------|------|
+| `vercel.json` | Vercel configuration (`outputDirectory: public`, rewrites, headers) |
+| `tools/prepare_vercel.mjs` | Assembles `public/` (1,600+ static files) from `app/`, `data/`, `.old/cjs/`, `.old/vyuka_downloaded/` |
+| `.vercelignore` | Excludes temporary scratch scripts and non-deploy files |
 
 ---
 
-## Architecture
+## Architecture & Features
 
 ```
-┌─────────────┬──────────────────┬────────────────────────────┐
-│ Activity    │ Sidebar          │ Editor group               │
-│ bar         │ EXPLORER tree    │ Tabs + breadcrumbs + main  │
-│ Explorer    │ Filters: tags,   │ Catalog cards / slides     │
-│ Search      │ relevance,       │                            │
-│ Progress    │ flavor, text     │                            │
-├─────────────┴──────────────────┴────────────────────────────┤
-│ Status bar — path · counts · filter summary                 │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────┬──────────────────┬────────────────────────────────────────────────────────┐
+│ Activity    │ Sidebar          │ Editor group                                           │
+│ bar         │ EXPLORER tree    │ Tabs + breadcrumbs + main content                      │
+│ Explorer    │ Filters: tags,   │ Catalog cards / slides / úkol cards                   │
+│ Progress    │ relevance,       │                                                        │
+│             │ flavor, text     │ Bottom Nav: ← Prev | Mark Studied | Next →             │
+├─────────────┴──────────────────┴────────────────────────────────────────────────────────┤
+│ Status bar — path · counts · filter summary                                             │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Information architecture (3 layers)**
+### 1. Sidebar Explorer & Multi-Dimensional Filters
+- **Interactive Tree**: Course weeks, lectures, homework sets, and individual slides.
+- **Tag Badges**: `[Core]`, `[WOW]`, `[Legendary]`, `[Tricky]`, `[Skip]`.
+- **Relevance Meter**: 10-segment heat scale (Slate Grey → Amber → Orange → Crimson Red).
+- **Flavors**: `basics`, `resyntax`, `newconcept`, `pythonic`, `paradigm`.
+- **Sorting**: Course order, relevance descending/ascending, title A–Z.
 
-1. **Week** — open → catalog cards for lectures & exercises  
-2. **Lecture / exercise** — open → metadata + page index  
-3. **Page** — open → single slide in the editor (or full lecture)
+### 2. Study Log & Progress View
+- **Progress Ring & Level Badges**: Dynamic percentage calculation based on manual `Mark studied` status.
+- **Dual Progress Bars**: Separate tracking for *Core path* and *Exercise dojo*.
+- **4-Tier Cumulative Study Plan PDF Print**:
+  - `Pass` (Level 1) — Minimum to finish the course (Core, relevance ≥ 7).
+  - `Solid` (Level 2) — Confident practitioner (Core + relevance ≥ 5, no Skip).
+  - `Advanced` (Level 3) — Everything except Skip.
+  - `Complete` (Level 4) — Full deep understanding (all 94 course items).
+  - **A4 2-Column Print Layout**: High-contrast side-by-side Lectures vs Exercises columns with colorful badges and heat segment meters (`@media print`).
 
-Tree lives **only** in the left sidebar. Tags and relevance appear on tree nodes **and** catalog cards.
+### 3. Homework & Exercise Dojo
+- **Úkol Cards**: Extracted problem statements with expandable Nápověda (Hint) and Řešení (Solution) blocks.
+- **Dual Difficulty Segment Meters**: Visual 5-segment rating bars for **T** (Technical score, `#4fc1ff`) and **L** (Logical score, `#cda34f`) difficulty axes calibrated across all 135 tasks.
 
-### Tags & relevance flow
+### 4. Bottom Page Navigation Bar
+Every lecture, exercise set, and presentation slide includes a bottom footer toolbar:
+- **`← Previous`**: Navigates to the previous topic in course order.
+- **`Mark Studied` / `✓ Studied`**: Toggles manual study progress in `localStorage` and updates status globally.
+- **`Next →`**: Navigates to the next topic in course order.
 
-```
-.old/cjs/course-data.js
-        │  tools/import_course_data.py
-        ▼
- data/course.json   ◄── tools/apply_phase2_labels.py (Phase 2)
-        │
-        ▼
- app/js/state.js → filters → tree.js + content.js (badges, cards)
-```
+### 5. Responsive Widescreen (16:9) Layout
+- Fluid max-width scaling (`1440px`) with auto-filling card grids (`repeat(auto-fill, minmax(...))`) for optimal space usage on 16:9 monitors.
+- Explicit CSS Grid column placement (`grid-column: 1..4`) ensuring collapsing the sidebar expands main content without collapsing the workspace.
 
-| Field | Values |
-|-------|--------|
-| `tags` | `Core`, `WOW`, `Legendary`, `Tricky`, `Skip` (≤2) |
-| `relevance` | 1–10 |
-| `diff` | `basics`, `resyntax`, `newconcept`, `pythonic`, `paradigm` |
+---
 
-Filters (sidebar) update **tree and main** together. Status bar shows visible/total counts.
-
-### Content pipeline
-
-- Metadata paths stay as `vyuka_downloaded/materialy/...` / `priklady/...`.
-- `serve.py` maps `/vyuka_downloaded/*` → `.old/vyuka_downloaded/*` and `/cjs/*` → `.old/cjs/*`.
-- The shell **fetches** lecture HTML and **extracts** `section.slide-section` bodies (does not embed the old SPA chrome).
-- Relative assets (`_files/...`) are rewritten against the lecture directory.
-
-### Keyboard
+## Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
-| `Ctrl+P` | Command palette / quick open |
-| `Ctrl+B` | Toggle sidebar |
-| `Ctrl+Shift+E` | Explorer |
-| `Ctrl+Shift+F` | Search (focus filter) |
-| `Ctrl+W` | Close tab |
-| Tree arrows | Expand / collapse / move focus |
+| `Ctrl+P` | Trigger Print mode (Generates 2-column Study Plan PDF or prints current page) |
+| `Ctrl+K` | Open Command palette |
+| `Ctrl+B` | Toggle sidebar (collapses / expands left panel) |
+| `Ctrl+Shift+E` | Switch to Explorer view |
+| `Ctrl+Shift+F` | Focus filter search |
+| `Ctrl+W` | Close active editor tab |
+| `← / → / Space` | Next / Previous slide (in presentation or fullscreen mode) |
+| `F` | Toggle presentation fullscreen mode |
 
 ---
 
-## Data rebuild
+## Data Model & Files
 
-```bash
-# Fresh import from archive (overwrites data/*.json — re-run Phase 2 after if needed)
-python tools/import_course_data.py
-python tools/apply_phase2_labels.py
-```
+| Path | Description |
+|------|-------------|
+| `app/` | Single-Page Application (HTML5, Vanilla CSS, ES Modules) |
+| `data/course.json` | Primary course structure (weeks, items, tags, relevance scores) |
+| `data/exercises.json` | 135 structured úkol items with T/L ratings and HTML prompts |
+| `data/slides.json` | Per-slide difficulty ratings |
+| `data/pages-index.json` | Outline metadata for presentation slides |
+| `tools/` | Python & Node.js build scripts for Vercel, data import, and labeling |
 
-For labeling policy see `LLM_LABELING_PROMPT.md` and `data/LABELING_CHANGELOG.md`.
-
----
-
-## Design tokens
-
-VS Code **Dark Modern** palette in `app/css/tokens.css` (optional light theme via title-bar **Theme**). UI font: IBM Plex Sans; mono: JetBrains Mono (copied into `app/fonts/`).
-
----
-
-## Residual risks
-
-- Some lecture HTML still contains old SPA chrome; extraction strips most of it, but edge-case pages may fall back to a partial dump or iframe.
-- Custom `<example src="...">` tags are shown as placeholders (not live-loaded).
-- `pages-index.json` is built from `.old/data/lecture-pages.json` when present — outlines without full bodies.
-- Slide flavors in `slides.json` are imported as-is (not fully re-audited in Phase 2).
-- Path overrides in `apply_phase2_labels.py` may miss renamed files; title-based overrides cover most items.

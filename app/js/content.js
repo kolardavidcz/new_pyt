@@ -260,6 +260,75 @@ function lectureHero(item, { compact = false } = {}) {
   return hero;
 }
 
+function buildBottomNavBar(item) {
+  const items = state.items;
+  const idx = items.findIndex((it) => it.id === item.id);
+  const prevItem = idx > 0 ? items[idx - 1] : null;
+  const nextItem = idx >= 0 && idx < items.length - 1 ? items[idx + 1] : null;
+
+  const studied = isStudied(item.id);
+
+  const bar = el("nav", { className: "bottom-nav-bar", "aria-label": "Item navigation" });
+
+  // 1. Previous button
+  if (prevItem) {
+    const prevBtn = el("button", {
+      type: "button",
+      className: "btn bottom-nav-btn prev",
+      title: `Previous: ${prevItem.title}`,
+      onClick: () => window.__pcsNavigate?.({ kind: prevItem.kind, id: prevItem.id }),
+    });
+    prevBtn.innerHTML = `<span class="nav-arrow">←</span> <span class="nav-label"><strong>W${prevItem.weekNum}</strong> ${escapeHtml(prevItem.title)}</span>`;
+    bar.appendChild(prevBtn);
+  } else {
+    const disabledPrev = el("button", { type: "button", className: "btn bottom-nav-btn prev disabled", disabled: true });
+    disabledPrev.innerHTML = `<span class="nav-arrow">←</span> <span class="nav-label">Start of course</span>`;
+    bar.appendChild(disabledPrev);
+  }
+
+  // 2. Mark Studied Button
+  const studyBtn = el("button", {
+    type: "button",
+    className: "btn bottom-nav-study-btn" + (studied ? " is-studied" : " primary"),
+    title: studied ? "Click to unmark as studied" : "Click to mark as studied for progress",
+    onClick: () => {
+      const now = toggleStudied(item.id);
+      studyBtn.classList.toggle("is-studied", now);
+      studyBtn.classList.toggle("primary", !now);
+      studyBtn.innerHTML = now ? "✓ Studied" : "☐ Mark studied";
+      studyBtn.title = now ? "Click to unmark as studied" : "Click to mark as studied for progress";
+      // Update top hero study buttons if present on page
+      document.querySelectorAll(".study-btn").forEach((b) => {
+        b.classList.toggle("is-studied", now);
+        b.classList.toggle("primary", !now);
+        b.textContent = now ? "✓ Studied" : "Mark studied";
+      });
+      try { renderTree(); } catch { /* */ }
+      window.__pcsUpdateStatus?.();
+    },
+  });
+  studyBtn.innerHTML = studied ? "✓ Studied" : "☐ Mark studied";
+  bar.appendChild(studyBtn);
+
+  // 3. Next button
+  if (nextItem) {
+    const nextBtn = el("button", {
+      type: "button",
+      className: "btn bottom-nav-btn next",
+      title: `Next: ${nextItem.title}`,
+      onClick: () => window.__pcsNavigate?.({ kind: nextItem.kind, id: nextItem.id }),
+    });
+    nextBtn.innerHTML = `<span class="nav-label"><strong>W${nextItem.weekNum}</strong> ${escapeHtml(nextItem.title)}</span> <span class="nav-arrow">→</span>`;
+    bar.appendChild(nextBtn);
+  } else {
+    const disabledNext = el("button", { type: "button", className: "btn bottom-nav-btn next disabled", disabled: true });
+    disabledNext.innerHTML = `<span class="nav-label">End of course 🎉</span> <span class="nav-arrow">→</span>`;
+    bar.appendChild(disabledNext);
+  }
+
+  return bar;
+}
+
 /**
  * Presentation mode: page index (outline of slides).
  * Replaces the old "item index" as secondary view.
@@ -329,6 +398,7 @@ export function showPresentation(itemId) {
     },
   }, "Start fullscreen ⛶"));
   main.appendChild(start);
+  main.appendChild(buildBottomNavBar(item));
 }
 
 /** @deprecated alias kept for any leftover imports */
@@ -428,6 +498,7 @@ export async function showPage(itemId, pageId) {
     const slideEl = renderSlide(page, item, idx >= 0 ? idx + 1 : 1);
     main.appendChild(slideEl);
     highlightRoot(slideEl);
+    main.appendChild(buildBottomNavBar(item));
   } catch (err) {
     main.innerHTML = `<div class="error-box">Failed to load content.<br/><code>${escapeHtml(err.message)}</code></div>`;
   } finally {
@@ -512,6 +583,7 @@ function renderExerciseView(item, data, main) {
   }
   main.appendChild(list);
   highlightRoot(list);
+  main.appendChild(buildBottomNavBar(item));
 }
 
 function scoreBarsHtml(score, max = 5) {
@@ -604,6 +676,7 @@ async function loadFullContent(item, main) {
     });
     main.appendChild(frag);
     for (const node of nodes) highlightRoot(node);
+    main.appendChild(buildBottomNavBar(item));
   } catch (err) {
     main.appendChild(el("div", { className: "error-box" },
       "Failed to load: ",
