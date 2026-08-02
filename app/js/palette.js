@@ -1,4 +1,4 @@
-/** Command palette (Ctrl+P) */
+/** Command palette (Ctrl+K / Ctrl+Shift+P) */
 
 import { state, filteredItems } from "./state.js";
 import { clear } from "./ui.js";

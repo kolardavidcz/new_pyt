@@ -55,7 +55,7 @@ export const state = {
 
   /** Which sidebar view: explorer | search | progress */
   view: "explorer",
-  sidebarOpen: true,
+  sidebarOpen: false,
   sidebarWidth: 280,
 
   /** Open editor tabs: { id, kind, title, itemId?, weekId?, pageId? } */
@@ -153,6 +153,13 @@ export function loadPersisted() {
     const w = parseInt(localStorage.getItem(SIDEBAR_W_KEY) || "", 10);
     if (w >= 180 && w <= 520) state.sidebarWidth = w;
   } catch { /* ignore */ }
+  try {
+    const sOpen = localStorage.getItem("pcs-sidebar-open");
+    if (sOpen !== null) state.sidebarOpen = JSON.parse(sOpen) === true;
+    else state.sidebarOpen = false;
+  } catch {
+    state.sidebarOpen = false;
+  }
 
   syncCloudProgress();
 }

@@ -37,7 +37,8 @@ export function showHome() {
       <span>${state.seen.size} seen</span>
     </div>
     <div class="welcome-keys" style="justify-content:flex-start;margin-top:12px">
-      <span><kbd class="kbd">Ctrl+P</kbd> Quick open</span>
+      <span><kbd class="kbd">Ctrl+P</kbd> Tisk / Print</span>
+      <span><kbd class="kbd">Ctrl+K</kbd> Quick open</span>
       <span><kbd class="kbd">Ctrl+B</kbd> Toggle sidebar</span>
       <span><kbd class="kbd">Ctrl+Shift+F</kbd> Search</span>
       <span><kbd class="kbd">Browser ←</kbd> Previous view</span>
