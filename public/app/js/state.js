@@ -197,40 +197,29 @@ export async function syncCloudProgress() {
     const seKey = getSeenKey();
     const remoteStudied = await kvGet(sKey);
     const remoteSeen = await kvGet(seKey);
-    
+
     let changed = false;
 
     if (Array.isArray(remoteStudied)) {
-      for (const id of remoteStudied) {
-        if (!state.studied.has(id)) {
-          state.studied.add(id);
-          state.seen.add(id);
-          changed = true;
-        }
+      const nextStudied = new Set(remoteStudied);
+      if (nextStudied.size !== state.studied.size || [...nextStudied].some((id) => !state.studied.has(id))) {
+        state.studied = nextStudied;
+        changed = true;
       }
     }
 
     if (Array.isArray(remoteSeen)) {
-      for (const id of remoteSeen) {
-        if (!state.seen.has(id)) {
-          state.seen.add(id);
-          changed = true;
-        }
+      const nextSeen = new Set(remoteSeen);
+      if (nextSeen.size !== state.seen.size || [...nextSeen].some((id) => !state.seen.has(id))) {
+        state.seen = nextSeen;
+        changed = true;
       }
     }
 
-    const studiedArr = [...state.studied];
-    const seenArr = [...state.seen];
-
     try {
-      localStorage.setItem(sKey, JSON.stringify(studiedArr));
-      localStorage.setItem(seKey, JSON.stringify(seenArr));
+      localStorage.setItem(sKey, JSON.stringify([...state.studied]));
+      localStorage.setItem(seKey, JSON.stringify([...state.seen]));
     } catch { /* ignore */ }
-
-    if (changed || !remoteStudied || remoteStudied.length < studiedArr.length) {
-      kvSet(sKey, studiedArr);
-      kvSet(seKey, seenArr);
-    }
 
     if (changed) {
       notifyStateChange("cloudSync");
