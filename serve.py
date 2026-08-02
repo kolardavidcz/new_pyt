@@ -24,7 +24,7 @@ from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parent
 OLD = ROOT / ".old"
-DEFAULT_PORT = 8765
+DEFAULT_PORT = 8770
 
 # Ensure common types
 mimetypes.add_type("application/javascript", ".js")
@@ -160,9 +160,9 @@ def main() -> int:
         port = int(sys.argv[1])
 
     os.chdir(ROOT)
-    server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
     print(f"Python Course Shell")
-    print(f"  http://127.0.0.1:{port}/")
+    print(f"  http://localhost:{port}/")
     print(f"  root: {ROOT}")
     print(f"  no-cache: on")
     print(f"  Ctrl+C to stop")

@@ -12,9 +12,26 @@ import { openPalette, closePalette, isPaletteOpen, initPalette, setPaletteHandle
 import { toggleFullscreen, updatePageStudyButtons } from "./content.js";
 
 async function loadJson(url) {
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
-  return res.json();
+  const clean = url.replace(/^\//, "");
+  const urlsToTry = [
+    "/" + clean,
+    "data/" + clean.replace(/^data\//, ""),
+    "./data/" + clean.replace(/^data\//, ""),
+    "../data/" + clean.replace(/^data\//, ""),
+    "./" + clean,
+  ];
+  let lastErr = null;
+  for (const u of urlsToTry) {
+    try {
+      const res = await fetch(u, { cache: "no-store" });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error(`Failed to load metadata: ${url}`);
 }
 
 async function boot() {

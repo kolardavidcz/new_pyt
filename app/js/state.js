@@ -32,6 +32,7 @@ export function getChecklistKey() {
   return u ? syncEngine.getKey(u, "checklist") : CHECKLIST_KEY;
 }
 
+/** @type {import("./types.js").AppState} */
 export const state = {
   course: null,
   slides: {},
@@ -58,8 +59,8 @@ export const state = {
   sidebarOpen: false,
   sidebarWidth: 280,
 
-  /** Print theme: "light" (default) | "dark" */
-  printTheme: "light",
+  /** Print code block color theme: "dark" (default VS Code dark) | "light" */
+  codeBlockColor: "dark",
 
   /** Open editor tabs: { id, kind, title, itemId?, weekId?, pageId? } */
   tabs: [],
@@ -160,20 +161,26 @@ export function loadPersisted() {
     const sOpen = localStorage.getItem("pcs-sidebar-open");
     if (sOpen !== null) state.sidebarOpen = JSON.parse(sOpen) === true;
     else state.sidebarOpen = false;
+  } catch {
+    state.sidebarOpen = false;
+  }
   try {
-    const pt = localStorage.getItem("pcs-print-theme");
-    if (pt === "dark" || pt === "light") state.printTheme = pt;
+    const cbc = localStorage.getItem("pcs-code-block-color") || localStorage.getItem("pcs-print-theme");
+    if (cbc === "dark" || cbc === "light") state.codeBlockColor = cbc;
   } catch { /* ignore */ }
-  document.documentElement.setAttribute("data-print-theme", state.printTheme);
+  document.documentElement.setAttribute("data-code-block-color", state.codeBlockColor);
 
   syncCloudProgress();
 }
 
-export function setPrintTheme(theme) {
-  const next = theme === "dark" ? "dark" : "light";
-  state.printTheme = next;
-  document.documentElement.setAttribute("data-print-theme", next);
-  try { localStorage.setItem("pcs-print-theme", next); } catch { /* ignore */ }
+export function setCodeBlockColor(color) {
+  const next = color === "light" ? "light" : "dark";
+  state.codeBlockColor = next;
+  document.documentElement.setAttribute("data-code-block-color", next);
+  try {
+    localStorage.setItem("pcs-code-block-color", next);
+    localStorage.setItem("pcs-print-theme", next);
+  } catch { /* ignore */ }
   notify();
 }
 
