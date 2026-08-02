@@ -4,7 +4,7 @@
 import {
   state, loadPersisted, buildIndexes, clearFilters, filtersActive,
   filteredItems, persistSidebarW, pagesFor, onStateChange,
-  setUser, logoutUser, defaultUser,
+  setUser, logoutUser, defaultUser, syncCloudProgress,
 } from "./state.js";
 import { renderTree, setTreeSelectHandler, expandAll, collapseAll } from "./tree.js";
 import { navigate, refreshActiveView, closeTab, initHistory, getInitialRoute } from "./router.js";
@@ -28,6 +28,13 @@ async function boot() {
   window.__pcsUpdateStatus = updateStatus;
   window.__pcsState = state;
   initHistory();
+
+  // Tablet & Multi-device Auto-Sync (Focus, Tab Visibility & 30s Background Poll)
+  window.addEventListener("focus", () => syncCloudProgress());
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") syncCloudProgress();
+  });
+  setInterval(() => syncCloudProgress(), 30000);
 
   // Reactive Event Bus listener: auto-update UI components when state mutates
   onStateChange((_, changeType) => {

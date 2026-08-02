@@ -195,19 +195,45 @@ export async function syncCloudProgress() {
   try {
     const sKey = getStudiedKey();
     const seKey = getSeenKey();
-    const rawLocal = localStorage.getItem(sKey);
     const remoteStudied = await kvGet(sKey);
-    if (Array.isArray(remoteStudied) && remoteStudied.length > 0) {
-      if (!rawLocal) {
-        state.studied = new Set(remoteStudied);
-        for (const id of remoteStudied) state.seen.add(id);
-        localStorage.setItem(sKey, JSON.stringify([...state.studied]));
-        localStorage.setItem(seKey, JSON.stringify([...state.seen]));
-        notifyStateChange("cloudSync");
+    const remoteSeen = await kvGet(seKey);
+    
+    let changed = false;
+
+    if (Array.isArray(remoteStudied)) {
+      for (const id of remoteStudied) {
+        if (!state.studied.has(id)) {
+          state.studied.add(id);
+          state.seen.add(id);
+          changed = true;
+        }
       }
-    } else if (state.studied.size > 0) {
-      kvSet(sKey, [...state.studied]);
-      kvSet(seKey, [...state.seen]);
+    }
+
+    if (Array.isArray(remoteSeen)) {
+      for (const id of remoteSeen) {
+        if (!state.seen.has(id)) {
+          state.seen.add(id);
+          changed = true;
+        }
+      }
+    }
+
+    const studiedArr = [...state.studied];
+    const seenArr = [...state.seen];
+
+    try {
+      localStorage.setItem(sKey, JSON.stringify(studiedArr));
+      localStorage.setItem(seKey, JSON.stringify(seenArr));
+    } catch { /* ignore */ }
+
+    if (changed || !remoteStudied || remoteStudied.length < studiedArr.length) {
+      kvSet(sKey, studiedArr);
+      kvSet(seKey, seenArr);
+    }
+
+    if (changed) {
+      notifyStateChange("cloudSync");
     }
   } catch { /* ignore */ }
 }
