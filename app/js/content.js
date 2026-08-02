@@ -325,7 +325,7 @@ function buildBottomNavBar(item) {
  * Presentation mode: page index (outline of slides).
  * Replaces the old "item index" as secondary view.
  */
-export function showPresentation(itemId) {
+export async function showPresentation(itemId) {
   const item = state.itemsById.get(itemId);
   const main = document.getElementById("main");
   if (!item) {
@@ -344,53 +344,33 @@ export function showPresentation(itemId) {
   hero.appendChild(lectureToolbar(item, "presentation"));
   main.appendChild(hero);
 
-  if (!pages.length) {
-    main.appendChild(el("p", { className: "desc", style: { padding: "0 28px" } },
-      "No page outline available — opening full lecture instead."));
-    loadFullContent(item, main);
-    return;
+  if (pages.length) {
+    const sec = el("div", { className: "catalog", style: { paddingTop: "4px", paddingBottom: "16px" } },
+      el("div", { className: "catalog-section" },
+        el("h2", {}, `Presentation Outline · ${pages.length} slides`),
+      ),
+    );
+    const list = el("div", { className: "page-list" });
+    pages.forEach((p, i) => {
+      const diff = slideDiff(item.slug, p.id);
+      const row = el("button", {
+        type: "button",
+        className: "page-row",
+        onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: p.id }),
+      });
+      row.innerHTML = `
+        <span class="page-num">${String(i + 1).padStart(2, "0")}</span>
+        <span class="page-title">${escapeHtml(p.title)}</span>
+        ${diff ? flavorHtml(diff) : ""}
+      `;
+      list.appendChild(row);
+    });
+    sec.querySelector(".catalog-section").appendChild(list);
+    main.appendChild(sec);
   }
 
-  const sec = el("div", { className: "catalog", style: { paddingTop: "4px" } },
-    el("div", { className: "catalog-section" },
-      el("h2", {}, `Presentation · ${pages.length} slides`),
-    ),
-  );
-  const list = el("div", { className: "page-list" });
-  pages.forEach((p, i) => {
-    const diff = slideDiff(item.slug, p.id);
-    const row = el("button", {
-      type: "button",
-      className: "page-row",
-      onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: p.id }),
-    });
-    row.innerHTML = `
-      <span class="page-num">${String(i + 1).padStart(2, "0")}</span>
-      <span class="page-title">${escapeHtml(p.title)}</span>
-      ${diff ? flavorHtml(diff) : ""}
-    `;
-    list.appendChild(row);
-  });
-  sec.querySelector(".catalog-section").appendChild(list);
-  main.appendChild(sec);
-
-  // Quick start first slide
-  const start = el("div", { className: "item-actions", style: { padding: "8px 28px 24px" } });
-  start.appendChild(el("button", {
-    type: "button",
-    className: "btn primary",
-    onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[0].id }),
-  }, "Start presentation"));
-  start.appendChild(el("button", {
-    type: "button",
-    className: "btn primary btn-fullscreen",
-    onClick: () => {
-      window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[0].id });
-      toggleFullscreen(true);
-    },
-  }, "Start fullscreen ⛶"));
-  main.appendChild(start);
-  main.appendChild(buildBottomNavBar(item));
+  // Always load full lecture content below outline
+  await loadFullContent(item, main);
 }
 
 /** @deprecated alias kept for any leftover imports */
@@ -745,14 +725,44 @@ function renderSlide(page, item, num) {
 const cache = new Map();
 
 export async function fetchAndExtract(path) {
-  if (cache.has(path)) return cache.get(path);
+  if (!path) return [];
+  if (cache.has(path)) {
+    const cached = cache.get(path);
+    if (Array.isArray(cached) && cached.length > 0 && cached.some((s) => s.html && s.html.trim().length > 0)) {
+      return cached;
+    }
+  }
 
-  const url = "/" + path.replace(/^\//, "");
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
-  const html = await res.text();
+  const cleanPath = path.replace(/^\//, "");
+  const urlsToTry = [
+    "/" + cleanPath,
+    "/app/" + cleanPath,
+    "/public/" + cleanPath,
+  ];
+
+  let html = null;
+  for (const url of urlsToTry) {
+    try {
+      const res = await fetch(url, { cache: "no-store" });
+      if (res.ok) {
+        const text = await res.text();
+        if (text && text.includes("<")) {
+          html = text;
+          break;
+        }
+      }
+    } catch { /* try next url fallback */ }
+  }
+
+  if (!html) {
+    console.warn(`Could not fetch content HTML for path: ${path}`);
+    return [];
+  }
+
   const slides = extractSlides(html);
-  cache.set(path, slides);
+  if (slides.length > 0 && slides.some((s) => s.html && s.html.trim().length > 0)) {
+    cache.set(path, slides);
+  }
   return slides;
 }
 
