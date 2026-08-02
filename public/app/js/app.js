@@ -4,6 +4,7 @@
 import {
   state, loadPersisted, buildIndexes, clearFilters, filtersActive,
   filteredItems, persistSidebarW, pagesFor, onStateChange,
+  setUser, logoutUser, defaultUser,
 } from "./state.js";
 import { renderTree, setTreeSelectHandler, expandAll, collapseAll } from "./tree.js";
 import { navigate, refreshActiveView, closeTab, initHistory, getInitialRoute } from "./router.js";
@@ -30,10 +31,11 @@ async function boot() {
 
   // Reactive Event Bus listener: auto-update UI components when state mutates
   onStateChange((_, changeType) => {
-    if (changeType === "studied" || changeType === "cloudSync" || changeType === "seen") {
+    if (changeType === "studied" || changeType === "cloudSync" || changeType === "seen" || changeType === "user") {
       updatePageStudyButtons();
       try { renderTree(); } catch {}
       updateStatus();
+      updateUserUI();
       const tab = state.tabs.find((t) => t.id === state.activeTabId);
       if (tab && (tab.kind === "progress" || tab.kind === "week" || tab.kind === "search" || tab.kind === "home")) {
         refreshActiveView();
@@ -54,6 +56,7 @@ async function boot() {
     buildIndexes(course);
     renderTree();
     updateStatus();
+    updateUserUI();
     // Restore deep link or land on welcome
     const initial = getInitialRoute();
     navigate(initial, { replace: true });
@@ -118,11 +121,120 @@ function stepSlide(dir) {
   }
 }
 
+function updateUserUI() {
+  const u = state.user;
+  const userLabel = document.getElementById("userLabel");
+  if (userLabel) userLabel.textContent = u ? u.username : "Přihlásit se";
+
+  const pName = document.getElementById("profileName");
+  const pUsername = document.getElementById("profileUsername");
+  const pFaculty = document.getElementById("profileFaculty");
+  const pId = document.getElementById("profileId");
+  const pAvatar = document.getElementById("profileAvatar");
+
+  if (u) {
+    if (pName) pName.textContent = u.name || u.username;
+    if (pUsername) pUsername.textContent = u.username;
+    if (pFaculty) pFaculty.textContent = u.faculty || "VSČHT Praha";
+    if (pId) pId.textContent = `ID: ${u.studentId || "987654"}`;
+    if (pAvatar) {
+      const initials = (u.name || u.username)
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+      pAvatar.textContent = initials || "VS";
+    }
+  }
+
+  // Update profile modal stats
+  const total = state.items.length || 92;
+  const studiedN = state.studied?.size || 0;
+  const pct = total > 0 ? Math.round((studiedN / total) * 100) : 0;
+
+  const pstatStudied = document.getElementById("pstatStudied");
+  const pstatPct = document.getElementById("pstatPct");
+  const pstatTotal = document.getElementById("pstatTotal");
+
+  if (pstatStudied) pstatStudied.textContent = studiedN;
+  if (pstatPct) pstatPct.textContent = `${pct}%`;
+  if (pstatTotal) pstatTotal.textContent = total;
+}
+
 function bindChrome() {
-  // Theme
+  // Theme & Profile
   document.getElementById("btnTheme")?.addEventListener("click", toggleTheme);
   document.getElementById("btnPrint")?.addEventListener("click", triggerPrint);
   document.getElementById("btnPalette")?.addEventListener("click", () => openPalette());
+
+  // Profile Modal
+  const profileModal = document.getElementById("profileModal");
+  const btnProfile = document.getElementById("btnProfile");
+  const btnCloseProfile = document.getElementById("btnCloseProfile");
+  const btnSwitchProfile = document.getElementById("btnSwitchProfile");
+  const btnLogoutProfile = document.getElementById("btnLogoutProfile");
+  const profileUserView = document.getElementById("profileUserView");
+  const profileLoginForm = document.getElementById("profileLoginForm");
+  const btnCancelLogin = document.getElementById("btnCancelLogin");
+
+  btnProfile?.addEventListener("click", () => {
+    updateUserUI();
+    if (!state.user) {
+      profileUserView?.classList.add("hidden");
+      profileLoginForm?.classList.remove("hidden");
+    } else {
+      profileUserView?.classList.remove("hidden");
+      profileLoginForm?.classList.add("hidden");
+    }
+    profileModal?.classList.remove("hidden");
+  });
+
+  btnCloseProfile?.addEventListener("click", () => profileModal?.classList.add("hidden"));
+  btnCancelLogin?.addEventListener("click", () => {
+    if (state.user) {
+      profileLoginForm?.classList.add("hidden");
+      profileUserView?.classList.remove("hidden");
+    } else {
+      profileModal?.classList.add("hidden");
+    }
+  });
+
+  btnSwitchProfile?.addEventListener("click", () => {
+    profileUserView?.classList.add("hidden");
+    profileLoginForm?.classList.remove("hidden");
+    const inputU = document.getElementById("inputUsername");
+    if (inputU) inputU.focus();
+  });
+
+  btnLogoutProfile?.addEventListener("click", () => {
+    logoutUser();
+    updateUserUI();
+    profileUserView?.classList.add("hidden");
+    profileLoginForm?.classList.remove("hidden");
+  });
+
+  profileLoginForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const username = document.getElementById("inputUsername")?.value.trim();
+    const fullName = document.getElementById("inputFullName")?.value.trim();
+    const faculty = document.getElementById("inputFaculty")?.value;
+
+    if (!username) return;
+
+    const newUser = {
+      username: username.toLowerCase(),
+      name: fullName || username,
+      studentId: String(Math.floor(100000 + Math.random() * 900000)),
+      faculty: faculty || "VSČHT Praha",
+    };
+
+    setUser(newUser);
+    updateUserUI();
+    profileLoginForm?.classList.add("hidden");
+    profileUserView?.classList.remove("hidden");
+    profileModal?.classList.add("hidden");
+  });
 
   // Activity bar
   document.querySelectorAll(".activity-btn[data-view]").forEach((btn) => {
