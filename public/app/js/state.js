@@ -58,6 +58,9 @@ export const state = {
   sidebarOpen: false,
   sidebarWidth: 280,
 
+  /** Print theme: "light" (default) | "dark" */
+  printTheme: "light",
+
   /** Open editor tabs: { id, kind, title, itemId?, weekId?, pageId? } */
   tabs: [],
   activeTabId: null,
@@ -157,11 +160,21 @@ export function loadPersisted() {
     const sOpen = localStorage.getItem("pcs-sidebar-open");
     if (sOpen !== null) state.sidebarOpen = JSON.parse(sOpen) === true;
     else state.sidebarOpen = false;
-  } catch {
-    state.sidebarOpen = false;
-  }
+  try {
+    const pt = localStorage.getItem("pcs-print-theme");
+    if (pt === "dark" || pt === "light") state.printTheme = pt;
+  } catch { /* ignore */ }
+  document.documentElement.setAttribute("data-print-theme", state.printTheme);
 
   syncCloudProgress();
+}
+
+export function setPrintTheme(theme) {
+  const next = theme === "dark" ? "dark" : "light";
+  state.printTheme = next;
+  document.documentElement.setAttribute("data-print-theme", next);
+  try { localStorage.setItem("pcs-print-theme", next); } catch { /* ignore */ }
+  notify();
 }
 
 const listeners = new Set();

@@ -2,7 +2,7 @@
 
 import {
   state, pagesFor, slideDiff, weekVisibleItems, filteredItems, markSeen,
-  isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress,
+  isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setPrintTheme,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot } from "./highlight.js";
@@ -1406,6 +1406,20 @@ export function showLogin() {
           </div>
         </div>
 
+        <div class="sync-status-card" style="margin-top:12px;">
+          <div class="sync-status-icon">🖨️</div>
+          <div class="sync-status-text" style="flex:1;">
+            <strong>Tiskové Téma (Print & PDF Theme)</strong>
+            <p class="desc">Nastavte barevný vzhled stránek a kódů při tisku do PDF nebo na tiskárnu.</p>
+          </div>
+          <div style="min-width:180px;">
+            <select id="selectPrintThemeSetting" class="sort-select" style="height:32px;font-size:12px;padding:0 8px;width:100%;">
+              <option value="light" ${state.printTheme === "light" ? "selected" : ""}>☀️ Světlé téma (Light)</option>
+              <option value="dark" ${state.printTheme === "dark" ? "selected" : ""}>🌙 Tmavé téma (Dark #181818)</option>
+            </select>
+          </div>
+        </div>
+
         <div class="login-actions-row">
           <button type="button" class="btn secondary" id="btnPageSwitchAccount">Přihlásit jiný účet VSČHT</button>
           <button type="button" class="btn primary danger" id="btnPageLogout">Odhlásit se</button>
@@ -1426,6 +1440,10 @@ export function showLogin() {
         btn.disabled = false;
         showLogin();
       }, 1000);
+    });
+
+    document.getElementById("selectPrintThemeSetting")?.addEventListener("change", (e) => {
+      setPrintTheme(e.target.value);
     });
 
     document.getElementById("btnPageSwitchAccount")?.addEventListener("click", () => {
