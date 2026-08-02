@@ -186,15 +186,7 @@ function bindChrome() {
   const btnCancelLogin = document.getElementById("btnCancelLogin");
 
   btnProfile?.addEventListener("click", () => {
-    updateUserUI();
-    if (!state.user) {
-      profileUserView?.classList.add("hidden");
-      profileLoginForm?.classList.remove("hidden");
-    } else {
-      profileUserView?.classList.remove("hidden");
-      profileLoginForm?.classList.add("hidden");
-    }
-    profileModal?.classList.remove("hidden");
+    navigate({ kind: "login" });
   });
 
   btnCloseProfile?.addEventListener("click", () => profileModal?.classList.add("hidden"));
