@@ -239,7 +239,11 @@ function bindChrome() {
   document.querySelectorAll(".activity-btn[data-view]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const view = btn.dataset.view;
-      setView(view);
+      if (view === "progress") {
+        navigate({ kind: "progress" });
+      } else if (view === "explorer") {
+        toggleSidebar();
+      }
     });
   });
 
@@ -436,28 +440,20 @@ function updateStatus() {
 function setView(view) {
   state.view = view;
   document.querySelectorAll(".activity-btn[data-view]").forEach((b) => {
-    b.classList.toggle("active", b.dataset.view === view);
+    b.classList.toggle("active", b.dataset.view === "explorer");
   });
   const title = document.getElementById("sidebarTitle");
   const treeRoot = document.getElementById("treeRoot");
   const filterStrip = document.getElementById("filterStrip");
 
-  if (view === "explorer") {
-    if (title) title.textContent = "Explorer";
-    treeRoot?.classList.remove("hidden");
-    filterStrip?.classList.remove("hidden");
-  } else if (view === "progress") {
-    if (title) title.textContent = "Progress";
-    navigate({ kind: "progress" });
-  }
-
-  // Ensure sidebar open when switching views
-  if (!state.sidebarOpen) {
-    state.sidebarOpen = true;
-    document.getElementById("workbench")?.classList.remove("sidebar-collapsed");
-    applySidebarWidth();
+  if (title) title.textContent = "Explorer";
+  treeRoot?.classList.remove("hidden");
+  filterStrip?.classList.remove("hidden");
+  if (view === "explorer" && !state.sidebarOpen) {
+    toggleSidebar();
   }
 }
+window.__pcsSetView = setView;
 
 function toggleSidebar() {
   state.sidebarOpen = !state.sidebarOpen;
