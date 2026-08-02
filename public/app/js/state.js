@@ -7,6 +7,24 @@ const SEEN_KEY = "pcs-seen-v1";
 const STUDIED_KEY = "pcs-studied-v1";
 const CHECKLIST_KEY = "pcs-checklist-v1";
 const SIDEBAR_W_KEY = "pcs-sidebar-w";
+const USER_KEY = "pcs-user-v1";
+
+export const defaultUser = {
+  username: "kolard",
+  name: "David Kolar",
+  studentId: "987654",
+  faculty: "FCHI · VSČHT Praha",
+};
+
+export function getStudiedKey() {
+  const u = state.user?.username;
+  return u ? `${STUDIED_KEY}:${u}` : STUDIED_KEY;
+}
+
+export function getSeenKey() {
+  const u = state.user?.username;
+  return u ? `${SEEN_KEY}:${u}` : SEEN_KEY;
+}
 
 export const state = {
   course: null,
