@@ -4,7 +4,7 @@ import { state } from "./state.js";
 import { clear, svgClose } from "./ui.js";
 import {
   showHome, showWeek, showFullContent, showPresentation, showPage,
-  showSearchResults, showProgress,
+  showSearchResults, showProgress, showLogin,
 } from "./content.js";
 import { revealItem, renderTree } from "./tree.js";
 
@@ -80,6 +80,7 @@ function targetToRoute(target) {
   if (kind === "page") return { kind: "page", id: target.id, pageId: target.pageId };
   if (kind === "search") return { kind: "search" };
   if (kind === "progress") return { kind: "progress" };
+  if (kind === "login") return { kind: "login" };
   return { kind: "home" };
 }
 
@@ -93,6 +94,7 @@ function routeToHash(route) {
   if (route.kind === "page") return `#/page/${enc(route.id)}/${enc(route.pageId)}`;
   if (route.kind === "search") return "#/search";
   if (route.kind === "progress") return "#/progress";
+  if (route.kind === "login") return "#/login";
   return "#/";
 }
 
@@ -110,6 +112,7 @@ function parseHash(hash) {
   if (a === "item" && b) return { kind: "lecture", id: dec(b) };
   if (a === "search") return { kind: "search" };
   if (a === "progress") return { kind: "progress" };
+  if (a === "login") return { kind: "login" };
   return { kind: "home" };
 }
 
@@ -234,6 +237,10 @@ function ensureTab(target) {
     id = "progress";
     title = "Progress";
     tabKind = "progress";
+  } else if (kind === "login") {
+    id = "login";
+    title = "Přihlášení / Profil";
+    tabKind = "login";
   } else {
     id = "home";
     title = "Welcome";
@@ -311,6 +318,7 @@ function tabToTarget(tab) {
   if (tab.kind === "page") return { kind: "page", id: tab.itemId, pageId: tab.pageId };
   if (tab.kind === "search") return { kind: "search" };
   if (tab.kind === "progress") return { kind: "progress" };
+  if (tab.kind === "login") return { kind: "login" };
   return { kind: "home" };
 }
 
@@ -383,6 +391,9 @@ function renderView(tab) {
     case "progress":
       showProgress();
       break;
+    case "login":
+      showLogin();
+      break;
     default:
       showHome();
   }
@@ -429,6 +440,9 @@ export function renderBreadcrumb(tab) {
   } else if (tab.kind === "progress") {
     parts.push(sep());
     parts.push(crumbCurrent("Progress"));
+  } else if (tab.kind === "login") {
+    parts.push(sep());
+    parts.push(crumbCurrent("Přihlášení / Profil"));
   }
 
   for (const p of parts) nav.appendChild(p);
@@ -468,6 +482,8 @@ function updateChrome(tab) {
     path = "search";
   } else if (tab?.kind === "progress") {
     path = "progress";
+  } else if (tab?.kind === "login") {
+    path = "login";
   }
   if (titlePath) titlePath.textContent = " — " + (tab?.title || "C/Java → Python");
   if (sbPath) sbPath.textContent = path;

@@ -2,7 +2,7 @@
 
 import {
   state, pagesFor, slideDiff, weekVisibleItems, filteredItems, markSeen,
-  isStudied, toggleStudied, setStudied,
+  isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot } from "./highlight.js";
@@ -1328,5 +1328,199 @@ export function showProgress() {
   wrap.appendChild(foot);
   main.appendChild(wrap);
 }
+
+/* ── Login & Account View ────────────────────────────── */
+
+export function showLogin() {
+  const main = document.getElementById("main");
+  if (!main) return;
+  main.className = "catalog catalog-login";
+  clear(main);
+
+  const container = el("div", { className: "login-page-container" });
+  const u = state.user;
+
+  if (u) {
+    // Logged-in profile view
+    const items = state.items || [];
+    const total = items.length;
+    const studiedCount = state.studied.size;
+    const pct = total > 0 ? Math.round((studiedCount / total) * 100) : 0;
+    const initials = (u.name || u.username)
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .substring(0, 2)
+      .toUpperCase();
+
+    container.innerHTML = `
+      <div class="login-card logged-in">
+        <div class="vscht-badge">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          VSČHT Praha · SIS SSO Logged In
+        </div>
+        <div class="login-profile-header">
+          <div class="profile-avatar-large">${escapeHtml(initials)}</div>
+          <div class="profile-info">
+            <h2>${escapeHtml(u.name || u.username)}</h2>
+            <div class="profile-meta-row">
+              <span class="profile-meta-pill">@${escapeHtml(u.username)}</span>
+              <span class="profile-meta-pill">${escapeHtml(u.faculty || "VSČHT Praha")}</span>
+              <span class="profile-meta-pill">ID: ${escapeHtml(u.studentId || "987654")}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sync-status-card">
+          <div class="sync-status-icon">☁️</div>
+          <div class="sync-status-text">
+            <strong>Cloud Synchronizace Aktivní</strong>
+            <p class="desc">Klíč databáze: <code>pyt:${escapeHtml(u.username)}:studied</code> (Upstash Redis)</p>
+          </div>
+          <button type="button" class="btn secondary" id="btnManualSync">Synchronizovat nyní 🔄</button>
+        </div>
+
+        <div class="profile-stats-grid">
+          <div class="pstat-box">
+            <span class="pstat-val">${studiedCount}</span>
+            <span class="pstat-lbl">Prostudováno</span>
+          </div>
+          <div class="pstat-box">
+            <span class="pstat-val">${pct}%</span>
+            <span class="pstat-lbl">Splněno</span>
+          </div>
+          <div class="pstat-box">
+            <span class="pstat-val">${total}</span>
+            <span class="pstat-lbl">Celkem témat</span>
+          </div>
+        </div>
+
+        <div class="login-actions-row">
+          <button type="button" class="btn secondary" id="btnPageSwitchAccount">Přihlásit jiný účet VSČHT</button>
+          <button type="button" class="btn primary danger" id="btnPageLogout">Odhlásit se</button>
+        </div>
+      </div>
+    `;
+
+    main.appendChild(container);
+
+    document.getElementById("btnManualSync")?.addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      btn.textContent = "Synchronizuji...";
+      btn.disabled = true;
+      await syncCloudProgress();
+      btn.textContent = "Synchronizováno ✓";
+      setTimeout(() => {
+        btn.textContent = "Synchronizovat nyní 🔄";
+        btn.disabled = false;
+        showLogin();
+      }, 1000);
+    });
+
+    document.getElementById("btnPageSwitchAccount")?.addEventListener("click", () => {
+      logoutUser();
+      showLogin();
+    });
+
+    document.getElementById("btnPageLogout")?.addEventListener("click", () => {
+      logoutUser();
+      showLogin();
+    });
+
+  } else {
+    // Logged-out Login form view
+    container.innerHTML = `
+      <div class="login-card">
+        <div class="vscht-badge">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          VSČHT Praha · Jednotné Přihlášení SIS SSO
+        </div>
+        
+        <h2>Přihlášení študenta / vyučujícího</h2>
+        <p class="desc">Zadejte svůj VSČHT login pro synchronizaci studijního postupu napříč zařízeními (PC, tablet, telefon).</p>
+
+        <form id="pageLoginForm" class="login-form">
+          <div class="form-group">
+            <label for="pageInputUsername">Uživatelské jméno (VSČHT Login)</label>
+            <input type="text" id="pageInputUsername" placeholder="např. kolard" required autocomplete="username" value="kolard" />
+          </div>
+          <div class="form-group">
+            <label for="pageInputFullName">Jméno a příjmení</label>
+            <input type="text" id="pageInputFullName" placeholder="např. David Kolar" required value="David Kolar" />
+          </div>
+          <div class="form-group">
+            <label for="pageInputFaculty">Fakulta / Ústav</label>
+            <select id="pageInputFaculty">
+              <option value="FCHI · VSČHT Praha" selected>FCHI · Fakulta chemicko-inženýrská</option>
+              <option value="FPBT · VSČHT Praha">FPBT · Fakulta potravinářské a biologické technologie</option>
+              <option value="FCHT · VSČHT Praha">FCHT · Fakulta chemické technologie</option>
+              <option value="FTOP · VSČHT Praha">FTOP · Fakulta technologie ochrany prostředí</option>
+              <option value="VŠOP · VSČHT Praha">VŠOP · Ústav ekonomiky a managementu</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn primary xl">Přihlásit se & Synchronizovat 🚀</button>
+          </div>
+        </form>
+
+        <div class="quick-login-section">
+          <span class="quick-title">Rychlé přihlášení testovacích účtů:</span>
+          <div class="quick-buttons">
+            <button type="button" class="btn secondary sm" id="btnQuickKolard">David Kolar (kolard)</button>
+            <button type="button" class="btn secondary sm" id="btnQuickStudent">Student Test (student1)</button>
+          </div>
+        </div>
+
+        <div class="login-info-box">
+          <p>ℹ️ <strong>Multi-Project Sync Engine:</strong> Vaše data jsou bezpečně izolována v cloudové databázi Upstash Redis pod klíčem <code>pyt:&lt;username&gt;:*</code>.</p>
+        </div>
+      </div>
+    `;
+
+    main.appendChild(container);
+
+    const form = document.getElementById("pageLoginForm");
+    form?.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const username = document.getElementById("pageInputUsername")?.value.trim();
+      const fullName = document.getElementById("pageInputFullName")?.value.trim();
+      const faculty = document.getElementById("pageInputFaculty")?.value;
+
+      if (!username) return;
+
+      const newUser = {
+        username: username.toLowerCase(),
+        name: fullName || username,
+        studentId: String(Math.floor(100000 + Math.random() * 900000)),
+        faculty: faculty || "VSČHT Praha",
+      };
+
+      setUser(newUser);
+      window.__pcsNavigate?.({ kind: "progress" });
+    });
+
+    document.getElementById("btnQuickKolard")?.addEventListener("click", () => {
+      setUser({
+        username: "kolard",
+        name: "David Kolar",
+        studentId: "987654",
+        faculty: "FCHI · VSČHT Praha",
+      });
+      window.__pcsNavigate?.({ kind: "progress" });
+    });
+
+    document.getElementById("btnQuickStudent")?.addEventListener("click", () => {
+      setUser({
+        username: "student1",
+        name: "Student Test",
+        studentId: "123456",
+        faculty: "FPBT · VSČHT Praha",
+      });
+      window.__pcsNavigate?.({ kind: "progress" });
+    });
+  }
+}
+
 
 

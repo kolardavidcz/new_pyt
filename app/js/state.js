@@ -1,4 +1,5 @@
 /** Shared application state */
+import { syncEngine } from "./sync.js";
 
 export const TAGS = ["Core", "WOW", "Legendary", "Tricky", "Skip"];
 export const FLAVORS = ["basics", "resyntax", "newconcept", "pythonic", "paradigm"];
@@ -18,12 +19,17 @@ export const defaultUser = {
 
 export function getStudiedKey() {
   const u = state.user?.username;
-  return u ? `${STUDIED_KEY}:${u}` : STUDIED_KEY;
+  return u ? syncEngine.getKey(u, "studied") : STUDIED_KEY;
 }
 
 export function getSeenKey() {
   const u = state.user?.username;
-  return u ? `${SEEN_KEY}:${u}` : SEEN_KEY;
+  return u ? syncEngine.getKey(u, "seen") : SEEN_KEY;
+}
+
+export function getChecklistKey() {
+  const u = state.user?.username;
+  return u ? syncEngine.getKey(u, "checklist") : CHECKLIST_KEY;
 }
 
 export const state = {
@@ -79,20 +85,23 @@ export function loadUser() {
     const raw = localStorage.getItem(USER_KEY);
     if (raw) {
       const u = JSON.parse(raw);
-      if (u && u.username) state.user = u;
-      else state.user = { ...defaultUser };
-    } else {
-      state.user = { ...defaultUser };
+      if (u && u.username) {
+        state.user = u;
+        return;
+      }
     }
-  } catch {
-    state.user = { ...defaultUser };
-  }
+  } catch { /* ignore */ }
+  state.user = null;
 }
 
 export function setUser(userObj) {
   state.user = userObj;
   try {
-    localStorage.setItem(USER_KEY, JSON.stringify(userObj));
+    if (userObj) {
+      localStorage.setItem(USER_KEY, JSON.stringify(userObj));
+    } else {
+      localStorage.removeItem(USER_KEY);
+    }
   } catch { /* ignore */ }
   loadPersisted();
   notifyStateChange("user", { user: userObj });
@@ -105,6 +114,7 @@ export function logoutUser() {
   } catch { /* ignore */ }
   state.studied = new Set();
   state.seen = new Set();
+  state.checklist = new Set();
   notifyStateChange("user", { user: null });
 }
 
@@ -112,8 +122,11 @@ export function loadPersisted() {
   loadUser();
   const sKey = getStudiedKey();
   const seKey = getSeenKey();
+  const chKey = getChecklistKey();
+
   state.studied = new Set();
   state.seen = new Set();
+  state.checklist = new Set();
 
   try {
     const raw = localStorage.getItem(seKey);
@@ -130,7 +143,7 @@ export function loadPersisted() {
     }
   } catch { /* ignore */ }
   try {
-    const raw = localStorage.getItem(CHECKLIST_KEY);
+    const raw = localStorage.getItem(chKey) || localStorage.getItem(CHECKLIST_KEY);
     if (raw) {
       const arr = JSON.parse(raw);
       if (Array.isArray(arr)) state.checklist = new Set(arr);
@@ -140,35 +153,6 @@ export function loadPersisted() {
     const w = parseInt(localStorage.getItem(SIDEBAR_W_KEY) || "", 10);
     if (w >= 180 && w <= 520) state.sidebarWidth = w;
   } catch { /* ignore */ }
-
-const KV_URL = "https://tough-husky-101028.upstash.io";
-const KV_TOKEN = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
-
-async function kvGet(key) {
-  try {
-    const res = await fetch(`${KV_URL}/get/${encodeURIComponent(key)}`, {
-      headers: { Authorization: `Bearer ${KV_TOKEN}` },
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (!data || !data.result) return null;
-    return typeof data.result === "string" ? JSON.parse(data.result) : data.result;
-  } catch {
-    return null;
-  }
-}
-
-function kvSet(key, val) {
-  try {
-    fetch(`${KV_URL}/set/${encodeURIComponent(key)}`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${KV_TOKEN}` },
-      body: JSON.stringify(val),
-    }).catch(() => {});
-  } catch {
-    /* ignore */
-  }
-}
 
   syncCloudProgress();
 }
@@ -192,39 +176,49 @@ export function notifyStateChange(changeType, detail) {
 }
 
 export async function syncCloudProgress() {
+  const username = state.user?.username;
+  if (!username) return;
+
   try {
-    const sKey = getStudiedKey();
-    const seKey = getSeenKey();
-    const remoteStudied = await kvGet(sKey);
-    const remoteSeen = await kvGet(seKey);
+    const studiedResult = await syncEngine.syncSet(
+      username,
+      "studied",
+      state.studied,
+      getStudiedKey()
+    );
+    const seenResult = await syncEngine.syncSet(
+      username,
+      "seen",
+      state.seen,
+      getSeenKey()
+    );
+    const checklistResult = await syncEngine.syncSet(
+      username,
+      "checklist",
+      state.checklist,
+      getChecklistKey()
+    );
 
     let changed = false;
-
-    if (Array.isArray(remoteStudied)) {
-      const nextStudied = new Set(remoteStudied);
-      if (nextStudied.size !== state.studied.size || [...nextStudied].some((id) => !state.studied.has(id))) {
-        state.studied = nextStudied;
-        changed = true;
-      }
+    if (studiedResult.changed) {
+      state.studied = studiedResult.set;
+      changed = true;
     }
-
-    if (Array.isArray(remoteSeen)) {
-      const nextSeen = new Set(remoteSeen);
-      if (nextSeen.size !== state.seen.size || [...nextSeen].some((id) => !state.seen.has(id))) {
-        state.seen = nextSeen;
-        changed = true;
-      }
+    if (seenResult.changed) {
+      state.seen = seenResult.set;
+      changed = true;
     }
-
-    try {
-      localStorage.setItem(sKey, JSON.stringify([...state.studied]));
-      localStorage.setItem(seKey, JSON.stringify([...state.seen]));
-    } catch { /* ignore */ }
+    if (checklistResult.changed) {
+      state.checklist = checklistResult.set;
+      changed = true;
+    }
 
     if (changed) {
       notifyStateChange("cloudSync");
     }
-  } catch { /* ignore */ }
+  } catch (err) {
+    console.warn("Cloud sync error:", err);
+  }
 }
 
 export function persistSeen() {
@@ -233,7 +227,9 @@ export function persistSeen() {
   try {
     localStorage.setItem(seKey, JSON.stringify(arr));
   } catch { /* ignore */ }
-  kvSet(seKey, arr);
+  if (state.user?.username) {
+    syncEngine.kvSet(syncEngine.getKey(state.user.username, "seen"), arr);
+  }
 }
 
 export function persistStudied() {
@@ -242,15 +238,20 @@ export function persistStudied() {
   try {
     localStorage.setItem(sKey, JSON.stringify(arr));
   } catch { /* ignore */ }
-  kvSet(sKey, arr);
+  if (state.user?.username) {
+    syncEngine.kvSet(syncEngine.getKey(state.user.username, "studied"), arr);
+  }
 }
 
 export function persistChecklist() {
+  const chKey = getChecklistKey();
   const arr = [...state.checklist];
   try {
-    localStorage.setItem(CHECKLIST_KEY, JSON.stringify(arr));
+    localStorage.setItem(chKey, JSON.stringify(arr));
   } catch { /* ignore */ }
-  kvSet(CHECKLIST_KEY, arr);
+  if (state.user?.username) {
+    syncEngine.kvSet(syncEngine.getKey(state.user.username, "checklist"), arr);
+  }
 }
 
 export function isChecklistChecked(id) {
