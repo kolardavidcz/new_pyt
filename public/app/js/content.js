@@ -2,7 +2,7 @@
 
 import {
   state, pagesFor, slideDiff, weekVisibleItems, filteredItems, markSeen,
-  isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setPrintTheme,
+  isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot } from "./highlight.js";
@@ -1407,15 +1407,15 @@ export function showLogin() {
         </div>
 
         <div class="sync-status-card" style="margin-top:12px;">
-          <div class="sync-status-icon">🖨️</div>
+          <div class="sync-status-icon">💻</div>
           <div class="sync-status-text" style="flex:1;">
-            <strong>Tiskové Téma (Print & PDF Theme)</strong>
-            <p class="desc">Nastavte barevný vzhled stránek a kódů při tisku do PDF nebo na tiskárnu.</p>
+            <strong>Code block color (Při tisku / In print)</strong>
+            <p class="desc">Barevný vzhled pouze kódových bloků při tisku. Celá stránka a texty zůstávají vždy v čistém světlém režimu (bílý papír).</p>
           </div>
-          <div style="min-width:180px;">
-            <select id="selectPrintThemeSetting" class="sort-select" style="height:32px;font-size:12px;padding:0 8px;width:100%;">
-              <option value="light" ${state.printTheme === "light" ? "selected" : ""}>☀️ Světlé téma (Light)</option>
-              <option value="dark" ${state.printTheme === "dark" ? "selected" : ""}>🌙 Tmavé téma (Dark #181818)</option>
+          <div style="min-width:160px;">
+            <select id="selectCodeBlockColor" class="sort-select" style="height:32px;font-size:12px;padding:0 8px;width:100%;">
+              <option value="dark" ${state.codeBlockColor === "dark" ? "selected" : ""}>Dark code (VS Code #1e1e1e)</option>
+              <option value="light" ${state.codeBlockColor === "light" ? "selected" : ""}>Light code (#f8f9fa)</option>
             </select>
           </div>
         </div>
@@ -1442,8 +1442,8 @@ export function showLogin() {
       }, 1000);
     });
 
-    document.getElementById("selectPrintThemeSetting")?.addEventListener("change", (e) => {
-      setPrintTheme(e.target.value);
+    document.getElementById("selectCodeBlockColor")?.addEventListener("change", (e) => {
+      setCodeBlockColor(e.target.value);
     });
 
     document.getElementById("btnPageSwitchAccount")?.addEventListener("click", () => {

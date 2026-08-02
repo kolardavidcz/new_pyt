@@ -16,6 +16,7 @@ import {
   cpSync,
   existsSync,
   mkdirSync,
+  readFileSync,
   readdirSync,
   rmSync,
   statSync,
@@ -87,6 +88,77 @@ optionalCopyDir(join(".old", "cjs"), "cjs");
 optionalCopyDir(join(".old", "vyuka_downloaded"), "vyuka_downloaded");
 optionalCopyDir("cjs", "cjs");
 optionalCopyDir("vyuka_downloaded", "vyuka_downloaded");
+
+// ── Build Optimization: CSS Bundling, Minification & JSON Compression ─
+
+function minifyCss(content) {
+  return content
+    .replace(/\/\*[\s\S]*?\*\//g, "") // Strip CSS comments
+    .replace(/\s+/g, " ")             // Collapse whitespace
+    .replace(/\s*([\{\}:;,])\s*/g, "$1") // Strip spaces around syntax characters
+    .replace(/;\}/g, "}")            // Strip trailing semicolons before closing brace
+    .trim();
+}
+
+function minifyJsonFile(filePath) {
+  try {
+    const raw = readFileSync(filePath, "utf8");
+    const json = JSON.parse(raw);
+    writeFileSync(filePath, JSON.stringify(json), "utf8");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function processOptimizations() {
+  console.log("  ⚡ Running build optimizations & minification …");
+  let minifiedJsonCount = 0;
+  let cssBytesSaved = 0;
+
+  // 1. Minify JSON files in data/
+  const dataDir = join(PUB, "data");
+  if (existsSync(dataDir)) {
+    const walkJson = (d) => {
+      for (const name of readdirSync(d)) {
+        const p = join(d, name);
+        if (statSync(p).isDirectory()) {
+          walkJson(p);
+        } else if (name.endsWith(".json")) {
+          if (minifyJsonFile(p)) minifiedJsonCount++;
+        }
+      }
+    };
+    walkJson(dataDir);
+  }
+
+  // 2. Bundle & Minify CSS files in app/css/
+  const cssDir = join(PUB, "app", "css");
+  if (existsSync(cssDir)) {
+    const cssFiles = ["tokens.css", "shell.css", "syntax.css", "content.css", "print.css"];
+    let bundledContent = "";
+
+    for (const f of cssFiles) {
+      const p = join(cssDir, f);
+      if (existsSync(p)) {
+        const raw = readFileSync(p, "utf8");
+        const minified = minifyCss(raw);
+        cssBytesSaved += (raw.length - minified.length);
+        writeFileSync(p, minified, "utf8");
+        bundledContent += minified + "\n";
+      }
+    }
+
+    // Write minified combined bundle
+    writeFileSync(join(cssDir, "bundle.min.css"), bundledContent.trim(), "utf8");
+    console.log(`  ✓ Bundled & minified ${cssFiles.length} CSS files into public/app/css/bundle.min.css`);
+  }
+
+  console.log(`  ✓ Minified ${minifiedJsonCount} JSON data files`);
+  console.log(`  ✓ Saved ${(cssBytesSaved / 1024).toFixed(1)} KB of CSS payload`);
+}
+
+processOptimizations();
 
 // Root index so `/` works without rewrites (rewrites still set as backup)
 if (existsSync(join(PUB, "app", "index.html"))) {
