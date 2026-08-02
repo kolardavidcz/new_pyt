@@ -177,21 +177,39 @@ const PINNED_HOME = {
   pinned: true,
 };
 
-/** Ensure the Welcome tab always exists as the first tab. */
-function ensurePinnedHome() {
-  const existing = state.tabs.find((t) => t.id === "home");
-  if (!existing) {
-    state.tabs.unshift({ ...PINNED_HOME });
-  } else if (state.tabs[0]?.id !== "home") {
-    state.tabs = [existing, ...state.tabs.filter((t) => t.id !== "home")];
-    existing.pinned = true;
-  } else {
-    existing.pinned = true;
+const PINNED_PROGRESS = {
+  id: "progress",
+  kind: "progress",
+  title: "Progress",
+  itemId: null,
+  weekId: null,
+  pageId: null,
+  pinned: true,
+};
+
+/** Ensure the Welcome (1st) and Progress (2nd) tabs always exist as pinned tabs. */
+function ensurePinnedTabs() {
+  let home = state.tabs.find((t) => t.id === "home");
+  if (!home) {
+    home = { ...PINNED_HOME };
+    state.tabs.unshift(home);
   }
+  home.pinned = true;
+
+  let progress = state.tabs.find((t) => t.id === "progress");
+  if (!progress) {
+    progress = { ...PINNED_PROGRESS };
+    state.tabs.splice(1, 0, progress);
+  }
+  progress.pinned = true;
+
+  // Preserve order: [home, progress, ...unpinned]
+  const others = state.tabs.filter((t) => t.id !== "home" && t.id !== "progress");
+  state.tabs = [home, progress, ...others];
 }
 
 function ensureTab(target) {
-  ensurePinnedHome();
+  ensurePinnedTabs();
   const kind = target.kind;
   let id, title, itemId, weekId, pageId, tabKind;
 
@@ -256,25 +274,21 @@ function ensureTab(target) {
       itemId: itemId || null,
       weekId: weekId || null,
       pageId: pageId || null,
-      pinned: id === "home",
+      pinned: id === "home" || id === "progress",
     };
-    // Cap unpinned tabs (keep Welcome pinned at index 0)
-    const unpinned = state.tabs.filter((t) => t.id !== "home");
+    // Cap unpinned tabs
+    const unpinned = state.tabs.filter((t) => t.id !== "home" && t.id !== "progress");
     if (unpinned.length >= 13) {
       const drop = unpinned[0];
       state.tabs = state.tabs.filter((t) => t.id !== drop.id);
     }
-    if (id === "home") {
-      state.tabs.unshift(tab);
-    } else {
-      state.tabs.push(tab);
-    }
-    ensurePinnedHome();
+    state.tabs.push(tab);
+    ensurePinnedTabs();
   } else {
     tab.title = title;
     tab.pageId = pageId || tab.pageId;
     tab.kind = tabKind;
-    if (id === "home") tab.pinned = true;
+    if (id === "home" || id === "progress") tab.pinned = true;
   }
   return tab;
 }
@@ -284,9 +298,9 @@ function activateTab(tabId) {
 }
 
 export function closeTab(tabId) {
-  // Welcome is pinned — never close
-  if (tabId === "home") {
-    navigate({ kind: "home" });
+  // Pinned tabs — never close
+  if (tabId === "home" || tabId === "progress") {
+    navigate({ kind: tabId });
     return;
   }
   const i = state.tabs.findIndex((t) => t.id === tabId);
@@ -294,7 +308,7 @@ export function closeTab(tabId) {
   const tab = state.tabs[i];
   if (tab.pinned) return;
   state.tabs.splice(i, 1);
-  ensurePinnedHome();
+  ensurePinnedTabs();
   if (state.activeTabId === tabId) {
     const next = state.tabs[i] || state.tabs[i - 1] || state.tabs[0] || null;
     if (next) {
@@ -326,13 +340,13 @@ export function renderTabs() {
   const list = document.getElementById("tabsList");
   if (!list) return;
   clear(list);
-  ensurePinnedHome();
+  ensurePinnedTabs();
 
   for (const tab of state.tabs) {
     const btn = document.createElement("button");
     btn.type = "button";
     const isActive = tab.id === state.activeTabId;
-    const isPinned = tab.pinned || tab.id === "home";
+    const isPinned = tab.pinned || tab.id === "home" || tab.id === "progress";
     btn.className = "tab"
       + (isActive ? " active" : "")
       + (isPinned ? " tab-pinned" : "");
