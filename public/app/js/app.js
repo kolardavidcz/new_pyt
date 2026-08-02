@@ -244,8 +244,14 @@ function bindChrome() {
   });
 
   document.getElementById("btnSidebarToggle")?.addEventListener("click", toggleSidebar);
+  document.getElementById("btnCloseSidebar")?.addEventListener("click", () => {
+    if (state.sidebarOpen) toggleSidebar();
+  });
   document.getElementById("btnExpandAll")?.addEventListener("click", expandAll);
-  document.getElementById("btnCollapseAll")?.addEventListener("click", collapseAll);
+  document.getElementById("btnCollapseAll")?.addEventListener("click", () => {
+    collapseAll();
+    if (state.sidebarOpen) toggleSidebar();
+  });
 
   // Filters
   const text = document.getElementById("filterText");
@@ -299,6 +305,12 @@ function bindChrome() {
   // Keyboard
   document.addEventListener("keydown", (e) => {
     const meta = e.ctrlKey || e.metaKey;
+    if (meta && e.shiftKey && e.key.toLowerCase() === "p") {
+      e.preventDefault();
+      if (isPaletteOpen()) closePalette();
+      else openPalette();
+      return;
+    }
     if (meta && e.key.toLowerCase() === "p") {
       e.preventDefault();
       triggerPrint();
@@ -449,6 +461,7 @@ function setView(view) {
 
 function toggleSidebar() {
   state.sidebarOpen = !state.sidebarOpen;
+  try { localStorage.setItem("pcs-sidebar-open", JSON.stringify(state.sidebarOpen)); } catch { /* */ }
   const wb = document.getElementById("workbench");
   wb?.classList.toggle("sidebar-collapsed", !state.sidebarOpen);
   // Inline grid from resize must not fight the collapsed class
