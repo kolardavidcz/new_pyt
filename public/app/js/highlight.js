@@ -186,15 +186,15 @@ function highlightGeneric(code, opts) {
       continue;
     }
 
-    // identifiers / keywords
-    if (/[A-Za-z_]/.test(ch)) {
+    // identifiers / keywords / constants / types (with full Czech character support)
+    if (/[a-zA-Z\u00C0-\u024F_]/.test(ch)) {
       let j = i + 1;
-      while (j < n && /[A-Za-z0-9_]/.test(code[j])) j++;
+      while (j < n && /[a-zA-Z0-9\u00C0-\u024F_\-]/.test(code[j])) j++;
       const word = code.slice(i, j);
       if (keywords.has(word)) out += span("keyword", word);
       else if (builtins.has(word)) out += span("builtin", word);
-      else if (/^[A-Z][A-Z0-9_]+$/.test(word)) out += span("constant", word);
-      else if (/^[A-Z][A-Za-z0-9_]*$/.test(word)) out += span("type", word);
+      else if (/^[A-Z\u00C0-\u024F][A-Z0-9\u00C0-\u024F_\-]+$/.test(word)) out += span("constant", word);
+      else if (/^[A-Z\u00C0-\u024F][a-zA-Z0-9\u00C0-\u024F_]*$/.test(word)) out += span("type", word);
       else {
         // function call?
         let k = j;
@@ -349,13 +349,42 @@ function highlightCode(code, lang) {
   }
 }
 
+export function trimBlankLines(text) {
+  if (!text) return "";
+  const lines = text.split("\n");
+  while (lines.length > 0 && lines[0].trim().length === 0) {
+    lines.shift();
+  }
+  while (lines.length > 0 && lines[lines.length - 1].trim().length === 0) {
+    lines.pop();
+  }
+  return lines.join("\n");
+}
+
+export function dedentCode(text) {
+  if (!text) return "";
+  text = trimBlankLines(text);
+  const lines = text.split("\n");
+  let minIndent = Infinity;
+  for (const line of lines) {
+    if (line.trim().length === 0) continue;
+    const match = line.match(/^[ \t]*/);
+    const indent = match ? match[0].length : 0;
+    if (indent < minIndent) minIndent = indent;
+  }
+  if (minIndent > 0 && minIndent !== Infinity) {
+    return lines
+      .map((line) => (line.length >= minIndent ? line.slice(minIndent) : line))
+      .join("\n");
+  }
+  return text;
+}
+
 function getCodeText(pre) {
   // Prefer raw text; strip syntaxhighlighter leftovers if any
   const code = pre.querySelector("code");
   let text = code ? code.textContent : pre.textContent;
-  // Normalize leading/trailing blank lines lightly
-  text = text.replace(/^\n+/, "").replace(/\n+$/, "\n");
-  return text;
+  return dedentCode(text);
 }
 
 /**
@@ -372,7 +401,7 @@ export function highlightRoot(root) {
     if (pre.classList.contains("syntaxhighlighter")) {
       const lines = [...pre.querySelectorAll(".line .code .content, .container .line")];
       if (lines.length) {
-        const text = lines.map((l) => l.textContent).join("\n");
+        const text = dedentCode(lines.map((l) => l.textContent).join("\n"));
         const lang = detectLang(pre);
         pre.className = `code-block lang-${lang}`;
         pre.innerHTML = `<code>${highlightCode(text, lang)}</code>`;
