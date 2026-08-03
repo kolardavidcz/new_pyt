@@ -35,6 +35,10 @@ const TESTS = [
   // ── 1. PRINT MODE DOCUMENT (Paper = #FFFFFF) ───────────────────────────
   { category: "Print Mode", label: "Print Headings (#000000 on White)", fg: "#000000", bg: "#ffffff", target: 7.0 },
   { category: "Print Mode", label: "Print Body Text (#111827 on White)", fg: "#111827", bg: "#ffffff", target: 7.0 },
+  { category: "Print Mode", label: "Print Bold Text [strong/b] (#000000 on White)", fg: "#000000", bg: "#ffffff", target: 7.0 },
+  { category: "Print Mode", label: "Print Italic Text [em/i] (#111827 on White)", fg: "#111827", bg: "#ffffff", target: 7.0 },
+  { category: "Print Mode", label: "Print Subscript/Superscript [sub/sup] (#111827 on White)", fg: "#111827", bg: "#ffffff", target: 7.0 },
+  { category: "Print Mode", label: "Print Highlighted Text [mark] (#000000 on #FEF08A)", fg: "#000000", bg: "#fef08a", target: 7.0 },
   { category: "Print Mode", label: "Print Note Callout Text (#111827 on #F3F4F6)", fg: "#111827", bg: "#f3f4f6", target: 7.0 },
   { category: "Print Mode", label: "Print Lecture Description (#111827 on White)", fg: "#111827", bg: "#ffffff", target: 7.0 },
   { category: "Print Mode", label: "Print C++/Java Comparison Text (#111827 on White)", fg: "#111827", bg: "#ffffff", target: 7.0 },
@@ -60,16 +64,21 @@ const TESTS = [
 
   // ── 4. DARK UI SCREEN THEME (Editor Surface = #1F1F1F, Surface = #181818) ─
   { category: "Dark UI Screen", label: "Dark UI Main Text (#CCCCCC on #1F1F1F)", fg: "#cccccc", bg: "#1f1f1f", target: 7.0 },
-  { category: "Dark UI Screen", label: "Dark UI Bright Text (#E8E8E8 on #1F1F1F)", fg: "#e8e8e8", bg: "#1f1f1f", target: 7.0 },
+  { category: "Dark UI Screen", label: "Dark UI Bold Text [strong/b] (#E8E8E8 on #1F1F1F)", fg: "#e8e8e8", bg: "#1f1f1f", target: 7.0 },
+  { category: "Dark UI Screen", label: "Dark UI Inline Code Pill (#DCDCAA on #2D2D2D)", fg: "#dcdcaa", bg: "#2d2d2d", target: 4.5 },
+  { category: "Dark UI Screen", label: "Dark UI Note Callout Text (#CCCCCC on #1E293B)", fg: "#cccccc", bg: "#1e293b", target: 7.0 },
   { category: "Dark UI Screen", label: "Dark UI Muted Text (#9D9D9D on #1F1F1F)", fg: "#9d9d9d", bg: "#1f1f1f", target: 4.5 },
   { category: "Dark UI Screen", label: "Dark UI Faint Text (#A0A0A0 on #181818)", fg: "#a0a0a0", bg: "#181818", target: 4.5 },
-  { category: "Dark UI Screen", label: "Dark UI Accent Link (#0078D4 on #1F1F1F)", fg: "#38bdf8", bg: "#1f1f1f", target: 4.5 },
+  { category: "Dark UI Screen", label: "Dark UI Accent Link (#38BDF8 on #1F1F1F)", fg: "#38bdf8", bg: "#1f1f1f", target: 4.5 },
   { category: "Dark UI Screen", label: "Dark UI Tag Core (#4EC9B0 on #181818)", fg: "#4ec9b0", bg: "#181818", target: 4.5 },
   { category: "Dark UI Screen", label: "Dark UI Tag WOW (#DCDCAA on #181818)", fg: "#dcdcaa", bg: "#181818", target: 4.5 },
   { category: "Dark UI Screen", label: "Dark UI Tag Legendary (#C586C0 on #181818)", fg: "#c586c0", bg: "#181818", target: 4.5 },
 
   // ── 5. LIGHT UI SCREEN THEME (Editor Surface = #FFFFFF, Surface = #F3F3F3) ─
   { category: "Light UI Screen", label: "Light UI Main Text (#1F2937 on White)", fg: "#1f2937", bg: "#ffffff", target: 7.0 },
+  { category: "Light UI Screen", label: "Light UI Bold Text [strong/b] (#000000 on White)", fg: "#000000", bg: "#ffffff", target: 7.0 },
+  { category: "Light UI Screen", label: "Light UI Inline Code Pill (#8B1014 on #F3F4F6)", fg: "#8b1014", bg: "#f3f4f6", target: 4.5 },
+  { category: "Light UI Screen", label: "Light UI Note Callout Text (#111827 on #EFF6FF)", fg: "#111827", bg: "#eff6ff", target: 7.0 },
   { category: "Light UI Screen", label: "Light UI Muted Text (#4B5563 on White)", fg: "#4b5563", bg: "#ffffff", target: 4.5 },
   { category: "Light UI Screen", label: "Light UI Accent Link (#007ACC on White)", fg: "#007acc", bg: "#ffffff", target: 4.5 },
 ];
