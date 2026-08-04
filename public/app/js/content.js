@@ -420,6 +420,8 @@ export async function showPage(itemId, pageId) {
       main.innerHTML = `<div class="error-box">Page <code>${escapeHtml(pageId)}</code> not found in lecture.</div>`;
       return;
     }
+    const subTitle = page.title || pageId;
+    document.title = `${subTitle} — ${item.title} · Python Hub`;
 
     const hero = lectureHero(item, { compact: true });
     main.appendChild(hero);
@@ -970,9 +972,13 @@ function printTier(level) {
   document.body.appendChild(output);
   document.body.classList.add("printing-tier");
 
+  const prevTitle = document.title;
+  document.title = `Python Study Plan — ${tier.label}`;
+
   window.addEventListener("afterprint", function cleanup() {
     document.body.classList.remove("printing-tier");
     output.remove();
+    document.title = prevTitle;
     window.removeEventListener("afterprint", cleanup);
   }, { once: true });
 
