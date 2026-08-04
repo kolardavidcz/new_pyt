@@ -421,7 +421,7 @@ export async function showPage(itemId, pageId) {
       return;
     }
     const subTitle = page.title || pageId;
-    document.title = `${subTitle} — ${item.title} · Python Hub`;
+    document.title = item.weekNum != null ? `W${item.weekNum} • ${subTitle}` : `newpyt • ${subTitle}`;
 
     const hero = lectureHero(item, { compact: true });
     main.appendChild(hero);

@@ -488,54 +488,29 @@ function updateChrome(tab) {
   const sbPath = document.getElementById("sbPath");
   let path = "python-course";
   let pageTitle = "C/Java → Python";
-  let docTitle = "Python Hub · VSČHT Praha";
+  let docTitle = "newpyt · VSČHT Praha";
 
   if (!tab || tab.kind === "home") {
     pageTitle = "Welcome";
-    docTitle = "Python Hub · VSČHT Praha";
-  } else if (tab.kind === "week") {
-    const w = state.weeksById.get(tab.weekId);
-    path = tab.weekId;
-    pageTitle = w ? `Týden ${w.week}: ${w.title}` : tab.weekId;
-    docTitle = `${pageTitle} · Python Hub`;
-  } else if (tab.kind === "content") {
-    const item = state.itemsById.get(tab.itemId);
+    docTitle = "newpyt · VSČHT Praha";
+  } else {
+    const item = tab.itemId ? state.itemsById.get(tab.itemId) : null;
     if (item) path = item.path;
-    pageTitle = item?.title || tab.itemId;
-    docTitle = `${pageTitle} · Python Hub`;
-  } else if (tab.kind === "presentation") {
-    const item = state.itemsById.get(tab.itemId);
-    if (item) path = item.path;
-    pageTitle = item ? `${item.title} (Prezentace)` : tab.itemId;
-    docTitle = `${pageTitle} · Python Hub`;
-  } else if (tab.kind === "page") {
-    const item = state.itemsById.get(tab.itemId);
-    if (item) path = item.path;
-    const pages = item ? (state.pagesIndex[item.path] || []) : [];
-    const pageObj = pages.find((x) => x.id === tab.pageId);
-    const exData = item ? state.exercises[item.path] : null;
-    const taskObj = exData?.tasks?.find((t) => t.id === tab.pageId);
+    else if (tab.weekId) path = tab.weekId;
+    else if (tab.kind === "search" || tab.kind === "progress" || tab.kind === "login") path = tab.kind;
 
-    let subTitle = pageObj?.title;
-    if (!subTitle && taskObj) {
-      subTitle = taskObj.title + (taskObj.summary ? `: ${taskObj.summary}` : "");
+    const w = tab.weekId ? state.weeksById.get(tab.weekId) : (item?.weekNum != null ? state.weeksById.get(item.weekId) : null);
+    const weekNum = item?.weekNum ?? w?.week;
+
+    const tabTitle = tab.title || "newpyt";
+    const cleanTabTitle = tabTitle.replace(/^W\d+:\s*/, "");
+    pageTitle = cleanTabTitle;
+
+    if (weekNum != null) {
+      docTitle = `W${weekNum} • ${cleanTabTitle}`;
+    } else {
+      docTitle = `newpyt • ${cleanTabTitle}`;
     }
-    if (!subTitle) subTitle = tab.pageId;
-
-    pageTitle = item ? `${subTitle} · ${item.title}` : subTitle;
-    docTitle = item ? `${subTitle} — ${item.title} · Python Hub` : `${subTitle} · Python Hub`;
-  } else if (tab.kind === "search") {
-    path = "search";
-    pageTitle = "Vyhledávání";
-    docTitle = "Vyhledávání · Python Hub";
-  } else if (tab.kind === "progress") {
-    path = "progress";
-    pageTitle = "Progress";
-    docTitle = "Přehled pokroku · Python Hub";
-  } else if (tab.kind === "login") {
-    path = "login";
-    pageTitle = "Přihlášení / Profil";
-    docTitle = "Přihlášení · Python Hub";
   }
 
   document.title = docTitle;
