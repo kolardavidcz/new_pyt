@@ -301,7 +301,7 @@ function highlightXmlRaw(code) {
   return out;
 }
 
-function highlightCode(code, lang) {
+export function highlightCode(code, lang) {
   switch (lang) {
     case "python":
       return highlightGeneric(code, {

@@ -5,7 +5,7 @@ import {
   isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
-import { highlightRoot } from "./highlight.js";
+import { highlightRoot, highlightCode, dedentCode } from "./highlight.js";
 import { renderTree } from "./tree.js";
 
 export function setLoading(on) {
@@ -474,6 +474,7 @@ export async function showPage(itemId, pageId) {
 
     const slideEl = renderSlide(page, item, idx >= 0 ? idx + 1 : 1);
     main.appendChild(slideEl);
+    await loadAndInlineExamples(slideEl);
     highlightRoot(slideEl);
     main.appendChild(buildBottomNavBar(item));
   } catch (err) {
@@ -500,7 +501,7 @@ export async function showFullContent(itemId) {
   if (item.kind === "exercise") {
     const structured = state.exercises[item.path];
     if (structured && structured.tasks?.length) {
-      renderExerciseView(item, structured, main);
+      await renderExerciseView(item, structured, main);
       return;
     }
   }
@@ -514,7 +515,7 @@ export async function showFullContent(itemId) {
 /**
  * Structured exercise view: separated úkol cards with prompt / hint / solution.
  */
-function renderExerciseView(item, data, main) {
+async function renderExerciseView(item, data, main) {
   main.className = "lecture-view exercise-view";
 
   const hero = lectureHero(item);
@@ -560,6 +561,7 @@ function renderExerciseView(item, data, main) {
     list.appendChild(renderTaskCard(task, item));
   }
   main.appendChild(list);
+  await loadAndInlineExamples(list);
   highlightRoot(list);
   main.appendChild(buildBottomNavBar(item));
 }
@@ -655,6 +657,7 @@ async function loadFullContent(item, main) {
       frag.appendChild(node);
     });
     main.appendChild(frag);
+    await loadAndInlineExamples(main);
     for (const node of nodes) highlightRoot(node);
     main.appendChild(buildBottomNavBar(item));
   } catch (err) {
@@ -821,23 +824,53 @@ function rewriteContentUrls(html, lecturePath) {
     if (!src || /^(https?:|data:|\/|#)/i.test(src)) return;
     node.setAttribute("src", baseUrl + src.replace(/^\.\//, ""));
   });
+
   wrap.querySelectorAll("[href]").forEach((node) => {
     const href = node.getAttribute("href");
     if (!href || /^(https?:|mailto:|data:|\/|#)/i.test(href)) return;
-    if (href.endsWith(".html") || href.endsWith(".xml")) {
-      node.setAttribute("href", baseUrl + href.replace(/^\.\//, ""));
-    }
+    node.setAttribute("href", baseUrl + href.replace(/^\.\//, ""));
   });
 
   wrap.querySelectorAll("example").forEach((ex) => {
     const src = ex.getAttribute("src") || "";
+    let lang = ex.getAttribute("lang") || "python";
+    if (src.endsWith(".out") || src.endsWith(".txt")) lang = "plain";
+
+    const fullUrl = /^(https?:|\/)/i.test(src) ? src : baseUrl + src.replace(/^\.\//, "");
     const pre = document.createElement("pre");
-    pre.className = "brush: python";
-    pre.innerHTML = `<code># example: ${escapeHtml(src)}\n# (source file not inlined in shell)</code>`;
+    pre.className = `code-block lang-${lang}`;
+    pre.dataset.exampleSrc = fullUrl;
+    pre.dataset.exampleLang = lang;
+    pre.innerHTML = `<code># Loading ${escapeHtml(src)}…</code>`;
     ex.replaceWith(pre);
   });
 
   return wrap.innerHTML;
+}
+
+export async function loadAndInlineExamples(root) {
+  if (!root) return;
+  const examplePres = root.querySelectorAll("pre[data-example-src]");
+  if (!examplePres.length) return;
+
+  await Promise.all(
+    [...examplePres].map(async (pre) => {
+      const url = pre.dataset.exampleSrc;
+      const lang = pre.dataset.exampleLang || "python";
+      try {
+        const res = await fetch(url, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        const formatted = dedentCode(text);
+        pre.innerHTML = `<code>${highlightCode(formatted, lang)}</code>`;
+        pre.dataset.hl = "1";
+        delete pre.dataset.exampleSrc;
+      } catch (err) {
+        const code = pre.querySelector("code") || pre;
+        code.textContent = `# example file: ${url}\n# (${err.message})`;
+      }
+    })
+  );
 }
 
 /* ── Search / progress ─────────────────────────────────── */
