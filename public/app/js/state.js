@@ -518,3 +518,11 @@ export function slideDiff(slug, pageId) {
   if (!entry) return null;
   return typeof entry === "string" ? entry : entry.diff || null;
 }
+
+export function slideTags(slug, pageId) {
+  const key = `${slug}#${pageId}`;
+  const entry = state.slides[key];
+  if (!entry || typeof entry === "string") return [];
+  return entry.tags || [];
+}
+

@@ -1,7 +1,7 @@
 /** Content loading: catalog views + lecture HTML extraction */
 
 import {
-  state, pagesFor, slideDiff, weekVisibleItems, filteredItems, markSeen,
+  state, pagesFor, slideDiff, slideTags, weekVisibleItems, filteredItems, markSeen,
   isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
@@ -221,12 +221,14 @@ function lectureToolbar(item, mode) {
     }, "Open full lecture"));
   }
 
-  bar.appendChild(el("button", {
+  const printBtn = el("button", {
     type: "button",
     className: "btn btn-print",
-    title: "Print or export to PDF",
+    title: "Tisk 2-UP / Export do PDF",
     onClick: () => window.print(),
-  }, "Tisk 🖨"));
+  });
+  printBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M6 9V4h12v5" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><rect x="6" y="14" width="5" height="7" rx="0.5" /><rect x="13" y="14" width="5" height="7" rx="0.5" /></svg>Tisk 2-UP`;
+  bar.appendChild(printBtn);
 
   // Pinned right after Tisk 🖨: Mark studied button
   const studied = isStudied(item.id);
@@ -354,6 +356,7 @@ export async function showPresentation(itemId) {
     const list = el("div", { className: "page-list" });
     pages.forEach((p, i) => {
       const diff = slideDiff(item.slug, p.id);
+      const tags = slideTags(item.slug, p.id);
       const row = el("button", {
         type: "button",
         className: "page-row",
@@ -362,6 +365,7 @@ export async function showPresentation(itemId) {
       row.innerHTML = `
         <span class="page-num">${String(i + 1).padStart(2, "0")}</span>
         <span class="page-title">${escapeHtml(p.title)}</span>
+        ${badgesHtml(tags)}
         ${diff ? flavorHtml(diff) : ""}
       `;
       list.appendChild(row);
@@ -455,11 +459,13 @@ export async function showPage(itemId, pageId) {
       title: "Celá obrazovka (F)",
       onClick: () => toggleFullscreen(),
     }, "Celá obrazovka ⛶"));
-    nav.appendChild(el("button", {
+    const presPrintBtn = el("button", {
       type: "button", className: "btn btn-print",
-      title: "Tisk slajdu / přednášky",
+      title: "Tisk 2-UP / Export do PDF",
       onClick: () => window.print(),
-    }, "Tisk 🖨"));
+    });
+    presPrintBtn.innerHTML = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><path d="M6 9V4h12v5" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><rect x="6" y="14" width="5" height="7" rx="0.5" /><rect x="13" y="14" width="5" height="7" rx="0.5" /></svg>Tisk 2-UP`;
+    nav.appendChild(presPrintBtn);
 
     if (pages.length) {
       const pos = el("span", {
@@ -580,16 +586,29 @@ function renderTaskCard(task, item) {
   const tS = task.technical_score ?? 1;
   const lS = task.logical_score ?? 1;
   const reason = task.challenge_reason || "";
+  const taskTags = task.tags?.length ? task.tags : (item.tags || []);
 
   const head = el("header", { className: "task-card-head" });
   head.innerHTML = `
     <span class="task-num">Úkol ${task.num}</span>
     <h2 class="task-title">${escapeHtml(task.title)}</h2>
+    ${badgesHtml(taskTags)}
     <div class="task-scores" title="${escapeHtml(reason)}">
       ${scoreBarHtml(tS, 5, "tech")}
       ${scoreBarHtml(lS, 5, "log")}
     </div>
   `;
+  const taskPrintBtn = el("button", {
+    type: "button",
+    className: "slide-print-btn",
+    title: `Tisk úkolu ${task.num} (${task.title})`,
+    onClick: (e) => {
+      e.stopPropagation();
+      printSingleSlide(card);
+    },
+  });
+  taskPrintBtn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V4h12v5" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><rect x="6" y="14" width="5" height="7" rx="0.5" /><rect x="13" y="14" width="5" height="7" rx="0.5" /></svg>`;
+  head.appendChild(taskPrintBtn);
   card.appendChild(head);
 
   const prompt = el("div", { className: "task-prompt slide-body" });
@@ -707,6 +726,7 @@ async function fetchAndExtractExercise(path) {
 
 function renderSlide(page, item, num) {
   const diff = slideDiff(item.slug, page.id);
+  const tags = slideTags(item.slug, page.id);
   const slide = el("article", {
     className: "slide",
     id: page.id,
@@ -715,12 +735,42 @@ function renderSlide(page, item, num) {
   header.innerHTML = `
     <span class="slide-num">${String(num).padStart(2, "0")}</span>
     <h2 class="slide-title">${escapeHtml(page.title)}</h2>
+    ${badgesHtml(tags)}
     ${diff ? flavorHtml(diff) : ""}
   `;
+  const slidePrintBtn = el("button", {
+    type: "button",
+    className: "slide-print-btn",
+    title: `Tisk slajdu ${num} (${page.title})`,
+    onClick: (e) => {
+      e.stopPropagation();
+      printSingleSlide(slide);
+    },
+  });
+  slidePrintBtn.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V4h12v5" /><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" /><rect x="6" y="14" width="5" height="7" rx="0.5" /><rect x="13" y="14" width="5" height="7" rx="0.5" /></svg>`;
+  header.appendChild(slidePrintBtn);
+
   const body = el("div", { className: "slide-body" });
   body.innerHTML = rewriteContentUrls(page.html, item.path);
   slide.append(header, body);
   return slide;
+}
+
+export function printSingleSlide(element) {
+  if (!element) { window.print(); return; }
+  document.querySelectorAll(".printing-single-slide").forEach((el) => {
+    el.classList.remove("printing-single-slide");
+  });
+  element.classList.add("printing-single-slide");
+  document.body.classList.add("printing-single-mode");
+
+  const cleanup = () => {
+    element.classList.remove("printing-single-slide");
+    document.body.classList.remove("printing-single-mode");
+    window.removeEventListener("afterprint", cleanup);
+  };
+  window.addEventListener("afterprint", cleanup);
+  window.print();
 }
 
 /* ── Fetch / extract ───────────────────────────────────── */
