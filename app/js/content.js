@@ -1,7 +1,7 @@
 /** Content loading: catalog views + lecture HTML extraction */
 
 import {
-  state, pagesFor, slideDiff, weekVisibleItems, filteredItems, markSeen,
+  state, pagesFor, slideDiff, slideTags, weekVisibleItems, filteredItems, markSeen,
   isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
@@ -354,6 +354,7 @@ export async function showPresentation(itemId) {
     const list = el("div", { className: "page-list" });
     pages.forEach((p, i) => {
       const diff = slideDiff(item.slug, p.id);
+      const tags = slideTags(item.slug, p.id);
       const row = el("button", {
         type: "button",
         className: "page-row",
@@ -362,6 +363,7 @@ export async function showPresentation(itemId) {
       row.innerHTML = `
         <span class="page-num">${String(i + 1).padStart(2, "0")}</span>
         <span class="page-title">${escapeHtml(p.title)}</span>
+        ${badgesHtml(tags)}
         ${diff ? flavorHtml(diff) : ""}
       `;
       list.appendChild(row);
@@ -580,11 +582,13 @@ function renderTaskCard(task, item) {
   const tS = task.technical_score ?? 1;
   const lS = task.logical_score ?? 1;
   const reason = task.challenge_reason || "";
+  const taskTags = task.tags?.length ? task.tags : (item.tags || []);
 
   const head = el("header", { className: "task-card-head" });
   head.innerHTML = `
     <span class="task-num">Úkol ${task.num}</span>
     <h2 class="task-title">${escapeHtml(task.title)}</h2>
+    ${badgesHtml(taskTags)}
     <div class="task-scores" title="${escapeHtml(reason)}">
       ${scoreBarHtml(tS, 5, "tech")}
       ${scoreBarHtml(lS, 5, "log")}
@@ -707,6 +711,7 @@ async function fetchAndExtractExercise(path) {
 
 function renderSlide(page, item, num) {
   const diff = slideDiff(item.slug, page.id);
+  const tags = slideTags(item.slug, page.id);
   const slide = el("article", {
     className: "slide",
     id: page.id,
@@ -715,6 +720,7 @@ function renderSlide(page, item, num) {
   header.innerHTML = `
     <span class="slide-num">${String(num).padStart(2, "0")}</span>
     <h2 class="slide-title">${escapeHtml(page.title)}</h2>
+    ${badgesHtml(tags)}
     ${diff ? flavorHtml(diff) : ""}
   `;
   const body = el("div", { className: "slide-body" });
