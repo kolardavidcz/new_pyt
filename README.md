@@ -70,25 +70,6 @@ node tools/check_contrast.mjs
 
 ---
 
-## 🐧 WSL2-First Development Workflow (`/wsl-first`)
-
-This project strictly enforces a **WSL2 (Ubuntu)** execution environment for all command-line operations, package management, and dev server execution.
-
-### Environment & Path Mapping
-| Environment / Action | Path Standard | Example Path |
-| :--- | :--- | :--- |
-| **Windows Explorer Drive B:** | `B:\` | `B:\_solved\python_overview` |
-| **WSL Linux Ext4 Mount** | Linux Path | `/mnt/b/_solved/python_overview` or `~/build_projects/...` |
-| **File Creation / Editing** | Windows UNC Path | `\\wsl.localhost\Ubuntu\home\kolar\...` |
-| **Terminal Commands** | WSL Command | `wsl bash -c "python serve.py 8765"` |
-
-### Toolchain Mandates
-- **Package Manager**: `pnpm` for Node.js scripts (`pnpm install`, `pnpm test`).
-- **Python Virtualenv**: `uv` (`uv venv`, `uv run <script>.py`).
-- **Line Endings**: STRICTLY Linux `LF` (`\n`) across all source code and JSON data stores to prevent git diff noise.
-
----
-
 ## 🏗️ Architecture & Technical Features
 
 ```
