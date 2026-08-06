@@ -17,11 +17,13 @@ let suppressHistory = false;
  * @param {{ replace?: boolean, skipHistory?: boolean }} [opts]
  */
 export function navigate(target, opts = {}) {
+  saveCurrentTabScroll();
   const tab = ensureTab(target);
   activateTab(tab.id);
   renderTabs();
   renderBreadcrumb(tab);
   renderView(tab);
+  restoreTabScroll(tab);
   updateChrome(tab);
 
   if (tab.itemId) {
@@ -35,6 +37,81 @@ export function navigate(target, opts = {}) {
   if (!opts.skipHistory && !suppressHistory) {
     pushHistory(targetToRoute(target), opts.replace);
   }
+}
+
+/* ── Tab Scroll Position Memory & Sync ──────────────────── */
+
+export function saveCurrentTabScroll() {
+  const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
+  const editorBody = document.querySelector(".editor-body");
+  if (!activeTab || !editorBody) return;
+
+  activeTab.scrollTop = editorBody.scrollTop;
+  if (activeTab.itemId) {
+    const maxScroll = editorBody.scrollHeight - editorBody.clientHeight;
+    if (maxScroll > 0) {
+      state.itemScrollRatios[activeTab.itemId] = editorBody.scrollTop / maxScroll;
+    }
+  }
+}
+
+export function restoreTabScroll(tab) {
+  if (!tab) return;
+
+  const performRestore = () => {
+    const editorBody = document.querySelector(".editor-body");
+    if (!editorBody) return;
+
+    let targetY = tab.scrollTop;
+
+    if ((targetY == null || targetY === 0) && tab.itemId && state.itemScrollRatios[tab.itemId] != null) {
+      const ratio = state.itemScrollRatios[tab.itemId];
+      const maxScroll = editorBody.scrollHeight - editorBody.clientHeight;
+      if (maxScroll > 0) {
+        targetY = Math.round(ratio * maxScroll);
+      }
+    }
+
+    if (targetY != null) {
+      editorBody.scrollTop = targetY;
+    }
+  };
+
+  requestAnimationFrame(performRestore);
+  setTimeout(performRestore, 60);
+  setTimeout(performRestore, 200);
+}
+
+let scrollTrackerBound = false;
+export function initScrollTracker() {
+  const editorBody = document.querySelector(".editor-body");
+  if (!editorBody || scrollTrackerBound) return;
+
+  let isTicking = false;
+  editorBody.addEventListener(
+    "scroll",
+    () => {
+      if (!isTicking) {
+        requestAnimationFrame(() => {
+          const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
+          if (activeTab) {
+            activeTab.scrollTop = editorBody.scrollTop;
+            if (activeTab.itemId) {
+              const maxScroll = editorBody.scrollHeight - editorBody.clientHeight;
+              if (maxScroll > 0) {
+                state.itemScrollRatios[activeTab.itemId] = editorBody.scrollTop / maxScroll;
+              }
+            }
+          }
+          isTicking = false;
+        });
+        isTicking = true;
+      }
+    },
+    { passive: true }
+  );
+
+  scrollTrackerBound = true;
 }
 
 /* ── History API (browser Back / Forward) ──────────────── */
