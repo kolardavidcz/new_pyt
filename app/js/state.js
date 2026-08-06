@@ -80,7 +80,10 @@ export const state = {
 
   /** Currently focused tree node key */
   focusedTreeKey: null,
-  
+
+  /** Cross-tab item scroll ratio memory: itemId → scrollRatio (0.0 to 1.0) */
+  itemScrollRatios: {},
+
   user: null,
 };
 

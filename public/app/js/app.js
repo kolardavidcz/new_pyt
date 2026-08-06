@@ -7,7 +7,7 @@ import {
   setUser, logoutUser, defaultUser, syncCloudProgress,
 } from "./state.js";
 import { renderTree, setTreeSelectHandler, expandAll, collapseAll } from "./tree.js";
-import { navigate, refreshActiveView, closeTab, initHistory, getInitialRoute } from "./router.js";
+import { navigate, refreshActiveView, closeTab, initHistory, getInitialRoute, initScrollTracker } from "./router.js";
 import { openPalette, closePalette, isPaletteOpen, initPalette, setPaletteHandler } from "./palette.js";
 import { toggleFullscreen, updatePageStudyButtons } from "./content.js";
 
@@ -45,6 +45,7 @@ async function boot() {
   window.__pcsUpdateStatus = updateStatus;
   window.__pcsState = state;
   initHistory();
+  initScrollTracker();
 
   // Tablet & Multi-device Auto-Sync (Focus, Tab Visibility & 30s Background Poll)
   window.addEventListener("focus", () => syncCloudProgress());
