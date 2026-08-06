@@ -7,19 +7,43 @@
 
 ---
 
-## 📸 Interface Screenshots
+## 📸 Interface Showcase & Screenshots
 
-### 1. VS Code Dark Modern Dashboard & Lecture Workspace
-![VS Code Dark Modern Dashboard](docs/screenshots/dashboard.png)
-*Interactive single-page application featuring the Explorer sidebar, multi-dimensional filters (tags, relevance meter, difficulty flavor), breadcrumb toolbar, and VS Code Dark+ syntax-highlighted code blocks.*
+### 1. Main Dashboard & Course Explorer
+![Main Dashboard & Course Explorer](docs/screenshots/1.png)
+*VS Code Dark Modern dashboard workspace featuring the Explorer sidebar with multi-dimensional filters (tag chips, relevance heat slider, difficulty flavors), course tree navigation, and week catalog grids.*
 
-### 2. A4 Printable Cumulative Study Plan PDF (`@media print`)
-![A4 Printable Study Plan PDF](docs/screenshots/print_plan.png)
-*High-contrast, 2-column side-by-side printable study plan generated via `window.print()` / `Ctrl+P`, compliant with WCAG 2.1 AAA contrast standards.*
+### 2. Progress & Study Tracking
+
+#### 2.1 Study Log & Level Progress Tracking
+![Study Log & Level Progress Tracking](docs/screenshots/2.1.png)
+*Study dashboard featuring the 4-level progress ring (`REPL tourist` to `Complete`), Core vs Dojo cumulative progress bars, 4-tier PDF print buttons (`Print: Pass`, `Print: Solid`, `Print: Advanced`, `Print: Complete`), and interactive study board tiles.*
+
+#### 2.2 Exercise Dojo & Homework Progress Matrix
+![Exercise Dojo & Homework Progress Matrix](docs/screenshots/2.2.png)
+*Detailed exercise tracking matrix breaking down weekly homework sets ("Rozcvička se syntaxí", "Číselné operace", "Práce s řetězci") with individual Úkol task lists and T/L difficulty scores.*
+
+### 3. Lecture & Presentation Views
+
+#### 3.1 Lecture Reader & Data Types Comparison
+![Lecture Reader & Data Types Comparison](docs/screenshots/3.1.png)
+*Lecture view featuring C++/Java comparison callouts, 10-segment relevance heat meter (`9/10`), slide headers with educational tag badges (`CORE`, `TRICKY`), and side-by-side data type comparison tables (`mutable` vs `immutable`).*
+
+#### 3.2 Presentation Mode & Fullscreen Slide View
+![Presentation Mode & Fullscreen Slide View](docs/screenshots/3.2.png)
+*Presentation slide view with top navigation toolbar ("Open full lecture", "All slides", "Next →", "Celá obrazovka ⛶", "Tisk 🖨", slide position counter `1 / 27`), and focused slide section content.*
+
+#### 3.3 Print Engine & PDF Export (`@media print`)
+![Print Engine & PDF Export](docs/screenshots/3.3.png)
+*Browser print preview engine (`window.print()` / `Ctrl+P`) rendering white paper backgrounds (`#ffffff`), high-contrast dark text (`#111827`), tag badges, and VS Code code blocks compliant with WCAG 2.1 AAA standards.*
+
+### 4. Structured Exercise Cards & Difficulty Scoring
+![Structured Exercise Cards & Difficulty Scoring](docs/screenshots/4.png)
+*Structured exercise view ("Číselné operace") featuring Úkol problem cards (`Úkol 1` to `Úkol 5`) with tag badges (`CORE`) and visual 5-segment rating bars for **T** (Technical score) and **L** (Logical score) difficulty axes.*
 
 ---
 
-## ⚡ Quick Start & Execution
+## ⚡ Quick Start & Local Execution
 
 ### 1. Local Development Server
 ```bash
