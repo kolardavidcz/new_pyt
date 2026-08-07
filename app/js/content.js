@@ -812,6 +812,92 @@ function extractSlides(html) {
   return slides;
 }
 
+function resolvePresentationHref(href, lecturePath) {
+  if (!href) return null;
+
+  // External link (not ookami.cz or vercel)
+  if (/^https?:\/\//i.test(href) && !href.includes("ookami.cz") && !href.includes("vercel.app")) {
+    return { type: "external", url: href };
+  }
+
+  // Clean domain
+  let clean = href.replace(/^https?:\/\/vyuka\.ookami\.cz\//i, "/").replace(/^https?:\/\/[^/]+\//i, "/");
+
+  // Extract slide query param (?slajd=5 or &slajd=5 or ?slide=5)
+  let slideParam = null;
+  const slajdMatch = clean.match(/[?&](slajd|slide)=([^&]*)/i);
+  if (slajdMatch && slajdMatch[2].trim() !== "") {
+    slideParam = slajdMatch[2].trim();
+  }
+  clean = clean.replace(/[?&](slajd|slide)=[^&]*/gi, "");
+
+  let hashFrag = "";
+  if (clean.includes("#")) {
+    const parts = clean.split("#");
+    clean = parts[0];
+    hashFrag = parts[1];
+  }
+
+  const normalizedPath = lecturePath.replace(/\\/g, "/");
+  const curBasename = normalizedPath.split("/").pop();
+
+  // Same-presentation link
+  if (!clean || clean === curBasename || clean.replace(/\.xml$/, ".html") === curBasename) {
+    let targetSlide = slideParam || hashFrag || "";
+    if (targetSlide && !targetSlide.startsWith("id") && /^\d+$/.test(targetSlide)) {
+      targetSlide = `id${targetSlide}`;
+    }
+    const curLectureId = "lecture:" + normalizedPath.replace(/^vyuka_downloaded\//, "");
+    let hash = `#/lecture/${encodeURIComponent(curLectureId)}`;
+    if (targetSlide) hash += `?slide=${encodeURIComponent(targetSlide)}`;
+    return { type: "same_presentation", hash, slide: targetSlide };
+  }
+
+  // Home / new_order link
+  if (clean === "/new_order.html" || clean === "new_order.html" || clean === "/index.html") {
+    return { type: "home", hash: "#/" };
+  }
+
+  // Cross-presentation link
+  if (clean.endsWith(".xml")) {
+    clean = clean.slice(0, -4) + ".html";
+  }
+
+  const currentDirParts = normalizedPath.split("/").slice(0, -1);
+  let targetPath = "";
+
+  if (clean.startsWith("/materialy/")) {
+    targetPath = "vyuka_downloaded" + clean;
+  } else if (clean.startsWith("materialy/")) {
+    targetPath = "vyuka_downloaded/" + clean;
+  } else if (clean.startsWith("/")) {
+    targetPath = "vyuka_downloaded/materialy" + clean;
+  } else {
+    // Relative path resolution
+    const combined = [...currentDirParts, ...clean.split("/")];
+    const norm = [];
+    for (const p of combined) {
+      if (p === "..") {
+        if (norm.length) norm.pop();
+      } else if (p !== "." && p !== "") {
+        norm.push(p);
+      }
+    }
+    targetPath = norm.join("/");
+  }
+
+  let targetSlide = slideParam || hashFrag || "";
+  if (targetSlide && !targetSlide.startsWith("id") && /^\d+$/.test(targetSlide)) {
+    targetSlide = `id${targetSlide}`;
+  }
+
+  const targetId = "lecture:" + targetPath.replace(/^vyuka_downloaded\//, "");
+  let hash = `#/lecture/${encodeURIComponent(targetId)}`;
+  if (targetSlide) hash += `?slide=${encodeURIComponent(targetSlide)}`;
+
+  return { type: "cross_presentation", hash, targetPath, slide: targetSlide };
+}
+
 function rewriteContentUrls(html, lecturePath) {
   const baseDir = lecturePath.replace(/\\/g, "/").replace(/\/[^/]+$/, "/");
   const baseUrl = "/" + baseDir;
@@ -825,10 +911,22 @@ function rewriteContentUrls(html, lecturePath) {
     node.setAttribute("src", baseUrl + src.replace(/^\.\//, ""));
   });
 
-  wrap.querySelectorAll("[href]").forEach((node) => {
+  wrap.querySelectorAll("a[href]").forEach((node) => {
     const href = node.getAttribute("href");
-    if (!href || /^(https?:|mailto:|data:|\/|#)/i.test(href)) return;
-    node.setAttribute("href", baseUrl + href.replace(/^\.\//, ""));
+    if (!href || /^(mailto:|data:)/i.test(href)) return;
+
+    const res = resolvePresentationHref(href, lecturePath);
+    if (!res) return;
+
+    if (res.type === "external") {
+      node.setAttribute("target", "_blank");
+      node.setAttribute("rel", "noopener noreferrer");
+      node.classList.add("external-link");
+    } else if (res.hash) {
+      node.setAttribute("href", res.hash);
+      node.classList.add("internal-pres-link");
+      if (res.slide) node.dataset.targetSlide = res.slide;
+    }
   });
 
   wrap.querySelectorAll("example").forEach((ex) => {

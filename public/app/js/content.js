@@ -133,10 +133,9 @@ function section(title, items) {
 }
 
 function itemCard(item) {
-  // Default open = full lecture / structured exercise
   const card = el("button", {
     type: "button",
-    className: "card" + (item.kind === "exercise" ? " card-exercise" : ""),
+    className: "card" + (item.kind === "exercise" ? " card-exercise" : "") + (item.isRemoved ? " is-removed" : ""),
     onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
   });
   const exMeta = state.exercises[item.path];
@@ -144,11 +143,12 @@ function itemCard(item) {
   card.innerHTML = `
     <div class="card-top">
       <div class="card-title">${escapeHtml(item.title)}</div>
-      <div class="card-kind">${escapeHtml(item.kind)}</div>
+      <div class="card-kind">${item.isRemoved ? "vyřazeno" : escapeHtml(item.kind)}</div>
     </div>
     ${item.desc ? `<div class="card-desc">${escapeHtml(item.desc)}</div>` : ""}
     ${item.compare ? `<div class="card-compare">${escapeHtml(item.compare)}</div>` : ""}
     <div class="card-footer">
+      ${item.isRemoved ? '<span class="badge badge-removed">Zrušeno</span>' : ""}
       ${badgesHtml(item.tags)}
       ${flavorHtml(item.diff)}
       ${taskCount ? `<span class="task-count-chip">${taskCount} úkolů</span>` : ""}

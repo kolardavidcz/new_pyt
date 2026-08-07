@@ -118,6 +118,10 @@ function handleNavigate(action) {
     toggleFullscreen();
     return;
   }
+  if (action.kind === "cmd-close-tab") {
+    if (state.activeTabId) closeTab(state.activeTabId);
+    return;
+  }
   navigate(action);
   updateStatus();
 }
@@ -371,8 +375,8 @@ function bindChrome() {
         closePalette();
       }
     }
-    // Close tab Ctrl+W
-    if (meta && e.key.toLowerCase() === "w") {
+    // Close tab Ctrl+Q or Ctrl+W
+    if (meta && (e.key.toLowerCase() === "q" || e.key.toLowerCase() === "w")) {
       e.preventDefault();
       if (state.activeTabId) closeTab(state.activeTabId);
     }
