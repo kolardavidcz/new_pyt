@@ -74,11 +74,11 @@ export function renderTree() {
 function buildWeekNode(week, items) {
   const open = !!state.expanded.get(week.id);
   const li = document.createElement("div");
-  li.className = "tree-node" + (open ? " open" : "");
+  li.className = "tree-node" + (open ? " open" : "") + (week.isRemovedSection ? " is-removed-week" : "");
   li.dataset.key = week.id;
 
   const row = document.createElement("div");
-  row.className = "tree-row";
+  row.className = "tree-row" + (week.isRemovedSection ? " is-removed" : "");
   row.setAttribute("role", "treeitem");
   row.setAttribute("aria-expanded", String(open));
   row.tabIndex = 0;
@@ -86,10 +86,11 @@ function buildWeekNode(week, items) {
   row.dataset.id = week.id;
   if (state.focusedTreeKey === week.id) row.classList.add("active");
 
+  const labelPrefix = week.isRemovedSection ? "📦 " : `W${week.week} · `;
   row.innerHTML = `
     <span class="tree-twistie">${svgChevron()}</span>
     <span class="tree-icon week">${svgFolder()}</span>
-    <span class="tree-label">W${week.week} · ${escape(week.title)}</span>
+    <span class="tree-label">${labelPrefix}${escape(week.title)}</span>
     <span class="tree-meta"><span class="rel-pill" style="color:var(--text-faint)">${items.length}</span></span>
   `;
 
@@ -100,7 +101,6 @@ function buildWeekNode(week, items) {
       renderTree();
       return;
     }
-    // double purpose: select week + ensure expanded
     state.expanded.set(week.id, true);
     select("week", week.id);
   });
@@ -126,11 +126,11 @@ function buildItemNode(item) {
   const open = !!state.expanded.get(key);
 
   const li = document.createElement("div");
-  li.className = "tree-node" + (open ? " open" : "");
+  li.className = "tree-node" + (open ? " open" : "") + (item.isRemoved ? " is-removed" : "");
   li.dataset.key = key;
 
   const row = document.createElement("div");
-  row.className = "tree-row";
+  row.className = "tree-row" + (item.isRemoved ? " is-removed" : "");
   row.setAttribute("role", "treeitem");
   if (hasPages) row.setAttribute("aria-expanded", String(open));
   row.tabIndex = 0;

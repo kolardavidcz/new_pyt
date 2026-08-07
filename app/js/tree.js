@@ -73,12 +73,13 @@ export function renderTree() {
 
 function buildWeekNode(week, items) {
   const open = !!state.expanded.get(week.id);
+  const isGrayShelf = week.week === 99;
   const li = document.createElement("div");
-  li.className = "tree-node" + (open ? " open" : "");
+  li.className = "tree-node" + (open ? " open" : "") + (isGrayShelf ? " tree-node-gray-shelf" : "");
   li.dataset.key = week.id;
 
   const row = document.createElement("div");
-  row.className = "tree-row";
+  row.className = "tree-row" + (isGrayShelf ? " tree-row-gray-shelf" : "");
   row.setAttribute("role", "treeitem");
   row.setAttribute("aria-expanded", String(open));
   row.tabIndex = 0;
@@ -86,10 +87,14 @@ function buildWeekNode(week, items) {
   row.dataset.id = week.id;
   if (state.focusedTreeKey === week.id) row.classList.add("active");
 
+  const weekLabel = isGrayShelf
+    ? `🗑️ ${escape(week.title)}`
+    : `W${week.week} · ${escape(week.title)}`;
+
   row.innerHTML = `
     <span class="tree-twistie">${svgChevron()}</span>
-    <span class="tree-icon week">${svgFolder()}</span>
-    <span class="tree-label">W${week.week} · ${escape(week.title)}</span>
+    <span class="tree-icon week" style="${isGrayShelf ? 'color:var(--text-faint)' : ''}">${svgFolder()}</span>
+    <span class="tree-label">${weekLabel}</span>
     <span class="tree-meta"><span class="rel-pill" style="color:var(--text-faint)">${items.length}</span></span>
   `;
 

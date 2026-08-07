@@ -176,17 +176,26 @@ function routeToHash(route) {
 }
 
 function parseHash(hash) {
-  const h = (hash || "").replace(/^#/, "") || "/";
-  const parts = h.split("/").filter(Boolean);
-  // ["week", "week-0"] or ["lecture", "lecture:..."] or ["page", id, pageId]
+  const rawHash = (hash || "").replace(/^#/, "") || "/";
+  const [pathPart, queryPart] = rawHash.split("?");
+  const queryParams = new URLSearchParams(queryPart || "");
+  const slideVal = queryParams.get("slide") || queryParams.get("slajd") || null;
+
+  const parts = pathPart.split("/").filter(Boolean);
   if (!parts.length) return { kind: "home" };
   const [a, b, c] = parts;
+
   if (a === "week" && b) return { kind: "week", id: dec(b) };
-  if ((a === "lecture" || a === "exercise") && b) return { kind: a, id: dec(b) };
+  if ((a === "lecture" || a === "exercise" || a === "content" || a === "item") && b) {
+    const itemId = dec(b);
+    if (slideVal) {
+      const formattedSlide = (!slideVal.startsWith("id") && /^\d+$/.test(slideVal)) ? `id${slideVal}` : slideVal;
+      return { kind: "page", id: itemId, pageId: formattedSlide };
+    }
+    return { kind: a === "content" || a === "item" ? "lecture" : a, id: itemId };
+  }
   if (a === "presentation" && b) return { kind: "presentation", id: dec(b) };
   if (a === "page" && b && c) return { kind: "page", id: dec(b), pageId: dec(c) };
-  if (a === "content" && b) return { kind: "lecture", id: dec(b) };
-  if (a === "item" && b) return { kind: "lecture", id: dec(b) };
   if (a === "search") return { kind: "search" };
   if (a === "progress") return { kind: "progress" };
   if (a === "login") return { kind: "login" };
