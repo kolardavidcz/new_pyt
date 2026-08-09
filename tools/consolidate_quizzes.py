@@ -1,5 +1,6 @@
 import json
 import glob
+import re
 from pathlib import Path
 
 master_quizzes = {}
@@ -25,6 +26,26 @@ for fpath in sorted(glob.glob("scratch/quiz_output_*.json")):
                 opts = q.get("options", [])
                 if any(len(o) > 35 and any(w in o.lower() for w in ["zatímco", "protože", "znamená", "pomocí", "umožňuje", "přičemž", "automaticky", "obsahuje", "vyžaduje"]) for o in opts):
                     q["type"] = "multiple_choice"
+            elif q.get("type") in ["code_fill", "fill_blank_choice"]:
+                q["type"] = "fill_blank_choice"
+                qtext = q.get("question", "")
+                options = q.get("options", [])
+                ans_idx = q.get("answer", 0)
+
+                clean_opts = []
+                for opt in options:
+                    c = re.sub(r'^[A-D]\)\s*', '', opt).strip()
+                    if len(c) > 30 and (" pro " in c or " s " in c or " bez " in c or " v " in c):
+                        parts = c.split(" pro ")[0].split(" s ")[0].split(" bez ")[0]
+                        c = parts.strip()
+                    clean_opts.append(c)
+                
+                q["options"] = clean_opts
+
+                if "```" not in qtext or "________" not in qtext:
+                    stem = qtext.split("```")[0].strip()
+                    code_snippet = f"\n\n```python\n# {stem}\nvysledek = ________\n```"
+                    q["question"] = stem + code_snippet
 
         master_quizzes[slug] = questions
         total_decks += 1
