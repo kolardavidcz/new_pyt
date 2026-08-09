@@ -3,7 +3,7 @@
 import {
   state, pagesFor, slideDiff, slideTags, weekVisibleItems, filteredItems, markSeen,
   isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor, logLinkError,
-  saveQuizScore, setPrintWithQuizzes, getQuizFor,
+  saveQuizScore, resetDeckQuizScores, setPrintWithQuizzes, getQuizFor,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot, highlightCode, dedentCode } from "./highlight.js";
@@ -228,18 +228,6 @@ function lectureToolbar(item, mode) {
     title: "Print or export to PDF",
     onClick: () => window.print(),
   }, "Tisk 🖨"));
-
-  const printQuizzes = state.printWithQuizzes;
-  const quizToggleBtn = el("button", {
-    type: "button",
-    className: "btn btn-quiz-toggle" + (printQuizzes ? " is-active" : ""),
-    title: printQuizzes ? "Tisk obsahuje kvízy na konci (Kliknutím vypnete)" : "Tisk bez kvízů (Kliknutím zapnete kvízy v tisku)",
-    onClick: () => {
-      setPrintWithQuizzes(!state.printWithQuizzes);
-      updatePrintQuizButtons();
-    },
-  }, printQuizzes ? "🖨 Kvíz v tisku ✓" : "🖨 Kvíz v tisku ☐");
-  bar.appendChild(quizToggleBtn);
 
   // Pinned right after Tisk 🖨: Mark studied button
   const studied = isStudied(item.id);
@@ -476,18 +464,6 @@ export async function showPage(itemId, pageId) {
       onClick: () => window.print(),
     }, "Tisk 🖨"));
 
-    const printQuizzes = state.printWithQuizzes;
-    const quizToggleBtn = el("button", {
-      type: "button",
-      className: "btn btn-quiz-toggle" + (printQuizzes ? " is-active" : ""),
-      title: printQuizzes ? "Tisk obsahuje kvízy na konci (Kliknutím vypnete)" : "Tisk bez kvízů (Kliknutím zapnete kvízy v tisku)",
-      onClick: () => {
-        setPrintWithQuizzes(!state.printWithQuizzes);
-        updatePrintQuizButtons();
-      },
-    }, printQuizzes ? "🖨 Kvíz v tisku ✓" : "🖨 Kvíz v tisku ☐");
-    nav.appendChild(quizToggleBtn);
-
     if (pages.length) {
       const pos = el("span", {
         className: "slide-pos",
@@ -502,13 +478,13 @@ export async function showPage(itemId, pageId) {
     await loadAndInlineExamples(slideEl);
     highlightRoot(slideEl);
 
+    main.appendChild(buildBottomNavBar(item));
+
     const isLastSlide = idx < 0 || idx === pages.length - 1;
     if (isLastSlide) {
       const quizEl = await renderQuizSection(item);
       if (quizEl) main.appendChild(quizEl);
     }
-
-    main.appendChild(buildBottomNavBar(item));
   } catch (err) {
     main.innerHTML = `<div class="error-box">Failed to load content.<br/><code>${escapeHtml(err.message)}</code></div>`;
   } finally {
@@ -694,9 +670,9 @@ async function loadFullContent(item, main) {
     main.appendChild(frag);
     await loadAndInlineExamples(main);
     for (const node of nodes) highlightRoot(node);
+    main.appendChild(buildBottomNavBar(item));
     const quizEl = await renderQuizSection(item);
     if (quizEl) main.appendChild(quizEl);
-    main.appendChild(buildBottomNavBar(item));
   } catch (err) {
     main.appendChild(el("div", { className: "error-box" },
       "Failed to load: ",
@@ -1104,8 +1080,6 @@ export function updatePrintQuizButtons() {
     b.innerHTML = on ? "🖨 Kvíz v tisku ✓" : "🖨 Kvíz v tisku ☐";
     b.title = on ? "Tisk obsahuje kvízy na konci (Kliknutím vypnete)" : "Tisk bez kvízů (Kliknutím zapnete kvízy v tisku)";
   });
-  const sel = document.getElementById("selectPrintWithQuizzes");
-  if (sel) sel.value = on ? "true" : "false";
 }
 
 export async function renderQuizSection(item) {
@@ -1121,14 +1095,26 @@ export async function renderQuizSection(item) {
 
   const header = el("header", { className: "quiz-card-header" });
   header.innerHTML = `
-    <span class="quiz-badge">Kvíz k prezentaci · Takeaways Test 🎯</span>
-    <h2 class="quiz-title">Ověření klíčových poznatků a takeaway bodů</h2>
-    <p class="quiz-subtitle">Otestujte si pochopení klíčových konceptů prezentace. Otázky prověřují takeaways i chytáky.</p>
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
+      <div>
+        <span class="quiz-badge">Kvíz k prezentaci · Takeaways Test</span>
+        <h2 class="quiz-title">Ověření klíčových poznatků a takeaway bodů</h2>
+        <p class="quiz-subtitle">Otestujte si pochopení klíčových konceptů prezentace. Otázky prověřují takeaways i chytáky.</p>
+      </div>
+      <button type="button" class="btn btn-reset-deck-quiz" style="background:#1e293b; border:1px solid #334155; color:#38bdf8; border-radius:4px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.15s ease;">Resetovat otázky</button>
+    </div>
     <div class="quiz-score-bar" style="margin-top:10px; font-size:12px; color:var(--fg-muted);">
       <span class="q-score-stat">Vyřešeno: <strong class="q-answered-n">${answeredCount}</strong> / ${questions.length}</span>
       <span class="q-score-stat" style="margin-left:14px;">Správně: <strong class="q-correct-n" style="color:var(--syntax-string, #89d185);">${correctCount}</strong></span>
     </div>
   `;
+
+  header.querySelector(".btn-reset-deck-quiz")?.addEventListener("click", async () => {
+    resetDeckQuizScores(deckKey);
+    const freshCard = await renderQuizSection(item);
+    if (freshCard) card.replaceWith(freshCard);
+  });
+
   card.appendChild(header);
 
   const list = el("div", { className: "quiz-questions-list" });
@@ -1148,8 +1134,8 @@ export async function renderQuizSection(item) {
     
     let typeLabel = "Otázka";
     if (q.type === "multiple_choice") typeLabel = "Výběr ABCD";
-    else if (q.type === "code_fill") typeLabel = "Doplňování kódu (________)";
-    else if (q.type === "predict_output") typeLabel = "Předpověď výstupu programu 🖥️";
+    else if (q.type === "code_fill" || q.type === "fill_blank_choice") typeLabel = "Doplňování kódu (________)";
+    else if (q.type === "predict_output") typeLabel = "Předpověď výstupu programu";
     else if (q.type === "true_false_tricky") typeLabel = "Pravda / Nepravda (Chyták)";
 
     const qNum = el("div", { className: "quiz-q-num" });
@@ -1198,8 +1184,8 @@ export async function renderQuizSection(item) {
       explanationEl.className = `quiz-explanation ${isCorrect ? "correct" : "incorrect"}`;
       explanationEl.innerHTML = `
         <div class="exp-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <div class="exp-title">${isCorrect ? "✓ Správně!" : "✕ Nepřesně!"}</div>
-          ${onRetry ? `<button type="button" class="btn-retry-fill" style="background:#1e293b; border:1px solid #334155; color:#38bdf8; border-radius:4px; padding:3px 10px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s ease;">🔄 Zkusit znovu</button>` : ""}
+          <div class="exp-title">${isCorrect ? "Správně!" : "Nepřesně!"}</div>
+          ${onRetry ? `<button type="button" class="btn-retry-fill" style="background:#1e293b; border:1px solid #334155; color:#38bdf8; border-radius:4px; padding:3px 10px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s ease;">Zkusit znovu</button>` : ""}
         </div>
         ${(!isCorrect && expectedText) ? `<div class="exp-expected" style="margin-bottom:6px; font-weight:600; color:var(--syntax-string, #ce9178);">Očekávaný výraz: <code>${escapeHtml(expectedText)}</code></div>` : ""}
         <div class="exp-body">${escapeHtml(q.explanation || "")}</div>
@@ -1227,8 +1213,8 @@ export async function renderQuizSection(item) {
       }
     }
 
-    if (q.type === "code_fill") {
-      // Interactive Typing Exercise for code_fill - directly in the code line
+    if (q.type === "code_fill" || q.type === "fill_blank_choice") {
+      // Interactive Typing & Draggable Chips Exercise for code_fill / fill_blank_choice
       const ansIdx = typeof q.answer === "number" ? q.answer : 0;
       const rawCorrect = (q.options && q.options[ansIdx]) ? q.options[ansIdx] : String(q.answer || "");
       const expectedClean = rawCorrect.replace(/^[A-D]\)\s*/, "").trim();
@@ -1253,8 +1239,10 @@ export async function renderQuizSection(item) {
         const isCorrect = normUser === normExp || normExp.includes(normUser) || normUser.includes(normExp);
 
         updateLiveFill(val, isCorrect);
-        inlineInput.classList.remove("correct", "incorrect");
-        inlineInput.classList.add(isCorrect ? "correct" : "incorrect");
+        if (inlineInput) {
+          inlineInput.classList.remove("correct", "incorrect");
+          inlineInput.classList.add(isCorrect ? "correct" : "incorrect");
+        }
 
         saveQuizScore(deckKey, q.id, {
           selected: val,
@@ -1279,7 +1267,6 @@ export async function renderQuizSection(item) {
           targetNode.innerHTML = targetNode.dataset.originalCode;
           delete targetNode.dataset.originalCode;
         }
-        // Re-inject inline input
         if (codeWrapEl) {
           const codeNode = codeWrapEl.querySelector("code");
           if (codeNode && !codeNode.querySelector(".inline-code-fill-input")) {
@@ -1301,23 +1288,48 @@ export async function renderQuizSection(item) {
             handleEvaluate(val);
           }
         });
+
+        inlineInput.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          inlineInput.classList.add("drag-over");
+        });
+        inlineInput.addEventListener("dragleave", () => {
+          inlineInput.classList.remove("drag-over");
+        });
+        inlineInput.addEventListener("drop", (e) => {
+          e.preventDefault();
+          inlineInput.classList.remove("drag-over");
+          const droppedText = e.dataTransfer ? e.dataTransfer.getData("text/plain") : "";
+          if (droppedText) {
+            inlineInput.value = droppedText;
+            inlineInput.size = Math.max(6, droppedText.length + 1);
+            handleEvaluate(droppedText);
+          }
+        });
       }
 
       if (q.options && q.options.length) {
         const hintDetails = el("details", { className: "quiz-fill-hints-details" });
         const pillsHtml = q.options.map((opt) => {
           const cleanOpt = opt.replace(/^[A-D]\)\s*/, "").trim();
-          return `<button type="button" class="fill-hint-pill"><code>${escapeHtml(cleanOpt)}</code></button>`;
+          return `<div class="fill-hint-pill draggable-chip" draggable="true" data-code="${escapeHtml(cleanOpt)}"><code>${escapeHtml(cleanOpt)}</code></div>`;
         }).join(" ");
-        hintDetails.innerHTML = `<summary>💡 Možnosti ke vložení (klikněte na kód pro vložení nebo napište do řádku a stiskněte Enter ↵)</summary><div class="hint-pills-wrap">${pillsHtml}</div>`;
+        hintDetails.innerHTML = `<summary>Možnosti ke vložení (přetáhněte kód do řádku nebo klikněte na čip)</summary><div class="hint-pills-wrap">${pillsHtml}</div>`;
         
-        hintDetails.querySelectorAll(".fill-hint-pill").forEach((pillBtn) => {
-          pillBtn.addEventListener("click", () => {
+        hintDetails.querySelectorAll(".draggable-chip").forEach((chipEl) => {
+          const codeVal = chipEl.dataset.code || chipEl.textContent.trim();
+
+          chipEl.addEventListener("dragstart", (e) => {
+            if (e.dataTransfer) {
+              e.dataTransfer.setData("text/plain", codeVal);
+            }
+          });
+
+          chipEl.addEventListener("click", () => {
             if (inlineInput) {
-              const textVal = pillBtn.textContent.trim();
-              inlineInput.value = textVal;
-              inlineInput.size = Math.max(6, textVal.length + 1);
-              handleEvaluate(textVal);
+              inlineInput.value = codeVal;
+              inlineInput.size = Math.max(6, codeVal.length + 1);
+              handleEvaluate(codeVal);
             }
           });
         });

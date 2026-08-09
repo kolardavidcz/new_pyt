@@ -110,6 +110,16 @@ export function saveQuizScore(slug, qId, scoreInfo) {
   notifyStateChange("quizScore", { slug, qId, scoreInfo });
 }
 
+export function resetDeckQuizScores(slug) {
+  if (state.quizScores[slug]) {
+    delete state.quizScores[slug];
+    try {
+      localStorage.setItem(QUIZ_SCORES_KEY, JSON.stringify(state.quizScores));
+    } catch { /* ignore */ }
+    notifyStateChange("quizScoreReset", { slug });
+  }
+}
+
 const ERROR_LOG_KEY = "pcs-error-link-log-v1";
 
 export function logLinkError(errData) {
