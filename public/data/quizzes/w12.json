@@ -1,0 +1,353 @@
+{
+  "execution_subprocess": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi voláním z rodiny os.exec*() a funkcí subprocess.run()?",
+      "options": [
+        "A) os.exec*() nahradí běžící proces novým procesem, zatímco subprocess.run() vytvoří dceřiný proces a počká na něj.",
+        "B) os.exec*() spouští proces asynchronně na pozadí, zatímco subprocess.run() vyžaduje vytvoření nového vlákna.",
+        "C) subprocess.run() nahradí běžící proces novým procesem, zatímco os.exec*() vrátí objekt typu CompletedProcess.",
+        "D) subprocess.run() funguje výhradně pod systémem Linux, zatímco rodina os.exec*() je určena výhradně pro Windows OS."
+      ],
+      "answer": 0,
+      "explanation": "Volání os.exec*() kompletně nahradí stávající proces nově spuštěným programem (stejně jako C execve()), takže se do původního Python skriptu již nevrátí. subprocess.run() spouští podproces a čeká na jeho dokončení."
+    },
+    {
+      "id": "q2",
+      "type": "code_fill",
+      "question": "Doplňte parametr pro automatické vyhození výjimky CalledProcessError při návratovém kódu různém od nuly:\n\n```python\nimport subprocess\nsubprocess.run([\"ls\", \"/nonexistent\"], ________=True)\n```",
+      "options": [
+        "A) check",
+        "B) strict",
+        "C) raise_err",
+        "D) exception"
+      ],
+      "answer": 0,
+      "explanation": "Parametr check=True způsobí, že v případě nebyl-li návratový kód externího procesu 0 (způsobil chybu), vyvolá subprocess.run() výjimku subprocess.CalledProcessError."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Co se stane při volání subprocess.run(\"ls -l\") bez nastavení shell=True na systému Linux?",
+      "options": [
+        "A) Systém vyvolá FileNotFoundError, protože hledá binární soubor s doslovným názvem \"ls -l\" včetně mezery.",
+        "B) Příkaz proběhne v systémovém shellu /bin/sh a vypíše podrobný seznam souborů v aktuálním adresáři.",
+        "C) Funkce automaticky rozdělá řetězec podle mezer a spustí příkaz ls s předaným parametrem -l.",
+        "D) Výpočet se zastaví s výjimkou ValueError, protože řetězce bez hranatých závorek nejsou v run() povoleny."
+      ],
+      "answer": 0,
+      "explanation": "Bez shell=True předává subprocess.run() prvotní argument přímo systémovému volání execv(). Systém hledá spustitelný soubor s přesným názvem \"ls -l\" (i s mezerou), což selže na FileNotFoundError. Správný zápis bez shellu je [\"ls\", \"-l\"]."
+    },
+    {
+      "id": "q4",
+      "type": "code_fill",
+      "question": "Doplňte parametr, který zajistí automatický převod standardního výstupu ze surových bajtů (bytes) na řetězec (str):\n\n```python\nimport subprocess\nres = subprocess.run([\"whoami\"], stdout=subprocess.PIPE, ________=\"utf-8\")\n```",
+      "options": [
+        "A) encoding",
+        "B) decode",
+        "C) text_mode",
+        "D) charset"
+      ],
+      "answer": 0,
+      "explanation": "Nastavení parametru encoding=\"utf-8\" (nebo text=True) způsobí, že proudy stdout, stderr a stdin pracují s textovými řetězci typu str namísto bajtového objektu bytes."
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o spouštění externích procesů přes shell:\n\nPředání neošetřeného uživatelského vstupu do subprocess.run(cmd, shell=True) představuje vážné bezpečnostní riziko (shell injection), kterému lze zabránit ošetřením vstupu pomocí shlex.quote().",
+      "options": [
+        "A) Pravda – shell=True interpretuje řetězec přes /bin/sh či cmd.exe, kde nebezpečné znaky odescapuje právě funkce shlex.quote().",
+        "B) Nepravda – shell=True automaticky sanitizuje všechny předané argumenty a použití shlex.quote() vyvolá chybu v syntaxi shellu."
+      ],
+      "answer": 0,
+      "explanation": "Spuštění shellu nad neuvozovaným uživatelským vstupem umožňuje útočníkovi vložit další příkazy (shell injection). Funkce shlex.quote() bezpečně obalí a odescapuje argument pro použití v shellu."
+    },
+    {
+      "id": "q6",
+      "type": "predict_output",
+      "question": "Jaký bude typ a cíl zachycení chybového výstupu při použití stderr=subprocess.STDOUT v subprocess.run()?",
+      "options": [
+        "A) Chybový výstup stderr se přesměruje do stejného proudu jako standardní výstup stdout a uloží do result.stdout.",
+        "B) Chybový výstup stderr se vytiskne přímo na konzoli terminálu a v návratovém objektu result zůstane None.",
+        "C) Chybový výstup stderr způsobí vyhození výjimky subprocess.STDOUTError okamžitě při zapsání chyby.",
+        "D) Standardní výstup stdout se přesměruje do chybového výstupu stderr a uloží se výhradně do result.stderr."
+      ],
+      "answer": 0,
+      "explanation": "Speciální konstanta subprocess.STDOUT předaná do parametru stderr přikáže rozhraní slít chybový výstup stderr přímo do výstupního proudu stdout."
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Kdy je nutné použít třídu subprocess.Popen s metodou communicate() místo funkce subprocess.run()?",
+      "options": [
+        "A) Při potřebě asynchronního běhu procesů na pozadí nebo oboustranného datového proudění během provádění podprocesu.",
+        "B) Při přesměrování standardního výstupu do souboru na disku, protože subprocess.run() přesměrování souborů nepodporuje.",
+        "C) Při nastavování proměnných prostředí env, protože parametr env je dostupný výhradně v nízkoúrovňové třídé Popen.",
+        "D) Při provádění příkazů na operačním systému Windows, protože subprocess.run() je určen výhradně pro Unix systémy."
+      ],
+      "answer": 0,
+      "explanation": "Funkce subprocess.run() je synchronní a čeká na dokončení procesu. Třída Popen umožňuje asynchronní spuštění procesu na pozadí, průběžné posílání dat na stdin za běhu a ruční řízení podprocesu."
+    }
+  ],
+  "speed_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jakým způsobem probíhá vývoj a překlad samotného interpretu PyPy?",
+      "options": [
+        "A) Kód napsaný v RPythonu se přeloží do jazyka C a následně zkompiluje do spustitelné binárky interpretu.",
+        "B) PyPy je napsán v C++ a využívá rozhraní Java Virtual Machine pro dynamický překlad bytekódu v paměti.",
+        "C) Zdrojový kód PyPy se kompiluje přímo do systémového assembleru procesoru přes LLVM bez mezikroku v C.",
+        "D) PyPy funguje jako skript v čistém Pythonu, který dynamicky upravuje bytecode CPythonu před spuštěním."
+      ],
+      "answer": 0,
+      "explanation": "Vývoj PyPy probíhá tak, že je napsán v omezené podmnožině Pythonu zvané RPython (Restricted Python). RPython je přeložen do C a následně zkompilován běžným C kompilátorem."
+    },
+    {
+      "id": "q2",
+      "type": "code_fill",
+      "question": "Doplňte parametr dekorátoru @jit, který zaručí vyhození výjimky při neschopnosti zkompilovat kód bez Python C-API:\n\n```python\nfrom numba import jit\n\n@jit(________=True)\ndef vypocet(x):\n    return x.sum()\n```",
+      "options": [
+        "A) nopython",
+        "B) strict",
+        "C) pure_c",
+        "D) fastmath"
+      ],
+      "answer": 0,
+      "explanation": "Parametr nopython=True (nebo samostatný dekorátor @njit) zakáže fallback do pomalého object mode. Pokud Numba nemůže kód přeložit do čistého nativního kódu bez Python C-API, vyvolá výjimku."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní účel dekorátoru @vectorize v knihovně Numba oproti standardnímu @jit?",
+      "options": [
+        "A) Vytvoří ze skalární funkce univerzální funkce (ufunc) schopnou pracovat nad vícerozměrnými poli.",
+        "B) Uvolní Globální zámek interpretu (GIL) a automaticky rozloží výpočet mezi více samostatných OS procesů.",
+        "C) Přeloží Python kód dopředu (AOT) do samostatného dynamického knihovního souboru .so nebo .dll na disku.",
+        "D) Zabezpečí automatickou konverzi Python objektů na C-struktury bez nutnosti instalace knihovny LLVM."
+      ],
+      "answer": 0,
+      "explanation": "Dekorátor @vectorize umožňuje napsat funkci pro skalární hodnoty a automaticky z ní vygeneruje NumPy ufunc, která podporuje broadcasting a operace nad vícerozměrnými n-dimenzionálními poli."
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "Co umožní nastavení parametru nogil=True u dekorátoru @jit v Numbě během provádění zkompilované funkce?",
+      "options": [
+        "A) Uvolní Globální zámek interpretu (GIL), takže zkompilovaná funkce může běžet souběžně ve více vláknech.",
+        "B) Vypne kontrolu přetečení paměti u polí NumPy a zrychlí indexaci prvků vynecháním platnostních testů.",
+        "C) Zaručí, že funkce bude moci přistupovat k dynamickým objektům typu dict a list bez použití zámku.",
+        "D) Přesune provádění výpočtu z procesoru CPU přímo na grafický akcelerátor GPU s využitím rozhraní CUDA."
+      ],
+      "answer": 0,
+      "explanation": "Parametr nogil=True instruuje Numbu, aby během vykonávání zkompilovaného nativního kódu uvolnila GIL (Global Interpreter Lock). Díky tomu mohou jiná Python vlákna běžet současně na jiných CPU jádrech."
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o kompilačním modelu Cythonu a Numby:\n\nCython typicky využívá AOT kompilaci skrze překlad do C a C kompilátor před spuštěním skriptu, zatímco Numba primárně využívá JIT kompilaci přes LLVM za běhu.",
+      "options": [
+        "A) Pravda – Cython vyžaduje předpřeklad C souboru a vytvoření rozšíření (setup.py), zatímco Numba kompiluje kód při spuštění.",
+        "B) Nepravda – Numba vyžaduje ruční překlad přes C kompilátor před během skriptu, zatímco Cython provádí JIT kompilaci v paměti."
+      ],
+      "answer": 0,
+      "explanation": "Cython překládá .pyx soubory do C/C++ předem (AOT) a kompiluje je do sdílené knihovny. Numba analyzuje Python kód za běhu a při prvním spuštění generuje strojový kód pomocí JIT (LLVM)."
+    }
+  ],
+  "speed_example_1": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Proč dosáhl prvotní pokus o cythonizaci s výrazem (vyrez * maska).sum() horšího času (3,1 s) než čistý Python (1,8 s)?",
+      "options": [
+        "A) Načítání výřezů alokovalo v každém kroku smyčky nové objekty a volalo pomalé C-API (žluté řádky v cython -a).",
+        "B) Cython zkompiloval maticové násobení do jednovláknového C kódu bez využití vektorových instrukcí SSE a AVX.",
+        "C) Knihovna Pillow zablokovala přístup k paměťovému bufferu obrázku, takže Cython musel kopírovat celou matici.",
+        "D) Výraz vyvolal vnitřní přetečení paměti typu float, což přinutilo CPython přejít do záložního režimu interpretace."
+      ],
+      "answer": 0,
+      "explanation": "V prvotním Cython kódu vytvářel výraz np.array(vyrez) v každé iteraci zanořené smyčky nový Python objekt. Nástroj cython -a označil řádek sytě žlutou barvou, což signalizuje intenzivní volání C-API CPythonu uvnitř smyčky."
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jaká úprava kódu v Cythonu snížila čas vykonání filtru obrázku z 3,1 s na špičkových 0,14 s?",
+      "options": [
+        "A) Nahrazení jednořádkového maticového násobení (vyrez * maska).sum() zanořenou C smyčkou přes jednotlivé prvky.",
+        "B) Použití dekorátoru @jit(nopython=True) nad původní cythoní funkcí a vypnutí kontroly mezí indexace polí.",
+        "C) Převod celého 3D pole RGB obrázku na jednorozměrný Python seznam objektů typu float před voláním filtru.",
+        "D) Zvýšení počtu vláken v modulu threading a rozdělení jednotlivých barevných kanálů obrázku do skriptů."
+      ],
+      "answer": 0,
+      "explanation": "Odstraněním NumPy operací nad výřezy a přepsáním násobení matice na přímou zanořenou C smyčku se kód zcela zbavil volání Python C-API uvnitř smyček, což snížilo čas na 0,14 s."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Na čem je založen princip vektorizace konvolučního filtru v čistém NumPy bez použití smyček for?",
+      "options": [
+        "A) Na součtu 9 posunutých 2D výřezů (views) původní matice s odpovídajícími koeficienty v jediném výrazu.",
+        "B) Na automatickém převodu 2D matice obrázku do frekvenční domény pomocí rychlé Fourierovy transformace (FFT).",
+        "C) Na použití funkce np.vectorize() nad původní nevektorizovanou pythonní funkcí se zanořenou smyčkou.",
+        "D) Na paralelním zpracování jednotlivých bajtů obrázku pomocí grafické karty přes externí modul CUDA."
+      ],
+      "answer": 0,
+      "explanation": "Vektorizace nahradila smyčku tím, že vytvořila 9 stejně velkých posunutých výřezů matice (např. M[0:-2, 0:-2], M[1:-1, 1:-1]), vynásobila je koeficienty masky a sečetla je najednou kompilovanou C operací NumPy."
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "Která dvojice metod dosáhla v ukázkovém srovnání filtru obrázku nejvyššího zrychlení (kolem 11x až 13x)?",
+      "options": [
+        "A) Optimalizovaný Cython s C smyčkami a vektorizované řešení v čistém NumPy.",
+        "B) Naivní nevektorizovaný Python s NumPy a Numba bez použití mezipaměti.",
+        "C) Numba s nastavením nopython=False a Cython s použitím volání np.array().",
+        "D) Naivní Python smyčka a funkce np.vectorize() aplikovaná na skalární funkci."
+      ],
+      "answer": 0,
+      "explanation": "Optimalizovaný Cython (s manuální C smyčkou) dosáhl času 0,14 s (13x zrychlení) a vektorizovaný NumPy dosáhl 0,16 s (11x zrychlení). Naivní smyčka trvala 1,8 s."
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o mezipaměti v Numbě:\n\nPři opakovaném spouštění skriptu s Numba dekorátorem s parametrem cache=True odpadá režie prvotní JIT kompilace, protože Numba načte předkompilovaný nativní kód přímo z disku.",
+      "options": [
+        "A) Pravda – Uložení kompilátu na disk snížilo čas běhu z 0,54 s (první spuštění) na 0,35 s při dalších spuštěních.",
+        "B) Nepravda – Parametr cache=True udrží data obrázku v L1 paměti, ale kód se musí při každém spuštění kompilovat znovu."
+      ],
+      "answer": 0,
+      "explanation": "Numba při cache=True uloží vygenerovaný nativní kód na disk (do __pycache__). Při dalším spuštění načte již zkompilovaný kód a vyhne se režii kompilátoru LLVM."
+    }
+  ],
+  "externalibs_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "K čemu slouží vestavěný modul ctypes v Pythonu?",
+      "options": [
+        "A) Umožňuje přímé volání funkcí ze sdílených C knihoven (.dll / .so) a poskytuje datové typy kompatibilní s C.",
+        "B) Překládá zdrojový kód Pythonu do samostatného spustitelného binárního souboru bez nutnosti C kompilátoru.",
+        "C) Slouží k automatické paralelizaci Python smyček vytvořením více systémových vláken bez zámku GIL.",
+        "D) Zabezpečuje šifrování komunikace mezi procesy při přenosu objektů přes síťové sokety v lokální síti."
+      ],
+      "answer": 0,
+      "explanation": "Modul ctypes je FFI (Foreign Function Interface) knihovna v Pythonu, která dovoluje načítat sdílené dynamické knihovny napsané v C (DLL/.so) a předávat jim C-kompatibilní datové typy."
+    },
+    {
+      "id": "q2",
+      "type": "code_fill",
+      "question": "Doplňte atribut objektu funkce z načtené knihovny v ctypes pro definici očekávaných typů vstupních parametrů:\n\n```python\nimport ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.spoctu_suma.________ = [ctypes.c_int, ctypes.c_int]\n```",
+      "options": [
+        "A) argtypes",
+        "B) restype",
+        "C) param_types",
+        "D) signature"
+      ],
+      "answer": 0,
+      "explanation": "Atribut argtypes určuje seznam typů z modulu ctypes, které C funkce přijímá. Atribut restype se používá pro definici návratového typu."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jak vyvolat v ctypes C funkci ze sdílené knihovny lib, jejíž název není platným identifikátorem v Pythonu (např. my-func)?",
+      "options": [
+        "A) Voláním funkce přes vestavěnou funkci getattr(lib, \"my-func\") předáním názvu jako řetězce.",
+        "B) Přepsáním pomlčky na podtržítko v Python skriptu, což ctypes automaticky namapuje v paměti.",
+        "C) Načtením knihovny s parametrem rename_rules={\"my-func\": \"my_func\"} v konstruktoru CDLL.",
+        "D) Volání takové funkce není v ctypes možné a C knihovna se musí překompilovat s jiným názvem."
+      ],
+      "answer": 0,
+      "explanation": "Pokud název exportované funkce v C knihovně není platný Python identifikátor (obsahuje např. pomlčku nebo tečku), nelze použít tečkovou notaci lib.my-func. Místo toho se použije getattr(lib, \"my-func\")."
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o načítání sdílených knihoven v modulu ctypes:\n\nZatímco Windows umožňuje odkazovat na sdílenou knihovnu relativní cestou, Linux striktně vyžaduje absolutní cestu k souboru knihovny.",
+      "options": [
+        "A) Pravda – Na Linuxu dynamický linker nehledá v aktuálním adresáři, proto je nutné předat např. os.path.abspath(\"mylib.so\").",
+        "B) Nepravda – Linux automaticky prohledává aktuální složku se skriptem, zatímco Windows vyžaduje výhradně absolutní cesty."
+      ],
+      "answer": 0,
+      "explanation": "Pod Linuxem systémový linker neprohledává aktuální pracovní adresář (z bezpečnostních důvodů), takže ctypes.CDLL(\"mylib.so\") selže. Je nutné zadat absolutní cestu (např. přes os.path.join(os.getcwd(), \"mylib.so\"))."
+    },
+    {
+      "id": "q5",
+      "type": "code_fill",
+      "question": "Doplňte atribut pro nastavení návratového typu C funkce vracející 64bitové číslo s plovoucí čárkou:\n\n```python\nimport ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.vypocti_prumer.________ = ctypes.c_double\n```",
+      "options": [
+        "A) restype",
+        "B) return_type",
+        "C) argtypes",
+        "D) result"
+      ],
+      "answer": 0,
+      "explanation": "Atribut restype říká modulu ctypes, jaký typ (např. ctypes.c_double nebo ctypes.c_int) C funkce vrací, aby mohla být návratová hodnota správně přetypována na Python objekt."
+    }
+  ],
+  "cython_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co přesně představuje projekt Cython z hlediska architektury?",
+      "options": [
+        "A) Jazyk rozšiřující Python o statické typy a kompilátor překládající tento kód do jazyka C/C++.",
+        "B) JIT kompilátor napsaný v C++, který nahrazuje standardní virtuální stroj CPython za běhu.",
+        "C) Grafické vývojové prostředí určené pro automatický přepis Python skriptů do jazyka Java.",
+        "D) Samostatný interpret Pythonu nezařazený do CPythonu, který nevyžaduje použití kompilátoru C."
+      ],
+      "answer": 0,
+      "explanation": "Cython je jednak programovací jazyk (nadmnožina Pythonu doplněná o statické C typy) a jednak kompilátor, který tento kód překládá do C nebo C++, jež se následně kompiluje do C extension modulu."
+    },
+    {
+      "id": "q2",
+      "type": "code_fill",
+      "question": "Doplňte klíčové slovo Cythonu pro definici staticky typované celočíselné C proměnné i:\n\n```cython\ndef suma(int n):\n    ________ int i\n    cdef int s = 0\n    for i in range(n):\n        s += i\n    return s\n```",
+      "options": [
+        "A) cdef",
+        "B) static",
+        "C) var",
+        "D) typed"
+      ],
+      "answer": 0,
+      "explanation": "Klíčové slovo cdef slouží v Cythonu k definici staticky typovaných C proměnných, funkcí nebo struktur. Proměnné vytvořené přes cdef nemají režii Python objektů (PyObject)."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jakého zrychlení typicky dosáhne čistý Python skript bez typových anotací pouhým překladem pomocí Cythonu?",
+      "options": [
+        "A) Zrychlení o 20 % až 50 % díky eliminaci režie interpretace bajtkódu virtuálním strojem.",
+        "B) Zrychlení o 100x až 1000x, protože Cython automaticky odvodí všechny statické C typy.",
+        "C) Žádného zrychlení, protože bez klíčového slova cdef se vygeneruje identický bajtkód.",
+        "D) Zpomalení o 50 %, protože volání C-API přes vygenerované C soubory přináší novou režii."
+      ],
+      "answer": 0,
+      "explanation": "Čistý Python kód (bez cdef) přeložený Cythonem běží přes C-API CPythonu. Odstraní se pouze režie interpretace eval-smyčky bytekódu, což typicky přináší zrychlení o cca 20 % až 50 %."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je rozdíl mezi deklarací funkce pomocí cdef a cpdef v Cythonu?",
+      "options": [
+        "A) cdef vytvoří rychlou funkci volatelnou pouze z C/Cythonu, zatímco cpdef vytvoří obě verze pro C i Python.",
+        "B) cpdef vytvoří funkci volatelnou pouze z Pythonu, zatímco cdef vytvoří funkci volatelnou výhradně z C++.",
+        "C) cdef automaticky uvolní Globální zámek interpretu (GIL), zatímco cpdef GIL striktně vyžaduje.",
+        "D) Obě slova jsou zcela synonymní a liší se pouze historickou verzí Cythonu, ve které byla představena."
+      ],
+      "answer": 0,
+      "explanation": "Funkce deklarovaná jako cdef má čisté C rozhraní a nelze ji volat z Pythonu. cpdef vygeneruje jak rychlou C funkci, tak Python wrapper, takže ji lze volat jak z C/Cythonu, tak přímo z Python skriptu."
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o závislosti vygenerovaného C kódu z Cythonu:\n\nVygenerovaný C kód z Cythonu spoléhá na hlavičkové soubory a knihovny CPythonu, takže výsledný zkompilovaný modul nelze spustit samostatně bez CPython prostředí.",
+      "options": [
+        "A) Pravda – Cython generuje C kód využívající Python C-API (objekty PyObject), které vyžadují prostředí CPythonu.",
+        "B) Nepravda – Cython generuje zcela nezávislý standalone binární spustitelný kód bez jakýchkoli závislostí."
+      ],
+      "answer": 0,
+      "explanation": "Kód vygenerovaný Cythonem úzce spolupracuje s hlavním interpretem CPythonu a volá jeho C-API (rozhraní Python.h). Proto zkompilovaný modul .so/.pyd vyžaduje CPython pro svůj běh."
+    }
+  ]
+}

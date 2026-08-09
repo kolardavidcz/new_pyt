@@ -55,6 +55,7 @@ def resolve_url_path(url_path: str) -> Path | None:
         # Also serve app fonts under familiar path if needed
         candidates.append(ROOT / "app" / path.lstrip("/"))
     elif path.startswith("/vyuka_downloaded/"):
+        candidates.append(ROOT / "public" / path.lstrip("/"))
         candidates.append(OLD / path.lstrip("/"))
     elif path.startswith("/archive/"):
         candidates.append(OLD / path[len("/archive/") :])
@@ -160,6 +161,7 @@ def main() -> int:
         port = int(sys.argv[1])
 
     os.chdir(ROOT)
+    ThreadingHTTPServer.allow_reuse_address = True
     server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
     print(f"Python Course Shell")
     print(f"  http://localhost:{port}/")

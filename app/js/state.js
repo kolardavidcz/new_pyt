@@ -81,11 +81,88 @@ export const state = {
   /** Currently focused tree node key */
   focusedTreeKey: null,
 
-  /** Cross-tab item scroll ratio memory: itemId → scrollRatio (0.0 to 1.0) */
+  /** Quizzes dictionary loaded from data/quizzes.json */
+  quizzes: {},
+
+  /** Quiz scores: slug -> { qId -> { selected, isCorrect, timestamp } } */
+  quizScores: {},
+
+  /** Print setting: include quizzes in print export */
+  printWithQuizzes: true,
+
+  /** Scroll ratio memory per item id for full lectures */
   itemScrollRatios: {},
 
   user: null,
 };
+
+const QUIZ_SCORES_KEY = "pcs-quiz-scores-v1";
+
+export function saveQuizScore(slug, qId, scoreInfo) {
+  if (!state.quizScores[slug]) state.quizScores[slug] = {};
+  state.quizScores[slug][qId] = {
+    ...scoreInfo,
+    timestamp: new Date().toISOString(),
+  };
+  try {
+    localStorage.setItem(QUIZ_SCORES_KEY, JSON.stringify(state.quizScores));
+  } catch { /* ignore */ }
+  notifyStateChange("quizScore", { slug, qId, scoreInfo });
+}
+
+const ERROR_LOG_KEY = "pcs-error-link-log-v1";
+
+export function logLinkError(errData) {
+  if (!errData || (!errData.href && !errData.targetId)) return;
+  const entry = {
+    id: `err-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    timestamp: new Date().toISOString(),
+    href: errData.href || "",
+    targetId: errData.targetId || "",
+    source: errData.source || window.location.hash || "app",
+    message: errData.message || "Item not found",
+    tag: errData.tag || "bad_link",
+    status: "open",
+    count: 1,
+  };
+
+  const existing = state.errorLinkLog.find((e) => e.targetId === entry.targetId && e.message === entry.message);
+  if (existing) {
+    existing.count += 1;
+    existing.timestamp = entry.timestamp;
+    existing.status = "open";
+  } else {
+    state.errorLinkLog.unshift(entry);
+  }
+
+  if (state.errorLinkLog.length > 200) state.errorLinkLog.pop();
+
+  try {
+    localStorage.setItem(ERROR_LOG_KEY, JSON.stringify(state.errorLinkLog));
+  } catch { /* ignore */ }
+
+  console.warn("[Link Error DB]", entry);
+  notifyStateChange("errorLog", { entry });
+}
+
+export function markLinkErrorFixed(id) {
+  const item = state.errorLinkLog.find((e) => e.id === id);
+  if (item) {
+    item.status = "fixed";
+    try {
+      localStorage.setItem(ERROR_LOG_KEY, JSON.stringify(state.errorLinkLog));
+    } catch { /* ignore */ }
+    notifyStateChange("errorLog", { item });
+  }
+}
+
+export function clearLinkErrorLog() {
+  state.errorLinkLog = [];
+  try {
+    localStorage.removeItem(ERROR_LOG_KEY);
+  } catch { /* ignore */ }
+  notifyStateChange("errorLog");
+}
 
 export function loadUser() {
   try {
@@ -161,6 +238,13 @@ export function loadPersisted() {
     if (w >= 180 && w <= 520) state.sidebarWidth = w;
   } catch { /* ignore */ }
   try {
+    const raw = localStorage.getItem(QUIZ_SCORES_KEY);
+    if (raw) {
+      const obj = JSON.parse(raw);
+      if (obj && typeof obj === "object") state.quizScores = obj;
+    }
+  } catch { /* ignore */ }
+  try {
     const sOpen = localStorage.getItem("pcs-sidebar-open");
     if (sOpen !== null) state.sidebarOpen = JSON.parse(sOpen) === true;
     else state.sidebarOpen = false;
@@ -171,7 +255,19 @@ export function loadPersisted() {
     const cbc = localStorage.getItem("pcs-code-block-color") || localStorage.getItem("pcs-print-theme");
     if (cbc === "dark" || cbc === "light") state.codeBlockColor = cbc;
   } catch { /* ignore */ }
+  try {
+    const pwq = localStorage.getItem("pcs-print-quizzes");
+    if (pwq !== null) state.printWithQuizzes = pwq === "true";
+  } catch { /* ignore */ }
+  try {
+    const raw = localStorage.getItem(ERROR_LOG_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) state.errorLinkLog = arr;
+    }
+  } catch { /* ignore */ }
   document.documentElement.setAttribute("data-code-block-color", state.codeBlockColor);
+  document.documentElement.setAttribute("data-print-quizzes", state.printWithQuizzes ? "true" : "false");
 
   syncCloudProgress();
 }
@@ -184,7 +280,106 @@ export function setCodeBlockColor(color) {
     localStorage.setItem("pcs-code-block-color", next);
     localStorage.setItem("pcs-print-theme", next);
   } catch { /* ignore */ }
-  notify();
+  notifyStateChange("codeBlockColor", { color: next });
+}
+
+export function setPrintWithQuizzes(enabled) {
+  state.printWithQuizzes = !!enabled;
+  document.documentElement.setAttribute("data-print-quizzes", state.printWithQuizzes ? "true" : "false");
+  try {
+    localStorage.setItem("pcs-print-quizzes", state.printWithQuizzes ? "true" : "false");
+  } catch { /* ignore */ }
+  notifyStateChange("printWithQuizzes", { enabled: state.printWithQuizzes });
+}
+
+let quizNormCache = null;
+
+function getQuizNormCache() {
+  if (!quizNormCache) {
+    quizNormCache = new Map();
+    for (const k in state.quizzes) {
+      quizNormCache.set(normalizeKey(k), state.quizzes[k]);
+    }
+  }
+  return quizNormCache;
+}
+
+export function invalidateQuizNormCache() {
+  quizNormCache = null;
+}
+
+function normalizeKey(str) {
+  return String(str || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+/**
+ * Asynchronous & resilient quiz lookup with multi-key normalization and lazy per-week fallback.
+ */
+export async function getQuizFor(item) {
+  if (!item) return null;
+  const item_id = item.id || "";
+  const slug = item.slug || "";
+  const path = (item.path || "").replace(/\\/g, "/");
+  const cleanPath = path.replace(/^vyuka_downloaded\/materialy\//, "").replace(/^vyuka_downloaded\//, "");
+  const cleanPathNoExt = cleanPath.replace(/\.(html|xml)$/, "");
+  const parts = cleanPathNoExt.split("/");
+  const base = parts[parts.length - 1];
+  const lastTwo = parts.length >= 2 ? `${parts[parts.length - 2]}_${parts[parts.length - 1]}` : base;
+  const idClean = item_id.replace(/^lecture:/, "").replace(/^exercise:/, "");
+
+  const candidates = [
+    item_id,
+    cleanPathNoExt,
+    lastTwo,
+    base,
+    slug,
+    path,
+    idClean,
+    "lecture:" + cleanPath,
+  ];
+
+  const checkMemory = () => {
+    for (const c of candidates) {
+      if (c && state.quizzes[c]) return state.quizzes[c];
+    }
+    const normMap = getQuizNormCache();
+    for (const c of candidates) {
+      if (c) {
+        const norm = normalizeKey(c);
+        if (normMap.has(norm)) return normMap.get(norm);
+      }
+    }
+    return null;
+  };
+
+  let found = checkMemory();
+  if (found) return found;
+
+  // Fallback: Lazy fetch per-week chunk if missing
+  const weekNum = item.weekNum !== undefined ? item.weekNum : (item.week ? item.week : null);
+  if (weekNum != null) {
+    const urls = [
+      `/data/quizzes/w${weekNum}.json`,
+      `./data/quizzes/w${weekNum}.json`,
+      `../data/quizzes/w${weekNum}.json`
+    ];
+    for (const u of urls) {
+      try {
+        const res = await fetch(u, { cache: "no-store" });
+        if (res.ok) {
+          const chunkData = await res.json();
+          if (chunkData && typeof chunkData === "object") {
+            Object.assign(state.quizzes, chunkData);
+            invalidateQuizNormCache();
+            found = checkMemory();
+            if (found) return found;
+          }
+        }
+      } catch { /* ignore */ }
+    }
+  }
+
+  return null;
 }
 
 const listeners = new Set();
@@ -407,11 +602,27 @@ export function buildIndexes(course) {
       const item = { ...lec, weekId: week.id, weekTitle: week.title, weekNum: week.week };
       state.items.push(item);
       state.itemsById.set(item.id, item);
+      const cleanPath = item.path ? item.path.replace(/\\/g, "/") : "";
+      if (cleanPath) {
+        state.itemsById.set("lecture:" + cleanPath.replace(/^vyuka_downloaded\//, ""), item);
+        state.itemsById.set("lecture:" + cleanPath.replace(/^vyuka_downloaded\/materialy\//, ""), item);
+      }
+      if (item.slug) {
+        state.itemsById.set("lecture:" + item.slug, item);
+      }
     }
     for (const ex of week.exercises || []) {
       const item = { ...ex, weekId: week.id, weekTitle: week.title, weekNum: week.week };
       state.items.push(item);
       state.itemsById.set(item.id, item);
+      const cleanPath = item.path ? item.path.replace(/\\/g, "/") : "";
+      if (cleanPath) {
+        state.itemsById.set("exercise:" + cleanPath.replace(/^vyuka_downloaded\//, ""), item);
+        state.itemsById.set("exercise:" + cleanPath.replace(/^vyuka_downloaded\/materialy\//, ""), item);
+      }
+      if (item.slug) {
+        state.itemsById.set("exercise:" + item.slug, item);
+      }
     }
   }
 }

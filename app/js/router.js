@@ -46,8 +46,10 @@ export function saveCurrentTabScroll() {
   const editorBody = document.querySelector(".editor-body");
   if (!activeTab || !editorBody) return;
 
+  if (!state.itemScrollRatios) state.itemScrollRatios = {};
+
   activeTab.scrollTop = editorBody.scrollTop;
-  if (activeTab.itemId) {
+  if (activeTab.itemId && activeTab.kind === "content") {
     const maxScroll = editorBody.scrollHeight - editorBody.clientHeight;
     if (maxScroll > 0) {
       state.itemScrollRatios[activeTab.itemId] = editorBody.scrollTop / maxScroll;
@@ -58,13 +60,16 @@ export function saveCurrentTabScroll() {
 export function restoreTabScroll(tab) {
   if (!tab) return;
 
+  if (!state.itemScrollRatios) state.itemScrollRatios = {};
+
   const performRestore = () => {
     const editorBody = document.querySelector(".editor-body");
     if (!editorBody) return;
 
     let targetY = tab.scrollTop;
 
-    if ((targetY == null || targetY === 0) && tab.itemId && state.itemScrollRatios[tab.itemId] != null) {
+    // Only apply ratio fallback for full continuous lecture documents, NOT for single slide pages
+    if (targetY == null && tab.kind === "content" && tab.itemId && state.itemScrollRatios[tab.itemId] != null) {
       const ratio = state.itemScrollRatios[tab.itemId];
       const maxScroll = editorBody.scrollHeight - editorBody.clientHeight;
       if (maxScroll > 0) {
@@ -72,14 +77,17 @@ export function restoreTabScroll(tab) {
       }
     }
 
-    if (targetY != null) {
+    if (targetY != null && targetY > 0) {
       editorBody.scrollTop = targetY;
+    } else if (tab.scrollTop === 0) {
+      editorBody.scrollTop = 0;
     }
   };
 
   requestAnimationFrame(performRestore);
-  setTimeout(performRestore, 60);
+  setTimeout(performRestore, 50);
   setTimeout(performRestore, 200);
+  setTimeout(performRestore, 500);
 }
 
 let scrollTrackerBound = false;
@@ -93,10 +101,11 @@ export function initScrollTracker() {
     () => {
       if (!isTicking) {
         requestAnimationFrame(() => {
+          if (!state.itemScrollRatios) state.itemScrollRatios = {};
           const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
           if (activeTab) {
             activeTab.scrollTop = editorBody.scrollTop;
-            if (activeTab.itemId) {
+            if (activeTab.itemId && activeTab.kind === "content") {
               const maxScroll = editorBody.scrollHeight - editorBody.clientHeight;
               if (maxScroll > 0) {
                 state.itemScrollRatios[activeTab.itemId] = editorBody.scrollTop / maxScroll;
@@ -240,9 +249,32 @@ function applyRoute(route) {
     navigate({ kind: "home" }, { skipHistory: true });
     return;
   }
-  // Resolve content kind: prefer item existence
+  // Resolve content kind: prefer item existence, fallback to dynamic item registration for disk files
   if (route.kind === "lecture" || route.kind === "exercise") {
-    const item = state.itemsById.get(route.id);
+    let item = state.itemsById.get(route.id);
+    if (!item && route.id) {
+      const rawPath = route.id.replace(/^(lecture|exercise):/, "");
+      const fullPath = rawPath.startsWith("vyuka_downloaded/")
+        ? rawPath
+        : (rawPath.startsWith("materialy/") ? "vyuka_downloaded/" + rawPath : "vyuka_downloaded/materialy/" + rawPath.replace(/^\//, ""));
+      const baseName = fullPath.split("/").pop().replace(/\.html$/, "");
+      const titleName = baseName.replace(/^[_.-]+/, "").replace(/[-_]/g, " ");
+      const displayTitle = titleName.charAt(0).toUpperCase() + titleName.slice(1);
+
+      item = {
+        id: route.id,
+        kind: route.kind,
+        title: displayTitle,
+        path: fullPath,
+        slug: baseName,
+        weekNum: 99,
+        relevance: 5,
+        tags: ["Core"],
+      };
+      state.itemsById.set(route.id, item);
+      state.itemsById.set("lecture:" + fullPath.replace(/^vyuka_downloaded\//, ""), item);
+      state.itemsById.set("lecture:" + fullPath.replace(/^vyuka_downloaded\/materialy\//, ""), item);
+    }
     if (item) {
       navigate({ kind: item.kind, id: item.id }, { skipHistory: true });
       return;

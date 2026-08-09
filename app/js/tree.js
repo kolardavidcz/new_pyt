@@ -17,6 +17,8 @@ export function renderTree() {
   if (!root || !state.course) return;
   clear(root);
 
+  const frag = document.createDocumentFragment();
+
   // Top special node for Checklist
   const checkNode = document.createElement("div");
   checkNode.className = "tree-node";
@@ -40,7 +42,7 @@ export function renderTree() {
     }
   });
   checkNode.appendChild(checkRow);
-  root.appendChild(checkNode);
+  frag.appendChild(checkNode);
 
   const weeks = state.course.weeks || [];
   for (const week of weeks) {
@@ -60,15 +62,17 @@ export function renderTree() {
       state.expanded.set(week.id, true);
     }
 
-    root.appendChild(buildWeekNode(week, items));
+    frag.appendChild(buildWeekNode(week, items));
   }
 
-  if (!root.childElementCount) {
+  if (!frag.childElementCount) {
     const empty = document.createElement("div");
     empty.style.cssText = "padding:16px 12px;color:var(--text-faint);font-size:12px;";
     empty.textContent = "No items match the current filters.";
-    root.appendChild(empty);
+    frag.appendChild(empty);
   }
+
+  root.appendChild(frag);
 }
 
 function buildWeekNode(week, items) {

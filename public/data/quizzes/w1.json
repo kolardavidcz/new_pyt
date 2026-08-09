@@ -1,0 +1,763 @@
+{
+  "_remarks": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Proč je zápis `{}` pro vytvoření prázdného slovníku rychlejší než volání `dict()`?",
+      "options": [
+        "A) Zápis `{}` překládá interpretr přímo na jedinou bajtkódovou instrukci, zatímco `dict()` vyžaduje dohledání jména v globálním prostoru.",
+        "B) Zápis `{}` alokuje paměť přímo v paměti procesoru, zatímco `dict()` vytváří objekt v dynamické paměti RAM pro celé prostředí.",
+        "C) Zápis `{}` automaticky zamkne slovník proti úpravám, zatímco `dict()` vytváří dynamickou a libovolně měnitelnou datovou strukturu.",
+        "D) Zápis `{}` provádí kontrolu typů klíčů již při překladu, zatímco `dict()` odkládá všechny kontroly typů až na samotný běh programu."
+      ],
+      "answer": 0,
+      "explanation": "Zápis `{}` odpovídá přímo instrukci BUILD_MAP v bajtkódu. Volání `dict()` vyžaduje dohledání jména v globálním/vestavěném jmenném prostoru a teprve poté zavolání callable objektu."
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Co vypíše následující kód po úpravě seznamu přes odkaz?",
+      "code": "xs = ['a', 'b', 'c']\nys = xs\nxs.remove('b')\nprint(ys)",
+      "options": [
+        "A) `['a', 'c']` — proměnné `xs` a `ys` odkazují na stejný objekt v paměti, takže změna v `xs` se projeví i v `ys`.",
+        "B) `['a', 'b', 'c']` — přiřazení `ys = xs` vytvoří nezávislou kopii obsahu seznamu, takže `ys` zůstane nezměněn.",
+        "C) `['b']` — metoda `remove()` odstraní ze seznamu zbývající prvky a v odkazované proměnné ponechá pouze vymazaný prvek.",
+        "D) `None` — metoda `remove()` modifikuje seznam na místě a vrací novou prázdnou hodnotu, která se přiřadí do `ys`."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu přiřazení `ys = xs` nevytváří kopii, ale nový alias k témuž objektu v paměti. Modifikace `xs.remove('b')` upraví samotný objekt, což je viditelné i přes jméno `ys`."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Co vypíše následující kód demonstrující mělkou kopii u vnořených seznamů?",
+      "code": "xs = [1, ['a', 'b']]\nys = xs[:]\nxs[1].pop()\nprint(ys)",
+      "options": [
+        "A) `[1, ['a']]` — mělká kopie zkopíruje pouze vnější seznam, vnitřní seznam zůstává sdílený v obou proměnných.",
+        "B) `[1, ['a', 'b']]` — výřez `xs[:]` vytvoří kompletní hlubokou kopii včetně všech vnořených datových struktur.",
+        "C) `[1, []]` — metoda `pop()` vyprázdní vnořený seznam v primárním objektu i ve všech jeho nezávislých kopiích.",
+        "D) `[['a']]` — zkopírovaný seznam automaticky odstraní celočíselné prvky na nultém indexu při úpravě podseznamu."
+      ],
+      "answer": 0,
+      "explanation": "Výřez `xs[:]` vytvoří mělkou kopii vnějšího seznamu. Prvky uvnitř (vnořený seznam `['a', 'b']`) jsou však stále stejné reference. Úprava `xs[1].pop()` se proto projeví i v `ys`."
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Lze n-tici `(1, 2, [3, 4])` použít jako klíč ve slovníku, protože samotná n-tice je immutable typ?",
+      "options": [
+        "A) Nepravda — n-tice je hešovatelná pouze tehdy, pokud jsou hešovatelné všechny prvky, které sama obsahuje.",
+        "B) Pravda — typ `tuple` je neproměnný, takže jeho heš je konstantní bez ohledu na datové typy vnořených prvků."
+      ],
+      "answer": 0,
+      "explanation": "Aby byla n-tice hešovatelná (a použitelná jako klíč slovníku nebo prvek množiny), musejí být hešovatelné i všechny její prvky. Protože obsahuje mutable seznam `[3, 4]`, volání `hash()` vyvolá TypeError."
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Co vypíše kód porovnávající vyprázdnění slovníku metodou `clear()` a přiřazením `{}`?",
+      "code": "d1 = d2 = {'a': 1, 'b': 2}\nd1.clear()\nprint(d2)",
+      "options": [
+        "A) `{}` — metoda `clear()` vyprázdní existující objekt v paměti, na který odkazuje jak `d1`, tak `d2`.",
+        "B) `{'a': 1, 'b': 2}` — metoda `clear()` se aplikuje pouze na jméno `d1` a druhý ukazatel `d2` ponechá netknutý.",
+        "C) `None` — zavolání `clear()` smaže celý slovník z paměti a vrátí speciální konduktor `None` pro oba odpovídající proměnné.",
+        "D) `KeyError` — odstranění všech prvků způsobí chybu klíče při pokusu o přistoupení k prázdnému slovníku přes `d2`."
+      ],
+      "answer": 0,
+      "explanation": "Metoda `d1.clear()` modifikuje stávající objekt slovníku přímo v paměti. Protože `d2` odkazuje na tentýž objekt, zobrazí se vyprázdněný slovník `{}`."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaký je rozdíl v asymptotické časové složitosti operace `x in kontejner` pro seznam (`list`) a množinu (`set`)?",
+      "options": [
+        "A) U seznamu je časová složitost O(n), protože vyžaduje lineární prohledání; u množiny je v průměrném případě O(1) díky hešování.",
+        "B) U seznamu je časová složitost O(1) díky přímému indexování prvků; u množiny je O(n) kvůli nutnosti proít se všemi heši.",
+        "C) Pro oba typy je časová složitost operace `in` zcela shodná a dosahuje nejhoršího možného případu O(log n) pro všechny vstupy.",
+        "D) U seznamu závisí časová složitost na seřazení prvků v rozsahu O(1) až O(n); u množiny je vždy striktně kvadratická O(n^2)."
+      ],
+      "answer": 0,
+      "explanation": "Seznam vyžaduje prohledání prvek po prvku (O(n)). Množina využívá hešovací tabulku, takže vyhledání prvku probíhá v průměrném čase O(1)."
+    },
+    {
+      "id": "q7",
+      "type": "code_fill",
+      "question": "Jaký konstruktor musíte použít pro vytvoření prázdné množiny?",
+      "code": "prazdna_mnozina = ________()\nprint(type(prazdna_mnozina))",
+      "options": [
+        "A) `set` pro správné vytvoření prázdné množiny, protože zápis `{}` vytváří prázdný slovník.",
+        "B) `dict` pro alokaci paměťové struktury s unikátními klíči bez přiřazených hodnot v objektu.",
+        "C) `frozenset` pro vyvození měnitelné prázdné množiny bez inicializačních prvků v seznamu.",
+        "D) `tuple` pro vytvoření hešovatelného kontejneru pro jedinečné prvky v paměti Pythonu."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu zápis `{}` označuje prázdný slovník (`dict`). Pro vytvoření prázdné množiny je nutné použít explicitní konstruktor `set()`."
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Proč v Pythonu platí `hash(1) == hash(1.0)`, ale `id(1) == id(1.0)` je v obecném případě `False`?",
+      "options": [
+        "A) Funkce `hash()` vrací stejnou hodnotu pro čísla se stejnou matematickou hodnotou, zatímco `id()` vrací unikátní adresu objektu v paměti.",
+        "B) Funkce `hash()` porovnává bajtové kódování typů na disku, zatímco `id()` přepočítává celkový počet alokovaných bajtů v paměti.",
+        "C) Funkce `hash()` převádí všechna reálná čísla na celá čísla, zatímco `id()` zjišťuje aktuální úroveň zanoření objektu v programu.",
+        "D) Funkce `hash()` a `id()` jsou plně zastupitelné a uvedený rozdíl vrací pouze interpretr spuštěný v optimalizačním režimu `-O`."
+      ],
+      "answer": 0,
+      "explanation": "`hash()` je navržen tak, aby pro hodnoty, které se sobě rovnají (`1 == 1.0`), vracel stejný heš. `id()` vrací adresu konkrétní instance objektu v paměti RAM."
+    }
+  ],
+  "_sequences": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co vypíše následující kód využívající výřez se záporným krokem na řetězci?",
+      "code": "sekvence = \"Python\"\nprint(sekvence[::-2])",
+      "options": [
+        "A) `nhP` — výřez prochází řetězec od konce k začátku a bere každý druhý znak z původního textu.",
+        "B) `Pty` — výřez bere každý druhý znak od začátku a ignoruje záporné znaménko v definici kroku.",
+        "C) `nohtyP` — záporný krok zprovozní kompletní převrácení řetězce a ignoruje číselnou hodnotu kroku.",
+        "D) `ValueError` — záporný krok výřezu je povolen pouze u seznamů a u řetězců vyvolá chybu typu."
+      ],
+      "answer": 0,
+      "explanation": "Zápis `[::-2]` prochází řetězec od konce do začátku s krokem -2. Pro \"Python\" vezme indexy -1 ('n'), -3 ('h') a -5 ('P'), čímž vznikne \"nhP\"."
+    },
+    {
+      "id": "q2",
+      "type": "code_fill",
+      "question": "Kterou vestavěnou funkci použijete pro získání indexu i hodnoty při průchodu sekvencí ve smyčce `for`?",
+      "code": "sekvence = ['a', 'b', 'c']\nfor idx, val in ________(sekvence):\n    print(idx, val)",
+      "options": [
+        "A) `enumerate` pro generování dvojic tvořených pořadovým indexem a odpovídajícím prvkem sekvence.",
+        "B) `zip` pro propojení dvou nezávislých sekvencí do jedné společné iterovatelné struktury n-tic.",
+        "C) `range` pro vytvoření číselného rozsahu od nuly do celkové délky zadané sekvence prvků.",
+        "D) `sorted` pro seřazení prvků sekvence podle abecedy před jejich postupným zpracováním."
+      ],
+      "answer": 0,
+      "explanation": "Funkce `enumerate(sekvence)` vrací iterátor generující dvojice `(index, prvek)` v přirozeném pořadí průchodu."
+    },
+    {
+      "id": "q3",
+      "type": "predict_output",
+      "question": "Co bude obsahem seznamu `xs` po provedení příkazu `del` nad výřezem?",
+      "code": "xs = [10, 20, 30, 40, 50]\ndel xs[1:4]\nprint(xs)",
+      "options": [
+        "A) `[10, 50]` — příkaz `del` odstraní prvky na indexech 1, 2 a 3 (prvek na indexu 4 již do výřezu nepatří).",
+        "B) `[10, 40, 50]` — příkaz `del` smaže prvky na indexech 1 až 4 včetně obou hraničních hodnot výřezu.",
+        "C) `[20, 30, 40]` — příkaz `del` vymaže okrajové prvky a ponechá vybraný výřez uvnitř nového seznamu.",
+        "D) `[10, 30, 50]` — příkaz `del` odstraňuje prvky na sudých pozicích uvnitř definovaného výřezu seznamu."
+      ],
+      "answer": 0,
+      "explanation": "Výřez `1:4` zahrnuje prvky na indexech 1, 2 a 3 (tj. hodnoty 20, 30, 40). Příkaz `del xs[1:4]` tyto tři prvky ze seznamu modifikací na místě odstraní, takže zůstane `[10, 50]`."
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Lze použít příkaz `del` k odstranění podřetězce z řetězce pomocí výřezu, například `del text[1:3]`?",
+      "options": [
+        "A) Nepravda — řetězce jsou neměnný (immutable) typ, takže jakýkoliv pokus o smazání jejich části vyvolá TypeError.",
+        "B) Pravda — příkaz `del` funguje univerzálně pro všechny sekvenční typy v Pythonu bez ohledu na mutabilitu."
+      ],
+      "answer": 0,
+      "explanation": "Příkaz `del` s indexem nebo výřezem vyžaduje, aby objekt podporoval mazání prvků (metodu `__delitem__`). Řetězce jsou immutable a operaci `__delitem__` nepodporují."
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Co vypíše přístup přes záporný index u následujícího seznamu?",
+      "code": "xs = [100, 200, 300, 400]\nprint(xs[-2])",
+      "options": [
+        "A) `300` — záporné indexování počítá od konce seznamu, kde index `-1` představuje poslední prvek a `-2` předposlední.",
+        "B) `200` — záporný index odčítá pozici od nuly směrem doprava a vrací druhý prvek od začátku seznamu.",
+        "C) `400` — záporné znaménko obrací celý seznam a přístup vrací prvek ze záporně posunuté pozice konce.",
+        "D) `IndexError` — záporné indexy nejsou v Pythonu povoleny a vyžadují explicitní výpočet `len(xs) - 2`."
+      ],
+      "answer": 0,
+      "explanation": "Záporné indexy počítají prvky od konce sekvence: `-1` je poslední prvek (400), `-2` je předposlední prvek (300)."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jak se liší chování vestavěné funkce `sorted(sekvence)` od metody `sekvence.sort()`?",
+      "options": [
+        "A) `sorted()` vrací nový seřazený seznam a původní sekvenci neupravuje, zatímco `sort()` řadí seznam přímo na místě.",
+        "B) `sorted()` funguje pouze pro čísla a vyvolá chybu na textu, zatímco `sort()` dokáže seřadit libovolné datové typy.",
+        "C) `sorted()` modifikuje původní objekt přímo v paměti, zatímco `sort()` vytváří hlubokou kopii seřazeného pole.",
+        "D) `sorted()` i `sort()` fungují zcela totožně a liší se pouze tím, že `sort()` je zastaralá funkce určená k odebrání."
+      ],
+      "answer": 0,
+      "explanation": "Funkce `sorted()` přijímá jakýkoliv iterovatelný objekt a vrací nový seřazený seznam. Metoda `.sort()` je dostupná pouze pro seznamy (`list`) a seřadí prvky in-place s návratovou hodnotou `None`."
+    }
+  ],
+  "basics": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co vypíše následující kód po dokončení smyčky `for`?",
+      "code": "for i in range(3):\n    pass\nprint(i)",
+      "options": [
+        "A) `2` — řídicí proměnná cyklu `i` zůstává po skončení cyklu definována a uchovává poslední nastavenou hodnotu.",
+        "B) `3` — proměnná se na konci cyklu inkrementuje o jedničku nad rozsah před porovnáním ukončovací podmínky.",
+        "C) `NameError` — proměnná definovaná v záhlaví cyklu zaniká při opuštění bloku smyčky a není vně přístupná.",
+        "D) `None` — po dokončení iterace se hodnota proměnné cyklu automaticky nuluje na prázdný objekt `None`."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu neexistuje pro smyčky blokový rozsah proměnných. Řídicí proměnná `i` po skončení cyklu přetrvává v lokálním/globálním oboru jmen s hodnotou z poslední iterace (`2`)."
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Co vypíše smyčka `for-else` při předčasném ukončení příkazem `break`?",
+      "code": "for x in [1, 2, 3]:\n    if x == 2:\n        break\nelse:\n    print(\"Konec\")",
+      "options": [
+        "A) Kód nevypíše nic — větev `else` u cyklu se provede pouze v případě, že cyklus doběhl normálně bez `break`.",
+        "B) `Konec` — větev `else` se u smyček provede vždy bez ohledu na způsob ukončení nebo přerušení cyklu.",
+        "C) `2` — větev `else` zachytí hodnotu proměnné z okamžiku, kdy došlo k předčasnému přerušení cyklu.",
+        "D) `SyntaxError` — klíčové slovo `else` je v Pythonu povolené výhradně u podmíněných příkazů `if` a `try`."
+      ],
+      "answer": 0,
+      "explanation": "Větev `else` u cyklů `for` a `while` se vykoná pouze v případě, že cyklus proběhl do konce (nebylo vyvoláno `break`). Protože došlo k `break`, větev `else` se přeskočí a nevypíše nic."
+    },
+    {
+      "id": "q3",
+      "type": "code_fill",
+      "question": "Jak v podmíněném výrazu (ternárním operátoru) v Pythonu doplníte chybějící klíčové slovo?",
+      "code": "stav = \"aktivni\" ________ vek >= 18 else \"neplnolety\"",
+      "options": [
+        "A) `if` pro zavedení podmínky, která stojí uprostřed mezi výrazem pro splněnou a nesplněnou větev.",
+        "B) `when` pro vyhodnocení výrazu podle standardní syntaxe funkcionálních jazyků v prostředí Pythonu.",
+        "C) `then` pro oddělení výstupní hodnoty od vyhodnocované logické podmínky na daném řádku kódu.",
+        "D) `case` pro spuštění vyhledávání vzorů v rámci jednořádkové deklarace podmíněného přiřazení."
+      ],
+      "answer": 0,
+      "explanation": "Syntaxe ternárního operátoru v Pythonu je `VÝRAZ1 if PODMÍNKA else VÝRAZ2`."
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "V jakém pořadí se vyhodnotí bloky v konstrukci `try-except-else-finally`, pokud v bloku `try` nenastane žádná výjimka?",
+      "code": "try:\n    x = 10\nexcept ValueError:\n    print(\"E\")\nelse:\n    print(\"L\")\nfinally:\n    print(\"F\")",
+      "options": [
+        "A) Vypíše `L` a následně `F` — blok `else` se provede při úspěšném doběhu `try` a `finally` se provede vždy.",
+        "B) Vypíše pouze `L` — blok `finally` se provádí výhradně tehdy, pokud v bloku `try` nebo `except` nastala chyba.",
+        "C) Vypíše `E` a následně `F` — větev `except` se vyhodnocuje vždy pro ověření typu zpracovávaných výjimek.",
+        "D) Vypíše `F` a následně `L` — blok `finally` má přednost při uvolňování zdrojů před zpracováním větve `else`."
+      ],
+      "answer": 0,
+      "explanation": "Pokud v `try` nenastane výjimka, blok `except` se přeskočí. Provede se blok `else` (úspěšný doběh) a následně blok `finally` (vykonává se vždy). Výstup je tedy `L` a `F`."
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Budou se příkazy `assert podmínka` vykonávat i v případě, že spustíte skript v optimalizovaném režimu příkazem `python -O skript.py`?",
+      "options": [
+        "A) Nepravda — v optimalizovaném režimu `-O` interpretr všechny příkazy `assert` kompletně ignoruje a neprovádí.",
+        "B) Pravda — kontroly `assert` jsou kritickou součástí programu a provádějí se bez ohledu na příznaky spuštění."
+      ],
+      "answer": 0,
+      "explanation": "Při spuštění Pythonu s příznakem `-O` (optimize) se z bajtkódu zcela odstraní všechny příkazy `assert`."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Co je to takzvaný 'wildcard' vzor v konstrukci `match-case` uvedené v Pythonu 3.10+?",
+      "options": [
+        "A) Vzor `case _:` který zachytí jakoukoliv hodnotu v případě, že selžou všechny předchozí větve.",
+        "B) Vzor `case *:` který automaticky rozbalí všechny prvky předaného seznamu do lokálních proměnných.",
+        "C) Vzor `case default:` pro zpětnou kompatibilitu se switch příkazy z jazyků C a C++.",
+        "D) Vzor `case else:` který umožňuje propojení podmínkového bloku `if` s porovnáváním vzorů."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu 3.10+ se jako záchytný vzor (wildcard) v `match-case` používá podtržítko `case _:`. Zachytí jakýkoliv objekt, pokud předchozí vzory nesouhlasily."
+    },
+    {
+      "id": "q7",
+      "type": "predict_output",
+      "question": "Co se stane při opakovaném volání funkce s výchozím argumentem typu seznam?",
+      "code": "def pridaj(val, acc=[]):\n    acc.append(val)\n    return acc\n\nprint(pridaj(1))\nprint(pridaj(2))",
+      "options": [
+        "A) Vypíše `[1]` a poté `[1, 2]` — výchozí argument `acc` se vytvoří pouze jednou při definici funkce a sdílí se.",
+        "B) Vypíše `[1]` a poté `[2]` — při každém volání funkce se vytvoří nový prázdný seznam pro výchozí parametr.",
+        "C) Vypíše `[1]` a poté `TypeError` — modifikace výchozího argumentu je v Pythonu zakázána z bezpečnostních důvodů.",
+        "D) Vypíše `[1]` a poté `None` — při opakovaném volání bez předání druhého parametru funkce vrátí prázdný objekt."
+      ],
+      "answer": 0,
+      "explanation": "Výchozí hodnoty argumentů se v Pythonu vyhodnocují pouze jednou při definici funkce (`def`). Změnitelný objekt (mutable default arg, zde seznam `[]`) je sdílen mezi všemi voláními funkce."
+    }
+  ],
+  "numbers": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výstupem celočíselného dělení a zbytku po dělení pro záporná čísla v Pythonu?",
+      "code": "print(-22 // 10, -22 % 10)",
+      "options": [
+        "A) `-3 8` — celočíselné dělení zaokrouhluje směrem k mínus nekonečnu a zbytek zachovává znaménko dělitele.",
+        "B) `-2 -2` — celočíselné dělení ořízne desetinnou část k nule a zbytek po dělení si ponechá znaménko dělence.",
+        "C) `-2 8` — celočíselné dělení se zaokrouhlí k nule, ale zbytek se přepočítá podle konstantní matematické identity.",
+        "D) `-3 -2` — celočíselné dělení se posune k mínus nekonečnu a zbytek se spočítá jako absolutní odchylka od nuly."
+      ],
+      "answer": 0,
+      "explanation": "Python provádí celočíselné dělení `//` zaokrouhlením dolů k mínus nekonečnu (`floor`), tedy `-22 // 10` je `-3`. Zbytek `%` splňuje vzorec `a = (a // b) * b + (a % b)`, takže `-22 % 10` je `8`."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký datový typ a hodnotu vrací operátor dělení `/` u dvou celých čísel v Pythonu 3?",
+      "code": "x = 4 / 2\nprint(type(x), x)",
+      "options": [
+        "A) `<class 'float'> 2.0` — v Pythonu 3 operátor `/` vždy vrací desetinné číslo typu `float`, i když je výsledek celé číslo.",
+        "B) `<class 'int'> 2` — pokud jsou oba operandy typu `int` a dělení je beze zbytku, interpretr vrátí celé číslo.",
+        "C) `<class 'int'> 2.0` — interpretr vytvoří celé číslo, ale zformátuje ho s desetinnou tečkou pro lepší čitelnost.",
+        "D) `<class 'complex'> (2+0j)` — dělení automaticky převádí všechny celočíselné operandy na komplexní čísla."
+      ],
+      "answer": 0,
+      "explanation": "Od Pythonu 3 operátor `/` provádí reálné dělení a vždy vrací objekt typu `float` (např. `4 / 2` dá `2.0`). Pro celočíselné dělení se používá operátor `//`."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Proč zápis `a + bj` vyvolá `NameError`, pokud máte proměnné `a = 1` a `b = 2`?",
+      "options": [
+        "A) Přípona `j` funguje pouze u literálů (např. `2j`); u proměnné je nutné násobit imaginární jednotku jako `a + b*1j`.",
+        "B) Komplexní čísla vyžadují použití velikého písmene `J` a zápis s malým `j` je vyhrazen pro systémové proměnné.",
+        "C) Proměnná `bj` musí být nejprve deklarována v modulu `cmath` před jejím použitím v matematickém výrazu.",
+        "D) Python nepodporuje komplexní čísla přímo v syntaxi a vyžaduje import externí knihovny `numpy`."
+      ],
+      "answer": 0,
+      "explanation": "Písmeno `j` označuje imaginární část pouze tehdy, když je připojeno přímo k číselnému literálu (např. `2j`). Zápis `bj` interpretr chápe jako jméno proměnné `bj`, která nebyla definována."
+    },
+    {
+      "id": "q4",
+      "type": "code_fill",
+      "question": "Který parametr musíte předat převodní funkci `int()`, aby převedla řetězec z hexadecimální soustavy?",
+      "code": "cislo = int(\"1a\", ________=16)\nprint(cislo)",
+      "options": [
+        "A) `base` pro určení číselné soustavy, ve které je vstupní řetězec zapsán.",
+        "B) `radix` pro definování základu číselné soustavy podle standardu C/C++.",
+        "C) `format` pro vyjasnění kódování znaků reprezentujících číselnou hodnotu.",
+        "D) `system` pro specifikaci soustavy při převodu textu na celé číslo."
+      ],
+      "answer": 0,
+      "explanation": "Konstruktor `int(string, base=N)` přijímá pojmenovaný parametr `base` určující základ číselné soustavy (zde 16 pro hexadecimální převod)."
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Co vypíše bitová negace `~x` u celého čísla v Pythonu?",
+      "code": "x = 10\nprint(~x)",
+      "options": [
+        "A) `-11` — bitová negace celého čísla v reprezentaci dvojkového doplňku odpovídá vzorci `-(x + 1)`.",
+        "B) `-10` — bitová negace změní znaménko čísla na opačné a zachová původní absolutní hodnotu.",
+        "C) `0` — bitová negace vynuluje všechny bity kladného čísla a vrací nulovou celočíselnou hodnotu.",
+        "D) `10` — bitová negace u celých čísel s libovolnou přesností neprovádí žádnou změnu hodnoty."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu jsou celá čísla reprezentována v dvojkovém doplňku. Operátor `~x` překlápí všechny bity, což se matematicky rovná `-(x + 1)`. Pro `x = 10` vrací `-(10 + 1) = -11`."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaká je hlavní výhoda použití modulu `decimal` oproti standardnímu typu `float`?",
+      "options": [
+        "A) `decimal` zamezuje nepřesnostem binárního zaokrouhlování u desetinných čísel a umožňuje nastavit přesnost výpočtů.",
+        "B) `decimal` provádí výpočty výrazně rychleji než nízkoúrovňový C typ double používaný pro `float`.",
+        "C) `decimal` dokáže reprezentovat nekonečně velká reálná čísla bez využití jakékoliv operační paměti RAM.",
+        "D) `decimal` automaticky převádí všechny aritmetické operace na zlomky a vrací je v podobě celých čísel."
+      ],
+      "answer": 0,
+      "explanation": "Datový typ `float` používá IEEE 754 binární reprezentaci, která nemůže přesně zobrazit číselné hodnoty jako 0.1. Modul `decimal` počítá v desítkové soustavě s uživatelsky nastavitelnou přesností."
+    },
+    {
+      "id": "q7",
+      "type": "true_false_tricky",
+      "question": "Vrací `int.from_bytes(b'\\x00\\x10', byteorder='big')` stejnou hodnotu jako s parametrem `byteorder='little'`?",
+      "options": [
+        "A) Nepravda — 'big' umístí nejvýznamnější bajt na začátek (výsledek 16), zatímco 'little' ho dá na konec (výsledek 4096).",
+        "B) Pravda — pořadí bajtů ovlivňuje pouze záporná čísla v dvojkovém doplňku a pro kladné hodnoty je výsledek shodný."
+      ],
+      "answer": 0,
+      "explanation": "Přejímání bajtů závisí na endianitě: `big` čte bajty v pořadí `0x00`, `0x10` (což je 16). `little` čte bajty pozpátku jako `0x10`, `0x00` (což je 4096)."
+    }
+  ],
+  "strings": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jak se liší chování metod `str.find()` a `str.index()` při hledání podřetězce, který v textu neexistuje?",
+      "options": [
+        "A) `find()` vrací hodnotu `-1`, zatímco `index()` vyvolá výjimku `ValueError`.",
+        "B) `find()` vyvolá výjimku `KeyError`, zatímco `index()` vrací prázdný řetězec `''`.",
+        "C) `find()` vrací `None`, zatímco `index()` vrací záporný index posledního znaku `-1`.",
+        "D) Metody se chovají zcela totožně a v obou případech vyvolají výjimku `IndexError`."
+      ],
+      "answer": 0,
+      "explanation": "Pokud hledaný podřetězec neexistuje, metoda `find()` vrátí `-1`. Metoda `index()` vyvolá výjimku `ValueError`."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Co vypíše metoda `strip('1234')` zavolaná na text obsahující číslice i mezery?",
+      "code": "xs = '12 to by nešlo 24'\nprint(xs.strip('1234'))",
+      "options": [
+        "A) `' to by nešlo '` — metoda odstraňuje z obou konců zadané znaky a zastaví se na prvním znaku (mezeře), který v množině není.",
+        "B) `'to by nešlo'` — metoda postupně vymaže všechny číslice i obklopující mezery ze všech míst daného řetězce.",
+        "C) `' to by nešlo'` — metoda odstraňuje znaky pouze z levé strany a pravý konec řetězce ponechá zcela netknutý.",
+        "D) `'12 to by nešlo 24'` — metoda selže bez úpravy řetězce, protože zadaný parametr nepředstavuje souvislý podřetězec."
+      ],
+      "answer": 0,
+      "explanation": "Metoda `strip(chars)` přijímá množinu znaků a odstraňuje je z obou konců řetězce tak dlouho, dokud naráží na znaky obsažené v `chars`. Na obou koncích řetězce `xs` jsou po odstranění číslic mezery, na kterých se mazání zastaví."
+    },
+    {
+      "id": "q3",
+      "type": "code_fill",
+      "question": "Kterou novou metodou z Pythonu 3.9+ bezpečně odstraníte specifikovanou předponu z řetězce?",
+      "code": "nazev = \"tmp_data.txt\"\ncisty_nazev = nazev.________(\"tmp_\")\nprint(cisty_nazev)",
+      "options": [
+        "A) `removeprefix` pro odstranění přesně zadané předpony z počátku řetězce.",
+        "B) `lstrip` pro smazání všech znaků zadaných v parametru bez ohledu na jejich pořadí.",
+        "C) `delete_start` pro vymazání počátečního podřetězce podle indexu první mezery.",
+        "D) `trim_left` pro standardní oříznutí textových znaků na začátku proměnné."
+      ],
+      "answer": 0,
+      "explanation": "Metoda `removeprefix('tmp_')` v Pythonu 3.9+ odstraní zadanou předponu, pokud řetězec touto předponou začíná."
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "Co vrací metoda `partition()` při rozdělení řetězce podle zadaného separátoru?",
+      "code": "s = \"a=b=c\"\nprint(s.partition('='))",
+      "options": [
+        "A) `('a', '=', 'b=c')` — vrací n-tici o 3 prvcích: část před prvním výskytem, samotný separátor a část za ním.",
+        "B) `['a', 'b', 'c']` — rozdělí řetězec na seznam všech částí oddělených separátorem a separátor zahodí.",
+        "C) `('a', 'b=c')` — vrací dvojici řetězců rozdělených podle prvního výskytu zadaného separátoru.",
+        "D) `('a=b', '=', 'c')` — rozděluje řetězec zprava doleva podle posledního výskytu daného znaku."
+      ],
+      "answer": 0,
+      "explanation": "Metoda `partition(sep)` rozdělí řetězec při prvním výskytu `sep` a vždy vrací trojici `(text_před, sep, text_za)`."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi r-řetězcem (raw string `r\"\\n\"`) a běžným řetězcem (`\"\\n\"`)?",
+      "options": [
+        "A) V `r\"\\n\"` se řídicí sekvence nevyhodnocují a vrací dva samostatné znaky `\\` a `n`, zatímco `\"\\n\"` představuje nový řádek.",
+        "B) V `r\"\\n\"` jsou všechny znaky automaticky převedeny na velká písmena ještě před zpracováním v kódu.",
+        "C) V `r\"\\n\"` se text ukládá jako pole bajtů `bytes`, zatímco `\"\\n\"` vytváří standardní Unicodový objekt.",
+        "D) V `r\"\\n\"` je zakázáno používat apostrofy a uvozovky, zatímco v `\"\\n\"` je jejich použití neomezené."
+      ],
+      "answer": 0,
+      "explanation": "Raw řetězce (s předponou `r` nebo `R`) potlačují vyhodnocování únikových sekvencí. Zápis `r\"\\n\"` obsahuje dva znaky: zpětné lomítko a písmeno 'n'."
+    },
+    {
+      "id": "q6",
+      "type": "true_false_tricky",
+      "question": "Lze změnit první znak v řetězci pomocí přímého přiřazení do indexu `s[0] = 'X'`?",
+      "options": [
+        "A) Nepravda — řetězce v Pythonu jsou immutable (neměnné), takže přiřazení do indexu vyvolá TypeError.",
+        "B) Pravda — indexový přístup v Pythonu umožňuje měnit libovolný prvek v jakémkoliv sekvenčním typu."
+      ],
+      "answer": 0,
+      "explanation": "Řetězce (`str`) jsou v Pythonu immutable. Jakýkoliv pokus o přímou modifikaci znaku přes index (`s[0] = 'X'`) selže s výjimkou `TypeError`."
+    },
+    {
+      "id": "q7",
+      "type": "predict_output",
+      "question": "Co je výstupem operátoru násobení u řetězce, pokud je druhým operandem nula?",
+      "code": "print(\"Python\" * 0)",
+      "options": [
+        "A) Prázdný řetězec `''` — násobení řetězce nulou nebo záporným číslem vrací prázdný řetězec.",
+        "B) `ValueError` — násobení textového řetězce nulovým celým číslem není v Pythonu povoleno.",
+        "C) `None` — operace vrátí prázdnou objektovou hodnotu bez alokace textového řetězce.",
+        "D) `\"0\"` — násobení převede textový řetězec na číselný literál reprezentující nulu."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu násobení řetězce celým číslem n opakuje řetězec n-krát. Pro n <= 0 vrací prázdný řetězec `''`."
+    }
+  ],
+  "encoding": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi Unicode Code Pointem a kódováním UTF-8?",
+      "options": [
+        "A) Code point je abstrakce přiřazující číselnou hodnotu znaku, zatímco UTF-8 definuje uložení této hodnoty v bajtech.",
+        "B) Code point představuje osmibitovou bajtovou sekvencí, zatímco UTF-8 je název univerzální tabulky všech znaků.",
+        "C) Code point slouží výhradně pro zápis v HTML entitách, zatímco UTF-8 je specifikace pro terminálový výstup.",
+        "D) Code point určuje pořadí bajtů v paměti (BOM), zatímco UTF-8 omezuje počet všech dostupných znaků na 256."
+      ],
+      "answer": 0,
+      "explanation": "Code point (např. U+0041) je pouze abstrakce a pořadové číslo znaku v Unicode tabulce, zatímco kódování jako UTF-8 definuje konkrétní algoritmus a bajtovou reprezentaci tohoto čísla v paměti či souboru."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Kolik bajtů zabere český znak s diakritikou (např. 'ě') při zakódování do UTF-8?",
+      "options": [
+        "A) Právě 1 bajt, protože všechna latinská písmena mají v kódování UTF-8 vždy pevné jednobajtové zastoupení.",
+        "B) Právě 2 bajty, protože codepoint leží v rozsahu 128 až 2047, který UTF-8 kóduje dvěma oktety.",
+        "C) Právě 3 bajty, protože evropské národní abecedy vyžadují v UTF-8 stejný počet bajtů jako asijské znaky.",
+        "D) Právě 4 bajty, což je maximální délka libovolného kódovaného Unicode znaku podle současného standardu."
+      ],
+      "answer": 1,
+      "explanation": "V kódování UTF-8 zabírá základní ASCII 1 bajt, diakritika (codepoint 128–2047, např. 'ě' s codepointem 283) zabírá 2 bajty, a asijské znaky typicky 3 bajty."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "K čemu slouží sekvence BOM (Byte Order Mark) na začátku textových souborů?",
+      "options": [
+        "A) Určuje pořadí bajtů (big/little endian) u vícebajtových kódování jako UTF-16 a indikuje kódování souboru.",
+        "B) Šifruje textový obsah souboru, aby nemohl být přečten jiným textovým editorem než v původním systému.",
+        "C) Komprimuje textové řetězce odstraněním nadbytečných nulových bitů z každého osmitaktového bajtu.",
+        "D) Převádí automaticky všechny znaky v souboru z kódové stránky CP1250 na univerzální kódování ISO 8859-2."
+      ],
+      "answer": 0,
+      "explanation": "BOM (např. FE FF pro UTF-16) slouží k detekci pořadí bajtů (endianness). U UTF-8 (EF BB BF) je BOM zbytečný, protože UTF-8 pracuje s jednoliitými bajty."
+    },
+    {
+      "id": "q4",
+      "type": "code_fill",
+      "question": "Který název metody doplníte na místo podtržítka pro převod řetězce na bajty v UTF-8?",
+      "code_snippet": "bajtovy_retezec = \"svět\".________('utf-8')",
+      "options": [
+        "A) encode — metoda typu str pro zakódování Unicodového řetězce do sekvence bajtů v zadaném kódování.",
+        "B) decode — metoda typu bytes pro dekódování sekvence bajtů zpět na Unicodový textový řetězec.",
+        "C) to_bytes — funkce pro převod celočíselných typů int na bajtovou reprezentaci o stanovené délce.",
+        "D) pack — funkce z modulu struct pro převod hodnot podle C-struktury na binární bajtové řetězce."
+      ],
+      "answer": 0,
+      "explanation": "Metoda .encode('utf-8') se volá nad řetězcem typu str a vrací bajty (bytes). Opačný převod z bytes na str zajišťuje metoda .decode('utf-8')."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jak rozpozná dekodér UTF-8, že bajt je pokračováním (2., 3. nebo 4. bajtem) vícebajtového znaku?",
+      "options": [
+        "A) Jeho nejvýznamnější bity (předpona) mají vždy přesnou binární hodnotu 10xxxxxx.",
+        "B) Jeho nejvýznamnější bity (předpona) mají vždy přesnou binární hodnotu 110zzzyy.",
+        "C) Jeho nejnižší bity (přípona) mají vždy přesnou binární hodnotu xxxxxx00.",
+        "D) Obsahuje výhradně samé nuly na všech osmi bitových pozicích daného bajtu."
+      ],
+      "answer": 0,
+      "explanation": "V UTF-8 bajty začínající bity `10` předznamenávají následný (pokračující) bajt vícebajtového znaku. Úvodní bajt vícebajtové sekvence začíná `110...`, `1110...` nebo `11110...` podle počtu celkových bajtů."
+    },
+    {
+      "id": "q6",
+      "type": "true_false_tricky",
+      "question": "Jak zachází Python 3 s textovými řetězci (str) v paměti na rozdíl od Pythonu 2?",
+      "options": [
+        "A) V Pythonu 3 je str sekvencí Unicode znaků a výchozí kódování je UTF-8, zatímco v Pythonu 2 byl str sekvencí bajtů.",
+        "B) V Pythonu 3 je str sekvencí bajtů svázanou s kódováním systému, zatímco v Pythonu 2 byl str vždy čistý Unicode."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu 3 jsou řetězce str striktně Unicodové (posloupnost znaků). V Pythonu 2 byl typ str ve skutečnosti bajtovým řetězcem a pro Unicode existoval samostatný typ unicode."
+    },
+    {
+      "id": "q7",
+      "type": "predict_output",
+      "question": "Jaký bude výstup kódu 'svět'.encode('utf-8')?",
+      "options": [
+        "A) b'sv\\xc4\\x9bt' — bajtový řetězec o 5 bajtech, kde diakritický znak ě zabírá dva bajty \\xc4\\x9b.",
+        "B) b'sv\\x00\\x9bt' — bajtový řetězec o 5 bajtech, kde diakritický znak ě je nahrazen nulovým bajtem.",
+        "C) b'sv\\xebt' — bajtový řetězec o 4 bajtech, kde diakritický znak ě zabírá pouze jeden bajt.",
+        "D) b'sv\\u011bt' — neplatný bajtový řetězec obsahující neinterpretovanou Unicode únikovou sekvenci."
+      ],
+      "answer": 0,
+      "explanation": "Znaky s, v, t spadají do ASCII (1 bajt), zatiaľ čo 'ě' má codepoint 283 a v UTF-8 se kóduje dvěma bajty 0xC4 0x9B. Celková délka výstupního bajtového řetězce je tedy 5 bajtů."
+    }
+  ],
+  "print": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Které parametry funkce print() řídí oddělovač mezi argumenty a zakončení výstupu?",
+      "options": [
+        "A) Parametr sep určuje řetězec vkládaný mezi objekty a parametr end určuje řetězec na konci výpisu.",
+        "B) Parametr delimiter určuje řetězec vkládaný mezi objekty a parametr finish řetězec na konci.",
+        "C) Parametr end určuje řetězec vkládaný mezi objekty a parametr sep určuje řetězec na konci výpisu.",
+        "D) Parametr space určuje řetězec vkládaný mezi objekty a parametr newline řetězec na konci výpisu."
+      ],
+      "answer": 0,
+      "explanation": "Výchozí hodnoty ve funkci print() jsou sep=' ' (mezera mezi argumenty) a end='\\n' (odřádkování na konci)."
+    },
+    {
+      "id": "q2",
+      "type": "code_fill",
+      "question": "Doplňte názvem parametru funkce print(), který přesměruje výstup do chybového proudu sys.stderr.",
+      "code_snippet": "print(\"Chyba aplikace\", ________=sys.stderr)",
+      "options": [
+        "A) file — akceptuje objekt s metodou write(), jako je sys.stderr nebo otevřený soubor.",
+        "B) stream — akceptuje datový proud pro zápis standardního nebo chybového textového výstupu.",
+        "C) output — určuje cílový výstupní kontejner pro uložení zformátovaného textového řetězce.",
+        "D) target — určuje ukazatel na cílový souborový popisovač operačního systému uživatele."
+      ],
+      "answer": 0,
+      "explanation": "Parametr file vyžaduje objekt podporující metodu write(string). Výchozí hodnotou je sys.stdout."
+    },
+    {
+      "id": "q3",
+      "type": "predict_output",
+      "question": "Co vypíše následující kód při formátování čísla s plovoucí řádovou čárkou?",
+      "code_snippet": "val = 1 / 3\nprint(f\"{val:.3f}\")",
+      "options": [
+        "A) 0.333 — f-řetězec zaokrouhlí číslo na přesně 3 desetinná místa v pevné řádové čárce.",
+        "B) 0.33 — f-řetězec ořízne výstupní řetězec na maximálně dvě platné desetinné číslice.",
+        "C) 0.333333 — f-řetězec zdvojnásobí výchozí zadanou přesnost zobrazeného reálného čísla.",
+        "D) 1/3 — f-řetězec v tomto specifikátoru zachová původní neshodnocený matematický výraz."
+      ],
+      "answer": 0,
+      "explanation": "Specifikátor `.3f` v f-řetězci formátuje číslo typu float na pevný počet tří desetinných míst (`f` = fixed point)."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Proč selže starší formátování '%s' % msg, je-li msg víceprvková n-tice (tuple)?",
+      "options": [
+        "A) Operátor % rozbalí n-tici na samostatné prvky, které neodpovídají jedinému specifikátoru %s.",
+        "B) Operátor % podporuje u složených objektů výhradně datový typ slovník s řetězcovými klíči.",
+        "C) N-tice je v Pythonu neměnná (immutable), takže ji nelze zkonvertovat na řetězec bez str().",
+        "D) Specifikátor %s vyžaduje na pravé straně výhradně jednoprvkový seznam číselných hodnot."
+      ],
+      "answer": 0,
+      "explanation": "Při použití `%` se n-tice rozbaluje jako seznam argumentů. Pokud má řetězec 1 specifikátor `%s` a n-tice má 2 prvky, vyvolá se TypeError. Pro předání samotné n-tice je nutné použít jednoprvkovou n-tici `'%s' % (msg, )`."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co se stane při spuštění následujícího kódu využívajícího třídu string.Template?",
+      "code_snippet": "from string import Template\n\nt = Template(\"$who vyhrál $count-krát\")\nprint(t.substitute(who=\"Tým\", count=3))",
+      "options": [
+        "A) Vypíše Tým vyhrál 3-krát, protože pomlčka nepatří do identifikátoru a ukončí název proměnné $count.",
+        "B) Vyvolá výjimku KeyError, protože identifikátor $count-krát se vyhodnotí jako celé neplatné slovo.",
+        "C) Vypíše Tým vyhrál $count-krát, protože metoda substitute bez složených závorek ${count} nesubstituuje.",
+        "D) Vypíše Tým vyhrál None-krát, protože nenalezený identifikátor se nahradí prázdnou hodnotou None."
+      ],
+      "answer": 0,
+      "explanation": "Znak `-` není platný v pythonním identifikátoru, takže ukončuje jméno proměnné `$count`. Pro splynutí s dalším textem bez mezery je nutné použít zápis `${count}-krát`."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaká je posloupnost kroků funkce shutil.get_terminal_size() při zjišťování rozměrů terminálu?",
+      "options": [
+        "A) Zkontrolovat COLUMNS/LINES, zavolat os.get_terminal_size(sys.__stdout__), použít fallback.",
+        "B) Zavolat os.get_terminal_size(sys.__stdout__), zkontrolovat COLUMNS/LINES, použít fallback.",
+        "C) Přečíst konfiguraci z .bashrc, zkontrolovat registr OS, vyvolat výjimku RuntimeError.",
+        "D) Vrátit vždy pevně hodnotu (80, 24) bez kontroly proměnných prostředí nebo systémového výstupu."
+      ],
+      "answer": 0,
+      "explanation": "Postup `shutil.get_terminal_size()`: 1. proměnné prostředí COLUMNS a LINES, 2. `os.get_terminal_size(sys.__stdout__)`, 3. při selhání fallback hodnota (výchozí 80, 24)."
+    },
+    {
+      "id": "q7",
+      "type": "code_fill",
+      "question": "Který prvek specifikátoru formátu doplníte pro zarovnání textu na střed?",
+      "code_snippet": "text = \"Python\"\nprint(f\"{text:________10}\")",
+      "options": [
+        "A) ^ — zarovná tisknutý řetězec na střed v rámci zadané šířky výstupního pole.",
+        "B) < — zarovná tisknutý řetězec k levému okraji v rámci zadané šířky výstupního pole.",
+        "C) > — zarovná tisknutý řetězec k pravému okraji v rámci zadané šířky výstupního pole.",
+        "D) = — vloží výplňové znaky mezi znaménko čísla a vlastní číselnou hodnotu výstupu."
+      ],
+      "answer": 0,
+      "explanation": "V minijazyku formátování určuje `^` zarovnání na střed, `<` doleva, `>` doprava a `=` výplň mezi znaménkem a číslem."
+    }
+  ],
+  "_comprehensions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaký datový typ vygeneruje výraz v kulatých závorkách bez použití závorek seznamu?",
+      "code_snippet": "expr = (x * 2 for x in range(5))\nprint(type(expr).__name__)",
+      "options": [
+        "A) generator — kulaté závorky vytvářejí lenivě vyhodnocovaný generátorový výraz (generator object).",
+        "B) tuple — kulaté závorky v Pythonu vždy vytvářejí immutable n-tici obsahující všechny prvky.",
+        "C) list — dynamické iterování automaticky konvertuje libovolný výraz na standardní seznam.",
+        "D) iterator — všechny výrazy v kulatých závorkách jsou přetypovány na základní třídu iterator."
+      ],
+      "answer": 0,
+      "explanation": "Výraz `(x for x in ...)` nevyváří n-tici (tuple), ale generátorový výraz (`generator object`), který generuje prvky až na požádání (lazy evaluation)."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký bude výstup vícenásobné generátorové notace pro kombinaci dvou seznamů?",
+      "code_snippet": "res = [x + y for x in [1, 2] for y in [10, 20]]\nprint(res)",
+      "options": [
+        "A) [11, 21, 12, 22] — vnější cyklus je for x a pro každý jeho prvek proiteruje celý vnitřní cyklus for y.",
+        "B) [11, 22] — vícenásobná generátorová notace páruje prvky na stejných indexech jako funkce zip().",
+        "C) [11, 12, 21, 22] — vnitřní cyklus for y proběhne jako první a teprve poté se vyhodnotí cyklus for x.",
+        "D) [[11, 21], [12, 22]] — vícenásobná generátorová notace automaticky vytváří vnořené dvourozměrné pole."
+      ],
+      "answer": 0,
+      "explanation": "Pořadí cyklů v comprehension odpovídá klasickým vnořeným for cyklům: levý for (`for x in ...`) je vnější, pravý for (`for y in ...`) je vnitřní."
+    },
+    {
+      "id": "q3",
+      "type": "code_fill",
+      "question": "Doplňte chybějící zápis hodnoty pro vytvoření generátorové notace slovníku (dict comprehension).",
+      "code_snippet": "squares = {x: ________ for x in range(4)}",
+      "options": [
+        "A) x**2 — výraz určující hodnotu přiřazenou ke klíči x v každé iteraci generátoru.",
+        "B) x -> x**2 — zápis anonymní funkce využívající šipkovou syntaxi pro generování hodnoty.",
+        "C) val=x**2 — pojmenovaný parametr určující výstupní hodnotu prvků generovaného slovníku.",
+        "D) (x**2) — n-tice vyžadovaná pro korektní spárování klíče a hodnoty ve slovníku."
+      ],
+      "answer": 0,
+      "explanation": "Generátorová notace slovníku má syntaxi `{klíč: hodnota for prvek in sekvence}`. Na místo podtržítka patří výraz pro hodnotu, např. `x**2`."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Který zápis pomocí generátorové notace je přesným ekvivalentem výrazu map(f, filter(p, xs))?",
+      "options": [
+        "A) [f(x) for x in xs if p(x)]",
+        "B) [p(x) for x in xs if f(x)]",
+        "C) [f(p(x)) for x in xs]",
+        "D) [f(x) if p(x) for x in xs]"
+      ],
+      "answer": 0,
+      "explanation": "`filter(p, xs)` vybere pouze prvky splňující predikát `p(x)` (což odpovídá `if p(x)`) a `map(f, ...)` aplikuje funkci `f(x)` na vybrané prvky."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jaká bude délka slovníku vytvořeného generátorovou notací z řetězce s duplicitními znaky?",
+      "code_snippet": "text = \"Abcd abcd\"\nd = {x: ord(x) for x in text}\nprint(len(d))",
+      "options": [
+        "A) 6 — klíče v generátoru slovníku jsou unikátní, takže opakující se znaky přepsaly své předchozí záznamy.",
+        "B) 9 — generátorová notace slovníku vytvoří nový záznam pro každý prvek vstupního řetězce bez výjimky.",
+        "C) 5 — mezera a rozlišení velikosti písmen se při zpracování slovníku automaticky ignorují a neskladují.",
+        "D) 8 — první znak řetězce se v generátoru slovníku použije pouze jako název struktury a ne jako klíč."
+      ],
+      "answer": 0,
+      "explanation": "Řetězec \"Abcd abcd\" obsahuje 6 unikátních znaků ('A', 'b', 'c', 'd', ' ', 'a'). Jelikož klíče slovníku musí být unikátní, duplicitní znaky přepíší dřívější klíče a výsledná délka je 6."
+    },
+    {
+      "id": "q6",
+      "type": "true_false_tricky",
+      "question": "Jaký je hlavní rozdíl v paměťové náročnosti mezi generátorovým výrazem a list comprehension?",
+      "options": [
+        "A) Generátorový výraz vyhodnocuje prvky lenivě po jednom s pamětí O(1), zatímco list comprehension vytvoří celý seznam O(N).",
+        "B) Generátorový výraz načte všechny prvky do paměti v předstihu O(N), zatímco list comprehension vytváří ukazatel O(1)."
+      ],
+      "answer": 0,
+      "explanation": "Generátorový výraz nealokuje paměť pro všechny výsledky najednou, ale vrací prvky na vyžádání (O(1) paměť). List comprehension zkonstruuje celý seznam v paměti okamžitě (O(N) paměť)."
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Co se stane při pokusu o opakovanou iteraci přes již vyčerpaný generátorový výraz?",
+      "code_snippet": "g = (x for x in range(3))\nlist(g)\nprint(list(g))",
+      "options": [
+        "A) Vypíše prázdný seznam [], protože generátor je jednorázový iterátor a po vyčerpání nevrací další prvky.",
+        "B) Vypíše opakováně seznam [0, 1, 2], protože generátor si v paměti automaticky uchovává svou sekvenci.",
+        "C) Vyvolá výjimku StopIteration, protože funkce list() neumí zpracovat druhotné volání vyčerpaného generátoru.",
+        "D) Vypíše seznam [None, None, None], protože vyčerpaný generátor vrací prázdné hodnoty místo původních čísel."
+      ],
+      "answer": 0,
+      "explanation": "Generátory jsou jednorázové iterátory. Jakmile jsou vyčerpány (např. prvním voláním `list(g)`), další iterace přes ně vrací ihned prázdný výstup."
+    }
+  ]
+}
