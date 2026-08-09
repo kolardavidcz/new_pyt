@@ -28,7 +28,7 @@ export function el(tag, props = {}, ...children) {
 }
 
 export function clear(node) {
-  while (node.firstChild) node.removeChild(node.firstChild);
+  if (node) node.textContent = "";
 }
 
 /**

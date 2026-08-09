@@ -1,0 +1,255 @@
+{
+  "fp": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co vrátí výraz (x > 5 and \"vysoké\") or (x > 0 and \"kladné\") or \"nula/záporné\" pro x = 3?",
+      "options": [
+        "A) Hodnotu 'kladné', protože první podvýraz selže a druhý vyjde jako pravdivý     .",
+        "B) Hodnotu True, protože operátor or konvertuje pravdivý výstupní text na boolean .",
+        "C) Hodnotu 'vysoké', protože operátor and má nižší prioritu než operátor or v kódu.",
+        "D) Výjimku TypeError, protože operátory and a or nelze použít přímo pro řetězec   ."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu operátory and a or nevrací True/False, ale poslední vyhodnocený operand. Pro x = 3 je x > 5 nepravdivé (vrátí False), posune se na (3 > 0 and 'kladné'), kde 3 > 0 je pravda, takže and vrátí pravý operand 'kladné'. Jelikož 'kladné' je truthy, or zkrátí vyhodnocování a ihned ji vrátí."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší rozsah proměnné cyklu v klasické smyčce for x in ... a v list comprehension v Pythonu 3?",
+      "options": [
+        "A) V klasickém cyklu for proměnná x zůstává po skončení, v list comprehension zaniká  .",
+        "B) V klasickém cyklu for proměnná x po skončení zaniká, v list comprehension zůstává  .",
+        "C) V obou případech proměnná x po ukončení cyklu automaticky vyprší z lokální paměti  .",
+        "D) V obou případech proměnná x v paměti zůstane se zachovanou hodnotou z iterace cyklu."
+      ],
+      "answer": 0,
+      "explanation": "Zatímco klasická smyčka for v Pythonu neotevírá nový lokální rozsah a proměnná cyklu x zůstává přístupná i po ukončení iterace, v Pythonu 3 má list comprehension svůj vlastní izolovaný rozsah funkcí/generátoru, takže pomocná proměnná x po dokončení vyhodnocení zaniká a neznečišťuje okolní namespace."
+    },
+    {
+      "id": "q3",
+      "type": "true_false_tricky",
+      "question": "Podporuje Python automatickou optimalizaci koncového volání (tail-call optimization) při řetězení kontinuací?",
+      "options": [
+        "A) Ne, Python TCO neprovádí, takže hluboké zanoření volání přeteče paměťový zásobník    .",
+        "B) Ano, Python detekuje koncový návrat a převádí kontinuaci automaticky na reálný cyklus.",
+        "C) Ne, Python TCO nepodporuje, ale rámce zásobníku jsou mazány před vyvoláním funkce    .",
+        "D) Ano, Python podporuje TCO výhradně pro anonymní lambda funkce zadané na řádku kódu   ."
+      ],
+      "answer": 0,
+      "explanation": "Python vědomě neimplementuje optimalizaci koncového volání (TCO). Při implementaci kontinuací pomocí volání dalších funkcí tak Python stále drží v paměti odkazy na všechny předchozí rámce na zásobníku, což při překročení limitu (typicky ~1000 volání) způsobí RecursionError."
+    },
+    {
+      "id": "q4",
+      "type": "code_fill",
+      "question": "Jaký výraz chybí na místě ________ pro okamžité vykonání funkcí ze seznamu v Pythonu 3?\n\nakce = [f1, f2, f3]\n[________ for f in akce]",
+      "options": [
+        "A) f() — zavolá každou funkci v seznamu při procházení generátorové notace seznamu   .",
+        "B) call(f) — předá danou funkci interpretu pro asynchronní vyhodnocení přímo v běhu  .",
+        "C) yield f — přemění konstrukci na generátor předávající výsledné operace postupně   .",
+        "D) next(f) — posune ukazatel provádění na první zadaný příkaz uvnitř těla dané funkce."
+      ],
+      "answer": 0,
+      "explanation": "Pro sekvenční zavolání seznamu funkcí v Pythonu 3 slouží syntaxe list comprehension [f() for f in akce]. Ta na rozdíl od map(lambda f: f(), akce), který v Pythonu 3 vrací lenivý iterátor a bez vyžádání prvky nevyhodnotí, seznam funkcí okamžitě proiteruje a všechny funkce zavolá."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jaký je výstup příkazu res = map(abs, [-1, -2]); print(res) v Pythonu 3?",
+      "options": [
+        "A) Objekt iterátoru <map object at ...>, protože funkce map vyhodnocuje prvky lenivě     .",
+        "B) Seznam kladných čísel [1, 2], protože funkce map aplikuje výpočet abs na prvky hned   .",
+        "C) N-tice kladných čísel (1, 2), protože funkce map vrací neměnnou sekvenci daných hodnot.",
+        "D) Výjimka TypeError, protože funkce abs vyžaduje na svém vstupu pouze jediný argument   ."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu 3 funkce map() vrací lenivý iterátor (objekt typu map), nikoliv seznam jako v Pythonu 2. Výpočet absolutní hodnoty nad prvky proběhne až ve chvíli, kdy jsou z iterátoru postupně vyžadovány hodnoty (např. pomocí list(res) nebo v cyklu for)."
+    }
+  ],
+  "coroutines": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Proč je nutné korutinu před prvním odesláním dat pomocí send(data) inicializovat voláním next(k) nebo k.send(None)?",
+      "options": [
+        "A) Aby se kód vykonal k prvnímu yield a korutina zamrzla v místě přejímání dat   .",
+        "B) Aby se vytvořil paměťový blok pro proměnné a inicializoval registr generátoru .",
+        "C) Aby se ověřilo, že korutina neobsahuje chybné zápisy a je plně asynchronní    .",
+        "D) Aby se do korutiny uložila adresa volající funkce pro zasílání odpovědi z běhu."
+      ],
+      "answer": 0,
+      "explanation": "Po vytvoření korutiny (zavoláním generátorové funkce) stojí ukazatel provádění na samém začátku těla funkce. První zavolání next(k) nebo k.send(None) spustí kód až k prvnímu výrazu yield, kde korutina pozastaví svůj běh a čeká na příchod prvních dat přes následný send(hodnota)."
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Co se stane uvnitř korutiny při zavolání metody g.close()?",
+      "options": [
+        "A) V místě aktuálního výrazu yield se vyvolá výjimka GeneratorExit pro ukončení .",
+        "B) Korutina se ihned zničí v paměti bez možnosti vykonání bloku kódu try-finally.",
+        "C) Všechny lokální proměnné zaniknou a příkaz yield okamžitě vrátí StopIteration.",
+        "D) Korutina proběhne až do konce těla a vrací posledně vypočtenou hodnotu z běhu."
+      ],
+      "answer": 0,
+      "explanation": "Zavolání metody .close() na generátoru či korutině vyvolá v místě pozastaveného yield výjimku GeneratorExit. Pokud korutina výjimku nezachytí (nebo ji zachytí a ukončí se), korutina se korektně zavře. Případné bloky finally uvnitř korutiny proběhnou."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jakou roli plní konstrukce yield from podgenerátor při obousměrné komunikaci s korutinami?",
+      "options": [
+        "A) Předává výstup z podgenerátoru ven a zároveň přeposílá vstupy z send() do něj .",
+        "B) Převádí synchronní podgenerátor na asynchronní úlohu spuštěnou v novém vlákně .",
+        "C) Zachytává výjimky v podgenerátoru a znemožňuje posílání nových dat přes send().",
+        "D) Vytváří kopii podgenerátoru, která přebírá vstupy bez ovlivnění stavu vnitřku ."
+      ],
+      "answer": 0,
+      "explanation": "Konstrukce yield from funguje jako obousměrný transparentní kanál: nejenže předává hodnoty generované podgenerátorem směrem k volajícímu, ale také přeposílá hodnoty poslané přes .send(), výjimky vyvolané přes .throw() a žádosti o zavření přes .close() přímo do podgenerátoru."
+    },
+    {
+      "id": "q4",
+      "type": "code_fill",
+      "question": "Jaká metoda chybí na místě ________ pro vyvolání výjimky uvnitř spuštěné korutiny?\n\ndef korutina():\n    try:\n        hodnota = (yield)\n    except ValueError:\n        print(\"Zachyceno\")\n\nk = korutina()\nnext(k)\nk.________(ValueError)",
+      "options": [
+        "A) throw — předá výjimku do korutiny, kde se vyvolá přímo v místě pozastavení kódu.",
+        "B) raise — vyvolá výjimku v okolním kontextu a okamžitě přeruší provádění korutiny.",
+        "C) catch — zachytí výjimku z korutiny a předá jí zadané chybové hlášení v textu   .",
+        "D) send — pošle objekt výjimky jako běžnou datovou hodnotu do proměnné u yield    ."
+      ],
+      "answer": 0,
+      "explanation": "Pro vyvolání výjimky uvnitř korutiny se používá metoda k.throw(TypVýjimky). Výjimka se vyvolá přímo v místě, kde korutina čeká na příkazu (yield), a pokud je uvnitř korutiny blok try-except, může být normálně zachycena."
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Je vhodné v jediném yield korutiny současně přijímat nová data z send() a vracet vypočtenou hodnotu ven?",
+      "options": [
+        "A) Ne, míchání koncepcí způsobuje posun stavů a střídavé vracení hodnoty None v běhu.",
+        "B) Ano, toto je standardní způsob implementace obousměrných datových proudů v kódu  .",
+        "C) Ne, Python vyvolá při pokusu o takový výskyt syntaktickou chybu typu SyntaxError .",
+        "D) Ano, ale pouze v případě, že předávaná i vracená hodnota jsou stejného typu dat  ."
+      ],
+      "answer": 0,
+      "explanation": "Podle osvědčených návrhových vzorů (David Beazley) by se role yield neměly míchat: generátory hodnoty produkují, korutiny je konzumují. Při pokusu o obousměrné předávání v jednom yield dochází z důvodu prázdného prvotního skoku k desynchronizaci stavů a každé druhé volání send() vrátí neočekávaně None."
+    }
+  ],
+  "pitfalls": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co vypíše následující kód při druhém volání funkce pridat(2)?\n\ndef pridat(val, prpkn=[]):\n    prpkn.append(val)\n    return prpkn\n\npridat(1)\nres = pridat(2)\nprint(res)",
+      "options": [
+        "A) Seznam [1, 2], protože výchozí objekt [] se vytvoří jen při definici funkce  .",
+        "B) Seznam [2], protože při každém volání bez argumentu se alokuje nový seznam   .",
+        "C) N-tici (1, 2), protože výchozí argumenty se v paměti mění na imutabilní typ  .",
+        "D) Výjimku UnboundLocalError, protože proměnná prpkn nebyla označena jako global."
+      ],
+      "answer": 0,
+      "explanation": "Výchozí hodnoty parametrů funkcí jsou v Pythonu vyhodnoceny pouze jednou při definici (překladu) funkce. Pokud je výchozí hodnotou mutabilní objekt (např. seznam []), všechna volání využívající výchozí parametr sdílejí přesně jednu a tu samou instanci v paměti."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Co vypíše příkaz print(d['b']) po úpravě prvku s klíčem 'a'?\n\nd = dict.fromkeys(['a', 'b'], [])\nd['a'].append(1)\nprint(d['b'])",
+      "options": [
+        "A) Seznam [1], protože všechny klíče sdílejí v paměti odkaz na stejný seznam       .",
+        "B) Seznam [], protože nově vytvořené klíče dostanou samostatné instance seznamů    .",
+        "C) Hodnotu None, protože metoda zvaná fromkeys nepřiřazuje klíčům výchozí strukturu.",
+        "D) Výjimku KeyError, protože klíč 'b' nebyl ve vytvořeném slovníku inicializován   ."
+      ],
+      "answer": 0,
+      "explanation": "Metoda dict.fromkeys(keys, default) předává výchozí hodnotu odkazem. Pokud předáte mutabilní objekt jako [], všechny klíče ve slovníku budou odkazovat na identickou instanci v paměti (id(d['a']) == id(d['b'])), takže změna pod jedním klíčem se projeví u všech ostatních."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jaký bude obsah proměnné t po proběhnutí bloku try-except?\n\nt = ([1],)\ntry:\n    t[0] += [2]\nexcept TypeError:\n    pass\nprint(t)",
+      "options": [
+        "A) N-tici ([1, 2],), protože operátor += upraví seznam v n-tici před výjimkou.",
+        "B) N-tici ([1],), protože vyvolaná výjimka TypeError ob obnoví původní n-tici.",
+        "C) N-tici ([1], [2]), protože nepřihlášený prvek se vloží až na konec n-tice .",
+        "D) Hodnotu None, protože selhání zapsání do n-tice vymaže celý datový objekt ."
+      ],
+      "answer": 0,
+      "explanation": "Příkaz t[0] += [2] provede dvě věci: 1) Zavolá in-place rozšíření t[0].__iadd__([2]), což seznam úspěšně upraví na [1, 2]. 2) Pokusí se uložit výsledek zpět do t[0], což selže s TypeError, protože n-tice nepodporuje přiřazení prvku. Seznam uvnitř n-tice však již upraven zůstane."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jak reaguje interpret Pythonu při zavolání funkce zmen()?\n\nval = 10\ndef zmen():\n    print(val)\n    val = 20\n\nzmen()",
+      "options": [
+        "A) Vyvolá UnboundLocalError, protože přiřazení val=20 z ní dělá lokální proměnnou .",
+        "B) Vypíše 10 a následně globální hodnotu val v paměti okamžitě přepíše na číslo 20.",
+        "C) Vypíše 10 a lokální proměnná val zastíní globální až na řádku za příkazem print.",
+        "D) Vypíše 20, protože interpret Pythonu provede interní optimalizaci pořadí kódu  ."
+      ],
+      "answer": 0,
+      "explanation": "Při analýze těla funkce Python v době překladu zjistí, že se do val v těle přiřazuje (val = 20), a označí val za lokální proměnnou pro celou funkci. Při spuštění pak řádek print(val) selže s UnboundLocalError, protože přistupuje k lokální proměnné dříve, než do ní byla uložena hodnota."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co vypíše výraz print([f() for f in funcs])?\n\nfuncs = [lambda: i for i in range(3)]\nprint([f() for f in funcs])",
+      "options": [
+        "A) Seznam [2, 2, 2], protože anonymní lambda funkce hledají i až při spuštění    .",
+        "B) Seznam [0, 1, 2], protože proměnná i se při vytváření těla lambdy ihned sváže .",
+        "C) Seznam [0, 0, 0], protože počáteční hodnota cyklu i=0 zůstane zachována v těle.",
+        "D) Výjimku NameError, protože proměnná i po dokončení generování z paměti zmizí  ."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu dochází v uzávěrech k tzv. late binding (zpožděnému vázání): proměnná i se v těle lambda funkce vyhodnocuje až ve chvíli zavolání f(), kdy už má po dokončení cyklu hodnotu 2. Všechny vytvořené lambda funkce tak vrátí 2. Opravou je použití výchozího parametru lambda i=i: i."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaká hodnota se vytiskne při volání print(y) po dokončení list comprehension v Pythonu 3.8+?\n\nres = [y for x in range(3) if (y := x * 2)]\nprint(y)",
+      "options": [
+        "A) Hodnota 4, protože proměnná z walrus operátoru := uniká do okolního rozsahu         .",
+        "B) Výjimka NameError, protože všechny proměnné v list comprehension jsou lokální       .",
+        "C) Hodnota 2, protože walrus operátor uchová pouze první úspěšně uložený prvek         .",
+        "D) Hodnota None, protože walrus operátor vrací při zápisu v podmínce prázdný datový typ."
+      ],
+      "answer": 0,
+      "explanation": "Zatímco běžné proměnné cyklu v list comprehension v Pythonu 3 neunikají z lokálního rozsahu comprehension, proměnné vytvořené přiřazovacím operátorem walrus (:=) unikat do nadřazeného rozsahu záměrně mohou. V proměnné y tak po dokončení zůstane hodnota z poslední iterace, tedy 4."
+    },
+    {
+      "id": "q7",
+      "type": "code_fill",
+      "question": "Jaký zápis f-stringu chybí na místě ________ pro vytištění hodnoty v složených závorkách?\n\njmeno = \"VŠCHT\"\n# Výsledný řetězec má být: \"{VŠCHT}\"\ns = f\"________\"",
+      "options": [
+        "A) {{{jmeno}}} — trojité složené závorky vkládají proměnnou do jednoho páru závorek    .",
+        "B) \\{{jmeno\\}} — zpětné lomítko ruší speciální význam složené závorky v textu f-stringu.",
+        "C) {{jmeno}} — dvojité složené závorky automaticky vyhodnotí zadanou proměnnou v kódu  .",
+        "D) {\\{jmeno\\}} — vnější závorky tvoří výraz a vnitřní eskapování vytvoří čistý text    ."
+      ],
+      "answer": 0,
+      "explanation": "V f-stringu se složená závorka eskapuje jejím zdvojením ({{ vypíše {). Pokud chceme vypsat složené závorky obsahující hodnotu proměnné, musíme použít trojité závorky {{{jmeno}}}: vnější pár {{ vytvoří textovou {, vnitřní {jmeno} vyhodnotí proměnnou a zbylé }} vytvoří uzavírací }."
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Ke kterému adresáři se vztahují relativní cesty při otevírání souborů pomocí open('data.txt')?",
+      "options": [
+        "A) K aktuálnímu pracovnímu adresáři (CWD), odkud byl spuštěn interpret Pythonu    .",
+        "B) K adresáři, ve kterém se nachází samotný právě vykonávaný skript s příponou .py.",
+        "C) K kořenovému adresáři projektu určenému v proměnné prostředí zvané PYTHONPATH  .",
+        "D) K systémovému dočasnému adresáři určenému systémem pro běžného uživatele v OS  ."
+      ],
+      "answer": 0,
+      "explanation": "Relativní cesty v Pythonu se nevztahují k umístění zdrojového souboru .py, ale k aktuálnímu pracovnímu adresáři (Current Working Directory), ze kterého byl interpret spuštěn. Spuštění skriptu z jiného adresáře tak bez úpravy cest vyvolá FileNotFoundError."
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "Co bude výstupem příkazu print(cisla) po odebrání prvků během iterace?\n\ncisla = [1, 2, 3, 4]\nfor x in cisla:\n    if x % 2 != 0:\n        cisla.remove(x)\nprint(cisla)",
+      "options": [
+        "A) Seznam [2, 3, 4], protože odebráním prvku 1 se posunou vnitřní indexy prvků .",
+        "B) Seznam [2, 4], protože metoda remove bezpečně aktualizuje ukazatel cyklu for.",
+        "C) Seznam [], protože odebrání prvku vymaže všechny zbývající prvky ze seznamu .",
+        "D) Výjimka RuntimeError, protože Python zakazuje modifikaci iterovaného pole   ."
+      ],
+      "answer": 0,
+      "explanation": "Při modifikaci seznamu během iterace se interní index posouvá v původním seznamu. Odebráním prvku 1 na indexu 0 se prvek 2 posune na index 0 a prvek 3 na index 1. Smyčka v následujícím kroku přejde na index 1 (kde je nyní 3), čímž prvek 2 úplně přeskočí! Ve výsledku zůstane [2, 3, 4]."
+    }
+  ]
+}

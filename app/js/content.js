@@ -2,7 +2,8 @@
 
 import {
   state, pagesFor, slideDiff, slideTags, weekVisibleItems, filteredItems, markSeen,
-  isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor,
+  isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor, logLinkError,
+  saveQuizScore, setPrintWithQuizzes, getQuizFor,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot, highlightCode, dedentCode } from "./highlight.js";
@@ -227,6 +228,18 @@ function lectureToolbar(item, mode) {
     title: "Print or export to PDF",
     onClick: () => window.print(),
   }, "Tisk 🖨"));
+
+  const printQuizzes = state.printWithQuizzes;
+  const quizToggleBtn = el("button", {
+    type: "button",
+    className: "btn btn-quiz-toggle" + (printQuizzes ? " is-active" : ""),
+    title: printQuizzes ? "Tisk obsahuje kvízy na konci (Kliknutím vypnete)" : "Tisk bez kvízů (Kliknutím zapnete kvízy v tisku)",
+    onClick: () => {
+      setPrintWithQuizzes(!state.printWithQuizzes);
+      updatePrintQuizButtons();
+    },
+  }, printQuizzes ? "🖨 Kvíz v tisku ✓" : "🖨 Kvíz v tisku ☐");
+  bar.appendChild(quizToggleBtn);
 
   // Pinned right after Tisk 🖨: Mark studied button
   const studied = isStudied(item.id);
@@ -463,6 +476,18 @@ export async function showPage(itemId, pageId) {
       onClick: () => window.print(),
     }, "Tisk 🖨"));
 
+    const printQuizzes = state.printWithQuizzes;
+    const quizToggleBtn = el("button", {
+      type: "button",
+      className: "btn btn-quiz-toggle" + (printQuizzes ? " is-active" : ""),
+      title: printQuizzes ? "Tisk obsahuje kvízy na konci (Kliknutím vypnete)" : "Tisk bez kvízů (Kliknutím zapnete kvízy v tisku)",
+      onClick: () => {
+        setPrintWithQuizzes(!state.printWithQuizzes);
+        updatePrintQuizButtons();
+      },
+    }, printQuizzes ? "🖨 Kvíz v tisku ✓" : "🖨 Kvíz v tisku ☐");
+    nav.appendChild(quizToggleBtn);
+
     if (pages.length) {
       const pos = el("span", {
         className: "slide-pos",
@@ -476,6 +501,13 @@ export async function showPage(itemId, pageId) {
     main.appendChild(slideEl);
     await loadAndInlineExamples(slideEl);
     highlightRoot(slideEl);
+
+    const isLastSlide = idx < 0 || idx === pages.length - 1;
+    if (isLastSlide) {
+      const quizEl = await renderQuizSection(item);
+      if (quizEl) main.appendChild(quizEl);
+    }
+
     main.appendChild(buildBottomNavBar(item));
   } catch (err) {
     main.innerHTML = `<div class="error-box">Failed to load content.<br/><code>${escapeHtml(err.message)}</code></div>`;
@@ -490,7 +522,8 @@ export async function showFullContent(itemId) {
   const item = state.itemsById.get(itemId);
   const main = document.getElementById("main");
   if (!item) {
-    main.innerHTML = `<div class="error-box">Item not found.</div>`;
+    logLinkError({ targetId: itemId, message: `Lecture or exercise item not found: ${itemId}` });
+    main.innerHTML = `<div class="error-box">Item not found: <code>${escapeHtml(itemId)}</code></div>`;
     return;
   }
   markSeen(item.id);
@@ -563,6 +596,8 @@ async function renderExerciseView(item, data, main) {
   main.appendChild(list);
   await loadAndInlineExamples(list);
   highlightRoot(list);
+  const quizEl = await renderQuizSection(item);
+  if (quizEl) main.appendChild(quizEl);
   main.appendChild(buildBottomNavBar(item));
 }
 
@@ -659,6 +694,8 @@ async function loadFullContent(item, main) {
     main.appendChild(frag);
     await loadAndInlineExamples(main);
     for (const node of nodes) highlightRoot(node);
+    const quizEl = await renderQuizSection(item);
+    if (quizEl) main.appendChild(quizEl);
     main.appendChild(buildBottomNavBar(item));
   } catch (err) {
     main.appendChild(el("div", { className: "error-box" },
@@ -812,30 +849,90 @@ function extractSlides(html) {
   return slides;
 }
 
+const LINK_REMAP_TABLE = {
+  "xML.encoding.xml": "text/encoding_xML.html",
+  "encoding.xml": "text/encoding_xML.html",
+  "/materialy/python/modules/html.entites.xml": "python/modules/_modules.html",
+  "html.entites.xml": "python/modules/_modules.html",
+  "strings.xml": "python/types/_sequences.html",
+  "dictionaries.xml": "python/types/dictionaries.html",
+  "sets.xml": "python/types/sets.html",
+  "tuples.xml": "python/types/tuples.html",
+  "lists.xml": "python/types/lists.html",
+  "frozensets.xml": "python/types/frozensets.html",
+  "print.xml": "python/cmd/overview.html",
+  "functional.xml": "python/functions/functional.html",
+  "generic.xml": "python/functions/generic.html",
+  "advanced.xml": "python/functions/advanced-1.html",
+  "advanced-3.xml": "python/functions/advanced-3.html",
+  "generators.xml": "python/generators/generators.html",
+  "tempfile.xml": "python/files/tempfile.html",
+  "virtualenv.xml": "python/packages/venv.html",
+  "scope.xml": "python/functions/scope.html",
+  "decorators.xml": "python/functions/decorators.html",
+  "parameters.xml": "python/functions/parameters.html",
+  "xslt.xml": "web/xml/overview.html?slide=id12",
+  "dtd.xml": "web/xml/xml.html?slide=id10",
+  "relaxng.xml": "web/xml/overview.html?slide=id9",
+  "xmlschema.xml": "web/xml/overview.html?slide=id8",
+  "xpath.xml": "web/xml/xpath.html",
+  "xpath2.xml": "web/xml/xpath2.html",
+  "xml.xml": "web/xml/xml.html",
+  "hopfield.xml": "python/numpy/vectorization.html",
+  "XXX.xml": "web/css/overview.html",
+  "new_order.html": "#/",
+  "/new_order.html": "#/",
+};
+
 function resolvePresentationHref(href, lecturePath) {
   if (!href) return null;
+
+  // Static asset downloads (_files/ directory or C/code assets)
+  if (href.includes("_files/") || /\.(c|h|base64|pyx|d|sh|cmd|log|txt|png|jpg|jpeg|gif|sqlite)$/i.test(href)) {
+    const normLecture = lecturePath.replace(/\\/g, "/");
+    const dir = normLecture.substring(0, normLecture.lastIndexOf("/"));
+    const cleanAsset = href.replace(/^(\.\/|\/)/, "");
+    const assetUrl = "/" + (cleanAsset.startsWith("vyuka_downloaded") ? cleanAsset : `${dir}/${cleanAsset.replace(/^[./]+/, "")}`);
+    return { type: "external", url: assetUrl };
+  }
 
   // External link (not ookami.cz or vercel)
   if (/^https?:\/\//i.test(href) && !href.includes("ookami.cz") && !href.includes("vercel.app")) {
     return { type: "external", url: href };
   }
+  if (href.startsWith("zetcode.com")) {
+    return { type: "external", url: "http://" + href };
+  }
 
   // Clean domain
   let clean = href.replace(/^https?:\/\/vyuka\.ookami\.cz\//i, "/").replace(/^https?:\/\/[^/]+\//i, "/");
-
-  // Extract slide query param (?slajd=5 or &slajd=5 or ?slide=5)
+  if (clean.includes("slad=")) clean = clean.replace("slad=", "slajd=");
   let slideParam = null;
+  if (/^slajd=\d+/i.test(clean)) {
+    slideParam = clean.replace(/^slajd=/i, "");
+    clean = "";
+  }
+
+  // Extract & strip slide and parameter query params (?slajd=5, &slajd=5, ?slide=5, &par=1, &amp;par=1)
   const slajdMatch = clean.match(/[?&](slajd|slide)=([^&]*)/i);
   if (slajdMatch && slajdMatch[2].trim() !== "") {
     slideParam = slajdMatch[2].trim();
   }
-  clean = clean.replace(/[?&](slajd|slide)=[^&]*/gi, "");
+  clean = clean.replace(/([?&]|&amp;)(slajd|slide|par)=[^&]*/gi, "");
 
   let hashFrag = "";
   if (clean.includes("#")) {
     const parts = clean.split("#");
     clean = parts[0];
     hashFrag = parts[1];
+  }
+
+  // Apply explicit LINK_REMAP_TABLE override if available
+  const cleanBasename = clean.split("/").pop();
+  if (LINK_REMAP_TABLE[cleanBasename]) {
+    clean = LINK_REMAP_TABLE[cleanBasename];
+  } else if (LINK_REMAP_TABLE[clean]) {
+    clean = LINK_REMAP_TABLE[clean];
   }
 
   const normalizedPath = lecturePath.replace(/\\/g, "/");
@@ -854,7 +951,7 @@ function resolvePresentationHref(href, lecturePath) {
   }
 
   // Home / new_order link
-  if (clean === "/new_order.html" || clean === "new_order.html" || clean === "/index.html") {
+  if (clean === "/new_order.html" || clean === "new_order.html" || clean === "/index.html" || clean === "#/") {
     return { type: "home", hash: "#/" };
   }
 
@@ -866,10 +963,15 @@ function resolvePresentationHref(href, lecturePath) {
   const currentDirParts = normalizedPath.split("/").slice(0, -1);
   let targetPath = "";
 
+  const knownCategories = ["python/", "web/", "text/", "techs/", "media/", "dvcs/", "jupyter/"];
+  const isCategoryAbs = knownCategories.some(cat => clean.startsWith(cat) || clean.startsWith("/" + cat));
+
   if (clean.startsWith("/materialy/")) {
     targetPath = "vyuka_downloaded" + clean;
   } else if (clean.startsWith("materialy/")) {
     targetPath = "vyuka_downloaded/" + clean;
+  } else if (isCategoryAbs) {
+    targetPath = "vyuka_downloaded/materialy/" + clean.replace(/^\//, "");
   } else if (clean.startsWith("/")) {
     targetPath = "vyuka_downloaded/materialy" + clean;
   } else {
@@ -891,8 +993,17 @@ function resolvePresentationHref(href, lecturePath) {
     targetSlide = `id${targetSlide}`;
   }
 
-  const targetId = "lecture:" + targetPath.replace(/^vyuka_downloaded\//, "");
-  let hash = `#/lecture/${encodeURIComponent(targetId)}`;
+  let canonicalId = "lecture:" + targetPath.replace(/^vyuka_downloaded\//, "");
+  if (state.itemsById) {
+    const matchedItem = state.itemsById.get(canonicalId) ||
+                        state.itemsById.get("lecture:" + targetPath.replace(/^vyuka_downloaded\/materialy\//, "")) ||
+                        state.itemsById.get("lecture:" + clean);
+    if (matchedItem && matchedItem.id) {
+      canonicalId = matchedItem.id;
+    }
+  }
+
+  let hash = `#/lecture/${encodeURIComponent(canonicalId)}`;
   if (targetSlide) hash += `?slide=${encodeURIComponent(targetSlide)}`;
 
   return { type: "cross_presentation", hash, targetPath, slide: targetSlide };
@@ -955,20 +1066,354 @@ export async function loadAndInlineExamples(root) {
     [...examplePres].map(async (pre) => {
       const url = pre.dataset.exampleSrc;
       const lang = pre.dataset.exampleLang || "python";
-      try {
-        const res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const text = await res.text();
+      const cleanUrl = url.replace(/^\//, "");
+      const urlsToTry = [
+        "/" + cleanUrl,
+        "/public/" + cleanUrl,
+        "/app/" + cleanUrl,
+      ];
+
+      let text = null;
+      for (const tryUrl of urlsToTry) {
+        try {
+          const res = await fetch(tryUrl, { cache: "no-store" });
+          if (res.ok) {
+            text = await res.text();
+            break;
+          }
+        } catch { /* try next url fallback */ }
+      }
+
+      if (text !== null) {
         const formatted = dedentCode(text);
         pre.innerHTML = `<code>${highlightCode(formatted, lang)}</code>`;
         pre.dataset.hl = "1";
         delete pre.dataset.exampleSrc;
-      } catch (err) {
+      } else {
         const code = pre.querySelector("code") || pre;
-        code.textContent = `# example file: ${url}\n# (${err.message})`;
+        code.textContent = `# example file: ${url}\n# (HTTP 404 - Not found)`;
       }
     })
   );
+}
+
+export function updatePrintQuizButtons() {
+  const on = state.printWithQuizzes;
+  document.querySelectorAll(".btn-quiz-toggle").forEach((b) => {
+    b.classList.toggle("is-active", on);
+    b.innerHTML = on ? "🖨 Kvíz v tisku ✓" : "🖨 Kvíz v tisku ☐";
+    b.title = on ? "Tisk obsahuje kvízy na konci (Kliknutím vypnete)" : "Tisk bez kvízů (Kliknutím zapnete kvízy v tisku)";
+  });
+  const sel = document.getElementById("selectPrintWithQuizzes");
+  if (sel) sel.value = on ? "true" : "false";
+}
+
+export async function renderQuizSection(item) {
+  const questions = await getQuizFor(item);
+  if (!questions || !questions.length) return null;
+
+  const deckKey = item.slug || item.id || item.path;
+  const card = el("section", { className: "quiz-section-card", id: "quizSection" });
+
+  const scoreMap = state.quizScores[deckKey] || {};
+  const answeredCount = Object.keys(scoreMap).length;
+  const correctCount = Object.values(scoreMap).filter((s) => s.isCorrect).length;
+
+  const header = el("header", { className: "quiz-card-header" });
+  header.innerHTML = `
+    <span class="quiz-badge">Kvíz k prezentaci · Takeaways Test 🎯</span>
+    <h2 class="quiz-title">Ověření klíčových poznatků a takeaway bodů</h2>
+    <p class="quiz-subtitle">Otestujte si pochopení klíčových konceptů prezentace. Otázky prověřují takeaways i chytáky.</p>
+    <div class="quiz-score-bar" style="margin-top:10px; font-size:12px; color:var(--fg-muted);">
+      <span class="q-score-stat">Vyřešeno: <strong class="q-answered-n">${answeredCount}</strong> / ${questions.length}</span>
+      <span class="q-score-stat" style="margin-left:14px;">Správně: <strong class="q-correct-n" style="color:var(--syntax-string, #89d185);">${correctCount}</strong></span>
+    </div>
+  `;
+  card.appendChild(header);
+
+  const list = el("div", { className: "quiz-questions-list" });
+
+  function updateHeaderStats() {
+    const curMap = state.quizScores[deckKey] || {};
+    const curAns = Object.keys(curMap).length;
+    const curCorr = Object.values(curMap).filter((s) => s.isCorrect).length;
+    const ansEl = card.querySelector(".q-answered-n");
+    const corrEl = card.querySelector(".q-correct-n");
+    if (ansEl) ansEl.textContent = curAns;
+    if (corrEl) corrEl.textContent = curCorr;
+  }
+
+  questions.forEach((q, idx) => {
+    const qCard = el("article", { className: `quiz-q-card qtype-${q.type}`, id: `qcard-${q.id || idx}` });
+    
+    let typeLabel = "Otázka";
+    if (q.type === "multiple_choice") typeLabel = "Výběr ABCD";
+    else if (q.type === "code_fill") typeLabel = "Doplňování kódu (________)";
+    else if (q.type === "predict_output") typeLabel = "Předpověď výstupu programu 🖥️";
+    else if (q.type === "true_false_tricky") typeLabel = "Pravda / Nepravda (Chyták)";
+
+    const qNum = el("div", { className: "quiz-q-num" });
+    qNum.innerHTML = `Otázka ${idx + 1} z ${questions.length} <span class="quiz-type-tag">${typeLabel}</span>`;
+    qCard.appendChild(qNum);
+
+    let qTextHtml = escapeHtml(q.question || "");
+    let codeSnippetHtml = "";
+
+    if (qTextHtml.includes("```")) {
+      const parts = qTextHtml.split("```");
+      let promptParts = [];
+      for (let pIdx = 0; pIdx < parts.length; pIdx++) {
+        if (pIdx % 2 === 1) {
+          let codeText = parts[pIdx].replace(/^(python|bash|c|java)\n?/i, "");
+          const dedented = dedentCode(codeText);
+          const lang = parts[pIdx].match(/^(python|bash|c|java)/i)?.[1] || "python";
+          codeSnippetHtml += `<pre class="code-block lang-${lang}"><code>${highlightCode(dedented, lang)}</code></pre>`;
+        } else {
+          promptParts.push(parts[pIdx]);
+        }
+      }
+      qTextHtml = promptParts.join("").trim();
+    }
+
+    const qText = el("div", { className: "quiz-q-text" });
+    qText.innerHTML = qTextHtml;
+    qCard.appendChild(qText);
+
+    let codeWrapEl = null;
+    if (codeSnippetHtml) {
+      const isPredict = q.type === "predict_output";
+      codeWrapEl = el("div", { className: isPredict ? "quiz-code-wrap quiz-terminal-wrap" : "quiz-code-wrap" });
+      if (isPredict) {
+        codeWrapEl.innerHTML = `<div class="terminal-bar"><span class="t-dot red"></span><span class="t-dot yellow"></span><span class="t-dot green"></span><span class="t-title">main.py — Python 3.12 Output Predictor</span></div>${codeSnippetHtml}`;
+      } else {
+        codeWrapEl.innerHTML = codeSnippetHtml;
+      }
+      qCard.appendChild(codeWrapEl);
+    }
+
+    const savedState = scoreMap[q.id];
+    const explanationEl = el("div", { className: "quiz-explanation hidden" });
+
+    function showExplanation(isCorrect, expectedText, onRetry) {
+      explanationEl.className = `quiz-explanation ${isCorrect ? "correct" : "incorrect"}`;
+      explanationEl.innerHTML = `
+        <div class="exp-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <div class="exp-title">${isCorrect ? "✓ Správně!" : "✕ Nepřesně!"}</div>
+          ${onRetry ? `<button type="button" class="btn-retry-fill" style="background:#1e293b; border:1px solid #334155; color:#38bdf8; border-radius:4px; padding:3px 10px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s ease;">🔄 Zkusit znovu</button>` : ""}
+        </div>
+        ${(!isCorrect && expectedText) ? `<div class="exp-expected" style="margin-bottom:6px; font-weight:600; color:var(--syntax-string, #ce9178);">Očekávaný výraz: <code>${escapeHtml(expectedText)}</code></div>` : ""}
+        <div class="exp-body">${escapeHtml(q.explanation || "")}</div>
+      `;
+
+      if (onRetry) {
+        const retryBtn = explanationEl.querySelector(".btn-retry-fill");
+        if (retryBtn) {
+          retryBtn.addEventListener("click", onRetry);
+        }
+      }
+      explanationEl.classList.remove("hidden");
+    }
+
+    function updateLiveFill(val, isCorrect) {
+      const cleanVal = val.replace(/^[A-D]\)\s*/, "").trim();
+      const targetNode = codeWrapEl ? codeWrapEl.querySelector("code") : qText;
+      if (targetNode) {
+        if (!targetNode.dataset.originalCode) {
+          targetNode.dataset.originalCode = targetNode.innerHTML;
+        }
+        const orig = targetNode.dataset.originalCode;
+        const fillHtml = `<span class="filled-blank ${isCorrect ? "correct" : "incorrect"}">${escapeHtml(cleanVal)}</span>`;
+        targetNode.innerHTML = orig.replace(/________|___/g, fillHtml);
+      }
+    }
+
+    if (q.type === "code_fill") {
+      // Interactive Typing Exercise for code_fill - directly in the code line
+      const ansIdx = typeof q.answer === "number" ? q.answer : 0;
+      const rawCorrect = (q.options && q.options[ansIdx]) ? q.options[ansIdx] : String(q.answer || "");
+      const expectedClean = rawCorrect.replace(/^[A-D]\)\s*/, "").trim();
+
+      // Inline blank replacement with live interactive input directly in code block or question text
+      const inlineInputHtml = `<input type="text" class="inline-code-fill-input" size="${Math.max(6, expectedClean.length + 1)}" autocomplete="off" spellcheck="false" placeholder="doplňte kód..." aria-label="Napište chybějící kód" />`;
+      if (codeWrapEl) {
+        const codeNode = codeWrapEl.querySelector("code");
+        if (codeNode) {
+          codeNode.innerHTML = codeNode.innerHTML.replace(/________|___|___BLANK___/g, inlineInputHtml);
+        }
+      } else if (qText.innerHTML.includes("________")) {
+        qText.innerHTML = qText.innerHTML.replace(/________|___|___BLANK___/g, inlineInputHtml);
+      }
+
+      const inlineInput = qCard.querySelector(".inline-code-fill-input");
+
+      const handleEvaluate = (val) => {
+        if (!val) return;
+        const normUser = val.toLowerCase().replace(/\s+/g, "");
+        const normExp = expectedClean.toLowerCase().replace(/\s+/g, "");
+        const isCorrect = normUser === normExp || normExp.includes(normUser) || normUser.includes(normExp);
+
+        updateLiveFill(val, isCorrect);
+        inlineInput.classList.remove("correct", "incorrect");
+        inlineInput.classList.add(isCorrect ? "correct" : "incorrect");
+
+        saveQuizScore(deckKey, q.id, {
+          selected: val,
+          isCorrect: isCorrect,
+        });
+
+        showExplanation(isCorrect, expectedClean, handleReset);
+        updateHeaderStats();
+      };
+
+      const handleReset = () => {
+        explanationEl.classList.add("hidden");
+        if (inlineInput) {
+          inlineInput.disabled = false;
+          inlineInput.value = "";
+          inlineInput.size = 6;
+          inlineInput.classList.remove("correct", "incorrect");
+          inlineInput.focus();
+        }
+        const targetNode = codeWrapEl ? codeWrapEl.querySelector("code") : qText;
+        if (targetNode && targetNode.dataset.originalCode) {
+          targetNode.innerHTML = targetNode.dataset.originalCode;
+          delete targetNode.dataset.originalCode;
+        }
+        // Re-inject inline input
+        if (codeWrapEl) {
+          const codeNode = codeWrapEl.querySelector("code");
+          if (codeNode && !codeNode.querySelector(".inline-code-fill-input")) {
+            codeNode.innerHTML = codeNode.innerHTML.replace(/________|___|___BLANK___/g, inlineInputHtml);
+          }
+        }
+      };
+
+      if (inlineInput) {
+        inlineInput.addEventListener("input", () => {
+          inlineInput.size = Math.max(6, inlineInput.value.length + 1);
+          inlineInput.classList.remove("correct", "incorrect");
+        });
+
+        inlineInput.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const val = inlineInput.value.trim();
+            handleEvaluate(val);
+          }
+        });
+      }
+
+      if (q.options && q.options.length) {
+        const hintDetails = el("details", { className: "quiz-fill-hints-details" });
+        const pillsHtml = q.options.map((opt) => {
+          const cleanOpt = opt.replace(/^[A-D]\)\s*/, "").trim();
+          return `<button type="button" class="fill-hint-pill"><code>${escapeHtml(cleanOpt)}</code></button>`;
+        }).join(" ");
+        hintDetails.innerHTML = `<summary>💡 Možnosti ke vložení (klikněte na kód pro vložení nebo napište do řádku a stiskněte Enter ↵)</summary><div class="hint-pills-wrap">${pillsHtml}</div>`;
+        
+        hintDetails.querySelectorAll(".fill-hint-pill").forEach((pillBtn) => {
+          pillBtn.addEventListener("click", () => {
+            if (inlineInput) {
+              const textVal = pillBtn.textContent.trim();
+              inlineInput.value = textVal;
+              inlineInput.size = Math.max(6, textVal.length + 1);
+              handleEvaluate(textVal);
+            }
+          });
+        });
+
+        qCard.appendChild(hintDetails);
+      }
+
+      if (savedState && inlineInput) {
+        const userVal = typeof savedState.selected === "number" && q.options ? q.options[savedState.selected] : String(savedState.selected || "");
+        const cleanUserVal = userVal.replace(/^[A-D]\)\s*/, "");
+        inlineInput.value = cleanUserVal;
+        inlineInput.size = Math.max(6, cleanUserVal.length + 1);
+        inlineInput.classList.add(savedState.isCorrect ? "correct" : "incorrect");
+        updateLiveFill(userVal, savedState.isCorrect);
+        showExplanation(savedState.isCorrect, expectedClean, handleReset);
+      }
+
+    } else if (q.options && q.options.length) {
+      const isTF = q.type === "true_false_tricky" || q.options.length === 2;
+      const isPredict = q.type === "predict_output";
+      const optsWrap = el("div", { className: isTF ? "quiz-options-list tf-options" : (isPredict ? "quiz-options-list term-options" : "quiz-options-list") });
+      
+      q.options.forEach((optText, optIdx) => {
+        const isCorrectOpt = optIdx === q.answer;
+        const btn = el("button", {
+          type: "button",
+          className: "quiz-opt-btn" + (isTF ? " tf-btn" : "") + (isPredict ? " term-opt-btn" : ""),
+          onClick: () => {
+            optsWrap.querySelectorAll(".quiz-opt-btn").forEach((b, i) => {
+              b.disabled = true;
+              if (i === q.answer) b.classList.add("correct");
+              else if (i === optIdx && !isCorrectOpt) b.classList.add("incorrect");
+            });
+
+            updateLiveFill(optText, isCorrectOpt);
+
+            saveQuizScore(deckKey, q.id, {
+              selected: optIdx,
+              isCorrect: isCorrectOpt,
+            });
+
+            showExplanation(isCorrectOpt);
+            updateHeaderStats();
+          },
+        });
+
+        if (isPredict) {
+          const cleanOptText = optText.replace(/^[A-D]\)\s*/, "");
+          btn.innerHTML = `<span class="term-dollar">&gt;&gt;&gt;</span> <code class="term-opt-text">${escapeHtml(cleanOptText)}</code>`;
+        } else {
+          btn.textContent = optText;
+        }
+
+        if (savedState) {
+          btn.disabled = true;
+          if (optIdx === q.answer) btn.classList.add("correct");
+          if (optIdx === savedState.selected && !savedState.isCorrect) btn.classList.add("incorrect");
+          if (optIdx === savedState.selected) {
+            updateLiveFill(optText, savedState.isCorrect);
+          }
+        }
+
+        optsWrap.appendChild(btn);
+      });
+      qCard.appendChild(optsWrap);
+    }
+
+    if (savedState) {
+      showExplanation(savedState.isCorrect);
+    }
+
+    qCard.appendChild(explanationEl);
+    list.appendChild(qCard);
+  });
+
+  card.appendChild(list);
+
+  // Append 180-degree upside-down Answer Key block for print view
+  const answerKeyEl = el("div", { className: "quiz-answer-key-upsidedown" });
+  let answerKeyItems = questions.map((q, i) => {
+    let ansStr = "";
+    if (typeof q.answer === "number" && q.options && q.options[q.answer]) {
+      ansStr = q.options[q.answer];
+    } else {
+      ansStr = String(q.answer || "");
+    }
+    return `<li><strong>Otázka ${i + 1}:</strong> ${escapeHtml(ansStr)}</li>`;
+  }).join("");
+
+  answerKeyEl.innerHTML = `
+    <div class="answer-key-title">🔄 Klíč správných odpovědí (pro kontrolu otočte stránku o 180°)</div>
+    <ol class="answer-key-list">${answerKeyItems}</ol>
+  `;
+  card.appendChild(answerKeyEl);
+
+  return card;
 }
 
 /* ── Search / progress ─────────────────────────────────── */
@@ -1121,7 +1566,9 @@ function printTier(level) {
 
   window.print();
 }
-window.printTier = printTier;
+if (typeof window !== "undefined") {
+  window.printTier = printTier;
+}
 
 function progressVibe(pct, studiedN, total) {
   if (total === 0) return "Catalog is empty — run the import tools first.";
@@ -1483,7 +1930,7 @@ export function showProgress() {
   main.appendChild(wrap);
 }
 
-/* ── Login & Account View ────────────────────────────── */
+/* ── Dedicated Login & Account Profile Command Center ────── */
 
 export function showLogin() {
   const main = document.getElementById("main");
@@ -1495,169 +1942,209 @@ export function showLogin() {
   const u = state.user;
 
   if (u) {
-    // Logged-in profile view
-    const items = state.items || [];
-    const total = items.length;
-    const studiedCount = state.studied.size;
-    const pct = total > 0 ? Math.round((studiedCount / total) * 100) : 0;
-    const initials = (u.name || u.username)
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .substring(0, 2)
-      .toUpperCase();
+    container.appendChild(renderUserProfileDashboard(u));
+  } else {
+    container.appendChild(renderLoginForm());
+  }
 
-    container.innerHTML = `
-      <div class="login-card logged-in">
-        <div class="vscht-badge">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          VSČHT Praha · SIS SSO Logged In
-        </div>
-        <div class="login-profile-header">
-          <div class="profile-avatar-large">${escapeHtml(initials)}</div>
-          <div class="profile-info">
-            <h2>${escapeHtml(u.name || u.username)}</h2>
-            <div class="profile-meta-row">
-              <span class="profile-meta-pill">@${escapeHtml(u.username)}</span>
-              <span class="profile-meta-pill">${escapeHtml(u.faculty || "VSČHT Praha")}</span>
-              <span class="profile-meta-pill">ID: ${escapeHtml(u.studentId || "987654")}</span>
-            </div>
-          </div>
-        </div>
+  main.appendChild(container);
+}
 
-        <div class="sync-status-card">
-          <div class="sync-status-icon">☁️</div>
-          <div class="sync-status-text">
-            <strong>Cloud Synchronizace Aktivní</strong>
-            <p class="desc">Klíč databáze: <code>pyt:${escapeHtml(u.username)}:studied</code> (Upstash Redis)</p>
-          </div>
-          <button type="button" class="btn secondary" id="btnManualSync">Synchronizovat nyní 🔄</button>
-        </div>
+function renderUserProfileDashboard(u) {
+  const items = state.items || [];
+  const total = items.length;
+  const studiedCount = state.studied.size;
+  const pct = total > 0 ? Math.round((studiedCount / total) * 100) : 0;
+  const initials = (u.name || u.username)
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
 
-        <div class="profile-stats-grid">
-          <div class="pstat-box">
-            <span class="pstat-val">${studiedCount}</span>
-            <span class="pstat-lbl">Prostudováno</span>
-          </div>
-          <div class="pstat-box">
-            <span class="pstat-val">${pct}%</span>
-            <span class="pstat-lbl">Splněno</span>
-          </div>
-          <div class="pstat-box">
-            <span class="pstat-val">${total}</span>
-            <span class="pstat-lbl">Celkem témat</span>
-          </div>
-        </div>
+  const card = el("div", { className: "login-card logged-in glass-card" });
+  card.innerHTML = `
+    <div class="vscht-badge">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      VSČHT Praha · SIS SSO Logged In
+    </div>
 
-        <div class="sync-status-card" style="margin-top:12px;">
-          <div class="sync-status-icon">💻</div>
-          <div class="sync-status-text" style="flex:1;">
-            <strong>Code block color (Při tisku / In print)</strong>
-            <p class="desc">Barevný vzhled pouze kódových bloků při tisku. Celá stránka a texty zůstávají vždy v čistém světlém režimu (bílý papír).</p>
-          </div>
-          <div style="min-width:160px;">
-            <select id="selectCodeBlockColor" class="sort-select" style="height:32px;font-size:12px;padding:0 8px;width:100%;">
-              <option value="dark" ${state.codeBlockColor === "dark" ? "selected" : ""}>Dark code (VS Code #1e1e1e)</option>
-              <option value="light" ${state.codeBlockColor === "light" ? "selected" : ""}>Light code (#f8f9fa)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="login-actions-row">
-          <button type="button" class="btn secondary" id="btnPageSwitchAccount">Přihlásit jiný účet VSČHT</button>
-          <button type="button" class="btn primary danger" id="btnPageLogout">Odhlásit se</button>
+    <div class="login-profile-header">
+      <div class="profile-avatar-large">${escapeHtml(initials)}</div>
+      <div class="profile-info">
+        <h2>${escapeHtml(u.name || u.username)}</h2>
+        <div class="profile-meta-row">
+          <span class="profile-meta-pill">@${escapeHtml(u.username)}</span>
+          <span class="profile-meta-pill">${escapeHtml(u.faculty || "VSČHT Praha")}</span>
+          <span class="profile-meta-pill">ID: ${escapeHtml(u.studentId || "987654")}</span>
         </div>
       </div>
-    `;
+    </div>
 
-    main.appendChild(container);
+    <div class="sync-status-card">
+      <div class="sync-status-icon">☁️</div>
+      <div class="sync-status-text">
+        <strong>Cloud Synchronizace Aktivní</strong>
+        <p class="desc">Upstash Redis storage key: <code>pyt:${escapeHtml(u.username)}:studied</code></p>
+      </div>
+      <button type="button" class="btn secondary sm" id="btnManualSync">Synchronizovat 🔄</button>
+    </div>
 
-    document.getElementById("btnManualSync")?.addEventListener("click", async (e) => {
+    <div class="profile-stats-grid">
+      <div class="pstat-box">
+        <span class="pstat-val">${studiedCount}</span>
+        <span class="pstat-lbl">Prostudováno</span>
+      </div>
+      <div class="pstat-box">
+        <span class="pstat-val">${pct}%</span>
+        <span class="pstat-lbl">Splněno</span>
+      </div>
+      <div class="pstat-box">
+        <span class="pstat-val">${total}</span>
+        <span class="pstat-lbl">Celkem témat</span>
+      </div>
+    </div>
+
+    <div class="login-settings-group">
+      <div class="sync-status-card setting-card">
+        <div class="sync-status-icon">💻</div>
+        <div class="sync-status-text" style="flex:1;">
+          <strong>Barevnost kódových bloků (Při tisku)</strong>
+          <p class="desc">Nastavuje tmavý (VS Code Dark) nebo světlý vzhled pouze pro kódové bloky v PDF exportu.</p>
+        </div>
+        <div style="min-width:150px;">
+          <select id="selectCodeBlockColor" class="sort-select" style="height:32px;font-size:12px;padding:0 8px;width:100%;">
+            <option value="dark" ${state.codeBlockColor === "dark" ? "selected" : ""}>Dark Code (#1e1e1e)</option>
+            <option value="light" ${state.codeBlockColor === "light" ? "selected" : ""}>Light Code (#f8f9fa)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sync-status-card setting-card" style="margin-top:10px;">
+        <div class="sync-status-icon">📝</div>
+        <div class="sync-status-text" style="flex:1;">
+          <strong>Kvízy a testy při tisku (Print with tests)</strong>
+          <p class="desc">Na konci přednášky při tisku automaticky vytiskne takeaway kvíz se syntax highlightem.</p>
+        </div>
+        <div style="min-width:150px;">
+          <select id="selectPrintWithQuizzes" class="sort-select" style="height:32px;font-size:12px;padding:0 8px;width:100%;">
+            <option value="true" ${state.printWithQuizzes ? "selected" : ""}>Zahrnout kvízy (Zapnuto)</option>
+            <option value="false" ${!state.printWithQuizzes ? "selected" : ""}>Skrýt kvízy (Vypnuto)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="login-actions-row">
+      <button type="button" class="btn secondary" id="btnPageSwitchAccount">Přihlásit jiný účet</button>
+      <button type="button" class="btn primary danger" id="btnPageLogout">Odhlásit se</button>
+    </div>
+  `;
+
+  // Bind dashboard events
+  setTimeout(() => {
+    card.querySelector("#btnManualSync")?.addEventListener("click", async (e) => {
       const btn = e.currentTarget;
       btn.textContent = "Synchronizuji...";
       btn.disabled = true;
       await syncCloudProgress();
       btn.textContent = "Synchronizováno ✓";
       setTimeout(() => {
-        btn.textContent = "Synchronizovat nyní 🔄";
+        btn.textContent = "Synchronizovat 🔄";
         btn.disabled = false;
         showLogin();
       }, 1000);
     });
 
-    document.getElementById("selectCodeBlockColor")?.addEventListener("change", (e) => {
+    card.querySelector("#selectCodeBlockColor")?.addEventListener("change", (e) => {
       setCodeBlockColor(e.target.value);
     });
 
-    document.getElementById("btnPageSwitchAccount")?.addEventListener("click", () => {
+    card.querySelector("#selectPrintWithQuizzes")?.addEventListener("change", (e) => {
+      setPrintWithQuizzes(e.target.value === "true");
+      updatePrintQuizButtons();
+    });
+
+    card.querySelector("#btnPageSwitchAccount")?.addEventListener("click", () => {
       logoutUser();
       showLogin();
     });
 
-    document.getElementById("btnPageLogout")?.addEventListener("click", () => {
+    card.querySelector("#btnPageLogout")?.addEventListener("click", () => {
       logoutUser();
       showLogin();
     });
+  }, 0);
 
-  } else {
-    // Logged-out Login form view
-    container.innerHTML = `
-      <div class="login-card">
-        <div class="vscht-badge">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          VSČHT Praha · Jednotné Přihlášení SIS SSO
-        </div>
-        
-        <h2>Přihlášení študenta / vyučujícího</h2>
-        <p class="desc">Zadejte svůj VSČHT login pro synchronizaci studijního postupu napříč zařízeními (PC, tablet, telefon).</p>
+  return card;
+}
 
-        <form id="pageLoginForm" class="login-form">
-          <div class="form-group">
-            <label for="pageInputUsername">Uživatelské jméno (VSČHT Login)</label>
-            <input type="text" id="pageInputUsername" placeholder="např. kolard" required autocomplete="username" value="kolard" />
-          </div>
-          <div class="form-group">
-            <label for="pageInputFullName">Jméno a příjmení</label>
-            <input type="text" id="pageInputFullName" placeholder="např. David Kolar" required value="David Kolar" />
-          </div>
-          <div class="form-group">
-            <label for="pageInputFaculty">Fakulta / Ústav</label>
-            <select id="pageInputFaculty">
-              <option value="FCHI · VSČHT Praha" selected>FCHI · Fakulta chemicko-inženýrská</option>
-              <option value="FPBT · VSČHT Praha">FPBT · Fakulta potravinářské a biologické technologie</option>
-              <option value="FCHT · VSČHT Praha">FCHT · Fakulta chemické technologie</option>
-              <option value="FTOP · VSČHT Praha">FTOP · Fakulta technologie ochrany prostředí</option>
-              <option value="VŠOP · VSČHT Praha">VŠOP · Ústav ekonomiky a managementu</option>
-            </select>
-          </div>
+function renderLoginForm() {
+  const card = el("div", { className: "login-card glass-card" });
+  card.innerHTML = `
+    <div class="vscht-badge">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      VSČHT Praha · Jednotné Přihlášení SIS SSO
+    </div>
+    
+    <h2>Přihlášení studenta / vyučujícího</h2>
+    <p class="desc">Zadejte své školní údaje pro synchronizaci studijního postupu v kurzu Python napříč všemi zařízeními (PC, tablet, telefon).</p>
 
-          <div class="form-actions">
-            <button type="submit" class="btn primary xl">Přihlásit se & Synchronizovat 🚀</button>
-          </div>
-        </form>
-
-        <div class="quick-login-section">
-          <span class="quick-title">Rychlé přihlášení testovacích účtů:</span>
-          <div class="quick-buttons">
-            <button type="button" class="btn secondary sm" id="btnQuickKolard">David Kolar (kolard)</button>
-            <button type="button" class="btn secondary sm" id="btnQuickStudent">Student Test (student1)</button>
-          </div>
-        </div>
-
-        <div class="login-info-box">
-          <p>ℹ️ <strong>Multi-Project Sync Engine:</strong> Vaše data jsou bezpečně izolována v cloudové databázi Upstash Redis pod klíčem <code>pyt:&lt;username&gt;:*</code>.</p>
+    <form id="pageLoginForm" class="login-form">
+      <div class="form-group">
+        <label for="pageInputUsername">Uživatelské jméno (VSČHT Login)</label>
+        <div class="input-with-icon">
+          <span class="input-icon">👤</span>
+          <input type="text" id="pageInputUsername" placeholder="např. kolard" required autocomplete="username" value="kolard" />
         </div>
       </div>
-    `;
+      <div class="form-group">
+        <label for="pageInputFullName">Jméno a příjmení</label>
+        <div class="input-with-icon">
+          <span class="input-icon">🎓</span>
+          <input type="text" id="pageInputFullName" placeholder="např. David Kolar" required value="David Kolar" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="pageInputFaculty">Fakulta / Ústav</label>
+        <div class="input-with-icon">
+          <span class="input-icon">🏛️</span>
+          <select id="pageInputFaculty">
+            <option value="FCHI · VSČHT Praha" selected>FCHI · Fakulta chemicko-inženýrská</option>
+            <option value="FPBT · VSČHT Praha">FPBT · Fakulta potravinářské a biologické technologie</option>
+            <option value="FCHT · VSČHT Praha">FCHT · Fakulta chemické technologie</option>
+            <option value="FTOP · VSČHT Praha">FTOP · Fakulta technologie ochrany prostředí</option>
+            <option value="VŠOP · VSČHT Praha">VŠOP · Ústav ekonomiky a managementu</option>
+          </select>
+        </div>
+      </div>
 
-    main.appendChild(container);
+      <div class="form-actions">
+        <button type="submit" class="btn primary xl btn-login-submit">Přihlásit se & Synchronizovat 🚀</button>
+      </div>
+    </form>
 
-    const form = document.getElementById("pageLoginForm");
+    <div class="quick-login-section">
+      <span class="quick-title">Rychlé testovací profily:</span>
+      <div class="quick-buttons">
+        <button type="button" class="btn secondary sm quick-pill" id="btnQuickKolard">David Kolar (kolard)</button>
+        <button type="button" class="btn secondary sm quick-pill" id="btnQuickStudent">Student Test (student1)</button>
+      </div>
+    </div>
+
+    <div class="login-info-box">
+      <p>ℹ️ <strong>Multi-Device Cloud Sync Engine:</strong> Vaše data jsou bezpečně izolována v databázi Upstash Redis pod klíčem <code>pyt:&lt;username&gt;:*</code>.</p>
+    </div>
+  `;
+
+  // Bind login form events
+  setTimeout(() => {
+    const form = card.querySelector("#pageLoginForm");
     form?.addEventListener("submit", (e) => {
       e.preventDefault();
-      const username = document.getElementById("pageInputUsername")?.value.trim();
-      const fullName = document.getElementById("pageInputFullName")?.value.trim();
-      const faculty = document.getElementById("pageInputFaculty")?.value;
+      const username = card.querySelector("#pageInputUsername")?.value.trim();
+      const fullName = card.querySelector("#pageInputFullName")?.value.trim();
+      const faculty = card.querySelector("#pageInputFaculty")?.value;
 
       if (!username) return;
 
@@ -1672,7 +2159,7 @@ export function showLogin() {
       window.__pcsNavigate?.({ kind: "progress" });
     });
 
-    document.getElementById("btnQuickKolard")?.addEventListener("click", () => {
+    card.querySelector("#btnQuickKolard")?.addEventListener("click", () => {
       setUser({
         username: "kolard",
         name: "David Kolar",
@@ -1682,7 +2169,7 @@ export function showLogin() {
       window.__pcsNavigate?.({ kind: "progress" });
     });
 
-    document.getElementById("btnQuickStudent")?.addEventListener("click", () => {
+    card.querySelector("#btnQuickStudent")?.addEventListener("click", () => {
       setUser({
         username: "student1",
         name: "Student Test",
@@ -1691,7 +2178,9 @@ export function showLogin() {
       });
       window.__pcsNavigate?.({ kind: "progress" });
     });
-  }
+  }, 0);
+
+  return card;
 }
 
 

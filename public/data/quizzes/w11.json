@@ -1,0 +1,547 @@
+{
+  "overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Proč se při kompilaci regulárních výrazů v Pythonu doporučuje používat raw string literály (např. r'\\d+\\w+')?",
+      "options": [
+        "A) Potlačují vyhodnocování zpětných lomítek na úrovni Pythonu a zabraňují nutnosti zdvojování \\\\.",
+        "B) Zrychlují kompilaci regulárního výrazu vytvořením konstantního objektu v bytecode před prováděním.",
+        "C) Automaticky převádějí celý vzor na velká písmena bez ohledu na nastavené kompilační příznaky modulu.",
+        "D) Povolují používání víceřádkových komentářů uvnitř vzoru bez aktivace rozšiřujícího režimu verbose."
+      ],
+      "answer": 0,
+      "explanation": "Použití raw stringu (`r'...'`) zabraňuje interpretu Pythonu ve vyhodnocování sekvencí se zpětným lomítkem (např. `\\n`, `\\t`). Regulární výraz tak dostane přesné zpětné lomítko bez nutnosti psát nepřehledné zdvojené `\\\\`."
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Co vrací metoda re.finditer(pattern, string) při vyhledání všech zásahů v textu?",
+      "options": [
+        "A) Iterátor postupně generující jednotlivé objekty zásahu (Match objects) obsahující podrobné informace.",
+        "B) Seznam (list) obsahující výhradně textové řetězce všech nalezených podřetězců vyhovujících vzoru.",
+        "C) Generátor vracející n-tice indexů počátku a konce jednotlivých zásahů bez samotných textových dat.",
+        "D) Slovník (dict) mapující názvy pojmenovaných skupin na seznamy jejich nalezených výskytů v textu."
+      ],
+      "answer": 0,
+      "explanation": "Metoda `re.finditer()` vrací iterátor vracející objekty shody (`Match` objects) pro všechny nepřekrývající se výskyty vzoru v textu, což šetří paměť a umožňuje přistupovat k pozicím i podskupinám."
+    },
+    {
+      "id": "q3",
+      "type": "predict_output",
+      "question": "Jak se liší výstup metody re.findall() u vzoru bez podskupin oproti vzoru s podskupinami?",
+      "options": [
+        "A) Bez skupin vrací seznam shodných řetězců, se skupinami vrací seznam n-tic zachycených podskupin.",
+        "B) Bez skupin vrací iterátor objektů Match, se skupinami vrací přímý seznam slovníků skupin groupdict.",
+        "C) Bez skupin vrací n-tici všech celých zásahů, se skupinami vrací seznam celých shody včetně zápisů.",
+        "D) Bez skupin vrací seznam řetězců, se skupinami vyvolá výjimku re.error kvůli nekompatibilitě typů."
+      ],
+      "answer": 0,
+      "explanation": "Pokud regulární výraz neobsahuje žádné podskupiny `()`, `findall()` vrací jednoduchý seznam zachycených řetězců. Pokud však výraz podskupiny obsahuje, vrací seznam n-tic (tuples) obsahujících hodnoty jednotlivých podskupin."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl v chování mezi funkcemi re.match() a re.search()?",
+      "options": [
+        "A) match hledá shodu výhradně od začátku řetězce, zatímco search prohledává celý řetězec kdekoliv.",
+        "B) match prohledává celý řetězec kdekoliv, zatímco search vyžaduje shodu přes celý řetězec do konce.",
+        "C) match vrací pouze Boolean hodnotu True/False, zatímco search vrací plnohodnotný objekt shody Match.",
+        "D) match funguje výhradně s předkompilovanými vzory, zatímco search přijímá i nekompilovaný řetězec."
+      ],
+      "answer": 0,
+      "explanation": "Funkce `re.match()` zkoumá shodu se vzorem pouze na samotném začátku řetězce (index 0). Naproti tomu `re.search()` prohledává celý řetězec a vrátí první nalezenou shodu kdekoliv v textu."
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Co vrátí volání m.group(1, 2) na objektu Match m, který úspěšně zachytil alespoň dvě podskupiny?",
+      "options": [
+        "A) N-tici (tuple) dvou řetězců odpovídajících první a druhé zachycené podskupině regulárního výrazu.",
+        "B) Spojený řetězec vzniklý konkatenačním sloučením první a druhé zachycené podskupiny bez oddělovače.",
+        "C) Seznam (list) obsahující celou shodu m.group(0) a následně obě zachycené podskupiny v pořadí.",
+        "D) Slovník (dict) obsahující celočíselné klíče 1 a 2 mapované na příslušné zachycené řetězce skupin."
+      ],
+      "answer": 0,
+      "explanation": "Předání více argumentů (indexů nebo jmen skupin) metodě `.group()` vrátí n-tici (tuple) obsahující odpovídající hodnoty pro každý zadaný argument v daném pořadí."
+    },
+    {
+      "id": "q6",
+      "type": "code_fill",
+      "question": "Doplňte metodu pro získání slovníku pojmenovaných skupin ze zachyceného objektu Match:\n\nimport re\npattern = re.compile(r'(?P<user>\\w+):(?P<role>\\w+)')\nmatch = pattern.search('user:admin')\ndata = match.________()",
+      "options": [
+        "A) groupdict",
+        "B) dictgroups",
+        "C) namedgroups",
+        "D) get_groups"
+      ],
+      "answer": 0,
+      "explanation": "Metoda `groupdict()` na objektu `Match` vrací slovník, kde klíči jsou jména pojmenovaných skupin definovaná pomocí `(?P<name>...)` a hodnotami jsou odpovídající zachycené podřetězce."
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Jak ovlivní přítomnost podskupiny v regulárním výrazu chování funkce re.split()?",
+      "options": [
+        "A) Zahrne zachycené podskupiny jako samostatné prvky do výsledného vráceného seznamu oddělených částí.",
+        "B) Odstraní všechny oddělovače z výstupního seznamu a vrací pouze spojené nerozdělené n-tice znaků.",
+        "C) Rozdělí řetězec pouze na prvním výskytu a ignoruje všechny následující shody v dalším textu.",
+        "D) Vyvolá výjimku ValueError, protože metoda split nepodporuje regulární výrazy s podskupinami."
+      ],
+      "answer": 0,
+      "explanation": "Pokud regulární výraz v `re.split()` obsahuje podskupiny v závorkách `()`, jsou texty zachycené těmito podskupinami také vloženy do výsledného vráceného seznamu mezi oddělené části."
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Proč se pro odkazování na skupiny v nahrazovacím řetězci metody re.sub() doporučuje zápis \\g<1>0 místo \\10?",
+      "options": [
+        "A) Zabraňuje dvouznačnosti mezi odkazem na skupinu číslo 1 následovanou nulou a skupinou číslo 10.",
+        "B) Umožňuje nahrazování neosetřených Unicode znaků bez nutnosti specifikovat explicitní kódování.",
+        "C) Zrychluje provádění substituce přímým adresováním paměťového ukazatele na zachycenou skupinu.",
+        "D) Zajišťuje kompatibilitu se staršími verzemi Pythonu 2, které neuplatňovaly zápis se zpětným lomítkem."
+      ],
+      "answer": 0,
+      "explanation": "Zápis `\\g<1>0` jednoznačně určuje odkaz na podskupinu číslo 1 následovaný doslovným znakem `0`. Zápis `\\10` by interpret regulárních výrazů vyhodnotil jako odkaz na podskupinu číslo 10."
+    },
+    {
+      "id": "q9",
+      "type": "predict_output",
+      "question": "Co je návratovou hodnotou metody re.subn(pattern, repl, string)?",
+      "options": [
+        "A) Dvojice (n-tice) tvořená novým upraveným řetězcem a celkovým počtem provedených nahrazení v textu.",
+        "B) Pouze celočíselný počet provedených substitucí v textu bez samotného vytvořeného nového řetězce.",
+        "C) Seznam všech mezivýsledků vzniklých postupným prováděním jednotlivých nahrazení v řetězci.",
+        "D) Objekt typu Match obsahující podrobné rozbalené údaje o posledním nahrazeném podřetězci."
+      ],
+      "answer": 0,
+      "explanation": "Metoda `re.subn()` provádí stejnou substituci jako `re.sub()`, ale navrací n-tici `(new_string, number_of_subs)`, která obsahuje nový řetězec a celkový počet provedených nahrazení."
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "question": "Jak se mění interpretace regulárního výrazu při zapnutí kompilačního příznaku re.VERBOSE?",
+      "options": [
+        "A) Ignorují se netisknutelné bílé znaky mimo třídy [] a je povoleno vkládat komentáře pomocí znaku #.",
+        "B) Povolují se rozšířené matematické operátory pro počítání opakování prvků v prohledávaném textu.",
+        "C) Automaticky se zapíná ignorování velikosti písmen a vyhledávání přes více řádků současně.",
+        "D) Zvedá se maximální povolený počet zachycených skupin z výchozího limitu 99 na neomezený počet."
+      ],
+      "answer": 0,
+      "explanation": "Příznak `re.VERBOSE` (neboli `re.X`) ignoruje mezery a odřádkování ve vzoru (pokud nejsou uvnitř znakové třídy `[]` nebo eskapované) a umožňuje psát poznámky a komentáře uvozené znakem `#`."
+    }
+  ],
+  "doctests": [
+    {
+      "id": "q1",
+      "type": "code_fill",
+      "question": "Doplňte název funkce pro automatické spuštění doctestů aktuálního modulu z kódu:\n\n```python\nimport doctest\n\nif __name__ == '__main__':\n    doctest.________()\n```",
+      "options": [
+        "A) testmod",
+        "B) run_all",
+        "C) main",
+        "D) testfile"
+      ],
+      "answer": 0,
+      "explanation": "Funkce doctest.testmod() prohledá aktuální modul (nebo zadaný modul) a spustí všechny testy nalezené v docstringách. unittest.main() patří k rozhraní unittest."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se z příkazové řádky spustí doctesty pro modul moje_logika.py s podrobným výpisem (verbose)?",
+      "options": [
+        "A) python -m doctest -v moje_logika.py",
+        "B) python doctest --verbose moje_logika.py",
+        "C) python -m unittest -v moje_logika.py",
+        "D) python moje_logika.py --doctest-verbose"
+      ],
+      "answer": 0,
+      "explanation": "Přepínač -m doctest spustí modul doctest jako skript a předá mu parametr -v pro podrobný výstup. unittest by spustil testovací třídy unittest, nikoli docstringy."
+    },
+    {
+      "id": "q3",
+      "type": "predict_output",
+      "question": "Jaký výstup vytvoří spuštění python -m doctest moje_logika.py, pokud všechny testy v docstringách projdu bez chyb?",
+      "options": [
+        "A) Neprodlevně se nevypíše vůbec žádný textový výstup na konzoli.",
+        "B) Vypíše se textový řetězec \"OK (tests=3, failures=0)\" na stdout.",
+        "C) Zobrazí se kompletní seznam otestovaných dokumentačních funkcí.",
+        "D) Vypíše se hlášení \"SUCCESS\" spolu s celkovým časem vykonání v ms."
+      ],
+      "answer": 0,
+      "explanation": "Doctest je navržen podle principu 'no news is good news' – pokud všechny testy uspějí, nevypisuje do konzole žádný výstup (pokud nebyl zadán příznak -v)."
+    },
+    {
+      "id": "q4",
+      "type": "code_fill",
+      "question": "Doplňte zápis v docstringu pro přeskočení vyhodnocení konkrétního řádku příkladu:\n\n```python\ndef moja_funkce():\n    \"\"\"\n    >>> moja_funkce()\n    'vysledek' # doctest: ________\n    \"\"\"\n    pass\n```",
+      "options": [
+        "A) +SKIP",
+        "B) IGNORE",
+        "C) NO_TEST",
+        "D) PASS"
+      ],
+      "answer": 0,
+      "explanation": "Direktiva # doctest: +SKIP (případně se znaménkem +) řekne doctestu, aby výstup daného příkladu v docstringu přeskočil a neporovnával ho."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jakým způsobem lze začlenit doctesty modulu logika do standardního běhu unittest sady?",
+      "options": [
+        "A) Definováním funkce load_tests vracející tests.addTests(doctest.DocTestSuite(logika)).",
+        "B) Zavoláním metody unittest.register_doctest(logika) přímo uvnitř testovací metody setUp().",
+        "C) Importováním balíčku logika přímo do konstruktoru hlavní testovací třídy unittest.TestCase.",
+        "D) Nastavením globální proměnné prostředí PYTHON_DOCTEST_ENABLE=1 před spuštěním sady testů."
+      ],
+      "answer": 0,
+      "explanation": "Unittest rozhraní vyhledává funkci load_tests(loader, tests, pattern), do které lze přidat testovací sadu vytvořenou pomocí doctest.DocTestSuite(modul)."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "K čemu slouží direktiva doctest.FAIL_FAST (resp. příkazový přepínač -o FAIL_FAST nebo -f)?",
+      "options": [
+        "A) Zastaví vykonávání doctestů ihned při výskytu první selhané kontrolní podmínky.",
+        "B) Přeskočí všechny časově náročné testy a spustí pouze jednoduché aritmetické operace.",
+        "C) Zapne optimalizovaný JIT kompilátor pro zrychlení celkového porovnávání řetězců.",
+        "D) Přesměruje chybové zprávy ze standardního chybového výstupu přímo do souboru logu."
+      ],
+      "answer": 0,
+      "explanation": "Příznak FAIL_FAST ukončí testování hned po první chybě, což šetří čas při ladění dlouhých sad docstring testů."
+    }
+  ],
+  "unittests": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaké pravidlo musí splňovat metody v třídě odvozené od unittest.TestCase, aby byly automaticky spuštěny?",
+      "options": [
+        "A) Jméno metody musí začínat předponou test, např. test_vypocet().",
+        "B) Metoda musí mít dekorátor @unittest.test a nesmí přijímat self.",
+        "C) Jméno metody musí končit příponou _test a vracet hodnotu True.",
+        "D) Metoda musí být deklarována jako statická dekorátorem @staticmethod."
+      ],
+      "answer": 0,
+      "explanation": "Test runner v unittest vyhledává ve třídách TestCase všechny metody, jejichž název začíná řetězcem test."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký je přesný rozdíl v okamžiku spuštění metod setUp() a tearDown() při běhu testovací třídy?",
+      "options": [
+        "A) setUp() se spouští před každou testovací metodou a tearDown() po každé testovací metodě.",
+        "B) setUp() se spouští pouze před celou třídou a tearDown() až po dokončení všech testů.",
+        "C) setUp() se volá výhradně při selhání testu a tearDown() proběhne u úspěšných testů.",
+        "D) setUp() inicializuje globální proměnné modulu a tearDown() uvolňuje paměť C rozšíření."
+      ],
+      "answer": 0,
+      "explanation": "Metody setUp() a tearDown() slouží jako test fixtures spouštěné individuálně před a po každé jednotlivé testovací metodě, čímž zajišťují izolaci testů."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Která assertion metoda v unittest ověřuje vyvolání očekávané výjimky při zavolání funkce?",
+      "options": [
+        "A) assertRaises(ExceptionType, func, *args)",
+        "B) assertExcept(ExceptionType, func, *args)",
+        "C) assertCatch(ExceptionType, func, *args)",
+        "D) assertThrow(ExceptionType, func, *args)"
+      ],
+      "answer": 0,
+      "explanation": "assertRaises(exc, callable, *args) kontroluje, zda zavolání callable(*args) vyvolá výjimku typu exc."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je přesný rozdíl mezi assertEqual(a, b) a assertIs(a, b) v knihovně unittest?",
+      "options": [
+        "A) assertEqual porovnává hodnoty přes a == b, zatímco assertIs porovnává identitu přes a is b.",
+        "B) assertEqual porovnává identitu v paměti, zatímco assertIs porovnává datové typy proměnných.",
+        "C) assertEqual funguje výhradně pro čísla, zatímco assertIs slouží ke kontrole řetězců.",
+        "D) assertEqual vyvolá výjimku TypeError, zatímco assertIs vyvolá varování UserWarning."
+      ],
+      "answer": 0,
+      "explanation": "assertEqual testuje rovnost obsahu/hodnoty (==), kdežto assertIs testuje identitu v paměti (id(a) == id(b) resp. a is b)."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co ověřuje metoda assertCountEqual(a, b) při porovnání dvou sekvencí v unittest?",
+      "options": [
+        "A) Zda sekvence a a b obsahují stejné prvky se stejnými četnostmi, bez ohledu na jejich pořadí.",
+        "B) Zda mají sekvence a a b pouze stejný celkový počet prvků navrácený vestavěnou funkcí len().",
+        "C) Zda sekvence a a b začínají i končí stejným prvkem a mají shodnou celkovou délku typu.",
+        "D) Zda součet číselných hodnot prvků v sekvenci a odpovídá součtu hodnot prvků v sekvenci b."
+      ],
+      "answer": 0,
+      "explanation": "assertCountEqual nekontroluje pouze délku (len), ale ověřuje, že obě kolekce obsahují přesně stejné prvky ve stejných počtech (četnostech), přičemž pořadí prvků ignoruje."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaký je výchozí počet desetinných míst při porovnání reálných čísel pomocí assertAlmostEqual(a, b)?",
+      "options": [
+        "A) 7 desetinných míst",
+        "B) 2 desetinná místa",
+        "C) 5 desetinných míst",
+        "D) 9 desetinných míst"
+      ],
+      "answer": 0,
+      "explanation": "Metoda assertAlmostEqual(a, b) ve výchozím nastavení ověřuje round(a - b, 7) == 0, tedy zaokrouhluje na 7 desetinných míst."
+    },
+    {
+      "id": "q7",
+      "type": "true_false_tricky",
+      "question": "Pokud testovací metoda v unittestu neobsahuje žádný assert ani vyvolanou výjimku, jak dopadne test?",
+      "options": [
+        "A) Test bude vyhodnocen jako úspěšný (passed), i když kód neověřil vůbec žádné podmínky.",
+        "B) Test selže s chybou AssertionError, protože chybí explicitní výrok ke kontrole stavu.",
+        "C) Test skončí ve stavu Error z důvodu nepřítomnosti návratové hodnoty typu boolean.",
+        "D) Test runner přeruší vykonávání celého souboru a vyžaduje doplnění typu v docstringu."
+      ],
+      "answer": 0,
+      "explanation": "V unittest test projde, pokud během jeho běhu nenastane žádná nezachycená výjimka (včetně AssertionError). Pokud test neobsahuje žádné tvrzení a nehodí výjimku, vyhodnotí se jako úspěšný."
+    }
+  ],
+  "timeit": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Proč modul timeit při měření doby vykonávání kódu standardně vypíná garbage collector (GC)?",
+      "options": [
+        "A) Zajišťuje tím stabilnější a reprodukovatelnější výsledky neovlivněné úklidem paměti.",
+        "B) Zabraňuje havárii interpreteru při opakovaném vytváření proměnných v globálním prostoru.",
+        "C) Vypnutí GC je nutné pro převod pythonního kódu do rychlých instrukcí C v paměti.",
+        "D) GC v Pythonu nelze spustit uvnitř vedlejšího vlákna, ve kterém modul měření provádí."
+      ],
+      "answer": 0,
+      "explanation": "Běh garbage collectoru zanáší do měření nahodilé časové odchylky. Proto jej timeit ve výchozím stavu vypíná, aby poskytl konzistentnější výsledky."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "K čemu slouží parametr setup při vytváření instance timeit.Timer(stmt, setup)?",
+      "options": [
+        "A) Obsahuje kód pro inicializaci proměnných, který se provede, ale nezapočítává do měření.",
+        "B) Určuje cestu k profilovacímu souboru, do kterého se uloží kompletní výstup cProfile.",
+        "C) Nastavuje časový limit v sekundách, po jehož překročení je měření skriptu stornováno.",
+        "D) Definuje seznam C knihoven, které mají mít přednost před čistou implementací Pythonu."
+      ],
+      "answer": 0,
+      "explanation": "setup se vykoná před spuštěním měřeného příkazu stmt, aby připravil potřebné proměnné/objekty bez zkreslení vlastního měřeného času."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Podle jaké hodnoty ze seznamu časů z Timer.repeat() je správné vyhodnocovat nejrychlejší běh?",
+      "options": [
+        "A) Minimální hodnota, protože nejlépe vystihuje reálný čas bez vnějších ruchů OS.",
+        "B) Aritmetický průměr všech hodnot, jelikož vyrovnává výkyvy způsobené plánovačem OS.",
+        "C) Medián naměřených časů, protože eliminuje extrémní odchylky na začátku a konci.",
+        "D) Směrodatná odchylka měření, která vyjadřuje míru využití vyrovnávací paměti CPU."
+      ],
+      "answer": 0,
+      "explanation": "Dokumentace timeit zdůrazňuje, že jediným reprezentativním údajem je minimum (min()), protože jakýkoliv jiný vliv OS (context switch, I/O, paging) čas jedině prodlouží."
+    },
+    {
+      "id": "q4",
+      "type": "code_fill",
+      "question": "Doplňte příkazový přepínač pro zadání inicializačního kódu setup při spouštění timeit z CLI:\n\n```bash\npython -m timeit ________ \"x = 5\" \"x**2\"\n```",
+      "options": [
+        "A) -s",
+        "B) -t",
+        "C) -i",
+        "D) -n"
+      ],
+      "answer": 0,
+      "explanation": "Přepínač -s (setup) v rozhraní příkazové řádky modulu timeit definuje kód pro inicializaci prostředí. -n určuje počet opakování smyčky."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co se stane, pokud při měření přes CLI python -m timeit nespecifikujeme počet opakování přepínačem -n?",
+      "options": [
+        "A) Modul automaticky zvyšuje počet opakování, dokud celková doba nedosáhne alespoň 0,2 s.",
+        "B) Vykoná se přesně 1 000 000 opakování bez ohledu na to, jak dlouho výpočet kódu trvá.",
+        "C) Měření selže s chybou ValueError, protože počet opakování je povinný argument CLI.",
+        "D) Kód se spustí pouze jednou a naměřený čas se vynásobí konstanta frekvence procesoru."
+      ],
+      "answer": 0,
+      "explanation": "Pokud -n není zadáno, timeit automaticky zkouší sekvence 1, 2, 5, 10, 20, 50... opakování, dokud celková doba celého běhu nepřesáhne 0,2 sekundy."
+    }
+  ],
+  "sqlite": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Proč se změny v databázi SQLite (INSERT, UPDATE) neprojeví v souboru ihned po zavolání cursor.execute()?",
+      "options": [
+        "A) Změny jsou drženy v transakci a pro jejich uložení je nutné zavolat connection.commit().",
+        "B) SQLite vyžaduje ruční uvolnění databázového zámku zavoláním sqlite3.flush_buffers().",
+        "C) Všechny zápisové operace probíhají ve vedlejším vlákně až po uzavření objektu kurzoru.",
+        "D) Změny se zapíší až v okamžiku, kdy velikost vyrovnávací paměti přesáhne velikost RAM."
+      ],
+      "answer": 0,
+      "explanation": "V ovladači sqlite3 probíhají úpravy v transakci. Bez zavolání connection.commit() na objektu připojení se provedené změny při ukončení zruší."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký je správný způsob předávání proměnných do SQL dotazu pro ochranu před SQL injection v sqlite3?",
+      "options": [
+        "A) Použitím symbolů ? a předáním hodnot jako n-tice v druhém argumentu cursor.execute().",
+        "B) Formátováním řetězců pomocí f-stringů přímo v textu SQL příkazu před jeho odesláním.",
+        "C) Spojením řetězců operátorem + a ošetřením uvozovek metodou str.replace(\"'\", \"''\").",
+        "D) Převodem všech vstupních proměnných na bajtový typ bytes před jejich vložením do SQL."
+      ],
+      "answer": 0,
+      "explanation": "Použití zástupných symbolů ? (nebo pojmenovaných :name) zajišťuje, že databázový ovladač vstupy bezpečně escapuje a znemožní útoky SQL Injection. F-stringy či spájení řetězců jsou hrubá chyba."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Která metoda objektu Cursor je nejvhodnější pro efektivní vložení velkého množství řádků z kolekce parametrů?",
+      "options": [
+        "A) cursor.executemany(sql, data)",
+        "B) cursor.execute_bulk(sql, data)",
+        "C) cursor.executescript(sql, data)",
+        "D) cursor.fetchmany(sql, data)"
+      ],
+      "answer": 0,
+      "explanation": "Metoda executemany() přijímá SQL šablonu se zástupnými symboly a sekvenci parametrů, které efektivně vykoná v rámci jednoho volání."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jak se liší metoda cursor.executescript() od standardní metody cursor.execute()?",
+      "options": [
+        "A) Umožňuje vykonat více SQL příkazů oddělených středníkem předaných v jediném řetězci.",
+        "B) Spouští SQL příkazy v externím procesu SQLite CLI místo vnitřní C knihovny Pythonu.",
+        "C) Automaticky volá commit() po každém řádku a ignoruje veškeré syntaktické chyby.",
+        "D) Převádí SQL dotaz do Python bajtkódu pro zrychlení opakovaných databázových dotazů."
+      ],
+      "answer": 0,
+      "explanation": "Metoda execute() vykoná pouze jeden SQL dotaz, zatímco executescript() dokáže zpracovat celý skript složený z více SQL příkazů oddělených středníky."
+    },
+    {
+      "id": "q5",
+      "type": "code_fill",
+      "question": "Doplňte kód pro načtení právě jednoho řádku z výsledkové sady databázového dotazu:\n\n```python\ncursor.execute(\"SELECT name FROM users WHERE id = 1\")\nrow = cursor.________()\n```",
+      "options": [
+        "A) fetchone",
+        "B) fetchrow",
+        "C) get_one",
+        "D) readline"
+      ],
+      "answer": 0,
+      "explanation": "Metoda cursor.fetchone() vrátí následující řádek z výsledné sady jako n-tici (tuple), nebo None, pokud už žádné další řádky nezbývají."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaké zkratky (shortcuts) nabízejí objekty připojení Connection podle standardu DB API 2 v sqlite3?",
+      "options": [
+        "A) Metody execute(), executemany() a executescript() lze volat přímo na objektu Connection.",
+        "B) Připojení k databázi se automaticky uzavře po 60 sekundách bez volání connection.close().",
+        "C) Tabulky vytvořené v SQLite se v Pythonu automaticky namapují na datové třídy dataclass.",
+        "D) Při výskytu chyb v SQL dotazu se automaticky spouští opravný skript v prostředí SQLite."
+      ],
+      "answer": 0,
+      "explanation": "Objekty Connection v modulu sqlite3 nabízejí zkratky connection.execute(...) apod., které si samy interně vytvoří dočasný kurzor a zavolají požadovanou operaci."
+    }
+  ],
+  "MatPlotLib": [
+    {
+      "id": "q1",
+      "type": "code_fill",
+      "question": "Doplňte název funkce pro zjištění aktuálně používaného renderovacího backendu v Matplotlibu:\n\nimport matplotlib\nbackend_name = matplotlib.________()",
+      "options": [
+        "A) get_backend",
+        "B) current_backend",
+        "C) show_backend",
+        "D) get_renderer"
+      ],
+      "answer": 0,
+      "explanation": "Funkce `matplotlib.get_backend()` vrací název aktuálně vybraného renderovacího backendu (např. 'QtAgg', 'TkAgg', 'module://matplotlib_inline.backend_inline')."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Co se stane, pokud funkci plt.plot() předáme pouze jednu jednodimenzionální sekvenci hodnot plt.plot([10, 20, 15])?",
+      "options": [
+        "A) Zadané hodnoty se použijí pro osu y a pro osu x se automaticky vygeneruje posloupnost indexů 0, 1, 2.",
+        "B) Zadané hodnoty se použijí pro osu x a pro osu y se automaticky doplňují nulové hodnoty stejné délky.",
+        "C) Vyvolá se ValueError z důvodu chybějící druhé sekvence souřadnic nezbytné pro vykreslení osy y.",
+        "D) Vykreslí se bodový graf na úhlopříčce, kde hodnoty osy x i osy y budou vzájemně shodné a rovny vstupu."
+      ],
+      "answer": 0,
+      "explanation": "Předáme-li funkci `plt.plot()` pouze jediný seznam či pole hodnot, Matplotlib předpokládá, že jde o hodnoty na svislé ose y. Pro vodorovnou osu x vygeneruje automatické indexy `0, 1, ..., N-1`."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Co v metodě plt.plot(x, y, 'ro-') specifikuje třetí řetězcový parametr 'ro-'?",
+      "options": [
+        "A) Vykreslení červené (r) plné čáry (-) spojující jednotlivé datové body označené kroužky (o).",
+        "B) Vykreslení růžového (r) obdélníkového (o) rámce okolo celého grafu s průhlednou výplní (-).",
+        "C) Vykreslení červených (r) bodů bez spojovací čáry s rotací popisků (o) o nastavený úhel (-).",
+        "D) Vytvoření rastrového (r) obrázku s ortogonálním (o) promítáním os a automatickou mřížkou (-)."
+      ],
+      "answer": 0,
+      "explanation": "Formátovací řetězec v Matplotlibu kombinuje barvu ('r' = red), značku bodu ('o' = circle marker) a typ čáry ('-' = solid line). Výsledkem je červená plná čára s kroužky v datových bodech."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jakým způsobem se docílí zobrazení popisu řad v legendě v modulu matplotlib.pyplot?",
+      "options": [
+        "A) Nastavením argumentu label ve funkci plot() a následným zavoláním samostatné funkce plt.legend().",
+        "B) Přímým předáním seznamu názvů řad jako jediného povinného argumentu do funkce plt.show().",
+        "C) Automatickým načtením jmen proměnných předaných do funkce plot() při zavolání plt.axis().",
+        "D) Vytvořením samostatného textového pole pomocí plt.text() s explicitními souřadnicemi legendy."
+      ],
+      "answer": 0,
+      "explanation": "Jednotlivým křivkám předáme pojmenovaný parametr `label='Název'` při volání `plt.plot()`. Aby se však legenda skutečně vykreslila do grafu, je nutné následně explicitně zavolat `plt.legend()`."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co vyjadřuje volání plt.subplot(211) v modulu pyplot?",
+      "options": [
+        "A) Mřížku o 2 řádcích a 1 sloupci, přičemž aktivuje první (horní) buňku pro kreslení podgrafu.",
+        "B) Mřížku o 21 řádcích a 1 sloupci, přičemž aktivuje první buňku pro vykreslení nového podgrafu.",
+        "C) Vykreslení 211 samostatných bodů do jediného grafu s předdefinovaným stylem čar a bodů.",
+        "D) Nastavení rozlišení výstupního grafu na 211 DPI bez vytvoření nové mřížky pro podgrafy."
+      ],
+      "answer": 0,
+      "explanation": "Zkrácený zápis `plt.subplot(211)` je ekvivalentní `plt.subplot(2, 1, 1)`. První číslice udává počet řádků (2), druhá počet sloupců (1) a třetí index aktivní buňky (1 = první buňka)."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jak se liší pojmenování metod pro nastavení popisků os na objektu Axes oproti top-level funkcím pyplot?",
+      "options": [
+        "A) Metody na objektu Axes mají předponu set_ (např. ax.set_xlabel()), zatímco pyplot volá plt.xlabel().",
+        "B) Metody na objektu Axes používají camelCase (např. ax.setXLabel()), zatímco pyplot vyžaduje snake_case.",
+        "C) Metody na objektu Axes se volají s velkým počátečním písmenem (ax.Xlabel()), pyplot používá malé.",
+        "D) Metody na objektu Axes vyžadují předání objektu Figure jako prvního povinného argumentu metody."
+      ],
+      "answer": 0,
+      "explanation": "Objektově orientované rozhraní Matplotlibu na objektu `Axes` používá metody s předponou `set_` (např. `ax.set_xlabel()`, `ax.set_title()`, `ax.set_xlim()`), zatímco modul `pyplot` nabízí přímé funkce bez předpony (např. `plt.xlabel()`)."
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Jak Matplotlib interně zpracovává objekty typu datetime předávané jako souřadnice na osách?",
+      "options": [
+        "A) Přepočítá je na číselné hodnoty reprezentující počet dní od počátku letopočtu pro polohování.",
+        "B) Převede je na textové řetězce a vykreslí je jako kategoriální osu s rovnoměrnými rozstupy bodů.",
+        "C) Vyžaduje předem manuální konverzi na UNIX timestamp (sekundy), jinak vyvolá výjimku TypeError.",
+        "D) Zaokrouhlí je na nejbližší celé hodiny a vytvoří z nich indexovaný slovník pro popis osy x."
+      ],
+      "answer": 0,
+      "explanation": "Matplotlib nativně podporuje `datetime` objekty tak, že je interně zkonvertuje na desítková čísla odpovídající počtu dní od 1. 1. 0001 (pomocí např. `date2num`), což umožňuje přesné výpočty i škálování časové osy."
+    }
+  ]
+}

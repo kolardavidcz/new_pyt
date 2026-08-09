@@ -1,0 +1,733 @@
+{
+  "boolean": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výstupem výrazu `[] or [0] and 'python'`?",
+      "options": [
+        "A) [0]",
+        "B) 'python'",
+        "C) True",
+        "D) []"
+      ],
+      "answer": 1,
+      "explanation": "Operátor and má vyšší prioritu než or. Výraz [0] and 'python' vyhodnotí [0] jako True, takže vrátí druhý operand 'python'. Výraz se zredukuje na [] or 'python'. Jelikož [] je False, operátor or vrátí druhý operand 'python'."
+    },
+    {
+      "id": "q2",
+      "type": "true_false_tricky",
+      "question": "N-tice `t = (False, [])` se v podmínce `if t:` vyhodnotí jako False, protože obsahuje pouze nepravdivé prvky.",
+      "options": [
+        "A) Tvrzení je nepravdivé, protože n-tice není prázdná (má 2 prvky), takže je vždy True.",
+        "B) Tvrzení je pravdivé, protože Python rekurzivně vyhodnocuje pravdivost prvků sekvence."
+      ],
+      "answer": 0,
+      "explanation": "Jakákoli neprázdná sekvence (včetně n-tice) se v booleovském kontextu vyhodnotí jako True bez ohledu na své prvky. Pouze prázdná sekvence () nebo [] je v Pythonu False."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jak se porovnají seznamy `[1, ('a', 'bc'), 3]` a `[1, ('a', 'b'), 4]` pomocí operátoru `<`?",
+      "options": [
+        "A) Výraz vyhodí `TypeError`, protože n-tice uvnitř seznamu nelze přímo porovnávat.",
+        "B) Výraz vrací `True`, protože první seznam má menší celkový součet číselných prvků.",
+        "C) Výraz vrací `False`, protože prvek `'bc'` je lexikograficky větší než prvek `'b'`.",
+        "D) Výraz vrací `True`, protože poslední prvek prvního seznamu `3` je menší než `4`."
+      ],
+      "answer": 2,
+      "explanation": "Seznamy se porovnávají lexikograficky prvek po prvku. Na indexu 0 jsou 1 a 1. Na indexu 1 se porovnají n-tice ('a', 'bc') < ('a', 'b'). Zde po shodě 'a' porovnání 'bc' < 'b' vrací False (neboť 'bc' je větší). Porovnávání skončí a vrátí False."
+    },
+    {
+      "id": "q4",
+      "type": "code_fill",
+      "question": "Doplňte operátor tak, aby proměnná `res` obsahovala `True` pouze v případě, že objekt `a` i `b` odkazují na stejnou paměťovou adresu:\n\nres = a ________ b",
+      "options": [
+        "A) ==",
+        "B) in",
+        "C) is",
+        "D) id"
+      ],
+      "answer": 2,
+      "explanation": "Operátor is testuje identitu objektů (zda id(a) == id(b)), zatímco operátor == porovnává hodnotový obsah objektů."
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký bude výstup výrazu `bool(' ') == bool()`?",
+      "options": [
+        "A) True",
+        "B) False",
+        "C) 0",
+        "D) TypeError"
+      ],
+      "answer": 1,
+      "explanation": "bool(' ') vyhodnocuje neprázdný řetězec s mezerou jako True. Volání bool() bez argumentu vrací výchozí hodnotu False. Výraz True == False vyhodnotí výsledek False."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaká je správná priorita vyhodnocení operátorů od nejvyšší k nejnižší v Pythonu?",
+      "options": [
+        "A) Logické `or`, logické `and`, logické `not`, porovnávací operátory (`==`), aritmetické operátory (`+`, `*`).",
+        "B) Porovnávací operátory (`==`), logické `not`, aritmetické operátory (`+`, `*`), logické `or`, logické `and`.",
+        "C) Aritmetické operátory (`+`, `*`), logické `or`, logické `and`, logické `not`, porovnávací operátory (`==`).",
+        "D) Aritmetické operátory (`+`, `*`), porovnávací operátory (`==`), logické `not`, logické `and`, logické `or`."
+      ],
+      "answer": 3,
+      "explanation": "Nejvyšší prioritu mají aritmetické operátory, za nimi porovnávací operátory, poté unární logický operátor not, následně and a nejnižší prioritu má or."
+    }
+  ],
+  "tuples": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co bude výsledkem následujícího kódu?\n\nt = (1, [2, 3], 4)\nt[1].append(5)\nprint(t)",
+      "options": [
+        "A) TypeError — operace selže, protože n-tice je neměnná a nedovoluje úpravu svých prvků.",
+        "B) (1, [2, 3, 5], 4) — prvek seznamu na indexu 1 je úspěšně modifikován přímo v paměti.",
+        "C) (1, [2, 3], 4, 5) — nový prvek 5 je přidán až na úplný konec původní n-tice objektů.",
+        "D) AttributeError — operace selže, protože objekt n-tice neobsahuje žádnou metodu append."
+      ],
+      "answer": 1,
+      "explanation": "N-tice t je sice neměnná, ale prvek na indexu 1 je měnitelný seznam [2, 3]. Volání .append(5) modifikuje tento seznam přímo v paměti."
+    },
+    {
+      "id": "q2",
+      "type": "code_fill",
+      "question": "Doplňte kód tak, aby proměnná `head` získala první prvek sekvence a proměnná `tail` seznam všech zbývajících prvků:\n\nhead, ________ tail = (10, 20, 30, 40)",
+      "options": [
+        "A) &",
+        "B) *",
+        "C) ...",
+        "D) in"
+      ],
+      "answer": 1,
+      "explanation": "Operátor rozšířeného rozbalování * před názvem proměnné zachytí zbývající prvky sekvence a uloží je do seznamu tail."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jaký bude obsah proměnných po provedení příkazu `*a, b, c = (1, 2)`?",
+      "options": [
+        "A) Proměnná `a` získá `[1]`, proměnná `b` získá `2` a proměnná `c` získá `None`.",
+        "B) Kód vyvolá `ValueError`, protože počet prvků je menší než počet proměnných.",
+        "C) Proměnná `a` získá `(1,)`, proměnná `b` získá `2` a proměnná `c` získá `0`.",
+        "D) Proměnná `a` získá `[]`, proměnná `b` získá `1` a proměnná `c` získá `2`."
+      ],
+      "answer": 3,
+      "explanation": "Vpravo jsou 2 prvky, vlevo jsou 2 pevné proměnné (b, c) a ohvězdičkovaná proměnná *a. Proměnná b dostane 1, c dostane 2 a ohvězdičkovaná proměnná a obdrží prázdný seznam []."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Co je skutečným konstruktorem n-tice v literální notaci Pythonu?",
+      "options": [
+        "A) Kulaté závorky `()` okolo celého výrazu.",
+        "B) Čárka `,` mezi jednotlivými prvky zápisu.",
+        "C) Hranaté závorky `[]` v kombinaci s `tuple()`.",
+        "D) Klíčové slovo `tuple` před výčtem prvků."
+      ],
+      "answer": 1,
+      "explanation": "Hlavním konstruktorem n-tice je v Pythonu čárka. Kulaté závorky slouží primárně k oddělení výrazů a určení priority."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co se stane při spuštění příkazu `x, = 'abc'`?",
+      "options": [
+        "A) Do proměnné `x` se uloží celý řetězec `'abc'` jako jeden neoddělitelný řetězcový prvek.",
+        "B) Do proměnné `x` se uloží pouze první znak `'a'` a ostatní zbývající znaky se zahodí.",
+        "C) Vyhodí se `ValueError`, protože řetězec má více prvků než požadovaný rozbalovací vzor.",
+        "D) Vyhodí se `TypeError`, protože řetězec není sekvenční typ určený pro rozbalování prvků."
+      ],
+      "answer": 2,
+      "explanation": "Zápis x, vyžaduje jednoprvkové rozbalení. Řetězec 'abc' má 3 prvky, takže příkaz vyvolá ValueError: too many values to unpack (expected 1)."
+    },
+    {
+      "id": "q6",
+      "type": "predict_output",
+      "question": "Jaký bude výsledek operace `zs = xs, ys` pro `xs = (1, 2)` a `ys = (3, 4)`?",
+      "options": [
+        "A) (1, 2, 3, 4) — plochá čtyřprvková n-tice vzniklá sloučením prvků `xs` a `ys`.",
+        "B) ((1, 2, 3, 4),) — jednoprvková n-tice obsahující spojenou čtyřprvkovou n-tici.",
+        "C) ((1, 2), (3, 4)) — dvouprvková n-tice tvořená zanořenými n-ticemi `xs` a `ys`.",
+        "D) [(1, 2), (3, 4)] — nový seznam tvořený dvěma prvky působícími jako n-tice."
+      ],
+      "answer": 2,
+      "explanation": "Čárka mezi xs a ys vytvoří novou dvouprvkovou n-tici, jejíž prvky jsou původní n-tice xs a ys."
+    },
+    {
+      "id": "q7",
+      "type": "true_false_tricky",
+      "question": "N-tice `t = (1, [2, 3])` může být použita jako klíč ve slovníku, protože n-tice jsou v Pythonu neměnné.",
+      "options": [
+        "A) Tvrzení je pravdivé, protože typ `tuple` je neproměnný a definuje metodu `__hash__()` pro libovolný obsah.",
+        "B) Tvrzení je nepravdivé, protože n-tice je hešovatelná pouze tehdy, pokud jsou hešovatelné všechny její prvky."
+      ],
+      "answer": 1,
+      "explanation": "N-tice je hešovatelná a použitelná jako klíč slovníku pouze v případě, že všechny obsažené prvky jsou hešovatelné. Protože seznam [2, 3] je měnitelný, vyvolá pokus o hešování TypeError."
+    },
+    {
+      "id": "q8",
+      "type": "predict_output",
+      "question": "Co bude v proměnné `_` po provedení rozbalení `_, a, _, b, *_ = (10, 20, 30, 40, 50, 60)`?",
+      "options": [
+        "A) Hodnota `30` přiřazená v pořadí z druhé pozice podtržítkového zástupce.",
+        "B) Hodnota `10` přiřazená v pořadí z první pozice podtržítkového zástupce.",
+        "C) Seznam `[50, 60]` přiřazený do posledního zachycovacího výrazu `*_`.",
+        "D) N-tice `(50, 60)` přiřazená v pořadí ze zbývajících nevyužitých prvků."
+      ],
+      "answer": 2,
+      "explanation": "Proměnná _ se postupně přepisuje. Jako poslední hodnotu obdrží z ohvězdičkované proměnné *_ seznam [50, 60]."
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "Jaké metody jsou nativně dostupné na instanci standardní n-tice `tuple`?",
+      "options": [
+        "A) Pouze dvě modifikační metody `append()` a `pop()`.",
+        "B) Pouze dvě vyhledávací metody `find()` a `where()`.",
+        "C) Pouze dvě veřejné metody `count()` a `index()`.",
+        "D) Pouze dvě řadící metody `sort()` a `reverse()`."
+      ],
+      "answer": 2,
+      "explanation": "Standardní n-tice v Pythonu má z veřejných metod k dispozici pouze count() a index()."
+    }
+  ],
+  "NamedTuples": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co se stane při pokusu o zavedení pojmenované n-tice `namedtuple('Point', 'x class y')`?",
+      "options": [
+        "A) Vytvoří se typ `Point`, kde se nepovolené jméno automaticky nahradí za `_1`.",
+        "B) Vyvolá se `ValueError`, protože `'class'` je vyhrazené klíčové slovo Pythonu.",
+        "C) Vyvolá se `SyntaxError`, protože jména prvků musí být zadána v seznamu.",
+        "D) Vytvoří se typ `Point`, ale k atributu `'class'` lze přistupovat jen indexem."
+      ],
+      "answer": 1,
+      "explanation": "Výchozí nastavení rename=False vyvolá ValueError, pokud název pole obsahuje vyhrazené klíčové slovo."
+    },
+    {
+      "id": "q2",
+      "type": "code_fill",
+      "question": "Doplňte kód pro vytvoření nové instance `Point` s upravenou souřadnicí `x`, aniž by se změnila původní neměnná instance `p`:\n\nPoint = namedtuple('Point', 'x y')\np = Point(1, 2)\nnew_p = p.________(x=10)",
+      "options": [
+        "A) replace",
+        "B) _make",
+        "C) _replace",
+        "D) update"
+      ],
+      "answer": 2,
+      "explanation": "Metoda _replace(**kwargs) vytvoří novou pojmenovanou n-tici s aktualizovanými hodnotami prvků, zatímco původní instance zůstane nezměněna."
+    },
+    {
+      "id": "q3",
+      "type": "predict_output",
+      "question": "Jaké pole bude vytvořeno na čtvrtém místě při spuštění příkazu `namedtuple('Item', 'name price qty price', rename=True)`?",
+      "options": [
+        "A) Název `_4` vzniklý nahrazením duplikátu podtržítkem s pořadím prvku.",
+        "B) Název `price_1` vzniklý automatickým přidáním pořadového čísla.",
+        "C) Název `_3` vzniklý nahrazením duplikátu podtržítkem s indexem pole.",
+        "D) Název `_price` vzniklý přidáním úvodního podtržítka před název."
+      ],
+      "answer": 2,
+      "explanation": "Při zapnutí rename=True se duplicitní jméno nahradí podtržítkem a jeho číselným indexem pole (index 3), tedy _3."
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "Jaký bude výstup příkazu `p = Person._make(['Alice', 30]); print(p.name, p[1])` pro `Person = namedtuple('Person', 'name age')`?",
+      "options": [
+        "A) Textový výstup `Alice Alice` způsobený načtením stejného prvku v obou případech.",
+        "B) Textový výstup `Alice 30` získaný kombinačním přístupem přes jméno i index.",
+        "C) Textový výstup `30 30` způsobený přečtením druhé hodnoty ze vstupního seznamu.",
+        "D) Chybová výjimka `TypeError` vyvolaná předáním seznamu místo n-tice do `_make()`."
+      ],
+      "answer": 1,
+      "explanation": "Metoda _make() vytvoří instanci z iterovatelného objektu. Prvky jsou přístupné přes atribut p.name ('Alice') i index p[1] (30)."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Proč pomocné metody třídy `namedtuple` (například `_fields`, `_make`, `_replace`) začínají podtržítkem?",
+      "options": [
+        "A) Aby se uživateli zabránilo v jejich volání z důvodu interní privatizace.",
+        "B) Aby se vyhovělo striktnímu pravidlu PEP 8 pro označování metod třídy.",
+        "C) Aby se předešlo konfliktu jmen s uživatelsky definovanými poli n-tice.",
+        "D) Aby se odlišily od metod jazyka C, které jsou v knihovně implementovány."
+      ],
+      "answer": 2,
+      "explanation": "Úvodní podtržítko u metod namedtuple předchází konfliktům s názvy uživatelských atributů."
+    },
+    {
+      "id": "q6",
+      "type": "true_false_tricky",
+      "question": "Příkaz `p.x = 5` uspěje a změní souřadnici `x` u vytvořené instance `p = Point(1, 2)`.",
+      "options": [
+        "A) Tvrzení je nepravdivé, protože pojmenované n-tice jsou neproměnné (`immutable`) stejně jako běžné n-tice.",
+        "B) Tvrzení je pravdivé, protože pojmenovaná n-tice funguje jako standardní třída s měnitelnými atributy."
+      ],
+      "answer": 0,
+      "explanation": "Instance namedtuple je neproměnná (immutable), takže pokus o zapsání nového atributu vyvolá AttributeError."
+    }
+  ],
+  "lists": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co bude výstupem následujícího kódu po úpravě seznamu pomocí výřezu?\n\nxs = [10, 20, 30, 40, 50]\nxs[1:4] = [99]\nprint(xs)",
+      "options": [
+        "A) `[10, 99, 30, 40, 50]` — hodnota `99` je vložena pouze na index 1.",
+        "B) `[10, 99, 50]` — výřez od indexu 1 do 3 je nahrazen prvkem `99`.",
+        "C) `[10, 20, 99, 50]` — hodnota `99` nahradí pouze prvek na indexu 2.",
+        "D) `[10, 99, 99, 99, 50]` — hodnota `99` se zopakuje pro každý index."
+      ],
+      "answer": 1,
+      "explanation": "Výřez xs[1:4] vybere [20, 30, 40]. Přiřazením [99] se celá tříprvková část nahradí seznamem [99]."
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jaká bude hodnota proměnné `res` po spuštění kódu `xs = [3, 1, 2]; res = xs.sort()`?",
+      "options": [
+        "A) `[1, 2, 3]` — metoda `.sort()` vytvoří a vrátí nový seřazený seznam.",
+        "B) `None` — metoda `.sort()` řadí na místě a vrací hodnotu `None`.",
+        "C) `[3, 1, 2]` — metoda `.sort()` vrátí původní nezměněný seznam objektů.",
+        "D) `True` — metoda `.sort()` vrátí booleovský příznak úspěšného seřazení."
+      ],
+      "answer": 1,
+      "explanation": "Metoda .sort() seřadí seznam in-place a vrací None."
+    },
+    {
+      "id": "q3",
+      "type": "code_fill",
+      "question": "Doplňte metodu tak, aby do seznamu `a` byly přidány jednotlivé prvky ze seznamu `b` jako samostatné položky (nikoli jako zanořený seznam):\n\na = [1, 2]\nb = [3, 4]\na.________(b)",
+      "options": [
+        "A) append",
+        "B) insert",
+        "C) extend",
+        "D) concat"
+      ],
+      "answer": 2,
+      "explanation": "Metoda extend(iterable) přidá prvky předané sekvence jednotlivě na konec seznamu."
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "Co bude výsledkem generátorové notace `[x + y for x in 'AB' for y in '12']`?",
+      "options": [
+        "A) `['A1', 'B2', 'A2', 'B1']`",
+        "B) `['A1', 'B1', 'A2', 'B2']`",
+        "C) `['A1', 'A2', 'B2', 'B1']`",
+        "D) `['A1', 'A2', 'B1', 'B2']`"
+      ],
+      "answer": 3,
+      "explanation": "Vícenásobná generátorová notace provede zanořenou smyčku for x in 'AB': for y in '12':."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co se stane při volání `xs.remove(99)` nad seznamem `xs = [10, 20, 30]`?",
+      "options": [
+        "A) Vyvolá se výjimka `IndexError`, protože zadaný index vybočuje z rozsahu seznamu.",
+        "B) Vyvolá se výjimka `ValueError`, protože hledaná hodnota se v seznamu nenachází.",
+        "C) Vrátí se booleovská hodnota `False` a původní seznam zůstane zcela nezměněn.",
+        "D) Vrátí se speciální hodnota `None` a původní seznam zůstane zcela nezměněn."
+      ],
+      "answer": 1,
+      "explanation": "Metoda .remove(x) hledá prvek podle hodnoty. Pokud chybí, vyhodí ValueError."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi operacemi `pop()` a `del` při práci se seznamy?",
+      "options": [
+        "A) `pop()` maže prvky podle jejich hodnoty, zatímco `del` maže prvky podle číselného indexu.",
+        "B) `pop()` je metoda určená pro n-tice, zatímco `del` je příkaz určený výhradně pro seznamy.",
+        "C) `pop()` smaže prvek a vrátí jeho hodnotu, zatímco `del` prvek smaže bez navrácení hodnoty.",
+        "D) `pop()` smaže všechny výskyty prvku, zatímco `del` smaže pouze prvně nalezený výskyt."
+      ],
+      "answer": 2,
+      "explanation": "pop() odebere prvek podle indexu a vrátí ho, zatímco del prvek odstraní bez navrácení hodnoty."
+    },
+    {
+      "id": "q7",
+      "type": "predict_output",
+      "question": "Jaký bude výstup operací `q = ['a', 'b', 'c']; q.append('d'); item = q.pop(0); print(item, q)`?",
+      "options": [
+        "A) Hodnota `d` a seznam `['a', 'b', 'c']`",
+        "B) Hodnota `a` a seznam `['b', 'c', 'd']`",
+        "C) Hodnota `c` a seznam `['a', 'b', 'd']`",
+        "D) Hodnota `b` a seznam `['a', 'c', 'd']`"
+      ],
+      "answer": 1,
+      "explanation": "U fronty (FIFO) .append('d') přidá prvek na konec a .pop(0) odebere nejstarší prvek 'a'."
+    },
+    {
+      "id": "q8",
+      "type": "true_false_tricky",
+      "question": "Volání `xs.insert(-1, 99)` vloží prvek `99` až na úplný konec seznamu `xs` (za poslední prvek).",
+      "options": [
+        "A) Tvrzení je pravdivé, protože index `-1` označuje konec seznamu stejně jako u metody `xs.pop(-1)`.",
+        "B) Tvrzení je nepravdivé, protože záporný index `-1` značí pozici před posledním prvkem, nikoli za ním."
+      ],
+      "answer": 1,
+      "explanation": "Metoda insert(i, x) vkládá prvek před index i. Index -1 tedy vloží prvek před poslední položku seznamu."
+    },
+    {
+      "id": "q9",
+      "type": "predict_output",
+      "question": "Jaký bude výstup příkazu `print([x**2 for x in range(5) if x % 2 != 0])`?",
+      "options": [
+        "A) `[0, 4]`",
+        "B) `[1, 3]`",
+        "C) `[1, 9]`",
+        "D) `[4, 9]`"
+      ],
+      "answer": 2,
+      "explanation": "Pro lichá čísla 1 a 3 z rozsahu 0..4 vypočítá druhé mocniny [1, 9]."
+    }
+  ],
+  "arrays": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co vytiskne příkaz `print(ar.typecode, ar.itemsize)` pro pole `ar = array('i', [1, 2, 3])`?",
+      "options": [
+        "A) `int 4` — typový kód je název typu `'int'` a velikost prvku jsou 4 bajty.",
+        "B) `i 4` — typový kód je řetězec `'i'` a velikost celého čísla `int` jsou 4 bajty.",
+        "C) `i 8` — typový kód je řetězec `'i'` a velikost celého čísla `int` je 8 bajtů.",
+        "D) `signed 2` — typový kód je název typu `'signed'` a velikost prvku jsou 2 bajty."
+      ],
+      "answer": 1,
+      "explanation": "Atribut typecode vrací řetězec 'i' a itemsize vrací 4 (velikost C int v bajtech)."
+    },
+    {
+      "id": "q2",
+      "type": "code_fill",
+      "question": "Doplňte název metody, která převede typované pole `array` na binární řetězec bajtů:\n\nfrom array import array\nar = array('h', [10, 20, 30])\nraw_bytes = ar.________()",
+      "options": [
+        "A) tofile",
+        "B) tobytes",
+        "C) tolist",
+        "D) encode"
+      ],
+      "answer": 1,
+      "explanation": "Metoda tobytes() vyexportuje souvislý paměťový blok pole do objektu typu bytes."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Co se stane při pokusu o spuštění příkazu `ar.append(3.14)` pro `ar = array('i', [1, 2, 3])`?",
+      "options": [
+        "A) Hodnota se automaticky ořízne na `3` a bez chyby se vloží do stávajícího pole celých čísel.",
+        "B) Vyvolá se `ValueError`, protože desítkové číslo `3.14` přesahuje povolený paměťový rozsah.",
+        "C) Vyvolá se `TypeError`, protože pole akceptuje pouze celé číslo odpovídající typovému kódu `'i'`.",
+        "D) Hodnota se úspěšně vloží jako float a typový kód pole se automaticky přetypuje na kód `'f'`."
+      ],
+      "answer": 2,
+      "explanation": "Pole z modulu array vyžaduje homogenní nativní C typ. Při vložení floatu do celočíselného pole se vyhodí TypeError."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl v paměťovém uspořádání mezi Python seznamem a polem z modulu `array`?",
+      "options": [
+        "A) Seznam ukládá hodnoty v souvislém paměťovém bloku, zatímco `array` vytváří spojový seznam.",
+        "B) `array` je neproměnný typ v souvislé paměti, zatímco seznam podporuje modifikace v místě.",
+        "C) Seznam je určen výhradně pro souvislá čísla, zatímco `array` ukládá heterogenní ukazatele.",
+        "D) `array` ukládá hodnoty v souvislém paměťovém bloku, zatímco seznam ukládá pole ukazatelů."
+      ],
+      "answer": 3,
+      "explanation": "Standardní seznam ukládá ukazatele na rozptýlené PyObjecty, zatímco array uchovává nativní C hodnoty v souvislém paměťovém bloku."
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Co vytiskne příkaz `print(hex(ar[0]))` po provedení `ar = array('h', [0x1234]); ar.byteswap()`?",
+      "options": [
+        "A) `0x1234` — původní nezměněná hodnota předávaného elementu.",
+        "B) `0x3412` — prochození obou bajtů dvoubajtové hodnoty `0x1234`.",
+        "C) `-0x1234` — záporná hodnota vzniklá změnou znaménkového bitu.",
+        "D) `RuntimeError` — výjimka vyvolaná nepodporovanou velikostí prvku."
+      ],
+      "answer": 1,
+      "explanation": "Metoda .byteswap() otočí pořadí bajtů každého prvku (0x1234 -> 0x3412)."
+    },
+    {
+      "id": "q6",
+      "type": "true_false_tricky",
+      "question": "Pro všestranné a rychlé výpočty s vícerozměrnými číselnými poli se v Pythonu standardně používá vestavěný modul `array`.",
+      "options": [
+        "A) Tvrzení je nepravdivé, protože modul `array` podporuje pouze jednorozměrná pole a pro matice se používá NumPy.",
+        "B) Tvrzení je pravdivé, protože modul `array` obsahuje kompletní lineární algebru a maticové výpočty přímo v CPythonu."
+      ],
+      "answer": 0,
+      "explanation": "Vestavěný modul array je pouze 1D homogenní číselné pole. Pro multidimenzionální pole a vědecké výpočty se používá balíček NumPy."
+    }
+  ],
+  "sorting_overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Jaká bude hodnota proměnné xs po vykonání tohoto kódu?\n`python\nxs = [3, 1, 4, 2]\nxs = xs.sort()\nprint(xs)\n`",
+      "code_snippet": "xs = [3, 1, 4, 2]\nxs = xs.sort()\nprint(xs)",
+      "options": [
+        "A) None — metoda .sort() řadí seznam v místě a vrací None, čímž se proměnná přepíše.",
+        "B) [1, 2, 3, 4] — metoda .sort() řadí seznam v místě a současně vrací jeho novou hodnotu.",
+        "C) [3, 1, 4, 2] — metoda .sort() selže a ponechá proměnnou xs v původním nezměněném stavu.",
+        "D) AttributeError — metoda .sort() neexistuje a pro řazení je nutné použít sorted(xs)."
+      ],
+      "answer": 0,
+      "explanation": "Metoda list.sort() provádí řazení v místě (in-place) a záměrně vrací None, aby signalizovala modifikaci objektu. Přiřazením xs = xs.sort() se tedy do proměnné xs uloží hodnota None. Pro získání nového setříděného seznamu je nutné použít globální funkci sorted(xs)."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi funkcí sorted() a metodou list.sort()?",
+      "options": [
+        "A) sorted() akceptuje libovolný iterovatelný objekt a vrací nový seznam, zatímco list.sort() mění seznam v místě.",
+        "B) sorted() mění původní datovou strukturu v místě, zatímco list.sort() vrací zkopírovaný setříděný seznam.",
+        "C) sorted() funguje výhradně pro číselná pole, zatímco metoda list.sort() je určená pouze pro textové řetězce.",
+        "D) sorted() vyžaduje povinný parametr key, zatímco metoda list.sort() řadí prvky výhradně bez klíče."
+      ],
+      "answer": 0,
+      "explanation": "Globální funkce sorted(iterable) vytváří a vrací nový seznam z jakéhokoliv iterovatelného objektu (např. množiny, n-tice, slovníku). Naopak metoda xs.sort() je dostupná pouze pro seznamy a mění pořadí prvků přímo v původním objektu, přičemž vrací None."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jaký bude výsledek následujícího porovnání dvou vnořených seznamů?\n`python\nres = [1, ['a', 'c']] < [1, ['a', 'b'], 3]\nprint(res)\n`",
+      "code_snippet": "res = [1, ['a', 'c']] < [1, ['a', 'b'], 3]\nprint(res)",
+      "options": [
+        "A) False — o výsledku rozhodla první neshodná dvojice prvků ('c' > 'b'), délka seznamu se neuvažuje.",
+        "B) True — druhý seznam je delší a obsahuje více prvků, takže má při lexikografickém porovnání přednost.",
+        "C) TypeError — vnořené seznamy nelze porovnávat přímo bez předchozího převedení na jednoduché n-tice.",
+        "D) True — řetězec 'c' má v tabulce Unicode vyšší pořadové číslo než 'b', což dává přednost levé straně."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu probíhá porovnávání sekvencí lexikograficky prvek po prvku. Na druhém indexu se porovnávají podseznamy ['a', 'c'] a ['a', 'b']. V nich je prvním neshodným prvkem 'c' a 'b'. Jelikož 'c' > 'b', je výraz ['a', 'c'] < ['a', 'b'] nepravdivý (False). Délka vnějšího seznamu už nehraje roli."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Co se stane při pokusu o setřídění seznamu obsahujícího smíšené typy?\n`python\nxs = ['a', 5, 'c']\nprint(sorted(xs))\n`",
+      "code_snippet": "xs = ['a', 5, 'c']\nprint(sorted(xs))",
+      "options": [
+        "A) TypeError — v Pythonu 3 nejsou typy str a int navzájem porovnatelné pomocí operátoru menší než.",
+        "B) [5, 'a', 'c'] — číselné hodnoty se automaticky seřadí před textové řetězce podle systémového typu.",
+        "C) ['a', 5, 'c'] — seznam zůstane v původním pořadí, protože porovnání nekompatibilních typů se přeskočí.",
+        "D) ['5', 'a', 'c'] — čísla se v předstihu implicitně přetypují na textové řetězce a seřadí abecedně."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu 3 vyžaduje řazení, aby prvky byly navzájem porovnatelné (<). Protože relace 'a' < 5 mezi str a int není definována, vyvolá volání sorted() výjimku TypeError: unorderable types: str() < int()."
+    },
+    {
+      "id": "q5",
+      "type": "code_fill",
+      "question": "Doplňte kód pro setřídění seznamu n-tic podle jejich druhé položky za pomoci funkce z modulu operator.\n`python\nfrom operator import ________\npairs = [('a', 3), ('b', 1), ('c', 2)]\nresult = sorted(pairs, key=itemgetter(1))\n`",
+      "code_snippet": "from operator import ________\npairs = [('a', 3), ('b', 1), ('c', 2)]\nresult = sorted(pairs, key=itemgetter(1))",
+      "options": [
+        "A) itemgetter — funkce z modulu operator vytvářející klíčový objekt pro přístup k indexu prvků.",
+        "B) attrgetter — funkce z modulu operator přistupující k pojmenovaným atributům daných objektů.",
+        "C) methodcaller — funkce z modulu operator volající specifikovanou metodu nad každým prvkem.",
+        "D) elementwise — funkce z modulu operator umožňující vektorské porovnávání prvků sekvence."
+      ],
+      "answer": 0,
+      "explanation": "operator.itemgetter(1) vytvoří callable objekt, který pro předaný prvek vrací x[1]. Je to výkonnější a čitelnější ekvivalent lambda funkce lambda x: x[1]."
+    },
+    {
+      "id": "q6",
+      "type": "predict_output",
+      "question": "Jaké bude pořadí prvků ve výstupním seznamu při více-kritériovém řazení pomocí lambda funkce?\n`python\ndata = ['Wendy', 'Pete', 'Jane', 'Ix']\nprint(sorted(data, key=lambda x: (len(x), x)))\n`",
+      "code_snippet": "data = ['Wendy', 'Pete', 'Jane', 'Ix']\nprint(sorted(data, key=lambda x: (len(x), x)))",
+      "options": [
+        "A) ['Ix', 'Jane', 'Pete', 'Wendy'] — prvky jsou seřazeny primárně podle délky a sekundárně abecedně.",
+        "B) ['Ix', 'Pete', 'Jane', 'Wendy'] — prvky se stejnou délkou si zachovají své původní pořadí ze vstupu.",
+        "C) ['Jane', 'Pete', 'Wendy', 'Ix'] — sekundární abecední kritérium seřadí prvky od nejdelšího slova.",
+        "D) ['Wendy', 'Pete', 'Jane', 'Ix'] — použití n-tice v lambda funkci způsobí chyba vyhodnocení klíče."
+      ],
+      "answer": 0,
+      "explanation": "Lambda funkce vrací n-tici (len(x), x). Python porovnává n-tice lexikograficky: nejprve podle 1. položky (délka slova: 'Ix'=2, 'Pete'=4, 'Jane'=4, 'Wendy'=5), a při shodě délek podle 2. položky (abecední pořadí: 'Jane' < 'Pete'). Proto dostaneme ['Ix', 'Jane', 'Pete', 'Wendy']."
+    },
+    {
+      "id": "q7",
+      "type": "true_false_tricky",
+      "question": "Zaručuje algoritmus TimSort v Pythonu stabilní řazení při opakovaném volání na stejná data?",
+      "options": [
+        "A) Ano, TimSort je stabilní algoritmus, což znamená, že prvky se shodným klíčem si vždy zachovají své původní vzájemné pořadí.",
+        "B) Ne, TimSort je nestabilní algoritmus, takže při řazení podle jednoho kritéria může svévolně změnit pořadí shodných prvků."
+      ],
+      "answer": 0,
+      "explanation": "TimSort je stabilní řadicí algoritmus. Pokud mají dva prvky stejnou hodnotu vyhodnoceného klíče (např. stejnou délku), jejich relativní pořadí ve výsledném seznamu zůstane přesně takové, jaké bylo na vstupu. Toho lze využít pro postupné víceúrovňové řazení."
+    },
+    {
+      "id": "q8",
+      "type": "code_fill",
+      "question": "Doplňte parametr funkce sorted() pro obrácení pořadí prvků od největšího po nejmenší.\n`python\nnumbers = [1, 5, 3, 2, 4]\nresult = sorted(numbers, ________=True)\n`",
+      "code_snippet": "numbers = [1, 5, 3, 2, 4]\nresult = sorted(numbers, ________=True)",
+      "options": [
+        "A) reverse — pojmenovaný boolean parametr otočující směr porovnávání všech prvků při řazení.",
+        "B) inverted — pojmenovaný parametr způsobující předřazení záporného znaménka u číselných typů.",
+        "C) descending — nepovinný argument přepínající algoritmus do režimu sestupného třídění prvků.",
+        "D) backward — příznak určující načítání vstupního iterovatelného objektu od posledního prvku."
+      ],
+      "answer": 0,
+      "explanation": "Funkce sorted() i metoda list.sort() přebírají nepovinný pojmenovaný parametr reverse. Při nastavení reverse=True probíhá třídění v opačném (sestupném) pořadí."
+    }
+  ],
+  "files_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní důvod pro použití konstrukce with open(...) při práci se soubory?",
+      "options": [
+        "A) Garantuje automatické uzavření souborového streamu při opuštění bloku i při výskytu výjimky.",
+        "B) Zrychluje čtení ze souboru tím, že automaticky načte celý jeho obsah do vyrovnávací paměti RAM.",
+        "C) Automaticky převádí všechny načtené bajty na velká písmena bez nutnosti volání metody upper().",
+        "D) Zamyká soubor na úrovni operačního systému proti zápisu ze strany ostatních běžících procesů."
+      ],
+      "answer": 0,
+      "explanation": "Konstrukce with vystupuje jako kontextový manažer. Při opuštění bloku kódu (ať už standardním dokončením nebo v důsledku neošetřené výjimky) zajistí bezpečné uzavření souboru a uvolnění systémových zdrojů."
+    },
+    {
+      "id": "q2",
+      "type": "code_fill",
+      "question": "Doplňte klíčový parametr funkce open() zaručující správný převod bajtů na textové znaky.\n`python\nwith open('data.txt', mode='r', ________='utf-8') as f:\n    content = f.read()\n`",
+      "code_snippet": "with open('data.txt', mode='r', ________='utf-8') as f:\n    content = f.read()",
+      "options": [
+        "A) encoding — parametr definující znakové kódování použité pro správný převod bajtů na řetězce.",
+        "B) charset — parametr určující znakovou sadu pro správné terminálové zobrazení načteného textu.",
+        "C) format — parametr předepisující požadované formátování textového souboru na systémové úrovni.",
+        "D) codec — parametr předávající šifrovací klíč pro dekódování binárních dat ze zadaného souboru."
+      ],
+      "answer": 0,
+      "explanation": "Parametr encoding='utf-8' explicitně stanovuje kódování pro čtení nebo zápis textových souborů. Nespoléhání se na výchozí kódování systému je zásadní pro přenositelnost kódu mezi různorodými operačními systémy."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jak se liší výstup metody soubor.write(data) od volání print(data, file=soubor)?",
+      "options": [
+        "A) write() zapíše pouze předaný řetězec, zatímco print() navíc automaticky přidá znak odřádkování \\n.",
+        "B) write() automaticky přidává nový řádek \\n na konec textu, zatímco print() zapisuje text bez úprav.",
+        "C) write() přijímá libovolný objekt a převede jej na str, zatímco print() vyžaduje výhradně typ bytes.",
+        "D) write() zapisuje data do souboru synchronně, zatímco print() odkládá zápis až na zavření souboru."
+      ],
+      "answer": 0,
+      "explanation": "Metoda f.write(string) zapíše přesně zadaný řetězec bez jakýchkoliv úprav či přidaných znaků. Oproti tomu funkce print(string, file=f) se chová standardně – mezi argumenty vkládá mezeru (sep=' ') a na konec přidává znak nového řádku (end='\\n')."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je paměťový rozdíl mezi procházením souboru pomocí for line in soubor: a použitím soubor.readlines()?",
+      "options": [
+        "A) for line in soubor načítá řádky postupně po jedné (O(1) paměť), kdežto readlines() načte vše do seznamu (O(N) paměť).",
+        "B) for line in soubor načte celý soubor do paměti najednou (O(N) paměť), zatímco readlines() vytvoří lenivý generátor.",
+        "C) for line in soubor funguje výhradně pro binární soubory v operačním systému, zatímco readlines() je pro textové.",
+        "D) Obě metody mají zcela totožnou paměťovou náročnost a vnitřně načítají kompletní obsah souboru do systémové RAM."
+      ],
+      "answer": 0,
+      "explanation": "Otevřený soubor je iterovatelný objekt. Cyklus for line in soubor: načítá z disku vždy jen právě zpracovávanou řádku, což vyžaduje minimální paměť O(1). Metoda soubor.readlines() načte okamžitě všechny řádky souboru do paměti jako seznam řetězců (O(N) paměť), což u velkých souborů může způsobit vyčerpání RAM."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co bude v proměnné data po spuštění níže uvedeného kódu nad souborem o dvou řádcích?\n`python\n# soubor data.txt obsahuje:\n# Ahoj\n# Světe\nwith open('data.txt', encoding='utf-8') as f:\n    data = f.read()\nprint(repr(data))\n`",
+      "code_snippet": "# soubor data.txt obsahuje:\n# Ahoj\n# Světe\nwith open('data.txt', encoding='utf-8') as f:\n    data = f.read()\nprint(repr(data))",
+      "options": [
+        "A) 'Ahoj\\nSvěte' — metoda read() načte celý obsah souboru jako jeden řetězec včetně odřádkování.",
+        "B) ['Ahoj\\n', 'Světe'] — metoda read() automaticky rozdělí všechny načtené řádky do prvkového seznamu.",
+        "C) 'AhojSvěte' — metoda read() při načítání automaticky odstraní všechny bílé znaky a odřádkování.",
+        "D) 'Světe' — metoda read() vrací pouze poslední přečtenou řádku ze zadaného otevřeného textového souboru."
+      ],
+      "answer": 0,
+      "explanation": "Metoda soubor.read() bez argumentu přečte celý obsah souboru najednou a vrátí jej jako jeden jediný řetězec typu str, v němž jsou zachovány všechny původní znaky nového řádku (\\n)."
+    }
+  ],
+  "frozensets": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi typem set a frozenset v Pythonu?",
+      "options": [
+        "A) set je proměnný (mutable) a nehešovatelný, zatímco frozenset je neproměnný (immutable) a hešovatelný.",
+        "B) set udržuje prvkům pevné pořadí vkládání, zatímco frozenset prvky automaticky seřadí podle hodnoty.",
+        "C) set umožňuje ukládat pouze čísla, zatímco frozenset dokáže uchovávat libovolné proměnné seznamy.",
+        "D) set vyžaduje volání metody copy(), zatímco frozenset se při přiřazení kopíruje automaticky hluboce."
+      ],
+      "answer": 0,
+      "explanation": "frozenset je neproměnnou (immutable) obdobou běžné množiny set. Protože je neproměnný, má definovanou metodu __hash__() a lze ho použít jako prvek jiné množiny nebo jako klíč ve slovníku."
+    },
+    {
+      "id": "q2",
+      "type": "code_fill",
+      "question": "Doplňte název konstruktoru pro vytvoření prázdné zmražené množiny.\n`python\nempty_fs = ________()\nprint(type(empty_fs).__name__)\n`",
+      "code_snippet": "empty_fs = ________()\nprint(type(empty_fs).__name__)",
+      "options": [
+        "A) frozenset — konstruktor vytvářející prázdnou neproměnnou množinu bez obsažených prvků.",
+        "B) fset — zkratkový konstruktor definující prázdnou zmraženou množinu v globálním prostoru.",
+        "C) frozen — klíčové slovo dekorující standardní množinový objekt pro zamezení jeho úprav.",
+        "D) set.freeze — statická metoda třídy set převádějící existující množinu na immutable typ."
+      ],
+      "answer": 0,
+      "explanation": "Na rozdíl od běžných množin nemá frozenset žádnou přímou notaci (jako {} pro dict nebo set()). Prázdnou zmraženou množinu lze vytvořit pouze zavoláním konstruktoru frozenset()."
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Co se stane při pokusu o zavolání metody add() nad objekt typu frozenset?\n`python\nfs = frozenset([1, 2, 3])\nfs.add(4)\n`",
+      "code_snippet": "fs = frozenset([1, 2, 3])\nfs.add(4)",
+      "options": [
+        "A) AttributeError — frozenset je immutable a neobsahuje modifikační metody jako add() nebo remove().",
+        "B) frozenset({1, 2, 3, 4}) — metoda vytvoří novou zmraženou množinu s přidaným prvkem a vrátí ji zpět.",
+        "C) TypeError — prvek 4 nelze přidat do množiny, protože není obalen do samostatného neproměnného objektu.",
+        "D) ValueError — operace přidávání prvku selže, protože kapacita zmražené množiny je vytvořením fixní."
+      ],
+      "answer": 0,
+      "explanation": "Jelikož je frozenset neproměnný typ, neobsahuje žádné metody, které by měnily jeho obsah (add, update, remove, discard, pop, clear). Volání fs.add(4) skončí výjimkou AttributeError: 'frozenset' object has no attribute 'add'."
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Co bude výstupem následujícího kódu vytvořeného ze seznamu s duplicitami?\n`python\nfs = frozenset([1, 2, 'ahoj', 2, 'ahoj', 3])\nprint(len(fs))\n`",
+      "code_snippet": "fs = frozenset([1, 2, 'ahoj', 2, 'ahoj', 3])\nprint(len(fs))",
+      "options": [
+        "A) 4 — duplicitní prvky byly při vytváření zmražené množiny automaticky odstraněny.",
+        "B) 6 — frozenset zachovává všechny vložené prvky včetně duplicit v nezměněném pořadí.",
+        "C) 2 — frozenset uchovává pouze prvky stejného datového typu a ostatní položky zahodí.",
+        "D) TypeError — vstupní seznam obsahuje smíšené typy int a str, které nelze zmrazit."
+      ],
+      "answer": 0,
+      "explanation": "Stejně jako klasická množina set, i frozenset uchovává výhradně unikátní prvky. Unikátní hodnoty v seznamu jsou 1, 2, 'ahoj' a 3, takže výstup funkce len(fs) bude 4."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Proč lze frozenset použít jako klíč ve slovníku, zatímco obyčejný set nikoliv?",
+      "options": [
+        "A) frozenset je immutable, takže jeho hešovací hodnota zůstává po celou dobu života objektu konstantní.",
+        "B) frozenset automaticky seřadí své prvky abecedně, což slovníku umožňuje rychlé vyhledávání položek.",
+        "C) frozenset spotřebovává méně paměti v RAM než set, což usnadňuje indexaci ve slovníkových tabulkách.",
+        "D) frozenset podporuje operátor [index], takže slovník může přistupovat k jeho prvkům přes pozici prvků."
+      ],
+      "answer": 0,
+      "explanation": "Klíče ve slovníku musí být hešovatelné (hashable), což vyžaduje neproměnnost objektu. Běžný set je mutable (lze do něj přidávat prvky), čímž by se měnil jeho hash. Neproměnný frozenset má stabilní hash, a proto splňuje podmínku pro klíč slovníku i prvek množiny."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaký bude výsledek množinového průniku dvou zmražených množin?\n`python\nfs1 = frozenset([1, 2, 3])\nfs2 = frozenset([2, 3, 4])\nprint(fs1 & fs2)\n`",
+      "code_snippet": "fs1 = frozenset([1, 2, 3])\nfs2 = frozenset([2, 3, 4])\nprint(fs1 & fs2)",
+      "options": [
+        "A) frozenset({2, 3}) — operátor & vrátí novou zmraženou množinu obsahující společné prvky.",
+        "B) frozenset({1, 4}) — operátor & vrátí rozdíl prvků přítomných výhradně v jedné ze zadaných množin.",
+        "C) {2, 3} — výsledek množinových operací nad frozenset se automaticky přetypuje na klasický set.",
+        "D) TypeError — operátor & není pro zmražené množiny podporován a je nutné použít intersection()."
+      ],
+      "answer": 0,
+      "explanation": "Operátor & (průnik / intersection) funguje pro frozenset stejně jako pro set a vrací nový frozenset obsahující prvky přítomné v obou množinách, tedy {2, 3}."
+    }
+  ]
+}
