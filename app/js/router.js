@@ -196,14 +196,14 @@ function parseHash(hash) {
 
   if (a === "week" && b) return { kind: "week", id: dec(b) };
   if ((a === "lecture" || a === "exercise" || a === "content" || a === "item") && b) {
-    const itemId = dec(b);
+    const itemId = dec(parts.slice(1).join("/"));
     if (slideVal) {
       const formattedSlide = (!slideVal.startsWith("id") && /^\d+$/.test(slideVal)) ? `id${slideVal}` : slideVal;
       return { kind: "page", id: itemId, pageId: formattedSlide };
     }
     return { kind: a === "content" || a === "item" ? "lecture" : a, id: itemId };
   }
-  if (a === "presentation" && b) return { kind: "presentation", id: dec(b) };
+  if (a === "presentation" && b) return { kind: "presentation", id: dec(parts.slice(1).join("/")) };
   if (a === "page" && b && c) return { kind: "page", id: dec(b), pageId: dec(c) };
   if (a === "search") return { kind: "search" };
   if (a === "progress") return { kind: "progress" };
@@ -249,11 +249,37 @@ function applyRoute(route) {
     navigate({ kind: "home" }, { skipHistory: true });
     return;
   }
+  if (route.kind === "week") {
+    let weekId = route.id;
+    if (!state.weeksById.has(weekId)) {
+      const normalized = "week-" + String(weekId).replace(/^w/, "");
+      if (state.weeksById.has(normalized)) {
+        weekId = normalized;
+      }
+    }
+    if (weekId !== route.id) {
+      navigate({ kind: "week", id: weekId }, { skipHistory: true });
+      return;
+    }
+  }
   // Resolve content kind: prefer item existence, fallback to dynamic item registration for disk files
-  if (route.kind === "lecture" || route.kind === "exercise") {
+  if (route.kind === "lecture" || route.kind === "exercise" || route.kind === "presentation") {
     let item = state.itemsById.get(route.id);
     if (!item && route.id) {
-      const rawPath = route.id.replace(/^(lecture|exercise):/, "");
+      const allItems = Array.from(state.itemsById.values());
+      const matched = allItems.find(i => 
+        i.slug === route.id ||
+        i.id.endsWith("/" + route.id + ".html") ||
+        i.id.endsWith("/" + route.id) ||
+        i.path.endsWith("/" + route.id + ".html") ||
+        i.path.endsWith("/" + route.id)
+      ) || (route.id.startsWith("ex-") ? allItems.filter(i => i.kind === "exercise")[(parseInt(route.id.replace(/^ex-/, ""), 10) || 1) - 1] : null);
+      if (matched) {
+        item = matched;
+      }
+    }
+    if (!item && route.id) {
+      const rawPath = route.id.replace(/^(lecture|exercise|presentation):/, "");
       const fullPath = rawPath.startsWith("vyuka_downloaded/")
         ? rawPath
         : (rawPath.startsWith("materialy/") ? "vyuka_downloaded/" + rawPath : "vyuka_downloaded/materialy/" + rawPath.replace(/^\//, ""));
@@ -276,7 +302,7 @@ function applyRoute(route) {
       state.itemsById.set("lecture:" + fullPath.replace(/^vyuka_downloaded\/materialy\//, ""), item);
     }
     if (item) {
-      navigate({ kind: item.kind, id: item.id }, { skipHistory: true });
+      navigate({ kind: route.kind === "presentation" ? "presentation" : item.kind, id: item.id }, { skipHistory: true });
       return;
     }
   }
@@ -358,7 +384,7 @@ function ensureTab(target) {
     itemId = target.id;
     pageId = target.pageId;
     const item = state.itemsById.get(itemId);
-    id = `page:${itemId}#${pageId}`;
+    id = `page:${itemId}`;
     const pages = item ? (state.pagesIndex[item.path] || []) : [];
     const p = pages.find((x) => x.id === pageId);
     title = p?.title || pageId;

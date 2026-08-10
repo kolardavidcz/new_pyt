@@ -17,6 +17,8 @@ export function renderTree() {
   if (!root || !state.course) return;
   clear(root);
 
+  const frag = document.createDocumentFragment();
+
   // Top special node for Checklist
   const checkNode = document.createElement("div");
   checkNode.className = "tree-node";
@@ -40,7 +42,7 @@ export function renderTree() {
     }
   });
   checkNode.appendChild(checkRow);
-  root.appendChild(checkNode);
+  frag.appendChild(checkNode);
 
   const weeks = state.course.weeks || [];
   for (const week of weeks) {
@@ -60,25 +62,28 @@ export function renderTree() {
       state.expanded.set(week.id, true);
     }
 
-    root.appendChild(buildWeekNode(week, items));
+    frag.appendChild(buildWeekNode(week, items));
   }
 
-  if (!root.childElementCount) {
+  if (!frag.childElementCount) {
     const empty = document.createElement("div");
     empty.style.cssText = "padding:16px 12px;color:var(--text-faint);font-size:12px;";
     empty.textContent = "No items match the current filters.";
-    root.appendChild(empty);
+    frag.appendChild(empty);
   }
+
+  root.appendChild(frag);
 }
 
 function buildWeekNode(week, items) {
   const open = !!state.expanded.get(week.id);
+  const isGrayShelf = week.week === 99;
   const li = document.createElement("div");
-  li.className = "tree-node" + (open ? " open" : "") + (week.isRemovedSection ? " is-removed-week" : "");
+  li.className = "tree-node" + (open ? " open" : "") + (isGrayShelf ? " tree-node-gray-shelf" : "");
   li.dataset.key = week.id;
 
   const row = document.createElement("div");
-  row.className = "tree-row" + (week.isRemovedSection ? " is-removed" : "");
+  row.className = "tree-row" + (isGrayShelf ? " tree-row-gray-shelf" : "");
   row.setAttribute("role", "treeitem");
   row.setAttribute("aria-expanded", String(open));
   row.tabIndex = 0;
@@ -86,11 +91,14 @@ function buildWeekNode(week, items) {
   row.dataset.id = week.id;
   if (state.focusedTreeKey === week.id) row.classList.add("active");
 
-  const labelPrefix = week.isRemovedSection ? "📦 " : `W${week.week} · `;
+  const weekLabel = isGrayShelf
+    ? `🗑️ ${escape(week.title)}`
+    : `W${week.week} · ${escape(week.title)}`;
+
   row.innerHTML = `
     <span class="tree-twistie">${svgChevron()}</span>
-    <span class="tree-icon week">${svgFolder()}</span>
-    <span class="tree-label">${labelPrefix}${escape(week.title)}</span>
+    <span class="tree-icon week" style="${isGrayShelf ? 'color:var(--text-faint)' : ''}">${svgFolder()}</span>
+    <span class="tree-label">${weekLabel}</span>
     <span class="tree-meta"><span class="rel-pill" style="color:var(--text-faint)">${items.length}</span></span>
   `;
 
@@ -101,6 +109,7 @@ function buildWeekNode(week, items) {
       renderTree();
       return;
     }
+    // double purpose: select week + ensure expanded
     state.expanded.set(week.id, true);
     select("week", week.id);
   });
@@ -126,11 +135,11 @@ function buildItemNode(item) {
   const open = !!state.expanded.get(key);
 
   const li = document.createElement("div");
-  li.className = "tree-node" + (open ? " open" : "") + (item.isRemoved ? " is-removed" : "");
+  li.className = "tree-node" + (open ? " open" : "");
   li.dataset.key = key;
 
   const row = document.createElement("div");
-  row.className = "tree-row" + (item.isRemoved ? " is-removed" : "");
+  row.className = "tree-row";
   row.setAttribute("role", "treeitem");
   if (hasPages) row.setAttribute("aria-expanded", String(open));
   row.tabIndex = 0;

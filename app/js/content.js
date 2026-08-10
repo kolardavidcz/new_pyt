@@ -3,11 +3,16 @@
 import {
   state, pagesFor, slideDiff, slideTags, weekVisibleItems, filteredItems, markSeen,
   isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor, logLinkError,
-  saveQuizScore, resetDeckQuizScores, setPrintWithQuizzes, getQuizFor,
+  saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, setPrintWithQuizzes, getQuizFor,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot, highlightCode, dedentCode } from "./highlight.js";
 import { renderTree } from "./tree.js";
+import { formatInlineCode, isFlexibleCodeFillCorrect, parseQuestionContent } from "./format.js";
+import { renderQuizSection, openImprovementModal, updatePrintQuizButtons } from "./quiz.js";
+
+export { formatInlineCode, isFlexibleCodeFillCorrect, parseQuestionContent };
+export { renderQuizSection, openImprovementModal, updatePrintQuizButtons };
 
 export function setLoading(on) {
   const bar = document.getElementById("loadingBar");
@@ -59,7 +64,11 @@ export function showHome() {
 /* ── Single week catalog ───────────────────────────────── */
 
 export function showWeek(weekId) {
-  const week = state.weeksById.get(weekId);
+  let week = state.weeksById.get(weekId);
+  if (!week && weekId) {
+    const normalized = "week-" + String(weekId).replace(/^w/, "");
+    week = state.weeksById.get(normalized);
+  }
   const main = document.getElementById("main");
   if (!week) {
     main.className = "";
@@ -178,14 +187,6 @@ export function toggleFullscreen(forceState) {
   }
 }
 
-if (typeof document !== "undefined") {
-  document.addEventListener("fullscreenchange", () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.classList.remove("presentation-fullscreen-mode");
-    }
-  });
-}
-
 export function updatePageStudyButtons(now) {
   const currentTab = state.tabs.find((t) => t.id === state.activeTabId);
   const isStudiedNow = now !== undefined ? now : (currentTab?.itemId ? isStudied(currentTab.itemId) : false);
@@ -218,16 +219,21 @@ function lectureToolbar(item, mode) {
       type: "button",
       className: "btn",
       title: "Scrollable full lecture",
-      onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
+      onClick: () => {
+        toggleFullscreen(false);
+        window.__pcsNavigate?.({ kind: item.kind, id: item.id });
+      },
     }, "Open full lecture"));
   }
 
-  bar.appendChild(el("button", {
-    type: "button",
-    className: "btn btn-print",
-    title: "Print or export to PDF",
-    onClick: () => window.print(),
-  }, "Tisk 🖨"));
+  if (mode === "full") {
+    bar.appendChild(el("button", {
+      type: "button",
+      className: "btn btn-print",
+      title: "Print or export to PDF",
+      onClick: () => window.print(),
+    }, "Tisk 🖨"));
+  }
 
   // Pinned right after Tisk 🖨: Mark studied button
   const studied = isStudied(item.id);
@@ -355,7 +361,8 @@ export async function showPresentation(itemId) {
     const list = el("div", { className: "page-list" });
     pages.forEach((p, i) => {
       const diff = slideDiff(item.slug, p.id);
-      const tags = slideTags(item.slug, p.id);
+      const skey = `${item.slug}#${p.id}`;
+      const tags = (state.slides[skey] && Array.isArray(state.slides[skey].tags)) ? state.slides[skey].tags : (item.tags || []);
       const row = el("button", {
         type: "button",
         className: "page-row",
@@ -435,7 +442,10 @@ export async function showPage(itemId, pageId) {
     const nav = el("div", { className: "item-actions lecture-toolbar", style: { padding: "0 28px 8px" } });
     nav.appendChild(el("button", {
       type: "button", className: "btn primary",
-      onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
+      onClick: () => {
+        toggleFullscreen(false);
+        window.__pcsNavigate?.({ kind: item.kind, id: item.id });
+      },
     }, "Open full lecture"));
     nav.appendChild(el("button", {
       type: "button", className: "btn",
@@ -458,11 +468,6 @@ export async function showPage(itemId, pageId) {
       title: "Celá obrazovka (F)",
       onClick: () => toggleFullscreen(),
     }, "Celá obrazovka ⛶"));
-    nav.appendChild(el("button", {
-      type: "button", className: "btn btn-print",
-      title: "Tisk slajdu / přednášky",
-      onClick: () => window.print(),
-    }, "Tisk 🖨"));
 
     if (pages.length) {
       const pos = el("span", {
@@ -477,8 +482,6 @@ export async function showPage(itemId, pageId) {
     main.appendChild(slideEl);
     await loadAndInlineExamples(slideEl);
     highlightRoot(slideEl);
-
-    main.appendChild(buildBottomNavBar(item));
 
     const isLastSlide = idx < 0 || idx === pages.length - 1;
     if (isLastSlide) {
@@ -600,7 +603,7 @@ function renderTaskCard(task, item) {
   const head = el("header", { className: "task-card-head" });
   head.innerHTML = `
     <span class="task-num">Úkol ${task.num}</span>
-    <h2 class="task-title">${escapeHtml(task.title)}</h2>
+    <h2 class="task-title">${formatInlineCode(task.title)}</h2>
     ${badgesHtml(taskTags)}
     <div class="task-scores" title="${escapeHtml(reason)}">
       ${scoreBarHtml(tS, 5, "tech")}
@@ -672,7 +675,13 @@ async function loadFullContent(item, main) {
     for (const node of nodes) highlightRoot(node);
     main.appendChild(buildBottomNavBar(item));
     const quizEl = await renderQuizSection(item);
-    if (quizEl) main.appendChild(quizEl);
+    if (quizEl) {
+      const slideText = main.innerText || "";
+      if (slideText.trim().length < 600) {
+        quizEl.classList.add("compact-lecture-quiz");
+      }
+      main.appendChild(quizEl);
+    }
   } catch (err) {
     main.appendChild(el("div", { className: "error-box" },
       "Failed to load: ",
@@ -727,7 +736,8 @@ async function fetchAndExtractExercise(path) {
 
 function renderSlide(page, item, num) {
   const diff = slideDiff(item.slug, page.id);
-  const tags = slideTags(item.slug, page.id);
+  const skey = `${item.slug}#${page.id}`;
+  const tags = (state.slides[skey] && Array.isArray(state.slides[skey].tags)) ? state.slides[skey].tags : (item.tags || []);
   const slide = el("article", {
     className: "slide",
     id: page.id,
@@ -1073,360 +1083,7 @@ export async function loadAndInlineExamples(root) {
   );
 }
 
-export function updatePrintQuizButtons() {
-  const on = state.printWithQuizzes;
-  document.querySelectorAll(".btn-quiz-toggle").forEach((b) => {
-    b.classList.toggle("is-active", on);
-    b.innerHTML = on ? "🖨 Kvíz v tisku ✓" : "🖨 Kvíz v tisku ☐";
-    b.title = on ? "Tisk obsahuje kvízy na konci (Kliknutím vypnete)" : "Tisk bez kvízů (Kliknutím zapnete kvízy v tisku)";
-  });
-}
 
-export async function renderQuizSection(item) {
-  const questions = await getQuizFor(item);
-  if (!questions || !questions.length) return null;
-
-  const deckKey = item.slug || item.id || item.path;
-  const card = el("section", { className: "quiz-section-card", id: "quizSection" });
-
-  const scoreMap = state.quizScores[deckKey] || {};
-  const answeredCount = Object.keys(scoreMap).length;
-  const correctCount = Object.values(scoreMap).filter((s) => s.isCorrect).length;
-
-  const header = el("header", { className: "quiz-card-header" });
-  header.innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">
-      <div>
-        <span class="quiz-badge">Kvíz k prezentaci · Takeaways Test</span>
-        <h2 class="quiz-title">Ověření klíčových poznatků a takeaway bodů</h2>
-        <p class="quiz-subtitle">Otestujte si pochopení klíčových konceptů prezentace. Otázky prověřují takeaways i chytáky.</p>
-      </div>
-      <button type="button" class="btn btn-reset-deck-quiz" style="background:#1e293b; border:1px solid #334155; color:#38bdf8; border-radius:4px; padding:6px 12px; font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.15s ease;">Resetovat otázky</button>
-    </div>
-    <div class="quiz-score-bar" style="margin-top:10px; font-size:12px; color:var(--fg-muted);">
-      <span class="q-score-stat">Vyřešeno: <strong class="q-answered-n">${answeredCount}</strong> / ${questions.length}</span>
-      <span class="q-score-stat" style="margin-left:14px;">Správně: <strong class="q-correct-n" style="color:var(--syntax-string, #89d185);">${correctCount}</strong></span>
-    </div>
-  `;
-
-  header.querySelector(".btn-reset-deck-quiz")?.addEventListener("click", async () => {
-    resetDeckQuizScores(deckKey);
-    const freshCard = await renderQuizSection(item);
-    if (freshCard) card.replaceWith(freshCard);
-  });
-
-  card.appendChild(header);
-
-  const list = el("div", { className: "quiz-questions-list" });
-
-  function updateHeaderStats() {
-    const curMap = state.quizScores[deckKey] || {};
-    const curAns = Object.keys(curMap).length;
-    const curCorr = Object.values(curMap).filter((s) => s.isCorrect).length;
-    const ansEl = card.querySelector(".q-answered-n");
-    const corrEl = card.querySelector(".q-correct-n");
-    if (ansEl) ansEl.textContent = curAns;
-    if (corrEl) corrEl.textContent = curCorr;
-  }
-
-  questions.forEach((q, idx) => {
-    const qCard = el("article", { className: `quiz-q-card qtype-${q.type}`, id: `qcard-${q.id || idx}` });
-    
-    let typeLabel = "Otázka";
-    if (q.type === "multiple_choice") typeLabel = "Výběr ABCD";
-    else if (q.type === "code_fill" || q.type === "fill_blank_choice") typeLabel = "Doplňování kódu (________)";
-    else if (q.type === "predict_output") typeLabel = "Předpověď výstupu programu";
-    else if (q.type === "true_false_tricky") typeLabel = "Pravda / Nepravda (Chyták)";
-
-    const qNum = el("div", { className: "quiz-q-num" });
-    qNum.innerHTML = `Otázka ${idx + 1} z ${questions.length} <span class="quiz-type-tag">${typeLabel}</span>`;
-    qCard.appendChild(qNum);
-
-    let qTextHtml = escapeHtml(q.question || "");
-    let codeSnippetHtml = "";
-
-    if (qTextHtml.includes("```")) {
-      const parts = qTextHtml.split("```");
-      let promptParts = [];
-      for (let pIdx = 0; pIdx < parts.length; pIdx++) {
-        if (pIdx % 2 === 1) {
-          let codeText = parts[pIdx].replace(/^(python|bash|c|java)\n?/i, "");
-          const dedented = dedentCode(codeText);
-          const lang = parts[pIdx].match(/^(python|bash|c|java)/i)?.[1] || "python";
-          codeSnippetHtml += `<pre class="code-block lang-${lang}"><code>${highlightCode(dedented, lang)}</code></pre>`;
-        } else {
-          promptParts.push(parts[pIdx]);
-        }
-      }
-      qTextHtml = promptParts.join("").trim();
-    }
-
-    const qText = el("div", { className: "quiz-q-text" });
-    qText.innerHTML = qTextHtml;
-    qCard.appendChild(qText);
-
-    let codeWrapEl = null;
-    if (codeSnippetHtml) {
-      const isPredict = q.type === "predict_output";
-      codeWrapEl = el("div", { className: isPredict ? "quiz-code-wrap quiz-terminal-wrap" : "quiz-code-wrap" });
-      if (isPredict) {
-        codeWrapEl.innerHTML = `<div class="terminal-bar"><span class="t-dot red"></span><span class="t-dot yellow"></span><span class="t-dot green"></span><span class="t-title">main.py — Python 3.12 Output Predictor</span></div>${codeSnippetHtml}`;
-      } else {
-        codeWrapEl.innerHTML = codeSnippetHtml;
-      }
-      qCard.appendChild(codeWrapEl);
-    }
-
-    const savedState = scoreMap[q.id];
-    const explanationEl = el("div", { className: "quiz-explanation hidden" });
-
-    function showExplanation(isCorrect, expectedText, onRetry) {
-      explanationEl.className = `quiz-explanation ${isCorrect ? "correct" : "incorrect"}`;
-      explanationEl.innerHTML = `
-        <div class="exp-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <div class="exp-title">${isCorrect ? "Správně!" : "Nepřesně!"}</div>
-          ${onRetry ? `<button type="button" class="btn-retry-fill" style="background:#1e293b; border:1px solid #334155; color:#38bdf8; border-radius:4px; padding:3px 10px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s ease;">Zkusit znovu</button>` : ""}
-        </div>
-        ${(!isCorrect && expectedText) ? `<div class="exp-expected" style="margin-bottom:6px; font-weight:600; color:var(--syntax-string, #ce9178);">Očekávaný výraz: <code>${escapeHtml(expectedText)}</code></div>` : ""}
-        <div class="exp-body">${escapeHtml(q.explanation || "")}</div>
-      `;
-
-      if (onRetry) {
-        const retryBtn = explanationEl.querySelector(".btn-retry-fill");
-        if (retryBtn) {
-          retryBtn.addEventListener("click", onRetry);
-        }
-      }
-      explanationEl.classList.remove("hidden");
-    }
-
-    function updateLiveFill(val, isCorrect) {
-      const cleanVal = val.replace(/^[A-D]\)\s*/, "").trim();
-      const targetNode = codeWrapEl ? codeWrapEl.querySelector("code") : qText;
-      if (targetNode) {
-        if (!targetNode.dataset.originalCode) {
-          targetNode.dataset.originalCode = targetNode.innerHTML;
-        }
-        const orig = targetNode.dataset.originalCode;
-        const fillHtml = `<span class="filled-blank ${isCorrect ? "correct" : "incorrect"}">${escapeHtml(cleanVal)}</span>`;
-        targetNode.innerHTML = orig.replace(/________|___/g, fillHtml);
-      }
-    }
-
-    if (q.type === "code_fill" || q.type === "fill_blank_choice") {
-      // Interactive Typing & Draggable Chips Exercise for code_fill / fill_blank_choice
-      const ansIdx = typeof q.answer === "number" ? q.answer : 0;
-      const rawCorrect = (q.options && q.options[ansIdx]) ? q.options[ansIdx] : String(q.answer || "");
-      const expectedClean = rawCorrect.replace(/^[A-D]\)\s*/, "").trim();
-
-      // Inline blank replacement with live interactive input directly in code block or question text
-      const inlineInputHtml = `<input type="text" class="inline-code-fill-input" size="${Math.max(6, expectedClean.length + 1)}" autocomplete="off" spellcheck="false" placeholder="doplňte kód..." aria-label="Napište chybějící kód" />`;
-      if (codeWrapEl) {
-        const codeNode = codeWrapEl.querySelector("code");
-        if (codeNode) {
-          codeNode.innerHTML = codeNode.innerHTML.replace(/________|___|___BLANK___/g, inlineInputHtml);
-        }
-      } else if (qText.innerHTML.includes("________")) {
-        qText.innerHTML = qText.innerHTML.replace(/________|___|___BLANK___/g, inlineInputHtml);
-      }
-
-      const inlineInput = qCard.querySelector(".inline-code-fill-input");
-
-      const handleEvaluate = (val) => {
-        if (!val) return;
-        const normUser = val.toLowerCase().replace(/\s+/g, "");
-        const normExp = expectedClean.toLowerCase().replace(/\s+/g, "");
-        const isCorrect = normUser === normExp || normExp.includes(normUser) || normUser.includes(normExp);
-
-        updateLiveFill(val, isCorrect);
-        if (inlineInput) {
-          inlineInput.classList.remove("correct", "incorrect");
-          inlineInput.classList.add(isCorrect ? "correct" : "incorrect");
-        }
-
-        saveQuizScore(deckKey, q.id, {
-          selected: val,
-          isCorrect: isCorrect,
-        });
-
-        showExplanation(isCorrect, expectedClean, handleReset);
-        updateHeaderStats();
-      };
-
-      const handleReset = () => {
-        explanationEl.classList.add("hidden");
-        if (inlineInput) {
-          inlineInput.disabled = false;
-          inlineInput.value = "";
-          inlineInput.size = 6;
-          inlineInput.classList.remove("correct", "incorrect");
-          inlineInput.focus();
-        }
-        const targetNode = codeWrapEl ? codeWrapEl.querySelector("code") : qText;
-        if (targetNode && targetNode.dataset.originalCode) {
-          targetNode.innerHTML = targetNode.dataset.originalCode;
-          delete targetNode.dataset.originalCode;
-        }
-        if (codeWrapEl) {
-          const codeNode = codeWrapEl.querySelector("code");
-          if (codeNode && !codeNode.querySelector(".inline-code-fill-input")) {
-            codeNode.innerHTML = codeNode.innerHTML.replace(/________|___|___BLANK___/g, inlineInputHtml);
-          }
-        }
-      };
-
-      if (inlineInput) {
-        inlineInput.addEventListener("input", () => {
-          inlineInput.size = Math.max(6, inlineInput.value.length + 1);
-          inlineInput.classList.remove("correct", "incorrect");
-        });
-
-        inlineInput.addEventListener("keydown", (e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            const val = inlineInput.value.trim();
-            handleEvaluate(val);
-          }
-        });
-
-        inlineInput.addEventListener("dragover", (e) => {
-          e.preventDefault();
-          inlineInput.classList.add("drag-over");
-        });
-        inlineInput.addEventListener("dragleave", () => {
-          inlineInput.classList.remove("drag-over");
-        });
-        inlineInput.addEventListener("drop", (e) => {
-          e.preventDefault();
-          inlineInput.classList.remove("drag-over");
-          const droppedText = e.dataTransfer ? e.dataTransfer.getData("text/plain") : "";
-          if (droppedText) {
-            inlineInput.value = droppedText;
-            inlineInput.size = Math.max(6, droppedText.length + 1);
-            handleEvaluate(droppedText);
-          }
-        });
-      }
-
-      if (q.options && q.options.length) {
-        const hintDetails = el("details", { className: "quiz-fill-hints-details" });
-        const pillsHtml = q.options.map((opt) => {
-          const cleanOpt = opt.replace(/^[A-D]\)\s*/, "").trim();
-          return `<div class="fill-hint-pill draggable-chip" draggable="true" data-code="${escapeHtml(cleanOpt)}"><code>${escapeHtml(cleanOpt)}</code></div>`;
-        }).join(" ");
-        hintDetails.innerHTML = `<summary>Možnosti ke vložení (přetáhněte kód do řádku nebo klikněte na čip)</summary><div class="hint-pills-wrap">${pillsHtml}</div>`;
-        
-        hintDetails.querySelectorAll(".draggable-chip").forEach((chipEl) => {
-          const codeVal = chipEl.dataset.code || chipEl.textContent.trim();
-
-          chipEl.addEventListener("dragstart", (e) => {
-            if (e.dataTransfer) {
-              e.dataTransfer.setData("text/plain", codeVal);
-            }
-          });
-
-          chipEl.addEventListener("click", () => {
-            if (inlineInput) {
-              inlineInput.value = codeVal;
-              inlineInput.size = Math.max(6, codeVal.length + 1);
-              handleEvaluate(codeVal);
-            }
-          });
-        });
-
-        qCard.appendChild(hintDetails);
-      }
-
-      if (savedState && inlineInput) {
-        const userVal = typeof savedState.selected === "number" && q.options ? q.options[savedState.selected] : String(savedState.selected || "");
-        const cleanUserVal = userVal.replace(/^[A-D]\)\s*/, "");
-        inlineInput.value = cleanUserVal;
-        inlineInput.size = Math.max(6, cleanUserVal.length + 1);
-        inlineInput.classList.add(savedState.isCorrect ? "correct" : "incorrect");
-        updateLiveFill(userVal, savedState.isCorrect);
-        showExplanation(savedState.isCorrect, expectedClean, handleReset);
-      }
-
-    } else if (q.options && q.options.length) {
-      const isTF = q.type === "true_false_tricky" || q.options.length === 2;
-      const isPredict = q.type === "predict_output";
-      const optsWrap = el("div", { className: isTF ? "quiz-options-list tf-options" : (isPredict ? "quiz-options-list term-options" : "quiz-options-list") });
-      
-      q.options.forEach((optText, optIdx) => {
-        const isCorrectOpt = optIdx === q.answer;
-        const btn = el("button", {
-          type: "button",
-          className: "quiz-opt-btn" + (isTF ? " tf-btn" : "") + (isPredict ? " term-opt-btn" : ""),
-          onClick: () => {
-            optsWrap.querySelectorAll(".quiz-opt-btn").forEach((b, i) => {
-              b.disabled = true;
-              if (i === q.answer) b.classList.add("correct");
-              else if (i === optIdx && !isCorrectOpt) b.classList.add("incorrect");
-            });
-
-            updateLiveFill(optText, isCorrectOpt);
-
-            saveQuizScore(deckKey, q.id, {
-              selected: optIdx,
-              isCorrect: isCorrectOpt,
-            });
-
-            showExplanation(isCorrectOpt);
-            updateHeaderStats();
-          },
-        });
-
-        if (isPredict) {
-          const cleanOptText = optText.replace(/^[A-D]\)\s*/, "");
-          btn.innerHTML = `<span class="term-dollar">&gt;&gt;&gt;</span> <code class="term-opt-text">${escapeHtml(cleanOptText)}</code>`;
-        } else {
-          btn.textContent = optText;
-        }
-
-        if (savedState) {
-          btn.disabled = true;
-          if (optIdx === q.answer) btn.classList.add("correct");
-          if (optIdx === savedState.selected && !savedState.isCorrect) btn.classList.add("incorrect");
-          if (optIdx === savedState.selected) {
-            updateLiveFill(optText, savedState.isCorrect);
-          }
-        }
-
-        optsWrap.appendChild(btn);
-      });
-      qCard.appendChild(optsWrap);
-    }
-
-    if (savedState) {
-      showExplanation(savedState.isCorrect);
-    }
-
-    qCard.appendChild(explanationEl);
-    list.appendChild(qCard);
-  });
-
-  card.appendChild(list);
-
-  // Append 180-degree upside-down Answer Key block for print view
-  const answerKeyEl = el("div", { className: "quiz-answer-key-upsidedown" });
-  let answerKeyItems = questions.map((q, i) => {
-    let ansStr = "";
-    if (typeof q.answer === "number" && q.options && q.options[q.answer]) {
-      ansStr = q.options[q.answer];
-    } else {
-      ansStr = String(q.answer || "");
-    }
-    return `<li><strong>Otázka ${i + 1}:</strong> ${escapeHtml(ansStr)}</li>`;
-  }).join("");
-
-  answerKeyEl.innerHTML = `
-    <div class="answer-key-title">🔄 Klíč správných odpovědí (pro kontrolu otočte stránku o 180°)</div>
-    <ol class="answer-key-list">${answerKeyItems}</ol>
-  `;
-  card.appendChild(answerKeyEl);
-
-  return card;
-}
 
 /* ── Search / progress ─────────────────────────────────── */
 
@@ -1655,7 +1312,7 @@ function detailedExerciseCard(item, studied) {
   head.innerHTML = `
     <div class="sec-title-row">
       <span class="st-status-check" style="cursor:pointer" title="Toggle studied status">${studied ? "✓" : "○"}</span>
-      <h3 class="sec-title" style="cursor:pointer">${escapeHtml(item.title)}</h3>
+      <h3 class="sec-title" style="cursor:pointer">${formatInlineCode(item.title)}</h3>
       <button type="button" class="sec-status-pill" style="cursor:pointer;border:none;font:inherit;background:rgba(110,118,129,0.2);color:var(--text-faint)">${studied ? "✓ SPLNĚNO" : "KE STUDIU"}</button>
     </div>
     <div class="sec-meta-row">
@@ -1691,7 +1348,7 @@ function detailedExerciseCard(item, studied) {
       tRow.innerHTML = `
         <div class="sti-top">
           <span class="sti-num">Úkol ${t.num}</span>
-          <span class="sti-title">${escapeHtml(t.summary || t.title)}</span>
+          <span class="sti-title">${formatInlineCode(t.summary || t.title)}</span>
           <div class="sti-scores">
             ${scoreBarHtml(tS, 5, "tech")}
             ${scoreBarHtml(lS, 5, "log")}

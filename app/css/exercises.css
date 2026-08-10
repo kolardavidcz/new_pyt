@@ -1,0 +1,886 @@
+/* newpyt — Exercise Dojo & Homework Progress Matrix Stylesheet */
+
+/* ── 1. Exercise View Container ─────────────────────────────────── */
+.exercise-view {
+  max-width: 900px;
+}
+
+.exercise-meta-line {
+  margin: 4px 0 8px;
+}
+
+.exercise-notes {
+  padding: 0 28px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.exercise-note {
+  padding: 8px 12px;
+  border-left: 3px solid var(--warning);
+  background: rgba(204, 167, 0, 0.08);
+  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.exercise-toc {
+  margin: 8px 28px 16px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.exercise-toc-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.exercise-toc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.exercise-toc-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px;
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+  font-size: var(--fs-sm);
+}
+
+.exercise-toc-item:hover {
+  background: var(--list-hover);
+  text-decoration: none;
+}
+
+.exercise-toc-item .toc-num {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: #cda34f;
+  min-width: 24px;
+}
+
+.exercise-toc-item .toc-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+/* ── 2. Structured Úkol Problem Cards & Difficulty Scoring ──────── */
+.exercise-tasks {
+  padding: 0 16px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.task-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0;
+  overflow: hidden;
+  scroll-margin-top: 12px;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.task-card.task-card-focus {
+  border-color: #cda34f;
+  box-shadow: 0 0 0 1px rgba(205, 163, 79, 0.35);
+}
+
+.task-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(205, 163, 79, 0.08);
+  border-bottom: 1px solid var(--border);
+}
+
+.task-num {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: #cda34f;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.task-title {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 500;
+  color: var(--text-bright);
+}
+
+.task-scores {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  cursor: help;
+}
+
+.score-tech {
+  border-color: rgba(0, 120, 212, 0.4);
+  background: rgba(0, 120, 212, 0.08);
+  color: #4fc1ff;
+}
+
+.score-log {
+  border-color: rgba(205, 163, 79, 0.4);
+  background: rgba(205, 163, 79, 0.08);
+  color: #cda34f;
+}
+
+.score-label {
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.score-bars {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 10px;
+  margin: 0 2px;
+}
+
+.score-bar-seg {
+  width: 4px;
+  height: 10px;
+  border-radius: 1px;
+  background: rgba(110, 118, 129, 0.25);
+  transition: background var(--dur) var(--ease);
+}
+
+.score-tech .score-bar-seg.on {
+  background: #4fc1ff;
+  box-shadow: 0 0 4px rgba(79, 193, 255, 0.4);
+}
+
+.score-log .score-bar-seg.on {
+  background: #cda34f;
+  box-shadow: 0 0 4px rgba(205, 163, 79, 0.4);
+}
+
+.score-num {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.toc-score-chips {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.toc-chip-t, .toc-chip-l {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.toc-chip-t {
+  background: rgba(0, 120, 212, 0.2);
+  color: #4fc1ff;
+}
+
+.toc-chip-l {
+  background: rgba(205, 163, 79, 0.2);
+  color: #cda34f;
+}
+
+.task-prompt {
+  padding: 14px 16px 12px;
+  font-size: var(--fs-md);
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.task-prompt > :first-child { margin-top: 0; }
+.task-prompt > :last-child { margin-bottom: 0; }
+
+.task-details {
+  border-top: 1px solid var(--border-subtle);
+  padding: 0;
+}
+
+.task-details summary {
+  cursor: pointer;
+  padding: 8px 16px;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+  user-select: none;
+  list-style: none;
+}
+
+.task-details summary::-webkit-details-marker { display: none; }
+.task-details summary::before {
+  content: "▸ ";
+  color: var(--text-faint);
+}
+
+.task-details[open] summary::before {
+  content: "▾ ";
+}
+
+.task-details summary:hover {
+  color: var(--text);
+  background: var(--list-hover);
+}
+
+.task-details-body {
+  padding: 4px 16px 14px;
+  font-size: var(--fs-sm);
+  color: var(--text-muted);
+}
+
+.task-hint summary { color: var(--info); }
+.task-solution summary { color: var(--success); }
+
+/* ── 3. Study Log & Progress Matrix ─────────────────────────────── */
+.progress-view {
+  max-width: 1440px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.progress-hero {
+  display: flex;
+  gap: 28px;
+  align-items: center;
+  padding: 8px 0 20px;
+  flex-wrap: wrap;
+}
+
+.progress-ring {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+.progress-ring-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.progress-ring-bg {
+  fill: none;
+  stroke: rgba(110, 118, 129, 0.25);
+  stroke-width: 2.8;
+}
+
+.progress-ring-fg {
+  fill: none;
+  stroke: #cda34f;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.4s var(--ease);
+}
+
+.progress-ring-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.progress-ring-label strong {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-bright);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.progress-ring-label span {
+  font-size: 11px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.progress-level-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 10px;
+  margin-bottom: 8px;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, rgba(0, 120, 212, 0.35), rgba(78, 201, 176, 0.25));
+  color: var(--info);
+  border: 1px solid rgba(0, 120, 212, 0.45);
+}
+
+.progress-dual-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 420px;
+}
+
+.progress-bar-track {
+  height: 6px;
+  background: rgba(110, 118, 129, 0.25);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.35s var(--ease);
+  min-width: 0;
+}
+
+.progress-bar-fill.core {
+  background: #cda34f;
+}
+
+.progress-bar-fill.ex {
+  background: linear-gradient(90deg, #cda34f, #e8c36a);
+}
+
+.progress-hero-text {
+  flex: 1;
+  min-width: 220px;
+}
+
+.progress-hero-text h1 {
+  margin: 0 0 4px;
+  font-size: var(--fs-2xl);
+  font-weight: 500;
+  color: var(--text-bright);
+}
+
+.progress-level-name {
+  margin: 0 0 8px;
+  font-size: var(--fs-lg);
+  font-weight: 500;
+  color: #4ec9b0;
+}
+
+.progress-vibe {
+  margin: 0 0 14px;
+  color: var(--text-muted);
+  font-size: var(--fs-md);
+  max-width: 48ch;
+  line-height: 1.5;
+}
+
+.progress-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.progress-stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 64px;
+}
+
+.progress-stat strong {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-bright);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-stat span {
+  font-size: 11px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.progress-core-bar {
+  max-width: 320px;
+}
+
+.progress-core-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+/* ── 4. Study Board & Grid Items ────────────────────────────────── */
+.study-board {
+  margin: 8px 0 24px;
+}
+
+.study-week {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.study-week-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.study-week-head h2 {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 500;
+  color: var(--text-bright);
+}
+
+.study-week-head .sw-num {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  margin-right: 6px;
+}
+
+.sw-pct {
+  font-size: 11px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.study-row-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 8px 0 6px;
+}
+
+.study-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
+}
+
+.study-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  border: 1px solid var(--border);
+  background: var(--editor);
+  color: inherit;
+  font: inherit;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+}
+
+.study-tile:hover {
+  border-color: var(--accent);
+  background: var(--list-hover);
+}
+
+.study-tile:focus-visible {
+  outline: var(--focus-ring);
+}
+
+.study-tile-sm {
+  min-width: 0;
+  max-width: 100%;
+  padding: 6px 10px;
+}
+
+.study-tile-lg {
+  min-width: 0;
+  max-width: 100%;
+  padding: 10px 12px;
+  border-left: 3px solid #cda34f;
+}
+
+.study-tile.studied {
+  border-color: rgba(137, 209, 133, 0.55);
+  background: rgba(137, 209, 133, 0.08);
+}
+
+.study-tile .st-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.study-tile .st-status-check {
+  font-weight: 700;
+  color: var(--text-faint);
+  font-size: 11px;
+}
+
+.study-tile.studied .st-status-check {
+  color: #89d185;
+}
+
+.study-tile .st-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  margin: 2px 0;
+}
+
+.study-tile .st-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--text-faint);
+  margin-top: auto;
+}
+
+.st-check { color: #89d185; font-weight: 700; }
+.st-pending { color: var(--text-faint); }
+.st-tasks {
+  color: #cda34f;
+  font-weight: 600;
+}
+
+.st-rel {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: #cca700;
+}
+
+/* Detailed Exercise Cards for Progress & Syllabus */
+.study-exercise-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.study-exercise-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--editor);
+  overflow: hidden;
+  transition: border-color var(--dur) var(--ease);
+}
+
+.study-exercise-card.studied {
+  border-color: rgba(137, 209, 133, 0.55);
+  background: rgba(137, 209, 133, 0.04);
+}
+
+.study-exercise-card .sec-head {
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.15);
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+}
+
+.study-exercise-card .sec-head:hover {
+  background: var(--list-hover);
+}
+
+.sec-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sec-title {
+  margin: 0;
+  font-size: var(--fs-md);
+  font-weight: 500;
+  color: var(--text-bright);
+  flex: 1;
+}
+
+.sec-status-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(110, 118, 129, 0.2);
+  color: var(--text-faint);
+}
+
+.study-exercise-card.studied .sec-status-pill {
+  background: rgba(63, 185, 80, 0.2);
+  color: #56d364;
+}
+
+.sec-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.sec-meta-item {
+  font-variant-numeric: tabular-nums;
+}
+
+.study-task-list {
+  padding: 8px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.study-task-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  font-size: var(--fs-sm);
+}
+
+.sti-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sti-num {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: #cda34f;
+  min-width: 48px;
+  flex-shrink: 0;
+}
+
+.sti-title {
+  flex: 1;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sti-scores {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.score-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+/* ── 5. Milestones & Next Practice ──────────────────────────────── */
+.progress-ex-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.progress-ex-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  text-align: left;
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.progress-ex-row:hover {
+  background: var(--list-hover);
+  border-color: #cda34f;
+}
+
+.progress-ex-row:focus-visible {
+  outline: var(--focus-ring);
+}
+
+.progress-ex-row.opened {
+  opacity: 0.85;
+  border-color: rgba(137, 209, 133, 0.35);
+}
+
+.pex-week {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: #cda34f;
+  font-weight: 600;
+  min-width: 28px;
+}
+
+.pex-title {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--fs-sm);
+  color: var(--text-bright);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pex-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.progress-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 16px 0 10px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 6px;
+}
+
+.progress-milestones {
+  margin-bottom: 20px;
+}
+
+.progress-ms-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.progress-ms {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 72px;
+  padding: 10px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  opacity: 0.45;
+  transition: opacity var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+
+.progress-ms.unlocked {
+  opacity: 1;
+  border-color: #3fb950;
+  background: rgba(63, 185, 80, 0.12);
+  box-shadow: 0 0 0 1px rgba(63, 185, 80, 0.18);
+}
+
+.progress-ms-icon {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-ms.unlocked .progress-ms-icon {
+  color: #56d364;
+}
+
+.progress-ms-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.progress-ms-at {
+  font-size: 9px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}
+
+.progress-foot {
+  margin-top: 28px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-hint {
+  margin: 0;
+  flex: 1;
+  min-width: 200px;
+  font-size: var(--fs-xs);
+  color: var(--text-faint);
+}
+
+.progress-reset {
+  opacity: 0.75;
+}
+
+.progress-reset:hover {
+  opacity: 1;
+}
+
+.print-tier-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}

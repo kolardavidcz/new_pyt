@@ -20,8 +20,21 @@ import sys
 from html.parser import HTMLParser
 from pathlib import Path
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 ROOT = Path(__file__).resolve().parent.parent
-OLD_PRI = ROOT / ".old" / "vyuka_downloaded" / "priklady"
+
+def get_priklady_dir() -> Path:
+    p1 = ROOT / ".old" / "vyuka_downloaded" / "priklady"
+    if p1.exists():
+        return p1
+    p2 = ROOT / "public" / "vyuka_downloaded" / "priklady"
+    if p2.exists():
+        return p2
+    return ROOT / "vyuka_downloaded" / "priklady"
+
+OLD_PRI = get_priklady_dir()
 OUT = ROOT / "data" / "exercises.json"
 
 

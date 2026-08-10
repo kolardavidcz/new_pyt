@@ -69,11 +69,11 @@ Ahoj!
 &gt;&gt;&gt; p.metoda2()
 Traceback (most recent call last):
   File "&lt;pyshell#18&gt;", line 1, in &lt;module&gt;
-    p.metoda2()
+p.metoda2()
   File "&lt;pyshell#10&gt;", line 7, in metoda2
-    raise NotImplementedError()
+raise NotImplementedError()
 NotImplementedError
-    </pre>
+</pre>
     <p>
         <em>Potomek</em> sice podědil po <em>Rodiči</em> dvě metody, ale naimplementoval pouze jednu a my se to nedozvíme, dokud se ji nepokusíme zavolat. To není moc příjemné.
     </p>
@@ -95,11 +95,11 @@ NotImplementedError
 &gt;&gt;&gt; r.metoda1()
 Traceback (most recent call last):
   File "&lt;pyshell#20&gt;", line 1, in &lt;module&gt;
-    r.metoda1()
+r.metoda1()
   File "&lt;pyshell#10&gt;", line 4, in metoda1
-    raise NotImplementedError()
+raise NotImplementedError()
 NotImplementedError
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id4" data-title="Metatřída „ABCMeta“ a dekorátor „@abstractmethod“"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Metatřída „ABCMeta“ a dekorátor „@abstractmethod“</h2></div><div class="section-body">
 
@@ -125,9 +125,9 @@ NotImplementedError
 &gt;&gt;&gt; r = Rodič()
 Traceback (most recent call last):
   File "&lt;pyshell#23&gt;", line 1, in &lt;module&gt;
-    r = Rodič()
+r = Rodič()
 TypeError: Can't instantiate abstract class Rodič with abstract methods metoda1, metoda2
-    </pre>
+</pre>
     <p>
         ..ale dokonce ani potomka, pokud bude v API chybět implementace vyžadovaných metod:
     </p>
@@ -140,9 +140,9 @@ TypeError: Can't instantiate abstract class Rodič with abstract methods metoda1
 &gt;&gt;&gt; p = Potomek()
 Traceback (most recent call last):
   File "&lt;pyshell#25&gt;", line 1, in &lt;module&gt;
-    p = Potomek()
+p = Potomek()
 TypeError: Can't instantiate abstract class Potomek with abstract methods metoda2
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id5" data-title="Kombinace abstraktního a klasických dekorátorů I"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Kombinace abstraktního a klasických dekorátorů I</h2></div><div class="section-body">
 
@@ -155,15 +155,15 @@ TypeError: Can't instantiate abstract class Potomek with abstract methods metoda
             # klasické třídní metody
             @abstractmethod
             def my_abstract_method(self, ...):
-                ...
+...
             @classmethod
             @abstractmethod
             def my_abstract_classmethod(cls, ...):
-                ...
+...
             @staticmethod
             @abstractmethod
             def my_abstract_staticmethod(...):
-                ...
+...
    </pre>
    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Přímo podle dokumentace.
@@ -180,21 +180,21 @@ TypeError: Can't instantiate abstract class Potomek with abstract methods metoda
             # deskriptor klasicky
             @abstractmethod
             def _get_x(self):
-                ...
+...
             @abstractmethod
             def _set_x(self, val):
-                ...
+...
             x = property(_get_x, _set_x)
 
             # deskriptor pomocí dekorátorů
             @property
             @abstractmethod
             def my_abstract_property(self):
-                ...
+...
             @my_abstract_property.setter
             @abstractmethod
             def my_abstract_property(self, val):
-                ...
+...
    </pre>
    <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Přímo podle dokumentace.

@@ -55,6 +55,22 @@
 
   /* ── 1. ULTRA-COMPACT UNIVERSAL PAPER LAYOUT ─────────────────────────── */
   html,
+  html[data-theme="dark"],
+  html[data-theme="light"] {
+    --bg: #ffffff !important;
+    --editor: #ffffff !important;
+    --sidebar: #ffffff !important;
+    --panel: #ffffff !important;
+    --text: #111827 !important;
+    --text-muted: #4b5563 !important;
+    --text-faint: #6b7280 !important;
+    --text-bright: #000000 !important;
+    --border: #cbd5e1 !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  html,
   body,
   #app,
   .workbench,
@@ -187,11 +203,13 @@
   p code, li code, td code, span code, code.inline-code {
     font-family: "JetBrains Mono", Consolas, monospace !important;
     font-size: 9pt !important;
-    color: #991b1b !important;
-    background: #f3f4f6 !important;
-    border: 1px solid #d1d5db !important;
-    padding: 0 4px !important;
-    border-radius: 3px !important;
+    color: #0284c7 !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
   }
 
   /* ── 2. EXTRA-COMPACT CODE BLOCKS ──────────────────────────────────── */
@@ -226,13 +244,48 @@
     margin: 0 !important;
   }
 
+  /* Inline Code Formatting in Print - Blue rgb(2, 132, 199) (#0284c7) (No BG, No Frame) */
+  html code.inline-code,
+  html .inline-code,
+  html[data-theme="dark"] code.inline-code,
+  html[data-theme="light"] code.inline-code,
+  html[data-theme="dark"][data-code-block-color="dark"] code.inline-code,
+  html[data-theme="dark"][data-code-block-color="light"] code.inline-code,
+  html[data-theme="light"][data-code-block-color="dark"] code.inline-code,
+  html[data-theme="light"][data-code-block-color="light"] code.inline-code,
+  html[data-theme="dark"] p code,
+  html[data-theme="light"] p code,
+  html[data-theme="dark"] li code,
+  html[data-theme="light"] li code,
+  html[data-theme="dark"] td code,
+  html[data-theme="light"] td code,
+  code.inline-code,
+  .inline-code,
+  .fill-hint-pill code,
+  .draggable-chip code,
+  .quiz-q-card p code,
+  .quiz-q-card li code,
+  p code,
+  li code {
+    font-family: "JetBrains Mono", Consolas, monospace !important;
+    font-size: 8.5pt !important;
+    color: #0284c7 !important; /* Signature Blue rgb(2, 132, 199) on light paper */
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   /* Code Block Theme in Print - matches user preference data-code-block-color */
-  /* Default & Dark Code Block Theme */
+  /* Default & Dark Code Block Theme (Light paper + Dark Code Box) */
   pre, pre.code-block, .code-block, [class*="code-block"], [class*="lang-"], .syntaxhighlighter,
-  .quiz-terminal-wrap,
   html[data-code-block-color="dark"] pre,
   html[data-code-block-color="dark"] .code-block,
-  html[data-code-block-color="dark"] .quiz-terminal-wrap {
+  .quiz-code-wrap pre {
     background: #1e1e1e !important;
     border: 1px solid #333333 !important;
     color: #d4d4d4 !important;
@@ -240,35 +293,66 @@
     print-color-adjust: exact !important;
   }
 
-  pre *, .code-block *, [class*="code-block"] *, [class*="lang-"] *, .quiz-terminal-wrap * {
+  pre code, .code-block code, [class*="code-block"] code, [class*="lang-"] code, .quiz-code-wrap pre code {
+    background: transparent !important;
+    color: #d4d4d4 !important;
+    border: none !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  pre *, .code-block *, [class*="code-block"] *, [class*="lang-"] *, .quiz-code-wrap pre * {
     background: transparent !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  .tok-comment, .comments { color: #6a9955 !important; font-style: italic !important; }
-  .tok-string, .string { color: #ce9178 !important; }
-  .tok-keyword, .keyword { color: #569cd6 !important; font-weight: 600 !important; }
-  .tok-builtin, .tok-number, .number { color: #b5cea8 !important; }
-  .tok-function, .functions { color: #dcdcaa !important; }
+  /* Dark Code Block Syntax Tokens (Light text on #1e1e1e dark background) - High Specificity */
+  pre .tok-comment, .code-block .tok-comment, html[data-theme="light"] pre .tok-comment { color: #6a9955 !important; font-style: italic !important; }
+  pre .tok-string, .code-block .tok-string, html[data-theme="light"] pre .tok-string { color: #ce9178 !important; }
+  pre .tok-keyword, .code-block .tok-keyword, html[data-theme="light"] pre .tok-keyword { color: #569cd6 !important; font-weight: 600 !important; }
+  pre .tok-builtin, .code-block .tok-builtin, html[data-theme="light"] pre .tok-builtin,
+  pre .tok-number, .code-block .tok-number, html[data-theme="light"] pre .tok-number { color: #b5cea8 !important; font-weight: 600 !important; }
+  pre .tok-function, .code-block .tok-function, html[data-theme="light"] pre .tok-function { color: #dcdcaa !important; }
+  pre .tok-operator, .code-block .tok-operator, html[data-theme="light"] pre .tok-operator, .quiz-code-wrap pre .tok-operator, .quiz-code-wrap pre * { color: #d4d4d4 !important; }
+  pre .term-prompt, .code-block .term-prompt, html[data-theme="light"] pre .term-prompt { color: #38bdf8 !important; font-weight: bold !important; }
+  pre .tok-term-output, .code-block .tok-term-output, html[data-theme="light"] pre .tok-term-output { color: #cccccc !important; font-weight: normal !important; }
 
-  /* Light Code Block Theme */
+  /* Light Code Block Theme (Light paper + Light Code Box - ONLY when data-code-block-color="light") */
   html[data-code-block-color="light"] pre,
   html[data-code-block-color="light"] .code-block,
-  html[data-code-block-color="light"] .quiz-terminal-wrap {
+  html[data-code-block-color="light"] .quiz-code-wrap pre {
     background: #f8f9fa !important;
-    border: 1px solid #d1d5db !important;
+    border: 1px solid #cbd5e1 !important;
     color: #1f2937 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  html[data-code-block-color="light"] .tok-comment { color: #008000 !important; }
-  html[data-code-block-color="light"] .tok-string { color: #a31515 !important; }
-  html[data-code-block-color="light"] .tok-keyword { color: #0000ff !important; font-weight: 600 !important; }
-  html[data-code-block-color="light"] .tok-builtin,
-  html[data-code-block-color="light"] .tok-number { color: #098658 !important; }
-  html[data-code-block-color="light"] .tok-function { color: #795e26 !important; }
+  html[data-code-block-color="light"] pre code,
+  html[data-code-block-color="light"] .code-block code,
+  html[data-code-block-color="light"] .quiz-code-wrap pre code {
+    background: transparent !important;
+    color: #1f2937 !important;
+    border: none !important;
+  }
+
+  html[data-code-block-color="light"] pre *,
+  html[data-code-block-color="light"] .code-block *,
+  html[data-code-block-color="light"] .quiz-code-wrap pre * {
+    color: #1f2937;
+  }
+
+  html[data-code-block-color="light"] pre .tok-comment, html[data-code-block-color="light"] .code-block .tok-comment { color: #008000 !important; font-style: italic !important; }
+  html[data-code-block-color="light"] pre .tok-string, html[data-code-block-color="light"] .code-block .tok-string { color: #b45309 !important; }
+  html[data-code-block-color="light"] pre .tok-keyword, html[data-code-block-color="light"] .code-block .tok-keyword { color: #0000ff !important; font-weight: 600 !important; }
+  html[data-code-block-color="light"] pre .tok-builtin, html[data-code-block-color="light"] .code-block .tok-builtin,
+  html[data-code-block-color="light"] pre .tok-number, html[data-code-block-color="light"] .code-block .tok-number { color: #098658 !important; }
+  html[data-code-block-color="light"] pre .tok-function, html[data-code-block-color="light"] .code-block .tok-function { color: #795e26 !important; }
+  html[data-code-block-color="light"] pre .tok-operator, html[data-code-block-color="light"] .code-block .tok-operator { color: #1f2937 !important; }
+  html[data-code-block-color="light"] pre .term-prompt, html[data-code-block-color="light"] .code-block .term-prompt { color: #0284c7 !important; font-weight: bold !important; }
+  html[data-code-block-color="light"] pre .tok-term-output, html[data-code-block-color="light"] .code-block .tok-term-output { color: #111827 !important; font-weight: normal !important; }
 
   /* ── 3. EXTRA-CLEAN QUIZ PRINT LAYOUT ────────────────────────────── */
   html[data-print-quizzes="false"] .quiz-section-card {
@@ -280,7 +364,7 @@
     page-break-before: always !important;
     clear: both !important;
     float: none !important;
-    margin-top: 0 !important;
+    margin-top: 20px !important;
     padding: 10px 0 !important;
     border: none !important;
     background: transparent !important;
@@ -288,12 +372,35 @@
     color: #111827 !important;
   }
 
+  .quiz-section-card.compact-lecture-quiz {
+    break-before: auto !important;
+    page-break-before: auto !important;
+  }
+
   .quiz-card-header {
+    display: block !important;
+    width: 100% !important;
     border-bottom: 1.5px solid #cbd5e1 !important;
     margin-bottom: 12px !important;
     padding-bottom: 6px !important;
     page-break-after: avoid !important;
     break-after: avoid !important;
+  }
+
+  .quiz-header-row {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .quiz-header-row > div {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .quiz-stats-box {
+    display: block !important;
+    float: right !important;
+    margin-top: -24px !important;
   }
 
   .quiz-badge {
@@ -303,6 +410,7 @@
     font-weight: 700 !important;
     padding: 2px 6px !important;
     border-radius: 3px !important;
+    display: inline-block !important;
   }
 
   .quiz-title {
@@ -379,6 +487,45 @@
     color: #0284c7 !important;
   }
 
+  /* High contrast token colors for quiz questions, options, and upside-down answer keys in print */
+  .quiz-q-card .tok-builtin,
+  .quiz-opt-btn .tok-builtin,
+  .quiz-answer-key-upsidedown .tok-builtin {
+    color: #047857 !important;
+    font-weight: 600 !important;
+  }
+
+  .quiz-q-card .tok-keyword,
+  .quiz-opt-btn .tok-keyword,
+  .quiz-answer-key-upsidedown .tok-keyword {
+    color: #1d4ed8 !important;
+    font-weight: 600 !important;
+  }
+
+  .quiz-q-card .tok-string,
+  .quiz-opt-btn .tok-string,
+  .quiz-answer-key-upsidedown .tok-string {
+    color: #b45309 !important;
+  }
+
+  .quiz-q-card .tok-number,
+  .quiz-opt-btn .tok-number,
+  .quiz-answer-key-upsidedown .tok-number {
+    color: #047857 !important;
+  }
+
+  .quiz-q-card .tok-function,
+  .quiz-opt-btn .tok-function,
+  .quiz-answer-key-upsidedown .tok-function {
+    color: #795e26 !important;
+  }
+
+  .quiz-q-card .tok-operator,
+  .quiz-opt-btn .tok-operator,
+  .quiz-answer-key-upsidedown .tok-operator {
+    color: #0f172a !important;
+  }
+
   /* Reset user typed input in code_fill to default ________ in print view */
   .filled-blank {
     font-size: 0 !important;
@@ -425,6 +572,17 @@
   }
   .quiz-answer-key-upsidedown li {
     margin-bottom: 3px !important;
+  }
+  .quiz-answer-key-upsidedown code,
+  .quiz-answer-key-upsidedown code.inline-code {
+    display: inline-block !important;
+    background: transparent !important;
+    color: #0284c7 !important;
+    border: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 8pt !important;
   }
 
   /* Printable Progress Report */

@@ -180,30 +180,30 @@
         Sdílenou funkci musíte tedy samozřejmě zavolat se správnými typy parametrů. To můžete zařídit buď jejich explicitním přetypováním při každém volání nebo lépe vyjmenováním příslušných typů v seznamu atributu <strong><code>argtypes</code></strong>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; from ctypes import CDLL, c_char_p, c_int, c_double
-        &gt;&gt;&gt; libc = CDLL('libc.so.6')
-        &gt;&gt;&gt; printf = libc.printf
+&gt;&gt;&gt; from ctypes import CDLL, c_char_p, c_int, c_double
+&gt;&gt;&gt; libc = CDLL('libc.so.6')
+&gt;&gt;&gt; printf = libc.printf
         
         # a) explicitní přetypování
-        &gt;&gt;&gt; printf(b"String '%s', Int %d, Double %f\n", b"Hi", 10, c_double(2.2))
+&gt;&gt;&gt; printf(b"String '%s', Int %d, Double %f\n", b"Hi", 10, c_double(2.2))
         String 'Hi', Int 10, Double 2.200000
         37
 
         # b) označení typů „dopředu“
-        &gt;&gt;&gt; printf.argtypes = [c_char_p, c_char_p, c_int, c_double]
-        &gt;&gt;&gt; printf(b"String '%s', Int %d, Double %f\n", b"Hi", 10, 2.2)
+&gt;&gt;&gt; printf.argtypes = [c_char_p, c_char_p, c_int, c_double]
+&gt;&gt;&gt; printf(b"String '%s', Int %d, Double %f\n", b"Hi", 10, 2.2)
         String 'Hi', Int 10, Double 2.200000
         37
-    </pre>
+</pre>
     <p>
         Uvedený způsob volání vás pak zachrání při pokusu předat špatné typy:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; printf(b"%d %d %d", 1, 2, 3)
+&gt;&gt;&gt; printf(b"%d %d %d", 1, 2, 3)
         Traceback (most recent call last):
           File "&lt;stdin&gt;", line 1, in &lt;module&gt;
         ctypes.ArgumentError: argument 2: &lt;class 'TypeError'&gt;: wrong type
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Bez invence podle dokumentace.
     </div></div>
@@ -214,26 +214,26 @@
         Práci s parametry si můžete na jednu stranu zesložitit, ale na druhu také zpřehlednit, použitím tříd s atributem <strong><code>_as_parameter_</code></strong> (ať už <a href="/materialy/python/objects/descriptors.xml?slajd=7">datovým nebo ne</a>). Modul <em>ctypes</em> se totiž po tomto parametru bude koukat, použijete-li při volání instanci takové třídy:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; import ctypes
-        &gt;&gt;&gt; libc = ctypes.CDLL('libc.so.6')
-        &gt;&gt;&gt; libc
+&gt;&gt;&gt; import ctypes
+&gt;&gt;&gt; libc = ctypes.CDLL('libc.so.6')
+&gt;&gt;&gt; libc
         &lt;CDLL 'libc.so.6', handle 7f45598819b0 at 7f45596b09e8&gt;
-        &gt;&gt;&gt; printf = libc.printf
-        &gt;&gt;&gt; printf
+&gt;&gt;&gt; printf = libc.printf
+&gt;&gt;&gt; printf
         &lt;_FuncPtr object at 0x7f45596c6048&gt;
         
-        &gt;&gt;&gt; class Bottles():
-        ...     def __init__(self, number):
-        ...         self._as_parameter_ = number
-        ... 
-        &gt;&gt;&gt; bottles = Bottles(42)
+&gt;&gt;&gt; class Bottles():
+...     def __init__(self, number):
+...         self._as_parameter_ = number
+... 
+&gt;&gt;&gt; bottles = Bottles(42)
         
-        &gt;&gt;&gt; printf(b"%d bottles of beer\n", bottles)
+&gt;&gt;&gt; printf(b"%d bottles of beer\n", bottles)
         42 bottles of beer
         19
-        &gt;&gt;&gt; o = printf(b"%d bottles of beer\n", bottles)
+&gt;&gt;&gt; o = printf(b"%d bottles of beer\n", bottles)
         42 bottles of beer
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Bez invence přímo podle dokumentace.
     </div></div>
@@ -247,25 +247,25 @@
         Chcete-li podobným způsobem použít vlastní třídy uvnitř seznamů pro atribut <em>argtypes</em>, musíte na nich nadefinovat metodu <strong><code>from_param()</code></strong>, která se postará o ověření správnosti typu a vrácení příslušné návratové hodnoty (klidně opět v podobě atributu objektu <code>_as_parameter_</code>):
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; import ctypes
-        &gt;&gt;&gt; libc = ctypes.CDLL('libc.so.6')
-        &gt;&gt;&gt; printf = libc.printf
+&gt;&gt;&gt; import ctypes
+&gt;&gt;&gt; libc = ctypes.CDLL('libc.so.6')
+&gt;&gt;&gt; printf = libc.printf
 
-        &gt;&gt;&gt; class Bottles():
-        ...     def __init__(self, number):
-        ...         self.number = number
-        ...     @classmethod
-        ...     def from_param(cls, obj):
-        ...         print(obj)  # instance `bottles`
-        ...         return obj.number
-        ... 
-        &gt;&gt;&gt; printf.argtypes = [ctypes.c_char_p, Bottles]
-        &gt;&gt;&gt; bottles = Bottles(42)
+&gt;&gt;&gt; class Bottles():
+...     def __init__(self, number):
+...         self.number = number
+...     @classmethod
+...     def from_param(cls, obj):
+...         print(obj)  # instance `bottles`
+...         return obj.number
+... 
+&gt;&gt;&gt; printf.argtypes = [ctypes.c_char_p, Bottles]
+&gt;&gt;&gt; bottles = Bottles(42)
 
-        &gt;&gt;&gt; printf(b"%d bottles of beer\n", bottles)
+&gt;&gt;&gt; printf(b"%d bottles of beer\n", bottles)
         42 bottles of beer
         19
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Za pomoci <a href="http://www.chriskrycho.com/2015/ctypes-structures-and-dll-exports.html" class="external">Python Enums, ctypes.Structures, and DLL exports</a>.
     </div></div>
@@ -279,15 +279,15 @@
         Podobně se ve výchozím nastavení od sdílených funkcí čeká, že spořádaně vrátí Céčkovské celé číslo (<em>int</em>). Není-li tomu tak, musíte správný typ nastavit pomocí atributu <strong><code>restype</code></strong>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; from ctypes import CDLL, c_char, c_char_p, c_int, c_double
-        &gt;&gt;&gt; libc = CDLL('libc.so.6')
-        &gt;&gt;&gt; strchr = libc.strchr
+&gt;&gt;&gt; from ctypes import CDLL, c_char, c_char_p, c_int, c_double
+&gt;&gt;&gt; libc = CDLL('libc.so.6')
+&gt;&gt;&gt; strchr = libc.strchr
         
-        &gt;&gt;&gt; strchr.argtypes = [c_char_p, c_char]
-        &gt;&gt;&gt; strchr.restype = c_char_p
-        &gt;&gt;&gt; strchr(b"abcdef", b"d")
+&gt;&gt;&gt; strchr.argtypes = [c_char_p, c_char]
+&gt;&gt;&gt; strchr.restype = c_char_p
+&gt;&gt;&gt; strchr(b"abcdef", b"d")
         b'def'
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Bez invence podle dokumentace.
     </div></div>

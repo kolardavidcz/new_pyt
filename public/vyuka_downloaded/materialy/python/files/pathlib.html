@@ -35,70 +35,70 @@
         Než se na modul <em>pathlib</em> podíváme pořádně, ukažme si pár jednoduchých příkladů. Nejdříve základní manipulaci s cestou:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; from pathlib import Path
+&gt;&gt;&gt; from pathlib import Path
 
         # bez udání cesty jsme v akutálním adresáři '.'
-        &gt;&gt;&gt; p0 = Path()
-        &gt;&gt;&gt; p0
+&gt;&gt;&gt; p0 = Path()
+&gt;&gt;&gt; p0
         PosixPath('.')
-        &gt;&gt;&gt; p0.resolve()
+&gt;&gt;&gt; p0.resolve()
         PosixPath('/tmp')
 
         # cesty se (ne)překvapivě spojují lomítky
-        &gt;&gt;&gt; p1 = p0 / 'cesta'
-        &gt;&gt;&gt; p1
+&gt;&gt;&gt; p1 = p0 / 'cesta'
+&gt;&gt;&gt; p1
         PosixPath('cesta')
-        &gt;&gt;&gt; p1.resolve()
+&gt;&gt;&gt; p1.resolve()
         PosixPath('/tmp/cesta')
 
         # přičemž stačí, aby typu „Path“ byl pouze pravý operand
-        &gt;&gt;&gt; p2 = '..' / p0
-        &gt;&gt;&gt; p2
+&gt;&gt;&gt; p2 = '..' / p0
+&gt;&gt;&gt; p2
         PosixPath('..')
-        &gt;&gt;&gt; p2.resolve()
+&gt;&gt;&gt; p2.resolve()
         PosixPath('/')
 
         # k dispozici máme užitečné funkce
-        &gt;&gt;&gt; Path().home()
+&gt;&gt;&gt; Path().home()
         PosixPath('/home/pirat')
-    </pre>
+</pre>
     <p>
         A teď ještě pár operací s odkazem na soubor:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # soubor má nějaké vlastnosti
-        &gt;&gt;&gt; p = Path().cwd() / 'pokus.txt'
-        &gt;&gt;&gt; p
+&gt;&gt;&gt; p = Path().cwd() / 'pokus.txt'
+&gt;&gt;&gt; p
         PosixPath('/tmp/pokus.txt')
-        &gt;&gt;&gt; p.parts
+&gt;&gt;&gt; p.parts
         ('/', 'tmp', 'pokus.txt')
-        &gt;&gt;&gt; p.parent
+&gt;&gt;&gt; p.parent
         PosixPath('/tmp')
 
         # souboru přímo vidíme na „vnitřnosti“ (od Python'u 3.5)..
-        &gt;&gt;&gt; p.write_text('příliš žluťoučký kůň', encoding='utf-8')
+&gt;&gt;&gt; p.write_text('příliš žluťoučký kůň', encoding='utf-8')
         20
-        &gt;&gt;&gt; p.read_bytes()
+&gt;&gt;&gt; p.read_bytes()
         b'p\xc5\x99\xc3\xadli\xc5\xa1 \xc5\xbelu\xc5\xa5ou\xc4\x8dk\xc3\xbd k\xc5\xaf\xc5\x88'
 
         # ..a můžeme s ním i celkem libovolně nakládat
-        &gt;&gt;&gt; t = Path('tmp.txt')
-        &gt;&gt;&gt; t
+&gt;&gt;&gt; t = Path('tmp.txt')
+&gt;&gt;&gt; t
         PosixPath('tmp.txt')
-        &gt;&gt;&gt; t.resolve()
+&gt;&gt;&gt; t.resolve()
         PosixPath('/tmp/tmp.txt')
-        &gt;&gt;&gt; p.rename(t)
-        &gt;&gt;&gt; p
+&gt;&gt;&gt; p.rename(t)
+&gt;&gt;&gt; p
         PosixPath('/tmp/pokus.txt')
-        &gt;&gt;&gt; p.exists()
+&gt;&gt;&gt; p.exists()
         False
-        &gt;&gt;&gt; t
+&gt;&gt;&gt; t
         PosixPath('tmp.txt')
-        &gt;&gt;&gt; t.exists()
+&gt;&gt;&gt; t.exists()
         True
-        &gt;&gt;&gt; t.read_text(encoding='utf-8')
+&gt;&gt;&gt; t.read_text(encoding='utf-8')
         'příliš žluťoučký kůň'
-    </pre>
+</pre>
     <p>
         Ne všechny operace jsou asi úplně průhledné, ale když nic jiného, tak se všechny odehrávají na jednom jediném objektu a ne pomocí armády funkcí v modulu <em>os</em>.
     </p>
@@ -148,29 +148,29 @@
         <li>
             přímým zadáním
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; p = PurePath('/tmp/pokus/tmp.tar.gz')
-                &gt;&gt;&gt; p
+&gt;&gt;&gt; p = PurePath('/tmp/pokus/tmp.tar.gz')
+&gt;&gt;&gt; p
                 PurePosixPath('/tmp/pokus/tmp.tar.gz')
             </pre>
         </li>
         <li>
             pomocí operátoru <code>/</code>, například
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; p = PurePath('/tmp') / 'pokus' / PurePath('tmp.tar.gz')
-                &gt;&gt;&gt; p
+&gt;&gt;&gt; p = PurePath('/tmp') / 'pokus' / PurePath('tmp.tar.gz')
+&gt;&gt;&gt; p
                 PurePosixPath('/tmp/pokus/tmp.tar.gz')
 
                 # Ale pozor!
-                &gt;&gt;&gt; p = PurePath('/tmp') / '/pokus' / PurePath('tmp.tar.gz')
-                &gt;&gt;&gt; p
+&gt;&gt;&gt; p = PurePath('/tmp') / '/pokus' / PurePath('tmp.tar.gz')
+&gt;&gt;&gt; p
                 PurePosixPath('/pokus/tmp.tar.gz')
             </pre>
         </li>
         <li>
             vypsáním (libovolných) jednotlivých částí
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; p = PurePath('/tmp', 'pokus/tmp.tar.gz')
-                &gt;&gt;&gt; p
+&gt;&gt;&gt; p = PurePath('/tmp', 'pokus/tmp.tar.gz')
+&gt;&gt;&gt; p
                 PurePosixPath('/tmp/pokus/tmp.tar.gz')
             </pre>
         </li>
@@ -178,13 +178,13 @@
             složením částí pomocí dedikované funkce
             <pre class="brush: python; gutter: false; toolbar: false; ">
                 # jako řetězce
-                &gt;&gt;&gt; p = PurePath('/tmp').joinpath('pokus', 'tmp.tar.gz')
-                &gt;&gt;&gt; p
+&gt;&gt;&gt; p = PurePath('/tmp').joinpath('pokus', 'tmp.tar.gz')
+&gt;&gt;&gt; p
                 PurePosixPath('/tmp/pokus/tmp.tar.gz')
 
                 # ale i jako objekty „pathlib“
-                &gt;&gt;&gt; p = PurePath('/tmp').joinpath('pokus', PurePath('tmp.tar.gz'))
-                &gt;&gt;&gt; p
+&gt;&gt;&gt; p = PurePath('/tmp').joinpath('pokus', PurePath('tmp.tar.gz'))
+&gt;&gt;&gt; p
                 PurePosixPath('/tmp/pokus/tmp.tar.gz')
             </pre>
         </li>
@@ -199,41 +199,41 @@
         <li>
             jednotlivé části cesty
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; p.parts
+&gt;&gt;&gt; p.parts
                 ('/', 'tmp', 'pokus', 'tmp.tar.gz')
             </pre>
         </li>
         <li>
             informace o kořeni (liší se u Windows a Linuxu)
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; p.drive
+&gt;&gt;&gt; p.drive
                 ''
-                &gt;&gt;&gt; p.anchor
+&gt;&gt;&gt; p.anchor
                 '/'
-                &gt;&gt;&gt; p.root
+&gt;&gt;&gt; p.root
                 '/'
             </pre>
         </li>
         <li>
             nadřazené části cesty
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; p.parent
+&gt;&gt;&gt; p.parent
                 PurePosixPath('/tmp/pokus')
 
-                &gt;&gt;&gt; list(p.parents)
+&gt;&gt;&gt; list(p.parents)
                 [PurePosixPath('/tmp/pokus'), PurePosixPath('/tmp'), PurePosixPath('/')]
             </pre>
         </li>
         <li>
             informace o jméně souboru
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; p.name
+&gt;&gt;&gt; p.name
                 'tmp.tar.gz'
-                &gt;&gt;&gt; p.stem
+&gt;&gt;&gt; p.stem
                 'tmp.tar'
-                &gt;&gt;&gt; p.suffix
+&gt;&gt;&gt; p.suffix
                 '.gz'
-                &gt;&gt;&gt; p.suffixes
+&gt;&gt;&gt; p.suffixes
                 ['.tar', '.gz']
             </pre>
         </li>
@@ -242,26 +242,26 @@
 </div></section><section class="slide-section" id="id7" data-title="Řetězcová reprezentace cesty"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">Řetězcová reprezentace cesty</h2></div><div class="section-body">
 
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; p = PurePath('/tmp/pokus/tmp.tar.gz')
+&gt;&gt;&gt; p = PurePath('/tmp/pokus/tmp.tar.gz')
 
-        &gt;&gt;&gt; p.as_posix()
+&gt;&gt;&gt; p.as_posix()
         '/tmp/pokus/tmp.tar.gz'
         
-        &gt;&gt;&gt; p.as_uri()
+&gt;&gt;&gt; p.as_uri()
         'file:///tmp/pokus/tmp.tar.gz'
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id8" data-title="Relativní cesta"><div class="section-header"><span class="section-num">8</span><h2 class="section-title">Relativní cesta</h2></div><div class="section-body">
 
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; p = PurePath('/tmp/pokus/tmp.tar.gz')
+&gt;&gt;&gt; p = PurePath('/tmp/pokus/tmp.tar.gz')
 
-        &gt;&gt;&gt; p.relative_to('/tmp')
+&gt;&gt;&gt; p.relative_to('/tmp')
         PurePosixPath('pokus/tmp.tar.gz')
 
-        &gt;&gt;&gt; p.relative_to( PurePath('/tmp') )
+&gt;&gt;&gt; p.relative_to( PurePath('/tmp') )
         PurePosixPath('pokus/tmp.tar.gz')
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id9" data-title="Filtrování cest – „match()“"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Filtrování cest – „match()“</h2></div><div class="section-body">
 
@@ -269,15 +269,15 @@
         Test proti <a href="?slajd=19"><em>glob</em>-vzoru</a>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; p = PurePath('/tmp/pokus/tmp.tar.gz')
+&gt;&gt;&gt; p = PurePath('/tmp/pokus/tmp.tar.gz')
 
-        &gt;&gt;&gt; p.match('*.gz')
+&gt;&gt;&gt; p.match('*.gz')
         True
-        &gt;&gt;&gt; p.match('tmp/*.gz')
+&gt;&gt;&gt; p.match('tmp/*.gz')
         False
-        &gt;&gt;&gt; p.match('pokus/*.gz')
+&gt;&gt;&gt; p.match('pokus/*.gz')
         True
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id10" data-title="Test absolutnosti (a rezervace)"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Test absolutnosti (a rezervace)</h2></div><div class="section-body">
 
@@ -285,12 +285,12 @@
         Pokud má cesta <em>root</em> a v případě Windows i <em>drive</em>, je pokládána za absolutní:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; PurePath('/tmp/pokus/tmp.tar.gz').is_absolute()
+&gt;&gt;&gt; PurePath('/tmp/pokus/tmp.tar.gz').is_absolute()
         True
 
-        &gt;&gt;&gt; PurePath('pokus/tmp.tar.gz').is_absolute()
+&gt;&gt;&gt; PurePath('pokus/tmp.tar.gz').is_absolute()
         False
-    </pre>
+</pre>
     <p>
         PS: Na Windows mohou také existovat tzv. <em>rezervované cesty</em>, operace s nimiž jsou zcela nedefinované a plné vedlejších efektů. O nich se dozvíte pomocí metody <em>is_reserved()</em>.
     </p>
@@ -301,16 +301,16 @@
         Následující operace vyrobí na základě existující cesty cestu s novou příponou či jménem:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; p = PurePath('/tmp/pokus/tmp.tar.gz')
+&gt;&gt;&gt; p = PurePath('/tmp/pokus/tmp.tar.gz')
 
         # změna přípony
-        &gt;&gt;&gt; p.with_suffix('.bz2')
+&gt;&gt;&gt; p.with_suffix('.bz2')
         PurePosixPath('/tmp/pokus/tmp.tar.bz2')
 
         # změna jména
-        &gt;&gt;&gt; p.with_name('tmp.tgz')
+&gt;&gt;&gt; p.with_name('tmp.tgz')
         PurePosixPath('/tmp/pokus/tmp.tgz')
-    </pre>
+</pre>
     <p>
         PS: Pokud zadaná cesta nemá jméno (tedy atribut <em>name</em> je prázdný řetězec), obdržíte výjimku <em>ValueError</em>.
     </p>
@@ -333,12 +333,12 @@
         Vytvoření konkrétní cesty je úplně stejné jako <a href="?slajd=5">vytvoření abstraktní cesty</a>, jen nejpoužívanějším konstruktorem (a nejpoužívanějším prvkem celého modulu <em>pathlib</em> vůbec) je nyní třída <strong><em>Path</em></strong>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; from pathlib import Path
+&gt;&gt;&gt; from pathlib import Path
 
-        &gt;&gt;&gt; p = Path('/tmp/pokus') / 'tmp.txt'
-        &gt;&gt;&gt; p
+&gt;&gt;&gt; p = Path('/tmp/pokus') / 'tmp.txt'
+&gt;&gt;&gt; p
         PosixPath('/tmp/pokus/tmp.txt')
-    </pre>
+</pre>
     <p>
         Všechny ostatní možné způsoby vytvoření cesty fungují samozřejmě také.
     </p>
@@ -352,14 +352,14 @@
         <li>
             aktuální pracovní adresář
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; Path().cwd()
+&gt;&gt;&gt; Path().cwd()
                 PosixPath('/tmp')
             </pre>
         </li>
         <li>
             uživatelův domovský adresář
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; Path().home()
+&gt;&gt;&gt; Path().home()
                 PosixPath('/home/pirat')
             </pre>
         </li>
@@ -378,25 +378,25 @@
         <li>
             <strong><em>expanduser()</em></strong> – náhrada zkratky domovského adresáře <code>~</code> za celou cestu
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; p = Path('~/tmp')
-                &gt;&gt;&gt; p
+&gt;&gt;&gt; p = Path('~/tmp')
+&gt;&gt;&gt; p
                 PosixPath('~/tmp')
 
-                &gt;&gt;&gt; p.expanduser()
+&gt;&gt;&gt; p.expanduser()
                 PosixPath('/home/pirat/tmp')
             </pre>
         </li>
         <li>
             <strong><em>resolve()</em></strong> – převod cesty na kanonickou (včetně náhrady symlinků a eliminace <code>'..'</code>)
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; Path().cwd()
+&gt;&gt;&gt; Path().cwd()
                 PosixPath('/tmp')
 
-                &gt;&gt;&gt; p = Path('./pokus/..')
-                &gt;&gt;&gt; p
+&gt;&gt;&gt; p = Path('./pokus/..')
+&gt;&gt;&gt; p
                 PosixPath('pokus/..')
 
-                &gt;&gt;&gt; p.resolve()
+&gt;&gt;&gt; p.resolve()
                 PosixPath('/tmp')
             </pre>
             <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
@@ -406,11 +406,11 @@
         <li>
             <strong><em>absolute()</em></strong> – převod cesty na absolutní (ovšem s ponecháním <code>'.'</code> a <code>'..'</code>!)
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; p = Path('./pokus/..')
-                &gt;&gt;&gt; p
+&gt;&gt;&gt; p = Path('./pokus/..')
+&gt;&gt;&gt; p
                 PosixPath('pokus/..')
 
-                &gt;&gt;&gt; p.absolute()
+&gt;&gt;&gt; p.absolute()
                 PosixPath('/tmp/pokus/..')
             </pre>
             <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
@@ -427,23 +427,23 @@
         Existence, vlastníci, časové značky a další vlastnosti:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; p = Path('/tmp/pokus/tmp.txt')
-        &gt;&gt;&gt; p
+&gt;&gt;&gt; p = Path('/tmp/pokus/tmp.txt')
+&gt;&gt;&gt; p
         PosixPath('/tmp/pokus/tmp.txt')
 
         # Existuje vůbec cesta?
-        &gt;&gt;&gt; p.exists()
+&gt;&gt;&gt; p.exists()
         True
 
         # vlastník a skupina
-        &gt;&gt;&gt; p.owner()
+&gt;&gt;&gt; p.owner()
         'pirat'
-        &gt;&gt;&gt; p.group()
+&gt;&gt;&gt; p.group()
         'pirat'
 
         # vlastnosti cesty (pro symlink použijte metodu „lstat()“)
         # PS: výstup úmyslně zalámán a okomentován
-        &gt;&gt;&gt; p.stat()
+&gt;&gt;&gt; p.stat()
         os.stat_result(
             # práva inode'u
             st_mode=33188,
@@ -460,11 +460,11 @@
         )
 
         # Jedná se o stejnou cestu? (lze zadat různě, třebas i řetězcem)
-        &gt;&gt;&gt; Path('pokus/tmp.txt')
+&gt;&gt;&gt; Path('pokus/tmp.txt')
         PosixPath('pokus/tmp.txt')
-        &gt;&gt;&gt; p.samefile( Path('pokus/tmp.txt') )
+&gt;&gt;&gt; p.samefile( Path('pokus/tmp.txt') )
         True
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id17" data-title="Modul „stat“ – jak číst výstup metody „Path.stat()“"><div class="section-header"><span class="section-num">17</span><h2 class="section-title">Modul „stat“ – jak číst výstup metody „Path.stat()“</h2></div><div class="section-body">
 
@@ -475,16 +475,16 @@
         <li>
             <code>st_mode</code> – přístupová práva k příslušnému <em>inode</em>u jako číslo; pokud preferujete spíše řetězec, je na to v modulu <a href="https://docs.python.org/3/library/stat.html" class="external"><code>stat</code></a> šikovná funkce jménem <code>filemode()</code>:
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; from stat import filemode
-                &gt;&gt;&gt; filemode(33188)
+&gt;&gt;&gt; from stat import filemode
+&gt;&gt;&gt; filemode(33188)
                 '-rw-r--r--'
             </pre>
         </li>
         <li>
             <code>st_atime</code>, <code>st_mtime</code>, <code>st_ctime</code> – popořadě čas posledního přístupu k souboru (<em><b>a</b>ccess</em>), jeho poslední modifikace (<em><b>m</b>odification</em>) a čas poslední změny metadat či vytvoření souboru (<em><b>c</b>reation</em>; konkértní význam je tedy závislý na platformě) v sekundách od <a href="/materialy/python/modules/times+dates.xml?slajd=2">začátku (unixové) epochy</a>:
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; from datetime import datetime
-                &gt;&gt;&gt; datetime.fromtimestamp(1520868343)
+&gt;&gt;&gt; from datetime import datetime
+&gt;&gt;&gt; datetime.fromtimestamp(1520868343)
                 datetime.datetime(2018, 3, 12, 16, 25, 43)
             </pre>
         </li>
@@ -504,15 +504,15 @@
         <li>
             Dotazy na adresáře, soubory a symbolické odkazy:
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; Path('pokus').is_dir()
+&gt;&gt;&gt; Path('pokus').is_dir()
                 True
 
-                &gt;&gt;&gt; Path('tmp.txt').is_dir()
+&gt;&gt;&gt; Path('tmp.txt').is_dir()
                 False
-                &gt;&gt;&gt; Path('tmp.txt').is_file()
+&gt;&gt;&gt; Path('tmp.txt').is_file()
                 True
 
-                &gt;&gt;&gt; Path('tmp.tar.gz').is_symlink()
+&gt;&gt;&gt; Path('tmp.tar.gz').is_symlink()
                 True
             </pre>
         </li>
@@ -528,30 +528,30 @@
         Získání seznamu podcest aktuální cesty (tedy typicky podadresářů, souborů a symbolických odkazů v daném adresáři) zařizuje generátor <strong><em>iterdir()</em></strong>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; p = Path('pokus')
+&gt;&gt;&gt; p = Path('pokus')
 
-        &gt;&gt;&gt; p.iterdir()
+&gt;&gt;&gt; p.iterdir()
         &lt;generator object Path.iterdir at 0x7f6ea0eee468&gt;
 
         # nazvdory tomu, že se výpis tváří jako řetězce..
-        &gt;&gt;&gt; for i in p.iterdir():
-        ...   print(i)
-        ... 
+&gt;&gt;&gt; for i in p.iterdir():
+...   print(i)
+... 
         pokus/tmp.txt
         pokus/tmp.tar.gz
 
         # ..jde ve skutečnosti o instance příslušné třídy „Path“
-        &gt;&gt;&gt; list( p.iterdir() )
+&gt;&gt;&gt; list( p.iterdir() )
         [PosixPath('pokus/tmp.txt'), PosixPath('pokus/tmp.tar.gz')]
-    </pre>
+</pre>
     <p>
         Tohle se zjevně mimo jiné dobře kombinuje s předchozími <em>is_</em>-metodami:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; for i in p.iterdir():
-        ...   if i.is_file():
-        ...     print(i)
-        ... 
+&gt;&gt;&gt; for i in p.iterdir():
+...   if i.is_file():
+...     print(i)
+... 
         pokus/tmp.txt
         pokus/tmp.tar.gz
     </pre>
@@ -562,20 +562,20 @@
         Pokud chceme proiterovat pouze cesty, které vyhovují nějakému <strong>vzoru</strong>, máme k dispozici další metodu – <em>glob()</em>. Ta reaguje na klasické „divoké znaky“ <code>?</code>, <code>*</code> a znakové rozsahy <code>[]</code>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; p = Path('/tmp')
+&gt;&gt;&gt; p = Path('/tmp')
 
-        &gt;&gt;&gt; list(p.glob('pokus/*'))
+&gt;&gt;&gt; list(p.glob('pokus/*'))
         [PosixPath('/tmp/pokus/tmp.tar.gz'), PosixPath('/tmp/pokus/tmp.txt'),
          PosixPath('/tmp/pokus/2.nfo'), PosixPath('/tmp/pokus/pokus.txt'),
          PosixPath('/tmp/pokus/1.txt')]
 
-        &gt;&gt;&gt; list(p.glob('pokus/*.txt'))
+&gt;&gt;&gt; list(p.glob('pokus/*.txt'))
         [PosixPath('/tmp/pokus/tmp.txt'), PosixPath('/tmp/pokus/pokus.txt'),
          PosixPath('/tmp/pokus/1.txt')]
 
-        &gt;&gt;&gt; list(p.glob('pokus/[0-9].*'))
+&gt;&gt;&gt; list(p.glob('pokus/[0-9].*'))
         [PosixPath('/tmp/pokus/2.nfo'), PosixPath('/tmp/pokus/1.txt')]
-    </pre>
+</pre>
     <div class="notes-block"><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
             Chcete-li najít soubor/adresář s <code>?</code> nebo <code>*</code> v názvu, stačí je zavřít do <code>[]</code>.
         </div></div><div class="note-item"><span class="note-icon">📝</span><div class="note-content">
@@ -591,19 +591,19 @@
        Pomocí funkce <em>chmod()</em> můžete změnit práva a vlastnosti odkazované cesty:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; p = Path('/tmp/pokus/pokus.txt')
+&gt;&gt;&gt; p = Path('/tmp/pokus/pokus.txt')
 
-        &gt;&gt;&gt; p.stat().st_mode
+&gt;&gt;&gt; p.stat().st_mode
         33279
-        &gt;&gt;&gt; oct(33279)
+&gt;&gt;&gt; oct(33279)
         '0o100777'
 
-        &gt;&gt;&gt; p.chmod(0o644)
-        &gt;&gt;&gt; p.stat().st_mode
+&gt;&gt;&gt; p.chmod(0o644)
+&gt;&gt;&gt; p.stat().st_mode
         33188
-        &gt;&gt;&gt; oct(33188)
+&gt;&gt;&gt; oct(33188)
         '0o100644'
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Pro udání práv/vlastností můžete kromě čísel také využít příslušné konstanty z modulu <a href="https://docs.python.org/3/library/stat.html" class="external"><em>stat</em></a> (kombinace se zadávají klasicky binárním OŘením).
     </div></div>
@@ -618,15 +618,15 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # Zatím je adresář prázdný..
-        &gt;&gt;&gt; p = Path('/tmp/pokus')
-        &gt;&gt;&gt; list( p.iterdir() )
+&gt;&gt;&gt; p = Path('/tmp/pokus')
+&gt;&gt;&gt; list( p.iterdir() )
         []
 
         # ..ale teď už nebude:
-        &gt;&gt;&gt; Path('pokus.txt').touch()
-        &gt;&gt;&gt; list( p.iterdir() )
+&gt;&gt;&gt; Path('pokus.txt').touch()
+&gt;&gt;&gt; list( p.iterdir() )
         [PosixPath('/tmp/pokus/pokus.txt')]
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Parametr <em>exist_ok</em> v základním nastavení na <code>True</code> u existujícího souboru upraví jeho čas modifikace na aktuální, při nastavení na <code>False</code> vyhodí výjimku <em>FileExistsError</em>.
     </div></div>
@@ -635,10 +635,10 @@
         Už asi nepřekvapivě se pak soubory mažou pomocí funkce <strong><em>unlink()</em></strong>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; Path('pokus.txt').unlink()
-        &gt;&gt;&gt; list( p.iterdir() )
+&gt;&gt;&gt; Path('pokus.txt').unlink()
+&gt;&gt;&gt; list( p.iterdir() )
         []
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id23" data-title="Tvorba a mazání adresářů – „mkdir()“ &amp; „rmdir()“"><div class="section-header"><span class="section-num">23</span><h2 class="section-title">Tvorba a mazání adresářů – „mkdir()“ &amp; „rmdir()“</h2></div><div class="section-body">
 
@@ -647,11 +647,11 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # zadání cesty řetězcem
-        &gt;&gt;&gt; Path('test1').mkdir()
+&gt;&gt;&gt; Path('test1').mkdir()
         
         # zadání cesty objektem Path()
-        &gt;&gt;&gt; Path( Path('test2') ).mkdir()
-    </pre>
+&gt;&gt;&gt; Path( Path('test2') ).mkdir()
+</pre>
     <p>
         Stačí si tedy jen dobře uvědomit, že <em>mkdir()</em> je vlastnost cesty – volá se tudíž na objektu <em>Path</em> a případné parametry této funkce pouze řídí její chování.
     </p>
@@ -661,14 +661,14 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # prázdný adresář
-        &gt;&gt;&gt; Path('test2').rmdir()
+&gt;&gt;&gt; Path('test2').rmdir()
 
         # neprázdný adresář
-        &gt;&gt;&gt; Path('test1').rmdir()
+&gt;&gt;&gt; Path('test1').rmdir()
         Traceback (most recent call last):
           …
         OSError: [Errno 39] Directory not empty: 'test1'
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Cestu lze opět pochopitelně zadat jak řetězcem, tak objektem typu <em>Path</em>.
     </div></div>
@@ -680,21 +680,21 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # Původní cesta..
-        &gt;&gt;&gt; p = Path('/tmp/pokus/test1')
+&gt;&gt;&gt; p = Path('/tmp/pokus/test1')
 
         # ..a její přejmenování:
-        &gt;&gt;&gt; p.replace('test')
+&gt;&gt;&gt; p.replace('test')
 
         # Objekt původní cesty už neukazuje na existující objekt..
-        &gt;&gt;&gt; p
+&gt;&gt;&gt; p
         PosixPath('/tmp/pokus/test1')
-        &gt;&gt;&gt; p.exists()
+&gt;&gt;&gt; p.exists()
         False
 
         # ..protože ten už má své nové jméno:
-        &gt;&gt;&gt; Path('/tmp/pokus/test').exists()
+&gt;&gt;&gt; Path('/tmp/pokus/test').exists()
         True
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         K určení cesty se opět pochopitelně dá použít místo řetězce i přímo objekt typu <em>Path</em>.
     </div></div>
@@ -727,14 +727,14 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # Existující cesta..
-        &gt;&gt;&gt; list( p.iterdir() )
+&gt;&gt;&gt; list( p.iterdir() )
         [PosixPath('/tmp/pokus/pokus.txt')]
 
         # ..a symlink na ni:
-        &gt;&gt;&gt; Path('pokus_sln.txt').symlink_to('pokus.txt')
-        &gt;&gt;&gt; list( p.iterdir() )
+&gt;&gt;&gt; Path('pokus_sln.txt').symlink_to('pokus.txt')
+&gt;&gt;&gt; list( p.iterdir() )
         [PosixPath('/tmp/pokus/pokus_sln.txt'), PosixPath('/tmp/pokus/pokus.txt')]
-    </pre>
+</pre>
     <p>
         PS: Plný konstruktor jest <code>symlink_to(target, target_is_directory=False)</code>, kde parametr <em>target_is_directory</em> má význam pouze pod Windows (musí být nastaven na <code>True</code>, je-li cílem symlinku adresář).
     </p>
@@ -748,10 +748,10 @@
         Když už máme cestu připravenou jako objekt typu <em>Path</em>, můžeme ji téměř klasicky otevřít k práci s jejím obsahem pomocí funkce <strong><em>open()</em></strong>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; f = Path('pokus.txt')
-        &gt;&gt;&gt; with f.open(encoding='utf-8') as soubor:
-        ...   print( soubor.read() )
-        ... 
+&gt;&gt;&gt; f = Path('pokus.txt')
+&gt;&gt;&gt; with f.open(encoding='utf-8') as soubor:
+...   print( soubor.read() )
+... 
         příliš žluťoučký kůň
     </pre>
     <p>
@@ -774,12 +774,12 @@
         Při práci s textem máme při zápise i při čtení k dispozici možnost nastavit jak kódování (parametr <em>encoding</em>), tak <a href="texts.xml?slajd=11">obsluhu chyb</a> (parametr <em>errors</em>). Neexistující soubor bude při zápise založen:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; f = Path('pokus.txt')
-        &gt;&gt;&gt; f.write_text('příliš žluťoučký kůň', encoding='utf-8')
+&gt;&gt;&gt; f = Path('pokus.txt')
+&gt;&gt;&gt; f.write_text('příliš žluťoučký kůň', encoding='utf-8')
         20
-        &gt;&gt;&gt; f.read_text()
+&gt;&gt;&gt; f.read_text()
         'příliš žluťoučký kůň'
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Plné konstruktory tedy jsou: <code>Path.write_text(data, encoding=None, errors=None)</code> a <code>Path.read_text(encoding=None, errors=None)</code> .
     </div></div>
@@ -791,12 +791,12 @@
         Při práci s bajty se žádné kódování neřeší, takže prostě jen zapisujeme a čteme <a href="/materialy/python/types/bytes.xml">bajtové řetězce</a>, jinak je vše stejné:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; f = Path('pokus.nfo')
-        &gt;&gt;&gt; f.write_bytes(b'ahoj')
+&gt;&gt;&gt; f = Path('pokus.nfo')
+&gt;&gt;&gt; f.write_bytes(b'ahoj')
         4
-        &gt;&gt;&gt; f.read_bytes()
+&gt;&gt;&gt; f.read_bytes()
         b'ahoj'
-    </pre>
+</pre>
     <p>
         A stejně tak funkce <em>write_bytes()</em> při zápise vrací <strong>počet zapsaných bajtů</strong>.
     </p>

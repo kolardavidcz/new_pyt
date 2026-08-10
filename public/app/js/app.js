@@ -4,20 +4,21 @@
 import {
   state, loadPersisted, buildIndexes, clearFilters, filtersActive,
   filteredItems, persistSidebarW, pagesFor, onStateChange,
-  setUser, logoutUser, defaultUser, syncCloudProgress,
+  setUser, logoutUser, defaultUser, syncCloudProgress, clearLinkErrorLog, markLinkErrorFixed,
 } from "./state.js";
 import { renderTree, setTreeSelectHandler, expandAll, collapseAll } from "./tree.js";
 import { navigate, refreshActiveView, closeTab, initHistory, getInitialRoute, initScrollTracker } from "./router.js";
 import { openPalette, closePalette, isPaletteOpen, initPalette, setPaletteHandler } from "./palette.js";
 import { toggleFullscreen, updatePageStudyButtons } from "./content.js";
+import { escapeHtml } from "./ui.js";
 
 async function loadJson(url) {
   const clean = url.replace(/^\//, "");
   const urlsToTry = [
-    "/" + clean,
     "data/" + clean.replace(/^data\//, ""),
     "./data/" + clean.replace(/^data\//, ""),
     "../data/" + clean.replace(/^data\//, ""),
+    "/" + clean,
     "./" + clean,
   ];
   let lastErr = null;
@@ -25,7 +26,14 @@ async function loadJson(url) {
     try {
       const res = await fetch(u, { cache: "no-store" });
       if (res.ok) {
-        return await res.json();
+        const contentType = res.headers.get("content-type") || "";
+        if (!contentType.includes("text/html")) {
+          try {
+            return await res.json();
+          } catch (e) {
+            lastErr = e;
+          }
+        }
       }
     } catch (e) {
       lastErr = e;
@@ -69,15 +77,17 @@ async function boot() {
   });
 
   try {
-    const [course, slides, pages, exercises] = await Promise.all([
+    const [course, slides, pages, exercises, quizzes] = await Promise.all([
       loadJson("/data/course.json"),
       loadJson("/data/slides.json").catch(() => ({})),
       loadJson("/data/pages-index.json").catch(() => ({})),
       loadJson("/data/exercises.json").catch(() => ({})),
+      loadJson("/data/quizzes.json").catch(() => ({})),
     ]);
     state.slides = slides || {};
     state.pagesIndex = pages || {};
     state.exercises = exercises || {};
+    state.quizzes = quizzes || {};
     buildIndexes(course);
     renderTree();
     updateStatus();
@@ -118,8 +128,62 @@ function handleNavigate(action) {
     toggleFullscreen();
     return;
   }
+  if (action.kind === "cmd-close-tab") {
+    if (state.activeTabId) closeTab(state.activeTabId);
+    return;
+  }
+  if (action.kind === "cmd-link-error-log") {
+    openErrorLogModal();
+    return;
+  }
   navigate(action);
   updateStatus();
+}
+
+function renderErrorLogList() {
+  const container = document.getElementById("errorLogList");
+  if (!container) return;
+  const list = state.errorLinkLog || [];
+  if (!list.length) {
+    container.innerHTML = `<div style="padding:28px; text-align:center; color:var(--fg-muted);">✅ Žádné chybové odkazy nebyly zaznamenány. Databáze je čistá!</div>`;
+    return;
+  }
+  container.innerHTML = list.map((e) => {
+    const isFixed = e.status === "fixed";
+    const tagBg = isFixed ? "var(--syntax-string, #89d185)" : "#f44747";
+    const tagText = isFixed ? "FIXED" : "BAD LINK";
+    return `
+    <div style="border-bottom:1px solid var(--border); padding:12px 0; opacity:${isFixed ? "0.6" : "1.0"};">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <span style="background:${tagBg}; color:#fff; font-size:10px; font-weight:bold; padding:2px 6px; border-radius:3px; text-transform:uppercase; margin-right:6px;">${tagText}</span>
+          <span style="color:var(--syntax-error, #f44747); font-weight:bold;">${escapeHtml(e.message)}</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <span style="font-size:11px; color:var(--fg-subtle);">${e.count > 1 ? `(${e.count}x)` : ""} ${new Date(e.timestamp).toLocaleTimeString()}</span>
+          ${!isFixed ? `<button type="button" class="btn btn-sm btn-mark-fixed" data-err-id="${e.id}" style="font-size:10px; padding:2px 8px;">Opraveno ✓</button>` : `<span style="font-size:11px; color:var(--syntax-string, #89d185);">Opraveno</span>`}
+        </div>
+      </div>
+      <div style="color:var(--fg-muted); margin-top:6px;">Target: <code>${escapeHtml(e.targetId || e.href)}</code></div>
+      <div style="color:var(--fg-subtle); font-size:11px; margin-top:2px;">Source: <code>${escapeHtml(e.source)}</code></div>
+    </div>
+  `;
+  }).join("");
+
+  container.querySelectorAll(".btn-mark-fixed").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const errId = btn.dataset.errId;
+      if (errId) {
+        markLinkErrorFixed(errId);
+        renderErrorLogList();
+      }
+    });
+  });
+}
+
+function openErrorLogModal() {
+  renderErrorLogList();
+  document.getElementById("errorLogModal")?.classList.remove("hidden");
 }
 
 function stepSlide(dir) {
@@ -203,6 +267,24 @@ function bindChrome() {
   const profileLoginForm = document.getElementById("profileLoginForm");
   const btnCancelLogin = document.getElementById("btnCancelLogin");
 
+  // Error Log Modal
+  const errorLogModal = document.getElementById("errorLogModal");
+  document.getElementById("btnCloseErrorLog")?.addEventListener("click", () => errorLogModal?.classList.add("hidden"));
+  document.getElementById("btnClearErrorLog")?.addEventListener("click", () => {
+    clearLinkErrorLog();
+    renderErrorLogList();
+  });
+  document.getElementById("btnExportErrorLog")?.addEventListener("click", () => {
+    const jsonStr = JSON.stringify(state.errorLinkLog || [], null, 2);
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `link-error-report-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
   btnProfile?.addEventListener("click", () => {
     navigate({ kind: "login" });
   });
@@ -277,9 +359,11 @@ function bindChrome() {
 
   // Filters
   const text = document.getElementById("filterText");
+  let filterTimer = null;
   text?.addEventListener("input", () => {
     state.filters.text = text.value;
-    onFiltersChanged();
+    clearTimeout(filterTimer);
+    filterTimer = setTimeout(() => onFiltersChanged(), 120);
   });
 
   document.querySelectorAll("#tagChips .chip").forEach((chip) => {
@@ -371,14 +455,14 @@ function bindChrome() {
         closePalette();
       }
     }
-    // Close tab Ctrl+W
-    if (meta && e.key.toLowerCase() === "w") {
+    // Close tab Ctrl+Q or Ctrl+W
+    if (meta && (e.key.toLowerCase() === "q" || e.key.toLowerCase() === "w")) {
       e.preventDefault();
       if (state.activeTabId) closeTab(state.activeTabId);
     }
 
     // Slide navigation & Fullscreen shortcut (ArrowLeft / ArrowRight, PageUp / PageDown, Space, F)
-    const isInput = !!e.target.closest("input, textarea, select, [contenteditable]");
+    const isInput = !!e.target.closest("input, textarea, select, button, [contenteditable], .quiz-section-card");
     if (!isInput && !isPaletteOpen() && !meta) {
       const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
       const isPresentation = activeTab && (activeTab.kind === "page" || activeTab.kind === "presentation");

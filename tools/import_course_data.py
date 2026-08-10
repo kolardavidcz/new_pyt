@@ -21,8 +21,28 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-OLD = ROOT / ".old"
 OUT = ROOT / "data"
+
+def get_cjs_dir() -> Path:
+    p1 = ROOT / ".old" / "cjs"
+    if p1.exists():
+        return p1
+    p2 = ROOT / "public" / "cjs"
+    if p2.exists():
+        return p2
+    return ROOT / "cjs"
+
+def get_vyuka_dir() -> Path:
+    p1 = ROOT / ".old" / "vyuka_downloaded"
+    if p1.exists():
+        return p1
+    p2 = ROOT / "public" / "vyuka_downloaded"
+    if p2.exists():
+        return p2
+    return ROOT / "vyuka_downloaded"
+
+OLD_CJS = get_cjs_dir()
+OLD_VYUKA = get_vyuka_dir()
 
 
 def extract_js_assignment(path: Path, var_patterns: list[str]) -> str:
@@ -112,16 +132,17 @@ def normalize_item(item: dict, kind: str, week: int) -> dict:
 
 
 def resolve_path(path: str) -> Path:
-    """Logical path under vyuka_downloaded → filesystem under .old/."""
+    """Logical path under vyuka_downloaded → filesystem under OLD_VYUKA."""
     p = path.replace("\\", "/")
     if p.startswith("vyuka_downloaded/"):
-        return OLD / p
-    return OLD / "vyuka_downloaded" / p
+        rel = p[len("vyuka_downloaded/"):]
+        return OLD_VYUKA / rel
+    return OLD_VYUKA / p
 
 
 def build_course() -> dict:
     raw = extract_js_assignment(
-        OLD / "cjs" / "course-data.js",
+        OLD_CJS / "course-data.js",
         [r"window\.courseData\s*=\s*(\[[\s\S]*\])\s*;?\s*$",
          r"window\.courseData\s*=\s*(\[[\s\S]*\])"],
     )
@@ -174,7 +195,7 @@ def build_course() -> dict:
 
 
 def build_slides() -> dict:
-    path = OLD / "cjs" / "slide-classification.js"
+    path = OLD_CJS / "slide-classification.js"
     if not path.is_file():
         return {}
     raw = extract_js_assignment(
@@ -198,7 +219,9 @@ def build_slides() -> dict:
 
 def build_pages_index() -> dict:
     """Lightweight page outline from lecture-pages.json or by scanning HTML."""
-    lp = OLD / "data" / "lecture-pages.json"
+    lp = ROOT / "data" / "source_reference" / "lecture-pages.json"
+    if not lp.is_file():
+        lp = ROOT / "data" / "lecture-pages.json"
     index: dict[str, list[dict]] = {}
 
     if lp.is_file():
@@ -244,7 +267,7 @@ def build_pages_index() -> dict:
             if self._in_h2:
                 self._buf.append(data)
 
-    for html in (OLD / "vyuka_downloaded").rglob("*.html"):
+    for html in OLD_VYUKA.rglob("*.html"):
         try:
             text = html.read_text(encoding="utf-8", errors="replace")
         except OSError:
@@ -258,7 +281,7 @@ def build_pages_index() -> dict:
             continue
         if not parser.pages:
             continue
-        rel = "vyuka_downloaded/" + html.relative_to(OLD / "vyuka_downloaded").as_posix()
+        rel = "vyuka_downloaded/" + html.relative_to(OLD_VYUKA).as_posix()
         index[rel] = parser.pages
 
     return index
@@ -275,26 +298,26 @@ def main() -> int:
         encoding="utf-8",
     )
     s = course["meta"]["stats"]
-    print(f"  → {course_path.relative_to(ROOT)}")
+    print(f"  -> {course_path.relative_to(ROOT)}")
     print(f"     weeks={s['weeks']} lectures={s['lectures']} exercises={s['exercises']} missing={s['missing']}")
 
-    print("Importing slide-classification.js …")
+    print("Importing slide-classification.js ...")
     slides = build_slides()
     slides_path = OUT / "slides.json"
     slides_path.write_text(
         json.dumps(slides, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-    print(f"  → {slides_path.relative_to(ROOT)} ({len(slides)} keys)")
+    print(f"  -> {slides_path.relative_to(ROOT)} ({len(slides)} keys)")
 
-    print("Building pages index …")
+    print("Building pages index ...")
     pages = build_pages_index()
     pages_path = OUT / "pages-index.json"
     pages_path.write_text(
         json.dumps(pages, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-    print(f"  → {pages_path.relative_to(ROOT)} ({len(pages)} lectures with pages)")
+    print(f"  -> {pages_path.relative_to(ROOT)} ({len(pages)} lectures with pages)")
 
     return 0
 

@@ -59,23 +59,23 @@
         1D je úplně stejné jako v klasickém Python'u, ve 2D pak představuje první index řádku a druhý sloupec:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.arange(1, 21).reshape(5, 4)
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a = np.arange(1, 21).reshape(5, 4)
+&gt;&gt;&gt; a
         array([[ 1,  2,  3,  4],
                [ 5,  6,  7,  8],
                [ 9, 10, 11, 12],
                [13, 14, 15, 16],
                [17, 18, 19, 20]])
         
-        &gt;&gt;&gt; a[1]
+&gt;&gt;&gt; a[1]
         array([5, 6, 7, 8])
         
-        &gt;&gt;&gt; a[1, 2:]
+&gt;&gt;&gt; a[1, 2:]
         array([7, 8])
         
-        &gt;&gt;&gt; a[1, 2]
+&gt;&gt;&gt; a[1, 2]
         7
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id4" data-title="Přiřazení do výřezu"><div class="section-header"><span class="section-num">4</span><h2 class="section-title">Přiřazení do výřezu</h2></div><div class="section-body">
 
@@ -83,30 +83,30 @@
         Přiřazení do výřezu pak funguje také tak, jak by člověk intuituvně očekával:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.zeros((3, 4), dtype=int)
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a = np.zeros((3, 4), dtype=int)
+&gt;&gt;&gt; a
         array([[0, 0, 0, 0],
                [0, 0, 0, 0],
                [0, 0, 0, 0]])
 
-        &gt;&gt;&gt; a[1] = 1
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a[1] = 1
+&gt;&gt;&gt; a
         array([[0, 0, 0, 0],
                [1, 1, 1, 1],
                [0, 0, 0, 0]])
 
-        &gt;&gt;&gt; a[2, 2:] = 2
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a[2, 2:] = 2
+&gt;&gt;&gt; a
         array([[0, 0, 0, 0],
                [1, 1, 1, 1],
                [0, 0, 2, 2]])
 
-        &gt;&gt;&gt; a[0, 1] = 3
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a[0, 1] = 3
+&gt;&gt;&gt; a
         array([[0, 3, 0, 0],
                [1, 1, 1, 1],
                [0, 0, 2, 2]])
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id5" data-title="Přiřazení pomocí [...]"><div class="section-header"><span class="section-num">5</span><h2 class="section-title">Přiřazení pomocí [...]</h2></div><div class="section-body">
 
@@ -114,18 +114,18 @@
         Python (opět právě kvůli <em>Numpy</em>) podporuje mimo jiné i tzv. <strong>výpustkovou notaci</strong>, tedy použití <code>...</code> na místě indexů do pole. V <em>Numpy</em> se takto označují sekvence os, které není třeba blíže určovat:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.full((3, 4), 7)
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a = np.full((3, 4), 7)
+&gt;&gt;&gt; a
         array([[7, 7, 7, 7],
                [7, 7, 7, 7],
                [7, 7, 7, 7]])
 
-        &gt;&gt;&gt; a[...] = 3
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a[...] = 3
+&gt;&gt;&gt; a
         array([[3, 3, 3, 3],
                [3, 3, 3, 3],
                [3, 3, 3, 3]])
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id6" data-title="Komentář"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Komentář</h2></div><div class="section-body">
 
@@ -147,46 +147,46 @@
         První dvě situace si můžete snadno ověřit pomocí adresy počátku dat, která ovšem bude pro třetí trochu posunutá. Vhodnější je tak rovnou použít řetězec <em>základních polí</em> pomocí atributu <em>base</em>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.array([[1, 2, 3], [4, 5, 6]])
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a = np.array([[1, 2, 3], [4, 5, 6]])
+&gt;&gt;&gt; a
         array([[1, 2, 3],
                [4, 5, 6]])
-        &gt;&gt;&gt; a.__array_interface__['data'][0]
+&gt;&gt;&gt; a.__array_interface__['data'][0]
         13087104
-        &gt;&gt;&gt; a.base
+&gt;&gt;&gt; a.base
         None
-        &gt;&gt;&gt; a.shape
+&gt;&gt;&gt; a.shape
         (2, 3)
-        &gt;&gt;&gt; a.strides
+&gt;&gt;&gt; a.strides
         (24, 8)
 
-        &gt;&gt;&gt; b = a.T
-        &gt;&gt;&gt; b
+&gt;&gt;&gt; b = a.T
+&gt;&gt;&gt; b
         array([[1, 4],
                [2, 5],
                [3, 6]])
-        &gt;&gt;&gt; b.__array_interface__['data'][0]
+&gt;&gt;&gt; b.__array_interface__['data'][0]
         13087104
-        &gt;&gt;&gt; b.base is a
+&gt;&gt;&gt; b.base is a
         True
-        &gt;&gt;&gt; b.shape
+&gt;&gt;&gt; b.shape
         (3, 2)
-        &gt;&gt;&gt; b.strides
+&gt;&gt;&gt; b.strides
         (8, 24)
 
-        &gt;&gt;&gt; c = a[..., 1:]
-        &gt;&gt;&gt; c
+&gt;&gt;&gt; c = a[..., 1:]
+&gt;&gt;&gt; c
         array([[2, 3],
                [5, 6]])
-        &gt;&gt;&gt; c.__array_interface__['data'][0]
+&gt;&gt;&gt; c.__array_interface__['data'][0]
         13087112
-        &gt;&gt;&gt; c.base is a
+&gt;&gt;&gt; c.base is a
         True
-        &gt;&gt;&gt; c.shape
+&gt;&gt;&gt; c.shape
         (2, 2)
-        &gt;&gt;&gt; c.strides
+&gt;&gt;&gt; c.strides
         (24, 8)
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id7" data-title="„Fancy indexing“ = kopie dat"><div class="section-header"><span class="section-num">7</span><h2 class="section-title">„Fancy indexing“ = kopie dat</h2></div><div class="section-body">
 
@@ -194,45 +194,45 @@
         Na první pohled možná trochu překvapivě umožňuje <em>Numpy</em> <strong>indexovat prvky polí</strong> dokonce i <strong>pomocí jiných numpyovských polí</strong>! (Čemuž se většinou říká právě <em>fancy indexing</em>.) Nicméně přitom narozdíl od výřezů dochází ke kopírování dat:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.array([2, 4, 3, 5, 6, 7])
+&gt;&gt;&gt; a = np.array([2, 4, 3, 5, 6, 7])
 
         # A) výřez (jiný pohled na data)
-        &gt;&gt;&gt; b = a[::2]
-        &gt;&gt;&gt; b
+&gt;&gt;&gt; b = a[::2]
+&gt;&gt;&gt; b
         array([2, 3, 6])
-        &gt;&gt;&gt; b.base is a
+&gt;&gt;&gt; b.base is a
         True
 
         # B1) seznam indexů (kopie dat)
-        &gt;&gt;&gt; c = a[np.arange(0, 6, 2)]
-        &gt;&gt;&gt; c
+&gt;&gt;&gt; c = a[np.arange(0, 6, 2)]
+&gt;&gt;&gt; c
         array([2, 3, 6])
-        &gt;&gt;&gt; c.base is a
+&gt;&gt;&gt; c.base is a
         False
         # PS:
-        &gt;&gt;&gt; np.arange(0, 6, 2)
+&gt;&gt;&gt; np.arange(0, 6, 2)
         array([0, 2, 4])
 
         # B2) seznam indexů jinak (kopie dat)
-        &gt;&gt;&gt; d = a[a % 2]
-        &gt;&gt;&gt; d
+&gt;&gt;&gt; d = a[a % 2]
+&gt;&gt;&gt; d
         array([2, 2, 4, 4, 2, 4])
-        &gt;&gt;&gt; d.base is a
+&gt;&gt;&gt; d.base is a
         False
         # PS:
-        &gt;&gt;&gt; a % 2
+&gt;&gt;&gt; a % 2
         array([0, 0, 1, 1, 0, 1])
 
         # C) pravdivostní maska (kopie dat)
-        &gt;&gt;&gt; e = a[a % 2 == 1]
-        &gt;&gt;&gt; e
+&gt;&gt;&gt; e = a[a % 2 == 1]
+&gt;&gt;&gt; e
         array([3, 5, 7])
-        &gt;&gt;&gt; e.base is a
+&gt;&gt;&gt; e.base is a
         False
         # PS:
-        &gt;&gt;&gt; a % 2 == 1
+&gt;&gt;&gt; a % 2 == 1
         array([False, False, True, True, False, True], dtype=bool)
-    </pre>
+</pre>
     <p>
         Tento přístup je sice <strong>velmi mocný</strong> (spousta operací nad poli se pomocí něj dá zapsat velmi kompaktním a pochopitelným způsobem), nicméně je také velmi pomalý (především právě kvůli tomu kopírování dat). Proto, je-li to možné, vyplatí se místo něj použít dedikované metody (ovšem typicky pouze pro výběr nad jednou osou).
     </p>
@@ -243,23 +243,23 @@
         Metoda <em>take()</em> je – pro výběr v jedné ose – rychlejší variantou k indexování pomocí pole indexů do pole:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.array([2, 3, 4, 5, 6, 7])
+&gt;&gt;&gt; a = np.array([2, 3, 4, 5, 6, 7])
 
         # výběrové pole
-        &gt;&gt;&gt; idx = np.arange(0, 6, 2)
-        &gt;&gt;&gt; idx
+&gt;&gt;&gt; idx = np.arange(0, 6, 2)
+&gt;&gt;&gt; idx
         array([0, 2, 4])
 
         # „fancy indexing“
-        &gt;&gt;&gt; b1 = a[idx]
-        &gt;&gt;&gt; b1
+&gt;&gt;&gt; b1 = a[idx]
+&gt;&gt;&gt; b1
         array([2, 4, 6])
 
         # dedikovaná metoda
-        &gt;&gt;&gt; b2 = a.take(idx, axis=0)
-        &gt;&gt;&gt; b2
+&gt;&gt;&gt; b2 = a.take(idx, axis=0)
+&gt;&gt;&gt; b2
         array([2, 4, 6])
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id9" data-title="„compress()“ – výběr pomocí pravdivostní masky"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">„compress()“ – výběr pomocí pravdivostní masky</h2></div><div class="section-body">
 
@@ -267,23 +267,23 @@
         Metoda <em>compress()</em> je – pro výběr v jedné ose – rychlejší variantou k indexování pomocí pravdivostního pole:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.array([2, 3, 4, 5, 6, 7])
+&gt;&gt;&gt; a = np.array([2, 3, 4, 5, 6, 7])
 
         # výběrové pole
-        &gt;&gt;&gt; idx = (a % 2 == 1)
-        &gt;&gt;&gt; idx
+&gt;&gt;&gt; idx = (a % 2 == 1)
+&gt;&gt;&gt; idx
         array([False,  True, False,  True, False,  True], dtype=bool)
 
         # „fancy indexing“
-        &gt;&gt;&gt; b1 = a[idx]
-        &gt;&gt;&gt; b1
+&gt;&gt;&gt; b1 = a[idx]
+&gt;&gt;&gt; b1
         array([3, 5, 7])
 
         # dedikovaná metoda
-        &gt;&gt;&gt; b2 = a.compress(idx, axis=0)
-        &gt;&gt;&gt; b2
+&gt;&gt;&gt; b2 = a.compress(idx, axis=0)
+&gt;&gt;&gt; b2
         array([3, 5, 7])
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id10" data-title="Metody měnící tvar pole"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Metody měnící tvar pole</h2></div><div class="section-body">
 
@@ -303,31 +303,31 @@
         Pomineme-li iterátor přes vektorový pohled <em>flat</em> a vždy-kopírující metodu <em>flatten()</em>, používá se pro převod vícerozměrných polí na pole jednorozměrná především metoda <em>ravel()</em>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.array([[1, 2, 3], [4, 5, 6]])
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a = np.array([[1, 2, 3], [4, 5, 6]])
+&gt;&gt;&gt; a
         array([[1, 2, 3],
                [4, 5, 6]])
 
-        &gt;&gt;&gt; a.ravel()
+&gt;&gt;&gt; a.ravel()
         array([1, 2, 3, 4, 5, 6])
 
-        &gt;&gt;&gt; a.T
+&gt;&gt;&gt; a.T
         array([[1, 4],
                [2, 5],
                [3, 6]])
-        &gt;&gt;&gt; a.T.ravel()
+&gt;&gt;&gt; a.T.ravel()
         array([1, 4, 2, 5, 3, 6])
-    </pre>
+</pre>
     <p>
         Její hlavní výhodou je, že – je-li to možné – neprovádí kopie dat, takže je výrazně rychlejší než ostatní způsoby:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a.ravel().base is a
+&gt;&gt;&gt; a.ravel().base is a
         True
 
-        &gt;&gt;&gt; a.T.ravel().base is a
+&gt;&gt;&gt; a.T.ravel().base is a
         False
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id12" data-title="„reshape()“ – změna tvaru"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">„reshape()“ – změna tvaru</h2></div><div class="section-body">
 
@@ -335,34 +335,34 @@
         Metoda <em>reshape()</em> umí měnit tvary polí, pokud jsou navzájem „kompatibilní“ (neboli dá-li se z jednoho přes celkový počet prvků a rozměry dopočítat na druhý):
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.arange(1, 13)
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a = np.arange(1, 13)
+&gt;&gt;&gt; a
         array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12])
 
-        &gt;&gt;&gt; a.reshape(3, 4)
+&gt;&gt;&gt; a.reshape(3, 4)
         array([[ 1,  2,  3,  4],
                [ 5,  6,  7,  8],
                [ 9, 10, 11, 12]])
 
-        &gt;&gt;&gt; a.reshape(3, 4).reshape(2, 6)
+&gt;&gt;&gt; a.reshape(3, 4).reshape(2, 6)
         array([[ 1,  2,  3,  4,  5,  6],
                [ 7,  8,  9, 10, 11, 12]])
-    </pre>
+</pre>
     <p>
         Přitom dokud nenabouráte (typicky transpozicí) možnost pouhé změny pohledu na prvky, nedostanete kopii:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a.reshape(3, 4).reshape(2, 6).base is a
+&gt;&gt;&gt; a.reshape(3, 4).reshape(2, 6).base is a
         True
 
-        &gt;&gt;&gt; a.reshape(3, 4).T.reshape(2, 6).base
+&gt;&gt;&gt; a.reshape(3, 4).T.reshape(2, 6).base
         array([[ 1,  5,  9],
                [ 2,  6, 10],
                [ 3,  7, 11],
                [ 4,  8, 12]])
-        &gt;&gt;&gt; a.reshape(3, 4).T.reshape(2, 6).base is a
+&gt;&gt;&gt; a.reshape(3, 4).T.reshape(2, 6).base is a
         False
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id13" data-title="„numpy.newaxis“ – přidávání dimenzí I"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">„numpy.newaxis“ – přidávání dimenzí I</h2></div><div class="section-body">
 
@@ -371,26 +371,26 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # originál
-        &gt;&gt;&gt; a = np.array([1, 2, 3])
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a = np.array([1, 2, 3])
+&gt;&gt;&gt; a
         array([1, 2, 3])
-        &gt;&gt;&gt; a.shape
+&gt;&gt;&gt; a.shape
         (3,)
 
         # přidaná dimenze
-        &gt;&gt;&gt; b = a[np.newaxis, :]
-        &gt;&gt;&gt; b
+&gt;&gt;&gt; b = a[np.newaxis, :]
+&gt;&gt;&gt; b
         array([[1, 2, 3]])
-        &gt;&gt;&gt; b.shape
+&gt;&gt;&gt; b.shape
         (1, 3)
 
         # totéž s pomocí výpustky
-        &gt;&gt;&gt; c = a[np.newaxis, ...]
-        &gt;&gt;&gt; c
+&gt;&gt;&gt; c = a[np.newaxis, ...]
+&gt;&gt;&gt; c
         array([[1, 2, 3]])
-        &gt;&gt;&gt; c.shape
+&gt;&gt;&gt; c.shape
         (1, 3)
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id14" data-title="„numpy.newaxis“ – přidávání dimenzí II"><div class="section-header"><span class="section-num">14</span><h2 class="section-title">„numpy.newaxis“ – přidávání dimenzí II</h2></div><div class="section-body">
 
@@ -399,22 +399,22 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # originál
-        &gt;&gt;&gt; a = np.array([[1, 2, 3], [4, 5, 6]])
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a = np.array([[1, 2, 3], [4, 5, 6]])
+&gt;&gt;&gt; a
         array([[1, 2, 3],
                [4, 5, 6]])
-        &gt;&gt;&gt; a.shape
+&gt;&gt;&gt; a.shape
         (2, 3)
 
         # přidání „uprostřed“
-        &gt;&gt;&gt; d = a[:, np.newaxis, :]
-        &gt;&gt;&gt; d
+&gt;&gt;&gt; d = a[:, np.newaxis, :]
+&gt;&gt;&gt; d
         array([[[1, 2, 3]],
 
                [[4, 5, 6]]])
-        &gt;&gt;&gt; d.shape
+&gt;&gt;&gt; d.shape
         (2, 1, 3)
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id15" data-title="„numpy.newaxis“ – přidávání dimenzí III"><div class="section-header"><span class="section-num">15</span><h2 class="section-title">„numpy.newaxis“ – přidávání dimenzí III</h2></div><div class="section-body">
 
@@ -423,28 +423,28 @@
         Asi nejčastější použití nalezne tento operátor v případech, kdy potřebujeme z<em>broadcasting</em>ovat pole nekompatibilního tvaru:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.array([0, 10, 20, 30])
-        &gt;&gt;&gt; b = np.array([0, 1, 2])
+&gt;&gt;&gt; a = np.array([0, 10, 20, 30])
+&gt;&gt;&gt; b = np.array([0, 1, 2])
 
-        &gt;&gt;&gt; a + b
+&gt;&gt;&gt; a + b
         Traceback (most recent call last):
           File "&lt;stdin&gt;", line 1, in &lt;module&gt;
         ValueError: operands could not be broadcast together with shapes (4,) (3,) 
 
-        &gt;&gt;&gt; am = a[:,np.newaxis]
-        &gt;&gt;&gt; am.shape
+&gt;&gt;&gt; am = a[:,np.newaxis]
+&gt;&gt;&gt; am.shape
         (4, 1)
-        &gt;&gt;&gt; am
+&gt;&gt;&gt; am
         array([[ 0],
                [10],
                [20],
                [30]])
-        &gt;&gt;&gt; am + b
+&gt;&gt;&gt; am + b
         array([[ 0,  1,  2],
                [10, 11, 12],
                [20, 21, 22],
                [30, 31, 32]])
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id16" data-title="„transpose()“ &amp; „T“ I"><div class="section-header"><span class="section-num">16</span><h2 class="section-title">„transpose()“ &amp; „T“ I</h2></div><div class="section-body">
 
@@ -452,22 +452,22 @@
         V jednodušších případech vrací metoda <em>transpose()</em> a atribut <em>T</em> stejný výsledek, a to nový (transponovaný) pohled na originální pole:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.arange(1, 7)
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a = np.arange(1, 7)
+&gt;&gt;&gt; a
         array([1, 2, 3, 4, 5, 6])
 
-        &gt;&gt;&gt; a.transpose()
+&gt;&gt;&gt; a.transpose()
         array([1, 2, 3, 4, 5, 6])
-        &gt;&gt;&gt; a.T
+&gt;&gt;&gt; a.T
         array([1, 2, 3, 4, 5, 6])
 
-        &gt;&gt;&gt; a.transpose() == a.T
+&gt;&gt;&gt; a.transpose() == a.T
         array([ True,  True,  True,  True,  True,  True], dtype=bool)
-        &gt;&gt;&gt; a.transpose() is a.T
+&gt;&gt;&gt; a.transpose() is a.T
         False
-        &gt;&gt;&gt; a.transpose().base is a.T.base is a
+&gt;&gt;&gt; a.transpose().base is a.T.base is a
         True
-    </pre>
+</pre>
     <p>
         PS: Nutno připomenout, že pro cokoliv složitějšího než 1D už s největší pravděpodobností nepůjde o jiný pohled na táž data, nýbrž o jejich kopii do nového paměťového umístění!
     </p>
@@ -479,8 +479,8 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # originál
-        &gt;&gt;&gt; a = np.arange(1, 13).reshape(2, 3, 2)
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a = np.arange(1, 13).reshape(2, 3, 2)
+&gt;&gt;&gt; a
         array([[[ 1,  2],
                 [ 3,  4],
                 [ 5,  6]],
@@ -488,11 +488,11 @@
                [[ 7,  8],
                 [ 9, 10],
                 [11, 12]]])
-        &gt;&gt;&gt; a.shape
+&gt;&gt;&gt; a.shape
         (2, 3, 2)
 
         # atribut „T“
-        &gt;&gt;&gt; a.T
+&gt;&gt;&gt; a.T
         array([[[ 1,  7],
                 [ 3,  9],
                 [ 5, 11]],
@@ -500,19 +500,19 @@
                [[ 2,  8],
                 [ 4, 10],
                 [ 6, 12]]])
-        &gt;&gt;&gt; a.T.shape
+&gt;&gt;&gt; a.T.shape
         (2, 3, 2)
 
         # komplexnější použití metody „transpose()“
-        &gt;&gt;&gt; np.transpose(a, axes=[2, 0, 1])
+&gt;&gt;&gt; np.transpose(a, axes=[2, 0, 1])
         array([[[ 1,  3,  5],
                 [ 7,  9, 11]],
 
                [[ 2,  4,  6],
                 [ 8, 10, 12]]])
-        &gt;&gt;&gt; np.transpose(a, axes=[2, 0, 1]).shape
+&gt;&gt;&gt; np.transpose(a, axes=[2, 0, 1]).shape
         (2, 2, 3)
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         <sup>*</sup> Ano – v duchu „dobré“ tradice Numpy nemají <em>transpose()</em> na poli a ve jmenném prostoru balíčku <em>numpy</em> stejné parametry…
     </div></div>
@@ -527,11 +527,11 @@
         Metoda <em>swapaxes()</em> prohodí dvě zadané osy:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.arange(1, 13).reshape(2, 3, 2)
-        &gt;&gt;&gt; a.shape
+&gt;&gt;&gt; a = np.arange(1, 13).reshape(2, 3, 2)
+&gt;&gt;&gt; a.shape
         (2, 3, 2)
 
-        &gt;&gt;&gt; a.swapaxes(0, 1)
+&gt;&gt;&gt; a.swapaxes(0, 1)
         array([[[ 1,  2],
                 [ 7,  8]],
 
@@ -540,19 +540,19 @@
 
                [[ 5,  6],
                 [11, 12]]])
-        &gt;&gt;&gt; a.swapaxes(0, 1).shape
+&gt;&gt;&gt; a.swapaxes(0, 1).shape
         (3, 2, 2)
-    </pre>
+</pre>
 
     <p class="enumerate">
         Metoda <em>moveaxes()</em> dělá v podstatě totéž, ale kromě dvou os dokáže na vstupu přebírat i dva seznamy os:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.arange(1, 13).reshape(2, 3, 2)
-        &gt;&gt;&gt; a.shape
+&gt;&gt;&gt; a = np.arange(1, 13).reshape(2, 3, 2)
+&gt;&gt;&gt; a.shape
         (2, 3, 2)
         
-        &gt;&gt;&gt; np.moveaxis(a, 0, 1)
+&gt;&gt;&gt; np.moveaxis(a, 0, 1)
         array([[[ 1,  2],
                 [ 7,  8]],
 
@@ -561,18 +561,18 @@
 
                [[ 5,  6],
                 [11, 12]]])
-        &gt;&gt;&gt; np.moveaxis(a, 0, 1).shape
+&gt;&gt;&gt; np.moveaxis(a, 0, 1).shape
         (3, 2, 2)
 
-        &gt;&gt;&gt; np.moveaxis(a, [2, 0], [0, 1])
+&gt;&gt;&gt; np.moveaxis(a, [2, 0], [0, 1])
         array([[[ 1,  3,  5],
                 [ 7,  9, 11]],
 
                [[ 2,  4,  6],
                 [ 8, 10, 12]]])
-        &gt;&gt;&gt; np.moveaxis(a, [2, 0], [0, 1]).shape
+&gt;&gt;&gt; np.moveaxis(a, [2, 0], [0, 1]).shape
         (2, 2, 3)
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id19" data-title="„resize()“ – změna tvaru a velikosti"><div class="section-header"><span class="section-num">19</span><h2 class="section-title">„resize()“ – změna tvaru a velikosti</h2></div><div class="section-body">
 
@@ -586,12 +586,12 @@
         Jako metoda pole se <em>resize()</em> pokusí změnit jeho velikost v místě, to znamená bez kopírování dat (pokud to půjde), přičemž <strong>při zvětšování doplní do nových míst nuly</strong>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.array([[1, 2, 3], [4, 5, 6]])
-        &gt;&gt;&gt; a.resize((2, 4))
-        &gt;&gt;&gt; a
+&gt;&gt;&gt; a = np.array([[1, 2, 3], [4, 5, 6]])
+&gt;&gt;&gt; a.resize((2, 4))
+&gt;&gt;&gt; a
         array([[1, 2, 3, 4],
                [5, 6, 0, 0]])
-    </pre>
+</pre>
     <p>
         Nicméně jakýkoliv odkaz na toto pole – především pak jakýkoliv jiný pohled na něj (pod svým vlastním jménem) – tomu zabrání, pokud uvedené chování nevypnete nastavením parametru <code>refcheck=False</code>.
     </p>
@@ -603,11 +603,11 @@
         Narozdíl od předchozí metody <em>resize()</em> v numpyovském jmenném prostoru data téměř vždy kopíruje, ale především <strong>při zvětšování doplňuje kopii původních dat</strong>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; a = np.array([[1, 2, 3], [4, 5, 6]])
-        &gt;&gt;&gt; np.resize(a, (2, 4))
+&gt;&gt;&gt; a = np.array([[1, 2, 3], [4, 5, 6]])
+&gt;&gt;&gt; np.resize(a, (2, 4))
         array([[1, 2, 3, 4],
                [5, 6, 1, 2]])
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Mimochodem zrovna v tomhle případě ke kopii nedošlo – zvětšené pole trůní na stejné adrese jako originální.
     </div></div>
