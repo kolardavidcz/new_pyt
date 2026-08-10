@@ -87,6 +87,9 @@ export const state = {
   /** Quiz scores: slug -> { qId -> { selected, isCorrect, timestamp } } */
   quizScores: {},
 
+  /** Question improvements logged by user: [{ id, timestamp, deckKey, questionId, category, userNote, questionText }] */
+  questionImprovements: [],
+
   /** Print setting: include quizzes in print export */
   printWithQuizzes: true,
 
@@ -97,6 +100,7 @@ export const state = {
 };
 
 const QUIZ_SCORES_KEY = "pcs-quiz-scores-v1";
+const QUESTION_IMPROVEMENTS_KEY = "pcs-question-improvements-v1";
 
 export function saveQuizScore(slug, qId, scoreInfo) {
   if (!state.quizScores[slug]) state.quizScores[slug] = {};
@@ -118,6 +122,73 @@ export function resetDeckQuizScores(slug) {
     } catch { /* ignore */ }
     notifyStateChange("quizScoreReset", { slug });
   }
+}
+
+export async function saveQuestionImprovement(data) {
+  const entry = {
+    id: `imp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    timestamp: new Date().toISOString(),
+    deckKey: data.deckKey || "",
+    questionId: data.questionId || "",
+    questionText: data.questionText || "",
+    questionType: data.questionType || "",
+    category: data.category || "q_a_makes_no_sense",
+    categoryLabel: data.categoryLabel || "Otázka/odpověď nedává smysl",
+    userNote: data.userNote || "",
+    status: "open",
+  };
+
+  if (!Array.isArray(state.questionImprovements)) state.questionImprovements = [];
+  state.questionImprovements.unshift(entry);
+  try {
+    localStorage.setItem(QUESTION_IMPROVEMENTS_KEY, JSON.stringify(state.questionImprovements));
+  } catch { /* ignore */ }
+
+  // 1. Post to local dev server API if available
+  try {
+    await fetch("/api/question-improvement", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry),
+    });
+  } catch { /* ignore */ }
+
+  // 2. Direct online Upstash Redis Cloud DB sync (Zero-Data-Loss)
+  try {
+    const kvUrl = "https://tough-husky-101028.upstash.io";
+    const kvToken = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
+    
+    const getRes = await fetch(`${kvUrl}/get/pyt:global:question_improvements`, {
+      headers: { Authorization: `Bearer ${kvToken}` },
+    });
+    let remoteList = [];
+    if (getRes.ok) {
+      const gData = await getRes.json();
+      if (gData && gData.result) {
+        remoteList = typeof gData.result === "string" ? JSON.parse(gData.result) : gData.result;
+      }
+    }
+
+    const byId = {};
+    for (const item of (Array.isArray(remoteList) ? remoteList : [])) {
+      if (item && item.id) byId[item.id] = item;
+    }
+    for (const item of state.questionImprovements) {
+      if (item && item.id) byId[item.id] = item;
+    }
+    const mergedList = Object.values(byId);
+
+    await fetch(`${kvUrl}/set/pyt:global:question_improvements`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${kvToken}` },
+      body: JSON.stringify(JSON.stringify(mergedList)),
+    });
+  } catch (err) {
+    console.warn("[Upstash Redis Cloud DB Sync Warning]", err);
+  }
+
+  notifyStateChange("questionImprovement", { entry });
+  return entry;
 }
 
 const ERROR_LOG_KEY = "pcs-error-link-log-v1";
@@ -369,9 +440,10 @@ export async function getQuizFor(item) {
   const weekNum = item.weekNum !== undefined ? item.weekNum : (item.week ? item.week : null);
   if (weekNum != null) {
     const urls = [
-      `/data/quizzes/w${weekNum}.json`,
+      `data/quizzes/w${weekNum}.json`,
       `./data/quizzes/w${weekNum}.json`,
-      `../data/quizzes/w${weekNum}.json`
+      `../data/quizzes/w${weekNum}.json`,
+      `/data/quizzes/w${weekNum}.json`
     ];
     for (const u of urls) {
       try {

@@ -15,6 +15,7 @@ Usage:
 
 from __future__ import annotations
 
+import json
 import mimetypes
 import os
 import sys
@@ -32,6 +33,68 @@ mimetypes.add_type("text/css", ".css")
 mimetypes.add_type("application/json", ".json")
 mimetypes.add_type("font/woff2", ".woff2")
 mimetypes.add_type("image/svg+xml", ".svg")
+
+
+def save_question_improvement(entry: dict) -> list:
+    db_path = ROOT / "data" / "question_improvements.json"
+    pub_path = ROOT / "public" / "data" / "question_improvements.json"
+
+    # 1. Read local file items
+    local_items = []
+    if db_path.exists():
+        try:
+            local_items = json.loads(db_path.read_text(encoding="utf-8"))
+        except Exception:
+            local_items = []
+
+    # 2. Read from Upstash Redis Cloud DB
+    remote_items = []
+    kv_url = "https://tough-husky-101028.upstash.io"
+    kv_token = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA"
+
+    try:
+        req = urllib.request.Request(
+            f"{kv_url}/get/pyt:global:question_improvements",
+            headers={"Authorization": f"Bearer {kv_token}"}
+        )
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            if data and data.get("result"):
+                res_val = data["result"]
+                remote_items = json.loads(res_val) if isinstance(res_val, str) else res_val
+    except Exception as e:
+        sys.stderr.write(f"[Upstash KV Fetch Error] {e}\n")
+
+    # 3. Non-destructive union merge by ID (Zero Data Loss)
+    by_id = {}
+    for item in (remote_items or []) + (local_items or []):
+        if isinstance(item, dict) and item.get("id"):
+            by_id[item["id"]] = item
+
+    if isinstance(entry, dict) and entry.get("id"):
+        by_id[entry["id"]] = entry
+
+    merged_list = list(by_id.values())
+
+    # 4. Save merged list to local disk
+    data_str = json.dumps(merged_list, indent=2, ensure_ascii=False)
+    db_path.write_text(data_str, encoding="utf-8")
+    pub_path.write_text(data_str, encoding="utf-8")
+
+    # 5. Sync merged list to Upstash Redis Cloud DB
+    try:
+        set_req = urllib.request.Request(
+            f"{kv_url}/set/pyt:global:question_improvements",
+            data=json.dumps(data_str).encode("utf-8"),
+            headers={"Authorization": f"Bearer {kv_token}"},
+            method="POST"
+        )
+        with urllib.request.urlopen(set_req, timeout=4) as resp:
+            pass
+    except Exception as e:
+        sys.stderr.write(f"[Upstash KV Push Error] {e}\n")
+
+    return merged_list
 
 
 def resolve_url_path(url_path: str) -> Path | None:
@@ -150,6 +213,38 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(size))
         self.end_headers()
+
+    def do_POST(self):
+        parsed = urlparse(self.path)
+        if parsed.path == "/api/question-improvement":
+            length = int(self.headers.get("Content-Length", 0))
+            raw_body = self.rfile.read(length)
+            try:
+                entry = json.loads(raw_body.decode("utf-8"))
+                if not entry.get("id"):
+                    import time
+                    entry["id"] = f"imp-{int(time.time() * 1000)}"
+                if not entry.get("timestamp"):
+                    import datetime
+                    entry["timestamp"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+                updated_db = save_question_improvement(entry)
+                resp = json.dumps({"status": "ok", "entry": entry, "total": len(updated_db)}).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(resp)))
+                self.end_headers()
+                self.wfile.write(resp)
+            except Exception as e:
+                err_resp = json.dumps({"status": "error", "message": str(e)}).encode("utf-8")
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(err_resp)))
+                self.end_headers()
+                self.wfile.write(err_resp)
+            return
+
+        self.send_error(404, f"Not found: {parsed.path}")
 
     def log_message(self, fmt, *args):
         sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))

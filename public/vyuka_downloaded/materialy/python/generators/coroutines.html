@@ -229,30 +229,30 @@
         Korutiny mohou vesele výjimky generovat, ale dokonce i přijímat (skrze svoji metodu <code>throw()</code>):
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; class MojeVýjimka(Exception):
-        ...     pass
-        ... 
-        ... def korutina():
-        ...     try:
-        ...         while True:
-        ...             hodnota = (yield)
-        ...             print('korutina:', hodnota)
-        ...     except MojeVýjimka:
-        ...         print('Zachycena MojeVýjimka!')
-        ...  
-        ... k = korutina()
-        ... next(k)
+&gt;&gt;&gt; class MojeVýjimka(Exception):
+...     pass
+... 
+... def korutina():
+...     try:
+...         while True:
+...             hodnota = (yield)
+...             print('korutina:', hodnota)
+...     except MojeVýjimka:
+...         print('Zachycena MojeVýjimka!')
+...  
+... k = korutina()
+... next(k)
         
-        &gt;&gt;&gt; k.send('Ahoj!')
+&gt;&gt;&gt; k.send('Ahoj!')
         korutina: Ahoj!
         
-        &gt;&gt;&gt; k.throw(MojeVýjimka)
+&gt;&gt;&gt; k.throw(MojeVýjimka)
         Zachycena MojeVýjimka!
         Traceback (most recent call last):
           File "&lt;pyshell#27&gt;", line 1, in &lt;module&gt;
             k.throw(MojeVýjimka)
         StopIteration
-    </pre>
+</pre>
     <p>
         Zavolání metody <em>throw(VÝJIMKA)</em> nejdříve způsobí návrat do korutiny/generátoru na příslušné místo, kde teprve je zaslaná výjimka vyvolána.
     </p>
@@ -263,26 +263,26 @@
         Chcete-li zastavit existující korutinu/generátor (<a href="generators.xml?slajd=8">jak už víme</a>, vyrobit nekonečný generátor je hračka), použijte její/jeho metodu <strong><code>close()</code></strong>. Příklad pro známý nekonečný generátor lichých čísel (ve variantě s počátkem):
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; def lichá_čísla(od):
-        ...     číslo = od - 2
-        ...     while True:
-        ...         číslo += 2
-        ...         yield číslo
+&gt;&gt;&gt; def lichá_čísla(od):
+...     číslo = od - 2
+...     while True:
+...         číslo += 2
+...         yield číslo
         
-        &gt;&gt;&gt; g = lichá_čísla(11)
+&gt;&gt;&gt; g = lichá_čísla(11)
         
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         9: 11
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         10: 13
         
-        &gt;&gt;&gt; g.close()
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; g.close()
+&gt;&gt;&gt; next(g)
         Traceback (most recent call last):
           File "&lt;pyshell#33&gt;", line 1, in &lt;module&gt;
             next(g)
         StopIteration
-    </pre>
+</pre>
     <p>
         Zavolání této metody způsobí odeslání výjimky <strong><code>GeneratorExit</code></strong> do korutiny/generátoru.
     </p>

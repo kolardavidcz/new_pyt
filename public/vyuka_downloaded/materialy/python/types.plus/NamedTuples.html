@@ -37,18 +37,18 @@
         Příklad je (nejen) v tomto případě asi výmluvnější:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; from collections import namedtuple
-        &gt;&gt;&gt; def bod(x, y, z):
-        ...     bod = namedtuple('bod_3D', 'x y z r')
-        ...     from math import sqrt
-        ...     return bod(x, y, z, sqrt(x*x + y*y + z*z))
+&gt;&gt;&gt; from collections import namedtuple
+&gt;&gt;&gt; def bod(x, y, z):
+...     bod = namedtuple('bod_3D', 'x y z r')
+...     from math import sqrt
+...     return bod(x, y, z, sqrt(x*x + y*y + z*z))
          
-        &gt;&gt;&gt; b = bod(2, 1, 3)
-        &gt;&gt;&gt; b
+&gt;&gt;&gt; b = bod(2, 1, 3)
+&gt;&gt;&gt; b
         bod_3D(x=2, y=1, z=3, r=3.7416573867739413)
-        &gt;&gt;&gt; b.z
+&gt;&gt;&gt; b.z
         3
-    </pre>
+</pre>
     <p>
         Proměnná <em>b</em> je tedy objektem o čtyřech prvcích (přičemž čtvrtý je dopočítán z prvních tří během zavedení), k nimž je možno přistupovat podle jejich jména.
     </p>
@@ -78,16 +78,16 @@
         Jména jednotlivých prvků je možno jak z konstruktoru pojmenované n-tice, tak přímo z konkrétní instance vytáhnout pomocí parametru <strong><code>_fields</code></strong>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
-        &gt;&gt;&gt; Bod._fields
+&gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
+&gt;&gt;&gt; Bod._fields
         ('x', 'y', 'z')
         
-        &gt;&gt;&gt; bod = Bod(x=1, y=2, z=3)
-        &gt;&gt;&gt; bod
+&gt;&gt;&gt; bod = Bod(x=1, y=2, z=3)
+&gt;&gt;&gt; bod
         Bod3D(x=1, y=2, z=3)
-        &gt;&gt;&gt; bod._fields
+&gt;&gt;&gt; bod._fields
         ('x', 'y', 'z')
-    </pre>
+</pre>
     <p>
         Vrácený objekt je n-tice, což umožňuje se jmény dále snadno pracovat.
     </p>
@@ -105,26 +105,26 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # řetězec jmen oddělených mezerami
-        &gt;&gt;&gt; NT = namedtuple('Bod3D', 'x y z')
-        &gt;&gt;&gt; NT._fields
+&gt;&gt;&gt; NT = namedtuple('Bod3D', 'x y z')
+&gt;&gt;&gt; NT._fields
         ('x', 'y', 'z')
         
         # řetězec jmen oddělených čárkou
-        &gt;&gt;&gt; NT = namedtuple('Bod3D', 'x,y,z')
-        &gt;&gt;&gt; NT._fields
+&gt;&gt;&gt; NT = namedtuple('Bod3D', 'x,y,z')
+&gt;&gt;&gt; NT._fields
         ('x', 'y', 'z')
-        &gt;&gt;&gt; NT = namedtuple('Bod3D', 'x, y, z')
-        &gt;&gt;&gt; NT._fields
+&gt;&gt;&gt; NT = namedtuple('Bod3D', 'x, y, z')
+&gt;&gt;&gt; NT._fields
         ('x', 'y', 'z')
         
         # ze sekvence řetězců
-        &gt;&gt;&gt; NT = namedtuple('Bod3D', ['x', 'y', 'z'])
-        &gt;&gt;&gt; NT._fields
+&gt;&gt;&gt; NT = namedtuple('Bod3D', ['x', 'y', 'z'])
+&gt;&gt;&gt; NT._fields
         ('x', 'y', 'z')
-        &gt;&gt;&gt; NT = namedtuple('Bod3D', ('x', 'y', 'z'))
-        &gt;&gt;&gt; NT._fields
+&gt;&gt;&gt; NT = namedtuple('Bod3D', ('x', 'y', 'z'))
+&gt;&gt;&gt; NT._fields
         ('x', 'y', 'z')
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id6" data-title="Přístup k prvkům"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Přístup k prvkům</h2></div><div class="section-body">
 
@@ -132,26 +132,26 @@
         Přístup pomocí jmen je jeden z hlavních důvodů pro existenci pojemnovaných n-tic, ale celkově se k jednotlivým prvkům dá přistupovat mnoha způsoby:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; NT = namedtuple('Bod3D', 'x y z')
-        &gt;&gt;&gt; bod = NT(x=1, y=2, z=3)
-        &gt;&gt;&gt; bod
+&gt;&gt;&gt; NT = namedtuple('Bod3D', 'x y z')
+&gt;&gt;&gt; bod = NT(x=1, y=2, z=3)
+&gt;&gt;&gt; bod
         Bod3D(x=1, y=2, z=3)
         
         # jménem jako u tříd
-        &gt;&gt;&gt; bod.x
+&gt;&gt;&gt; bod.x
         1
         
         # pořadím jako u n-tic
-        &gt;&gt;&gt; bod[0]
+&gt;&gt;&gt; bod[0]
         1
         
         # z řetězce pomocí funkce „getattr()“
-        &gt;&gt;&gt; getattr(bod, 'x')
+&gt;&gt;&gt; getattr(bod, 'x')
         1
-        &gt;&gt;&gt; jméno = 'x'
-        &gt;&gt;&gt; getattr(bod, jméno)
+&gt;&gt;&gt; jméno = 'x'
+&gt;&gt;&gt; getattr(bod, jméno)
         1
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Pro srovnání – u slovníků je přístup <code>xs[KLÍČ]</code>, kde <em>KLÍČ</em>em může být libovolný hešovatelný typ.
     </div></div>
@@ -165,30 +165,30 @@
         <li>
             a) nepovolená jména
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; student = namedtuple('Student', 'name class age gender')
+&gt;&gt;&gt; student = namedtuple('Student', 'name class age gender')
                 Traceback (most recent call last):
                   File "&lt;stdin&gt;", line 1, in &lt;module&gt;
                   File "/usr/lib/python3.4/collections/__init__.py", line 341, in namedtuple
                     'keyword: %r' % name)
                 ValueError: Type names and field names cannot be a keyword: 'class'
                 
-                &gt;&gt;&gt; student = namedtuple('Student', 'name class age gender', rename=True)
-                &gt;&gt;&gt; student._fields
+&gt;&gt;&gt; student = namedtuple('Student', 'name class age gender', rename=True)
+&gt;&gt;&gt; student._fields
                 ('name', '_1', 'age', 'gender')
             </pre>
         </li>
         <li>
             b) duplikace jmen
             <pre class="brush: python; gutter: false; toolbar: false; ">
-                &gt;&gt;&gt; student = namedtuple('Student', 'name age gender age')
+&gt;&gt;&gt; student = namedtuple('Student', 'name age gender age')
                 Traceback (most recent call last):
                   File "&lt;stdin&gt;", line 1, in &lt;module&gt;
                   File "/usr/lib/python3.4/collections/__init__.py", line 348, in namedtuple
                     raise ValueError('Encountered duplicate field name: %r' % name)
                 ValueError: Encountered duplicate field name: 'age'
                 
-                &gt;&gt;&gt; student = namedtuple('Student', 'name age gender age', rename=True)
-                &gt;&gt;&gt; student._fields
+&gt;&gt;&gt; student = namedtuple('Student', 'name age gender age', rename=True)
+&gt;&gt;&gt; student._fields
                 ('name', 'age', 'gender', '_3')
             </pre>
         </li>
@@ -203,37 +203,37 @@
         Jak jsme viděli na předchozích slajdech, instance pojmenovaných n-tic se typicky vyrábí pomocí volání konstruktoru s pojmenovanými parametry, ale jde to i pozičně:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
+&gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
         
         # a) pozičně
-        &gt;&gt;&gt; bod = Bod(1, 2, 3)
-        &gt;&gt;&gt; bod
+&gt;&gt;&gt; bod = Bod(1, 2, 3)
+&gt;&gt;&gt; bod
         Bod3D(x=1, y=2, z=3)
         
         # a) přeze jména
-        &gt;&gt;&gt; bod = Bod(x=1, y=2, z=3)
-        &gt;&gt;&gt; bod
+&gt;&gt;&gt; bod = Bod(x=1, y=2, z=3)
+&gt;&gt;&gt; bod
         Bod3D(x=1, y=2, z=3)
-    </pre>
+</pre>
     
     <p class="enumerate">
         Díky tomu lze ovšem s výhodou použít i triky s rozbalováním vhodných struktur za pomoci operátorů <strong><code>*</code></strong> a <strong><code>**</code></strong>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
+&gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
         
         # a) pozičně
-        &gt;&gt;&gt; hodnoty = [1, 2, 3]
-        &gt;&gt;&gt; bod = Bod(*hodnoty)
-        &gt;&gt;&gt; bod
+&gt;&gt;&gt; hodnoty = [1, 2, 3]
+&gt;&gt;&gt; bod = Bod(*hodnoty)
+&gt;&gt;&gt; bod
         Bod3D(x=1, y=2, z=3)
         
         # a) přeze jména
-        &gt;&gt;&gt; hodnoty = {'x': 1, 'y': 2, 'z': 3}
-        &gt;&gt;&gt; bod = Bod(**hodnoty)
-        &gt;&gt;&gt; bod
+&gt;&gt;&gt; hodnoty = {'x': 1, 'y': 2, 'z': 3}
+&gt;&gt;&gt; bod = Bod(**hodnoty)
+&gt;&gt;&gt; bod
         Bod3D(x=1, y=2, z=3)
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id9" data-title="Přiřazení hodnot pomocí „_make()“"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Přiřazení hodnot pomocí „_make()“</h2></div><div class="section-body">
 
@@ -241,12 +241,12 @@
         Na přiřazování podle pozice je k dispozici ještě metoda <strong><code>_make(ITERABLE)</code></strong>, která je schopna zpracovat téměř libovolný vstupní iterovatelný objekt:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
+&gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
         
-        &gt;&gt;&gt; bod = Bod._make([1, 2, 3])
-        &gt;&gt;&gt; bod
+&gt;&gt;&gt; bod = Bod._make([1, 2, 3])
+&gt;&gt;&gt; bod
         Bod3D(x=1, y=2, z=3)
-    </pre>
+</pre>
     <p>
         Čehož se s velkou výhodou používá například při načítání hodnot z CSV-souborů nebo databází:
     </p>
@@ -274,34 +274,34 @@
         Ačkoli se pojmenované n-tice na venek stále tváří jako skutečné n-tice, to znamená jako neproměnné objekty, pomocí metody <strong><code>_replace(kwargs)</code></strong> lze na základě původní pojmenované n-tice vyrobit pojmenovanou n-tici novou, jejíž některé prvky budou obsahovat hodnoty nové:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
-        &gt;&gt;&gt; bod = Bod(1, 2, 3)
-        &gt;&gt;&gt; bod
+&gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')
+&gt;&gt;&gt; bod = Bod(1, 2, 3)
+&gt;&gt;&gt; bod
         Bod3D(x=1, y=2, z=3)
         
         # záměnou je vrácena nová pojmenovaná n-tice
-        &gt;&gt;&gt; bod._replace(y=6)
+&gt;&gt;&gt; bod._replace(y=6)
         Bod3D(x=1, y=6, z=3)
         
         # původní objekt zůstal nezměněn
-        &gt;&gt;&gt; bod
+&gt;&gt;&gt; bod
         Bod3D(x=1, y=2, z=3)
-    </pre>
+</pre>
     <br>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Tudíž provedete-li přiřazení <code>bod = bod._replace(y=6)</code>, ve výsledku nahradíte původní n-tici n-ticí novou:
         <pre class="brush: python; gutter: false; toolbar: false; ">
             # původní „bod“
-            &gt;&gt;&gt; bod
+&gt;&gt;&gt; bod
             Bod3D(x=1, y=2, z=3)
-            &gt;&gt;&gt; id(bod)
+&gt;&gt;&gt; id(bod)
             140361685120808
             
             # nový „bod“
-            &gt;&gt;&gt; bod = bod._replace(y=6)
-            &gt;&gt;&gt; bod
+&gt;&gt;&gt; bod = bod._replace(y=6)
+&gt;&gt;&gt; bod
             Bod3D(x=1, y=6, z=3)
-            &gt;&gt;&gt; id(bod)
+&gt;&gt;&gt; id(bod)
             140361685121608
         </pre>
     </div></div>
@@ -312,31 +312,31 @@
         Výpisu jmen prvků pomocí <em>_fields</em> jde použít k „subklásování“:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; Bod2D = namedtuple('Bod2D', 'x y')
-        &gt;&gt;&gt; Bod2D._fields
+&gt;&gt;&gt; Bod2D = namedtuple('Bod2D', 'x y')
+&gt;&gt;&gt; Bod2D._fields
         ('x', 'y')
         
-        &gt;&gt;&gt; Bod3D = namedtuple('Bod3D', Bod2D._fields + ('z',))
-        &gt;&gt;&gt; Bod3D._fields
+&gt;&gt;&gt; Bod3D = namedtuple('Bod3D', Bod2D._fields + ('z',))
+&gt;&gt;&gt; Bod3D._fields
         ('x', 'y', 'z')
-    </pre>
+</pre>
     
     <p class="enumerate">
         Pomocí <em>_replace()</em> zase můžete simulovat výchozí hodnoty:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; Account = namedtuple('Account', 'owner balance transaction_count')
+&gt;&gt;&gt; Account = namedtuple('Account', 'owner balance transaction_count')
         
         # výchozí pojmenovaná n-tice s předpřipravenými hodnotami
-        &gt;&gt;&gt; default_account = Account('&lt;owner name&gt;', 0.0, 0)
-        &gt;&gt;&gt; default_account
+&gt;&gt;&gt; default_account = Account('&lt;owner name&gt;', 0.0, 0)
+&gt;&gt;&gt; default_account
         Account(owner='&lt;owner name&gt;', balance=0.0, transaction_count=0)
         
         # výroba nového objektu – část hodnot výchozí, část nová
-        &gt;&gt;&gt; johns_account = default_account._replace(owner='John')
-        &gt;&gt;&gt; johns_account
+&gt;&gt;&gt; johns_account = default_account._replace(owner='John')
+&gt;&gt;&gt; johns_account
         Account(owner='John', balance=0.0, transaction_count=0)
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Podle dokumentace.
     </div></div>
@@ -345,17 +345,17 @@
         A konečně můžete pojmenovanou n-tici natvrdo podědit a upravit její funkcionalitu:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; class Point(namedtuple('Point', 'x y')):
-        ...   __slots__ = ()
-        ...   @property
-        ...   def hypot(self):
-        ...     return (self.x ** 2 + self.y ** 2) ** 0.5
-        ...   def __str__(self):
-        ...     return 'Point: x=%6.3f  y=%6.3f  hypot=%6.3f' % (self.x, self.y, self.hypot)
-        ... 
-        &gt;&gt;&gt; for p in Point(3, 4), Point(14, 5/7):
-        ...   print(p)
-        ... 
+&gt;&gt;&gt; class Point(namedtuple('Point', 'x y')):
+...   __slots__ = ()
+...   @property
+...   def hypot(self):
+...     return (self.x ** 2 + self.y ** 2) ** 0.5
+...   def __str__(self):
+...     return 'Point: x=%6.3f  y=%6.3f  hypot=%6.3f' % (self.x, self.y, self.hypot)
+... 
+&gt;&gt;&gt; for p in Point(3, 4), Point(14, 5/7):
+...   print(p)
+... 
         Point: x= 3.000  y= 4.000  hypot= 5.000
         Point: x=14.000  y= 0.714  hypot=14.018
     </pre>

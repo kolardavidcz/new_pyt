@@ -15,10 +15,10 @@ import { escapeHtml } from "./ui.js";
 async function loadJson(url) {
   const clean = url.replace(/^\//, "");
   const urlsToTry = [
-    "/" + clean,
     "data/" + clean.replace(/^data\//, ""),
     "./data/" + clean.replace(/^data\//, ""),
     "../data/" + clean.replace(/^data\//, ""),
+    "/" + clean,
     "./" + clean,
   ];
   let lastErr = null;
@@ -26,7 +26,14 @@ async function loadJson(url) {
     try {
       const res = await fetch(u, { cache: "no-store" });
       if (res.ok) {
-        return await res.json();
+        const contentType = res.headers.get("content-type") || "";
+        if (!contentType.includes("text/html")) {
+          try {
+            return await res.json();
+          } catch (e) {
+            lastErr = e;
+          }
+        }
       }
     } catch (e) {
       lastErr = e;

@@ -41,10 +41,10 @@
         Pro vyřešení musíme vědět, že čísla jsou v PNG zapsána v pořadí <em>big-endian</em> a jde o klasický čtyřbajtový <em>int</em>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; import struct
-        &gt;&gt;&gt; struct.unpack('&gt;I', b'\x00\x00\x01\x4d')
+&gt;&gt;&gt; import struct
+&gt;&gt;&gt; struct.unpack('&gt;I', b'\x00\x00\x01\x4d')
         (333,)
-    </pre>
+</pre>
     <p>
         Znak <code>&gt;</code> v tzv. <strong>formátovacím řetězci</strong> říká, že jde o pořadí <em>big-endian</em>, a znak <code>I</code> pak udává, že jde o čtyřbajtové celé číslo. Hledaná délka je tedy 333 bajtů.
     </p>
@@ -129,7 +129,7 @@
 &gt;&gt;&gt; import struct
 &gt;&gt;&gt; 8 * struct.calcsize('P')
 64
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id6" data-title="Příznaky překladu"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Příznaky překladu</h2></div><div class="section-body">
 
@@ -290,12 +290,12 @@
         Používáte-li nějaký konkrétní formátovací řetězec vícekrát, je vhodné pro něj zavést vlastní objekt..
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; fmto = struct.Struct('&gt;I')
-        &gt;&gt;&gt; fmto
+&gt;&gt;&gt; fmto = struct.Struct('&gt;I')
+&gt;&gt;&gt; fmto
         &lt;Struct object at 0x7f3029931340&gt;
-        &gt;&gt;&gt; fmto.unpack(b'\x00\x00\x01\x4d')
+&gt;&gt;&gt; fmto.unpack(b'\x00\x00\x01\x4d')
         (333,)
-    </pre>
+</pre>
     <p>
         ..na kterém jsou dostupné prakticky všechny metody modulu <em>struct</em> (výjimkou je metoda <a href="?slajd=11"><em>calcsize()</em></a>, kterou nahrazuje atribut <em>size</em> se stejným významem). Ušetříte tím totiž na neustálé kompilaci formátovacího řetězce.
     </p>
@@ -310,23 +310,23 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # zabalení v pořadí znak – celé číslo
-        &gt;&gt;&gt; struct.pack('&gt;cl', b'j', 1)
+&gt;&gt;&gt; struct.pack('&gt;cl', b'j', 1)
         b'j\x00\x00\x00\x01'
-        &gt;&gt;&gt; struct.pack('&lt;cl', b'j', 1)
+&gt;&gt;&gt; struct.pack('&lt;cl', b'j', 1)
         b'j\x01\x00\x00\x00'
 
         # zabalení v pořadí celé číslo – znak
-        &gt;&gt;&gt; struct.pack('&gt;lc', 1, b'j')
+&gt;&gt;&gt; struct.pack('&gt;lc', 1, b'j')
         b'\x00\x00\x00\x01j'
-        &gt;&gt;&gt; struct.pack('&lt;lc', 1, b'j')
+&gt;&gt;&gt; struct.pack('&lt;lc', 1, b'j')
         b'\x01\x00\x00\x00j'
 
         # ukázka rozbalení (varianta big-endian)
-        &gt;&gt;&gt; struct.unpack('&gt;cl', b'j\x00\x00\x00\x01')
+&gt;&gt;&gt; struct.unpack('&gt;cl', b'j\x00\x00\x00\x01')
         (b'j', 1)
-        &gt;&gt;&gt; struct.unpack('&gt;lc', b'\x00\x00\x00\x01j')
+&gt;&gt;&gt; struct.unpack('&gt;lc', b'\x00\x00\x00\x01j')
         (1, b'j')
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id10" data-title="Poznámka k zarovnání"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Poznámka k zarovnání</h2></div><div class="section-body">
 
@@ -335,17 +335,17 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # zabalení
-        &gt;&gt;&gt; struct.pack('cl', b'j', 1)
+&gt;&gt;&gt; struct.pack('cl', b'j', 1)
         b'j\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00'
-        &gt;&gt;&gt; struct.pack('lc', 1, b'j')
+&gt;&gt;&gt; struct.pack('lc', 1, b'j')
         b'\x01\x00\x00\x00\x00\x00\x00\x00j'
 
         # rozbalení
-        &gt;&gt;&gt; struct.unpack('cl', b'j\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00')
+&gt;&gt;&gt; struct.unpack('cl', b'j\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00')
         (b'j', 1)
-        &gt;&gt;&gt; struct.unpack('lc', b'\x01\x00\x00\x00\x00\x00\x00\x00j')
+&gt;&gt;&gt; struct.unpack('lc', b'\x01\x00\x00\x00\x00\x00\x00\x00j')
         (1, b'j')
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Nezapomeňte, že příklady jsou ukázány na 64-bitovém little-endian systému.
     </div></div>
@@ -354,19 +354,19 @@
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # zabalení
-        &gt;&gt;&gt; struct.pack('lc', 1, b'j')
+&gt;&gt;&gt; struct.pack('lc', 1, b'j')
         b'\x01\x00\x00\x00\x00\x00\x00\x00j'
-        &gt;&gt;&gt; struct.pack('lc0h', 1, b'j')
+&gt;&gt;&gt; struct.pack('lc0h', 1, b'j')
         b'\x01\x00\x00\x00\x00\x00\x00\x00j\x00'
-        &gt;&gt;&gt; struct.pack('lc0i', 1, b'j')
+&gt;&gt;&gt; struct.pack('lc0i', 1, b'j')
         b'\x01\x00\x00\x00\x00\x00\x00\x00j\x00\x00\x00'
-        &gt;&gt;&gt; struct.pack('lc0l', 1, b'j')
+&gt;&gt;&gt; struct.pack('lc0l', 1, b'j')
         b'\x01\x00\x00\x00\x00\x00\x00\x00j\x00\x00\x00\x00\x00\x00\x00'
 
         # rozbalení
-        &gt;&gt;&gt; struct.unpack('lc0l', b'\x01\x00\x00\x00\x00\x00\x00\x00j\x00\x00\x00\x00\x00\x00\x00')
+&gt;&gt;&gt; struct.unpack('lc0l', b'\x01\x00\x00\x00\x00\x00\x00\x00j\x00\x00\x00\x00\x00\x00\x00')
         (1, b'j')
-    </pre>
+</pre>
 
     
 
@@ -376,24 +376,24 @@
         Nejen vzhledem k chování přirozeného zarovnání se vyplatí vědět, kolik bajtů vlastně uvedená struktura zabere. K tomu slouží metoda <em>calcsize('FORMAT')</em>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; struct.calcsize('cl')
+&gt;&gt;&gt; struct.calcsize('cl')
         16
-        &gt;&gt;&gt; struct.calcsize('lc')
+&gt;&gt;&gt; struct.calcsize('lc')
         9
-        &gt;&gt;&gt; struct.calcsize('lc0l')
+&gt;&gt;&gt; struct.calcsize('lc0l')
         16
-    </pre>
+</pre>
 
     <p class="enumerate">
         Pro předkompilované formátovací objekty pak máme k dispozici následující jejich atributy:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; fmto = struct.Struct('&gt;i')
-        &gt;&gt;&gt; fmto.format
+&gt;&gt;&gt; fmto = struct.Struct('&gt;i')
+&gt;&gt;&gt; fmto.format
         b'&gt;i'
-        &gt;&gt;&gt; fmto.size
+&gt;&gt;&gt; fmto.size
         4
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id12" data-title="„iter_unpack()“"><div class="section-header"><span class="section-num">12</span><h2 class="section-title">„iter_unpack()“</h2></div><div class="section-body">
 
@@ -401,13 +401,13 @@
         Sekvenci stejně zabalených (n-tic) hodnot můžeme rozbalit také iterativně:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; xs = struct.pack('&gt;hIhI', 1, 2, 3, 4)
-        &gt;&gt;&gt; xs
+&gt;&gt;&gt; xs = struct.pack('&gt;hIhI', 1, 2, 3, 4)
+&gt;&gt;&gt; xs
         b'\x00\x01\x00\x00\x00\x02\x00\x03\x00\x00\x00\x04'
 
-        &gt;&gt;&gt; for x in struct.iter_unpack('&gt;hI', xs):
-        ...    print(x)
-        ... 
+&gt;&gt;&gt; for x in struct.iter_unpack('&gt;hI', xs):
+...    print(x)
+... 
         (1, 2)
         (3, 4)
     </pre>

@@ -43,9 +43,9 @@
 &gt;&gt;&gt; next(g)
 Traceback (most recent call last):
   File "&lt;pyshell#117&gt;", line 1, in &lt;module&gt;
-    next(g)
+next(g)
 StopIteration
-    </pre>
+</pre>
     <ul>
         <li>
             Každé <code>yield</code> „zmrazí“ funkci v aktuálním stavu, a tak při příštím zavolání generátoru se řízení vrátí přesně do tohoto stavu (narozdíl od funkce, která se „spustí“ znovu od začátku).
@@ -152,9 +152,9 @@ třetí volání
 &gt;&gt;&gt; g.__next__()
 Traceback (most recent call last):
   File "&lt;pyshell#123&gt;", line 1, in &lt;module&gt;
-    g.__next__()
+g.__next__()
 StopIteration
-    </pre>
+</pre>
     <p>
         Tohle v kódu nebude chtít jen tak použít, ale naznačuje to přímou souvislost s <a href="/materialy/python/iterators/iterators.xml">iterátory</a>.
     </p>
@@ -165,29 +165,29 @@ StopIteration
         Zatím jsem moc nezdůraznil, že <strong>zavolaný generátor vždy vykoná veškerý dostupný kód, než se zarazí po vrácení hodnoty vykonáním příslušného následujícího <code>yield</code>'u</strong>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; def generátor():
-        ...     print('Start!')
-        ...     yield 1
-        ...     print('Jsme v generátoru…')
-        ...     yield 2
-        ...     print('Brzy bude konec.')
-        &gt;&gt;&gt; g = generátor()
+&gt;&gt;&gt; def generátor():
+...     print('Start!')
+...     yield 1
+...     print('Jsme v generátoru…')
+...     yield 2
+...     print('Brzy bude konec.')
+&gt;&gt;&gt; g = generátor()
         
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         Start!
         0: 1
         
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         Jsme v generátoru…
         1: 2
         
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         Brzy bude konec.
         Traceback (most recent call last):
           File "&lt;pyshell#5&gt;", line 1, in &lt;module&gt;
             next(g)
         StopIteration
-    </pre>
+</pre>
     <p>
         Asi nejdůležitější je si uvědomit, že se to především týká veškerého kódu před prvním <em>yield</em>'em. To znamená, že <strong>zavolání funkce „konstruktoru“ dekorátoru nezačne automaticky vykonávat v ní (resp. v něm) obsažený kód – to obstará až první zavolání funkce <code>next()</code></strong>.
     </p>
@@ -198,19 +198,19 @@ StopIteration
         Přestože funkce obsahující místo <em>return</em> slovo <em>yield</em> fakticky slouží jako <strong>konstruktor generátoru</strong> (aneb jejím zavoláním je vytvořen objekt úplně jiného typu – místo vrácené hodnoty dostaneme generátor), není žádný důvod, proč by nemohla přijímat vstupní parametry. Příklad:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; def lichá_čísla(od=1):
-        ...     číslo = od - 2
-        ...     while True:
-        ...         číslo += 2
-        ...         yield číslo
+&gt;&gt;&gt; def lichá_čísla(od=1):
+...     číslo = od - 2
+...     while True:
+...         číslo += 2
+...         yield číslo
          
-        &gt;&gt;&gt; g = lichá_čísla(11)
+&gt;&gt;&gt; g = lichá_čísla(11)
          
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         9: 11
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         10: 13
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id10" data-title="Konečné generátory"><div class="section-header"><span class="section-num">10</span><h2 class="section-title">Konečné generátory</h2></div><div class="section-body">
 
@@ -259,27 +259,27 @@ StopIteration
         Ale jde to i jinak – generátory podporují své explicitní ukončení také pomocí metody <code>close()</code>:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; def lichá_čísla(od):
-        ...     číslo = od - 2
-        ...     while True:
-        ...         číslo += 2
-        ...         yield číslo
+&gt;&gt;&gt; def lichá_čísla(od):
+...     číslo = od - 2
+...     while True:
+...         číslo += 2
+...         yield číslo
          
-        &gt;&gt;&gt; g = lichá_čísla(11)
+&gt;&gt;&gt; g = lichá_čísla(11)
          
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         9: 11
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         10: 13
          
-        &gt;&gt;&gt; g.close()
+&gt;&gt;&gt; g.close()
         
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         Traceback (most recent call last):
           File "&lt;pyshell#33&gt;", line 1, in &lt;module&gt;
             next(g)
         StopIteration
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id13" data-title="Nekonečné generátory"><div class="section-header"><span class="section-num">13</span><h2 class="section-title">Nekonečné generátory</h2></div><div class="section-body">
 
@@ -287,21 +287,21 @@ StopIteration
         Jak jsme <a href="?slajd=8">už viděli</a>, jedna z mnoha výhod generátorů tkví v tom, že mohou být potenciálně i nekonečné, aniž bychom se museli bát o dostupnou paměť – počítá (a vrací) se z nich jenom to, co je v danou chvíli skutečně potřeba:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; def sudá_čísla():
-        ...     číslo = 0
-        ...     while True:
-        ...         číslo += 2
-        ...         yield číslo
+&gt;&gt;&gt; def sudá_čísla():
+...     číslo = 0
+...     while True:
+...         číslo += 2
+...         yield číslo
         
-        &gt;&gt;&gt; g = sudá_čísla()
+&gt;&gt;&gt; g = sudá_čísla()
         
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         2
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         4
-        &gt;&gt;&gt; next(g)
+&gt;&gt;&gt; next(g)
         6
-    </pre>
+</pre>
     <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
         Samozřejmě si pak musíte dát pozor, abyste se nechytili v nekonečné smyčce ^_^
     </div></div>

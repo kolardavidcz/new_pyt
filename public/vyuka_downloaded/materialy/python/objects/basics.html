@@ -190,22 +190,22 @@
         Kromě „obyčejných“ proměnných můžeme do tříd schovat samozřejmě i funkce. A dokud se ke třídě chováme jako ke jmennému prostoru, všechno funguje přesně tak, jak bychom čekali:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; class T:
-        ...     
-        ...     a = 'Ahoj!'
-        ...     
-        ...     def fn(x):
-        ...         return f'Zavoláno: fn({x})'
+&gt;&gt;&gt; class T:
+...     
+...     a = 'Ahoj!'
+...     
+...     def fn(x):
+...         return f'Zavoláno: fn({x})'
 
-        &gt;&gt;&gt; T.a
+&gt;&gt;&gt; T.a
         'Ahoj!'
-        &gt;&gt;&gt; T.fn
+&gt;&gt;&gt; T.fn
         &lt;function T.fn at 0x000001F4751C0D60&gt;
-        &gt;&gt;&gt; T.fn(666)
+&gt;&gt;&gt; T.fn(666)
         'Zavoláno: fn(666)'
-        &gt;&gt;&gt; T.fn('Baf!')
+&gt;&gt;&gt; T.fn('Baf!')
         'Zavoláno: fn(Baf!)'
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id6" data-title="Funkce jako atributy tříd II"><div class="section-header"><span class="section-num">6</span><h2 class="section-title">Funkce jako atributy tříd II</h2></div><div class="section-body">
 
@@ -213,22 +213,22 @@
         Jakmile ale začneme třídy používat jako konstruktory instancí, vystrčí na nás nos podle mě kardinálně špatné rozhodnutí tvůrců Python'u:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; class T:
-        ...     
-        ...     a = 'Ahoj!'
-        ...     
-        ...     def fn(x):
-        ...         return f'Zavoláno: fn({x})'
+&gt;&gt;&gt; class T:
+...     
+...     a = 'Ahoj!'
+...     
+...     def fn(x):
+...         return f'Zavoláno: fn({x})'
 
-        &gt;&gt;&gt; t = T()
-        &gt;&gt;&gt; t.fn
+&gt;&gt;&gt; t = T()
+&gt;&gt;&gt; t.fn
         &lt;bound method T.fn of &lt;__main__.T object at 0x000001F4749AB830&gt;&gt;
-        &gt;&gt;&gt; t.fn(666)
+&gt;&gt;&gt; t.fn(666)
         Traceback (most recent call last):
           File "&lt;pyshell#7&gt;", line 1, in &lt;module&gt;
             t.fn(666)
         TypeError: T.fn() takes 1 positional argument but 2 were given
-    </pre>
+</pre>
     <p>
         Dva poziční argumenty? Jenom proto, že jsem funkci zavolal na instanci? Co to má znamenat?
     </p>
@@ -239,20 +239,20 @@
         Dobře, zkusme se tomu přizpůsobit:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; class T:
-        ...     
-        ...     a = 'Ahoj!'
-        ...     
-        ...     def fn(x, y):
-        ...         return f'Zavoláno: fn({x}, {y})'
+&gt;&gt;&gt; class T:
+...     
+...     a = 'Ahoj!'
+...     
+...     def fn(x, y):
+...         return f'Zavoláno: fn({x}, {y})'
 
-        &gt;&gt;&gt; t = T()
-        &gt;&gt;&gt; t.fn(666)
+&gt;&gt;&gt; t = T()
+&gt;&gt;&gt; t.fn(666)
         'Zavoláno: fn(&lt;__main__.T object at 0x000001F47518C920&gt;, 666)'
 
-        &gt;&gt;&gt; t
+&gt;&gt;&gt; t
         &lt;__main__.T object at 0x000001F47518C920&gt;
-    </pre>
+</pre>
     <p>
         Aha, takže funkce na instanci (neboli tedy <em>metoda instance</em>) dostane jako první parametr referenci na tuto instanci. Nezvyklé, ale dává to smysl asi tak stejně dobře, jako automagické objevování se této reference v podobě klíčového slova <code>this</code> v jiných jazycích.
     </p>
@@ -263,21 +263,21 @@
         Jenže to má ten důsledek, že <em>jedna a ta samá funkce</em> se v rámci instance volá s jiným počtem parametrů než v rámci jmenného prostoru třídy:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; class T:
-        ...     
-        ...     a = 'Ahoj!'
-        ...     
-        ...     def fn(x, y):
-        ...         return f'Zavoláno: fn({x}, {y})'
+&gt;&gt;&gt; class T:
+...     
+...     a = 'Ahoj!'
+...     
+...     def fn(x, y):
+...         return f'Zavoláno: fn({x}, {y})'
 
-        &gt;&gt;&gt; T.fn(666)
+&gt;&gt;&gt; T.fn(666)
         Traceback (most recent call last):
           File "&lt;pyshell#13&gt;", line 1, in &lt;module&gt;
             T.fn(666)
         TypeError: T.fn() missing 1 required positional argument: 'y'
-        &gt;&gt;&gt; T.fn('Baf!', 666)
+&gt;&gt;&gt; T.fn('Baf!', 666)
         'Zavoláno: fn(Baf!, 666)'
-    </pre>
+</pre>
 
 </div></section><section class="slide-section" id="id9" data-title="Instanční metody – jak to mělo být"><div class="section-header"><span class="section-num">9</span><h2 class="section-title">Instanční metody – jak to mělo být</h2></div><div class="section-body">
 
@@ -326,20 +326,20 @@
         Důvod, proč jsem ze stavu instančních metod tak nakvašený, je v tom, že existují i třídní metody – které očekávaně operují nad atributy třídy, nikoli instance – a ty se samozřejmě pomocí dedikovaného dekorátoru zavádí:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; class T:
-        ...     
-        ...     a = 'Ahoj!'
-        ...     
-        ...     @classmethod
-        ...     def fn(x, y):
-        ...         return f'Zavoláno: fn({x}, {y})'
+&gt;&gt;&gt; class T:
+...     
+...     a = 'Ahoj!'
+...     
+...     @classmethod
+...     def fn(x, y):
+...         return f'Zavoláno: fn({x}, {y})'
 
-        &gt;&gt;&gt; t = T()
-        &gt;&gt;&gt; t.fn(666)
+&gt;&gt;&gt; t = T()
+&gt;&gt;&gt; t.fn(666)
         "Zavoláno: fn(&lt;class '__main__.T'&gt;, 666)"
-        &gt;&gt;&gt; T
+&gt;&gt;&gt; T
         &lt;class '__main__.T'&gt;
-    </pre>
+</pre>
     <p>
         <strong>Třídní metody tedy při svém volání také automaticky dostávají navíc (první) poziční parametr, ale je jím reference na příslušnou třídu.</strong> A nikoho toto chování nepřekvapí, protože před funkcí je v definici napsaný dekorátor, který na to upozorňuje.
     </p>
@@ -578,12 +578,12 @@ alisa.krevní_skupina --&gt; 0
   </p>
   <pre class="brush: python; gutter: false; toolbar: false; ">
   class Člověk():
-    ...
+...
   
   AliasČlověk = Člověk
   
   class Školák(AliasČlověk):
-    ...
+...
   </pre>
   <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
     Samozřejmě nezáleží na tom, jak svůj alias pojmenujete, je to normální „proměnná“.
@@ -603,20 +603,20 @@ alisa.krevní_skupina --&gt; 0
   </p>
   <pre class="brush: python; gutter: false; toolbar: false; ">
 class Rodič:
-    ...
+...
     def fn(self, atr1):
-        ...
-    ...
+...
+...
 
 class Potomek(Rodič):
-    ...
+...
     # upravená metoda 'fn()'
     def fn(self, atr1, atr2):
         # případné volání rodičovské metody
         Rodič.fn(self, atr1)
         # následuje kód, kde (snad :) využijeme i 'atr2'
-        ...
-    ...
+...
+...
   </pre>
   <p>
       PS: Tohle je přesně místo, kde budete chtít použít <code>super()</code>. Jelikož tato funkce toho ale umí mnohem víc, než by člověk na první pohled čekal, je jí věnována <a href="super.xml">samostatná přednáška</a>.
@@ -633,7 +633,7 @@ class Potomek(Rodič):
   </p>
   <pre class="brush: python; gutter: false; toolbar: false; ">
   class Školák(Člověk):
-    ...
+...
     def průměrná_známka(self):
         """Vrací průměr všech známek studenta."""
         součet = 0
@@ -662,11 +662,11 @@ class Potomek(Rodič):
   </p>
   <pre class="brush: python; gutter: false; toolbar: false; ">
   class Školák(Člověk):
-    ...
+...
     školáků = 0
-    ...
+...
     def __init__(self, ...):
-        ...
+...
         Školák.školáků += 1
   </pre>
   <p>
@@ -683,12 +683,12 @@ class Potomek(Rodič):
   </p>
   <pre class="brush: python; gutter: false; toolbar: false; ">
   class Školák(Člověk):
-    ...
+...
     školáků = 0
-    ...
+...
     
     def __init__(self, ...):
-        ...
+...
         self.přidej_školáka()
   
     @classmethod
@@ -715,15 +715,15 @@ class Potomek(Rodič):
         class Třída:
         
             def statická_metoda(...):
-                ...
+...
         
             @classmethod
             def třídní_metoda(cls, ...):
-                ...
+...
         
             @instancemethod
             def instanční_metoda(self, ...):
-                ...
+...
     </pre>
     <p>
         Neoznačené metody by se volaly jako normální funkce se správným počtem parametrů a u dekorovaných by každému na první pohled bylo jasné, že je něco jinak, a dal by si pozor, co píše. Bohužel zvítězil názor, že: <em>„Třídy chtějí lidé především kvůli instancím, tak instanční metody zavedeme bez dekorátoru, ať ušetříme psaní.“</em> Psaní jsme sice ušetřili, ale jako bonus jsme získali solidní guláš…
@@ -747,7 +747,7 @@ class Potomek(Rodič):
 &gt;&gt;&gt; MyClass.__b
 Traceback (most recent call last):
   File "&lt;pyshell#12&gt;", line 1, in &lt;module&gt;
-    MyClass.__b
+MyClass.__b
 AttributeError: type object 'MyClass' has no attribute '__b'
   </pre>
   <div class="note-item"><span class="note-icon">📝</span><div class="note-content">

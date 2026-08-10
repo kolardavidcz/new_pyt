@@ -3,25 +3,10 @@
  * Handles pre/code blocks after lecture HTML is injected.
  */
 
-const PY_KEYWORDS = new Set([
-  "False", "None", "True", "and", "as", "assert", "async", "await", "break",
-  "class", "continue", "def", "del", "elif", "else", "except", "finally",
-  "for", "from", "global", "if", "import", "in", "is", "lambda", "nonlocal",
-  "not", "or", "pass", "raise", "return", "try", "while", "with", "yield",
-  "match", "case", "type",
-]);
+import { DYNAMIC_PY_KEYWORDS, DYNAMIC_PY_BUILTINS } from "./syntax_tokens.js";
 
-const PY_BUILTINS = new Set([
-  "abs", "all", "any", "bin", "bool", "bytearray", "bytes", "callable", "chr",
-  "classmethod", "compile", "complex", "dict", "dir", "divmod", "enumerate",
-  "eval", "exec", "filter", "float", "format", "frozenset", "getattr",
-  "globals", "hasattr", "hash", "help", "hex", "id", "input", "int",
-  "isinstance", "issubclass", "iter", "len", "list", "locals", "map", "max",
-  "memoryview", "min", "next", "object", "oct", "open", "ord", "pow", "print",
-  "property", "range", "repr", "reversed", "round", "set", "setattr", "slice",
-  "sorted", "staticmethod", "str", "sum", "super", "tuple", "type", "vars",
-  "zip", "self", "cls",
-]);
+const PY_KEYWORDS = DYNAMIC_PY_KEYWORDS;
+const PY_BUILTINS = DYNAMIC_PY_BUILTINS;
 
 const JS_KEYWORDS = new Set([
   "break", "case", "catch", "class", "const", "continue", "debugger", "default",
@@ -161,12 +146,17 @@ function highlightGeneric(code, opts) {
       continue;
     }
 
-    // numbers
-    if (/\d/.test(ch) && (i === 0 || /[^A-Za-z0-9_]/.test(prev))) {
+    // numbers (including signed numbers like -0, -1, -0.5, +5 when at token start)
+    const isSignedNum = (ch === "-" || ch === "+") &&
+      (i + 1 < n) && /\d/.test(code[i + 1]) &&
+      (i === 0 || /[^A-Za-z0-9_)]/.test(prev));
+
+    if ((/\d/.test(ch) || isSignedNum) && (i === 0 || /[^A-Za-z0-9_)]/.test(prev))) {
       let j = i;
-      if (code.startsWith("0x", i) || code.startsWith("0X", i) ||
-          code.startsWith("0b", i) || code.startsWith("0B", i) ||
-          code.startsWith("0o", i) || code.startsWith("0O", i)) {
+      if (isSignedNum) j++;
+      if (code.startsWith("0x", j) || code.startsWith("0X", j) ||
+          code.startsWith("0b", j) || code.startsWith("0B", j) ||
+          code.startsWith("0o", j) || code.startsWith("0O", j)) {
         j += 2;
         while (j < n && /[0-9a-fA-F_]/.test(code[j])) j++;
       } else {
@@ -301,15 +291,115 @@ function highlightXmlRaw(code) {
   return out;
 }
 
+function isPythonReprOutput(line) {
+  const t = line.trim();
+  if (!t) return false;
+
+  // 1. Structural data objects: [...], (...), {...} or line containing list/tuple/dict representations
+  if (/(?:\[.*\]|\{.*\}|\(.*\))/.test(t)) {
+    return true;
+  }
+  // 2. String repr '...' or "..."
+  if (/['"][^'"]*['"]/.test(t)) {
+    return true;
+  }
+  // 3. Class / object repr <class '...'> or <... at 0x...>
+  if (t.startsWith("<") && t.endsWith(">")) {
+    return true;
+  }
+  // 4. Numeric repr 42, -1, 3.14, 0x12
+  if (/^[+-]?(?:0[xXbBoO][0-9a-fA-F_]+|\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)$/.test(t)) {
+    return true;
+  }
+  // 5. Keyword repr True, False, None
+  if (t === "True" || t === "False" || t === "None") {
+    return true;
+  }
+  return false;
+}
+
+function highlightPythonRepl(code, opts) {
+  const lines = code.split("\n");
+  let inContinuation = false;
+  let lastPromptWasSingleLine = false;
+
+  const highlightedLines = lines.map((line) => {
+    // Comment line inside REPL block (e.g. "# a) Zaveďme seznam...")
+    if (/^\s*#/.test(line)) {
+      return highlightGeneric(line, opts);
+    }
+
+    // Match >>> prompt or ... prompt
+    const mPrompt = line.match(/^(\s*)(>{3}|\.{3})(\s*)(.*)$/);
+    if (mPrompt) {
+      inContinuation = mPrompt[2] === "...";
+      lastPromptWasSingleLine = mPrompt[2] === ">>>";
+      const leadingSpace = esc(mPrompt[1]);
+      const promptSymbol = span("prompt", mPrompt[2]);
+      const spacing = esc(mPrompt[3]);
+      const codePart = highlightGeneric(mPrompt[4], opts);
+      return `${leadingSpace}${promptSymbol}${spacing}${codePart}`;
+    }
+
+    // Check if line is indented continuation of a multiline statement following ...
+    if (inContinuation && /^\s{4,}/.test(line) && line.trim().length > 0) {
+      return highlightGeneric(line, opts);
+    }
+
+    // Dedent indented REPL output lines following prompts (e.g. "    15" -> "15" or "    !,?AJaee..." -> "!,?AJaee...")
+    let activeLine = line;
+    if (/^\s+\S/.test(activeLine)) {
+      activeLine = activeLine.trimStart();
+    }
+    // Strip line number prefix artifacts like "6: {}" -> "{}" or "7: {}" -> "{}"
+    activeLine = activeLine.replace(/^\d+:\s*(\{\}|\[\]|\(\))/, "$1");
+
+    // Check if line is a Python REPL object return representation (repr)
+    if (isPythonReprOutput(activeLine)) {
+      inContinuation = false;
+      lastPromptWasSingleLine = false;
+      return highlightGeneric(activeLine, opts);
+    }
+
+    // Otherwise, this is a raw stdout/stderr print output line!
+    inContinuation = false;
+    lastPromptWasSingleLine = false;
+    return span("term-output", activeLine);
+  });
+
+  return highlightedLines.join("\n");
+}
+
 export function highlightCode(code, lang) {
   switch (lang) {
-    case "python":
-      return highlightGeneric(code, {
+    case "python": {
+      const opts = {
         lineComment: "#",
         keywords: PY_KEYWORDS,
         builtins: PY_BUILTINS,
         stringChars: ['"', "'"],
-      });
+      };
+      if (code.includes(">>>") || code.includes("...")) {
+        return highlightPythonRepl(code, opts);
+      }
+      return highlightGeneric(code, opts);
+    }
+    case "text":
+    case "plain": {
+      const opts = {
+        lineComment: "#",
+        keywords: PY_KEYWORDS,
+        builtins: PY_BUILTINS,
+        stringChars: ['"', "'"],
+      };
+      const lines = code.split("\n");
+      return lines.map((line) => {
+        if (/^\s*#/.test(line) || isPythonReprOutput(line)) {
+          return highlightGeneric(line, opts);
+        }
+        return span("term-output", line);
+      }).join("\n");
+    }
     case "bash":
       return highlightGeneric(code, {
         lineComment: "#",

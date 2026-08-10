@@ -1,14 +1,19 @@
 /* newpyt — Printable Stylesheet (@media print) */
 
 @media print {
-  /* Force browsers (Chrome, Edge, Firefox, Safari) to print background colors & syntax highlighting */
+  @page {
+    size: A4 portrait;
+    margin: 12mm 12mm 12mm 12mm;
+  }
+
+  /* Force background colors & syntax highlighting in Chrome, Edge, Firefox, Safari */
   html, body, pre, pre.code-block, .syntaxhighlighter, .syntaxhighlighter *, pre * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     color-adjust: exact !important;
   }
 
-  /* Hide non-printable workbench UI chrome */
+  /* Hide ALL non-printable UI chrome & interactive controls */
   .titlebar,
   .activitybar,
   .sidebar,
@@ -30,11 +35,41 @@
   .exercise-toc,
   .slide-pos,
   .bottom-nav-bar,
-  button {
+  .btn,
+  .icon-btn,
+  button,
+  .fill-input-group,
+  .quiz-fill-hints-details,
+  .terminal-bar,
+  .vscht-badge,
+  .quick-login-section,
+  .login-info-box,
+  .login-actions-row,
+  .sync-status-card,
+  input,
+  select,
+  textarea,
+  summary {
     display: none !important;
   }
 
-  /* ── EVERY PRINT IS STRICTLY LIGHT MODE PAPER & DOCUMENT TEXT ─────────── */
+  /* ── 1. ULTRA-COMPACT UNIVERSAL PAPER LAYOUT ─────────────────────────── */
+  html,
+  html[data-theme="dark"],
+  html[data-theme="light"] {
+    --bg: #ffffff !important;
+    --editor: #ffffff !important;
+    --sidebar: #ffffff !important;
+    --panel: #ffffff !important;
+    --text: #111827 !important;
+    --text-muted: #4b5563 !important;
+    --text-faint: #6b7280 !important;
+    --text-bright: #000000 !important;
+    --border: #cbd5e1 !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
   html,
   body,
   #app,
@@ -56,46 +91,71 @@
     background: #ffffff !important;
     background-color: #ffffff !important;
     color: #111827 !important;
+    font-size: 10pt !important;
+    line-height: 1.38 !important;
     margin: 0 !important;
     padding: 0 !important;
     box-shadow: none !important;
   }
 
-  /* Structural slide & card page breaks */
+  /* Structural compact page breaks & images */
+  img, svg:not([width]), figure img, .slide img, .task-card img, picture img {
+    max-width: 100% !important;
+    max-height: 85vh !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 8px auto !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
   .slide,
   .task-card,
   .week-block {
     break-inside: auto !important;
     page-break-inside: auto !important;
-    margin-bottom: 24px !important;
+    margin-bottom: 14px !important;
     border: none !important;
   }
 
   .slide-header,
   .task-card-head {
     background: transparent !important;
-    border-bottom: none !important;
-    border-top: 1px solid #e5e7eb !important;
-    padding: 12px 0 6px 0 !important;
-    margin-top: 20px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    border-top: none !important;
+    padding: 4px 0 4px 0 !important;
+    margin-top: 12px !important;
+    margin-bottom: 8px !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
 
   .slide:first-child .slide-header,
   .slide:first-of-type .slide-header,
   .task-card:first-child .task-card-head {
-    border-top: none !important;
     margin-top: 0 !important;
     padding-top: 0 !important;
   }
 
-  .slide-title,
-  .task-title,
-  h1, h2, h3, h4, h5, h6 {
+  /* Compact headings */
+  h1, h2, h3, h4, h5, h6,
+  .slide-title, .task-title {
     color: #000000 !important;
     background: transparent !important;
+    font-weight: 700 !important;
+    margin-top: 8px !important;
+    margin-bottom: 4px !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
 
-  /* Universal high-contrast document text overrides for page layout */
+  h1 { font-size: 15pt !important; line-height: 1.25 !important; }
+  h2 { font-size: 12.5pt !important; line-height: 1.25 !important; }
+  h3 { font-size: 11pt !important; line-height: 1.25 !important; }
+
+  /* Body text & lists */
   .slide-body p,
   .slide-body ul,
   .slide-body ol,
@@ -115,536 +175,440 @@
   .compare,
   .sub-title,
   .meta,
-  .item-meta,
-  html[data-theme="dark"] .week-block-desc,
-  html[data-theme="dark"] .week-block-count,
-  html[data-theme="dark"] .card-desc,
-  html[data-theme="dark"] .card-compare,
-  html[data-theme="dark"] .item-hero .desc,
-  html[data-theme="dark"] .item-hero .compare,
-  html[data-theme="dark"] .desc,
-  html[data-theme="dark"] .compare,
-  html[data-theme="dark"] .meta,
-  html[data-theme="dark"] .item-meta {
+  .item-meta {
     color: #111827 !important;
     background: transparent !important;
+    margin-top: 3px !important;
+    margin-bottom: 4px !important;
   }
 
-  /* Bold & Italic text elements in print: pure black / high-contrast dark text */
-  strong,
-  b,
-  .slide-body strong,
-  .slide-body b,
-  html[data-theme="dark"] .slide-body strong,
-  html[data-theme="dark"] .slide-body b,
-  .note-item strong,
-  .note-item b {
-    color: #000000 !important;
-    font-weight: 700 !important;
-  }
+  /* High contrast text elements */
+  strong, b { color: #000000 !important; font-weight: 700 !important; }
+  em, i { color: #111827 !important; font-style: italic !important; }
+  a { color: #0369a1 !important; text-decoration: underline !important; }
 
-  em,
-  i,
-  .slide-body em,
-  .slide-body i,
-  html[data-theme="dark"] .slide-body em,
-  html[data-theme="dark"] .slide-body i,
-  .note-item em,
-  .note-item i {
-    color: #111827 !important;
-    font-style: italic !important;
-  }
-
-  sub,
-  sup,
-  .slide-body sub,
-  .slide-body sup,
-  html[data-theme="dark"] .slide-body sub,
-  html[data-theme="dark"] .slide-body sup {
-    color: #111827 !important;
-  }
-
-  mark,
-  .slide-body mark {
-    color: #000000 !important;
-    background-color: #fef08a !important;
-  }
-
-  /* Links in print: high contrast Sky 700 (#0369a1) */
-  a,
-  .slide-body a,
-  html[data-theme="dark"] .slide-body a {
-    color: #0369a1 !important;
-    text-decoration: underline !important;
-  }
-  html[data-theme="dark"] .slide-body,
-  html[data-theme="dark"] .slide-body p,
-  html[data-theme="dark"] .slide-body li,
-  html[data-theme="dark"] .slide-body dt,
-  html[data-theme="dark"] .slide-body dd,
-  html[data-theme="dark"] .slide-body td:not(.code):not(.gutter),
-  html[data-theme="dark"] .slide-body th {
-    color: #111827 !important;
-    background: transparent !important;
-  }
-
-  /* Note callout boxes (e.g. hash() / __hash__() notes): crisp high contrast on white paper */
+  /* Callouts & Notes */
   .note-item,
-  .notes-block,
   .notes-block .note-item,
-  .slide-body .note-item,
-  html[data-theme="dark"] .slide-body .note-item,
-  html[data-theme="dark"] .notes-block .note-item {
-    background: #f3f4f6 !important;
-    border-left: 4px solid #2563eb !important;
+  .slide-body .note-item {
+    background: #f8fafc !important;
+    border-left: 3px solid #2563eb !important;
     color: #111827 !important;
+    padding: 6px 10px !important;
+    margin: 8px 0 !important;
     border-radius: 0 4px 4px 0 !important;
   }
 
-  .note-item p,
-  .note-item li,
-  .note-content > span,
-  .note-content > div:not(.syntaxhighlighter):not(.code-block):not([class*="code-block"]):not([class*="lang-"]):not(pre),
-  html[data-theme="dark"] .note-item p,
-  html[data-theme="dark"] .note-item li {
-    color: #111827 !important;
-  }
-
-  /* Standalone inline code snippet styling */
-  p code,
-  li code,
-  td code,
-  span code,
-  code.inline-code,
-  tt {
-    font-family: "JetBrains Mono", Consolas, "Cascadia Code", monospace !important;
-    color: #8b1014 !important;
-    background: #f3f4f6 !important;
-    border: 1px solid #d1d5db !important;
-    padding: 1px 5px !important;
-    border-radius: 3px !important;
-    font-weight: 500 !important;
-  }
-
-  /* Code block containers base */
-  pre,
-  pre.code-block,
-  .code-block,
-  [class*="code-block"],
-  [class*="lang-"],
-  .syntaxhighlighter {
-    font-family: "JetBrains Mono", Consolas, "Cascadia Code", monospace !important;
-    white-space: pre-wrap !important;
-    word-break: break-all !important;
-    padding: 12px 14px !important;
-    break-inside: auto !important;
-    page-break-inside: auto !important;
-    border-radius: 4px !important;
-    margin: 14px 0 !important;
-  }
-
-  /* Strip all individual inner token background boxes & borders inside code blocks */
-  pre code,
-  pre.code-block code,
-  .code-block code,
-  [class*="code-block"] code,
-  [class*="lang-"] code,
-  .syntaxhighlighter code,
-  .syntaxhighlighter .line,
-  .syntaxhighlighter td,
-  .syntaxhighlighter .container,
-  .syntaxhighlighter span {
-    font-family: "JetBrains Mono", Consolas, "Cascadia Code", monospace !important;
-    border: none !important;
+  /* Inline code snippets */
+  p code, li code, td code, span code, code.inline-code {
+    font-family: "JetBrains Mono", Consolas, monospace !important;
+    font-size: 9pt !important;
+    color: #0284c7 !important;
     background: transparent !important;
+    border: none !important;
     padding: 0 !important;
     margin: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
   }
 
-  /* ── 1. DARK CODE BLOCK THEME (Default or html[data-code-block-color="dark"]) ───────── */
+  /* ── 2. EXTRA-COMPACT CODE BLOCKS ──────────────────────────────────── */
   pre,
   pre.code-block,
   .code-block,
   [class*="code-block"],
   [class*="lang-"],
-  .syntaxhighlighter,
-  .syntaxhighlighter.printing,
-  .slide-body pre,
-  .slide-body .code-block,
-  .slide-body [class*="code-block"],
-  .slide-body [class*="lang-"],
-  .slide-body .syntaxhighlighter,
+  .syntaxhighlighter {
+    font-family: "JetBrains Mono", Consolas, monospace !important;
+    font-size: 8.5pt !important;
+    line-height: 1.28 !important;
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+    padding: 6px 10px !important;
+    margin: 8px 0 !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    border-radius: 4px !important;
+  }
+
+  pre code,
+  pre.code-block code,
+  .code-block code,
+  [class*="code-block"] code,
+  [class*="lang-"] code,
+  .syntaxhighlighter code {
+    font-family: "JetBrains Mono", Consolas, monospace !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Inline Code Formatting in Print - Blue rgb(2, 132, 199) (#0284c7) (No BG, No Frame) */
+  html code.inline-code,
+  html .inline-code,
+  html[data-theme="dark"] code.inline-code,
+  html[data-theme="light"] code.inline-code,
+  html[data-theme="dark"][data-code-block-color="dark"] code.inline-code,
+  html[data-theme="dark"][data-code-block-color="light"] code.inline-code,
+  html[data-theme="light"][data-code-block-color="dark"] code.inline-code,
+  html[data-theme="light"][data-code-block-color="light"] code.inline-code,
+  html[data-theme="dark"] p code,
+  html[data-theme="light"] p code,
+  html[data-theme="dark"] li code,
+  html[data-theme="light"] li code,
+  html[data-theme="dark"] td code,
+  html[data-theme="light"] td code,
+  code.inline-code,
+  .inline-code,
+  .fill-hint-pill code,
+  .draggable-chip code,
+  .quiz-q-card p code,
+  .quiz-q-card li code,
+  p code,
+  li code {
+    font-family: "JetBrains Mono", Consolas, monospace !important;
+    font-size: 8.5pt !important;
+    color: #0284c7 !important; /* Signature Blue rgb(2, 132, 199) on light paper */
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Code Block Theme in Print - matches user preference data-code-block-color */
+  /* Default & Dark Code Block Theme (Light paper + Dark Code Box) */
+  pre, pre.code-block, .code-block, [class*="code-block"], [class*="lang-"], .syntaxhighlighter,
   html[data-code-block-color="dark"] pre,
-  html[data-code-block-color="dark"] pre.code-block,
   html[data-code-block-color="dark"] .code-block,
-  html[data-code-block-color="dark"] [class*="code-block"],
-  html[data-code-block-color="dark"] [class*="lang-"],
-  html[data-code-block-color="dark"] .syntaxhighlighter,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing,
-  html[data-code-block-color="dark"] .slide-body pre,
-  html[data-code-block-color="dark"] .slide-body .code-block,
-  html[data-code-block-color="dark"] .slide-body [class*="code-block"],
-  html[data-code-block-color="dark"] .slide-body [class*="lang-"],
-  html[data-code-block-color="dark"] .slide-body .syntaxhighlighter {
+  .quiz-code-wrap pre {
     background: #1e1e1e !important;
-    background-color: #1e1e1e !important;
     border: 1px solid #333333 !important;
     color: #d4d4d4 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Universal bright base text for all dark code block lines, REPL prompts & plain text */
-  pre *,
-  pre code,
-  .code-block *,
-  .code-block code,
-  [class*="code-block"] *,
-  [class*="code-block"] code,
-  [class*="lang-"] *,
-  [class*="lang-"] code,
-  .syntaxhighlighter,
-  .syntaxhighlighter *,
-  .syntaxhighlighter.printing,
-  .syntaxhighlighter.printing *,
-  .syntaxhighlighter td,
-  .syntaxhighlighter td *,
-  .syntaxhighlighter .line,
-  .syntaxhighlighter .container,
-  .syntaxhighlighter .plain,
-  .syntaxhighlighter .plain *,
-  .syntaxhighlighter .script,
-  .syntaxhighlighter .script *,
-  .syntaxhighlighter code,
-  html[data-code-block-color="dark"] pre *,
-  html[data-code-block-color="dark"] .code-block *,
-  html[data-code-block-color="dark"] [class*="code-block"] *,
-  html[data-code-block-color="dark"] [class*="lang-"] *,
-  html[data-code-block-color="dark"] .syntaxhighlighter,
-  html[data-code-block-color="dark"] .syntaxhighlighter *,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing *,
-  html[data-code-block-color="dark"] .syntaxhighlighter td,
-  html[data-code-block-color="dark"] .syntaxhighlighter .line,
-  html[data-code-block-color="dark"] .syntaxhighlighter .plain,
-  html[data-code-block-color="dark"] .syntaxhighlighter .plain * {
-    color: #d4d4d4 !important;
+  pre code, .code-block code, [class*="code-block"] code, [class*="lang-"] code, .quiz-code-wrap pre code {
     background: transparent !important;
+    color: #d4d4d4 !important;
     border: none !important;
+    padding: 0 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Dark Code Syntax Tokens (Vibrant VS Code Dark+ Palette — Highest Priority Overrides) */
-  .syntaxhighlighter .comments,
-  .syntaxhighlighter .comments *,
-  .syntaxhighlighter.printing .comments,
-  .syntaxhighlighter.printing .comments *,
-  .tok-comment,
-  .tok-comment *,
-  html[data-code-block-color="dark"] .syntaxhighlighter .comments,
-  html[data-code-block-color="dark"] .syntaxhighlighter .comments *,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .comments,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .comments *,
-  html[data-code-block-color="dark"] .tok-comment {
-    color: #6a9955 !important;
-    font-style: italic !important;
+  pre *, .code-block *, [class*="code-block"] *, [class*="lang-"] *, .quiz-code-wrap pre * {
+    background: transparent !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
-  .syntaxhighlighter .string,
-  .syntaxhighlighter .string *,
-  .syntaxhighlighter.printing .string,
-  .syntaxhighlighter.printing .string *,
-  .tok-string,
-  .tok-string *,
-  html[data-code-block-color="dark"] .syntaxhighlighter .string,
-  html[data-code-block-color="dark"] .syntaxhighlighter .string *,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .string,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .string *,
-  html[data-code-block-color="dark"] .tok-string {
-    color: #ce9178 !important;
-  }
+  /* Dark Code Block Syntax Tokens (Light text on #1e1e1e dark background) - High Specificity */
+  pre .tok-comment, .code-block .tok-comment, html[data-theme="light"] pre .tok-comment { color: #6a9955 !important; font-style: italic !important; }
+  pre .tok-string, .code-block .tok-string, html[data-theme="light"] pre .tok-string { color: #ce9178 !important; }
+  pre .tok-keyword, .code-block .tok-keyword, html[data-theme="light"] pre .tok-keyword { color: #569cd6 !important; font-weight: 600 !important; }
+  pre .tok-builtin, .code-block .tok-builtin, html[data-theme="light"] pre .tok-builtin,
+  pre .tok-number, .code-block .tok-number, html[data-theme="light"] pre .tok-number { color: #b5cea8 !important; font-weight: 600 !important; }
+  pre .tok-function, .code-block .tok-function, html[data-theme="light"] pre .tok-function { color: #dcdcaa !important; }
+  pre .tok-operator, .code-block .tok-operator, html[data-theme="light"] pre .tok-operator, .quiz-code-wrap pre .tok-operator, .quiz-code-wrap pre * { color: #d4d4d4 !important; }
+  pre .term-prompt, .code-block .term-prompt, html[data-theme="light"] pre .term-prompt { color: #38bdf8 !important; font-weight: bold !important; }
+  pre .tok-term-output, .code-block .tok-term-output, html[data-theme="light"] pre .tok-term-output { color: #cccccc !important; font-weight: normal !important; }
 
-  .syntaxhighlighter .keyword,
-  .syntaxhighlighter .keyword *,
-  .syntaxhighlighter.printing .keyword,
-  .syntaxhighlighter.printing .keyword *,
-  .tok-keyword,
-  .tok-keyword *,
-  html[data-code-block-color="dark"] .syntaxhighlighter .keyword,
-  html[data-code-block-color="dark"] .syntaxhighlighter .keyword *,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .keyword,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .keyword *,
-  html[data-code-block-color="dark"] .tok-keyword {
-    color: #569cd6 !important;
-    font-weight: 600 !important;
-  }
-
-  .syntaxhighlighter .color1,
-  .syntaxhighlighter .color1 *,
-  .syntaxhighlighter.printing .color1,
-  .syntaxhighlighter.printing .color1 *,
-  .syntaxhighlighter .value,
-  .syntaxhighlighter .value *,
-  .syntaxhighlighter.printing .value,
-  .syntaxhighlighter.printing .value *,
-  .syntaxhighlighter .number,
-  .syntaxhighlighter .number *,
-  .syntaxhighlighter.printing .number,
-  .syntaxhighlighter.printing .number *,
-  .tok-builtin,
-  .tok-type,
-  .tok-number,
-  .tok-constant,
-  html[data-code-block-color="dark"] .syntaxhighlighter .color1,
-  html[data-code-block-color="dark"] .syntaxhighlighter .color1 *,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .color1,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .color1 *,
-  html[data-code-block-color="dark"] .syntaxhighlighter .value,
-  html[data-code-block-color="dark"] .syntaxhighlighter .value *,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .value,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .value *,
-  html[data-code-block-color="dark"] .tok-number {
-    color: #b5cea8 !important;
-  }
-
-  .syntaxhighlighter .color2,
-  .syntaxhighlighter .color2 *,
-  .syntaxhighlighter.printing .color2,
-  .syntaxhighlighter.printing .color2 *,
-  .syntaxhighlighter .functions,
-  .syntaxhighlighter .functions *,
-  .syntaxhighlighter.printing .functions,
-  .syntaxhighlighter.printing .functions *,
-  .tok-function,
-  .tok-function *,
-  html[data-code-block-color="dark"] .syntaxhighlighter .color2,
-  html[data-code-block-color="dark"] .syntaxhighlighter .color2 *,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .color2,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .color2 *,
-  html[data-code-block-color="dark"] .syntaxhighlighter .functions,
-  html[data-code-block-color="dark"] .syntaxhighlighter .functions *,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .functions,
-  html[data-code-block-color="dark"] .syntaxhighlighter.printing .functions *,
-  html[data-code-block-color="dark"] .tok-function {
-    color: #dcdcaa !important;
-  }
-
-  .tok-operator,
-  html[data-code-block-color="dark"] .tok-operator {
-    color: #d4d4d4 !important;
-  }
-
-  /* Custom HTML color classes in slides (barva_1, darkblue, gray, etc.) */
-  .darkblue, .blue, .barva_1,
-  .syntaxhighlighter.printing .darkblue,
-  .syntaxhighlighter.printing .blue,
-  .syntaxhighlighter.printing .barva_1,
-  html[data-code-block-color="dark"] .darkblue,
-  html[data-code-block-color="dark"] .blue,
-  html[data-code-block-color="dark"] .barva_1 { color: #569cd6 !important; }
-
-  .gray, .grey,
-  .syntaxhighlighter.printing .gray,
-  .syntaxhighlighter.printing .grey,
-  html[data-code-block-color="dark"] .gray,
-  html[data-code-block-color="dark"] .grey { color: #a0a0a0 !important; }
-
-  .red, .barva_2,
-  .syntaxhighlighter.printing .red,
-  .syntaxhighlighter.printing .barva_2,
-  html[data-code-block-color="dark"] .red,
-  html[data-code-block-color="dark"] .barva_2 { color: #f48771 !important; }
-
-  .violet, .barva_3,
-  .syntaxhighlighter.printing .violet,
-  .syntaxhighlighter.printing .barva_3,
-  html[data-code-block-color="dark"] .violet,
-  html[data-code-block-color="dark"] .barva_3 { color: #c586c0 !important; }
-
-  .green, html[data-code-block-color="dark"] .green { color: #89d185 !important; }
-  .orange, html[data-code-block-color="dark"] .orange { color: #ce9178 !important; }
-  .yellow, html[data-code-block-color="dark"] .yellow { color: #dcdcaa !important; }
-  .py23k, .py2k, .py3k, .py_c_api, .py_macro_api, .pyx_c_api, .pyx_macro_api,
-  html[data-code-block-color="dark"] .py23k,
-  html[data-code-block-color="dark"] .py2k,
-  html[data-code-block-color="dark"] .py3k,
-  html[data-code-block-color="dark"] .py_c_api,
-  html[data-code-block-color="dark"] .py_macro_api,
-  html[data-code-block-color="dark"] .pyx_c_api,
-  html[data-code-block-color="dark"] .pyx_macro_api { color: #4ec9b0 !important; }
-
-  /* ── 2. LIGHT CODE BLOCK THEME (STRICTLY html[data-code-block-color="light"]) ────── */
+  /* Light Code Block Theme (Light paper + Light Code Box - ONLY when data-code-block-color="light") */
   html[data-code-block-color="light"] pre,
-  html[data-code-block-color="light"] pre.code-block,
-  html[data-code-block-color="light"] .syntaxhighlighter,
-  html[data-code-block-color="light"] .slide-body pre,
-  html[data-code-block-color="light"] .slide-body .syntaxhighlighter {
+  html[data-code-block-color="light"] .code-block,
+  html[data-code-block-color="light"] .quiz-code-wrap pre {
     background: #f8f9fa !important;
-    background-color: #f8f9fa !important;
-    border: 1px solid #d1d5db !important;
+    border: 1px solid #cbd5e1 !important;
     color: #1f2937 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  html[data-code-block-color="light"] .tok-comment,
-  html[data-code-block-color="light"] .comments,
-  html[data-code-block-color="light"] .comments * { color: #008000 !important; font-style: italic !important; }
-
-  html[data-code-block-color="light"] .tok-string,
-  html[data-code-block-color="light"] .string,
-  html[data-code-block-color="light"] .string * { color: #a31515 !important; }
-
-  html[data-code-block-color="light"] .tok-keyword,
-  html[data-code-block-color="light"] .keyword,
-  html[data-code-block-color="light"] .keyword * { color: #0000ff !important; font-weight: 600 !important; }
-
-  html[data-code-block-color="light"] .tok-builtin,
-  html[data-code-block-color="light"] .tok-type,
-  html[data-code-block-color="light"] .color1,
-  html[data-code-block-color="light"] .color1 *,
-  html[data-code-block-color="light"] .tok-number,
-  html[data-code-block-color="light"] .number { color: #267f99 !important; }
-
-  html[data-code-block-color="light"] .tok-function,
-  html[data-code-block-color="light"] .functions,
-  html[data-code-block-color="light"] .functions *,
-  html[data-code-block-color="light"] .color2,
-  html[data-code-block-color="light"] .color2 * { color: #795e26 !important; }
-
-  details {
-    display: block !important;
+  html[data-code-block-color="light"] pre code,
+  html[data-code-block-color="light"] .code-block code,
+  html[data-code-block-color="light"] .quiz-code-wrap pre code {
+    background: transparent !important;
+    color: #1f2937 !important;
+    border: none !important;
   }
-  details > summary {
+
+  html[data-code-block-color="light"] pre *,
+  html[data-code-block-color="light"] .code-block *,
+  html[data-code-block-color="light"] .quiz-code-wrap pre * {
+    color: #1f2937;
+  }
+
+  html[data-code-block-color="light"] pre .tok-comment, html[data-code-block-color="light"] .code-block .tok-comment { color: #008000 !important; font-style: italic !important; }
+  html[data-code-block-color="light"] pre .tok-string, html[data-code-block-color="light"] .code-block .tok-string { color: #b45309 !important; }
+  html[data-code-block-color="light"] pre .tok-keyword, html[data-code-block-color="light"] .code-block .tok-keyword { color: #0000ff !important; font-weight: 600 !important; }
+  html[data-code-block-color="light"] pre .tok-builtin, html[data-code-block-color="light"] .code-block .tok-builtin,
+  html[data-code-block-color="light"] pre .tok-number, html[data-code-block-color="light"] .code-block .tok-number { color: #098658 !important; }
+  html[data-code-block-color="light"] pre .tok-function, html[data-code-block-color="light"] .code-block .tok-function { color: #795e26 !important; }
+  html[data-code-block-color="light"] pre .tok-operator, html[data-code-block-color="light"] .code-block .tok-operator { color: #1f2937 !important; }
+  html[data-code-block-color="light"] pre .term-prompt, html[data-code-block-color="light"] .code-block .term-prompt { color: #0284c7 !important; font-weight: bold !important; }
+  html[data-code-block-color="light"] pre .tok-term-output, html[data-code-block-color="light"] .code-block .tok-term-output { color: #111827 !important; font-weight: normal !important; }
+
+  /* ── 3. EXTRA-CLEAN QUIZ PRINT LAYOUT ────────────────────────────── */
+  html[data-print-quizzes="false"] .quiz-section-card {
+    display: none !important;
+  }
+
+  .quiz-section-card {
+    break-before: page !important;
+    page-break-before: always !important;
+    clear: both !important;
+    float: none !important;
+    margin-top: 20px !important;
+    padding: 10px 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #111827 !important;
+  }
+
+  .quiz-section-card.compact-lecture-quiz {
+    break-before: auto !important;
+    page-break-before: auto !important;
+  }
+
+  .quiz-card-header {
+    display: block !important;
+    width: 100% !important;
+    border-bottom: 1.5px solid #cbd5e1 !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 6px !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .quiz-header-row {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .quiz-header-row > div {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .quiz-stats-box {
+    display: block !important;
+    float: right !important;
+    margin-top: -24px !important;
+  }
+
+  .quiz-badge {
+    color: #0369a1 !important;
+    background: #e0f2fe !important;
+    font-size: 8.5pt !important;
+    font-weight: 700 !important;
+    padding: 2px 6px !important;
+    border-radius: 3px !important;
+    display: inline-block !important;
+  }
+
+  .quiz-title {
+    color: #0f172a !important;
+    font-size: 13pt !important;
+    font-weight: 700 !important;
+    margin-top: 4px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .quiz-subtitle,
+  .quiz-score-bar,
+  .quiz-explanation,
+  .btn-retry-fill,
+  .quiz-fill-hints-details,
+  .fill-hint-pill,
+  .inline-code-fill-input {
+    display: none !important;
+  }
+
+  /* Reset web interaction states for print - options look clean & unselected */
+  .quiz-q-card {
+    border: none !important;
+    border-bottom: 1px dashed #cbd5e1 !important;
+    background: transparent !important;
+    margin-bottom: 10px !important;
+    padding: 6px 0 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .quiz-q-num {
+    font-size: 8pt !important;
+    color: #64748b !important;
+    margin-bottom: 2px !important;
+  }
+
+  .quiz-q-text {
+    color: #0f172a !important;
+    font-size: 9.5pt !important;
+    font-weight: 600 !important;
+    margin-bottom: 6px !important;
+  }
+
+  .quiz-options-list {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 5px !important;
+  }
+
+  /* Print clean option buttons (strips green/red selection states) */
+  .quiz-opt-btn,
+  .quiz-opt-btn.correct,
+  .quiz-opt-btn.incorrect,
+  .term-opt-btn,
+  .term-opt-btn.correct,
+  .term-opt-btn.incorrect {
+    display: block !important;
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1e293b !important;
+    padding: 4px 8px !important;
+    font-size: 8.5pt !important;
+    font-weight: normal !important;
+    border-radius: 4px !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .term-opt-text {
+    color: #1e293b !important;
+  }
+  .term-dollar {
+    color: #0284c7 !important;
+  }
+
+  /* High contrast token colors for quiz questions, options, and upside-down answer keys in print */
+  .quiz-q-card .tok-builtin,
+  .quiz-opt-btn .tok-builtin,
+  .quiz-answer-key-upsidedown .tok-builtin {
+    color: #047857 !important;
+    font-weight: 600 !important;
+  }
+
+  .quiz-q-card .tok-keyword,
+  .quiz-opt-btn .tok-keyword,
+  .quiz-answer-key-upsidedown .tok-keyword {
+    color: #1d4ed8 !important;
+    font-weight: 600 !important;
+  }
+
+  .quiz-q-card .tok-string,
+  .quiz-opt-btn .tok-string,
+  .quiz-answer-key-upsidedown .tok-string {
+    color: #b45309 !important;
+  }
+
+  .quiz-q-card .tok-number,
+  .quiz-opt-btn .tok-number,
+  .quiz-answer-key-upsidedown .tok-number {
+    color: #047857 !important;
+  }
+
+  .quiz-q-card .tok-function,
+  .quiz-opt-btn .tok-function,
+  .quiz-answer-key-upsidedown .tok-function {
+    color: #795e26 !important;
+  }
+
+  .quiz-q-card .tok-operator,
+  .quiz-opt-btn .tok-operator,
+  .quiz-answer-key-upsidedown .tok-operator {
+    color: #0f172a !important;
+  }
+
+  /* Reset user typed input in code_fill to default ________ in print view */
+  .filled-blank {
+    font-size: 0 !important;
+    background: transparent !important;
+    color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .filled-blank::before {
+    content: "________" !important;
+    font-size: 8.5pt !important;
+    color: #0284c7 !important;
+    font-family: var(--font-mono, monospace) !important;
     font-weight: bold !important;
-    color: #000000 !important;
+    letter-spacing: 1px !important;
   }
-  details > summary ~ * {
+
+  /* Upside-down 180deg Answer Key Block for Print */
+  .quiz-answer-key-upsidedown {
     display: block !important;
+    transform: rotate(180deg) !important;
+    transform-origin: center center !important;
+    margin-top: 30px !important;
+    padding: 10px 14px !important;
+    border: 1px dashed #94a3b8 !important;
+    background: #f8fafc !important;
+    font-size: 8.5pt !important;
+    line-height: 1.4 !important;
+    color: #334155 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .quiz-answer-key-upsidedown .answer-key-title {
+    font-weight: 700 !important;
+    font-size: 9pt !important;
+    margin-bottom: 6px !important;
+    color: #0f172a !important;
+  }
+  .quiz-answer-key-upsidedown ol {
+    margin: 0 !important;
+    padding-left: 18px !important;
+  }
+  .quiz-answer-key-upsidedown li {
+    margin-bottom: 3px !important;
+  }
+  .quiz-answer-key-upsidedown code,
+  .quiz-answer-key-upsidedown code.inline-code {
+    display: inline-block !important;
+    background: transparent !important;
+    color: #0284c7 !important;
+    border: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    font-family: var(--font-mono, monospace) !important;
+    font-size: 8pt !important;
   }
 
   /* Printable Progress Report */
-  .progress-view {
-    max-width: 100% !important;
-  }
   .progress-hero {
     border-bottom: 2px solid #e5e7eb !important;
-    padding-bottom: 16px !important;
-    margin-bottom: 20px !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 14px !important;
   }
   .study-week {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
     border: 1px solid #d1d5db !important;
     background: #ffffff !important;
-    margin-bottom: 16px !important;
-    padding: 12px 16px !important;
-  }
-  .study-tile {
-    border: 1px solid #d1d5db !important;
-    background: #ffffff !important;
-    color: #111827 !important;
-  }
-  .study-tile.studied {
-    border-color: #059669 !important;
-    background: #ecfdf5 !important;
-  }
-  .study-tile .st-title {
-    color: #111827 !important;
-    font-weight: 600 !important;
-  }
-  .st-status-check {
-    color: #059669 !important;
-  }
-  .st-check {
-    color: #059669 !important;
-    font-weight: bold !important;
-  }
-  .st-pending {
-    color: #6b7280 !important;
-  }
-  .st-rel {
-    color: #d97706 !important;
-    font-weight: bold !important;
-  }
-  .study-exercise-card {
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
-    border: 1px solid #cbd5e1 !important;
-    background: #ffffff !important;
-    margin-bottom: 12px !important;
-  }
-  .study-exercise-card .sec-head {
-    background: #f8fafc !important;
-    border-bottom: 1px solid #e2e8f0 !important;
-  }
-  .sec-title {
-    color: #0f172a !important;
-  }
-  .sec-status-pill {
-    background: #e2e8f0 !important;
-    color: #475569 !important;
-  }
-  .study-exercise-card.studied .sec-status-pill {
-    background: #dcfce7 !important;
-    color: #15803d !important;
-  }
-  .study-task-item {
-    border: 1px solid #e2e8f0 !important;
-    background: #ffffff !important;
-    color: #1e293b !important;
-  }
-  .sti-num {
-    color: #b45309 !important;
-  }
-  .sti-title {
-    color: #0f172a !important;
-  }
-
-  /* Printable PDF Checklist Overrides */
-  .progress-view-toggle-row,
-  .chk-lvl-tabs,
-  .chk-print-actions {
-    display: none !important;
+    margin-bottom: 10px !important;
+    padding: 8px 12px !important;
   }
   .chk-week-block {
     break-inside: avoid !important;
     page-break-inside: avoid !important;
     border: 1px solid #cbd5e1 !important;
     background: #ffffff !important;
-    padding: 12px 14px !important;
-    margin-bottom: 16px !important;
-  }
-  .chk-week-head h2 {
-    color: #0f172a !important;
-    font-size: 14px !important;
+    padding: 8px 12px !important;
+    margin-bottom: 10px !important;
   }
   .chk-card-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px !important;
-  }
-  .chk-card {
-    border: 1px solid #e2e8f0 !important;
-    background: #f8fafc !important;
-    padding: 8px 10px !important;
-  }
-  .chk-title {
-    color: #0f172a !important;
-  }
-  .chk-sub {
-    color: #64748b !important;
-  }
-  .chk-rel-num {
-    color: #b45309 !important;
-  }
-  .chk-rel-bar {
-    background: #e2e8f0 !important;
-  }
-  .chk-rel-fill {
-    background: #d97706 !important;
+    gap: 6px !important;
   }
 }
-

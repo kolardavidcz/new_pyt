@@ -278,51 +278,51 @@ Python: \r">CR</td><td class="violet" title="shift out">SO</td><td class="violet
         Podívejme se na zoubek českému slovu <code>svět</code> v kódování UTF-8:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; 'svět'.encode('utf-8')
+&gt;&gt;&gt; 'svět'.encode('utf-8')
         b'sv\xc4\x9bt'
-    </pre>
+</pre>
     <p>
         Písmenu <code>ě</code> tedy odpovídá sekvence bajtů <code>\xc4\x9b</code>, zatímco písmena <code>s</code>, <code>v</code> a <code>t</code> jakožto členy spodní části ASCII-tabulky jsou reprezentována sama sebou. V tomto případě můžeme toto rozdělení vykoukat snadno přímo (pouze jeden znak je zaznamenán dvoubajtově), ale správně ho zjistíme až z odpovídající binární podoby:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # s (skutečně začíná na 0, zobrazeno je jenom 7 bitů)
-        &gt;&gt;&gt; bin(ord('s'))
+&gt;&gt;&gt; bin(ord('s'))
         '0b1110011'
         
         # v (skutečně začíná na 0, zobrazeno je jenom 7 bitů)
-        &gt;&gt;&gt; bin(ord('v'))
+&gt;&gt;&gt; bin(ord('v'))
         '0b1110110'
 
         # ě
-        &gt;&gt;&gt; bin(int('c4', 16))
+&gt;&gt;&gt; bin(int('c4', 16))
         '0b11000100'
-        &gt;&gt;&gt; bin(int('9b', 16))
+&gt;&gt;&gt; bin(int('9b', 16))
         '0b10011011'
         
         # t (skutečně začíná na 0, zobrazeno je jenom 7 bitů)
-        &gt;&gt;&gt; bin(ord('t'))
+&gt;&gt;&gt; bin(ord('t'))
         '0b1110100'
-    </pre>
+</pre>
     <p>
         Podle algoritmu pro kódování UTF-8 získáme pro jednotlivé znaky odpovídající číslo do unicodové tabulky:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
         # s = '0b01110011'
-        &gt;&gt;&gt; int('01110011', 2)
+&gt;&gt;&gt; int('01110011', 2)
         115
         
         # v = '0b01110110'
-        &gt;&gt;&gt; int('01110110', 2)
+&gt;&gt;&gt; int('01110110', 2)
         118
         
         # ě = '0b11000100' '0b10011011'
-        &gt;&gt;&gt; int('00000001', 2) * 256 + int('00011011', 2)
+&gt;&gt;&gt; int('00000001', 2) * 256 + int('00011011', 2)
         283
         
         # t = '0b01110100'
-        &gt;&gt;&gt; int('01110100', 2)
+&gt;&gt;&gt; int('01110100', 2)
         116
-    </pre>
+</pre>
     <p>
         Aniž bychom koukali do standardu, jaké znaky těmto unicodovým <em>codepointům</em> odpovídají, můžeme daná čísla přímo použít pro <a href="xML.encoding.xml?slajd=5">znakové HTML-entity</a> <code>&amp;#115; &amp;#118; &amp;#283; &amp;#116;</code>: „svět“
     </p>
@@ -333,27 +333,27 @@ Python: \r">CR</td><td class="violet" title="shift out">SO</td><td class="violet
         Podívejme se na zoubek japonskému znaku <code>狼</code> (<em>ookami</em> = vlk) v kódování UTF-8:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; '狼'.encode('utf-8')
+&gt;&gt;&gt; '狼'.encode('utf-8')
         b'\xe7\x8b\xbc'
-    </pre>
+</pre>
     <p>
         Jednotlivé bajty mají následující binární podobu:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; bin(int('e7', 16))
+&gt;&gt;&gt; bin(int('e7', 16))
         '0b11100111'
-        &gt;&gt;&gt; bin(int('8b', 16))
+&gt;&gt;&gt; bin(int('8b', 16))
         '0b10001011'
-        &gt;&gt;&gt; bin(int('bc', 16))
+&gt;&gt;&gt; bin(int('bc', 16))
         '0b10111100'
-    </pre>
+</pre>
     <p>
         Podle algoritmu pro kódování UTF-8 získáme odpovídající číslo do unicodové tabulky:
     </p>
     <pre class="brush: python; gutter: false; toolbar: false; ">
-        &gt;&gt;&gt; int('01110010', 2) * 256 + int('11111100', 2)
+&gt;&gt;&gt; int('01110010', 2) * 256 + int('11111100', 2)
         29436
-    </pre>
+</pre>
     <p>
         A decimální <code>29436</code> je skutečně <em>codepoint</em> odpovídající v Unicode'u znaku <code>狼</code>.
     </p>
