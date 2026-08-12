@@ -10,7 +10,7 @@ import {
 import { renderTree, setTreeSelectHandler, expandAll, collapseAll } from "./tree.js";
 import { navigate, refreshActiveView, closeTab, initHistory, getInitialRoute, initScrollTracker } from "./router.js";
 import { openPalette, closePalette, isPaletteOpen, initPalette, setPaletteHandler } from "./palette.js";
-import { toggleFullscreen, updatePageStudyButtons } from "./content.js";
+import { toggleFullscreen, updatePageStudyButtons, showLogin } from "./content.js";
 import { initAdminPanel, openAdminModal, updateAdminUIElements } from "./admin.js";
 import { escapeHtml } from "./ui.js";
 
@@ -295,14 +295,7 @@ function bindChrome() {
   });
 
   btnProfile?.addEventListener("click", () => {
-    if (state.user) {
-      profileUserView?.classList.remove("hidden");
-      profileLoginForm?.classList.add("hidden");
-    } else {
-      profileUserView?.classList.add("hidden");
-      profileLoginForm?.classList.remove("hidden");
-    }
-    profileModal?.classList.remove("hidden");
+    showLogin();
   });
 
   profileModal?.addEventListener("click", (e) => {

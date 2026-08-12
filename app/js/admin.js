@@ -1,6 +1,6 @@
 /**
  * Admin Panel Master Module
- * Scalable multi-admin dashboard for newpyt course environment.
+ * Scalable multi-admin dashboard formatted in VS Code "2 · Terminal" theme style.
  */
 
 import {
@@ -79,101 +79,92 @@ function renderAdminModalContent(activeTab = "improvements") {
   const openCount = improvements.filter((i) => (i.status || "open") === "open").length;
 
   adminModalEl.innerHTML = `
-    <div class="modal-card admin-modal-card">
-      <div class="modal-header">
-        <h3>
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-          </svg>
-          Admin Panel — Správa kurzu newpyt
-        </h3>
+    <div class="modal-card admin-modal-card" style="font-family:var(--font-mono, monospace);">
+      <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div class="v2-comment" style="margin:0 0 2px;">// admin/control-center.ts</div>
+          <h3 style="font-family:var(--font-mono, monospace); font-size:15px; margin:0; display:flex; align-items:center; gap:8px; color:var(--fg);">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            [ADMIN PANEL] — newpyt course control
+          </h3>
+        </div>
         <button type="button" class="btn-close-modal" id="btnCloseAdminModal" aria-label="Zavřít">✕</button>
       </div>
 
       <div class="admin-nav-tabs">
         <button type="button" class="admin-tab-btn ${activeTab === "improvements" ? "active" : ""}" data-tab="improvements">
-          Vylepšení otázek ${openCount > 0 ? `<span class="admin-badge-count">${openCount}</span>` : ""}
+          [1] vylepšení ${openCount > 0 ? `<span class="admin-badge-count">${openCount}</span>` : ""}
         </button>
         <button type="button" class="admin-tab-btn ${activeTab === "users" ? "active" : ""}" data-tab="users">
-          Uživatelé a Admini
+          [2] uživatelé
         </button>
         <button type="button" class="admin-tab-btn ${activeTab === "relevance" ? "active" : ""}" data-tab="relevance">
-          Relevance prezentací
+          [3] relevance
         </button>
         <button type="button" class="admin-tab-btn ${activeTab === "diagnostics" ? "active" : ""}" data-tab="diagnostics">
-          Diagnostika a Logy
+          [4] diagnostika
         </button>
       </div>
 
       <div class="modal-body" style="padding:16px 20px;">
         <!-- TAB 1: QUESTION IMPROVEMENTS OVERVIEW -->
         <div class="admin-tab-content ${activeTab === "improvements" ? "active" : ""}" id="tab-improvements">
-          <div class="admin-toolbar">
-            <input type="text" class="admin-search-input" id="admSearchImp" placeholder="Hledat v připomínkách (otázka, příčina, ID)..." />
-            <div style="display:flex; gap:8px; align-items:center;">
-              <select class="admin-search-input" id="admFilterStatus" style="min-width:130px;">
-                <option value="all">Všechny stavy</option>
-                <option value="open" selected>Pouze Otevřené (${openCount})</option>
-                <option value="resolved">Vyřešené</option>
-                <option value="dismissed">Zamítnuté</option>
-              </select>
-            </div>
+          <div class="admin-toolbar" style="display:flex; gap:10px; margin-bottom:12px;">
+            <input type="text" class="admin-search-input" id="admSearchImp" placeholder="$ search --query (otázka, ID)..." style="flex:1; font-family:var(--font-mono);" />
+            <select class="admin-search-input" id="admFilterStatus" style="min-width:140px; font-family:var(--font-mono);">
+              <option value="all">všechny stavy</option>
+              <option value="open" selected>pouze otevřené (${openCount})</option>
+              <option value="resolved">vyřešené</option>
+              <option value="dismissed">zamítnuté</option>
+            </select>
           </div>
           <div class="admin-card-list" id="admImpList"></div>
         </div>
 
         <!-- TAB 2: USER & ADMIN MANAGEMENT -->
         <div class="admin-tab-content ${activeTab === "users" ? "active" : ""}" id="tab-users">
-          <div class="admin-toolbar">
-            <h4 style="margin:0; font-size:14px; color:var(--fg);">Registrovat nového Administrátora</h4>
-          </div>
-          <div style="background:var(--bg-elevated, #252526); border:1px solid var(--border-subtle, #333); border-radius:8px; padding:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <input type="text" id="admNewAdminUsername" class="admin-search-input" placeholder="Uživatelské jméno (např. petrd)" />
-            <input type="password" id="admNewAdminPass" class="admin-search-input" placeholder="Heslo pro admina" />
-            <button type="button" class="btn primary sm" id="btnAdmCreateAdmin">Přidat Admina</button>
-            <div id="admUserCreateMsg" style="font-size:12px; color:#89d185; width:100%;"></div>
+          <div class="v2-comment">// admin/users-manager.ts</div>
+          <div style="background:var(--editor, #1e1e1e); border:1px solid var(--border-subtle, #333); border-radius:2px; padding:12px 14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
+            <input type="text" id="admNewAdminUsername" class="admin-search-input" placeholder="e-mail (@vscht.cz)" style="flex:1; font-family:var(--font-mono);" />
+            <input type="password" id="admNewAdminPass" class="admin-search-input" placeholder="heslo" style="flex:1; font-family:var(--font-mono);" />
+            <button type="button" class="btn primary sm v2-submit" id="btnAdmCreateAdmin" style="width:auto;"><span class="prompt">$</span>grant-admin</button>
+            <div id="admUserCreateMsg" style="font-size:11.5px; color:#89d185; width:100%; font-family:var(--font-mono);"></div>
           </div>
 
-          <div class="admin-toolbar" style="margin-top:16px;">
-            <h4 style="margin:0; font-size:14px; color:var(--fg);">Seznam uživatelů a oprávnění</h4>
-            <input type="text" class="admin-search-input" id="admSearchUsers" placeholder="Filtrovat uživatele..." />
+          <div class="admin-toolbar" style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:12px; color:var(--text-muted); font-family:var(--font-mono);">/* uživatelé a oprávnění */</span>
+            <input type="text" class="admin-search-input" id="admSearchUsers" placeholder="$ filter --user..." style="min-width:200px; font-family:var(--font-mono);" />
           </div>
-          <div class="admin-card-list" id="admUsersList"></div>
+          <div class="admin-card-list" id="admUsersList" style="margin-top:10px;"></div>
         </div>
 
         <!-- TAB 3: PRESENTATION RELEVANCE MANAGER -->
         <div class="admin-tab-content ${activeTab === "relevance" ? "active" : ""}" id="tab-relevance">
-          <div class="admin-toolbar">
-            <h4 style="margin:0; font-size:14px; color:var(--fg);">Nastavení relevancí prezentací (1 - 10)</h4>
-            <input type="text" class="admin-search-input" id="admSearchRel" placeholder="Hledat prezentaci podle názvu..." />
+          <div class="admin-toolbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-size:12px; color:var(--text-muted); font-family:var(--font-mono);">/* relevance 1–10 (AI / Teacher T / Student S) */</span>
+            <input type="text" class="admin-search-input" id="admSearchRel" placeholder="$ search --deck..." style="min-width:220px; font-family:var(--font-mono);" />
           </div>
           <div class="admin-card-list" id="admRelList"></div>
         </div>
 
         <!-- TAB 4: DIAGNOSTICS & SYSTEM -->
         <div class="admin-tab-content ${activeTab === "diagnostics" ? "active" : ""}" id="tab-diagnostics">
-          <div class="profile-stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom:16px;">
-            <div class="pstat-box">
-              <span class="pstat-val">${state.items ? state.items.length : 0}</span>
-              <span class="pstat-lbl">Celkem témat</span>
-            </div>
-            <div class="pstat-box">
-              <span class="pstat-val">${improvements.length}</span>
-              <span class="pstat-lbl">Připomínek otázek</span>
-            </div>
-            <div class="pstat-box">
-              <span class="pstat-val">${state.errorLinkLog ? state.errorLinkLog.length : 0}</span>
-              <span class="pstat-lbl">Zaznamenaných chyb</span>
-            </div>
+          <div class="v2-comment">// system/diagnostics.log</div>
+          <div class="v2-status-line" style="display:flex; justify-content:space-around; margin:8px 0 16px; font-family:var(--font-mono);">
+            <div>témat: <span class="num">${state.items ? state.items.length : 0}</span></div>
+            <div>připomínek: <span class="num">${improvements.length}</span></div>
+            <div>chyb v odkazech: <span class="num">${state.errorLinkLog ? state.errorLinkLog.length : 0}</span></div>
           </div>
 
-          <div style="background:var(--bg-elevated, #252526); border:1px solid var(--border-subtle, #333); border-radius:8px; padding:16px; display:flex; flex-direction:column; gap:12px;">
-            <h4 style="margin:0; font-size:14px; color:var(--fg);">Systémové akce a mezipaměť</h4>
+          <div style="background:var(--editor, #1e1e1e); border:1px solid var(--border-subtle, #333); border-radius:2px; padding:14px; display:flex; flex-direction:column; gap:10px;">
+            <div class="v2-comment">/* mezipaměť a cloud sync */</div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-              <button type="button" class="btn secondary sm" id="btnAdmForceSync">Vynutit Cloud Sync</button>
-              <button type="button" class="btn secondary sm" id="btnAdmClearErrors">Vymazat Logy Chyb</button>
+              <button type="button" class="btn secondary sm" id="btnAdmForceSync" style="font-family:var(--font-mono);"><span class="prompt">$</span>sync --force</button>
+              <button type="button" class="btn secondary sm" id="btnAdmClearErrors" style="font-family:var(--font-mono);"><span class="prompt">$</span>clear-logs</button>
             </div>
-            <div id="admDiagMsg" style="font-size:12px; color:#89d185;"></div>
+            <div id="admDiagMsg" style="font-size:11.5px; color:#89d185; font-family:var(--font-mono);"></div>
           </div>
         </div>
       </div>
@@ -223,36 +214,36 @@ function renderImprovementsTab() {
     });
 
     if (!list.length) {
-      container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--fg-muted);">Žádné připomínky k otázkám neodpovídají zadání.</div>`;
+      container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--fg-muted); font-family:var(--font-mono); font-size:12px;">// Žádné připomínky k otázkám neodpovídají zadání.</div>`;
       return;
     }
 
     container.innerHTML = list.map((item) => {
       const status = item.status || "open";
-      let statusLabel = "Otevřeno";
-      if (status === "resolved") statusLabel = "Vyřešeno";
-      else if (status === "dismissed") statusLabel = "Zamítnuto";
+      let statusLabel = "[OPEN]";
+      if (status === "resolved") statusLabel = "[RESOLVED]";
+      else if (status === "dismissed") statusLabel = "[DISMISSED]";
 
       return `
-        <div class="admin-item-card" data-id="${item.id}">
-          <div class="admin-item-head">
+        <div class="admin-item-card" data-id="${item.id}" style="font-family:var(--font-mono, monospace); border-radius:2px;">
+          <div class="admin-item-head" style="display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <strong>Prezentace:</strong> <code>${escapeHtml(item.deckKey)}</code> · 
-              <strong>Otázka:</strong> <code>${escapeHtml(item.questionId)}</code>
+              <strong>deck:</strong> <code>${escapeHtml(item.deckKey)}</code> · 
+              <strong>id:</strong> <code>${escapeHtml(item.questionId)}</code>
             </div>
-            <span class="admin-status-pill ${status}">${statusLabel}</span>
+            <span class="admin-status-pill ${status}" style="font-family:var(--font-mono); font-weight:700;">${statusLabel}</span>
           </div>
-          <div style="font-size:12.5px; color:var(--fg-muted);">
-            <strong>Kategorie:</strong> ${escapeHtml(item.categoryLabel || item.category)}
+          <div style="font-size:11.5px; color:var(--fg-muted); margin-top:4px;">
+            <strong>kategorie:</strong> ${escapeHtml(item.categoryLabel || item.category)}
           </div>
-          ${item.questionText ? `<div style="font-size:12px; font-style:italic; color:var(--fg-subtle); background:var(--editor); padding:6px 10px; border-radius:4px;">"${escapeHtml(item.questionText)}"...</div>` : ""}
-          ${item.userNote ? `<div style="font-size:13px; font-weight:500; color:var(--fg); margin-top:2px;"><strong>Poznámka od uživatele:</strong> ${escapeHtml(item.userNote)}</div>` : ""}
-          <div style="font-size:11px; color:var(--fg-subtle);">${new Date(item.timestamp).toLocaleString("cs-CZ")}</div>
-          <div class="admin-item-actions">
-            ${status !== "resolved" ? `<button type="button" class="admin-btn-sm success btn-act-resolve" data-id="${item.id}">Označit za vyřešené</button>` : ""}
-            ${status !== "dismissed" ? `<button type="button" class="admin-btn-sm btn-act-dismiss" data-id="${item.id}">Zamítnout</button>` : ""}
-            ${status !== "open" ? `<button type="button" class="admin-btn-sm btn-act-reopen" data-id="${item.id}">Znovu otevřít</button>` : ""}
-            <button type="button" class="admin-btn-sm danger btn-act-delete" data-id="${item.id}">Smazat</button>
+          ${item.questionText ? `<div style="font-size:11.5px; font-style:italic; color:var(--fg-subtle); background:var(--editor); padding:6px 10px; border-radius:2px; margin-top:4px;">"${escapeHtml(item.questionText)}"...</div>` : ""}
+          ${item.userNote ? `<div style="font-size:12px; color:var(--fg); margin-top:4px;"><strong>poznámka:</strong> ${escapeHtml(item.userNote)}</div>` : ""}
+          <div style="font-size:10.5px; color:var(--fg-subtle); margin-top:4px;">${new Date(item.timestamp).toLocaleString("cs-CZ")}</div>
+          <div class="admin-item-actions" style="margin-top:8px;">
+            ${status !== "resolved" ? `<button type="button" class="admin-btn-sm success btn-act-resolve" data-id="${item.id}"><span class="prompt">$</span>resolve</button>` : ""}
+            ${status !== "dismissed" ? `<button type="button" class="admin-btn-sm btn-act-dismiss" data-id="${item.id}"><span class="prompt">$</span>dismiss</button>` : ""}
+            ${status !== "open" ? `<button type="button" class="admin-btn-sm btn-act-reopen" data-id="${item.id}"><span class="prompt">$</span>reopen</button>` : ""}
+            <button type="button" class="admin-btn-sm danger btn-act-delete" data-id="${item.id}"><span class="prompt">$</span>delete</button>
           </div>
         </div>
       `;
@@ -305,22 +296,22 @@ function renderUsersTab() {
       const username = uInput?.value.trim();
       const password = pInput?.value.trim();
       if (!username || !password) {
-        if (msgEl) msgEl.textContent = "Zadejte uživatelské jméno a heslo pro admina.";
+        if (msgEl) msgEl.textContent = "Zadejte e-mail a heslo pro admina.";
         return;
       }
 
       try {
-        await registerUser({ email: `${username}@vscht.cz`, password });
-        addAdminUser(username);
+        const cleanEmail = username.includes("@") ? username : `${username}@vscht.cz`;
+        await registerUser({ email: cleanEmail, password });
+        addAdminUser(cleanEmail);
         if (uInput) uInput.value = "";
         if (pInput) pInput.value = "";
-        if (msgEl) msgEl.textContent = `Admin účet "${username}" byl úspěšně vytvořen.`;
+        if (msgEl) msgEl.textContent = `✓ Admin účet "${cleanEmail}" byl úspěšně vytvořen.`;
         renderUsersTab();
       } catch (err) {
-        // If account exists, just promote to admin & reset password
         addAdminUser(username);
         await resetUserPassword(username, password);
-        if (msgEl) msgEl.textContent = `Účet "${username}" byl povýšen na Admina s novým heslem.`;
+        if (msgEl) msgEl.textContent = `✓ Účet "${username}" byl povýšen na Admina s novým heslem.`;
         renderUsersTab();
       }
     };
@@ -337,8 +328,8 @@ function renderUsersTab() {
       if (!usersDb[adm]) {
         usersDb[adm] = {
           username: adm,
-          email: `${adm}@vscht.cz`,
-          faculty: adm === "kolard" ? "FCHI · VSČHT Praha" : "VSČHT Praha",
+          email: adm.includes("@") ? adm : `${adm}@vscht.cz`,
+          faculty: adm === "kolard" || adm === "kolard@vscht.cz" ? "FCHI · VSČHT Praha" : "VSČHT Praha",
           studentId: "000000",
           role: "admin",
         };
@@ -352,7 +343,7 @@ function renderUsersTab() {
     });
 
     if (!userKeys.length) {
-      container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--fg-muted);">Žádní uživatelé nenalezeni.</div>`;
+      container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--fg-muted); font-family:var(--font-mono); font-size:12px;">// Žádní uživatelé nenalezeni.</div>`;
       return;
     }
 
@@ -361,25 +352,25 @@ function renderUsersTab() {
       const isAdmin = isAdminUser({ username: u, role: rec.role });
 
       return `
-        <div class="admin-item-card">
-          <div class="admin-item-head">
+        <div class="admin-item-card" style="font-family:var(--font-mono, monospace); border-radius:2px;">
+          <div class="admin-item-head" style="display:flex; justify-content:space-between; align-items:center;">
             <div>
-              <strong style="font-size:14px; color:var(--fg);">${escapeHtml(rec.username)}</strong> 
-              <span style="color:var(--fg-muted); font-size:12px;">(${escapeHtml(rec.email || u)})</span>
+              <strong style="font-size:13.5px; color:var(--fg);">${escapeHtml(rec.username)}</strong> 
+              <span style="color:var(--fg-muted); font-size:11.5px;">(${escapeHtml(rec.email || u)})</span>
             </div>
-            <span class="admin-status-pill ${isAdmin ? "resolved" : "dismissed"}">${isAdmin ? "ADMIN" : "STUDENT"}</span>
+            <span class="admin-status-pill ${isAdmin ? "resolved" : "dismissed"}">${isAdmin ? "[ADMIN]" : "[STUDENT]"}</span>
           </div>
-          <div style="font-size:12px; color:var(--fg-muted);">
-            Fakulta: ${escapeHtml(rec.faculty || "VSČHT")} · ID: ${escapeHtml(rec.studentId || "—")}
+          <div style="font-size:11.5px; color:var(--fg-muted); margin-top:2px;">
+            fakulta: ${escapeHtml(rec.faculty || "VSČHT")} · id: ${escapeHtml(rec.studentId || "—")}
           </div>
-          <div class="admin-item-actions" style="align-items:center;">
-            <input type="password" class="admin-search-input adm-pass-input" placeholder="Nové heslo..." style="min-width:140px; font-size:12px;" data-user="${escapeHtml(u)}" />
-            <button type="button" class="admin-btn-sm success btn-act-reset-pass" data-user="${escapeHtml(u)}">Resetovat heslo</button>
-            ${u !== "kolard" ? (
+          <div class="admin-item-actions" style="align-items:center; margin-top:8px;">
+            <input type="password" class="admin-search-input adm-pass-input" placeholder="Nové heslo..." style="min-width:140px; font-size:11.5px; font-family:var(--font-mono);" data-user="${escapeHtml(u)}" />
+            <button type="button" class="admin-btn-sm success btn-act-reset-pass" data-user="${escapeHtml(u)}"><span class="prompt">$</span>reset-pass</button>
+            ${u !== "kolard" && u !== "kolard@vscht.cz" ? (
               isAdmin
-                ? `<button type="button" class="admin-btn-sm btn-act-revoke-admin" data-user="${escapeHtml(u)}">Odebrat Admina</button>`
-                : `<button type="button" class="admin-btn-sm btn-act-grant-admin" data-user="${escapeHtml(u)}">Povýšit na Admina</button>`
-            ) : `<span style="font-size:11px; color:var(--accent); font-weight:bold;">Superadmin (kolard)</span>`}
+                ? `<button type="button" class="admin-btn-sm btn-act-revoke-admin" data-user="${escapeHtml(u)}"><span class="prompt">$</span>revoke-admin</button>`
+                : `<button type="button" class="admin-btn-sm btn-act-grant-admin" data-user="${escapeHtml(u)}"><span class="prompt">$</span>grant-admin</button>`
+            ) : `<span style="font-size:10.5px; color:var(--accent); font-weight:bold;">[SUPERADMIN]</span>`}
           </div>
         </div>
       `;
@@ -444,7 +435,7 @@ function renderRelevanceTab() {
     });
 
     if (!items.length) {
-      container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--fg-muted);">Žádná témata nenalezena.</div>`;
+      container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--fg-muted); font-family:var(--font-mono); font-size:12px;">// Žádná témata nenalezena.</div>`;
       return;
     }
 
@@ -453,15 +444,15 @@ function renderRelevanceTab() {
       const rel = it.relevance || 5;
 
       return `
-        <div class="admin-rel-row">
+        <div class="admin-rel-row" style="font-family:var(--font-mono, monospace);">
           <div style="flex:1; min-width:0;">
-            <strong style="font-size:13.5px; color:var(--fg);">${escapeHtml(it.title)}</strong>
-            <div style="font-size:11.5px; color:var(--fg-muted);">Týden ${it.weekNum || 1} · <code>${escapeHtml(key)}</code></div>
+            <strong style="font-size:13px; color:var(--fg);">${escapeHtml(it.title)}</strong>
+            <div style="font-size:11px; color:var(--fg-muted);">w${it.weekNum || 1} · <code>${escapeHtml(key)}</code></div>
           </div>
           <div style="display:flex; align-items:center; gap:12px;">
-            <span class="rel-bar-preview">${starsHtml(rel, 10, "bar")}</span>
-            <input type="number" min="1" max="10" value="${rel}" class="admin-rel-input rel-num-input" data-key="${escapeHtml(key)}" />
-            <button type="button" class="admin-btn-sm success btn-save-rel" data-key="${escapeHtml(key)}">Uložit</button>
+            <span class="rel-bar-preview">${starsHtml(it, 10, "bar")}</span>
+            <input type="number" min="1" max="10" value="${rel}" class="admin-rel-input rel-num-input" data-key="${escapeHtml(key)}" style="font-family:var(--font-mono); font-size:12px;" />
+            <button type="button" class="admin-btn-sm success btn-save-rel" data-key="${escapeHtml(key)}"><span class="prompt">$</span>save</button>
           </div>
         </div>
       `;
@@ -484,7 +475,7 @@ function renderRelevanceTab() {
         const val = Number(inp?.value || 5);
         saveRelevanceOverride(key, val);
         b.textContent = "Uloženo";
-        setTimeout(() => { b.textContent = "Uložit"; }, 1200);
+        setTimeout(() => { b.innerHTML = `<span class="prompt">$</span>save`; }, 1200);
       });
     });
   }
@@ -504,7 +495,7 @@ function renderDiagnosticsTab() {
       forceSyncBtn.textContent = "Synchronizuji…";
       await loadQuestionImprovements();
       forceSyncBtn.disabled = false;
-      forceSyncBtn.textContent = "Vynutit Cloud Sync";
+      forceSyncBtn.innerHTML = `<span class="prompt">$</span>sync --force`;
       if (msgEl) msgEl.textContent = "Cloud DB plně synchronizována.";
     };
   }

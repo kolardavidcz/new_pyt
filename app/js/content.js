@@ -4,16 +4,17 @@ import {
   state, pagesFor, slideDiff, slideTags, weekVisibleItems, filteredItems, markSeen,
   isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor, logLinkError,
   saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, setPrintWithQuizzes, getQuizFor,
-  registerUser, loginWithPassword,
+  registerUser, loginWithPassword, resetUserPassword, isAdminUser,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot, highlightCode, dedentCode } from "./highlight.js";
 import { renderTree } from "./tree.js";
 import { formatInlineCode, isFlexibleCodeFillCorrect, parseQuestionContent } from "./format.js";
-import { renderQuizSection, openImprovementModal, updatePrintQuizButtons } from "./quiz.js";
+import { renderQuizSection, openImprovementModal, openPresentationImprovementModal, updatePrintQuizButtons } from "./quiz.js";
+import { openAdminModal } from "./admin.js";
 
 export { formatInlineCode, isFlexibleCodeFillCorrect, parseQuestionContent };
-export { renderQuizSection, openImprovementModal, updatePrintQuizButtons };
+export { renderQuizSection, openImprovementModal, openPresentationImprovementModal, updatePrintQuizButtons };
 
 export function setLoading(on) {
   const bar = document.getElementById("loadingBar");
@@ -1607,21 +1608,22 @@ export function showProgress() {
 /* ── Dedicated Login & Account Profile Command Center ────── */
 
 export function showLogin() {
-  const main = document.getElementById("main");
-  if (!main) return;
-  main.className = "catalog catalog-login";
-  clear(main);
+  const profileModal = document.getElementById("profileModal");
+  if (!profileModal) return;
 
-  const container = el("div", { className: "login-page-container" });
+  const cardContainer = profileModal.querySelector("#profileModalCard") || profileModal.querySelector(".profile-modal-card");
+  if (!cardContainer) return;
+
+  clear(cardContainer);
   const u = state.user;
 
   if (u) {
-    container.appendChild(renderUserProfileDashboard(u));
+    cardContainer.appendChild(renderUserProfileDashboard(u));
   } else {
-    container.appendChild(renderLoginForm());
+    cardContainer.appendChild(renderLoginForm());
   }
 
-  main.appendChild(container);
+  profileModal.classList.remove("hidden");
 }
 
 function renderUserProfileDashboard(u) {
@@ -1636,35 +1638,42 @@ function renderUserProfileDashboard(u) {
     .substring(0, 2)
     .toUpperCase();
 
-  const card = el("div", { className: "v2-card" });
+  const isAdmin = isAdminUser(u);
+
+  const card = el("div", { className: "v2-card", style: "width:100%; border:none; padding:0; background:transparent;" });
   card.innerHTML = `
-    <div class="v2-identity" style="display:flex; justify-content:space-between; align-items:center;">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <div class="v2-avatar">${escapeHtml(initials)}</div>
-        <div>
-          <div class="v2-identity-name">${escapeHtml(u.name || u.username)}</div>
-          <div class="v2-identity-meta">${escapeHtml(u.email || u.username + "@vscht.cz")}</div>
-        </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle, #333); padding-bottom:10px; margin-bottom:14px;">
+      <p class="v2-comment" style="margin:0;">// auth/profile.ts</p>
+      <button type="button" class="icon-btn" id="btnCloseProfileModal" title="Zavřít" style="background:transparent; border:none; color:var(--fg-muted); cursor:pointer; font-size:16px;">✕</button>
+    </div>
+
+    <div class="v2-identity">
+      <div class="v2-avatar">${escapeHtml(initials)}</div>
+      <div>
+        <div class="v2-identity-name">${escapeHtml(u.name || u.username)}</div>
+        <div class="v2-identity-meta">${escapeHtml(u.email || u.username + "@vscht.cz")} · VSČHT Praha</div>
       </div>
-      <button type="button" class="btn secondary sm" id="btnPageLogout">Logout</button>
     </div>
 
     <div class="v2-status-line">
-      <span class="ok">✓</span> progress <span class="num">${studiedCount}</span>/<span class="num">${total}</span> studied · <span class="num">${pct}%</span> complete
+      <span class="ok">✓</span> progress <span class="num">${studiedCount}</span>/<span class="num">${total}</span> prostudováno · <span class="num">${pct}%</span> splněno
     </div>
 
-    <!-- Cloud Progress Sync Status -->
-    <div class="v2-row" style="border-left:2px solid #0284c7; padding-left:8px;">
-      <span class="v2-row-icon" style="color:#38bdf8">☁️</span>
+    <div class="v2-row">
+      <span class="v2-row-icon" style="color:#38bdf8">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .3-4.98A3.5 3.5 0 0 0 5.2 6.06 2.75 2.75 0 0 0 4.5 12.5z"/></svg>
+      </span>
       <div class="v2-row-main">
-        <strong>cloud_sync (Upstash Redis)</strong>
-        <span>Synchronizace postupu pod klíčem: <code>pyt:${escapeHtml(u.username)}:*</code></span>
+        <strong>cloud_sync</strong>
+        <span>key: <code>pyt:${escapeHtml(u.username)}:*</code></span>
       </div>
       <button type="button" class="btn secondary sm" id="btnManualSync">sync</button>
     </div>
 
     <div class="v2-row">
-      <span class="v2-row-icon" style="color:#569cd6">💻</span>
+      <span class="v2-row-icon" style="color:#569cd6">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="8" rx="1"/><path d="M6 13.5h4M8 11v2.5"/></svg>
+      </span>
       <div class="v2-row-main">
         <strong>print_code_theme</strong>
         <span>appearance in PDF export</span>
@@ -1676,7 +1685,9 @@ function renderUserProfileDashboard(u) {
     </div>
 
     <div class="v2-row">
-      <span class="v2-row-icon" style="color:#4ec9b0">📝</span>
+      <span class="v2-row-icon" style="color:#4ec9b0">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 2h5l3 3v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M9 2v3h3M5.5 8h5M5.5 10.5h5"/></svg>
+      </span>
       <div class="v2-row-main">
         <strong>print_with_quizzes</strong>
         <span>takeaway quiz on print</span>
@@ -1687,20 +1698,35 @@ function renderUserProfileDashboard(u) {
       </select>
     </div>
 
-    <div class="v2-dev">
-      <p class="v2-dev-label">/* dev quick switch */</p>
-      <div class="quick-buttons">
-        <button type="button" class="btn secondary sm" id="btnQuickSwitchKolard">kolard</button>
-        <button type="button" class="btn secondary sm" id="btnQuickSwitchStudent">student1</button>
+    ${isAdmin ? `
+      <div style="margin-top:14px;">
+        <button type="button" class="btn primary sm v2-submit" id="btnProfileOpenAdmin" style="width:100%; border-color:#38bdf8; background:rgba(56,189,248,0.15); color:#38bdf8; font-weight:600;"><span class="prompt">$</span>admin --overview</button>
       </div>
+    ` : ""}
+
+    <div class="v2-dev">
+      <p class="v2-dev-label">/* dev: switch test account */</p>
+      <div class="quick-buttons" style="display:flex; gap:6px;">
+        <button type="button" class="btn secondary sm" id="btnQuickSwitchKolard" style="flex:1; font-size:11px;">kolard@vscht.cz</button>
+        <button type="button" class="btn secondary sm" id="btnQuickSwitchStudent" style="flex:1; font-size:11px;">student1@vscht.cz</button>
+      </div>
+    </div>
+
+    <div class="v2-actions" style="margin-top:14px;">
+      <button type="button" class="btn danger" id="btnPageLogout"><span class="prompt">$</span>logout</button>
     </div>
   `;
 
   // Bind dashboard events
   setTimeout(() => {
+    const profileModal = document.getElementById("profileModal");
+    card.querySelector("#btnCloseProfileModal")?.addEventListener("click", () => {
+      profileModal?.classList.add("hidden");
+    });
+
     card.querySelector("#btnManualSync")?.addEventListener("click", async (e) => {
       const btn = e.currentTarget;
-      btn.textContent = "syncing...";
+      btn.textContent = "syncing…";
       btn.disabled = true;
       await syncCloudProgress();
       btn.textContent = "synced ✓";
@@ -1718,6 +1744,11 @@ function renderUserProfileDashboard(u) {
     card.querySelector("#selectPrintWithQuizzes")?.addEventListener("change", (e) => {
       setPrintWithQuizzes(e.target.value === "true");
       updatePrintQuizButtons();
+    });
+
+    card.querySelector("#btnProfileOpenAdmin")?.addEventListener("click", () => {
+      profileModal?.classList.add("hidden");
+      openAdminModal();
     });
 
     card.querySelector("#btnQuickSwitchKolard")?.addEventListener("click", async () => {
@@ -1740,68 +1771,108 @@ function renderUserProfileDashboard(u) {
 }
 
 function renderLoginForm() {
-  const card = el("div", { className: "v2-card" });
+  const card = el("div", { className: "v2-card", style: "width:100%; border:none; padding:0; background:transparent;" });
   card.innerHTML = `
-    <!-- Tab Switcher -->
-    <div class="login-tab-bar" style="display:flex; gap:6px; margin-bottom:14px; font-family:var(--font-mono);">
-      <button type="button" class="btn primary sm tab-btn active" id="tabBtnLogin" style="flex:1;">🔑 Přihlášení</button>
-      <button type="button" class="btn secondary sm tab-btn" id="tabBtnRegister" style="flex:1;">📝 Registrace</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle, #333); padding-bottom:10px; margin-bottom:14px;">
+      <p class="v2-comment" style="margin:0;">// auth/login.ts</p>
+      <button type="button" class="icon-btn" id="btnCloseProfileModal" title="Zavřít" style="background:transparent; border:none; color:var(--fg-muted); cursor:pointer; font-size:16px;">✕</button>
     </div>
 
-    <!-- Login Form (Email + Password) -->
+    <h2 class="v2-title">Přihlášení studenta / vyučujícího</h2>
+    <p class="v2-desc">Zadejte své školní údaje (@vscht.cz) pro synchronizaci postupu napříč zařízeními.</p>
+
+    <!-- Tab Switcher -->
+    <div class="login-tab-bar" style="display:flex; gap:6px; margin-bottom:14px; font-family:var(--font-mono);">
+      <button type="button" class="btn primary sm tab-btn active" id="tabBtnLogin" style="flex:1;">[1] login</button>
+      <button type="button" class="btn secondary sm tab-btn" id="tabBtnRegister" style="flex:1;">[2] register</button>
+      <button type="button" class="btn secondary sm tab-btn" id="tabBtnReset" style="flex:1;">[3] reset</button>
+    </div>
+
+    <!-- 1. Login Form (Email @vscht.cz + Password) -->
     <form id="pageLoginForm" class="v2-form">
-      <div id="loginErrorBanner" style="display:none; font-size:11.5px; color:#ef4444; background:rgba(239,68,68,0.1); padding:8px 10px; border-left:2px solid #ef4444; margin-bottom:8px; font-family:var(--font-mono);"></div>
+      <div id="loginErrorBanner" style="display:none; font-size:11.5px; color:#ef4444; background:rgba(239,68,68,0.1); padding:8px 10px; border-left:2px solid #ef4444; font-family:var(--font-mono);"></div>
 
       <div class="v2-field">
-        <label>email (Školní e-mail @vscht.cz)</label>
+        <label>username_email (@vscht.cz)</label>
         <input type="email" id="pageInputEmail" value="kolard@vscht.cz" placeholder="např. kolard@vscht.cz" required autocomplete="email" />
       </div>
 
       <div class="v2-field">
-        <label>password (Heslo)</label>
+        <label>password</label>
         <input type="password" id="pageInputPassword" value="kolard123" placeholder="Zadejte heslo..." required autocomplete="current-password" />
       </div>
 
-      <button type="submit" class="btn primary xl v2-submit" id="btnLoginSubmit"><span class="prompt">$</span>login --password</button>
+      <div style="display:flex; justify-content:flex-end;">
+        <button type="button" id="btnGoToReset" style="background:none; border:none; color:var(--accent); font-size:11px; cursor:pointer; text-decoration:underline; font-family:var(--font-mono);">Zapomněli jste heslo?</button>
+      </div>
+
+      <button type="submit" class="btn primary xl v2-submit" id="btnLoginSubmit" style="margin-top:6px;"><span class="prompt">$</span>login --password</button>
     </form>
 
-    <!-- Registration Form (Email + Password only) -->
+    <!-- 2. Registration Form -->
     <form id="pageRegisterForm" class="v2-form" style="display:none;">
-      <div id="regErrorBanner" style="display:none; font-size:11.5px; color:#ef4444; background:rgba(239,68,68,0.1); padding:8px 10px; border-left:2px solid #ef4444; margin-bottom:8px; font-family:var(--font-mono);"></div>
+      <div id="regErrorBanner" style="display:none; font-size:11.5px; color:#ef4444; background:rgba(239,68,68,0.1); padding:8px 10px; border-left:2px solid #ef4444; font-family:var(--font-mono);"></div>
 
       <div class="v2-field">
-        <label>email (Školní e-mail @vscht.cz)</label>
+        <label>username_email (@vscht.cz)</label>
         <input type="email" id="regInputEmail" placeholder="např. novakj@vscht.cz" required autocomplete="email" />
       </div>
 
       <div class="v2-field">
-        <label>password (Heslo)</label>
+        <label>password</label>
         <input type="password" id="regInputPassword" placeholder="Zvolte heslo..." required autocomplete="new-password" />
       </div>
 
-      <button type="submit" class="btn primary xl v2-submit" id="btnRegSubmit"><span class="prompt">$</span>register --account</button>
+      <button type="submit" class="btn primary xl v2-submit" id="btnRegSubmit" style="margin-top:6px;"><span class="prompt">$</span>register --account</button>
+    </form>
+
+    <!-- 3. Password Reset Form -->
+    <form id="pageResetForm" class="v2-form" style="display:none;">
+      <div id="resetStatusBanner" style="display:none; font-size:11.5px; padding:8px 10px; font-family:var(--font-mono);"></div>
+
+      <div class="v2-field">
+        <label>reset_email (@vscht.cz)</label>
+        <input type="email" id="resetInputEmail" placeholder="např. kolard@vscht.cz" required autocomplete="email" />
+      </div>
+
+      <div class="v2-field">
+        <label>new_password</label>
+        <input type="password" id="resetInputNewPass" placeholder="Zadejte nové heslo..." required autocomplete="new-password" />
+      </div>
+
+      <button type="submit" class="btn primary xl v2-submit" id="btnResetSubmit" style="margin-top:6px;"><span class="prompt">$</span>reset --password</button>
     </form>
 
     <div class="v2-dev">
-      <p class="v2-dev-label">/* dev quick switch */</p>
-      <div class="quick-buttons">
-        <button type="button" class="btn secondary sm" id="btnQuickKolard">kolard@vscht.cz</button>
-        <button type="button" class="btn secondary sm" id="btnQuickStudent">student1@vscht.cz</button>
+      <p class="v2-dev-label">/* dev: switch test account */</p>
+      <div class="quick-buttons" style="display:flex; gap:6px;">
+        <button type="button" class="btn secondary sm" id="btnQuickKolard" style="flex:1; font-size:11px;">kolard@vscht.cz</button>
+        <button type="button" class="btn secondary sm" id="btnQuickStudent" style="flex:1; font-size:11px;">student1@vscht.cz</button>
       </div>
     </div>
   `;
 
   // Bind login form events
   setTimeout(() => {
+    const profileModal = document.getElementById("profileModal");
+    card.querySelector("#btnCloseProfileModal")?.addEventListener("click", () => {
+      profileModal?.classList.add("hidden");
+    });
+
     const tabLogin = card.querySelector("#tabBtnLogin");
     const tabReg = card.querySelector("#tabBtnRegister");
+    const tabReset = card.querySelector("#tabBtnReset");
+
     const formLogin = card.querySelector("#pageLoginForm");
     const formReg = card.querySelector("#pageRegisterForm");
+    const formReset = card.querySelector("#pageResetForm");
+
     const loginErr = card.querySelector("#loginErrorBanner");
     const regErr = card.querySelector("#regErrorBanner");
+    const resetBanner = card.querySelector("#resetStatusBanner");
 
     const setActiveTab = (activeTab, activeForm) => {
-      [tabLogin, tabReg].forEach((t) => {
+      [tabLogin, tabReg, tabReset].forEach((t) => {
         if (t === activeTab) {
           t.classList.add("primary", "active");
           t.classList.remove("secondary");
@@ -1810,9 +1881,8 @@ function renderLoginForm() {
           t.classList.remove("primary", "active");
         }
       });
-      [formLogin, formReg].forEach((f) => {
+      [formLogin, formReg, formReset].forEach((f) => {
         if (f === activeForm) {
-          f.classList.remove("hidden");
           f.style.display = "flex";
         } else {
           f.style.display = "none";
@@ -1822,6 +1892,11 @@ function renderLoginForm() {
 
     tabLogin?.addEventListener("click", () => setActiveTab(tabLogin, formLogin));
     tabReg?.addEventListener("click", () => setActiveTab(tabReg, formReg));
+    tabReset?.addEventListener("click", () => setActiveTab(tabReset, formReset));
+
+    card.querySelector("#btnGoToReset")?.addEventListener("click", () => {
+      setActiveTab(tabReset, formReset);
+    });
 
     // Submit Password Login Form
     formLogin?.addEventListener("submit", async (e) => {
@@ -1844,7 +1919,7 @@ function renderLoginForm() {
       }
     });
 
-    // Submit Registration Form (Email + Password)
+    // Submit Registration Form
     formReg?.addEventListener("submit", async (e) => {
       e.preventDefault();
       if (regErr) regErr.style.display = "none";
@@ -1865,7 +1940,37 @@ function renderLoginForm() {
       }
     });
 
-    // Quick Dev Accounts (Pre-seeded with salted SHA-256 hashes)
+    // Submit Password Reset Form
+    formReset?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (resetBanner) resetBanner.style.display = "none";
+
+      const email = card.querySelector("#resetInputEmail")?.value.trim();
+      const newPass = card.querySelector("#resetInputNewPass")?.value.trim();
+
+      if (!email || !newPass) return;
+
+      try {
+        await resetUserPassword(email, newPass);
+        if (resetBanner) {
+          resetBanner.style.display = "block";
+          resetBanner.style.color = "#89d185";
+          resetBanner.style.background = "rgba(137,209,133,0.1)";
+          resetBanner.style.borderLeft = "2px solid #89d185";
+          resetBanner.textContent = `✓ Pokyny pro reset hesla byly odeslány na ${email}. Heslo bylo úspěšně změněno.`;
+        }
+      } catch (err) {
+        if (resetBanner) {
+          resetBanner.style.display = "block";
+          resetBanner.style.color = "#ef4444";
+          resetBanner.style.background = "rgba(239,68,68,0.1)";
+          resetBanner.style.borderLeft = "2px solid #ef4444";
+          resetBanner.textContent = err.message || "Reset hesla selhal.";
+        }
+      }
+    });
+
+    // Quick Dev Accounts
     card.querySelector("#btnQuickKolard")?.addEventListener("click", async () => {
       await loginWithPassword({ usernameOrEmail: "kolard@vscht.cz", password: "kolard123" });
       showLogin();

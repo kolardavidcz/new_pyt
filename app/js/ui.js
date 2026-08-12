@@ -56,36 +56,88 @@ export function flavorHtml(diff) {
 }
 
 /* ── Global Component: Relevance & Difficulty Meter ───── */
-export function starsHtml(n, max = 10, variant = "compact") {
-  const r = Math.max(0, Math.min(max, Number(n) || 0));
+export function starsHtml(n, max = 10, variant = "compact", extra = {}) {
+  let r = 5;
+  let relTeacher = null;
+  let relStudent = null;
+
+  if (typeof n === "object" && n !== null) {
+    r = Number(n.relevance || n.relevanceAI || 5);
+    relTeacher = n.relevanceTeacher;
+    relStudent = n.relevanceStudent;
+  } else {
+    r = Number(n) || 5;
+  }
+
+  r = Math.max(1, Math.min(max, r));
+
+  if (extra && typeof extra === "object") {
+    if (extra.teacher !== undefined) relTeacher = extra.teacher;
+    if (extra.student !== undefined) relStudent = extra.student;
+  }
+
+  // Sensible default multi-ratings for S (Student) and T (Teacher) if not explicitly set
+  if (relTeacher === null || relTeacher === undefined) {
+    relTeacher = r >= 9 ? r - 1 : r >= 6 ? r + 1 : r;
+  }
+  if (relStudent === null || relStudent === undefined) {
+    relStudent = r >= 8 ? r - 3 : r >= 5 ? r - 1 : Math.max(1, r - 2);
+  }
+
+  relTeacher = Math.max(1, Math.min(max, Number(relTeacher)));
+  relStudent = Math.max(1, Math.min(max, Number(relStudent)));
+
   const level = r >= 8 ? "peak" : r >= 6 ? "high" : r >= 5 ? "mid" : "low";
-  const segs = segmentsHtml(r, max);
-  const heatHint =
-    r <= 4 ? "Low priority (grey)"
-    : r === 5 ? "Medium (yellow)"
-    : r <= 7 ? "Elevated (orange)"
-    : "High priority (red)";
+  const segs = segmentsHtml(r, max, relTeacher, relStudent);
+
+  const titleText = `Relevance AI: ${r}/10, Teacher (T): ${relTeacher}/10, Student (S): ${relStudent}/10`;
+
   if (variant === "compact") {
-    return `<span class="rel-meter rel-compact rel-${level} rel-n-${r}" title="Relevance ${r}/10 — ${heatHint}">` +
+    return `<span class="rel-meter rel-compact rel-${level} rel-n-${r}" title="${escapeAttr(titleText)}">` +
       `<span class="rel-segs rel-segs-mini" aria-hidden="true">${segs}</span>` +
       `<span class="rel-pill">${r}</span></span>`;
   }
   if (variant === "full") {
-    return `<div class="rel-meter rel-full rel-${level} rel-n-${r}" title="Relevance ${r}/10">` +
-      `<div class="rel-full-label"><span>Relevance</span><strong>${r}<span class="rel-max">/10</span></strong></div>` +
+    return `<div class="rel-meter rel-full rel-${level} rel-n-${r}" title="${escapeAttr(titleText)}">` +
+      `<div class="rel-full-label"><span>Relevance (AI)</span><strong>${r}<span class="rel-max">/10</span></strong></div>` +
       `<span class="rel-segs rel-segs-full" aria-hidden="true">${segs}</span>` +
       `</div>`;
   }
-  return `<span class="rel-meter rel-bar rel-${level} rel-n-${r}" title="Relevance ${r}/10">` +
+  return `<span class="rel-meter rel-bar rel-${level} rel-n-${r}" title="${escapeAttr(titleText)}">` +
     `<span class="rel-segs" aria-hidden="true">${segs}</span>` +
-    `<span class="rel-pill">${r}</span></span>`;
+    `<span class="rel-pill">${r}<span class="rel-max" style="font-size:9px; color:var(--text-faint);">/10</span></span></span>`;
 }
 
-function segmentsHtml(filled, max = 10) {
+function segmentsHtml(filled, max = 10, relTeacher = null, relStudent = null) {
   let html = "";
   for (let i = 1; i <= max; i++) {
     html += `<i class="rel-seg${i <= filled ? " on" : ""}" style="--i:${i}"></i>`;
   }
+
+  let offsetS = "translateX(-50%)";
+  let offsetT = "translateX(-50%)";
+
+  if (relTeacher !== null && relStudent !== null && relTeacher === relStudent) {
+    offsetS = "translateX(-90%)";
+    offsetT = "translateX(10%)";
+  }
+
+  // Teacher marker line (T - blue)
+  if (relTeacher !== null && relTeacher >= 1 && relTeacher <= max) {
+    const posT = relTeacher * 10 - 5;
+    html += `<span class="rel-marker rel-marker-teacher" style="left:${posT}%; transform:${offsetT};" title="Teacher (T): ${relTeacher}/10">` +
+      `<span class="rel-marker-label">T</span>` +
+      `<span class="rel-marker-line"></span></span>`;
+  }
+
+  // Student marker line (S - white)
+  if (relStudent !== null && relStudent >= 1 && relStudent <= max) {
+    const posS = relStudent * 10 - 5;
+    html += `<span class="rel-marker rel-marker-student" style="left:${posS}%; transform:${offsetS};" title="Student (S): ${relStudent}/10">` +
+      `<span class="rel-marker-label">S</span>` +
+      `<span class="rel-marker-line"></span></span>`;
+  }
+
   return html;
 }
 
