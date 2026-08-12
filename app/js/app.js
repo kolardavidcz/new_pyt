@@ -260,8 +260,6 @@ function updateUserUI() {
 function bindChrome() {
   // Theme & Profile & Admin
   document.getElementById("btnTheme")?.addEventListener("click", toggleTheme);
-  document.getElementById("btnPrint")?.addEventListener("click", triggerPrint);
-  document.getElementById("btnPalette")?.addEventListener("click", () => openPalette());
   document.getElementById("btnTitlebarAdmin")?.addEventListener("click", () => openAdminModal());
   document.getElementById("btnProfileAdmin")?.addEventListener("click", () => {
     document.getElementById("profileModal")?.classList.add("hidden");
@@ -297,7 +295,18 @@ function bindChrome() {
   });
 
   btnProfile?.addEventListener("click", () => {
-    navigate({ kind: "login" });
+    if (state.user) {
+      profileUserView?.classList.remove("hidden");
+      profileLoginForm?.classList.add("hidden");
+    } else {
+      profileUserView?.classList.add("hidden");
+      profileLoginForm?.classList.remove("hidden");
+    }
+    profileModal?.classList.remove("hidden");
+  });
+
+  profileModal?.addEventListener("click", (e) => {
+    if (e.target === profileModal) profileModal.classList.add("hidden");
   });
 
   btnCloseProfile?.addEventListener("click", () => profileModal?.classList.add("hidden"));
