@@ -259,17 +259,131 @@ export function loadUser() {
   state.user = null;
 }
 
-export function setUser(userObj) {
-  state.user = userObj;
+const USERS_DB_KEY = "pcs-users-db-v1";
+
+/** Hash password with Web Crypto API SHA-256 + Salt */
+export async function hashPassword(password, salt) {
+  const enc = new TextEncoder();
+  const data = enc.encode(password + ":" + salt);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+/** Generate a 16-byte random hex salt */
+export function generateSalt() {
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return Array.from(array).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+export function getUsersDb() {
   try {
-    if (userObj) {
-      localStorage.setItem(USER_KEY, JSON.stringify(userObj));
-    } else {
-      localStorage.removeItem(USER_KEY);
-    }
+    const raw = localStorage.getItem(USERS_DB_KEY);
+    if (raw) return JSON.parse(raw);
   } catch { /* ignore */ }
+  return {};
+}
+
+export function saveUserToDb(userRecord) {
+  const db = getUsersDb();
+  db[userRecord.username] = userRecord;
+  try {
+    localStorage.setItem(USERS_DB_KEY, JSON.stringify(db));
+  } catch { /* ignore */ }
+}
+
+export async function registerUser({ email, password }) {
+  const rawEmail = String(email || "").trim().toLowerCase();
+  if (!rawEmail) {
+    throw new Error("Zadejte platný e-mail.");
+  }
+  const cleanUsername = rawEmail.includes("@") ? rawEmail.split("@")[0] : rawEmail;
+  const fullEmail = rawEmail.includes("@") ? rawEmail : `${cleanUsername}@vscht.cz`;
+
+  const db = getUsersDb();
+  if (db[cleanUsername]) {
+    throw new Error(`Účet pro ${fullEmail} již existuje. Přihlaste se.`);
+  }
+  const salt = generateSalt();
+  const passwordHash = await hashPassword(password, salt);
+  const userRecord = {
+    username: cleanUsername,
+    email: fullEmail,
+    salt,
+    passwordHash,
+    faculty: "VSČHT Praha",
+    studentId: String(Math.floor(100000 + Math.random() * 900000)),
+  };
+  saveUserToDb(userRecord);
+  const sessionUser = { ...userRecord };
+  delete sessionUser.passwordHash;
+  delete sessionUser.salt;
+  setUser(sessionUser);
+  await syncCloudProgress();
+  return sessionUser;
+}
+
+export async function loginWithPassword({ usernameOrEmail, password }) {
+  const clean = usernameOrEmail.includes("@") ? usernameOrEmail.split("@")[0].toLowerCase() : usernameOrEmail.toLowerCase();
+  const db = getUsersDb();
+  let userRecord = db[clean];
+
+  // Auto-seed dev accounts if not present
+  if (!userRecord && (clean === "kolard" || clean === "student1")) {
+    const salt = generateSalt();
+    const passwordHash = await hashPassword(clean === "kolard" ? "kolard123" : "student123", salt);
+    userRecord = {
+      username: clean,
+      email: `${clean}@vscht.cz`,
+      salt,
+      passwordHash,
+      faculty: clean === "kolard" ? "FCHI · VSČHT Praha" : "FPBT · VSČHT Praha",
+      studentId: clean === "kolard" ? "987654" : "123456",
+    };
+    saveUserToDb(userRecord);
+  }
+
+  if (!userRecord) {
+    throw new Error("Uživatel nenalezen. Zkontrolujte jméno nebo se zaregistrujte.");
+  }
+
+  const computedHash = await hashPassword(password, userRecord.salt);
+  if (computedHash !== userRecord.passwordHash) {
+    throw new Error("Nespárované heslo. Zkontrolujte zadané heslo.");
+  }
+
+  const sessionUser = { ...userRecord };
+  delete sessionUser.passwordHash;
+  delete sessionUser.salt;
+  setUser(sessionUser);
+  await syncCloudProgress();
+  return sessionUser;
+}
+
+export function setUser(userObj) {
+  if (userObj && typeof userObj === "object") {
+    const rawName = String(userObj.username || userObj.name || "").trim();
+    if (rawName) {
+      const cleanUsername = rawName.includes("@") ? rawName.split("@")[0].toLowerCase() : rawName.toLowerCase();
+      userObj.username = cleanUsername;
+      if (!userObj.name || userObj.name === cleanUsername) userObj.name = cleanUsername;
+      if (!userObj.faculty) userObj.faculty = "VSČHT Praha";
+      if (!userObj.studentId) userObj.studentId = String(Math.floor(100000 + Math.random() * 900000));
+      state.user = userObj;
+      try {
+        localStorage.setItem(USER_KEY, JSON.stringify(userObj));
+      } catch { /* ignore */ }
+    } else {
+      state.user = null;
+      try { localStorage.removeItem(USER_KEY); } catch { /* ignore */ }
+    }
+  } else {
+    state.user = null;
+    try { localStorage.removeItem(USER_KEY); } catch { /* ignore */ }
+  }
   loadPersisted();
-  notifyStateChange("user", { user: userObj });
+  notifyStateChange("user", { user: state.user });
 }
 
 export function logoutUser() {
@@ -393,6 +507,90 @@ function normalizeKey(str) {
   return String(str || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
+const GENERIC_DISTRACTORS = [
+  "Žádná z uvedených možností",
+  "SyntaxError (neplatná syntaxe)",
+  "TypeError (nekompatibilní typy)",
+  "AttributeError (objekt nemá tento atribut)",
+  "None (metoda nevrací hodnotu)",
+  "Všechny uvedené možnosti jsou správné"
+];
+
+/** FNV-1a 32-bit hash for uniform 25% option distribution */
+function hashFnv32(str) {
+  let hVal = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    hVal ^= str.charCodeAt(i);
+    hVal += (hVal << 1) + (hVal << 4) + (hVal << 7) + (hVal << 8) + (hVal << 24);
+  }
+  return hVal >>> 0;
+}
+
+/** Deterministically shuffles q.options with uniform ~25% A/B/C/D distribution ONCE forever */
+export function ensureShuffledOptions(q, deckKey = "", idx = 0) {
+  if (!q || q._shuffled || !Array.isArray(q.options) || q.options.length <= 1) return;
+
+  // Do not shuffle True/False binary questions
+  const cleanFirst = String(q.options[0] || "").replace(/^[A-D]\)\s*/, "").trim().toLowerCase();
+  if (q.type === "true_false_tricky" || (q.options.length === 2 && (cleanFirst === "pravda" || cleanFirst === "ano" || cleanFirst === "true"))) {
+    q._shuffled = true;
+    return;
+  }
+
+  // Determine original correct option text
+  let originalCorrectText = "";
+  if (typeof q.answer === "number" && q.options[q.answer] !== undefined) {
+    originalCorrectText = q.options[q.answer];
+  } else if (typeof q.answer === "string" && q.answer) {
+    originalCorrectText = q.answer;
+  } else {
+    originalCorrectText = q.options[0];
+  }
+
+  const cleanOriginalCorrect = String(originalCorrectText).replace(/^[A-D]\)\s*/, "").trim();
+
+  // If question has 3 options, add plausible 4th distractor so Option D gets ~25% representation
+  if (q.options.length === 3) {
+    const dIdx = hashFnv32(`${deckKey}:${q.id || idx}:distractor`) % GENERIC_DISTRACTORS.length;
+    const newOpt = GENERIC_DISTRACTORS[dIdx];
+    if (!q.options.includes(newOpt) && !q.options.some(o => String(o).replace(/^[A-D]\)\s*/, "").trim() === newOpt)) {
+      q.options.push(newOpt);
+    }
+  }
+
+  const cleanOpts = q.options.map(opt => String(opt).replace(/^[A-D]\)\s*/, "").trim());
+
+  // Uniform seed based on deckKey, question ID, index, and stem text
+  const seedStr = `${deckKey}:${q.id || idx}:${q.question || ""}:${cleanOpts.length}`;
+  const hash = hashFnv32(seedStr);
+  const targetIdx = hash % cleanOpts.length;
+
+  // Filter out correct option and shuffle distractors
+  const distractors = cleanOpts.filter(opt => opt !== cleanOriginalCorrect);
+  const shuffledDistract = [...distractors];
+  for (let i = shuffledDistract.length - 1; i > 0; i--) {
+    const swapIdx = (hash + i * 17) % (i + 1);
+    const tmp = shuffledDistract[i];
+    shuffledDistract[i] = shuffledDistract[swapIdx];
+    shuffledDistract[swapIdx] = tmp;
+  }
+
+  // Reconstruct options array placing correct answer exactly at targetIdx (25% A, 25% B, 25% C, 25% D)
+  let newOptions = [];
+  let distPointer = 0;
+  for (let i = 0; i < cleanOpts.length; i++) {
+    if (i === targetIdx) {
+      newOptions.push(cleanOriginalCorrect);
+    } else {
+      newOptions.push(shuffledDistract[distPointer++] || "Není k dispozici");
+    }
+  }
+
+  q.options = newOptions;
+  q.answer = targetIdx;
+  q._shuffled = true;
+}
+
 /**
  * Asynchronous & resilient quiz lookup with multi-key normalization and lazy per-week fallback.
  */
@@ -434,34 +632,39 @@ export async function getQuizFor(item) {
   };
 
   let found = checkMemory();
-  if (found) return found;
-
-  // Fallback: Lazy fetch per-week chunk if missing
-  const weekNum = item.weekNum !== undefined ? item.weekNum : (item.week ? item.week : null);
-  if (weekNum != null) {
-    const urls = [
-      `data/quizzes/w${weekNum}.json`,
-      `./data/quizzes/w${weekNum}.json`,
-      `../data/quizzes/w${weekNum}.json`,
-      `/data/quizzes/w${weekNum}.json`
-    ];
-    for (const u of urls) {
-      try {
-        const res = await fetch(u, { cache: "no-store" });
-        if (res.ok) {
-          const chunkData = await res.json();
-          if (chunkData && typeof chunkData === "object") {
-            Object.assign(state.quizzes, chunkData);
-            invalidateQuizNormCache();
-            found = checkMemory();
-            if (found) return found;
+  if (!found) {
+    // Fallback: Lazy fetch per-week chunk if missing
+    const weekNum = item.weekNum !== undefined ? item.weekNum : (item.week ? item.week : null);
+    if (weekNum != null) {
+      const urls = [
+        `data/quizzes/w${weekNum}.json`,
+        `./data/quizzes/w${weekNum}.json`,
+        `../data/quizzes/w${weekNum}.json`,
+        `/data/quizzes/w${weekNum}.json`
+      ];
+      for (const u of urls) {
+        try {
+          const res = await fetch(u, { cache: "no-store" });
+          if (res.ok) {
+            const chunkData = await res.json();
+            if (chunkData && typeof chunkData === "object") {
+              Object.assign(state.quizzes, chunkData);
+              invalidateQuizNormCache();
+              found = checkMemory();
+              if (found) break;
+            }
           }
-        }
-      } catch { /* ignore */ }
+        } catch { /* ignore */ }
+      }
     }
   }
 
-  return null;
+  if (Array.isArray(found)) {
+    const deckKey = item.slug || item.id || item.path || "";
+    found.forEach((q, idx) => ensureShuffledOptions(q, deckKey, idx));
+  }
+
+  return found;
 }
 
 const listeners = new Set();

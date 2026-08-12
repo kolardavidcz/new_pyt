@@ -315,20 +315,14 @@ function bindChrome() {
 
   profileLoginForm?.addEventListener("submit", (e) => {
     e.preventDefault();
-    const username = document.getElementById("inputUsername")?.value.trim();
-    const fullName = document.getElementById("inputFullName")?.value.trim();
-    const faculty = document.getElementById("inputFaculty")?.value;
+    const rawUser = document.getElementById("inputUsername")?.value.trim();
+    if (!rawUser) return;
 
-    if (!username) return;
+    const cleanUsername = rawUser.includes("@") ? rawUser.split("@")[0].toLowerCase() : rawUser.toLowerCase();
 
-    const newUser = {
-      username: username.toLowerCase(),
-      name: fullName || username,
-      studentId: String(Math.floor(100000 + Math.random() * 900000)),
-      faculty: faculty || "VSČHT Praha",
-    };
-
-    setUser(newUser);
+    setUser({
+      username: cleanUsername,
+    });
     updateUserUI();
     profileLoginForm?.classList.add("hidden");
     profileUserView?.classList.remove("hidden");

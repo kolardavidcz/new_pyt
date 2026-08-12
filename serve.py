@@ -153,13 +153,12 @@ def resolve_url_path(url_path: str) -> Path | None:
 
 
 class Handler(SimpleHTTPRequestHandler):
-    protocol_version = "HTTP/1.1"
+    protocol_version = "HTTP/1.0"
 
     def end_headers(self):
         self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
         self.send_header("Pragma", "no-cache")
         self.send_header("Expires", "0")
-        # Allow iframe/content fetch within same origin
         self.send_header("Access-Control-Allow-Origin", "*")
         super().end_headers()
 
@@ -193,7 +192,10 @@ class Handler(SimpleHTTPRequestHandler):
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()
-        self.wfile.write(data)
+        try:
+            self.wfile.write(data)
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, OSError):
+            pass
 
     def do_HEAD(self):
         parsed = urlparse(self.path)
