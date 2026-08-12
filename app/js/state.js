@@ -191,6 +191,217 @@ export async function saveQuestionImprovement(data) {
   return entry;
 }
 
+export async function loadQuestionImprovements() {
+  const kvUrl = "https://tough-husky-101028.upstash.io";
+  const kvToken = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
+  try {
+    const rawLocal = localStorage.getItem(QUESTION_IMPROVEMENTS_KEY);
+    if (rawLocal) {
+      state.questionImprovements = JSON.parse(rawLocal);
+    }
+  } catch { /* ignore */ }
+
+  try {
+    const getRes = await fetch(`${kvUrl}/get/pyt:global:question_improvements`, {
+      headers: { Authorization: `Bearer ${kvToken}` },
+    });
+    if (getRes.ok) {
+      const gData = await getRes.json();
+      if (gData && gData.result) {
+        const remoteList = typeof gData.result === "string" ? JSON.parse(gData.result) : gData.result;
+        if (Array.isArray(remoteList)) {
+          const byId = {};
+          for (const item of remoteList) if (item && item.id) byId[item.id] = item;
+          for (const item of (state.questionImprovements || [])) if (item && item.id) byId[item.id] = item;
+          state.questionImprovements = Object.values(byId).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+          localStorage.setItem(QUESTION_IMPROVEMENTS_KEY, JSON.stringify(state.questionImprovements));
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("[Upstash Fetch Improvements Warning]", err);
+  }
+  return state.questionImprovements || [];
+}
+
+export async function updateQuestionImprovementStatus(id, newStatus) {
+  if (!Array.isArray(state.questionImprovements)) return;
+  const idx = state.questionImprovements.findIndex((item) => item.id === id);
+  if (idx !== -1) {
+    state.questionImprovements[idx].status = newStatus;
+    state.questionImprovements[idx].resolvedAt = new Date().toISOString();
+    try {
+      localStorage.setItem(QUESTION_IMPROVEMENTS_KEY, JSON.stringify(state.questionImprovements));
+    } catch { /* ignore */ }
+
+    // Sync to Upstash Redis
+    try {
+      const kvUrl = "https://tough-husky-101028.upstash.io";
+      const kvToken = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
+      await fetch(`${kvUrl}/set/pyt:global:question_improvements`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${kvToken}` },
+        body: JSON.stringify(JSON.stringify(state.questionImprovements)),
+      });
+    } catch { /* ignore */ }
+
+    notifyStateChange("questionImprovementUpdated", { id, newStatus });
+  }
+}
+
+export async function deleteQuestionImprovement(id) {
+  if (!Array.isArray(state.questionImprovements)) return;
+  state.questionImprovements = state.questionImprovements.filter((item) => item.id !== id);
+  try {
+    localStorage.setItem(QUESTION_IMPROVEMENTS_KEY, JSON.stringify(state.questionImprovements));
+  } catch { /* ignore */ }
+
+  try {
+    const kvUrl = "https://tough-husky-101028.upstash.io";
+    const kvToken = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
+    await fetch(`${kvUrl}/set/pyt:global:question_improvements`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${kvToken}` },
+      body: JSON.stringify(JSON.stringify(state.questionImprovements)),
+    });
+  } catch { /* ignore */ }
+
+  notifyStateChange("questionImprovementDeleted", { id });
+}
+
+const ADMINS_LIST_KEY = "pcs-admins-list-v1";
+const RELEVANCE_OVERRIDES_KEY = "pcs-relevance-overrides-v1";
+
+export function getAdminsList() {
+  try {
+    const raw = localStorage.getItem(ADMINS_LIST_KEY);
+    if (raw) {
+      const list = JSON.parse(raw);
+      if (Array.isArray(list)) {
+        if (!list.includes("kolard")) list.push("kolard");
+        return list;
+      }
+    }
+  } catch { /* ignore */ }
+  return ["kolard"];
+}
+
+export function isAdminUser(user = state.user) {
+  if (!user || !user.username) return false;
+  const clean = user.username.toLowerCase();
+  if (clean === "kolard") return true;
+  if (user.role === "admin" || user.isAdmin === true) return true;
+  const admins = getAdminsList();
+  return admins.includes(clean);
+}
+
+export function addAdminUser(username) {
+  const clean = String(username || "").trim().toLowerCase();
+  if (!clean) return;
+  const list = getAdminsList();
+  if (!list.includes(clean)) {
+    list.push(clean);
+    try {
+      localStorage.setItem(ADMINS_LIST_KEY, JSON.stringify(list));
+    } catch { /* ignore */ }
+  }
+  // Promote in DB if present
+  const db = getUsersDb();
+  if (db[clean]) {
+    db[clean].role = "admin";
+    saveUserToDb(db[clean]);
+  }
+  notifyStateChange("adminListUpdated", { list });
+}
+
+export function removeAdminUser(username) {
+  const clean = String(username || "").trim().toLowerCase();
+  if (!clean || clean === "kolard") return; // kolard is superadmin, cannot be removed
+  let list = getAdminsList();
+  list = list.filter((u) => u !== clean);
+  try {
+    localStorage.setItem(ADMINS_LIST_KEY, JSON.stringify(list));
+  } catch { /* ignore */ }
+
+  const db = getUsersDb();
+  if (db[clean]) {
+    db[clean].role = "student";
+    saveUserToDb(db[clean]);
+  }
+  notifyStateChange("adminListUpdated", { list });
+}
+
+export async function resetUserPassword(username, newPassword) {
+  const clean = String(username || "").trim().toLowerCase();
+  if (!clean || !newPassword) throw new Error("Zadejte uživatele a nové heslo.");
+  const db = getUsersDb();
+  const userRecord = db[clean];
+  if (!userRecord) throw new Error(`Uživatel "${clean}" nebyl nalezen v databázi.`);
+
+  const salt = generateSalt();
+  const passwordHash = await hashPassword(newPassword, salt);
+  userRecord.salt = salt;
+  userRecord.passwordHash = passwordHash;
+  saveUserToDb(userRecord);
+  notifyStateChange("userPasswordReset", { username: clean });
+  return true;
+}
+
+export function loadRelevanceOverrides() {
+  let overrides = {};
+  try {
+    const raw = localStorage.getItem(RELEVANCE_OVERRIDES_KEY);
+    if (raw) overrides = JSON.parse(raw);
+  } catch { /* ignore */ }
+
+  if (state.items && state.items.length) {
+    state.items.forEach((item) => {
+      const key = item.slug || item.id || item.path;
+      if (overrides[key] !== undefined) {
+        item.relevance = Number(overrides[key]);
+      }
+    });
+  }
+  return overrides;
+}
+
+export function saveRelevanceOverride(deckKey, newRelevance) {
+  const relNum = Math.max(1, Math.min(10, Number(newRelevance) || 1));
+  let overrides = {};
+  try {
+    const raw = localStorage.getItem(RELEVANCE_OVERRIDES_KEY);
+    if (raw) overrides = JSON.parse(raw);
+  } catch { /* ignore */ }
+
+  overrides[deckKey] = relNum;
+  try {
+    localStorage.setItem(RELEVANCE_OVERRIDES_KEY, JSON.stringify(overrides));
+  } catch { /* ignore */ }
+
+  // Apply to current loaded state
+  if (state.items) {
+    state.items.forEach((item) => {
+      const key = item.slug || item.id || item.path;
+      if (key === deckKey) {
+        item.relevance = relNum;
+      }
+    });
+  }
+
+  notifyStateChange("relevanceUpdated", { deckKey, relevance: relNum });
+
+  // Optional Upstash sync
+  try {
+    const kvUrl = "https://tough-husky-101028.upstash.io";
+    const kvToken = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
+    fetch(`${kvUrl}/set/pyt:global:relevance_overrides`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${kvToken}` },
+      body: JSON.stringify(JSON.stringify(overrides)),
+    });
+  } catch { /* ignore */ }
+}
+
 const ERROR_LOG_KEY = "pcs-error-link-log-v1";
 
 export function logLinkError(errData) {

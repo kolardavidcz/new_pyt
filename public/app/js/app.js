@@ -5,11 +5,13 @@ import {
   state, loadPersisted, buildIndexes, clearFilters, filtersActive,
   filteredItems, persistSidebarW, pagesFor, onStateChange,
   setUser, logoutUser, defaultUser, syncCloudProgress, clearLinkErrorLog, markLinkErrorFixed,
+  loadRelevanceOverrides,
 } from "./state.js";
 import { renderTree, setTreeSelectHandler, expandAll, collapseAll } from "./tree.js";
 import { navigate, refreshActiveView, closeTab, initHistory, getInitialRoute, initScrollTracker } from "./router.js";
 import { openPalette, closePalette, isPaletteOpen, initPalette, setPaletteHandler } from "./palette.js";
 import { toggleFullscreen, updatePageStudyButtons } from "./content.js";
+import { initAdminPanel, openAdminModal, updateAdminUIElements } from "./admin.js";
 import { escapeHtml } from "./ui.js";
 
 async function loadJson(url) {
@@ -47,6 +49,7 @@ async function boot() {
   applySidebarWidth();
   bindChrome();
   initPalette();
+  initAdminPanel();
   setPaletteHandler(handleNavigate);
   setTreeSelectHandler(handleNavigate);
   window.__pcsNavigate = handleNavigate;
@@ -89,6 +92,7 @@ async function boot() {
     state.exercises = exercises || {};
     state.quizzes = quizzes || {};
     buildIndexes(course);
+    loadRelevanceOverrides();
     renderTree();
     updateStatus();
     updateUserUI();
@@ -249,13 +253,20 @@ function updateUserUI() {
   if (pstatStudied) pstatStudied.textContent = studiedN;
   if (pstatPct) pstatPct.textContent = `${pct}%`;
   if (pstatTotal) pstatTotal.textContent = total;
+
+  updateAdminUIElements();
 }
 
 function bindChrome() {
-  // Theme & Profile
+  // Theme & Profile & Admin
   document.getElementById("btnTheme")?.addEventListener("click", toggleTheme);
   document.getElementById("btnPrint")?.addEventListener("click", triggerPrint);
   document.getElementById("btnPalette")?.addEventListener("click", () => openPalette());
+  document.getElementById("btnTitlebarAdmin")?.addEventListener("click", () => openAdminModal());
+  document.getElementById("btnProfileAdmin")?.addEventListener("click", () => {
+    document.getElementById("profileModal")?.classList.add("hidden");
+    openAdminModal();
+  });
 
   // Profile Modal
   const profileModal = document.getElementById("profileModal");
@@ -337,6 +348,8 @@ function bindChrome() {
         navigate({ kind: "progress" });
       } else if (view === "explorer") {
         toggleSidebar();
+      } else if (view === "admin") {
+        openAdminModal();
       }
     });
   });
