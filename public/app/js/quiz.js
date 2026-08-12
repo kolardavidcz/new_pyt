@@ -30,7 +30,7 @@ export function openImprovementModal(deckKey, q, qIdx) {
   modal.innerHTML = `
     <div class="modal-card">
       <div class="modal-header">
-        <h3>Vylepšit otázku</h3>
+        <h3>Navrhnout úpravu</h3>
         <button type="button" class="btn-close-modal" aria-label="Zavřít">✕</button>
       </div>
       <div class="modal-body">
@@ -77,7 +77,7 @@ export function openImprovementModal(deckKey, q, qIdx) {
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-cancel-modal">Zrušit</button>
-        <button type="button" class="btn primary btn-submit-improve">Uložit do DB vylepšení</button>
+        <button type="button" class="btn primary btn-submit-improve">Uložit návrh úpravy</button>
       </div>
     </div>
   `;
@@ -119,7 +119,119 @@ export function openImprovementModal(deckKey, q, qIdx) {
       userNote,
     });
 
-    feedbackMsg.textContent = `✓ Připomínka k otázce ${qId} byla uložena do DB!`;
+    feedbackMsg.textContent = `✓ Připomínka k otázce ${qId} byla uložena!`;
+    feedbackMsg.classList.remove("hidden");
+    submitBtn.textContent = "Uloženo ✓";
+    submitBtn.style.background = "#16a34a";
+
+    setTimeout(() => {
+      closeModal();
+    }, 1400);
+  });
+}
+
+export function openPresentationImprovementModal(item) {
+  let modal = document.getElementById("questionImproveModal");
+  if (!modal) {
+    modal = el("div", { className: "modal-overlay hidden", id: "questionImproveModal" });
+    document.body.appendChild(modal);
+  }
+
+  const deckKey = item.slug || item.id || item.path || "prezentace";
+  const title = item.title || deckKey;
+
+  modal.innerHTML = `
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Navrhnout úpravu</h3>
+        <button type="button" class="btn-close-modal" aria-label="Zavřít">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="q-summary-box">
+          <div class="q-sum-row"><strong>Prezentace:</strong> <code>${escapeHtml(title)}</code></div>
+          <div class="q-sum-row"><strong>ID / Cesta:</strong> <code>${escapeHtml(deckKey)}</code></div>
+        </div>
+
+        <label class="improve-form-label">Důvod návrhu / typ úpravy:</label>
+        <div class="radio-group">
+          <label class="radio-opt">
+            <input type="radio" name="improveReason" value="content_error" checked />
+            <div class="radio-txt">
+              <strong>1. Chyba v obsahu nebo textu prezentace</strong>
+              <small>Překlep, neaktuální informace nebo nejasná formulace</small>
+            </div>
+          </label>
+          <label class="radio-opt">
+            <input type="radio" name="improveReason" value="code_example_issue" />
+            <div class="radio-txt">
+              <strong>2. Nesrozumitelný kód nebo příklad</strong>
+              <small>Nefunkční ukázka kódu nebo chybějící vysvětlení příkladu</small>
+            </div>
+          </label>
+          <label class="radio-opt">
+            <input type="radio" name="improveReason" value="missing_topic" />
+            <div class="radio-txt">
+              <strong>3. Doplnit téma nebo vysvětlení</strong>
+              <small>Vhodné přidat podrobnější popis nebo další příklad</small>
+            </div>
+          </label>
+          <label class="radio-opt">
+            <input type="radio" name="improveReason" value="other" />
+            <div class="radio-txt">
+              <strong>4. Jiný návrh na zlepšení</strong>
+            </div>
+          </label>
+        </div>
+
+        <label class="improve-form-label" style="margin-top:14px;">Poznámka k návrhu úpravy:</label>
+        <textarea class="improve-notes-input" placeholder="Popište, co konkrétně navrhujete upravit nebo doplnit..." rows="3"></textarea>
+        <div class="modal-feedback-msg hidden" style="margin-top:10px; font-size:12px; color:#89d185; font-weight:600;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel-modal">Zrušit</button>
+        <button type="button" class="btn primary btn-submit-improve">Uložit návrh úpravy</button>
+      </div>
+    </div>
+  `;
+
+  modal.classList.remove("hidden");
+
+  const closeModal = () => modal.classList.add("hidden");
+  modal.querySelector(".btn-close-modal")?.addEventListener("click", closeModal);
+  modal.querySelector(".btn-cancel-modal")?.addEventListener("click", closeModal);
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  const submitBtn = modal.querySelector(".btn-submit-improve");
+  const notesInput = modal.querySelector(".improve-notes-input");
+  const feedbackMsg = modal.querySelector(".modal-feedback-msg");
+
+  submitBtn?.addEventListener("click", async () => {
+    const selectedRadio = modal.querySelector('input[name="improveReason"]:checked');
+    const category = selectedRadio ? selectedRadio.value : "content_error";
+
+    let categoryLabel = "Chyba v obsahu prezentace";
+    if (category === "code_example_issue") categoryLabel = "Nesrozumitelný kód/příklad";
+    else if (category === "missing_topic") categoryLabel = "Doplnit téma/vysvětlení";
+    else if (category === "other") categoryLabel = "Jiný návrh prezentace";
+
+    const userNote = notesInput ? notesInput.value.trim() : "";
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Ukládám…";
+
+    await saveQuestionImprovement({
+      deckKey,
+      questionId: "presentation-content",
+      questionText: title,
+      questionType: "presentation",
+      category,
+      categoryLabel,
+      userNote,
+    });
+
+    feedbackMsg.textContent = `✓ Návrh úpravy prezentace byl uložen!`;
     feedbackMsg.classList.remove("hidden");
     submitBtn.textContent = "Uloženo ✓";
     submitBtn.style.background = "#16a34a";
@@ -163,7 +275,7 @@ export async function renderQuizSection(item) {
     const qNum = el("div", { className: "quiz-q-num" });
     qNum.innerHTML = `
       <span>Otázka ${idx + 1} z ${questions.length} <span class="quiz-type-tag">${typeLabel}</span></span>
-      <button type="button" class="btn-improve-q" title="Nahlásit chybu nebo navrhnout vylepšení otázky">Vylepšit otázku</button>
+      <button type="button" class="btn-improve-q" title="Nahlásit chybu nebo navrhnout vylepšení">Navrhnout úpravu</button>
     `;
     qNum.querySelector(".btn-improve-q")?.addEventListener("click", () => {
       openImprovementModal(deckKey, q, idx);

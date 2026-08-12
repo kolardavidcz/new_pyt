@@ -251,6 +251,14 @@ function lectureToolbar(item, mode) {
   }, studied ? "✓ Studied" : "☐ Mark studied");
   bar.appendChild(studyBtn);
 
+  // Navrhnout úpravu button
+  bar.appendChild(el("button", {
+    type: "button",
+    className: "btn btn-suggest-update",
+    title: "Navrhnout úpravu obsahu prezentace nebo nahlásit chybu",
+    onClick: () => openPresentationImprovementModal(item),
+  }, "Navrhnout úpravu"));
+
   return bar;
 }
 
@@ -464,6 +472,12 @@ export async function showPage(itemId, pageId) {
         onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[idx + 1].id }),
       }, "Next →"));
     }
+
+    nav.appendChild(el("button", {
+      type: "button", className: "btn secondary btn-suggest-update",
+      title: "Navrhnout úpravu obsahu prezentace nebo nahlásit chybu",
+      onClick: () => openPresentationImprovementModal(item),
+    }, "Navrhnout úpravu"));
 
     if (pages.length) {
       const pos = el("span", {

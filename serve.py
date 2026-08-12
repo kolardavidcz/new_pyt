@@ -25,7 +25,7 @@ from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parent
 OLD = ROOT / ".old"
-DEFAULT_PORT = 8770
+DEFAULT_PORT = 34060
 
 # Ensure common types
 mimetypes.add_type("application/javascript", ".js")
