@@ -141,37 +141,6 @@ export async function renderQuizSection(item) {
   const answeredCount = Object.keys(scoreMap).length;
   const correctCount = Object.values(scoreMap).filter((s) => s.isCorrect).length;
 
-  const header = el("header", { className: "quiz-card-header" });
-  header.innerHTML = `
-    <div class="quiz-header-row" style="display:flex; justify-content:space-between; align-items:center;">
-      <div>
-        <span class="quiz-badge">Kvíz k prezentaci · Takeaways Test</span>
-        <h3 class="quiz-title">Test porozumění &amp; zopakování klíčových konceptů</h3>
-        <p class="quiz-subtitle">Otestujte si své znalosti z přednášky. Odpovědi se automaticky vyhodnocují a ukládají.</p>
-      </div>
-      <div class="quiz-stats-box" style="text-align:right;">
-        <div class="quiz-score-pill" style="font-size:14px; font-weight:700; color:var(--syntax-string, #ce9178);">
-          Skóre: <span class="score-val">${correctCount} / ${questions.length}</span>
-        </div>
-        ${answeredCount > 0 ? `<button type="button" class="btn-reset-quiz" style="background:transparent; border:none; color:var(--text-muted, #888); font-size:11px; cursor:pointer; text-decoration:underline; margin-top:4px;">Resetovat test</button>` : ""}
-      </div>
-    </div>
-  `;
-
-  header.querySelector(".btn-reset-quiz")?.addEventListener("click", async () => {
-    await resetDeckQuizScores(deckKey);
-    const main = document.getElementById("main");
-    if (main) {
-      const refreshed = await renderQuizSection(item);
-      const oldSec = document.getElementById("quizSection");
-      if (refreshed && oldSec) {
-        oldSec.replaceWith(refreshed);
-      }
-    }
-  });
-
-  card.appendChild(header);
-
   const list = el("div", { className: "quiz-questions-list" });
 
   function updateHeaderStats() {
@@ -300,7 +269,7 @@ export async function renderQuizSection(item) {
       const verifyBtn = el("button", {
         type: "button",
         className: "btn-verify-fill",
-        style: "height:32px; padding:0 18px; font-size:13px; font-weight:600; background:var(--accent-blue, #0284c7); color:#ffffff; border:none; border-radius:6px; cursor:pointer; transition:all 0.15s ease; box-shadow:0 2px 6px rgba(2, 132, 199, 0.3);",
+        style: "height:32px; padding:0 18px; font-size:13px; font-weight:600; background:#0284c7; color:#ffffff; border:none; border-radius:2px; cursor:pointer; transition:all 0.15s ease; box-shadow:0 2px 6px rgba(2, 132, 199, 0.3);",
       }, "Zkontrolovat");
       fillActionBar.appendChild(verifyBtn);
       qCard.appendChild(fillActionBar);
@@ -486,6 +455,29 @@ export async function renderQuizSection(item) {
   });
 
   card.appendChild(list);
+
+  // Bottom action bar with "Resetovat test" button
+  const footer = el("div", { className: "quiz-card-footer", style: "margin-top:24px; padding-top:16px; border-top:1px solid var(--border-subtle, rgba(255, 255, 255, 0.1)); display:flex; justify-content:center;" });
+  const resetBtn = el("button", {
+    type: "button",
+    className: "btn secondary btn-reset-quiz",
+    style: "padding: 8px 20px; font-size: 13px; font-weight: 500;",
+    onClick: async () => {
+      if (confirm("Chcete resetovat všechny odpovědi v tomto testu?")) {
+        await resetDeckQuizScores(deckKey);
+        const main = document.getElementById("main");
+        if (main) {
+          const refreshed = await renderQuizSection(item);
+          const oldSec = document.getElementById("quizSection");
+          if (refreshed && oldSec) {
+            oldSec.replaceWith(refreshed);
+          }
+        }
+      }
+    }
+  }, "Resetovat test");
+  footer.appendChild(resetBtn);
+  card.appendChild(footer);
 
   const answerKeyEl = el("div", { className: "quiz-answer-key-upsidedown" });
   let answerKeyItems = questions.map((q, i) => {

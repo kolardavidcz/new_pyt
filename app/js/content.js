@@ -4,6 +4,7 @@ import {
   state, pagesFor, slideDiff, slideTags, weekVisibleItems, filteredItems, markSeen,
   isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor, logLinkError,
   saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, setPrintWithQuizzes, getQuizFor,
+  registerUser, loginWithPassword,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot, highlightCode, dedentCode } from "./highlight.js";
@@ -439,7 +440,7 @@ export async function showPage(itemId, pageId) {
     const pages = pagesFor(item.path);
     const idx = pages.findIndex((p) => p.id === pageId);
 
-    const nav = el("div", { className: "item-actions lecture-toolbar", style: { padding: "0 28px 8px" } });
+    const nav = el("div", { className: "item-actions lecture-toolbar presentation-floating-nav" });
     nav.appendChild(el("button", {
       type: "button", className: "btn primary",
       onClick: () => {
@@ -448,31 +449,25 @@ export async function showPage(itemId, pageId) {
       },
     }, "Open full lecture"));
     nav.appendChild(el("button", {
-      type: "button", className: "btn",
+      type: "button", className: "btn secondary",
       onClick: () => window.__pcsNavigate?.({ kind: "presentation", id: item.id }),
     }, "All slides"));
     if (idx > 0) {
       nav.appendChild(el("button", {
-        type: "button", className: "btn",
+        type: "button", className: "btn secondary",
         onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[idx - 1].id }),
       }, "← Prev"));
     }
     if (idx >= 0 && idx < pages.length - 1) {
       nav.appendChild(el("button", {
-        type: "button", className: "btn",
+        type: "button", className: "btn secondary",
         onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[idx + 1].id }),
       }, "Next →"));
     }
-    nav.appendChild(el("button", {
-      type: "button", className: "btn primary btn-fullscreen",
-      title: "Celá obrazovka (F)",
-      onClick: () => toggleFullscreen(),
-    }, "Celá obrazovka ⛶"));
 
     if (pages.length) {
       const pos = el("span", {
         className: "slide-pos",
-        style: { marginLeft: "auto", fontSize: "12px", color: "var(--text-faint)", alignSelf: "center" },
       }, `${Math.max(idx, 0) + 1} / ${pages.length}`);
       nav.appendChild(pos);
     }
@@ -1417,10 +1412,6 @@ export function showProgress() {
   `;
   const heroText = el("div", { className: "progress-hero-text" });
   heroText.innerHTML = `
-    <div class="progress-level-badge">${escapeHtml(level.badge)}</div>
-    <h1>Study log</h1>
-    <p class="progress-level-name">${escapeHtml(level.name)}</p>
-    <p class="progress-vibe">${escapeHtml(vibe)}</p>
     <div class="progress-stats">
       <div class="progress-stat">
         <strong>${studiedN}/${total}</strong><span>studied</span>
@@ -1631,82 +1622,63 @@ function renderUserProfileDashboard(u) {
     .substring(0, 2)
     .toUpperCase();
 
-  const card = el("div", { className: "login-card logged-in glass-card" });
+  const card = el("div", { className: "v2-card" });
   card.innerHTML = `
-    <div class="vscht-badge">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      VSČHT Praha · SIS SSO Logged In
-    </div>
-
-    <div class="login-profile-header">
-      <div class="profile-avatar-large">${escapeHtml(initials)}</div>
-      <div class="profile-info">
-        <h2>${escapeHtml(u.name || u.username)}</h2>
-        <div class="profile-meta-row">
-          <span class="profile-meta-pill">@${escapeHtml(u.username)}</span>
-          <span class="profile-meta-pill">${escapeHtml(u.faculty || "VSČHT Praha")}</span>
-          <span class="profile-meta-pill">ID: ${escapeHtml(u.studentId || "987654")}</span>
+    <div class="v2-identity" style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="v2-avatar">${escapeHtml(initials)}</div>
+        <div>
+          <div class="v2-identity-name">${escapeHtml(u.name || u.username)}</div>
+          <div class="v2-identity-meta">${escapeHtml(u.email || u.username + "@vscht.cz")}</div>
         </div>
       </div>
+      <button type="button" class="btn secondary sm" id="btnPageLogout">Logout</button>
     </div>
 
-    <div class="sync-status-card">
-      <div class="sync-status-icon">☁️</div>
-      <div class="sync-status-text">
-        <strong>Cloud Synchronizace Aktivní</strong>
-        <p class="desc">Upstash Redis storage key: <code>pyt:${escapeHtml(u.username)}:studied</code></p>
-      </div>
-      <button type="button" class="btn secondary sm" id="btnManualSync">Synchronizovat 🔄</button>
+    <div class="v2-status-line">
+      <span class="ok">✓</span> progress <span class="num">${studiedCount}</span>/<span class="num">${total}</span> studied · <span class="num">${pct}%</span> complete
     </div>
 
-    <div class="profile-stats-grid">
-      <div class="pstat-box">
-        <span class="pstat-val">${studiedCount}</span>
-        <span class="pstat-lbl">Prostudováno</span>
+    <!-- Cloud Progress Sync Status -->
+    <div class="v2-row" style="border-left:2px solid #0284c7; padding-left:8px;">
+      <span class="v2-row-icon" style="color:#38bdf8">☁️</span>
+      <div class="v2-row-main">
+        <strong>cloud_sync (Upstash Redis)</strong>
+        <span>Synchronizace postupu pod klíčem: <code>pyt:${escapeHtml(u.username)}:*</code></span>
       </div>
-      <div class="pstat-box">
-        <span class="pstat-val">${pct}%</span>
-        <span class="pstat-lbl">Splněno</span>
-      </div>
-      <div class="pstat-box">
-        <span class="pstat-val">${total}</span>
-        <span class="pstat-lbl">Celkem témat</span>
-      </div>
+      <button type="button" class="btn secondary sm" id="btnManualSync">sync</button>
     </div>
 
-    <div class="login-settings-group">
-      <div class="sync-status-card setting-card">
-        <div class="sync-status-icon">💻</div>
-        <div class="sync-status-text" style="flex:1;">
-          <strong>Barevnost kódových bloků (Při tisku)</strong>
-          <p class="desc">Nastavuje tmavý (VS Code Dark) nebo světlý vzhled pouze pro kódové bloky v PDF exportu.</p>
-        </div>
-        <div style="min-width:150px;">
-          <select id="selectCodeBlockColor" class="sort-select" style="height:32px;font-size:12px;padding:0 8px;width:100%;">
-            <option value="dark" ${state.codeBlockColor === "dark" ? "selected" : ""}>Dark Code (#1e1e1e)</option>
-            <option value="light" ${state.codeBlockColor === "light" ? "selected" : ""}>Light Code (#f8f9fa)</option>
-          </select>
-        </div>
+    <div class="v2-row">
+      <span class="v2-row-icon" style="color:#569cd6">💻</span>
+      <div class="v2-row-main">
+        <strong>print_code_theme</strong>
+        <span>appearance in PDF export</span>
       </div>
-
-      <div class="sync-status-card setting-card" style="margin-top:10px;">
-        <div class="sync-status-icon">📝</div>
-        <div class="sync-status-text" style="flex:1;">
-          <strong>Kvízy a testy při tisku (Print with tests)</strong>
-          <p class="desc">Na konci přednášky při tisku automaticky vytiskne takeaway kvíz se syntax highlightem.</p>
-        </div>
-        <div style="min-width:150px;">
-          <select id="selectPrintWithQuizzes" class="sort-select" style="height:32px;font-size:12px;padding:0 8px;width:100%;">
-            <option value="true" ${state.printWithQuizzes ? "selected" : ""}>Zahrnout kvízy (Zapnuto)</option>
-            <option value="false" ${!state.printWithQuizzes ? "selected" : ""}>Skrýt kvízy (Vypnuto)</option>
-          </select>
-        </div>
-      </div>
+      <select id="selectCodeBlockColor" class="v2-select">
+        <option value="dark" ${state.codeBlockColor === "dark" ? "selected" : ""}>dark</option>
+        <option value="light" ${state.codeBlockColor === "light" ? "selected" : ""}>light</option>
+      </select>
     </div>
 
-    <div class="login-actions-row">
-      <button type="button" class="btn secondary" id="btnPageSwitchAccount">Přihlásit jiný účet</button>
-      <button type="button" class="btn primary danger" id="btnPageLogout">Odhlásit se</button>
+    <div class="v2-row">
+      <span class="v2-row-icon" style="color:#4ec9b0">📝</span>
+      <div class="v2-row-main">
+        <strong>print_with_quizzes</strong>
+        <span>takeaway quiz on print</span>
+      </div>
+      <select id="selectPrintWithQuizzes" class="v2-select">
+        <option value="true" ${state.printWithQuizzes ? "selected" : ""}>true</option>
+        <option value="false" ${!state.printWithQuizzes ? "selected" : ""}>false</option>
+      </select>
+    </div>
+
+    <div class="v2-dev">
+      <p class="v2-dev-label">/* dev quick switch */</p>
+      <div class="quick-buttons">
+        <button type="button" class="btn secondary sm" id="btnQuickSwitchKolard">kolard</button>
+        <button type="button" class="btn secondary sm" id="btnQuickSwitchStudent">student1</button>
+      </div>
     </div>
   `;
 
@@ -1714,12 +1686,12 @@ function renderUserProfileDashboard(u) {
   setTimeout(() => {
     card.querySelector("#btnManualSync")?.addEventListener("click", async (e) => {
       const btn = e.currentTarget;
-      btn.textContent = "Synchronizuji...";
+      btn.textContent = "syncing...";
       btn.disabled = true;
       await syncCloudProgress();
-      btn.textContent = "Synchronizováno ✓";
+      btn.textContent = "synced ✓";
       setTimeout(() => {
-        btn.textContent = "Synchronizovat 🔄";
+        btn.textContent = "sync";
         btn.disabled = false;
         showLogin();
       }, 1000);
@@ -1734,8 +1706,13 @@ function renderUserProfileDashboard(u) {
       updatePrintQuizButtons();
     });
 
-    card.querySelector("#btnPageSwitchAccount")?.addEventListener("click", () => {
-      logoutUser();
+    card.querySelector("#btnQuickSwitchKolard")?.addEventListener("click", async () => {
+      await loginWithPassword({ usernameOrEmail: "kolard@vscht.cz", password: "kolard123" });
+      showLogin();
+    });
+
+    card.querySelector("#btnQuickSwitchStudent")?.addEventListener("click", async () => {
+      await loginWithPassword({ usernameOrEmail: "student1@vscht.cz", password: "student123" });
       showLogin();
     });
 
@@ -1749,108 +1726,142 @@ function renderUserProfileDashboard(u) {
 }
 
 function renderLoginForm() {
-  const card = el("div", { className: "login-card glass-card" });
+  const card = el("div", { className: "v2-card" });
   card.innerHTML = `
-    <div class="vscht-badge">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      VSČHT Praha · Jednotné Přihlášení SIS SSO
+    <!-- Tab Switcher -->
+    <div class="login-tab-bar" style="display:flex; gap:6px; margin-bottom:14px; font-family:var(--font-mono);">
+      <button type="button" class="btn primary sm tab-btn active" id="tabBtnLogin" style="flex:1;">🔑 Přihlášení</button>
+      <button type="button" class="btn secondary sm tab-btn" id="tabBtnRegister" style="flex:1;">📝 Registrace</button>
     </div>
-    
-    <h2>Přihlášení studenta / vyučujícího</h2>
-    <p class="desc">Zadejte své školní údaje pro synchronizaci studijního postupu v kurzu Python napříč všemi zařízeními (PC, tablet, telefon).</p>
 
-    <form id="pageLoginForm" class="login-form">
-      <div class="form-group">
-        <label for="pageInputUsername">Uživatelské jméno (VSČHT Login)</label>
-        <div class="input-with-icon">
-          <span class="input-icon">👤</span>
-          <input type="text" id="pageInputUsername" placeholder="např. kolard" required autocomplete="username" value="kolard" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="pageInputFullName">Jméno a příjmení</label>
-        <div class="input-with-icon">
-          <span class="input-icon">🎓</span>
-          <input type="text" id="pageInputFullName" placeholder="např. David Kolar" required value="David Kolar" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="pageInputFaculty">Fakulta / Ústav</label>
-        <div class="input-with-icon">
-          <span class="input-icon">🏛️</span>
-          <select id="pageInputFaculty">
-            <option value="FCHI · VSČHT Praha" selected>FCHI · Fakulta chemicko-inženýrská</option>
-            <option value="FPBT · VSČHT Praha">FPBT · Fakulta potravinářské a biologické technologie</option>
-            <option value="FCHT · VSČHT Praha">FCHT · Fakulta chemické technologie</option>
-            <option value="FTOP · VSČHT Praha">FTOP · Fakulta technologie ochrany prostředí</option>
-            <option value="VŠOP · VSČHT Praha">VŠOP · Ústav ekonomiky a managementu</option>
-          </select>
-        </div>
+    <!-- Login Form (Email + Password) -->
+    <form id="pageLoginForm" class="v2-form">
+      <div id="loginErrorBanner" style="display:none; font-size:11.5px; color:#ef4444; background:rgba(239,68,68,0.1); padding:8px 10px; border-left:2px solid #ef4444; margin-bottom:8px; font-family:var(--font-mono);"></div>
+
+      <div class="v2-field">
+        <label>email (Školní e-mail @vscht.cz)</label>
+        <input type="email" id="pageInputEmail" value="kolard@vscht.cz" placeholder="např. kolard@vscht.cz" required autocomplete="email" />
       </div>
 
-      <div class="form-actions">
-        <button type="submit" class="btn primary xl btn-login-submit">Přihlásit se & Synchronizovat 🚀</button>
+      <div class="v2-field">
+        <label>password (Heslo)</label>
+        <input type="password" id="pageInputPassword" value="kolard123" placeholder="Zadejte heslo..." required autocomplete="current-password" />
       </div>
+
+      <button type="submit" class="btn primary xl v2-submit" id="btnLoginSubmit"><span class="prompt">$</span>login --password</button>
     </form>
 
-    <div class="quick-login-section">
-      <span class="quick-title">Rychlé testovací profily:</span>
-      <div class="quick-buttons">
-        <button type="button" class="btn secondary sm quick-pill" id="btnQuickKolard">David Kolar (kolard)</button>
-        <button type="button" class="btn secondary sm quick-pill" id="btnQuickStudent">Student Test (student1)</button>
-      </div>
-    </div>
+    <!-- Registration Form (Email + Password only) -->
+    <form id="pageRegisterForm" class="v2-form" style="display:none;">
+      <div id="regErrorBanner" style="display:none; font-size:11.5px; color:#ef4444; background:rgba(239,68,68,0.1); padding:8px 10px; border-left:2px solid #ef4444; margin-bottom:8px; font-family:var(--font-mono);"></div>
 
-    <div class="login-info-box">
-      <p>ℹ️ <strong>Multi-Device Cloud Sync Engine:</strong> Vaše data jsou bezpečně izolována v databázi Upstash Redis pod klíčem <code>pyt:&lt;username&gt;:*</code>.</p>
+      <div class="v2-field">
+        <label>email (Školní e-mail @vscht.cz)</label>
+        <input type="email" id="regInputEmail" placeholder="např. novakj@vscht.cz" required autocomplete="email" />
+      </div>
+
+      <div class="v2-field">
+        <label>password (Heslo)</label>
+        <input type="password" id="regInputPassword" placeholder="Zvolte heslo..." required autocomplete="new-password" />
+      </div>
+
+      <button type="submit" class="btn primary xl v2-submit" id="btnRegSubmit"><span class="prompt">$</span>register --account</button>
+    </form>
+
+    <div class="v2-dev">
+      <p class="v2-dev-label">/* dev quick switch */</p>
+      <div class="quick-buttons">
+        <button type="button" class="btn secondary sm" id="btnQuickKolard">kolard@vscht.cz</button>
+        <button type="button" class="btn secondary sm" id="btnQuickStudent">student1@vscht.cz</button>
+      </div>
     </div>
   `;
 
   // Bind login form events
   setTimeout(() => {
-    const form = card.querySelector("#pageLoginForm");
-    form?.addEventListener("submit", (e) => {
+    const tabLogin = card.querySelector("#tabBtnLogin");
+    const tabReg = card.querySelector("#tabBtnRegister");
+    const formLogin = card.querySelector("#pageLoginForm");
+    const formReg = card.querySelector("#pageRegisterForm");
+    const loginErr = card.querySelector("#loginErrorBanner");
+    const regErr = card.querySelector("#regErrorBanner");
+
+    const setActiveTab = (activeTab, activeForm) => {
+      [tabLogin, tabReg].forEach((t) => {
+        if (t === activeTab) {
+          t.classList.add("primary", "active");
+          t.classList.remove("secondary");
+        } else {
+          t.classList.add("secondary");
+          t.classList.remove("primary", "active");
+        }
+      });
+      [formLogin, formReg].forEach((f) => {
+        if (f === activeForm) {
+          f.classList.remove("hidden");
+          f.style.display = "flex";
+        } else {
+          f.style.display = "none";
+        }
+      });
+    };
+
+    tabLogin?.addEventListener("click", () => setActiveTab(tabLogin, formLogin));
+    tabReg?.addEventListener("click", () => setActiveTab(tabReg, formReg));
+
+    // Submit Password Login Form
+    formLogin?.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const username = card.querySelector("#pageInputUsername")?.value.trim();
-      const fullName = card.querySelector("#pageInputFullName")?.value.trim();
-      const faculty = card.querySelector("#pageInputFaculty")?.value;
+      if (loginErr) loginErr.style.display = "none";
 
-      if (!username) return;
+      const usernameOrEmail = card.querySelector("#pageInputEmail")?.value.trim();
+      const password = card.querySelector("#pageInputPassword")?.value.trim();
 
-      const newUser = {
-        username: username.toLowerCase(),
-        name: fullName || username,
-        studentId: String(Math.floor(100000 + Math.random() * 900000)),
-        faculty: faculty || "VSČHT Praha",
-      };
+      if (!usernameOrEmail || !password) return;
 
-      setUser(newUser);
-      window.__pcsNavigate?.({ kind: "progress" });
+      try {
+        await loginWithPassword({ usernameOrEmail, password });
+        showLogin();
+      } catch (err) {
+        if (loginErr) {
+          loginErr.textContent = err.message || "Přihlášení selhalo.";
+          loginErr.style.display = "block";
+        }
+      }
     });
 
-    card.querySelector("#btnQuickKolard")?.addEventListener("click", () => {
-      setUser({
-        username: "kolard",
-        name: "David Kolar",
-        studentId: "987654",
-        faculty: "FCHI · VSČHT Praha",
-      });
-      window.__pcsNavigate?.({ kind: "progress" });
+    // Submit Registration Form (Email + Password)
+    formReg?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (regErr) regErr.style.display = "none";
+
+      const email = card.querySelector("#regInputEmail")?.value.trim();
+      const password = card.querySelector("#regInputPassword")?.value.trim();
+
+      if (!email || !password) return;
+
+      try {
+        await registerUser({ email, password });
+        showLogin();
+      } catch (err) {
+        if (regErr) {
+          regErr.textContent = err.message || "Registrace selhala.";
+          regErr.style.display = "block";
+        }
+      }
     });
 
-    card.querySelector("#btnQuickStudent")?.addEventListener("click", () => {
-      setUser({
-        username: "student1",
-        name: "Student Test",
-        studentId: "123456",
-        faculty: "FPBT · VSČHT Praha",
-      });
-      window.__pcsNavigate?.({ kind: "progress" });
+    // Quick Dev Accounts (Pre-seeded with salted SHA-256 hashes)
+    card.querySelector("#btnQuickKolard")?.addEventListener("click", async () => {
+      await loginWithPassword({ usernameOrEmail: "kolard@vscht.cz", password: "kolard123" });
+      showLogin();
+    });
+
+    card.querySelector("#btnQuickStudent")?.addEventListener("click", async () => {
+      await loginWithPassword({ usernameOrEmail: "student1@vscht.cz", password: "student123" });
+      showLogin();
     });
   }, 0);
 
   return card;
 }
-
-
-
