@@ -331,19 +331,23 @@ export function removeAdminUser(username) {
   notifyStateChange("adminListUpdated", { list });
 }
 
-export async function resetUserPassword(username, newPassword) {
-  const clean = String(username || "").trim().toLowerCase();
-  if (!clean || !newPassword) throw new Error("Zadejte uživatele a nové heslo.");
+export async function resetUserPassword(usernameOrEmail, newPassword) {
+  const clean = String(usernameOrEmail || "").trim().toLowerCase();
+  if (!clean || !newPassword) throw new Error("Zadejte e-mail nebo uživatelské jméno a nové heslo.");
   const db = getUsersDb();
-  const userRecord = db[clean];
-  if (!userRecord) throw new Error(`Uživatel "${clean}" nebyl nalezen v databázi.`);
+  let userRecord = db[clean];
+  if (!userRecord) {
+    const foundKey = Object.keys(db).find((k) => (db[k].email || "").toLowerCase() === clean);
+    if (foundKey) userRecord = db[foundKey];
+  }
+  if (!userRecord) throw new Error(`Uživatel s e-mailem "${clean}" nebyl nalezen v databázi.`);
 
   const salt = generateSalt();
   const passwordHash = await hashPassword(newPassword, salt);
   userRecord.salt = salt;
   userRecord.passwordHash = passwordHash;
   saveUserToDb(userRecord);
-  notifyStateChange("userPasswordReset", { username: clean });
+  notifyStateChange("userPasswordReset", { username: userRecord.username });
   return true;
 }
 
