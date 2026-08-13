@@ -404,7 +404,6 @@ export function saveRelevanceOverride(deckKey, newRelevance) {
   }
 
   notifyStateChange("relevanceUpdated", { deckKey, relevanceTeacher: relNum });
-}
 
   // Optional Upstash sync
   try {

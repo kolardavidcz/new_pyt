@@ -164,7 +164,7 @@ function itemCard(item) {
       ${badgesHtml(item.tags)}
       ${flavorHtml(item.diff)}
       ${taskCount ? `<span class="task-count-chip">${taskCount} úkolů</span>` : ""}
-      ${starsHtml(item.relevance, 10, "bar")}
+      ${starsHtml(item, 10, "bar")}
     </div>
   `;
   return card;
@@ -272,7 +272,7 @@ function lectureHero(item, { compact = false } = {}) {
       ${flavorHtml(item.diff)}
       <span style="color:var(--text-faint);font-size:11px;margin-left:4px">${escapeHtml(item.kind)} · W${item.weekNum}</span>
     </div>
-    ${starsHtml(item.relevance, 10, compact ? "bar" : "full")}
+    ${starsHtml(item, 10, compact ? "bar" : "full")}
     ${!compact && item.desc ? `<p class="desc">${escapeHtml(item.desc)}</p>` : ""}
     ${!compact && item.compare ? `<p class="compare">${escapeHtml(item.compare)}</p>` : ""}
   `;
