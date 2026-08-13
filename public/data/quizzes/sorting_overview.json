@@ -1,0 +1,110 @@
+[
+  {
+    "id": "q1",
+    "type": "predict_output",
+    "question": "Jaká bude hodnota proměnné xs po vykonání tohoto kódu?\n`python\nxs = [3, 1, 4, 2]\nxs = xs.sort()\nprint(xs)\n`",
+    "code_snippet": "xs = [3, 1, 4, 2]\nxs = xs.sort()\nprint(xs)",
+    "options": [
+      "A) None — metoda .sort() řadí seznam v místě a vrací None, čímž se proměnná přepíše.",
+      "B) [1, 2, 3, 4] — metoda .sort() řadí seznam v místě a současně vrací jeho novou hodnotu.",
+      "C) [3, 1, 4, 2] — metoda .sort() selže a ponechá proměnnou xs v původním nezměněném stavu.",
+      "D) AttributeError — metoda .sort() neexistuje a pro řazení je nutné použít sorted(xs)."
+    ],
+    "answer": 0,
+    "explanation": "Metoda list.sort() provádí řazení v místě (in-place) a záměrně vrací None, aby signalizovala modifikaci objektu. Přiřazením xs = xs.sort() se tedy do proměnné xs uloží hodnota None. Pro získání nového setříděného seznamu je nutné použít globální funkci sorted(xs)."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl mezi funkcí sorted() a metodou list.sort()?",
+    "options": [
+      "A) sorted() akceptuje libovolný iterovatelný objekt a vrací nový seznam, zatímco list.sort() mění seznam v místě.",
+      "B) sorted() mění původní datovou strukturu v místě, zatímco list.sort() vrací zkopírovaný setříděný seznam.",
+      "C) sorted() funguje výhradně pro číselná pole, zatímco metoda list.sort() je určená pouze pro textové řetězce.",
+      "D) sorted() vyžaduje povinný parametr key, zatímco metoda list.sort() řadí prvky výhradně bez klíče."
+    ],
+    "answer": 0,
+    "explanation": "Globální funkce sorted(iterable) vytváří a vrací nový seznam z jakéhokoliv iterovatelného objektu (např. množiny, n-tice, slovníku). Naopak metoda xs.sort() je dostupná pouze pro seznamy a mění pořadí prvků přímo v původním objektu, přičemž vrací None."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jaký bude výsledek následujícího porovnání dvou vnořených seznamů?\n`python\nres = [1, ['a', 'c']] < [1, ['a', 'b'], 3]\nprint(res)\n`",
+    "code_snippet": "res = [1, ['a', 'c']] < [1, ['a', 'b'], 3]\nprint(res)",
+    "options": [
+      "A) False — o výsledku rozhodla první neshodná dvojice prvků ('c' > 'b'), délka seznamu se neuvažuje.",
+      "B) True — druhý seznam je delší a obsahuje více prvků, takže má při lexikografickém porovnání přednost.",
+      "C) TypeError — vnořené seznamy nelze porovnávat přímo bez předchozího převedení na jednoduché n-tice.",
+      "D) True — řetězec 'c' má v tabulce Unicode vyšší pořadové číslo než 'b', což dává přednost levé straně."
+    ],
+    "answer": 0,
+    "explanation": "V Pythonu probíhá porovnávání sekvencí lexikograficky prvek po prvku. Na druhém indexu se porovnávají podseznamy ['a', 'c'] a ['a', 'b']. V nich je prvním neshodným prvkem 'c' a 'b'. Jelikož 'c' > 'b', je výraz ['a', 'c'] < ['a', 'b'] nepravdivý (False). Délka vnějšího seznamu už nehraje roli."
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Co se stane při pokusu o setřídění seznamu obsahujícího smíšené typy?\n`python\nxs = ['a', 5, 'c']\nprint(sorted(xs))\n`",
+    "code_snippet": "xs = ['a', 5, 'c']\nprint(sorted(xs))",
+    "options": [
+      "A) TypeError — v Pythonu 3 nejsou typy str a int navzájem porovnatelné pomocí operátoru menší než.",
+      "B) [5, 'a', 'c'] — číselné hodnoty se automaticky seřadí před textové řetězce podle systémového typu.",
+      "C) ['a', 5, 'c'] — seznam zůstane v původním pořadí, protože porovnání nekompatibilních typů se přeskočí.",
+      "D) ['5', 'a', 'c'] — čísla se v předstihu implicitně přetypují na textové řetězce a seřadí abecedně."
+    ],
+    "answer": 0,
+    "explanation": "V Pythonu 3 vyžaduje řazení, aby prvky byly navzájem porovnatelné (<). Protože relace 'a' < 5 mezi str a int není definována, vyvolá volání sorted() výjimku TypeError: unorderable types: str() < int()."
+  },
+  {
+    "id": "q5",
+    "type": "fill_blank_choice",
+    "question": "Doplňte kód pro setřídění seznamu n-tic podle jejich druhé položky za pomoci funkce z modulu operator.\n`python\nfrom operator import ________\npairs = [('a', 3), ('b', 1), ('c', 2)]\nresult = sorted(pairs, key=itemgetter(1))\n`\n\n```python\n# Doplňte kód pro setřídění seznamu n-tic podle jejich druhé položky za pomoci funkce z modulu operator.\n`python\nfrom operator import ________\npairs = [('a', 3), ('b', 1), ('c', 2)]\nresult = sorted(pairs, key=itemgetter(1))\n`\nvysledek = ________\n```",
+    "code_snippet": "from operator import ________\npairs = [('a', 3), ('b', 1), ('c', 2)]\nresult = sorted(pairs, key=itemgetter(1))",
+    "options": [
+      "itemgetter — funkce z modulu operator vytvářející klíčový objekt",
+      "attrgetter — funkce z modulu operator přistupující k pojmenovaným atributům daných objektů.",
+      "methodcaller — funkce z modulu operator volající specifikovanou metodu nad každým prvkem.",
+      "elementwise — funkce z modulu operator umožňující vektorské porovnávání prvků sekvence."
+    ],
+    "answer": 0,
+    "explanation": "operator.itemgetter(1) vytvoří callable objekt, který pro předaný prvek vrací x[1]. Je to výkonnější a čitelnější ekvivalent lambda funkce lambda x: x[1]."
+  },
+  {
+    "id": "q6",
+    "type": "predict_output",
+    "question": "Jaké bude pořadí prvků ve výstupním seznamu při více-kritériovém řazení pomocí lambda funkce?\n`python\ndata = ['Wendy', 'Pete', 'Jane', 'Ix']\nprint(sorted(data, key=lambda x: (len(x), x)))\n`",
+    "code_snippet": "data = ['Wendy', 'Pete', 'Jane', 'Ix']\nprint(sorted(data, key=lambda x: (len(x), x)))",
+    "options": [
+      "A) ['Ix', 'Jane', 'Pete', 'Wendy'] — prvky jsou seřazeny primárně podle délky a sekundárně abecedně.",
+      "B) ['Ix', 'Pete', 'Jane', 'Wendy'] — prvky se stejnou délkou si zachovají své původní pořadí ze vstupu.",
+      "C) ['Jane', 'Pete', 'Wendy', 'Ix'] — sekundární abecední kritérium seřadí prvky od nejdelšího slova.",
+      "D) ['Wendy', 'Pete', 'Jane', 'Ix'] — použití n-tice v lambda funkci způsobí chyba vyhodnocení klíče."
+    ],
+    "answer": 0,
+    "explanation": "Lambda funkce vrací n-tici (len(x), x). Python porovnává n-tice lexikograficky: nejprve podle 1. položky (délka slova: 'Ix'=2, 'Pete'=4, 'Jane'=4, 'Wendy'=5), a při shodě délek podle 2. položky (abecední pořadí: 'Jane' < 'Pete'). Proto dostaneme ['Ix', 'Jane', 'Pete', 'Wendy']."
+  },
+  {
+    "id": "q7",
+    "type": "true_false_tricky",
+    "question": "Zaručuje algoritmus TimSort v Pythonu stabilní řazení při opakovaném volání na stejná data?",
+    "options": [
+      "A) Ano, TimSort je stabilní algoritmus, což znamená, že prvky se shodným klíčem si vždy zachovají své původní vzájemné pořadí.",
+      "B) Ne, TimSort je nestabilní algoritmus, takže při řazení podle jednoho kritéria může svévolně změnit pořadí shodných prvků."
+    ],
+    "answer": 0,
+    "explanation": "TimSort je stabilní řadicí algoritmus. Pokud mají dva prvky stejnou hodnotu vyhodnoceného klíče (např. stejnou délku), jejich relativní pořadí ve výsledném seznamu zůstane přesně takové, jaké bylo na vstupu. Toho lze využít pro postupné víceúrovňové řazení."
+  },
+  {
+    "id": "q8",
+    "type": "fill_blank_choice",
+    "question": "Doplňte parametr funkce sorted() pro obrácení pořadí prvků od největšího po nejmenší.\n`python\nnumbers = [1, 5, 3, 2, 4]\nresult = sorted(numbers, ________=True)\n`\n\n```python\n# Doplňte parametr funkce sorted() pro obrácení pořadí prvků od největšího po nejmenší.\n`python\nnumbers = [1, 5, 3, 2, 4]\nresult = sorted(numbers, ________=True)\n`\nvysledek = ________\n```",
+    "code_snippet": "numbers = [1, 5, 3, 2, 4]\nresult = sorted(numbers, ________=True)",
+    "options": [
+      "reverse — pojmenovaný boolean parametr otočující směr porovnávání všech prvků při řazení.",
+      "inverted — pojmenovaný parametr způsobující předřazení záporného znaménka u číselných typů.",
+      "descending — nepovinný argument přepínající algoritmus do režimu sestupného třídění prvků.",
+      "backward — příznak určující načítání vstupního iterovatelného objektu od posledního prvku."
+    ],
+    "answer": 0,
+    "explanation": "Funkce sorted() i metoda list.sort() přebírají nepovinný pojmenovaný parametr reverse. Při nastavení reverse=True probíhá třídění v opačném (sestupném) pořadí."
+  }
+]

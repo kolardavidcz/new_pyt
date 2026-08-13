@@ -812,9 +812,10 @@ export function ensureShuffledOptions(q, deckKey = "", idx = 0) {
     }
   }
 
-  q.options = newOptions;
-  q.answer = targetIdx;
-  q._shuffled = true;
+}
+
+export async function getQuizForDeck(item) {
+  return getQuizFor(item);
 }
 
 /**
@@ -859,28 +860,46 @@ export async function getQuizFor(item) {
 
   let found = checkMemory();
   if (!found) {
-    // Fallback: Lazy fetch per-week chunk if missing
-    const weekNum = item.weekNum !== undefined ? item.weekNum : (item.week ? item.week : null);
-    if (weekNum != null) {
-      const urls = [
-        `data/quizzes/w${weekNum}.json`,
-        `./data/quizzes/w${weekNum}.json`,
-        `../data/quizzes/w${weekNum}.json`,
-        `/data/quizzes/w${weekNum}.json`
-      ];
-      for (const u of urls) {
-        try {
-          const res = await fetch(u, { cache: "no-store" });
-          if (res.ok) {
-            const chunkData = await res.json();
-            if (chunkData && typeof chunkData === "object") {
-              Object.assign(state.quizzes, chunkData);
-              invalidateQuizNormCache();
-              found = checkMemory();
-              if (found) break;
-            }
+    // 1. Try per-deck chunk
+    const targetKey = item.slug || item.id || idClean || "";
+    if (targetKey) {
+      try {
+        const res = await fetch(`data/quizzes/${targetKey}.json`);
+        if (res.ok) {
+          const qList = await res.json();
+          if (Array.isArray(qList)) {
+            state.quizzes[targetKey] = qList;
+            invalidateQuizNormCache();
+            found = qList;
           }
-        } catch { /* ignore */ }
+        }
+      } catch { /* ignore */ }
+    }
+
+    // 2. Fallback: Lazy fetch per-week chunk if missing
+    if (!found) {
+      const weekNum = item.weekNum !== undefined ? item.weekNum : (item.week ? item.week : null);
+      if (weekNum != null) {
+        const urls = [
+          `data/quizzes/w${weekNum}.json`,
+          `./data/quizzes/w${weekNum}.json`,
+          `../data/quizzes/w${weekNum}.json`,
+          `/data/quizzes/w${weekNum}.json`
+        ];
+        for (const u of urls) {
+          try {
+            const res = await fetch(u);
+            if (res.ok) {
+              const chunkData = await res.json();
+              if (chunkData && typeof chunkData === "object") {
+                Object.assign(state.quizzes, chunkData);
+                invalidateQuizNormCache();
+                found = checkMemory();
+                if (found) break;
+              }
+            }
+          } catch { /* ignore */ }
+        }
       }
     }
   }
@@ -891,6 +910,10 @@ export async function getQuizFor(item) {
   }
 
   return found;
+}
+
+export function loadQuizForDeck(item) {
+  return getQuizForDeck(item);
 }
 
 const listeners = new Set();

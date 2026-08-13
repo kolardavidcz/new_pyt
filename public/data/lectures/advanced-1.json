@@ -1,0 +1,66 @@
+{
+  "slug": "advanced-1",
+  "total": 10,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Uzávěry (closures) I",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Uzávěry (closures) I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Funkce definované uvnitř jiných funkcí mají jednu podivuhodnou vlastnost – <em>jsou-li z nadřazené funkce vráceny, nesou s sebou kontext platný v době jejich vrácení</em>. Nejlépe osvětlí příklad:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# toto je vnější funkce, „generující“ uzávěr\r\ndef přičti(kolik):\r\n\r\n    # tato vnitřní funkce vidí na proměnné nadřazené funkce,\r\n    #    tj. i na argument 'kolik'\r\n    def vnitřní_fce(k_čemu):\r\n        return kolik + k_čemu\r\n    \r\n    # vnitřní funkci vrátíme „upravenou“ o argument 'kolik'\r\n    #    z doby jejího vrácení\r\n    return vnitřní_fce\r\n\r\n\r\n# „Vyrobme“ funkci, která bude ke svému argumentu přičítat 5:\r\n&gt;&gt;&gt; přičti_5 = přičti(5)\r\n# Je to opravdu funkce, a to ta očekávaná (vnitřní):\r\n&gt;&gt;&gt; přičti_5\r\n&lt;function vnitřní_fce at 0x00E2D108&gt;\r\n\r\n# Vyzkoušejme to:\r\n&gt;&gt;&gt; přičti_5(3)\r\n8\r\n\r\n# Na věci nic nezmění, když vyrobíme další funkci s jiným číslem:\r\n&gt;&gt;&gt; přičti_3 = přičti(3)\r\n&gt;&gt;&gt; přičti_3\r\n&lt;function vnitřní_fce at 0x00E2D0C0&gt;\r\n&gt;&gt;&gt; přičti_3(3)\r\n6\r\n&gt;&gt;&gt; přičti_5(10)\r\n15\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Uzávěry (closures) II",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Uzávěry (closures) II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Jelikož každá z vnitřních funkcí si sebou nese kontext platný v okamžiku jejich vrácení, tedy i hodnoty proměnných (a tudíž i argumentů) v nadřazené funkci v tu chvíli, odpovídají přičítací funkce z předchozího slajdu vlastně následujícím definicím:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\ndef přičti_5(k_čemu):\r\n    return 5 + k_čemu\r\n\r\ndef přičti_3(k_čemu):\r\n    return 3 + k_čemu\r\n  </pre>\r\n  <p>\r\n    Takovéto funkce jsou v Python'u velmi často používány (nejkřiklavější příklad nabízí asi <a href=\"/materialy/python/functions/decorators.xml\">dekorátory</a>) a říká se jim, případně i takovémuto chování obecně, právě <strong>uzávěry</strong> (<em>closures</em>).\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Poznámka",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož volání funkce <em>přičti()</em> vrací funkci, můžete samozřejmě napsat třeba i tohle:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; přičti(5)(3)\r\n        8\r\n</pre>\r\n    <p>\r\n        Ne že by to tedy bylo dvakrát čitelné, zvlášť kdybyste uzávěrů za sebou zřetězili vícero…\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Co je to uzávěr?",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Co je to uzávěr?</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ačkoli předchozí (hodně umělý) příklad snad osvětlil, jak se uzávěr chová, pro vyškolené paradigmatem OOP vymyslel před lety Steve Majewski krásný příměr:\r\n    </p>\r\n    <blockquote>\r\n        Objekt je balík dat, ke kterému jsou přidané metody.<br>\r\n        Uzávěr je procedura, ke které jsou přidána data.\r\n    </blockquote>\r\n    <p>\r\n        Jejich poměrná neznalost je asi v přímé úměře k rozšíření OOP – jejich hájemstvím jsou totiž převážně <em>funkcionální programovací jazyky</em> a těžko si představit něco víc ortogonálního k OOP než právě je.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Lambda-funkce",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Lambda-funkce</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Lambda-funkce v Python'u jsou anonymní (tj. bezejmenné) funkce definované typicky v rámci jednoho řádku a skládající se pouze z jednoho výrazu, který je vyhodnocen a automaticky vrácen ve chvíli volání funkce:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\nlambda [ARGUMENT[Y]]: VÝRAZ\r\n  </pre>\r\n  <p>\r\n    Pythonovské <em>lambda-funkce</em> tedy nemají jméno, jejich argumenty nejsou uzavřeny v závorkách a spočítaná hodnota (či objekt) jejich těla je automaticky vrácena, aniž by bylo třeba použít příkaz <code>return</code>.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Přesněji řečeno je tato definice platná pouze pro Python, protože v něm jsou lambda-funkce oproti běžně chápanému pojetí tohoto termínu velmi „osekány“. Typicky totiž těla lambda-funkcí nejsou omezena pouze na jeden jediný výraz – ve většině jazyků, které je obsahují, jsou lambda-funkce plnohodnotné funkce, které prostě jen nemají vlastní záznam v tabulce jmen programu a vyskytují se na místě, kde by jinak stál odkaz na „běžnou“ funkci.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Lambda-funkce v uzávěrech",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Lambda-funkce v uzávěrech</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Příklad z prvního slajdu o uzávěrech..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\ndef přičti(kolik):\r\n    def vnitřní_fce(k_čemu):\r\n        return kolik + k_čemu\r\n    return vnitřní_fce\r\n  </pre>\r\n  <p>\r\n    ..by šel pomocí lambda-funkce přepsat takto:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\ndef přičti(kolik):\r\n    return lambda k_čemu: kolik + k_čemu\r\n\r\n&gt;&gt;&gt; přičti_5 = přičti(5)\r\n&gt;&gt;&gt; přičti_5\r\n&lt;function &lt;lambda&gt; at 0x00DC9CD8&gt;\r\n&gt;&gt;&gt; přičti_5(3)\r\n8\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Asi to není na první pohled tak pěkný zápis, ale má dvě výhody:\r\n    <ul>\r\n      <li>\r\n        Bez dalšího zkoumání každý vidí, že návratovým typem funkce <em>přičti()</em> je <em>funkce</em>.\r\n      </li>\r\n      <li>\r\n        Do tabulky lokálních objektů funkce <em>přičti()</em> není potřeba zavádět další funkci (zde <em>vnitřní_fce()</em>), čímž se ušetří dost prostředků z „režije“ programu.\r\n      </li>\r\n    </ul>\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Použití",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Použití</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Lambda-funkce nachází použití všude tam, kde je požadována funkce, ale přitom není potřeba kvůli tomu zavádět pojmenovanou funkci na obecnější úrovni.\r\n    </p>\r\n    <p>\r\n        Vzhledem k „osekanosti“ lambda-funkcí v Python'u se s nimi tedy většinou setkáme na místech parametrů funkcí, kde je uvedené omezení na jednu řádku a jeden výraz nakonec ještě i celkem vítáno. Několik klasických případů ilustrují následující příklady.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Příklady použití – řazení pomocí „sorted()“",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Příklady použití – řazení pomocí „sorted()“</h2></div><div class=\"section-body\">\r\n\r\n    \r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        sorted( xs, key = lambda x: x[2] )     # \r\n\r\n        sorted( xs, key = lambda x: len(x) )   # sorted( xs, key=len )\r\n    </pre>\r\n    <br>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pro srovnání – první z příkladů by se pomocí pojmenované funkce zapsal takto:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \"> \r\n            def fn(x):\r\n                return x[2]\r\n            sorted(xs, key=fn)\r\n        </pre>\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Příklady použití – funkce jako parametr funkce",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Příklady použití – funkce jako parametr funkce</h2></div><div class=\"section-body\">\r\n\r\n    \r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        def mymap(xs, fn=lambda x: x):\r\n            return [fn(x) for x in xs]\r\n\r\n        # Výchozí chování pojmenovaného argumentu 'fn' je „identita“:\r\n&gt;&gt;&gt; mymap( ['a', 'b', 'c', ] )\r\n        ['a', 'b', 'c']\r\n\r\n        # „Přepišme“ identitu vestavěnou funkcí 'ord':\r\n&gt;&gt;&gt; mymap( ['a', 'b', 'c', ], ord )\r\n        [97, 98, 99]\r\n\r\n        # Podstrčme funkci nějakou naši vlastní „šílenost“:\r\n&gt;&gt;&gt; mymap( ['a', 'b', 'c', ], lambda x: chr(ord(x)+3) )\r\n        ['d', 'e', 'f']\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Funkci můžete samozřejmě volat i jako <code>mymap('abc', ord)</code> a podobně.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Příklady použití – vytvořující funkce pro „defaultdict“",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Příklady použití – vytvořující funkce pro „defaultdict“</h2></div><div class=\"section-body\">\r\n\r\n    \r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; from collections import defaultdict\r\n&gt;&gt;&gt; xs = \"abrakadabra\"\r\n&gt;&gt;&gt; xd = defaultdict(\r\n              lambda: ['samohláska', 0] if x in 'aeiouy' else ['souhláska', 0]\r\n            )\r\n&gt;&gt;&gt; for x in xs:\r\n...   xd[x][1] += 1\r\n... \r\n&gt;&gt;&gt; xd\r\n        defaultdict(&lt;function &lt;lambda&gt; at 0x7fc7473b96a8&gt;,\r\n          {'b': ['souhláska', 2], \r\n           'd': ['souhláska', 1],\r\n           'r': ['souhláska', 2],\r\n           'a': ['samohláska', 5],\r\n           'k': ['souhláska', 1]}\r\n        )\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        (Pozalamováno pro lepší čitelnost.)\r\n    </div></div>\r\n\r\n</div>"
+    }
+  ]
+}

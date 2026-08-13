@@ -3,7 +3,7 @@
 import {
   state, pagesFor, slideDiff, slideTags, weekVisibleItems, filteredItems, markSeen,
   isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor, logLinkError,
-  saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, setPrintWithQuizzes, getQuizFor,
+  saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, setPrintWithQuizzes, getQuizFor, getQuizForDeck,
   registerUser, loginWithPassword, resetUserPassword, isAdminUser,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
@@ -675,14 +675,44 @@ async function loadFullContent(item, main) {
     }
     const frag = document.createDocumentFragment();
     const nodes = [];
-    slides.forEach((s, i) => {
-      const node = renderSlide(s, item, i + 1);
+
+    // Lazy section mounting for long lectures (> 6 slides)
+    const initialBatchSize = slides.length > 6 ? 4 : slides.length;
+
+    for (let i = 0; i < initialBatchSize; i++) {
+      const node = renderSlide(slides[i], item, i + 1);
       nodes.push(node);
       frag.appendChild(node);
-    });
+    }
     main.appendChild(frag);
     await loadAndInlineExamples(main);
     for (const node of nodes) highlightRoot(node);
+
+    // Defer mounting remaining offscreen slides
+    if (slides.length > initialBatchSize) {
+      const remainingContainer = el("div", { className: "deferred-slides-container" });
+      main.appendChild(remainingContainer);
+
+      const mountRemaining = async () => {
+        const remFrag = document.createDocumentFragment();
+        const remNodes = [];
+        for (let i = initialBatchSize; i < slides.length; i++) {
+          const node = renderSlide(slides[i], item, i + 1);
+          remNodes.push(node);
+          remFrag.appendChild(node);
+        }
+        remainingContainer.appendChild(remFrag);
+        await loadAndInlineExamples(remainingContainer);
+        for (const node of remNodes) highlightRoot(node);
+      };
+
+      if ("requestIdleCallback" in window) {
+        requestIdleCallback(() => mountRemaining());
+      } else {
+        setTimeout(() => mountRemaining(), 50);
+      }
+    }
+
     main.appendChild(buildBottomNavBar(item));
     const quizEl = await renderQuizSection(item);
     if (quizEl) {
@@ -759,9 +789,11 @@ function renderSlide(page, item, num) {
     ${badgesHtml(tags)}
     ${diff ? flavorHtml(diff) : ""}
   `;
+  slide.appendChild(header);
+
   const body = el("div", { className: "slide-body" });
-  body.innerHTML = rewriteContentUrls(page.html, item.path);
-  slide.append(header, body);
+  body.innerHTML = rewriteContentUrls(page.html || "", item.path);
+  slide.appendChild(body);
   return slide;
 }
 
@@ -773,11 +805,26 @@ export async function fetchAndExtract(path) {
   if (!path) return [];
   if (cache.has(path)) {
     const cached = cache.get(path);
-    if (Array.isArray(cached) && cached.length > 0 && cached.some((s) => s.html && s.html.trim().length > 0)) {
-      return cached;
-    }
+    if (Array.isArray(cached) && cached.length > 0) return cached;
   }
 
+  const slug = path.split("/").pop().replace(/\.html?$/, "");
+
+  // 1. Try static pre-rendered JSON slide tree (Static Shell + Dynamic Dojo)
+  if (slug) {
+    try {
+      const res = await fetch(`data/lectures/${slug}.json`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.slides) && data.slides.length > 0) {
+          cache.set(path, data.slides);
+          return data.slides;
+        }
+      }
+    } catch { /* ignore */ }
+  }
+
+  // 2. Fallback: Raw HTML fetch + client-side DOMParser
   const cleanPath = path.replace(/^\//, "");
   const urlsToTry = [
     "/" + cleanPath,
@@ -788,7 +835,7 @@ export async function fetchAndExtract(path) {
   let html = null;
   for (const url of urlsToTry) {
     try {
-      const res = await fetch(url, { cache: "no-store" });
+      const res = await fetch(url);
       if (res.ok) {
         const text = await res.text();
         if (text && text.includes("<")) {
@@ -805,7 +852,7 @@ export async function fetchAndExtract(path) {
   }
 
   const slides = extractSlides(html);
-  if (slides.length > 0 && slides.some((s) => s.html && s.html.trim().length > 0)) {
+  if (slides.length > 0) {
     cache.set(path, slides);
   }
   return slides;

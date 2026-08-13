@@ -1,0 +1,54 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Co se stane při pokusu o setřídění seznamu `items` pomocí `sorted(items)` v níže uvedeném kódu?\n\nclass Item:\n    def __init__(self, val):\n        self.val = val\n\nitems = [Item(3), Item(1)]\nsorted(items)",
+    "options": [
+      "A) Vyvolá TypeError, protože třída Item nedefinuje magickou metodu __lt__() potřebnou pro řazení prvků.",
+      "B) Setřídí objekty podle jejich paměťových adres získaných pomocí vestavěné funkce id() bez vyhození chyby.",
+      "C) Vyvolá AttributeError, protože funkce sorted() vyžaduje existenci metody __cmp__() pro srovnání.",
+      "D) Vypíše nesetříděný seznam v původním pořadí, protože chybějící porovnávací metoda se potichu ignoruje."
+    ],
+    "answer": 0,
+    "explanation": "Funkce `sorted()` vyžaduje pro porovnávání prvků relaci menší než (`<`), realizovanou magickou metodou `__lt__()`. Bez jejím definice selže volání na `TypeError: '<' not supported between instances of 'Item' and 'Item'`."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jaký bude výsledek výrazu `a > b`, pokud třída `Cislo` definuje pouze metodu `__lt__()`?\n\nclass Cislo:\n    def __init__(self, val):\n        self.val = val\n    def __lt__(self, other):\n        return self.val < other.val\n\na = Cislo(5)\nb = Cislo(3)\nprint(a > b)",
+    "options": [
+      "A) Vypíše True, protože Python při absenci __gt__ zamění pořadí operandů a zavolá b.__lt__(a).",
+      "B) Vyvolá TypeError, protože operátor > vyžaduje explicitní definici magické metody __gt__.",
+      "C) Vypíše False, protože neexistující metoda __gt__ vrátí implicitní pravdivostní hodnotu False.",
+      "D) Vyvolá AttributeError, protože doplňkové porovnávání funguje pouze pro dvojici == a !=."
+    ],
+    "answer": 0,
+    "explanation": "Metody `__lt__` a `__gt__` jsou doplňkové. Při vyhodnocení `a > b` hledá Python nejprve `a.__gt__(b)`. Pokud neexistuje, zamění operandy a zavolá `b.__lt__(a)` (`3 < 5`), což vrátí `True`."
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte název dekorátoru modulu `functools` pro automatické dopočítání chybějících porovnávacích metod:\n\nfrom functools import ________\n\n@________\nclass Bod:\n    def __init__(self, x):\n        self.x = x\n    def __eq__(self, other):\n        return self.x == other.x\n    def __lt__(self, other):\n        return self.x < other.x\n\n```python\n# Doplňte název dekorátoru modulu `functools` pro automatické dopočítání chybějících porovnávacích metod:\n\nfrom functools import ________\n\n@________\nclass Bod:\n    def __init__(self, x):\n        self.x = x\n    def __eq__(self, other):\n        return self.x == other.x\n    def __lt__(self, other):\n        return self.x < other.x\nvysledek = ________\n```",
+    "options": [
+      "total_ordering",
+      "full_ordering",
+      "comparison_order",
+      "auto_ordering"
+    ],
+    "answer": 0,
+    "explanation": "Dekorátor `@functools.total_ordering` automaticky dopočítá zbývající bohaté porovnávací metody (`__le__`, `__gt__`, `__ge__`), pokud třída definuje `__eq__` a alespoň jednu z metod `__lt__`, `__le__`, `__gt__`, `__ge__`."
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Které metody je nutné ve třídě minimálně definovat, aby dekorátor `@total_ordering` správně doplnil ostatní porovnávací operátory?",
+    "options": [
+      "A) Metodu __eq__() a současně alespoň jednu z porovnávacích metod __lt__(), __le__(), __gt__() nebo __ge__().",
+      "B) Všechny dvě základní metody __eq__() a __lt__(), ostatní čtyři porovnávací metody nelze jako základ použít.",
+      "C) Pouze metodu __lt__(), přičemž metodu pro rovnost __eq__() si dekorátor odvodí z porovnání automaticky.",
+      "D) Jakoukoli jednu libovolnou porovnávací metodu ze všech šesti dostupných bez ohledu na metodu __eq__()."
+    ],
+    "answer": 0,
+    "explanation": "Podle dokumentace vyžaduje `@total_ordering` implementaci metody `__eq__()` plus alespoň jedné ze čtyř neekvivalentních porovnávacích metod (`__lt__`, `__le__`, `__gt__`, `__ge__`)."
+  }
+]

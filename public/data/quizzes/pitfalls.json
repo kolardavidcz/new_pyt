@@ -1,0 +1,119 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Co vypíše následující kód při druhém volání funkce pridat(2)?\n\ndef pridat(val, prpkn=[]):\n    prpkn.append(val)\n    return prpkn\n\npridat(1)\nres = pridat(2)\nprint(res)",
+    "options": [
+      "A) Seznam [1, 2], protože výchozí objekt [] se vytvoří jen při definici funkce  .",
+      "B) Seznam [2], protože při každém volání bez argumentu se alokuje nový seznam   .",
+      "C) N-tici (1, 2), protože výchozí argumenty se v paměti mění na imutabilní typ  .",
+      "D) Výjimku UnboundLocalError, protože proměnná prpkn nebyla označena jako global."
+    ],
+    "answer": 0,
+    "explanation": "Výchozí hodnoty parametrů funkcí jsou v Pythonu vyhodnoceny pouze jednou při definici (překladu) funkce. Pokud je výchozí hodnotou mutabilní objekt (např. seznam []), všechna volání využívající výchozí parametr sdílejí přesně jednu a tu samou instanci v paměti."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Co vypíše příkaz print(d['b']) po úpravě prvku s klíčem 'a'?\n\nd = dict.fromkeys(['a', 'b'], [])\nd['a'].append(1)\nprint(d['b'])",
+    "options": [
+      "A) Seznam [1], protože všechny klíče sdílejí v paměti odkaz na stejný seznam       .",
+      "B) Seznam [], protože nově vytvořené klíče dostanou samostatné instance seznamů    .",
+      "C) Hodnotu None, protože metoda zvaná fromkeys nepřiřazuje klíčům výchozí strukturu.",
+      "D) Výjimku KeyError, protože klíč 'b' nebyl ve vytvořeném slovníku inicializován   ."
+    ],
+    "answer": 0,
+    "explanation": "Metoda dict.fromkeys(keys, default) předává výchozí hodnotu odkazem. Pokud předáte mutabilní objekt jako [], všechny klíče ve slovníku budou odkazovat na identickou instanci v paměti (id(d['a']) == id(d['b'])), takže změna pod jedním klíčem se projeví u všech ostatních."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jaký bude obsah proměnné t po proběhnutí bloku try-except?\n\nt = ([1],)\ntry:\n    t[0] += [2]\nexcept TypeError:\n    pass\nprint(t)",
+    "options": [
+      "A) N-tici ([1, 2],), protože operátor += upraví seznam v n-tici před výjimkou.",
+      "B) N-tici ([1],), protože vyvolaná výjimka TypeError ob obnoví původní n-tici.",
+      "C) N-tici ([1], [2]), protože nepřihlášený prvek se vloží až na konec n-tice .",
+      "D) Hodnotu None, protože selhání zapsání do n-tice vymaže celý datový objekt ."
+    ],
+    "answer": 0,
+    "explanation": "Příkaz t[0] += [2] provede dvě věci: 1) Zavolá in-place rozšíření t[0].__iadd__([2]), což seznam úspěšně upraví na [1, 2]. 2) Pokusí se uložit výsledek zpět do t[0], což selže s TypeError, protože n-tice nepodporuje přiřazení prvku. Seznam uvnitř n-tice však již upraven zůstane."
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Jak reaguje interpret Pythonu při zavolání funkce zmen()?\n\nval = 10\ndef zmen():\n    print(val)\n    val = 20\n\nzmen()",
+    "options": [
+      "A) Vyvolá UnboundLocalError, protože přiřazení val=20 z ní dělá lokální proměnnou .",
+      "B) Vypíše 10 a následně globální hodnotu val v paměti okamžitě přepíše na číslo 20.",
+      "C) Vypíše 10 a lokální proměnná val zastíní globální až na řádku za příkazem print.",
+      "D) Vypíše 20, protože interpret Pythonu provede interní optimalizaci pořadí kódu  ."
+    ],
+    "answer": 0,
+    "explanation": "Při analýze těla funkce Python v době překladu zjistí, že se do val v těle přiřazuje (val = 20), a označí val za lokální proměnnou pro celou funkci. Při spuštění pak řádek print(val) selže s UnboundLocalError, protože přistupuje k lokální proměnné dříve, než do ní byla uložena hodnota."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Co vypíše výraz print([f() for f in funcs])?\n\nfuncs = [lambda: i for i in range(3)]\nprint([f() for f in funcs])",
+    "options": [
+      "A) Seznam [2, 2, 2], protože anonymní lambda funkce hledají i až při spuštění    .",
+      "B) Seznam [0, 1, 2], protože proměnná i se při vytváření těla lambdy ihned sváže .",
+      "C) Seznam [0, 0, 0], protože počáteční hodnota cyklu i=0 zůstane zachována v těle.",
+      "D) Výjimku NameError, protože proměnná i po dokončení generování z paměti zmizí  ."
+    ],
+    "answer": 0,
+    "explanation": "V Pythonu dochází v uzávěrech k tzv. late binding (zpožděnému vázání): proměnná i se v těle lambda funkce vyhodnocuje až ve chvíli zavolání f(), kdy už má po dokončení cyklu hodnotu 2. Všechny vytvořené lambda funkce tak vrátí 2. Opravou je použití výchozího parametru lambda i=i: i."
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaká hodnota se vytiskne při volání print(y) po dokončení list comprehension v Pythonu 3.8+?\n\nres = [y for x in range(3) if (y := x * 2)]\nprint(y)",
+    "options": [
+      "A) Hodnota 4, protože proměnná z walrus operátoru := uniká do okolního rozsahu         .",
+      "B) Výjimka NameError, protože všechny proměnné v list comprehension jsou lokální       .",
+      "C) Hodnota 2, protože walrus operátor uchová pouze první úspěšně uložený prvek         .",
+      "D) Hodnota None, protože walrus operátor vrací při zápisu v podmínce prázdný datový typ."
+    ],
+    "answer": 0,
+    "explanation": "Zatímco běžné proměnné cyklu v list comprehension v Pythonu 3 neunikají z lokálního rozsahu comprehension, proměnné vytvořené přiřazovacím operátorem walrus (:=) unikat do nadřazeného rozsahu záměrně mohou. V proměnné y tak po dokončení zůstane hodnota z poslední iterace, tedy 4."
+  },
+  {
+    "id": "q7",
+    "type": "fill_blank_choice",
+    "question": "Jaký zápis f-stringu chybí na místě ________ pro vytištění hodnoty v složených závorkách?\n\njmeno = \"VŠCHT\"\n# Výsledný řetězec má být: \"{VŠCHT}\"\ns = f\"________\"\n\n```python\n# Jaký zápis f-stringu chybí na místě ________ pro vytištění hodnoty v složených závorkách?\n\njmeno = \"VŠCHT\"\n# Výsledný řetězec má být: \"{VŠCHT}\"\ns = f\"________\"\nvysledek = ________\n```",
+    "options": [
+      "{{{jmeno}}} — trojité složené závorky vkládají proměnnou do jednoho páru závorek    .",
+      "\\{{jmeno\\}} — zpětné lomítko ruší speciální význam složené závorky v textu f-stringu.",
+      "{{jmeno}} — dvojité složené závorky automaticky vyhodnotí zadanou proměnnou v kódu  .",
+      "{\\{jmeno\\}} — vnější závorky tvoří výraz a vnitřní eskapování vytvoří čistý text    ."
+    ],
+    "answer": 0,
+    "explanation": "V f-stringu se složená závorka eskapuje jejím zdvojením ({{ vypíše {). Pokud chceme vypsat složené závorky obsahující hodnotu proměnné, musíme použít trojité závorky {{{jmeno}}}: vnější pár {{ vytvoří textovou {, vnitřní {jmeno} vyhodnotí proměnnou a zbylé }} vytvoří uzavírací }."
+  },
+  {
+    "id": "q8",
+    "type": "multiple_choice",
+    "question": "Ke kterému adresáři se vztahují relativní cesty při otevírání souborů pomocí open('data.txt')?",
+    "options": [
+      "A) K aktuálnímu pracovnímu adresáři (CWD), odkud byl spuštěn interpret Pythonu    .",
+      "B) K adresáři, ve kterém se nachází samotný právě vykonávaný skript s příponou .py.",
+      "C) K kořenovému adresáři projektu určenému v proměnné prostředí zvané PYTHONPATH  .",
+      "D) K systémovému dočasnému adresáři určenému systémem pro běžného uživatele v OS  ."
+    ],
+    "answer": 0,
+    "explanation": "Relativní cesty v Pythonu se nevztahují k umístění zdrojového souboru .py, ale k aktuálnímu pracovnímu adresáři (Current Working Directory), ze kterého byl interpret spuštěn. Spuštění skriptu z jiného adresáře tak bez úpravy cest vyvolá FileNotFoundError."
+  },
+  {
+    "id": "q9",
+    "type": "multiple_choice",
+    "question": "Co bude výstupem příkazu print(cisla) po odebrání prvků během iterace?\n\ncisla = [1, 2, 3, 4]\nfor x in cisla:\n    if x % 2 != 0:\n        cisla.remove(x)\nprint(cisla)",
+    "options": [
+      "A) Seznam [2, 3, 4], protože odebráním prvku 1 se posunou vnitřní indexy prvků .",
+      "B) Seznam [2, 4], protože metoda remove bezpečně aktualizuje ukazatel cyklu for.",
+      "C) Seznam [], protože odebrání prvku vymaže všechny zbývající prvky ze seznamu .",
+      "D) Výjimka RuntimeError, protože Python zakazuje modifikaci iterovaného pole   ."
+    ],
+    "answer": 0,
+    "explanation": "Při modifikaci seznamu během iterace se interní index posouvá v původním seznamu. Odebráním prvku 1 na indexu 0 se prvek 2 posune na index 0 a prvek 3 na index 1. Smyčka v následujícím kroku přejde na index 1 (kde je nyní 3), čímž prvek 2 úplně přeskočí! Ve výsledku zůstane [2, 3, 4]."
+  }
+]

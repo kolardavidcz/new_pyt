@@ -1,0 +1,80 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Co se stane při instanciaci objektu, pokud přepsaná metoda __new__() ve třídě nevrátí instanci dané třídy?\n\n```python\nclass Creator:\n    def __new__(cls):\n        print(\"NEW\")\n        return None\n    def __init__(self):\n        print(\"INIT\")\n\nc = Creator()\n```",
+    "options": [
+      "A) Vypíše pouze NEW a proměnná c bude obsahovat None, protože metoda __init__() se zavolá pouze při vrácení správné instance.",
+      "B) Vypíše NEW i INIT, protože Python volá metodu __init__() vždy bezpodmínečně po dokončení metody __new__().",
+      "C) Vyvolá výjimku TypeError, neboť metoda __new__() má striktně předepsáno vracet platný paměťový ukazatel na instanci.",
+      "D) Vypíše pouze INIT, protože vrácením hodnoty None metoda __new__() deleguje vytvoření objektu na konstruktor __init__()."
+    ],
+    "answer": 0,
+    "explanation": "Python zavolá __init__(self, ...) pouze tehdy, pokud __new__(cls, ...) vrátí instanci třídy cls (nebo její podtřídy). Pokud __new__ vrátí None (nebo objekt jiného typu), __init__ se nezavolá."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jaká je klíčová výhoda použití metatříd oproti třídním dekorátorům (@decorator) při objektovém návrhu?",
+    "options": [
+      "A) Chování definované metatřídou se automaticky dědí na všechny podtřídy, zatímco dekorátor upraví pouze konkrétní třídu.",
+      "B) Třídní dekorátory pracují pouze při instanciaci objektů, zatímco metatřídy mohou modifikovat i lokální proměnné funkcí.",
+      "C) Metatřídy nevyžadují použití dědičnosti od třídy type, což umožňuje jejich snadnější kombinování v programu.",
+      "D) Použití metatříd úplně odstraňuje potřebu psát metody __init__() u všech vytvořených instancí dané podtřídy."
+    ],
+    "answer": 0,
+    "explanation": "Dekorátor upraví pouze tu třídu, nad kterou je napsán. Metatřída definuje způsob tvorby třídy a tento mechanismus automaticky podědí všechny podtřídy dané třídy."
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte správné pořadí argumentů pro dynamické vytvoření třídy pomocí tříargumentového volání metatřídy type():\n\n```python\nMyClass = type(________, (object,), {\"x\": 10})\n```",
+    "options": [
+      "\"MyClass\"",
+      "object",
+      "{\"x\": 10}",
+      "MyClass"
+    ],
+    "answer": 0,
+    "explanation": "Tříargumentové volání type(name, bases, dict) přijímá jako 1. argument název třídy v podobě řetězce (zde \"MyClass\"), jako 2. argument n-tici rodičů a jako 3. argument slovník atributů třídy."
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "K čemu slouží magická metoda __prepare__(metacls, name, bases, **kwargs) při procesu vytváření třídy metatřídou?",
+    "options": [
+      "A) Vytváří a vrací mapovací objekt (slovník), který se použije jako jmenný prostor třídy během vykonávání jejího těla.",
+      "B) Slouží k automatickému promazání nepoužívaných metod v rodičovských třídách před zahájením kompilace těla.",
+      "C) Kontroluje datové typy všech definovaných atributů a vyvolá výjimku TypeError při nalezení neznámé vlastnosti.",
+      "D) Spouští se až po dokončení metody __init__ metatřídy pro závěrečnou registraci třídy do globálního jmenného prostoru."
+    ],
+    "answer": 0,
+    "explanation": "Metoda __prepare__ se volá jako první krok při definici třídy. Vrací slovník (např. OrderedDict nebo custom dict), který slouží k zachycení atributů definovaných v těle třídy v pořadí, v jakém byly zapsány."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Jaký bude výstup při opakované instanciaci třídy spravované metatřídou implementující vzor Singleton pomocí __call__?\n\n```python\nclass Singleton(type):\n    _instances = {}\n    def __call__(cls, *args, **kwargs):\n        if cls not in cls._instances:\n            cls._instances[cls] = super().__call__(*args, **kwargs)\n        return cls._instances[cls]\n\nclass Logger(metaclass=Singleton):\n    def __init__(self, name):\n        self.name = name\n\na = Logger(\"First\")\nb = Logger(\"Second\")\nprint(a is b, b.name)\n```",
+    "options": [
+      "A) Vypíše True First, protože druhá instanciace vrátí již existující objekt a bez opětovného přepsání atributu.",
+      "B) Vypíše True Second, protože metoda __init__ třídy Logger se zavolá znovu a přepíše atribut name na Second.",
+      "C) Vypíše False Second, protože metoda __call__ vytvoří dvě odlišné instance třídy Logger se stejnými atributy.",
+      "D) Vyvolá výjimku KeyError, protože slovník _instances nepodporuje ukládání objektů tříd jako klíčů vyhledávání."
+    ],
+    "answer": 0,
+    "explanation": "Při prvním volání Logger(\"First\") vrátí Singleton.__call__ novou instanci a uloží ji do _instances. Při druhém volání Logger(\"Second\") podmínka cls not in cls._instances selže, super().__call__ (a tedy i Logger.__init__) se už podruhé nezavolá a vrátí se původní instance a. Proto a is b je True a b.name zůstává \"First\"."
+  },
+  {
+    "id": "q6",
+    "type": "fill_blank_choice",
+    "question": "Doplňte správnou syntaxi hlavičky třídy pro specifikaci vlastní metatřídy Meta:\n\n```python\nclass CustomClass(________=Meta):\n    pass\n```",
+    "options": [
+      "metaclass",
+      "meta",
+      "type",
+      "base"
+    ],
+    "answer": 0,
+    "explanation": "V Pythonu 3 se předpis metatřídy předává v hlavičce definice třídy pomocí pojmenovaného argumentu metaclass=Meta."
+  }
+]

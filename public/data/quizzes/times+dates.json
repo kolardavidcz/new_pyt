@@ -1,0 +1,104 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jaký atribut určuje, zda je objekt datetime v Pythonu naivní (naive) nebo informovaný (aware)?",
+    "options": [
+      "A) Atribut tzinfo, který obsahuje None u naivních objektů a instanci časové zóny u informovaných.",
+      "B) Atribut is_aware, který obsahuje logickou hodnotu False u naivních a True u informovaných.",
+      "C) Atribut timezone, který uchovává textový název časového pásma nebo prázdný řetězec \"\".",
+      "D) Atribut utc_offset, který vrací celočíselný posun v sekundách nebo hodnotu -1 při nepřiřazení."
+    ],
+    "answer": 0,
+    "explanation": "Naivní objekty datetime mají v atributu tzinfo hodnotu None. Informované objekty obsahují referenci na instanci třídy dědící z tzinfo (např. timezone.utc nebo objekt z pytz)."
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte název funkce z modulu calendar, která provádí zpětnou konverzi z UTC n-tice struct_time na sekundy od epochy:\n\nimport time, calendar\nst = time.gmtime(0)\nepoch_seconds = calendar.________(st)\n\n```python\n# Doplňte název funkce z modulu calendar, která provádí zpětnou konverzi z UTC n-tice struct_time na sekundy od epochy:\n\nimport time, calendar\nst = time.gmtime(0)\nepoch_seconds = calendar.________(st)\nvysledek = ________\n```",
+    "options": [
+      "timegm",
+      "mktime",
+      "gmtime",
+      "mktimes"
+    ],
+    "answer": 0,
+    "explanation": "Funkce calendar.timegm() přijímá časovou n-tici struct_time v UTC a vrací počet sekund od epochy (1. 1. 1970). Naopak time.mktime() očekává časovou n-tici v lokálním čase."
+  },
+  {
+    "id": "q3",
+    "type": "true_false_tricky",
+    "question": "Vyhodnoťte pravdivost tvrzení o chování metody datetime.timestamp() při volání na naivním objektu datetime:\n\nMetoda timestamp() u naivního objektu datetime automaticky předpokládá, že zadaný čas je v UTC, a provede přímý výpočet bez závislosti na nastavení systému.",
+    "options": [
+      "A) Nepravda – u naivního objektu se předpokládá lokální čas systému a k přepočtu na epochu se použije platformní céčkovská funkce mktime().",
+      "B) Pravda – u naivního objektu se předpokládá univerzální čas UTC a k přepočtu na epochu se použije interní matematika bez závislosti na systému."
+    ],
+    "answer": 0,
+    "explanation": "Pokud je objekt datetime naivní (tzinfo=None), metoda timestamp() jej interpretuje jako lokální čas a používá kód spoléhající na platformní funkci mktime(), což může vést k chybám či výjimce OverflowError."
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl mezi metodami datetime.strptime() a datetime.strftime()?",
+    "options": [
+      "A) strptime() převádí textový řetězec na objekt datetime, zatímco strftime() formátuje datetime objekt na textový řetězec.",
+      "B) strptime() vypisuje časový objekt na standardní výstup, zatímco strftime() načítá vstupní čas z konzole od uživatele.",
+      "C) strptime() provádí konverzi času do UTC pásma, zatímco strftime() převede UTC čas na lokální časovou zónu systému.",
+      "D) strptime() zjišťuje aktuální systémový čas, zatímco strftime() nastavuje nový systémový čas operačního systému."
+    ],
+    "answer": 0,
+    "explanation": "strptime (string parse time) parsuje text podle zadávaného formátu na objekt datetime. strftime (string format time) převádí objekt datetime na zformátovaný textový řetězec."
+  },
+  {
+    "id": "q5",
+    "type": "fill_blank_choice",
+    "question": "Doplňte chybějící volání metody pro převedení naivního objektu dt na informovaný v pásu UTC bez změny složek času:\n\nfrom datetime import datetime, timezone\ndt = datetime(2026, 8, 9, 14, 0, 0)\ndt_aware = dt.________(tzinfo=timezone.utc)\n\n```python\n# Doplňte chybějící volání metody pro převedení naivního objektu dt na informovaný v pásu UTC bez změny složek času:\n\nfrom datetime import datetime, timezone\ndt = datetime(2026, 8, 9, 14, 0, 0)\ndt_aware = dt.________(tzinfo=timezone.utc)\nvysledek = ________\n```",
+    "options": [
+      "replace",
+      "convert",
+      "astimezone",
+      "set_tz"
+    ],
+    "answer": 0,
+    "explanation": "Metoda dt.replace(tzinfo=timezone.utc) vrátí nový objekt datetime se stejnými složkami roku, měsíce, hodin atd., ale s nastaveným atributem tzinfo. Metoda astimezone() se používá k přepočtu informovaného času z jedné zóny do druhé."
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "K čemu slouží parametr fold v metodě replace() u objektu datetime zavedený v Pythonu 3.6?",
+    "options": [
+      "A) K rozlišení dvou stejných lokálních časů nastávajících při zimním posunu času (0 pro dřívější, 1 pro pozdější).",
+      "B) K nastavení počtu nanosekund přidávaných k běžné sekundové přesnosti (0 pro sekundy, 1 pro nanosekundy).",
+      "C) K zapnutí automatické korekce přestupných sekund nahromaděných v éře UNIXového počítání (0 vypnuto, 1 zapnuto).",
+      "D) K určení způsobu zaokrouhlování mikrosekund při převodu na celé sekundy (0 dolů, 1 nahoru k celému číslu)."
+    ],
+    "answer": 0,
+    "explanation": "Při podzimním přechodu z letního času na standardní čas nastávají stejné nástěnné časy dvakrát. Parametr fold rozlišuje první (0) a druhý (1) průchod stejného zobrazeného času."
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Jaký bude účinek spuštění následujícího příkazu v Pythonu na platformě Linux?\n\nimport os\nos.utime(\"data.txt\")",
+    "options": [
+      "A) Nastaví čas posledního přístupu i čas poslední modifikace souboru data.txt na aktuální systémový čas.",
+      "B) Vynuluje čas modifikace i čas přístupu souboru data.txt na začátek UNIXové epochy (1. ledna 1970).",
+      "C) Smaže veškerá časová razítka souboru data.txt a nastaví přístupová práva k souboru na hodnotu 000.",
+      "D) Vyvolá výjimku TypeError, protože funkce os.utime() striktně vyžaduje předání n-tice časových údajů."
+    ],
+    "answer": 0,
+    "explanation": "Volání os.utime(path) bez dalších argumentů (nebo s times=None) nastaví čas přístupu (atime) i modifikace (mtime) zadané cesty na aktuální systémový čas."
+  },
+  {
+    "id": "q8",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl mezi funkcemi time.localtime() a time.gmtime() z modulu time?",
+    "options": [
+      "A) localtime() vrací struct_time v lokální časové zóně, zatímco gmtime() vrací struct_time v koordinovaném světovém čase UTC.",
+      "B) localtime() vrací čas jako číslo typu float, zatímco gmtime() vrací objekt reprezentující zónu v podobě textového řetězce.",
+      "C) localtime() provádí konverzi času pouze pro systém Windows, zatímco gmtime() funguje výhradně na systémech typu POSIX/Linux.",
+      "D) localtime() bere v úvahu pouze přestupné sekundy, zatímco gmtime() započítává pouze posuny letního a zimního času na Zemi."
+    ],
+    "answer": 0,
+    "explanation": "Obě funkce převádějí sekundy od epochy na n-tici struct_time. localtime() zohledňuje nastavené lokální časové pásmo a DST, zatímco gmtime() vrací čas v nultém poledníku (UTC)."
+  }
+]

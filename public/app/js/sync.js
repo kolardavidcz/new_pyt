@@ -11,8 +11,22 @@ export const DEFAULT_KV_TOKEN = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY
 export class CloudSyncEngine {
   constructor(options = {}) {
     this.appId = options.appId || "pyt";
-    this.kvUrl = options.kvUrl || DEFAULT_KV_URL;
-    this.kvToken = options.kvToken || DEFAULT_KV_TOKEN;
+    this.apiEndpoint = options.apiEndpoint || "/api/sync";
+
+    // Batched Optimistic Queue state
+    this.queueMap = new Map(); // key -> val
+    this.flushTimer = null;
+    this.debounceMs = 2000; // 2s adaptive debounced flush
+
+    // Auto-drain on unload / tab hide
+    if (typeof window !== "undefined") {
+      window.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") this.flush();
+      });
+      window.addEventListener("beforeunload", () => {
+        this.flush();
+      });
+    }
   }
 
   /**
@@ -37,10 +51,12 @@ export class CloudSyncEngine {
   }
 
   async kvGet(key) {
+    // If pending in batch queue, return optimistic queued value immediately
+    if (this.queueMap.has(key)) {
+      return this.queueMap.get(key);
+    }
     try {
-      const res = await fetch(`${this.kvUrl}/get/${encodeURIComponent(key)}`, {
-        headers: { Authorization: `Bearer ${this.kvToken}` },
-      });
+      const res = await fetch(`${this.apiEndpoint}?key=${encodeURIComponent(key)}`);
       if (!res.ok) return null;
       const data = await res.json();
       if (!data || data.result === undefined || data.result === null) return null;
@@ -51,14 +67,49 @@ export class CloudSyncEngine {
   }
 
   async kvSet(key, val) {
+    // Optimistic batch queueing: store locally and schedule flush in 2s
+    this.queueMap.set(key, val);
+    this.scheduleFlush();
+    return true;
+  }
+
+  scheduleFlush() {
+    if (this.flushTimer) clearTimeout(this.flushTimer);
+    this.flushTimer = setTimeout(() => {
+      this.flush();
+    }, this.debounceMs);
+  }
+
+  async flush() {
+    if (this.flushTimer) {
+      clearTimeout(this.flushTimer);
+      this.flushTimer = null;
+    }
+    if (this.queueMap.size === 0) return true;
+
+    const payload = Array.from(this.queueMap.entries()).map(([key, val]) => ({ key, val }));
+    this.queueMap.clear();
+
     try {
-      const res = await fetch(`${this.kvUrl}/set/${encodeURIComponent(key)}`, {
+      if (typeof navigator !== "undefined" && navigator.sendBeacon && document.visibilityState === "hidden") {
+        const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+        navigator.sendBeacon(this.apiEndpoint, blob);
+        return true;
+      }
+
+      const res = await fetch(this.apiEndpoint, {
         method: "POST",
-        headers: { Authorization: `Bearer ${this.kvToken}` },
-        body: JSON.stringify(val),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
       return res.ok;
     } catch {
+      // On network failure, re-queue failed operations
+      for (const item of payload) {
+        if (!this.queueMap.has(item.key)) {
+          this.queueMap.set(item.key, item.val);
+        }
+      }
       return false;
     }
   }

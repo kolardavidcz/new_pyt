@@ -1,0 +1,80 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Proč je při opakovaném překreslování grafu v animaci výhodnější použít metodu line.set_data(x, y) místo volání pyplot.plot()?",
+    "options": [
+      "A) Upravuje data v již vytvořeném objektu čáry místo opakovaného alokování nových objektů grafu.",
+      "B) Převede souřadnice grafu přímo na rasterizovaný maticový obrázek v paměti grafické karty.",
+      "C) Zamezuje blikání obrazovky tím, že zakáže překreslování os a popisků v každém snímku animace.",
+      "D) Automaticky přepíná vykreslování dat do samostatného výpočetního vlákna operačního systému."
+    ],
+    "answer": 0,
+    "explanation": "Volání pyplot.plot() při každém kroku vytváří a přidává nové Line2D objekty do os grafu, což vede k rychlému zpomalení (přetížení paměti i vykreslovací smyčky). Metoda set_data() pouze aktualizuje vnitřní pole existující čáry."
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte název metody objektu čáry z Matplotlib pro aktualizaci zobrazovaných dat v probíhající animaci.\n\n```python\n# Doplňte název metody objektu čáry z Matplotlib pro aktualizaci zobrazovaných dat v probíhající animaci.\nvysledek = ________\n```",
+    "code": "line, = plt.plot([], [])\ndef update(x_new, y_new):\n    line.________(x_new, y_new)\n    plt.draw()",
+    "options": [
+      "set_data — aktualizuje souřadnice bodů existujícího vykreslovacího objektu čáry.",
+      "update_plot — vyvolá znovuvykreslení celého plátna grafu",
+      "set_values — nastaví nové pole hodnot",
+      "append_data — přidá nové souřadnice bodů na konec stávajícího datového pole čáry."
+    ],
+    "answer": 0,
+    "explanation": "Metoda Line2D.set_data(xdata, ydata) přijímá nové sekvence souřadnic X a Y a přiřadí je existujícímu objektu čáry, což je klíčové pro plynulé a výkonné animace."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "K čemu slouží funkce pyplot.pause(interval) při vytváření jednoduchých animací v knihovně Matplotlib?",
+    "options": [
+      "A) Pozastaví běh skriptu na zadaný čas v sekundách a vynutí aktualizaci vykreslovaného okna grafu.",
+      "B) Zastaví nahrávání animace do MP4 souboru a vytvoří v daném místě kontrolní snímek pro pauzu.",
+      "C) Uloží aktuální stav grafu do paměťového vyrovnávacího zásobníku pro kešování snímků.",
+      "D) Přepne grafický okenní subsystém z interaktivního režimu do statického zobrazení okna."
+    ],
+    "answer": 0,
+    "explanation": "plt.pause(interval) zavolá interně přikreslení celého okna (plt.draw()) a přeruší vykonávání skriptu na stanovený interval. To umožňuje sledovat vývoj grafu v reálném čase bez nutnosti stavět komplexní objekt FuncAnimation."
+  },
+  {
+    "id": "q4",
+    "type": "true_false_tricky",
+    "question": "Posouzení externích závislostí při ukládání animace z Matplotlib do video formátu metodou animation.save():",
+    "options": [
+      "A) Uložení animace do video formátu (např. MP4) vyžaduje mít v systému nainstalovaný externí enkodér jako ffmpeg.",
+      "B) Knihovna Matplotlib obsahuje vlastní integrovaný enkodér, takže zápis MP4 probíhá bez jakýchkoli závislostí."
+    ],
+    "answer": 0,
+    "explanation": "Matplotlib sám o sobě neobsahuje enkodéry pro komprimované video formáty. Metoda save() spouští na pozadí externí systémové nástroje jako ffmpeg nebo mencoder (konfigurovatelné přes parametr writer)."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Co přesně vrací standardní vykreslovací funkce pyplot.plot() a jak se tato hodnota využívá v ArtistAnimation?",
+    "options": [
+      "A) Vrací seznam objektů typu Line2D, které se postupně ukládají do seznamu snímků animace.",
+      "B) Vrací dvourozměrné pole raw bajtů obrázku určené k přímému uložení do paměťového streamu.",
+      "C) Vrací unikátní celočíselný identifikátor snímku vytvořeného na plátně grafického okna.",
+      "D) Vrací pravdivostní hodnotu True indikující úspěšné vykreslení dané čáry na obrazovku."
+    ],
+    "answer": 0,
+    "explanation": "pyplot.plot() vrací seznam vykreslených prvků (tzv. artists, typicky seznam instancí Line2D). Třída ArtistAnimation přijímá jako hlavního průvodce seznam takovýchto seznamů artistů představujících jednotlivé snímky."
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaký výsledek vyprodukuje následující kód vytvářející animaci pomocí ArtistAnimation?",
+    "code": "fig, ax = plt.subplots()\nframes = []\nfor i in range(5):\n    line, = ax.plot([0, 1], [0, i], 'r-')\n    frames.append([line])\nanim = animation.ArtistAnimation(fig, frames, interval=200)",
+    "options": [
+      "A) Vytvoří se animace zobrazující v každém kroku čáru spojující bod (0,0) s bodem (1,i).",
+      "B) Nastane chyba TypeError, protože ArtistAnimation přijímá pouze funkce, nikoli seznamy prvků.",
+      "C) Graf zobrazí pouze poslední červenou čáru a předchozí snímky budou automaticky smazány.",
+      "D) Všechny čáry se vykreslí najednou přes sebe v jediném statickém snímku zcela bez animace."
+    ],
+    "answer": 0,
+    "explanation": "ArtistAnimation projde seznam frames a v zadaném časovém intervalu (zde 200 ms) zobrazuje pouze artisty přiřazené k danému snímku (v tomto případě příslušnou čáru line)."
+  }
+]

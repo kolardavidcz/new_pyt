@@ -1,0 +1,106 @@
+[
+  {
+    "id": "q1",
+    "type": "predict_output",
+    "question": "Jaký datový typ mají proměnné args a kwargs uvnitř těla následující funkce?\n\ndef f(*args, **kwargs):\n    print(type(args), type(kwargs))\n\nf(1, 2, a=3)",
+    "options": [
+      "A) args je typu tuple (n-tice) a kwargs je typu dict (slovník).",
+      "B) args je typu list (seznam) a kwargs je typu dict (slovník).",
+      "C) args je typu tuple (n-tice) a kwargs je typu list (seznam).",
+      "D) args je typu list (seznam) a kwargs je typu set (množina)."
+    ],
+    "answer": 0,
+    "explanation": "Operátor * zabalí přebytečné poziční argumenty do n-tice (tuple), zatímco operátor ** zabalí přebytečné pojmenované argumenty do slovníku (dict)."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jaký výstup vytvoří volání následující funkce s variabilním počtem argumentů?\n\ndef f(a, *args, b):\n    return a + sum(args) + b\n\nprint(f(1, 2, 3, 4, b=5))",
+    "options": [
+      "A) Vypíše číslo 15, protože a=1, args=(2, 3, 4) a b je předáno jako povinný keyword-only argument b=5.",
+      "B) Vyvolá výjimku SyntaxError, protože parametr s hvězdičkou *args musí být až na úplném konci definice.",
+      "C) Vyvolá výjimku TypeError, protože argument b se pokusí odebrat hodnotu 4 z n-tice pozičních argumentů.",
+      "D) Vypíše číslo 10, protože hodnota b=5 přepíše poslední prvek n-tice args a sečte pouze předané hodnoty."
+    ],
+    "answer": 0,
+    "explanation": "Parametru a se přiřadí 1, n-tice *args zachytí zbývající poziční argumenty (2, 3, 4) a parametr b umístěný za *args vyžaduje volání jako pojmenovaný argument b=5. Součet 1 + 9 + 5 je 15."
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte chybějící token do definice funkce tak, aby parametr key musel být volán výhradně jako pojmenovaný argument:\n\ndef compare(a, b, ________, key=None):\n    pass\n\n```python\n# Doplňte chybějící token do definice funkce tak, aby parametr key musel být volán výhradně jako pojmenovaný argument:\n\ndef compare(a, b, ________, key=None):\n    pass\nvysledek = ________\n```",
+    "options": [
+      "*",
+      "/",
+      "**",
+      "*args"
+    ],
+    "answer": 0,
+    "explanation": "Samostatná hvězdička * v seznamu parametrů vynucuje, že všechny následující parametry mohou být předány pouze jako pojmenované (keyword-only)."
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Doplňte chybějící token do definice funkce tak, aby parametry a a b musely být volány výhradně pozičně:\n\ndef process(a, b, ________, mode='fast'):\n    pass\n\n```python\n# Doplňte chybějící token do definice funkce tak, aby parametry a a b musely být volány výhradně pozičně:\n\ndef process(a, b, ________, mode='fast'):\n    pass\nvysledek = ________\n```",
+    "options": [
+      "/",
+      "*",
+      "**",
+      "*pos"
+    ],
+    "answer": 0,
+    "explanation": "Znak / (od Pythonu 3.8) určuje hranici pozičně-omezených parametrů (positional-only). Všechny parametry před / nesmí být při volání předány pomocí jména."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Jaký výstup vyprodukuje postupné dvojí zavolání funkce s výchozím proměnným argumentem?\n\ndef append_to(element, target=[]):\n    target.append(element)\n    return target\n\nprint(append_to(1))\nprint(append_to(2))",
+    "options": [
+      "A) První volání vrátí [1] a druhé volání vrátí [1, 2], protože seznam target se vytvoří pouze jednou.",
+      "B) První volání vrátí [1] a druhé volání vrátí [2], protože seznam target se vytvoří při každém volání.",
+      "C) První volání vrátí [1] a druhé volání vyvolá TypeError, protože seznam target nelze opakovaně měnit.",
+      "D) Obě volání vrátí hodnotu None, protože metoda append upravuje seznam na místě a nic nevrací."
+    ],
+    "answer": 0,
+    "explanation": "Jelikož se výchozí hodnota target=[] vyhodnotí pouze jednou při definici funkce, všichni volající bez zadaného argumentu sdílejí stejný objekt seznamu v paměti. Metoda .append() ho mutuje, takže druhý dotaz obdrží kumulovaný seznam [1, 2]."
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaký výstup vytvoří následující kód demonstrující předávání proměnných objektů do funkce?\n\ndef modify(lst):\n    lst[0] = 99\n    lst = [100, 200]\n\ndata = [1, 2]\nmodify(data)\nprint(data)",
+    "options": [
+      "A) Vypíše [99, 2], protože zápis do prvku lst[0] změní původní objekt, zatímco přiřazení do lst jen předefinuje lokální jméno.",
+      "B) Vypíše [100, 200], protože přiřazení nového seznamu do proměnné lst přepíše původní objekt data předaný odkazem.",
+      "C) Vypíše [1, 2], protože všechny argumenty se v Pythonu předávají výhradně hodnotou a lokální změny se neprojeví.",
+      "D) Vyvolá výjimku UnboundLocalError, protože proměnná lst je v těle funkce modifikována i znovu přiřazována."
+    ],
+    "answer": 0,
+    "explanation": "Zápis lst[0] = 99 modifikuje obsah původního objektu seznamu v paměti (data). Následující přiřazení lst = [100, 200] pouze přesměruje lokální nálepku lst na úplně nový objekt seznamu, čímž zruší odkaz na data, ale neovlivní již změněný vnější seznam."
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Jaký je idiomatický způsob řešení výchozí hodnoty pro mutable parametr (např. seznam) v Pythonu?",
+    "options": [
+      "A) Nastavit výchozí hodnotu na None a uvnitř těla funkce vytvořit nový seznam pomocí podmínky if param is None.",
+      "B) Použít jako výchozí hodnotu prázdnou n-tici () a v těle funkce ji předisponovat pomocí konverze na list(param).",
+      "C) Nastavit výchozí hodnotu na copy.deepcopy([]) přímo v hlavičce definice parametrů dané funkce.",
+      "D) Využít dekorátor @classmethod pro automatické vytvoření nové instance seznamu při každém zavolání."
+    ],
+    "answer": 0,
+    "explanation": "Standardním návrhovým vzorem v Pythonu je použít param=None v hlavičce a uvnitř funkce provést if param is None: param = []. Tím se zaručí, že při každém volání bez argumentu vznikne zcela nový samostatný objekt."
+  },
+  {
+    "id": "q8",
+    "type": "multiple_choice",
+    "question": "Co se stane při spuštění následujícího kódu s pozičně-omezeným parametrem?\n\ndef calc(x, /, y):\n    return x + y\n\nprint(calc(x=2, y=3))",
+    "options": [
+      "A) Vyvolá TypeError, protože parametr x se nachází před lomítkem / a nesmí být předán jako pojmenovaný.",
+      "B) Vypíše číslo 5, protože lomítko / je pouze orientační záložka a předávání jmen argumentů neomezuje.",
+      "C) Vyvolá SyntaxError, protože lomítko / v definici parametrů není platným syntaktickým prvkem Pythonu.",
+      "D) Vypíše číslo 5, pokud je zadaný parametr y pozičně a x pojmenovaně v libovolném pořadí argumentů."
+    ],
+    "answer": 0,
+    "explanation": "Znak / označuje, že všechny před ním uvedené parametry (zde x) jsou positional-only. Pokus o jejich předání pomocí jména x=2 skončí s TypeError: calc() got some positional-only arguments passed as keyword arguments: 'x'."
+  }
+]

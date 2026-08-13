@@ -1,0 +1,104 @@
+[
+  {
+    "id": "q1",
+    "type": "predict_output",
+    "question": "Jaké výstupy a v jakém pořadí vytiskne následující kód?\n\ntry:\n    x = 1 / 1\nexcept ZeroDivisionError:\n    print('E')\nelse:\n    print('L')\nfinally:\n    print('F')",
+    "options": [
+      "A) Vytiskne L a potom F.",
+      "B) Vytiskne E a potom F.",
+      "C) Vytiskne pouze text L.",
+      "D) Vytiskne F a potom L."
+    ],
+    "answer": 0,
+    "explanation": "Větev else se provede pouze v případě, že v bloku try nedošlo k žádné výjimce. Větev finally se provede vždy."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Proč je chyba uvést except Exception: před except ValueError:?",
+    "options": [
+      "A) ValueError dědí z Exception, takže první větev zachytí vše a druhá se nikdy nespustí.",
+      "B) Exception dědí z ValueError, takže druhá větev vyvolá při kompilaci chybu SyntaxError.",
+      "C) ValueError se automaticky převádí na Exception a způsobí nečekaný pád celého programu.",
+      "D) Druhý blok except alokuje paměťové zdroje, které rodičovská třída automaticky uvolní."
+    ],
+    "answer": 0,
+    "explanation": "Python vyhodnocuje except bloky shora dolů. Jelikož ValueError dědí z Exception, obecný except Exception: zachytí i ValueError a ke specifičtějšímu bloku se řízení nedostane."
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte syntakticky správné zachycení dvou výjimek současně v jedné větví except:\n\n```python\n# Doplňte syntakticky správné zachycení dvou výjimek současně v jedné větví except:\nvysledek = ________\n```",
+    "options": [
+      "except (TypeError, ValueError):",
+      "except {TypeError, ValueError}:",
+      "except [TypeError, ValueError]:",
+      "except <TypeError, ValueError>:"
+    ],
+    "answer": 0,
+    "explanation": "Pro zachycení více typů výjimek současně v jedné větvi except musí být tyto třídy zapsány jako n-tice (tuple) v závorkách."
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Doplňte příkaz pro opětovné vyvolání právě odchycené výjimky dále po hierarchii:\n\n```python\n# Doplňte příkaz pro opětovné vyvolání právě odchycené výjimky dále po hierarchii:\nvysledek = ________\n```",
+    "options": [
+      "raise",
+      "throw",
+      "yield",
+      "retry"
+    ],
+    "answer": 0,
+    "explanation": "Příkaz raise bez argumentu uvnitř bloku except znovu vyvolá aktuálně zpracovávanou výjimku směrem nahoru ve volajícím zásobníku."
+  },
+  {
+    "id": "q5",
+    "type": "predict_output",
+    "question": "Co vytiskne příkaz print(ex.args) po zachycení výjimky vyvolané jako raise ValueError('a', 'b')?",
+    "options": [
+      "A) N-tici prvků ('a', 'b').",
+      "B) Seznam prvků ['a', 'b'].",
+      "C) Množinu prvků {'a', 'b'}.",
+      "D) Spojený text ('a' + 'b')."
+    ],
+    "answer": 0,
+    "explanation": "Všechny positional argumenty předané konstruktoru výjimky se ukládají do atributu .args jako n-tice (tuple)."
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaká je doporučená minimální definice vlastní uživatelské třídy výjimky v Pythonu?",
+    "options": [
+      "A) Třída dědící z Exception: class AppError(Exception): pass",
+      "B) Třída dědící z BaseException: class AppErr(BaseException): pass",
+      "C) Třída dědící z obecného object: class AppError(object): pass",
+      "D) Třída dědící ze SystemExit: class AppError(SystemExit): pass"
+    ],
+    "answer": 0,
+    "explanation": "Uživatelské výjimky by měly dědit z třídy Exception (nikoliv přímo z BaseException, ze které dědí i systémové výjimky jako KeyboardInterrupt nebo SystemExit)."
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Co se stane s příkazy assert při spuštění skriptu s parametrem python -O script.py?",
+    "options": [
+      "A) Příkazy assert jsou z kódu zcela odstraněny a vůbec se nevykonají.",
+      "B) Příkazy assert vyvolají výjimku AssertionError při každém selhání.",
+      "C) Příkazy assert pouze vypíší varování do konsole a program běží dál.",
+      "D) Příkazy assert se automaticky převedou na klasickou podmínku if not."
+    ],
+    "answer": 0,
+    "explanation": "Při spuštění Pythonu s příznakem optimalizace -O je proměnná __debug__ nastavena na False a všechny příkazy assert jsou bytecode kompilátorem zcela odstraněny."
+  },
+  {
+    "id": "q8",
+    "type": "true_false_tricky",
+    "question": "Konstrukce try: ... except: bez specifikace třídy odchytí i přerušení programu klávesnicí KeyboardInterrupt.",
+    "options": [
+      "A) Pravda – holé except: odchytává všechny výjimky odvozené z BaseException.",
+      "B) Nepravda – holé except: odchytává výhradně výjimky odvozené z Exception."
+    ],
+    "answer": 0,
+    "explanation": "Holé except: bez specifikace třídy odchytává všechny výjimky odvozené z BaseException, tedy včetně KeyboardInterrupt a SystemExit."
+  }
+]

@@ -1,0 +1,78 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Které magické číslo v hlavičce souboru PNM označuje binární formát pro RGB obrázek (PPM)?",
+    "options": [
+      "A) P6",
+      "B) P3",
+      "C) P5",
+      "D) P4"
+    ],
+    "answer": 0,
+    "explanation": "Magická čísla P1/P4 patří PBM, P2/P5 patří PGM a P3/P6 patří PPM. Sudá čísla označují binární kódování, tudíž binární RGB obrázek je P6."
+  },
+  {
+    "id": "q2",
+    "type": "predict_output",
+    "question": "Co v monochromatických formátech PBM (P1 a P4) představují bity či čísla 0 a 1?",
+    "options": [
+      "A) 0 představuje bílou barvu (pozadí) a 1 představuje černou barvu (popředí).",
+      "B) 0 představuje černou barvu (popředí) a 1 představuje bílou barvu (pozadí).",
+      "C) 0 představuje průhlednost a 1 představuje maximální nastavenou barvu.",
+      "D) Hodnoty 0 a 1 jsou závislé výhradně na zvoleném nastavení palety v hlavičce."
+    ],
+    "answer": 0,
+    "explanation": "V formátu PBM označuje hodnota 0 bílé pozadí a hodnota 1 černou barvu. To je opacně oproti šedotónovým formátům PGM, kde 0 znamená nejtmavší (černou)."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jak jsou uložena grafická data pixelů v binární variantě P4 formátu PBM?",
+    "options": [
+      "A) Každý bajt obsahuje přesně 8 pixelů, kde jednotlivé bity odpovídají černobílým pixelům.",
+      "B) Každému pixelu odpovídá právě jeden celý bajt obsahující hodnotu 0x00 nebo 0xFF.",
+      "C) Každé dva pixely jsou sloučeny do jednoho bajtu v podobě čtyřbitových nibblů.",
+      "D) Pixely jsou komprimovány jednoduchým během opakovaných hodnot RLE do bajtů."
+    ],
+    "answer": 0,
+    "explanation": "V binárním PBM (P4) je pro úsporu 8 pixelů sloučeno do 1 bajtu. Pokud šířka obrázku není násobkem 8, přebytečné bity v posledním bajtu se doplňují nulami."
+  },
+  {
+    "id": "q4",
+    "type": "predict_output",
+    "question": "Jaký problém nastává při zapsání binárního formátu P5 nebo P6 na systému Windows s koncem řádek \\r\\n?",
+    "options": [
+      "A) Znak \\r poslouží jako oddělovač hlavičky a znak \\n je chybě interpretován jako první bajt dat.",
+      "B) Hlavička souboru je parserem odmítnuta jako neplatná z důvodu nálezu nepovolených znaků.",
+      "C) Soubor se sice otevře, ale barevná data všech pixelů se posunou o 8 bitů v barevné paletě.",
+      "D) Zpracovávající aplikace zkonvertuje dvoubajtový konec řádky na jediný mezerní bajt."
+    ],
+    "answer": 0,
+    "explanation": "Binární data v PNM musí začínat těsně za jediným whitespace bajtem. Při Windows konci řádek \\r\\n ukončí znak \\r (CR) hlavičku a znak \\n (LF, 0x0A) přečte dekodér jako první datový bajt."
+  },
+  {
+    "id": "q5",
+    "type": "fill_blank_choice",
+    "question": "Doplňte správné pořadí uložení bajtů barvových složek pro každý pixel v binárním formátu P6.\n\n```text\nPo hlavičce následují pro každý pixel 3 bajty v pořadí: ________\n```",
+    "options": [
+      "R, G, B (červená, zelená, modrá)",
+      "B, G, R (modrá, zelená, červená)",
+      "G, R, B (zelená, červená, modrá)",
+      "R, G, B, A (červená, zelená, modrá, alfa)"
+    ],
+    "answer": 0,
+    "explanation": "Formát PPM ukládá barevné složky striktně v kanálovém pořadí R (Red), G (Green), B (Blue). V P6 připadají na každý pixel právě tyto 3 bajty."
+  },
+  {
+    "id": "q6",
+    "type": "true_false_tricky",
+    "question": "Posuďte způsob zápisu hlavičky u binárních variant PNM (P4, P5, P6).",
+    "options": [
+      "A) Pravda: Hlavička binárních variant je zapsána v ASCII textu úplně stejně jako u ASCII variant.",
+      "B) Nepravda: Hlavička binárních variant je uložena v binární struktuře s pevnou délkou bajtů."
+    ],
+    "answer": 0,
+    "explanation": "Všechny formáty PNM (ASCII i binární P4-P6) mají hlavičku (identifikátor, rozměry, max hodnota) uloženu v kódování ASCII. Změna na binární uložení se týká výhradně samotných dát za hlavičkou."
+  }
+]

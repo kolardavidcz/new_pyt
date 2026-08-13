@@ -1,0 +1,65 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "V jakém okamžiku vyvolá Python výjimku TypeError, pokud podtřída neodvozená od ABC neobsahuje implementaci abstraktní metody rodiče?\n\n```python\nfrom abc import ABCMeta, abstractmethod\n\nclass Base(metaclass=ABCMeta):\n    @abstractmethod\n    def compute(self):\n        pass\n\nclass Sub(Base):\n    pass\n```",
+    "options": [
+      "A) Při pokusu o vytvoření instance s = Sub(), kde Python ověří kompletnost abstraktních metod v rozhraní.",
+      "B) Až při pokusu o přímé zavolání chybějící metody s.compute(), podobně jako u výjimky NotImplementedError.",
+      "C) Již při samotné definici třídy class Sub(Base):, kdy interpret prochází a překládá kód tridy.",
+      "D) K žádné výjimce nedojde, protože podtřída automaticky podědí prázdnou implementaci metody compute od Base."
+    ],
+    "answer": 0,
+    "explanation": "Použití ABCMeta a @abstractmethod způsobí, že kontrola rozhraní proběhne již u instanciace třídy Sub(). Pokus o vytvoření instance vyvolá TypeError: Can't instantiate abstract class Sub with abstract method compute."
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte správný název metatřídy z modulu abc, která umožňuje definici abstraktních tříd a metod:\n\n```python\nfrom abc import ________, abstractmethod\n\nclass Plugin(metaclass=________):\n    @abstractmethod\n    def run(self):\n        pass\n```",
+    "options": [
+      "ABCMeta",
+      "ABC",
+      "AbstractClass",
+      "BaseMeta"
+    ],
+    "answer": 0,
+    "explanation": "Třída ABCMeta z modulu abc je metatřída určující chování abstraktních tříd v Pythonu."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jaké je správné pořadí vrstvení dekorátorů při definici abstraktní třídní metody (@classmethod)?",
+    "options": [
+      "A) @classmethod musí být jako vnější dekorátor a @abstractmethod jako vnitřní dekorátor přímo nad def.",
+      "B) @abstractmethod musí být jako vnější dekorátor a @classmethod jako vnitřní dekorátor přímo nad def.",
+      "C) Pořadí obou dekorátorů je libovolné, protože dekorátor @abstractmethod automaticky detekuje okolní metody.",
+      "D) Dekorační funkce @classmethod a @abstractmethod nelze u jedné metody v Pythonu vůbec kombinoat."
+    ],
+    "answer": 0,
+    "explanation": "Podle dokumentace Pythonu musí být @abstractmethod aplikován jako poslední (tzn. nejblíže k samotné funkci u příkazu def), zatímco @classmethod (nebo @staticmethod či @property) balí až takto označenou abstraktní metodu."
+  },
+  {
+    "id": "q4",
+    "type": "true_false_tricky",
+    "question": "Zaregistrování třídy jako virtuální podtřídy pomocí ABC.register(CustomClass) způsobí, že CustomClass zdědí všechny metody a atributy definované v ABC.",
+    "options": [
+      "A) Tvrzení je nepravdivé; metoda register() ovlivní pouze kontrolu přes isinstance a issubclass, ale nezajišťuje žádnou dědičnost kódových metod.",
+      "B) Tvrzení je pravdivé; dynamická registrace přes register() vloží objekt ABC do proměnné __bases__ třídy CustomClass a zpřístupní její metody."
+    ],
+    "answer": 0,
+    "explanation": "Funkce register() slouží pouze k registraci virtuálních podtříd. Ovlivňuje introspekci (isinstance(CustomClass(), ABC) bude True), ale neodvodí třídu v MRO a nepředá žádné metody z ABC do CustomClass."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Proč je použití ABCMeta a @abstractmethod pedagogicky i architektonicky výhodnější než pouhé vyvolávání raise NotImplementedError() v těle metod rodiče?",
+    "options": [
+      "A) Odhalí neúplnou implementaci API již při tvorbě instance, nikoliv až v momentu zavolání neimplementované metody.",
+      "B) Automaticky vygeneruje výchozí prázdné implementace pro všechny abstraktní metody přímo u odvozené třídy.",
+      "C) Umožňuje spouštět neimplementované metody bez vyvolání jakékoliv výjimky s výchozí návratovou hodnotou None.",
+      "D) Zajišťuje výrazné zrychlení běhu kódu zkompilováním abstraktních metod do nativních instrukcí CPythonu."
+    ],
+    "answer": 0,
+    "explanation": "Použití raise NotImplementedError() v těle metody selže až ve chvíli, kdy kód v produkci danou metodu zavolá. Použití ABCMeta zabrání samotné instanciaci objektu, čímž chybu neúplného rozhraní odhalí ihned."
+  }
+]

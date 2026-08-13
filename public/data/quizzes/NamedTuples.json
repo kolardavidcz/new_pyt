@@ -1,0 +1,78 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Co se stane při pokusu o zavedení pojmenované n-tice `namedtuple('Point', 'x class y')`?",
+    "options": [
+      "A) Vytvoří se typ `Point`, kde se nepovolené jméno automaticky nahradí za `_1`.",
+      "B) Vyvolá se `ValueError`, protože `'class'` je vyhrazené klíčové slovo Pythonu.",
+      "C) Vyvolá se `SyntaxError`, protože jména prvků musí být zadána v seznamu.",
+      "D) Vytvoří se typ `Point`, ale k atributu `'class'` lze přistupovat jen indexem."
+    ],
+    "answer": 1,
+    "explanation": "Výchozí nastavení rename=False vyvolá ValueError, pokud název pole obsahuje vyhrazené klíčové slovo."
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte kód pro vytvoření nové instance `Point` s upravenou souřadnicí `x`, aniž by se změnila původní neměnná instance `p`:\n\nPoint = namedtuple('Point', 'x y')\np = Point(1, 2)\nnew_p = p.________(x=10)\n\n```python\n# Doplňte kód pro vytvoření nové instance `Point` s upravenou souřadnicí `x`, aniž by se změnila původní neměnná instance `p`:\n\nPoint = namedtuple('Point', 'x y')\np = Point(1, 2)\nnew_p = p.________(x=10)\nvysledek = ________\n```",
+    "options": [
+      "replace",
+      "_make",
+      "_replace",
+      "update"
+    ],
+    "answer": 2,
+    "explanation": "Metoda _replace(**kwargs) vytvoří novou pojmenovanou n-tici s aktualizovanými hodnotami prvků, zatímco původní instance zůstane nezměněna."
+  },
+  {
+    "id": "q3",
+    "type": "predict_output",
+    "question": "Jaké pole bude vytvořeno na čtvrtém místě při spuštění příkazu `namedtuple('Item', 'name price qty price', rename=True)`?",
+    "options": [
+      "A) Název `_4` vzniklý nahrazením duplikátu podtržítkem s pořadím prvku.",
+      "B) Název `price_1` vzniklý automatickým přidáním pořadového čísla.",
+      "C) Název `_3` vzniklý nahrazením duplikátu podtržítkem s indexem pole.",
+      "D) Název `_price` vzniklý přidáním úvodního podtržítka před název."
+    ],
+    "answer": 2,
+    "explanation": "Při zapnutí rename=True se duplicitní jméno nahradí podtržítkem a jeho číselným indexem pole (index 3), tedy _3."
+  },
+  {
+    "id": "q4",
+    "type": "predict_output",
+    "question": "Jaký bude výstup příkazu `p = Person._make(['Alice', 30]); print(p.name, p[1])` pro `Person = namedtuple('Person', 'name age')`?",
+    "options": [
+      "A) Textový výstup `Alice Alice` způsobený načtením stejného prvku v obou případech.",
+      "B) Textový výstup `Alice 30` získaný kombinačním přístupem přes jméno i index.",
+      "C) Textový výstup `30 30` způsobený přečtením druhé hodnoty ze vstupního seznamu.",
+      "D) Chybová výjimka `TypeError` vyvolaná předáním seznamu místo n-tice do `_make()`."
+    ],
+    "answer": 1,
+    "explanation": "Metoda _make() vytvoří instanci z iterovatelného objektu. Prvky jsou přístupné přes atribut p.name ('Alice') i index p[1] (30)."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Proč pomocné metody třídy `namedtuple` (například `_fields`, `_make`, `_replace`) začínají podtržítkem?",
+    "options": [
+      "A) Aby se uživateli zabránilo v jejich volání z důvodu interní privatizace.",
+      "B) Aby se vyhovělo striktnímu pravidlu PEP 8 pro označování metod třídy.",
+      "C) Aby se předešlo konfliktu jmen s uživatelsky definovanými poli n-tice.",
+      "D) Aby se odlišily od metod jazyka C, které jsou v knihovně implementovány."
+    ],
+    "answer": 2,
+    "explanation": "Úvodní podtržítko u metod namedtuple předchází konfliktům s názvy uživatelských atributů."
+  },
+  {
+    "id": "q6",
+    "type": "true_false_tricky",
+    "question": "Příkaz `p.x = 5` uspěje a změní souřadnici `x` u vytvořené instance `p = Point(1, 2)`.",
+    "options": [
+      "A) Tvrzení je nepravdivé, protože pojmenované n-tice jsou neproměnné (`immutable`) stejně jako běžné n-tice.",
+      "B) Tvrzení je pravdivé, protože pojmenovaná n-tice funguje jako standardní třída s měnitelnými atributy."
+    ],
+    "answer": 0,
+    "explanation": "Instance namedtuple je neproměnná (immutable), takže pokus o zapsání nového atributu vyvolá AttributeError."
+  }
+]

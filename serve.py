@@ -164,6 +164,37 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urlparse(self.path)
+        if parsed.path.startswith("/api/sync"):
+            from urllib.parse import parse_qs
+            qs = parse_qs(parsed.query)
+            key = (qs.get("key") or qs.get("k") or [""])[0]
+            if not key:
+                self.send_error(400, "Missing key parameter")
+                return
+            kv_url = "https://tough-husky-101028.upstash.io"
+            kv_token = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA"
+            try:
+                import urllib.request
+                req = urllib.request.Request(
+                    f"{kv_url}/get/{urllib.parse.quote(key)}",
+                    headers={"Authorization": f"Bearer {kv_token}"}
+                )
+                with urllib.request.urlopen(req, timeout=4) as resp:
+                    resp_bytes = resp.read()
+                    self.send_response(200)
+                    self.send_header("Content-Type", "application/json; charset=utf-8")
+                    self.send_header("Content-Length", str(len(resp_bytes)))
+                    self.end_headers()
+                    self.wfile.write(resp_bytes)
+            except Exception as e:
+                err_resp = json.dumps({"result": None, "error": str(e)}).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(err_resp)))
+                self.end_headers()
+                self.wfile.write(err_resp)
+            return
+
         fs_path = resolve_url_path(parsed.path)
 
         if fs_path is None:
@@ -197,27 +228,63 @@ class Handler(SimpleHTTPRequestHandler):
         except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, OSError):
             pass
 
-    def do_HEAD(self):
-        parsed = urlparse(self.path)
-        fs_path = resolve_url_path(parsed.path)
-        if fs_path is None:
-            self.send_error(404, f"Not found: {parsed.path}")
-            return
-        try:
-            size = fs_path.stat().st_size
-        except OSError as e:
-            self.send_error(500, str(e))
-            return
-        ctype, _ = mimetypes.guess_type(str(fs_path))
-        if ctype is None:
-            ctype = "application/octet-stream"
-        self.send_response(200)
-        self.send_header("Content-Type", ctype)
-        self.send_header("Content-Length", str(size))
-        self.end_headers()
-
     def do_POST(self):
         parsed = urlparse(self.path)
+        if parsed.path.startswith("/api/sync"):
+            length = int(self.headers.get("Content-Length", 0))
+            raw_body = self.rfile.read(length)
+            kv_url = "https://tough-husky-101028.upstash.io"
+            kv_token = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA"
+            try:
+                import urllib.request
+                payload = json.loads(raw_body.decode("utf-8"))
+                if isinstance(payload, list):
+                    # Batched operations
+                    results = []
+                    for op in payload:
+                        if isinstance(op, dict) and op.get("key"):
+                            k = op["key"]
+                            v = op.get("val")
+                            set_req = urllib.request.Request(
+                                f"{kv_url}/set/{urllib.parse.quote(k)}",
+                                data=json.dumps(v).encode("utf-8"),
+                                headers={"Authorization": f"Bearer {kv_token}"},
+                                method="POST"
+                            )
+                            with urllib.request.urlopen(set_req, timeout=4) as resp:
+                                results.append({"key": k, "ok": resp.status == 200})
+                    resp_bytes = json.dumps({"status": "ok", "results": results}).encode("utf-8")
+                else:
+                    k = payload.get("key") if isinstance(payload, dict) else None
+                    v = payload.get("val") if isinstance(payload, dict) else payload
+                    if not k:
+                        from urllib.parse import parse_qs
+                        qs = parse_qs(parsed.query)
+                        k = (qs.get("key") or qs.get("k") or [""])[0]
+
+                    set_req = urllib.request.Request(
+                        f"{kv_url}/set/{urllib.parse.quote(k)}",
+                        data=json.dumps(v).encode("utf-8"),
+                        headers={"Authorization": f"Bearer {kv_token}"},
+                        method="POST"
+                    )
+                    with urllib.request.urlopen(set_req, timeout=4) as resp:
+                        resp_bytes = resp.read()
+
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(resp_bytes)))
+                self.end_headers()
+                self.wfile.write(resp_bytes)
+            except Exception as e:
+                err_resp = json.dumps({"status": "error", "message": str(e)}).encode("utf-8")
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(err_resp)))
+                self.end_headers()
+                self.wfile.write(err_resp)
+            return
+
         if parsed.path == "/api/question-improvement":
             length = int(self.headers.get("Content-Length", 0))
             raw_body = self.rfile.read(length)
