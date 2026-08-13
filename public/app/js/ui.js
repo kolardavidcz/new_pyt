@@ -59,12 +59,10 @@ export function flavorHtml(diff) {
 export function starsHtml(n, max = 10, variant = "compact", extra = {}) {
   let r = 5;
   let relTeacher = null;
-  let relStudent = null;
 
   if (typeof n === "object" && n !== null) {
-    r = Number(n.relevance || n.relevanceAI || 5);
-    relTeacher = n.relevanceTeacher;
-    relStudent = n.relevanceStudent;
+    r = Number(n.relevanceAI || n.relevance || 5);
+    relTeacher = n.relevanceTeacher !== undefined ? n.relevanceTeacher : null;
   } else {
     r = Number(n) || 5;
   }
@@ -72,25 +70,24 @@ export function starsHtml(n, max = 10, variant = "compact", extra = {}) {
   r = Math.max(1, Math.min(max, r));
 
   if (extra && typeof extra === "object") {
-    if (extra.teacher !== undefined) relTeacher = extra.teacher;
-    if (extra.student !== undefined) relStudent = extra.student;
+    if (extra.teacher !== undefined && extra.teacher !== null) {
+      relTeacher = Number(extra.teacher);
+    }
   }
 
-  // Sensible default multi-ratings for S (Student) and T (Teacher) if not explicitly set
-  if (relTeacher === null || relTeacher === undefined) {
-    relTeacher = r >= 9 ? r - 1 : r >= 6 ? r + 1 : r;
+  if (relTeacher !== null && !isNaN(relTeacher)) {
+    relTeacher = Math.max(1, Math.min(max, relTeacher));
+  } else {
+    relTeacher = null;
   }
-  if (relStudent === null || relStudent === undefined) {
-    relStudent = r >= 8 ? r - 3 : r >= 5 ? r - 1 : Math.max(1, r - 2);
-  }
-
-  relTeacher = Math.max(1, Math.min(max, Number(relTeacher)));
-  relStudent = Math.max(1, Math.min(max, Number(relStudent)));
 
   const level = r >= 8 ? "peak" : r >= 6 ? "high" : r >= 5 ? "mid" : "low";
-  const segs = segmentsHtml(r, max, relTeacher, relStudent);
+  const segs = segmentsHtml(r, max, relTeacher);
 
-  const titleText = `Relevance AI: ${r}/10, Teacher (T): ${relTeacher}/10, Student (S): ${relStudent}/10`;
+  let titleText = `Relevance AI: ${r}/10`;
+  if (relTeacher !== null) {
+    titleText += `, Teacher (T): ${relTeacher}/10`;
+  }
 
   if (variant === "compact") {
     return `<span class="rel-meter rel-compact rel-${level} rel-n-${r}" title="${escapeAttr(titleText)}">` +
@@ -108,33 +105,17 @@ export function starsHtml(n, max = 10, variant = "compact", extra = {}) {
     `<span class="rel-pill">${r}<span class="rel-max" style="font-size:9px; color:var(--text-faint);">/10</span></span></span>`;
 }
 
-function segmentsHtml(filled, max = 10, relTeacher = null, relStudent = null) {
+function segmentsHtml(filled, max = 10, relTeacher = null) {
   let html = "";
   for (let i = 1; i <= max; i++) {
     html += `<i class="rel-seg${i <= filled ? " on" : ""}" style="--i:${i}"></i>`;
   }
 
-  let offsetS = "translateX(-50%)";
-  let offsetT = "translateX(-50%)";
-
-  if (relTeacher !== null && relStudent !== null && relTeacher === relStudent) {
-    offsetS = "translateX(-90%)";
-    offsetT = "translateX(10%)";
-  }
-
-  // Teacher marker line (T - blue)
+  // Teacher marker line (T - white line & label) - ONLY if relTeacher is explicitly set
   if (relTeacher !== null && relTeacher >= 1 && relTeacher <= max) {
     const posT = relTeacher * 10 - 5;
-    html += `<span class="rel-marker rel-marker-teacher" style="left:${posT}%; transform:${offsetT};" title="Teacher (T): ${relTeacher}/10">` +
+    html += `<span class="rel-marker rel-marker-teacher" style="left:${posT}%;" title="Teacher (T): ${relTeacher}/10">` +
       `<span class="rel-marker-label">T</span>` +
-      `<span class="rel-marker-line"></span></span>`;
-  }
-
-  // Student marker line (S - white)
-  if (relStudent !== null && relStudent >= 1 && relStudent <= max) {
-    const posS = relStudent * 10 - 5;
-    html += `<span class="rel-marker rel-marker-student" style="left:${posS}%; transform:${offsetS};" title="Student (S): ${relStudent}/10">` +
-      `<span class="rel-marker-label">S</span>` +
       `<span class="rel-marker-line"></span></span>`;
   }
 

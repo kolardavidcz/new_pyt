@@ -361,8 +361,11 @@ export function loadRelevanceOverrides() {
   if (state.items && state.items.length) {
     state.items.forEach((item) => {
       const key = item.slug || item.id || item.path;
-      if (overrides[key] !== undefined) {
-        item.relevance = Number(overrides[key]);
+      if (item.relevanceAI === undefined) {
+        item.relevanceAI = item.relevance || 5;
+      }
+      if (overrides[key] !== undefined && overrides[key] !== null) {
+        item.relevanceTeacher = Number(overrides[key]);
       }
     });
   }
@@ -370,14 +373,22 @@ export function loadRelevanceOverrides() {
 }
 
 export function saveRelevanceOverride(deckKey, newRelevance) {
-  const relNum = Math.max(1, Math.min(10, Number(newRelevance) || 1));
   let overrides = {};
   try {
     const raw = localStorage.getItem(RELEVANCE_OVERRIDES_KEY);
     if (raw) overrides = JSON.parse(raw);
   } catch { /* ignore */ }
 
-  overrides[deckKey] = relNum;
+  const relNum = newRelevance !== null && newRelevance !== undefined && newRelevance !== ""
+    ? Math.max(1, Math.min(10, Number(newRelevance)))
+    : null;
+
+  if (relNum !== null) {
+    overrides[deckKey] = relNum;
+  } else {
+    delete overrides[deckKey];
+  }
+
   try {
     localStorage.setItem(RELEVANCE_OVERRIDES_KEY, JSON.stringify(overrides));
   } catch { /* ignore */ }
@@ -387,12 +398,13 @@ export function saveRelevanceOverride(deckKey, newRelevance) {
     state.items.forEach((item) => {
       const key = item.slug || item.id || item.path;
       if (key === deckKey) {
-        item.relevance = relNum;
+        item.relevanceTeacher = relNum;
       }
     });
   }
 
-  notifyStateChange("relevanceUpdated", { deckKey, relevance: relNum });
+  notifyStateChange("relevanceUpdated", { deckKey, relevanceTeacher: relNum });
+}
 
   // Optional Upstash sync
   try {

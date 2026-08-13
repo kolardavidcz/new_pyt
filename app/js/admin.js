@@ -441,17 +441,21 @@ function renderRelevanceTab() {
 
     container.innerHTML = items.map((it) => {
       const key = it.slug || it.id || it.path;
-      const rel = it.relevance || 5;
+      const relAI = it.relevanceAI || it.relevance || 5;
+      const relTeacher = it.relevanceTeacher !== undefined ? it.relevanceTeacher : "";
 
       return `
         <div class="admin-rel-row" style="font-family:var(--font-mono, monospace);">
           <div style="flex:1; min-width:0;">
             <strong style="font-size:13px; color:var(--fg);">${escapeHtml(it.title)}</strong>
-            <div style="font-size:11px; color:var(--fg-muted);">w${it.weekNum || 1} · <code>${escapeHtml(key)}</code></div>
+            <div style="font-size:11px; color:var(--fg-muted);">w${it.weekNum || 1} · <code>${escapeHtml(key)}</code> · <span style="color:#6a9955;">AI: ${relAI}/10</span></div>
           </div>
           <div style="display:flex; align-items:center; gap:12px;">
             <span class="rel-bar-preview">${starsHtml(it, 10, "bar")}</span>
-            <input type="number" min="1" max="10" value="${rel}" class="admin-rel-input rel-num-input" data-key="${escapeHtml(key)}" style="font-family:var(--font-mono); font-size:12px;" />
+            <div style="display:flex; align-items:center; gap:4px;">
+              <span style="font-size:11px; color:#ffffff; font-weight:700;">T:</span>
+              <input type="number" min="1" max="10" value="${relTeacher}" placeholder="T..." class="admin-rel-input rel-num-input" data-key="${escapeHtml(key)}" style="font-family:var(--font-mono); font-size:12px; width:55px;" />
+            </div>
             <button type="button" class="admin-btn-sm success btn-save-rel" data-key="${escapeHtml(key)}"><span class="prompt">$</span>save</button>
           </div>
         </div>
@@ -460,10 +464,13 @@ function renderRelevanceTab() {
 
     container.querySelectorAll(".rel-num-input").forEach((inp) => {
       inp.addEventListener("input", () => {
-        const val = Number(inp.value);
+        const val = inp.value !== "" ? Number(inp.value) : null;
+        const key = inp.getAttribute("data-key");
+        const item = items.find((i) => (i.slug || i.id || i.path) === key);
+        if (item) item.relevanceTeacher = val;
         const row = inp.closest(".admin-rel-row");
         const barEl = row?.querySelector(".rel-bar-preview");
-        if (barEl) barEl.innerHTML = starsHtml(val, 10, "bar");
+        if (barEl && item) barEl.innerHTML = starsHtml(item, 10, "bar");
       });
     });
 
@@ -472,9 +479,9 @@ function renderRelevanceTab() {
         const key = b.getAttribute("data-key");
         const row = b.closest(".admin-rel-row");
         const inp = row?.querySelector(".rel-num-input");
-        const val = Number(inp?.value || 5);
+        const val = inp?.value !== "" ? Number(inp?.value) : null;
         saveRelevanceOverride(key, val);
-        b.textContent = "Uloženo";
+        b.textContent = "Uloženo ✓";
         setTimeout(() => { b.innerHTML = `<span class="prompt">$</span>save`; }, 1200);
       });
     });
