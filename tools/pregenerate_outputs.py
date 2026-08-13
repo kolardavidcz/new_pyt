@@ -28,14 +28,19 @@ def main():
     for py_path in py_files:
         out_path = py_path.with_suffix(".out")
         
-        # Run python script in its directory
+        # Run python script in its directory with forced UTF-8 environment
         try:
+            env = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"}
             res = subprocess.run(
                 [sys.executable, py_path.name],
                 cwd=py_path.parent,
+                stdin=subprocess.DEVNULL,
                 capture_output=True,
                 text=True,
-                timeout=5
+                encoding="utf-8",
+                errors="replace",
+                env=env,
+                timeout=2
             )
             stdout = res.stdout
             if res.stderr and not stdout:
