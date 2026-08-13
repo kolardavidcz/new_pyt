@@ -1,0 +1,67 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jak se chová objekt vytvořený pomocí modulu mmap?",
+    "options": [
+      "A) Kombinuje rozhraní souborového proudu (read/seek) a měnitelného bajtového pole.",
+      "B) Funguje výhradně jako klasický textový řetězec str uložený v operační paměti.",
+      "C) Slouží jako databázový index pro rychlé vyhledávání v relacích na disku.",
+      "D) Automaticky šifruje a komprimuje souborová data zapsaná na pevný disk."
+    ],
+    "answer": 0,
+    "explanation": "Objekt mmap namapuje soubor přímo do paměti a poskytuje hybridní rozhraní – podporuje souborové metody (read, readline, seek) i přístup přes indexy a výřezy jako bytearray."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jaké omezení platí pro parametr offset při alokaci mmap.mmap()?",
+    "options": [
+      "A) Parametr offset musí být celočíselným násobkem mmap.ALLOCATIONGRANULARITY.",
+      "B) Offset může být libovolné číslo v rozsahu od 0 do celkové velikosti souboru.",
+      "C) Parametr offset musí vždy začínat od nuly, posun uvnitř souboru není podporován.",
+      "D) Parametr offset udává přesný počet textových řádků přeskočených při mapování."
+    ],
+    "answer": 0,
+    "explanation": "Operační systém vyžaduje Zarovnání offsetu paměťových stránek. V Pythonu musí být offset v mmap celočíselným násobkem mmap.ALLOCATIONGRANULARITY (obvykle 64 KiB / 65536 B)."
+  },
+  {
+    "id": "q3",
+    "type": "predict_output",
+    "question": "Jaký typ a hodnotu vrátí metoda read_byte() nad objektem mmap?\n\nimport mmap\nwith mmap.mmap(-1, 10) as m:\n    m.write(b'ABC')\n    m.seek(0)\n    val = m.read_byte()\n    print(val, type(val))",
+    "options": [
+      "A) 65 <class 'int'>",
+      "B) b'A' <class 'bytes'>",
+      "C) 'A' <class 'str'>",
+      "D) 0 <class 'int'>"
+    ],
+    "answer": 0,
+    "explanation": "Metoda read_byte() přečte 1 bajt a vrátí ho jako celé číslo (int, ASCII 65 pro 'A') a posune ukazatel o 1. Metoda read(1) by naopak vrátila bajtový objekt b'A' (bytes)."
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Jakým způsobem je nutné předat regulární výraz při vyhledávání v objektu mmap?",
+    "options": [
+      "A) Vzor musí být definován jako bajtový řetězec s předponou rb (např. rb'pattern').",
+      "B) Vzor musí být předán jako běžný textový Unicode řetězec str v kódování UTF-8.",
+      "C) Regulární výrazy nelze nad objektem mmap z důvodu paměťových omezení použít.",
+      "D) Vzor je nutné nejprve převést na celočíselné pole ASCII hodnot jednotlivých znaků."
+    ],
+    "answer": 0,
+    "explanation": "Jelikož mmap reprezentuje neopracovaná bajtová data v paměti, operace a regexpy nad mmap vyžadují bajtový vzor (byte regex pattern) s předponou rb''."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Co znamená předání hodnoty -1 jako prvního argumentu (fileno) do mmap.mmap(-1, length)?",
+    "options": [
+      "A) Vytvoří se anonymní paměťový blok neprovázaný se žádným konkrétním souborem.",
+      "B) Otevře se v režimu pro čtení naposledy modifikovaný soubor z pevného disku.",
+      "C) Funkce vyhodí výjimku ValueError z důvodu neplatného souborového popisovače.",
+      "D) Soubor se otevře v neomezeném režimu paměti, kde jeho délka může dynamicky rost."
+    ],
+    "answer": 0,
+    "explanation": "Hodnota fileno = -1 slouží k vytvoření anonymního alokovaného paměťového bloku (anonymous memory mapping) v RAM, který není vázán na žádný fyzický soubor na disku."
+  }
+]

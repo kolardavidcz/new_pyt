@@ -1,0 +1,42 @@
+{
+  "slug": "cgi",
+  "total": 6,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Dlouhá léta sloužil ke zpracování parametrů GETu a POSTu objekt <em>cgi.FieldStorage()</em>. V Python'u 3.11 se však při jeho importu objeví hlášení o deprikaci modulu <em>cgi</em> a jeho chystaném vyřazení v Python'u 3.13. Zároveň se v dokumentaci objevily poznámky, čím nahradit jeho funkcionalitu. Je však bohužel třeba říci, že zrovna v případě zpracování parametrů GETu a POSTu to vůbec není žádná výhra :-(\r\n    </p>\r\n    <p>\r\n        Pro GET a s oklikou i POST bez binárních dat náhradu obstará funkce <code>urllib.parse.parse_qs()</code>, pro POST s binárními daty ale balík <code>email.message.Message</code>, který přívětivostí zrovna moc neoplývá, nebo dokonce externí (sic!) knihovna <a href=\"https://pypi.org/project/multipart/\" class=\"external\"><em>multipart</em></a>! Můžeme jen doufat, že za ty dva tři roky, než k zahození modulu dojde, se situace zlepší…\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Ostatně původně měl být modul <em>cgi</em> označen za zastaralý již ve verzi 3.8 a zahozený ve 3.10. Tentokrát bych tomu ale bohužel už věřil. (PS 2024: A také se tak stalo…)\r\n    </div></div>\r\n    \r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "GET – „cgi.FieldStorage()“",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">GET – „cgi.FieldStorage()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pro získání „slovníkových“ hodnot z GETu je asi nejsnažší použití třídy <em>cgi.FieldStorage</em> a jejích metod, například <em>getvalue()</em> a <em>getlist()</em>, které si poradí třebas i s rozložením více hodnot ke stejným klíčům:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">💻 Command</div><pre class=\"brush: shell; gutter: false; toolbar: false; \">http://localhost:8080/?par1=ahoj&amp;par2=123&amp;par1=456</pre></div><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/cgi_fs/wsgi.3.py\"><em>cgi_fs/wsgi.3.py</em></a></div><example src=\"_files/cgi_fs/wsgi.3.py\" lang=\"python\"></example></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><example src=\"_files/cgi_fs/wsgi.3.out\" lang=\"text\"></example></div></div>\r\n    <p>\r\n        PS: Nezapomeňte však, že <strong>takto získané hodnoty jsou stále neošetřeny!</strong>\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "POST I",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">POST I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Data odeslaná metodou <em>POST</em> jsou také dostupná v rámci <em>environ</em>, ale na jiném místě – uvnitř objektu <em>wsgi.input</em> (který se tváří jako proud), takže se k nim asi nejsnáze dostanete následujícím způsobem:\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/cgi_fs/wsgi.4.py\"></example>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "POST IIa",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">POST IIa</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Výhodou předchozího kódu je, že za vás automaticky zpracuje i komplikovanější odpovědi, jako je např. nahrávání binárních souborů:\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/cgi_fs/wsgi.5.py\"></example>\r\n    \r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "POST IIb",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">POST IIb</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Funkce <em>print()</em> hned na začátku vyprodukuje na konzoli následující výstupy (za znakem <em>#</em> je komentář ke vstupu, který způsobil daný výstup; výstup je pro lepší čitelnost ručně zalámán):\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/cgi_fs/wsgi.5a.out\"></example>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Hlášení serveru kromě datumu a času obsahuje dále metodu, cíl a protokol plus návratový kód a velikost vráceného objektu (bez hlaviček; v bajtech).\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Při posledním z dotazů vypíše HTML-stránka (kromě prázdného formuláře) toto:\r\n    </p>\r\n    <example lang=\"text\" src=\"_files/cgi_fs/wsgi.5b.out\"></example>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Takže je jasné, proč je potřeba použít metodu <code>html.escape()</code>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Získávání parametrů – „getlist()“, „getfirst()“",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Získávání parametrů – „getlist()“, „getfirst()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož vaše API může zavolat kdokoli odkudkoli, nemůžete se spolehnout, že hodnot daného formulářového políčka bude jen a právě takový počet, jaký máte nadefinován ve formuláři. Obecně je proto jistější místo příliš obecné <em>getvalue()</em>, u jejíhož výstupu musíte rozlišovat, zda se jedná o seznam nebo jednu konkrétní hodnotu, používat následující metody:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong><em>getlist(KLÍČ)</em></strong> – vždy vrátí seznam, ať už prázdný (nebylo nic zadáno) nebo obsahující libovolný počet prvků;\r\n        </li>\r\n        <li>\r\n            <strong><em>getfirst(KLÍČ, default=None)</em></strong> – vždy vrátí jeden prvek, ať už je zadaný právě jenom jeden nebo i více, nebo přednastavenou hodnotu.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    }
+  ]
+}

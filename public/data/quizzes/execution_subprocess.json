@@ -1,0 +1,91 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl mezi voláním z rodiny os.exec*() a funkcí subprocess.run()?",
+    "options": [
+      "A) os.exec*() nahradí běžící proces novým procesem, zatímco subprocess.run() vytvoří dceřiný proces a počká na něj.",
+      "B) os.exec*() spouští proces asynchronně na pozadí, zatímco subprocess.run() vyžaduje vytvoření nového vlákna.",
+      "C) subprocess.run() nahradí běžící proces novým procesem, zatímco os.exec*() vrátí objekt typu CompletedProcess.",
+      "D) subprocess.run() funguje výhradně pod systémem Linux, zatímco rodina os.exec*() je určena výhradně pro Windows OS."
+    ],
+    "answer": 0,
+    "explanation": "Volání os.exec*() kompletně nahradí stávající proces nově spuštěným programem (stejně jako C execve()), takže se do původního Python skriptu již nevrátí. subprocess.run() spouští podproces a čeká na jeho dokončení."
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte parametr pro automatické vyhození výjimky CalledProcessError při návratovém kódu různém od nuly:\n\n```python\nimport subprocess\nsubprocess.run([\"ls\", \"/nonexistent\"], ________=True)\n```",
+    "options": [
+      "check",
+      "strict",
+      "raise_err",
+      "exception"
+    ],
+    "answer": 0,
+    "explanation": "Parametr check=True způsobí, že v případě nebyl-li návratový kód externího procesu 0 (způsobil chybu), vyvolá subprocess.run() výjimku subprocess.CalledProcessError."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Co se stane při volání subprocess.run(\"ls -l\") bez nastavení shell=True na systému Linux?",
+    "options": [
+      "A) Systém vyvolá FileNotFoundError, protože hledá binární soubor s doslovným názvem \"ls -l\" včetně mezery.",
+      "B) Příkaz proběhne v systémovém shellu /bin/sh a vypíše podrobný seznam souborů v aktuálním adresáři.",
+      "C) Funkce automaticky rozdělá řetězec podle mezer a spustí příkaz ls s předaným parametrem -l.",
+      "D) Výpočet se zastaví s výjimkou ValueError, protože řetězce bez hranatých závorek nejsou v run() povoleny."
+    ],
+    "answer": 0,
+    "explanation": "Bez shell=True předává subprocess.run() prvotní argument přímo systémovému volání execv(). Systém hledá spustitelný soubor s přesným názvem \"ls -l\" (i s mezerou), což selže na FileNotFoundError. Správný zápis bez shellu je [\"ls\", \"-l\"]."
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Doplňte parametr, který zajistí automatický převod standardního výstupu ze surových bajtů (bytes) na řetězec (str):\n\n```python\nimport subprocess\nres = subprocess.run([\"whoami\"], stdout=subprocess.PIPE, ________=\"utf-8\")\n```",
+    "options": [
+      "encoding",
+      "decode",
+      "text_mode",
+      "charset"
+    ],
+    "answer": 0,
+    "explanation": "Nastavení parametru encoding=\"utf-8\" (nebo text=True) způsobí, že proudy stdout, stderr a stdin pracují s textovými řetězci typu str namísto bajtového objektu bytes."
+  },
+  {
+    "id": "q5",
+    "type": "true_false_tricky",
+    "question": "Vyhodnoťte pravdivost tvrzení o spouštění externích procesů přes shell:\n\nPředání neošetřeného uživatelského vstupu do subprocess.run(cmd, shell=True) představuje vážné bezpečnostní riziko (shell injection), kterému lze zabránit ošetřením vstupu pomocí shlex.quote().",
+    "options": [
+      "A) Pravda – shell=True interpretuje řetězec přes /bin/sh či cmd.exe, kde nebezpečné znaky odescapuje právě funkce shlex.quote().",
+      "B) Nepravda – shell=True automaticky sanitizuje všechny předané argumenty a použití shlex.quote() vyvolá chybu v syntaxi shellu."
+    ],
+    "answer": 0,
+    "explanation": "Spuštění shellu nad neuvozovaným uživatelským vstupem umožňuje útočníkovi vložit další příkazy (shell injection). Funkce shlex.quote() bezpečně obalí a odescapuje argument pro použití v shellu."
+  },
+  {
+    "id": "q6",
+    "type": "predict_output",
+    "question": "Jaký bude typ a cíl zachycení chybového výstupu při použití stderr=subprocess.STDOUT v subprocess.run()?",
+    "options": [
+      "A) Chybový výstup stderr se přesměruje do stejného proudu jako standardní výstup stdout a uloží do result.stdout.",
+      "B) Chybový výstup stderr se vytiskne přímo na konzoli terminálu a v návratovém objektu result zůstane None.",
+      "C) Chybový výstup stderr způsobí vyhození výjimky subprocess.STDOUTError okamžitě při zapsání chyby.",
+      "D) Standardní výstup stdout se přesměruje do chybového výstupu stderr a uloží se výhradně do result.stderr."
+    ],
+    "answer": 0,
+    "explanation": "Speciální konstanta subprocess.STDOUT předaná do parametru stderr přikáže rozhraní slít chybový výstup stderr přímo do výstupního proudu stdout."
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Kdy je nutné použít třídu subprocess.Popen s metodou communicate() místo funkce subprocess.run()?",
+    "options": [
+      "A) Při potřebě asynchronního běhu procesů na pozadí nebo oboustranného datového proudění během provádění podprocesu.",
+      "B) Při přesměrování standardního výstupu do souboru na disku, protože subprocess.run() přesměrování souborů nepodporuje.",
+      "C) Při nastavování proměnných prostředí env, protože parametr env je dostupný výhradně v nízkoúrovňové třídé Popen.",
+      "D) Při provádění příkazů na operačním systému Windows, protože subprocess.run() je určen výhradně pro Unix systémy."
+    ],
+    "answer": 0,
+    "explanation": "Funkce subprocess.run() je synchronní a čeká na dokončení procesu. Třída Popen umožňuje asynchronní spuštění procesu na pozadí, průběžné posílání dat na stdin za běhu a ruční řízení podprocesu."
+  }
+]

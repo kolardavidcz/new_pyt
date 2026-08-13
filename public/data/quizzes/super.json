@@ -1,0 +1,78 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Co vypíše následující kód při zavolání metody `c.test()`?\n\nclass A:\n    def test(self):\n        return \"A\"\n\nclass B:\n    def test(self):\n        return \"B\"\n\nclass C(A, B):\n    def test(self):\n        return super(A, self).test()\n\nc = C()\nprint(c.test())",
+    "options": [
+      "A) Vypíše řetězec 'B', protože hledání v MRO třídy C pokračuje po třídě A dalším rodičem B.",
+      "B) Vypíše řetězec 'A', protože super(A, self) odkazuje přímo na rodičovskou třídu A.",
+      "C) Vyvolá AttributeError, protože třída A nedědí z třídy B a nemá přístup k jejím metodám.",
+      "D) Vyvolá TypeError, protože prvním argumentem funkce super() musí být instance objektu."
+    ],
+    "answer": 0,
+    "explanation": "První parametr `type` ve `super(A, self)` určuje třídu v MRO rodokmenu instance `c` (`C -> A -> B -> object`), od jejíhož NÁSLEDUJÍCÍHO prvku se začne metoda vyhledávat. Za třídou `A` v MRO třídy `C` následuje třída `B`, proto se zavolá `B.test()`."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jaký bude výsledek vykonání kódu při volání `b.greet()` s vnořenou funkcí?\n\nclass A:\n    def greet(self):\n        return \"Hello\"\n\nclass B(A):\n    def greet(self):\n        def inner():\n            return super().greet() + \" World\"\n        return inner()\n\nb = B()\nprint(b.greet())",
+    "options": [
+      "A) Vyvolá RuntimeError, protože bezargumentový super() nefunguje uvnitř vnořené funkce bez self.",
+      "B) Vypíše řetězec 'Hello World', protože super() automaticky vyhledá instanci v nadřazeném rozsahu.",
+      "C) Vyvolá AttributeError, protože vnořená funkce inner nemá přístup k metodám rodičovské třídy.",
+      "D) Vypíše hodnotu None, protože vnořená funkce inner nepředává argumenty do nadřazené metody."
+    ],
+    "answer": 0,
+    "explanation": "Bezargumentové volání `super()` spoléhá na kompilátorem vkládanou proměnnou `__class__` a první argument metody (`self`). Uvnitř vnořené funkce `inner()`, která nemá parametr `self`, toto automatické doplnění selže a vyvolá `RuntimeError: super(): __class__ cell not found` (případně `TypeError`)."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jaké bude pořadí výpisů při vytvoření instance `c = C()` v diamantové dědičnosti?\n\nclass Base:\n    def __init__(self):\n        print(\"Base\")\n\nclass A(Base):\n    def __init__(self):\n        print(\"A\")\n        super().__init__()\n\nclass B(Base):\n    def __init__(self):\n        print(\"B\")\n        super().__init__()\n\nclass C(A, B):\n    def __init__(self):\n        print(\"C\")\n        super().__init__()\n\nc = C()",
+    "options": [
+      "A) Vypíše postupně C, A, B, Base díky kooperativnímu řetězení v MRO pořadí.",
+      "B) Vypíše postupně C, A, Base, B, Base kvůli dvojímu volání rodiče Base.",
+      "C) Vypíše postupně C, A, Base, protože třída A zavolá přímo konstruktor Base.",
+      "D) Vyvolá TypeError, protože třídy A a B dědí ze stejné základní třídy Base."
+    ],
+    "answer": 0,
+    "explanation": "MRO pro třídu `C` je `[C, A, B, Base, object]`. Volání `super().__init__()` uvnitř `A.__init__` nevyvolá přímo `Base.__init__`, ale předá řízení dalšímu prvku v MRO rodokmenu třídy `C`, což je `B.__init__`. Až `B.__init__` zavolá `Base.__init__`, takže každý konstruktor se zavolá právě jednou."
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Doplňte název atributu pro získání n-tice s pořadím prohledávání metod (MRO) třídy `MojeTrida`:\n\nporadi = MojeTrida.________\n\n```python\n# Doplňte název atributu pro získání n-tice s pořadím prohledávání metod (MRO) třídy `MojeTrida`:\n\nporadi = MojeTrida.________\nvysledek = ________\n```",
+    "options": [
+      "__mro__",
+      "__order__",
+      "__hierarchy__",
+      "__parents__"
+    ],
+    "answer": 0,
+    "explanation": "Atribut `__mro__` na třídě obsahuje n-tici (tuple) ukazující přesné linealizované pořadí tříd, ve kterém Python vyhledává atributy a metody."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Co přesně specifikuje prvotní argument `type` ve volání `super(type, object)`?",
+    "options": [
+      "A) Třídu v MRO řetězci, od jejíž následující pozice se započne vyhledávání požadované metody.",
+      "B) Cílovou rodičovskou třídu, jejíž metoda se má přímo spustit s vynecháním ostatních předků.",
+      "C) Typ objektu, na kterém se má vyhledávání zastavit při dosažení vrchní úrovně dědičnosti.",
+      "D) Výchozí třídu, která se použije jako záložní řešení v případě nenalezení metody v potomcích."
+    ],
+    "answer": 0,
+    "explanation": "První parametr `type` nenařizuje spuštění metody přímo z dané třídy; určuje bod v MRO rodokmenu druhého argumentu, od jehož následujícího souseda se začne hledat."
+  },
+  {
+    "id": "q6",
+    "type": "true_false_tricky",
+    "question": "Vyhodnoťte pravdivost tvrzení: Volání `super()` s oběma explicitními parametry `super(Třída, objekt)` lze použít výhradně uvnitř instančních metod dané třídy.",
+    "options": [
+      "A) Nepravda – `super(Třída, objekt)` s oběma parametry lze použít kdekoli v kódu, protože oba parametry plně určují MRO i prohledávanou instanci.",
+      "B) Pravda – `super()` vyžaduje vazbu na kontext třídy a při použití mimo její metody vyvolá chybu SyntaxError bez ohledu na předané argumenty."
+    ],
+    "answer": 0,
+    "explanation": "Při předání obou argumentů `super(Třída, objekt)` má funkce vše potřebné (MRO i objekt) a lze ji zavolat kdekoli v kódu mimo těla metod. Pouze bezargumentová varianta `super()` vyžaduje běhový kontext metody."
+  }
+]

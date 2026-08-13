@@ -1,0 +1,65 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Proč dosáhl prvotní pokus o cythonizaci s výrazem (vyrez * maska).sum() horšího času (3,1 s) než čistý Python (1,8 s)?",
+    "options": [
+      "A) Načítání výřezů alokovalo v každém kroku smyčky nové objekty a volalo pomalé C-API (žluté řádky v cython -a).",
+      "B) Cython zkompiloval maticové násobení do jednovláknového C kódu bez využití vektorových instrukcí SSE a AVX.",
+      "C) Knihovna Pillow zablokovala přístup k paměťovému bufferu obrázku, takže Cython musel kopírovat celou matici.",
+      "D) Výraz vyvolal vnitřní přetečení paměti typu float, což přinutilo CPython přejít do záložního režimu interpretace."
+    ],
+    "answer": 0,
+    "explanation": "V prvotním Cython kódu vytvářel výraz np.array(vyrez) v každé iteraci zanořené smyčky nový Python objekt. Nástroj cython -a označil řádek sytě žlutou barvou, což signalizuje intenzivní volání C-API CPythonu uvnitř smyčky."
+  },
+  {
+    "id": "q2",
+    "type": "predict_output",
+    "question": "Jaká úprava kódu v Cythonu snížila čas vykonání filtru obrázku z 3,1 s na špičkových 0,14 s?",
+    "options": [
+      "A) Nahrazení jednořádkového maticového násobení (vyrez * maska).sum() zanořenou C smyčkou přes jednotlivé prvky.",
+      "B) Použití dekorátoru @jit(nopython=True) nad původní cythoní funkcí a vypnutí kontroly mezí indexace polí.",
+      "C) Převod celého 3D pole RGB obrázku na jednorozměrný Python seznam objektů typu float před voláním filtru.",
+      "D) Zvýšení počtu vláken v modulu threading a rozdělení jednotlivých barevných kanálů obrázku do skriptů."
+    ],
+    "answer": 0,
+    "explanation": "Odstraněním NumPy operací nad výřezy a přepsáním násobení matice na přímou zanořenou C smyčku se kód zcela zbavil volání Python C-API uvnitř smyček, což snížilo čas na 0,14 s."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Na čem je založen princip vektorizace konvolučního filtru v čistém NumPy bez použití smyček for?",
+    "options": [
+      "A) Na součtu 9 posunutých 2D výřezů (views) původní matice s odpovídajícími koeficienty v jediném výrazu.",
+      "B) Na automatickém převodu 2D matice obrázku do frekvenční domény pomocí rychlé Fourierovy transformace (FFT).",
+      "C) Na použití funkce np.vectorize() nad původní nevektorizovanou pythonní funkcí se zanořenou smyčkou.",
+      "D) Na paralelním zpracování jednotlivých bajtů obrázku pomocí grafické karty přes externí modul CUDA."
+    ],
+    "answer": 0,
+    "explanation": "Vektorizace nahradila smyčku tím, že vytvořila 9 stejně velkých posunutých výřezů matice (např. M[0:-2, 0:-2], M[1:-1, 1:-1]), vynásobila je koeficienty masky a sečetla je najednou kompilovanou C operací NumPy."
+  },
+  {
+    "id": "q4",
+    "type": "predict_output",
+    "question": "Která dvojice metod dosáhla v ukázkovém srovnání filtru obrázku nejvyššího zrychlení (kolem 11x až 13x)?",
+    "options": [
+      "A) Optimalizovaný Cython s C smyčkami a vektorizované řešení v čistém NumPy.",
+      "B) Naivní nevektorizovaný Python s NumPy a Numba bez použití mezipaměti.",
+      "C) Numba s nastavením nopython=False a Cython s použitím volání np.array().",
+      "D) Naivní Python smyčka a funkce np.vectorize() aplikovaná na skalární funkci."
+    ],
+    "answer": 0,
+    "explanation": "Optimalizovaný Cython (s manuální C smyčkou) dosáhl času 0,14 s (13x zrychlení) a vektorizovaný NumPy dosáhl 0,16 s (11x zrychlení). Naivní smyčka trvala 1,8 s."
+  },
+  {
+    "id": "q5",
+    "type": "true_false_tricky",
+    "question": "Vyhodnoťte pravdivost tvrzení o mezipaměti v Numbě:\n\nPři opakovaném spouštění skriptu s Numba dekorátorem s parametrem cache=True odpadá režie prvotní JIT kompilace, protože Numba načte předkompilovaný nativní kód přímo z disku.",
+    "options": [
+      "A) Pravda – Uložení kompilátu na disk snížilo čas běhu z 0,54 s (první spuštění) na 0,35 s při dalších spuštěních.",
+      "B) Nepravda – Parametr cache=True udrží data obrázku v L1 paměti, ale kód se musí při každém spuštění kompilovat znovu."
+    ],
+    "answer": 0,
+    "explanation": "Numba při cache=True uloží vygenerovaný nativní kód na disk (do __pycache__). Při dalším spuštění načte již zkompilovaný kód a vyhne se režii kompilátoru LLVM."
+  }
+]

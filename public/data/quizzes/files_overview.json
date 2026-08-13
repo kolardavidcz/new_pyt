@@ -1,0 +1,69 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní důvod pro použití konstrukce with open(...) při práci se soubory?",
+    "options": [
+      "A) Garantuje automatické uzavření souborového streamu při opuštění bloku i při výskytu výjimky.",
+      "B) Zrychluje čtení ze souboru tím, že automaticky načte celý jeho obsah do vyrovnávací paměti RAM.",
+      "C) Automaticky převádí všechny načtené bajty na velká písmena bez nutnosti volání metody upper().",
+      "D) Zamyká soubor na úrovni operačního systému proti zápisu ze strany ostatních běžících procesů."
+    ],
+    "answer": 0,
+    "explanation": "Konstrukce with vystupuje jako kontextový manažer. Při opuštění bloku kódu (ať už standardním dokončením nebo v důsledku neošetřené výjimky) zajistí bezpečné uzavření souboru a uvolnění systémových zdrojů."
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte klíčový parametr funkce open() zaručující správný převod bajtů na textové znaky.\n`python\nwith open('data.txt', mode='r', ________='utf-8') as f:\n    content = f.read()\n`\n\n```python\n# Doplňte klíčový parametr funkce open() zaručující správný převod bajtů na textové znaky.\n`python\nwith open('data.txt', mode='r', ________='utf-8') as f:\n    content = f.read()\n`\nvysledek = ________\n```",
+    "code_snippet": "with open('data.txt', mode='r', ________='utf-8') as f:\n    content = f.read()",
+    "options": [
+      "encoding — parametr definující znakové kódování použité",
+      "charset — parametr určující znakovou sadu",
+      "format — parametr předepisující požadované formátování textového souboru na systémové úrovni.",
+      "codec — parametr předávající šifrovací klíč"
+    ],
+    "answer": 0,
+    "explanation": "Parametr encoding='utf-8' explicitně stanovuje kódování pro čtení nebo zápis textových souborů. Nespoléhání se na výchozí kódování systému je zásadní pro přenositelnost kódu mezi různorodými operačními systémy."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jak se liší výstup metody soubor.write(data) od volání print(data, file=soubor)?",
+    "options": [
+      "A) write() zapíše pouze předaný řetězec, zatímco print() navíc automaticky přidá znak odřádkování \\n.",
+      "B) write() automaticky přidává nový řádek \\n na konec textu, zatímco print() zapisuje text bez úprav.",
+      "C) write() přijímá libovolný objekt a převede jej na str, zatímco print() vyžaduje výhradně typ bytes.",
+      "D) write() zapisuje data do souboru synchronně, zatímco print() odkládá zápis až na zavření souboru."
+    ],
+    "answer": 0,
+    "explanation": "Metoda f.write(string) zapíše přesně zadaný řetězec bez jakýchkoliv úprav či přidaných znaků. Oproti tomu funkce print(string, file=f) se chová standardně – mezi argumenty vkládá mezeru (sep=' ') a na konec přidává znak nového řádku (end='\\n')."
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Jaký je paměťový rozdíl mezi procházením souboru pomocí for line in soubor: a použitím soubor.readlines()?",
+    "options": [
+      "A) for line in soubor načítá řádky postupně po jedné (O(1) paměť), kdežto readlines() načte vše do seznamu (O(N) paměť).",
+      "B) for line in soubor načte celý soubor do paměti najednou (O(N) paměť), zatímco readlines() vytvoří lenivý generátor.",
+      "C) for line in soubor funguje výhradně pro binární soubory v operačním systému, zatímco readlines() je pro textové.",
+      "D) Obě metody mají zcela totožnou paměťovou náročnost a vnitřně načítají kompletní obsah souboru do systémové RAM."
+    ],
+    "answer": 0,
+    "explanation": "Otevřený soubor je iterovatelný objekt. Cyklus for line in soubor: načítá z disku vždy jen právě zpracovávanou řádku, což vyžaduje minimální paměť O(1). Metoda soubor.readlines() načte okamžitě všechny řádky souboru do paměti jako seznam řetězců (O(N) paměť), což u velkých souborů může způsobit vyčerpání RAM."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Co bude v proměnné data po spuštění níže uvedeného kódu nad souborem o dvou řádcích?\n`python\n# soubor data.txt obsahuje:\n# Ahoj\n# Světe\nwith open('data.txt', encoding='utf-8') as f:\n    data = f.read()\nprint(repr(data))\n`",
+    "code_snippet": "# soubor data.txt obsahuje:\n# Ahoj\n# Světe\nwith open('data.txt', encoding='utf-8') as f:\n    data = f.read()\nprint(repr(data))",
+    "options": [
+      "A) 'Ahoj\\nSvěte' — metoda read() načte celý obsah souboru jako jeden řetězec včetně odřádkování.",
+      "B) ['Ahoj\\n', 'Světe'] — metoda read() automaticky rozdělí všechny načtené řádky do prvkového seznamu.",
+      "C) 'AhojSvěte' — metoda read() při načítání automaticky odstraní všechny bílé znaky a odřádkování.",
+      "D) 'Světe' — metoda read() vrací pouze poslední přečtenou řádku ze zadaného otevřeného textového souboru."
+    ],
+    "answer": 0,
+    "explanation": "Metoda soubor.read() bez argumentu přečte celý obsah souboru najednou a vrátí jej jako jeden jediný řetězec typu str, v němž jsou zachovány všechny původní znaky nového řádku (\\n)."
+  }
+]

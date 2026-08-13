@@ -1,0 +1,78 @@
+{
+  "slug": "pnm",
+  "total": 12,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Rodinu grafických formátů <strong>PBM</strong> (někdy též souhrnně nazývanou <strong>PNM</strong>, <em>portable anymap format</em>) vymyslel v 80. letech Jef Poskanzer. Jeho původním záměrem bylo vytvořit monochromatický grafický formát, který by se dal přenášet v těle emailu jako obyčejné ASCII.\r\n    </p>\r\n    <p>\r\n        Později byl formát rozšířen o možnost zobrazení škály šedé a klasické 8-bitové RGB-spektrum a nakonec i o 16-bitové (které je ale dosti nestandardizované). Je sice velmi nešikovný na uchovávání větších objemů dat, protože jde v podstatě pouze o nekomprimovanou sekvenci údajů o jednotlivých pixelech obrázku, ale na druhou stranu se s ním z úplně stejného důvodu velmi snadno pracuje, a proto je často používán jako pracovní grafický formát.\r\n    </p>\r\n    <p>\r\n        Dnes se o jeho udržování stará projekt <a href=\"http://netpbm.sourceforge.net/doc/pbm.html\">Netpbm</a>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Příklady ve slajdech převzaty a případně upraveny podle <a href=\"http://en.wikipedia.org/wiki/Netpbm_format\">Wikipedie</a>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Rozdělení",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Rozdělení</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Rodina formátů <b>Netpbm</b> je extrémně jednoduchá na zpracovávání (a ruku v ruce s tím extrémně nevhodná na uchovávání :). Obsahuje celkem 6 různých formátů lišících se barevnou „hloubkou“ a typem kódování:\r\n    </p>\r\n    <table align=\"center\">\r\n        <tr>\r\n            <th> identifikátor pro kódování<br>ASCII / binary </th>\r\n            <th> typ </th>\r\n        </tr>\r\n        <tr>\r\n            <td> P1 / P4 </td>\r\n            <td> PBM = portable bitmap (černobílé) </td>\r\n        </tr>\r\n        <tr>\r\n            <td> P2 / P5 </td>\r\n            <td> PGM = portable graymap (odstíny šedé) </td>\r\n        </tr>\r\n        <tr>\r\n            <td> P3 / P6 </td>\r\n            <td> PPM = portable pixmap (RGB) </td>\r\n        </tr>\r\n    </table>\r\n    <p>\r\n        <i>ASCII</i> se bezvadně čte, ale pochopitelně je oproti <i>binary</i> pekelně nafouknuté – kde v binárním P6 pro zápis RGB-pixelu stačí 3 bajty, tam ASCII P3 potřebuje bajtů až 11 (a to počítám pouze mezery mezi barvami jednoho pixelu, nikoli mezi jednotlivými pixely).\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Struktura",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Struktura</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Struktura PNM-formátů je obecně následující:\r\n    </p>\r\n    <pre>identifikátor↵↵          # identifikátor podle tabulky výše\r\n[# komentář↵↵]           # nepovinný; často je zde název souboru\r\nšířka↵↵výška↵↵           # rozměry zadány jako dekadické číslo v ASCII\r\nmaximální-počet-barev↵   # zadán jako dekadické číslo v ASCII; &gt;0 &amp; &lt;=255 (resp. 65536)\r\ndata-obrázku             # „mřížka“ pixelů o daném počtu řádků a sloupců  </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <code>↵↵</code> představuje libovolný počet bílých znaků (<em>whitespace</em>, tj. mezery, TABy, CR, LF), <code>↵</code> zastupuje právě jeden bílý znak.\r\n    </div></div>\r\n    <p>\r\n        Dejte si pozor, kam a jak píšete komentáře – obecně všechno za znakem <code>#</code> je pokládáno za komentář, to znamená i uprostřed řádky (a hlavně odřádkování na konci komentáře), což může někdy udělat nečekanou paseku. Podobně není (u ASCII-kódování) doporučováno mít datové řádky delší než 70 znaků. A nakonec data obrázku by také měla končit na <em>whitespace</em>, protože některé programy si s tím jinak neporadí.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "PBM ASCII",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">PBM ASCII</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Struktura PBM je obecně následující (nyní už zjednodušeně oproti obecnému popisu z předchozího slajdu):\r\n    </p>\r\n    <pre>identifikátor\r\nšířka výška\r\ndata-obrázku  </pre>\r\n\r\n    <p>\r\n        Pro ukázku PBM-souboru (tj. černobílého) si ukažme jednoduché písmeno J ve variantě P1, tj. ASCII:\r\n    </p>\r\n    <example src=\"_files/PBM-example.pbm\" lang=\"text\"></example>\r\n    <p>\r\n        V tomto souboru je zaznamenán následující obrázek (dvacetkrát zvětšené): <img src=\"_files/PBM-example.scale20.png\" width=\"120\" height=\"190\" alt=\"\" title=\"\">\r\n    </p>\r\n    <p>\r\n        PS: Formát <em>P1</em> je také jediný, ve kterém můžete vynechat mezery mezi daty obrázku – rozlišení mezi 0 a 1 je zadrátováno ve všech prohlížečích.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "PBM binary",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">PBM binary</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Binární podoba, tedy varianta P4, se z pochopitelných důvodů úspornosti liší od binárních variant vícebarevných formátů PGM a PPM:\r\n    </p>\r\n    <blockquote>\r\n        Po hlavičce, která je společná ASCII i binární variantě, následují (za povinným <strong>právě jedním prázdným znakem/bajtem</strong>) data obrázku v podobě – <em>co 8 pixelů, to jeden bajt</em>.\r\n    </blockquote>\r\n    <p>\r\n        Každých osm sloupečků je tedy sloučeno do jednoho bajtu, ve kterém jejich barvové hodnoty (černá/bílá) představuje nastavení příslušných bitů (0/1). „Přebytečné“ sloupečky (tedy sloupečky, které musíme doplnit, abychom dostali celý počet bajtů) jsou „shrnuty“ do posledního bajtu v podobě nul.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: V principu prohlížeče obrázků na data v „přebytečných“ sloupcích nemají důvod vůbec brát zřetel, takže do nich můžete schovat, co vás napadne, a neomezovat se jen na stadardní nuly. Co třebas šifrovaná zpráva v kódování na tři bity? ^_~\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "PS: Vynucení zobrazení pixelů bez vyhlazování",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">PS: Vynucení zobrazení pixelů bez vyhlazování</h2></div><div class=\"section-body\">\r\n    \r\n    <p>\r\n        Jelikož při ladění PNM-obrázků je poměrně důležité vidět jednotlivé pixely a jelikož prakticky všechny běžně používané zobrazovače mají ve výchozím nastavení zapnuto vyhlazování obrázků (pokud neděláte s něčím určeným specificky pro <em>pixel art</em>), je třeba uvedené vypnout. Zde pro příklad nastavení prohlížeče <a href=\"https://www.irfanview.com\" class=\"external\">IrfanView</a>:\r\n    </p>\r\n    <img src=\"_files/_nastaveni_IrfanView.jpg\" width=\"776\" height=\"700\" alt=\"vypnutí vyhlazování v IrfanView\">\r\n    \r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "PGM ASCII",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">PGM ASCII</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Struktura PGM je obecně následující (opět zjednodušeně oproti obecnému popisu):\r\n    </p>\r\n    <pre>identifikátor\r\nšířka výška\r\nmaximální-počet-stupňů-šedi\r\ndata-obrázku  </pre>\r\n    \r\n    <p>\r\n        Jako příklad PGM (tj. obrázek ve stupních šedi) ve variantě P2, tj. ASCII, si ukažme následující:\r\n    </p>\r\n    <example src=\"_files/PGM-example.2.pgm\" lang=\"text\"></example>\r\n    <p>\r\n        V tomto souboru je zaznamenán následující obrázek (asi třicetkrát zvětšené): <img src=\"_files/PGM-example.2.scale30.png\" width=\"589\" height=\"173\" alt=\"\" title=\"\">\r\n    </p>\r\n    <p>\r\n        PS: Navzdory logice zde mezera mezi jednotlivými pixely je  nutná i v případě, že používáme pouze barvy s maximálním indexem 9. Optimalizované rozlišení mezi jedno- a vícecifernými čísly už není nikde přítomno.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "PGM binary",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">PGM binary</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Binární podoba, tedy varianta P5, je zcela průhledná:\r\n    </p>\r\n    <blockquote>\r\n        Po hlavičce, která je společná ASCII i binární variantě, následují (za povinným <strong>právě jedním prázdným znakem/bajtem</strong>) data obrázku v podobě – <em>co pixel, to jeden bajt</em>.\r\n    </blockquote>\r\n    <p>\r\n        Binární varianta tedy sdílí – samozřejmě až na identifikátor – s ASCII-variantou hlavičku (a to klidně až po finální bílý znak, který ale musí být opravdu jen a pouze jeden<sup>*</sup>) a k vlastnímu ušetření paměti dochází až na úrovni dat obrázků.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <sup>*</sup> Pozor tedy na rozdělovače typu „dvoubajtový konec řádky textového souboru ve Windows“! Jinak je první bajt použit jako rozdělovač a druhý jako první bajt dat obrázku a nebudete se stačit divit výsledku ^_~\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "PPM ASCII",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">PPM ASCII</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Struktura PPM je obecně následující (opět zjednodušeně oproti obecnému popisu):\r\n    </p>\r\n    <pre>identifikátor\r\nšířka výška\r\nmaximální-počet-barev\r\ndata-obrázku  </pre>\r\n    \r\n    <p>\r\n        PPM se od PGM liší tím, že na každý pixel musí zaznamenat tři barvy, a to postupně v pořadí R-G-B (tj. červená, zelená, modrá). Použijeme-li podobně přehledný způsob zaznamenání jako dříve, následující obrázek (šedesátčtyři-krát zvětšeno) <img src=\"_files/PPM-example.scale64.png\" width=\"192\" height=\"128\" alt=\"\" title=\"\"> bude v ASCII-variantě P3 zapsán takto:\r\n    </p>\r\n    <example src=\"_files/PPM-example.ppm\" lang=\"text\"></example>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jak jsou pixely „rozházené“ po řádcích není podstatné, protože příslušnou informaci si zpracovávající software načte z druhého významového řádku.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "PPM binary",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">PPM binary</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Binární podoba, tedy varianta P6, je opět zcela průhledná a prakticky stejná, jako u P5 (šedotónový binární), pouze na každý pixel připadají nyní tři barvové údaje (za červenou, zelenou a modrou složku):\r\n    </p>\r\n    <blockquote>\r\n        Po hlavičce, která je (až na identifikátor) společná ASCII i binární variantě, následují (za povinným <strong>právě jedním prázdným znakem/bajtem</strong>) data obrázku v podobě – <em>co pixel, to právě tři bajty (postupně R, G a B)</em>.\r\n    </blockquote>\r\n\r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Srovnávací tabulka",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Srovnávací tabulka</h2></div><div class=\"section-body\">\r\n\r\n    <table class=\"center\" border=\"1\">\r\n        <tr>\r\n            <th>formát</th>\r\n            <th>varianta</th>\r\n            <th>kódování</th>\r\n            <th>poznámky</th>\r\n        </tr>\r\n        <tr>\r\n            <th>PBM</th>\r\n            <td>P1</td>\r\n            <td>ascii</td>\r\n            <td>\r\n                Daty jsou buď 0 (bílá) nebo 1 (černá).\r\n                <br>\r\n                1 pixel ~ 1 znak (mezera nepovinná)\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <th></th>\r\n            <td>P4</td>\r\n            <td>binární</td>\r\n            <td>\r\n                8 pixelů ~ 1 bajt\r\n                <br>\r\n                Doplňkové sloupečky součástí posledního bajtu (většinou jako nuly).\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <th>PGM</th>\r\n            <td>P2</td>\r\n            <td>ascii</td>\r\n            <td>\r\n                Daty jsou čísla od 0 (černá) po nejvyšší odstín (bílá).\r\n                <br>\r\n                1 pixel ~ až 3 znaky (plus další na mezeru)\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <th></th>\r\n            <td>P5</td>\r\n            <td>binární</td>\r\n            <td>1 pixel ~ 1 bajt</td>\r\n        </tr>\r\n        <tr>\r\n            <th>PPM</th>\r\n            <td>P3</td>\r\n            <td>ascii</td>\r\n            <td>\r\n                Daty jsou trojce čísel od 0 po (převážně) 255.\r\n                <br>\r\n                1 pixel ~ až 11 znaků (plus další na mezeru)\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <th></th>\r\n            <td>P6</td>\r\n            <td>binární</td>\r\n            <td>1 pixel ~ 3 bajty</td>\r\n        </tr>\r\n    </table>\r\n\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Poznámky",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Poznámky</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        ASCII-kódování znamená, že to jsou řetězcové údaje v kódování ASCII! V základním nastavení by to mělo být v pořádku, protože spodní polovina jednobajtových kódování (ve většině případů ) i UTF8 bez BOMu jsou v podstatě právě ASCII.\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Rozložení pixelů do řádek v datech obrázku není podstatné – zpracovávající program ví vše potřebné už z hlavičky. Pouze se doporučuje, aby u ASCII-formátů nebyla žádná z řádek delší než 70 znaků.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pro vlastní ruční tvorbu (nebo čtení) je samozřejmě vizuální rozdělení po pixelech velmi přínosné.\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Komprese do bajtů mezi ASCII-formátem a binárním formátem se projevuje až na úrovni dat obrázků – celá hlavička je zaznamenána znakově v ASCII!\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Rozšíření na 16-bitovou barevnou hloubku s sebou nese potřebu rozhodnout o pořadí příslušných dvou bajtů. Nepřekvapivě se na tom jednotlivé implementace neshodnou, ale <em>de facto</em> standard <em>Netpbm</em> bere jako nejvýznamější bajt ten první.\r\n    </p>\r\n\r\n</div>"
+    }
+  ]
+}

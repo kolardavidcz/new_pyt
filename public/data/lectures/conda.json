@@ -1,0 +1,102 @@
+{
+  "slug": "conda",
+  "total": 16,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Balíčkovací systémy",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Balíčkovací systémy</h2></div><div class=\"section-body\">\r\n    <h4 class=\"center\">\r\n        (přednášku připravil Jiří Novotný)\r\n    </h4>\r\n    <p>\r\n        <strong>Balíčkovací systémy</strong> slouží k bezproblémové instalaci modulů a knihoven z repozitářů, souhrně <strong>balíčků</strong> neboli <em>packages</em>.\r\n    </p>\r\n    <p>\r\n        <strong>Repozitáře</strong> pak slouží jako spojení mezi vývojáři knihoven a jejich koncovým „zákazníkem“, tj. programátorem. Vývojář umístí svůj balíček do repozitáře a dodá k němu několik informací – zejména jaká verze Pythonu a jaké další balíčky či knihovny jsou potřeba a jakým způsobem se má balíček nainstalovat (cesty, kompilace C knihoven a podobně).\r\n    </p>\r\n    <p>\r\n        Chce-li programátor nainstalovat nějaký balíček, zadá balíčkovacímu systému jeho název (případně i konkrétní verzi) a ten už se postará o jeho správnou instalaci včetně stažení závislostí neboli <em>dependencies</em>. Typicky se pro toto používá třeba <em>pip</em> a jeho <cmd>pip install &lt;název balíčku&gt;</cmd> nebo právě <em>conda</em>.\r\n    </p>\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Virtuální prostředí",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Virtuální prostředí</h2></div><div class=\"section-body\">\r\n    <p>\r\n        Programátor se snadno může dostat do situace, kdy pro různé projekty potřebuje různé verze téhož balíčku\r\n        (případně samotného Pythonu). Jenže balíčky se standardně instalují do a načítají z adresáře, jehož cesta je definována v systémové proměnné <em>PATH</em>. Je tak v zásadě nemožné mít nainstalovaných několik verzí téhož balíčku.\r\n    </p>\r\n    <p>\r\n        Tento problém řeší virtuální prostředí – pokud ho vytvoříme a aktivujeme, upraví se pythoní cesty v <em>PATH</em>, které nyní bude směřovat do námi definovaného adresáře, a Python tak pro své součásti bude sahat sem. Současně se sem budou instalovat nové balíčky a jejich součásti.\r\n    </p>\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "(Ana)conda",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">(Ana)conda</h2></div><div class=\"section-body\">\r\n    <p>\r\n        Program <em>conda</em> z dílny projektu <a href=\"http://pydata.org/\" class=\"external\">PyData</a> řeší obě věci najednou – slouží jako balíčkovací systém (využívá i vlastní repozitář) a zároveň jako manažer virtuálních prostředí. Je součástí projektu <a href=\"http://anaconda.org/\" class=\"external\">Anaconda</a>, který poskytuje distribuci Pythonu, která již v základu obsahuje spoustu balíčků a knihoven pro vědeckou práci (<a href=\"http://docs.continuum.io/anaconda/pkg-docs\" class=\"external\">jejich výčet</a>).\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Nepotřebuje-li člověk tolik balíčků, stačí si stáhnout ořezanou verzi jménem <em>Miniconda</em>, která obsahuje <em>condu</em> a pythoní interpretr včetně standardních knihoven.\r\n    </div></div>\r\n    <p>\r\n        Velkou výhodou je, že člověk nepotřebuje mít administrátorská práva, ať už pracuje ve Windows či Linuxu – instalace spočívá v pouhém rozbalení.\r\n    </p>\r\n    <p>\r\n        V následujících slajdech si ukážeme instalaci a základní práci s <em>condou</em>.\r\n    </p>\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Instalace (Ana)condy",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Instalace (Ana)condy</h2></div><div class=\"section-body\">\r\n    <p>\r\n        Příslušné instalátory dle OS najdete zde: <a href=\"https://www.continuum.io/downloads\" class=\"external\">Anaconda</a>, <a href=\"http://conda.pydata.org/miniconda.html\" class=\"external\">Miniconda</a>.\r\n    </p>\r\n    <p>\r\n        Instalace je jednoduchá – ve všech případech máte možnost si stáhnout samorozbalovací archiv (ve Windows GUI instalátor, v Linuxu shell skript), případně i archiv, který si sami někam rozbalíte (poté je však nutné ručně přidat cestu do <em>PATH</em>).\r\n    </p>\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "První seznámení s condou",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">První seznámení s condou</h2></div><div class=\"section-body\">\r\n    <p>\r\n        Máte-li správně nainstalovanou <em>condu</em> zjistíte jednoduše – v příkazové řádce zkuste napsat <cmd>conda</cmd>. Měl by se Vám vypsat seznam dostupných příkazů pro <em>condu</em>. Dále příkaz <cmd>conda info</cmd> zobrazí informace o <em>condě</em> a používaných cestách.\r\n    </p>\r\n    <p>\r\n        Užitečný je příkaz <cmd>conda help</cmd>, kterým je možné získat základní přehled o dostupných příkazech. V dřívějších verzích se stejná syntaxe používala i pro nápovědu k vlastním příkazům, ale dnes použijte přepínač <code>--help</code>, např. <cmd>conda install --help</cmd>.\r\n    </p>\r\n    <p>\r\n        Dále se může hodit tento <a href=\"http://conda.pydata.org/docs/using/cheatsheet.html\" class=\"external\">cheatsheet</a> v PDF a <a href=\"http://conda.pydata.org/docs/index.html\" class=\"external\">oficiální příručka</a>.\r\n    </p>\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Vytvoření virtuálního prostředí I",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Vytvoření virtuálního prostředí I</h2></div><div class=\"section-body\">\r\n    <p>\r\n        Virtuální prostředí (dále VP) se vytváří jednoduše pomocí příkazu <cmd>conda create</cmd>. Ten má i další parametry, na které se podíváme níže.\r\n    </p>\r\n    <p>\r\n        Všechna VP se defaultně vytvářejí jinde podle OS a podle toho, zda jste si nainstalovali <em>Anacondu</em> či <em>Minicondu</em>. Jejich seznam s názvy a cestami se Vám ukáže příkazem <code>conda env list</code> (nebo <cmd>conda info --envs</cmd>). Zkusíte-li tento příkaz ještě předtím, než vytvoříte nové VP, ukáže se Vám základní VP s názvem <em>base</em> (dříve <em>root</em>). Toto VP je vlastně samotná instalace condy, která v případě <em>Minicondy</em> obsahuje instalaci Pythonu plus pár základních balíčků, v případě <em>Anacondy</em> snad kompletní distribuci všech podporovaných základních balíčků. Defaultně se tedy pracuje ve VP <em>base</em>.\r\n    </p>\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Vytvoření virtuálního prostředí II",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Vytvoření virtuálního prostředí II</h2></div><div class=\"section-body\">\r\n    <p>\r\n        Některé parametry příkazu <cmd>conda create</cmd>:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <cmd>-n NÁZEV</cmd>, <cmd>--name NÁZEV</cmd> – název virtuálního prostředí (asi nejužívanější varianta);\r\n        </li>\r\n        <li>\r\n            <cmd>--copy</cmd> – zkopíruje balíčky místo vytvoření hard nebo softlinku (některé balíčky už jsou přítomny v kořenovém VP <em>root</em>, takže se na ně může jen vytvořit link);\r\n        </li>\r\n        <li>\r\n            <cmd>--clone VP</cmd> – naklonuje existující VP. Parametrem je jeho název nebo cesta k němu;\r\n        </li>\r\n        <li>\r\n            <cmd>--dry-run</cmd> – conda pouze vypíše to, co by měla provést.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Za posledním pojmenovaným parametrem následuje <strong>seznam balíčků</strong>, které chcete do nového prostředí umístit. <strong>Povinný kupodivu není ani jeden, ale v tom případě vytvoříte prázdné VP, které bude vidět výchozí Python a balíčky systému, nikoliv Condy!</strong> Takže alespoň jeden budete chtít uvést, a to pravděpodobně <code>python</code>, který je také brán jako balíček.\r\n    </p>\r\n    <p>\r\n        U balíčků můžete dále specifikovat verzi pomocí <cmd>=verze</cmd>, např. <cmd>python=3</cmd> nainstaluje do VP nejnovější dostupnou trojkovou verzi.\r\n    </p>\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Vytvoření virtuálního prostředí – příklady",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Vytvoření virtuálního prostředí – příklady</h2></div><div class=\"section-body\">\r\n    <ul>\r\n        <li>\r\n            vytvoření VP s nejvyšším dostupným trojkovým Pythonem<br>\r\n            <cmd>conda create -n myenv python=3</cmd>\r\n        </li>\r\n        <li>\r\n            vytvoření VP s Pythonem 2.7<br>\r\n            <cmd>conda create -n myenv python=2.7</cmd>\r\n        </li>\r\n        <li>\r\n            vytvoření VP s Pythonem 2.7 a balíčkem <em>numpy</em><br>\r\n            <cmd>conda create -n myenv python=2.7 numpy</cmd>\r\n        </li>\r\n        <li>\r\n            zobrazení seznamu VP<br>\r\n            <cmd>conda env list</cmd><br>\r\n            <cmd>conda info --envs</cmd>\r\n        </li>\r\n    </ul>\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Práce ve virtuálním prostředí",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Práce ve virtuálním prostředí</h2></div><div class=\"section-body\">\r\n    <p class=\"enumerate\">\r\n        Chce-li člověk začít pracovat ve vytvořeném VP, stačí k tomu příkaz <code>conda activate VirtuálníProstředí</code>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Před Condou verze 4.6 to bylo ve Windows <cmd>activate &lt;název VP&gt;</cmd> a v případě Linuxu <cmd>source activate &lt;název VP&gt;</cmd>. V obou případech jste museli stát v místě umístění těchto (de)aktivačních skriptů (tj. v adresáři <code>bin</code> daného VP).\r\n    </div></div>\r\n    <p>\r\n        Že člověk pracuje ve VP pozná snadno – před aktuální cestou v příkazové řádce se ukazuje název aktivního VP. Jelikož nyní <em>PATH</em> ukazuje na adresář s VP, veškeré příkazy, jako je např. <em>python</em> nebo <em>pip</em>, budou směřovat právě sem.\r\n    </p>\r\n    <p class=\"enumerate\">\r\n        Pro deaktivaci aktuálního VP pak stačí zavolat <code>conda deactivate</code>. Conda vás tím automaticky přepne zpět na základní VP (tedy <em>base</em>).\r\n    </p>\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Odstranění virtuálního prostředí",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Odstranění virtuálního prostředí</h2></div><div class=\"section-body\">\r\n    <p>\r\n        Kompletní likvidaci vybraného VP zařídí příkaz:\r\n    </p>\r\n    <blockquote>\r\n        <code>conda remove -n VirtuálníProstředí --all</code>\r\n    </blockquote>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Nebo samozřejmě též v dlouhé verzi s <code>--name</code>.\r\n    </div></div>\r\n    <p>\r\n        Přepínač <code>--all</code> je důležitý – bez specifikace <strong>všech balíčků k odstranění</strong> nebude totiž odstraněno ani dané VP.\r\n    </p>\r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Instalace balíčků",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Instalace balíčků</h2></div><div class=\"section-body\">\r\n    <p>\r\n        Základním příkazem pro instalaci balíčků je <cmd>conda install &lt;název balíčku&gt;</cmd>, kde je opět možné specifikovat verzi pomocí <cmd>=verze</cmd>. Samozřejmě balíčků můžete najednou nainstalovat více, stačí je psát za sebou. <em>Conda</em> nejprve zkontroluje všechny závislosti a kompatibilitu balíčků s Vaší verzí Pythonu či OS a poté potvrdíte, že balíčky chcete opravdu stáhnout a nainstalovat. Defaultně se instaluje nejnovější (případně poslední kompatibilní) verze balíčku.\r\n    </p>\r\n    <p>\r\n        Chcete-li použít repozitář <a href=\"http://anaconda.org\" class=\"external\">Anaconda</a>, musíte ho specifikovat parametrem <cmd>-c &lt;NÁZEV_CHANNELU&gt;</cmd>. <em>Channel</em> je vlastně konkrétní repozitář někoho, kdo příspívá do <em>Anacondy</em> (např. channel <a href=\"https://anaconda.org/rdkit\" class=\"external\">rdkit</a>).\r\n    </p>\r\n    <p>\r\n        Kromě toho můžete instalovat i balíčky přímo ze souboru, stačí místo názvu balíčku zadat lokální cestu k němu.\r\n    </p>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Někdy je rychlejší stáhnout konkrétní verzi balíčku z <a href=\"http://anaconda.org\">Anacondy</a> a tu poté nainstalovat lokálně. Všechny závislosti se samozřejmě stáhnou a nainstalují také.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Pokud máte potřebné balíčky již v keši (např. z nějaké předchozí instalace v jiném virtuálním prostředí), můžete je dokonce pomocí přepínače <code>--offline</code> instalovat i bez připojení k internetu.\r\n        </div></div></div>\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Instalace balíčků – příklady",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Instalace balíčků – příklady</h2></div><div class=\"section-body\">\r\n    <ul>\r\n        <li>\r\n            instalace Djanga<br>\r\n            <cmd>conda install django</cmd>\r\n        </li>\r\n        <li>\r\n            instalace Djanga ve verzi 1.9.2<br>\r\n            <cmd>conda install django=1.9.2</cmd>\r\n        </li>\r\n        <li>\r\n            instalace rdKitu z repozitáře Anaconda<br>\r\n            <cmd>conda install -c rdkit rdkit</cmd>\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Lepší je asi uvést úplnou cestu k channelu, tj. <em>https://conda.anaconda.org/rdkit</em>, viz <a href=\"https://anaconda.org/rdkit/rdkit\" class=\"external\">https://anaconda.org/rdkit/rdkit</a>.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            instalace rdKitu ze souboru (takto samozřejmě pokud je soubor v adresáři, kde zrovna pracujete)<br>\r\n            <cmd>conda install rdkit-2015.09.2-np110py27_0.tar.bz2</cmd>\r\n        </li>\r\n        <li>\r\n            jelikož <em>PATH</em> míří do našeho aktivního VP, je možné použít i <em>pip</em> a <em>conda</em> o tom navíc bude vědět (balíček nainstalovaný <em>pipem</em> je možné normálně vidět a ovládat <em>condou</em>)<br>\r\n            <cmd>pip install django==1.9.2</cmd>\r\n        </li>\r\n    </ul>\r\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Správa balíčků",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Správa balíčků</h2></div><div class=\"section-body\">\r\n    <p>\r\n        Vždy se týká aktivního VP!\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            zobrazí seznam balíčků<br>\r\n            <cmd>conda list</cmd>\r\n        </li>\r\n        <li>\r\n            aktualizace balíčků<br>\r\n            <cmd>conda update django numpy</cmd>\r\n        </li>\r\n       <li>\r\n            aktualizace všech balíčků (včetně samotné <em>condy</em> a Pythonu)<br>\r\n            <cmd>conda update --all</cmd>\r\n        </li>\r\n       <li>\r\n            odstranění balíčků<br>\r\n            <cmd>conda remove django</cmd>\r\n        </li>\r\n       <li>\r\n            vyhledávání balíčků v repozitářích (defaultně regexem)<br>\r\n            <cmd>conda search django</cmd>\r\n        </li>\r\n    </ul>\r\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Správa balíčků – Python",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Správa balíčků – Python</h2></div><div class=\"section-body\">\r\n    <p>\r\n        Jelikož příkaz <code>conda update --all</code> povýší (případně i poníží!) všechny balíčky daného virtuálního prostředí na co nejnovější verze tak, aby zůstala zachována jeho konzistence, bude se vlastní interpret Python'u <em>apgrejdovat</em> pouze na úrovni setinkových verzí. Pochopitelně – naprostá většina ostatních balíčků VP na něm totiž závisí! Proto:\r\n    </p>\r\n    <blockquote>\r\n        Chcete-li novější Python, musíte zavolat příkaz <code>conda update python</code>. <em>Conda</em> se pak pokusí najít co nejnovější verzi Python'u, ke které bude schopná dodat i konzistentní VP.\r\n    </blockquote>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Příklad z praxe: VP obsahující v základu interpret Python'u 3.8.11 bylo týden po uveřejnění verze 3.10 (která už byla v rámci Condy dostupná) uvedeným postupem povýšeno na verzi Python'u „pouze“ 3.9.7, protože pro tři-devítkovou řadu všechny ostatní závislé balíčky již v repozitáři (dávno) byly, zatímco pro řadu 3.10 dosud ne.\r\n    </div></div>\r\n    <p>\r\n        PS: A když se verze mezi sebou hodně pohádají (novější Conda závislá na novější verzi Pythonu a ten neapgrejdovatelný z neznámého důvodu), budete si muset apgrejd vyžádat kompletně celý ručně, např. <code>$ conda install --name base conda=23.3.1 python=3.11</code>.\r\n    </p>\r\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Správa virtuálních prostředí – „env list“, „env export &amp; create“",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Správa virtuálních prostředí – „env list“, „env export &amp; create“</h2></div><div class=\"section-body\">\r\n    <ul>\r\n        <li>\r\n            zobrazí všechna vytvořená VP<br>\r\n            <cmd>conda env list</cmd> (postaru též <cmd>conda info --envs</cmd>)\r\n        </li>\r\n       <li>\r\n            export informací o aktivním VP do souboru<br>\r\n            <cmd>conda env export &gt; myenv.yml</cmd>\r\n        </li>\r\n       <li>\r\n            nahrání informací o VP ze souboru<br>\r\n            <cmd>conda env create -f myenv.yml</cmd>\r\n        </li>\r\n    </ul>\r\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Použití v PyCharmu",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Použití v PyCharmu</h2></div><div class=\"section-body\">\r\n    <p>\r\n        Pracujete-li v oblíbeném IDE PyCharm, můžete si u projektu zvolit libovolné VP vytvořené <em>condou</em>. Stačí v nastavení projektu nastavit cestu k pythonímu interpretru ve VP, které chcete použít, a to pomocí „Add Local“:\r\n    </p>\r\n    <img src=\"_files/pycharm_local.png\" width=\"870\" height=\"325\" alt=\"PyCharm – výběr virtuálního prostředí\">\r\n    <p>\r\n        PyCharm však umí s <em>condou</em> spolupracovat, takže je v něm přímo možné vytvořit nové VP. Místo „Add Local“ stačí dát „Create Conda Env“:\r\n    </p>\r\n    <img src=\"_files/pycharm_create.png\" width=\"1136\" height=\"321\" alt=\"PyCharm – vytvoření virtuálního prostředí\">\r\n</div>"
+    }
+  ]
+}

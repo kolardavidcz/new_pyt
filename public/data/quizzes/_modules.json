@@ -1,0 +1,104 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Kde Python přednostně vyhledává moduly při volání `import název`?",
+    "options": [
+      "A) V adresáři aktuálně spouštěného skriptu (první položka sys.path).",
+      "B) V systémovém adresáři instalace Pythonu (adresář Lib/site-packages).",
+      "C) V adresářích definovaných v systémové proměnné prostředí PYTHONPATH.",
+      "D) V uživatelském adresáři balíčků definovaném proměnnou site.USER_SITE."
+    ],
+    "answer": 0,
+    "explanation": "Aktuální adresář skriptu je v sys.path na prvním místě (jako prázdný řetězec ''), takže lokální modul má přednost před systémovými knihovnami i PYTHONPATH."
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte název magické proměnné pro omezení exportovaných jmen při `from module import *`:\n\n```python\n________ = ['funkce1', 'funkce2']\n```",
+    "options": [
+      "__all__",
+      "__export__",
+      "__public__",
+      "__imports__"
+    ],
+    "answer": 0,
+    "explanation": "Proměnná __all__ definuje seznam řetězců se jmény objektů, které se mají vyexportovat při importu pomocí hvězdičky (from module import *). Pokud __all__ = [], nevyexportuje se nic."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jaký je důsledek provedení příkazu `del modul` po předchozím `import modul`?",
+    "options": [
+      "A) Odstraní pouze odkaz ze jmenného prostoru skriptu, ale modul zůstane načtený v sys.modules.",
+      "B) Způsobí kompletní uvolnění paměti a při příštím importu se zdrojový kód z disku znovu vykoná.",
+      "C) Způsobí zneplatnění všech objektů, které byly z tohoto modulu dříve importovány do paměti.",
+      "D) Vyvolá výjimku ImportError, protože naimportovaný modul nelze z běžícího interpretu odstranit."
+    ],
+    "answer": 0,
+    "explanation": "Příkaz del modul smaže pouze lokální proměnnou v namespace. Modul zůstává načtený v registru sys.modules, takže další import kód znovu nevykoná; k novému načtení slouží importlib.reload()."
+  },
+  {
+    "id": "q4",
+    "type": "predict_output",
+    "question": "Který z následujících zápisů relativního importu v rámci balíčku je v Pythonu platný?",
+    "options": [
+      "A) from . import utils (relativní importy vyžadují syntaktickou formu from ... import).",
+      "B) import .utils (relativní tečka bez klíčového slova from není v syntaxi povolená).",
+      "C) import ..tools (zpětný posun o dvě úrovně tečkami u příkazu import nelze použít).",
+      "D) from . import .utils (kombinace teček v modulu i u příkazu import je syntaktická chyba)."
+    ],
+    "answer": 0,
+    "explanation": "V Pythonu je relativní import povolen pouze ve formě `from .[module] import [name]`. Příkaz `import .module` vyvolá syntaktickou chybu SyntaxError."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl mezi běžným balíčkem (regular package) a jmenným balíčkem (namespace package)?",
+    "options": [
+      "A) Běžný balíček vyžaduje soubor __init__.py, zatímco jmenný balíček jej neobsahuje a může být rozprostřen v sys.path.",
+      "B) Jmenný balíček vyžaduje soubor __init__.py, zatímco běžný balíček může existovat pouze jako adresář bez souborů.",
+      "C) Běžný balíček podporuje relativní importy, zatímco jmenný balíček umožňuje pouze absolutní importy podmodulů.",
+      "D) Jmenný balíček má při importu vždy vyšší prioritu než běžný balíček se stejným názvem v prohledávané cestě."
+    ],
+    "answer": 0,
+    "explanation": "Jmenný balíček (namespace package) od Pythonu 3.3 nezahrnuje __init__.py, což umožňuje jeho složkám sídlit v různých adresářích v sys.path. Běžný balíček s __init__.py má při vyhledávání vždy prioritu."
+  },
+  {
+    "id": "q6",
+    "type": "predict_output",
+    "question": "Co vypíše kód v souboru `calc.py`, pokud jej spustíte přímo z terminálu příkazem `python calc.py`?\n\n```python\ndef add(a, b):\n    return a + b\n\nprint(__name__)\n```",
+    "options": [
+      "A) __main__",
+      "B) calc",
+      "C) calc.py",
+      "D) __calc__"
+    ],
+    "answer": 0,
+    "explanation": "Při přímém spuštění souboru jako hlavního skriptu nastaví Python magickou proměnnou __name__ na řetězec \"__main__\". Pokud by byl soubor importován jako modul, obsahoval by řetězec \"calc\"."
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Co se stane při spuštění adresáře nebo `.zip` archivu příkazem `python mojebiblioteka`?",
+    "options": [
+      "A) Python vyhledá v kořeni daného adresáře či archivu soubor __main__.py a spustí jeho kód.",
+      "B) Python automaticky načte a vykoná soubor __init__.py z kořene balíčku jako hlavní skript.",
+      "C) Příkaz selže s chybou IsADirectoryError, protože Python neumí spouštět celé adresáře.",
+      "D) Python zkompiluje všechny soubory .py do .pyc a uloží je do nového adresáře __pycache__."
+    ],
+    "answer": 0,
+    "explanation": "Adresář nebo ZIP archiv obsahující soubor __main__.py lze přímo předat interpretu Pythonu k vykonání jako samostatný spustitelný balíček."
+  },
+  {
+    "id": "q8",
+    "type": "true_false_tricky",
+    "question": "Posuďte pravdivost tvrzení: V Pythonu 3 stačí ke spuštění modulu ponechat pouze soubor `.pyc` v podadresáři `__pycache__` a zdrojový `.py` smazat.",
+    "options": [
+      "A) Nepravda: Python 3 soubory v __pycache__ ignoruje, pokud v nadřazeném adresáři chybí odpovídající zdrojový .py soubor.",
+      "B) Pravda: Python 3 automaticky načte zkompilovaný .pyc z __pycache__ bez ohledu na to, zda zdrojový .py soubor existuje."
+    ],
+    "answer": 0,
+    "explanation": "V Pythonu 3 se .pyc v __pycache__ nenaimportují bez existujícího .py souboru v nadřazeném adresáři. Pro samostatné spuštění bez zdrojového kódu je nutné .pyc přesunout do nadřazeného adresáře a odstranit ze jména označení cpython-3x."
+  }
+]

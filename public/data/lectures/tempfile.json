@@ -1,0 +1,54 @@
+{
+  "slug": "tempfile",
+  "total": 8,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Často potřebujete ve svém programu někam odložit dočasná pracovní data. Existují standardní místa, která byste měli zkusit použít (např. <em>C:\\TEMP</em> nebo <em>/tmp</em>) a která jsou k tomu např. svými právy pro zápis uzpůsobena.\r\n  </p>\r\n  <p>\r\n    Starat se o to všechno ale sám a navíc tak, aby to fungovalo na libovolné cílové platformě, je dosti otrava a navíc další bezvadné místo na zanešení chyb (a to nejen bezpečnostních). Python právě pro tyto potřeby obsahuje velmi univerzální modul <code>tempfile</code>.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Práce s dočasnými objekty",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Práce s dočasnými objekty</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Z pohledu uživatele se s <em>dočasnými objekty</em> (týká se to jak souborů, tak adresářů) pracuje téměř úplně stejně jako s normálními soubory a adresáři. Především to znamená, že výstupy příslušných konstruktorů můžete použít například v kontextu <code>with</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    with tempfile.TemporaryFile() as fp:\r\n        BLOK\r\n  </pre>\r\n  <p>\r\n    Snad jediným – zato ale důležitým – rozdílem je, že z důvodů co největší platformní nezávislosti jsou <em>dočasné soubory</em> ve výchozím nastavení otevírány zásadně jako <em>binární</em> (tedy v módu <code>b</code>).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Výchozí mód otevření souborů je <code>w+b</code>, tedy binární otevřené pro čtení i zápis, přičemž případný již existující neprázdný soubor je při otevření nejdříve smazán.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Umístění dočasných souborů",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Umístění dočasných souborů</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Ačkoli většině funkcí modulu <em>tempfile</em> můžete vnutit vlastní umístění dočasných souborů, opravdu to není dobrý nápad, pokud pro to nemáte skutečně dobrý důvod.\r\n  </p>\r\n  <p>\r\n    Python sám bude hledat vhodné místo podle následujícího algoritmu:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n        Adresář uložený v proměnné prostředí <code>TMPDIR</code>.\r\n    </li>\r\n    <li>\r\n        Adresář uložený v proměnné prostředí <code>TEMP</code>.\r\n    </li>\r\n    <li>\r\n        Adresář uložený v proměnné prostředí <code>TMP</code>.\r\n    </li>\r\n    <li>\r\n        Platformně závislé umístění:\r\n        <ul>\r\n            <li>\r\n                <em>Windows</em>: postupně adresáře <code>C:\\TEMP</code>, <code>C:\\TMP</code>, <code>\\TEMP</code> a <code>\\TMP</code>\r\n            </li>\r\n            <li>\r\n                <em>všude jinde</em>: postupně adresáře <code>/tmp</code>, <code>/var/tmp</code> a <code>/usr/tmp</code>\r\n            </li>\r\n        </ul>\r\n    </li>\r\n    <li>\r\n        Jako místo poslední záchrany se Python pokusí použít aktuální pracovní adresář (tedy typicky místo spuštění programu).\r\n    </li>\r\n  </ol>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "„TemporaryFile“",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„TemporaryFile“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Ačkoli plný konstruktor <code>TemporaryFile</code> pro tvorbu <strong>dočasných nepojmenovaných souborů</strong>, které jsou před každým pokud možno schovány (tím je myšleno, že jejich jméno není dostupné v programu a podporuje-li to platforma, tak ani v ní), je dosti šílený..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    tempfile.TemporaryFile(mode='w+b', buffering=None, encoding=None,\r\n                           newline=None, suffix='', prefix='tmp', dir=None)\r\n  </pre>\r\n  <p>\r\n    ..pro běžné použití vzhledem k rozumnému výchozímu nastavení jednotlivých atributů není většinou potřeba používat složitější konstrukci než tuto:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    with tempfile.TemporaryFile() as fp:\r\n        BLOK\r\n  </pre>\r\n  <p>\r\n    Z hlediska snad všech standardních operací se s výstupním objektem <em>fp</em> zachází stejně jako s každým běžným souborem.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "„NamedTemporaryFile“",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">„NamedTemporaryFile“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Konstruktor <code>NamedTemporaryFile</code> pro tvorbu <strong>dočasných pojmenovaných souborů</strong> je podobně šílený..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    tempfile.NamedTemporaryFile(mode='w+b', buffering=None, encoding=None,\r\n                                newline=None, suffix='', prefix='tmp', dir=None,\r\n                                delete=True)\r\n  </pre>\r\n  <p>\r\n    ..ale opět se s ním pracuje stejně jako s normálním souborem. Oproti <em>TemporaryFile</em> je tu však samozřejmě několik rozdílů:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        Vytvořený objekt má viditelné jméno. Je přístupné pod parametrem <em>file</em> na otevřeném proudu (<em>stream</em>u).\r\n    </li>\r\n    <li>\r\n        Změnou parametru <em>delete</em> můžete určit, zda se dočasný soubor po ukončení práce s ním má ihned smazat (výchozí nastavení) nebo ne.\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "„SpooledTemporaryFile“",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">„SpooledTemporaryFile“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Třetí možností, jak zavést dočasný soubor, je konstruktor <code>SpooledTemporaryFile</code>. Na první pohled vypadá ještě šíleněji než oba předchozí..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    tempfile.SpooledTemporaryFile(max_size=0, mode='w+b', buffering=None,\r\n                                  encoding=None, newline=None, suffix='',\r\n                                  prefix='tmp', dir=None)\r\n  </pre>\r\n  <p>\r\n    ..ale ve skutečnosti je jen logickým završením řady dočasných souborů – dočasný soubor v jeho provedení je možno (za jistých podmínek) držet převážně pouze v paměti a fyzicky ho ukládat na disk až na vyžádání. Soubor přitom bude uložen z paměti na disk, pokud:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        Jeho velikost překročí hodnotu paramatru <em>max_size</em>.\r\n    </li>\r\n    <li>\r\n        Na otevřeném proudu (<em>stream</em>u) je zavolána metoda <code>fileno()</code> (sloužící ke zjištění popisovače souboru).\r\n    </li>\r\n    <li>\r\n        Je vynuceno jeho uložení na disk zavoláním metody <code>rollover()</code> (na otevřeném proudu).\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "„TemporaryDirectory“",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">„TemporaryDirectory“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Posledním z objektů je <code>TemporaryDirectory</code> sloužící pro správu dočasných adresářů:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    tempfile.TemporaryDirectory(suffix='', prefix='tmp', dir=None)\r\n  </pre>\r\n  <p>\r\n    Návratový objekt může být (stejně jako všechny předchozí) přímo použit v kontextu <em>with</em>. Po jeho opuštění je obsah dočasného adresáře, jakož i adresář sám, smazán ze souborového systému. Přitom:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        Jméno adresáře je uloženo v atributu <em>name</em> vráceného objektu.\r\n    </li>\r\n    <li>\r\n        Dočasný adresář můžete úmyslně promazat zavoláním jeho metody <code>cleanup()</code>.\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    Do takto vyvořeného adresáře můžete pak sázet soubory (nebo i adresáře) třebas i běžnými souborovými metodami – dočasný adresář je zlikviduje při svém uzavření (tedy odchodu z kontextu <em>with</em> nebo po ukončení skriptu).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Výhodné, potřebujete-li vytvářet soubory sice dočasné, ale konkrétního jména.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Ukázka",
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Ukázka</h2></div><div class=\"section-body\">\r\n\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; import tempfile\r\n\r\n# A) create a temporary file and write some data to it\r\n&gt;&gt;&gt; fp = tempfile.TemporaryFile()\r\n&gt;&gt;&gt; fp.write(b'Hello world!')\r\n# read data from file\r\n&gt;&gt;&gt; fp.seek(0)\r\n&gt;&gt;&gt; fp.read()\r\nb'Hello world!'\r\n# close the file, it will be removed\r\n&gt;&gt;&gt; fp.close()\r\n\r\n# B) create a temporary file using a context manager\r\n&gt;&gt;&gt; with tempfile.TemporaryFile() as fp:\r\n...     fp.write(b'Hello world!')\r\n...     fp.seek(0)\r\n...     fp.read()\r\nb'Hello world!'\r\n&gt;&gt;&gt;\r\n# file is now closed and removed\r\n\r\n# C) create a temporary directory using the context manager\r\n&gt;&gt;&gt; with tempfile.TemporaryDirectory() as tmpdirname:\r\n...     print('created temporary directory', tmpdirname)\r\n&gt;&gt;&gt;\r\n# directory and contents have been removed\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Velmi mírně upraveno podle dokumentace.\r\n  </div></div>\r\n\r\n</div>"
+    }
+  ]
+}

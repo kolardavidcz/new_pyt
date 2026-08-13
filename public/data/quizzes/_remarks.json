@@ -1,0 +1,108 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Proč je zápis `{}` pro vytvoření prázdného slovníku rychlejší než volání `dict()`?",
+    "options": [
+      "A) Zápis `{}` překládá interpretr přímo na jedinou bajtkódovou instrukci, zatímco `dict()` vyžaduje dohledání jména v globálním prostoru.",
+      "B) Zápis `{}` alokuje paměť přímo v paměti procesoru, zatímco `dict()` vytváří objekt v dynamické paměti RAM pro celé prostředí.",
+      "C) Zápis `{}` automaticky zamkne slovník proti úpravám, zatímco `dict()` vytváří dynamickou a libovolně měnitelnou datovou strukturu.",
+      "D) Zápis `{}` provádí kontrolu typů klíčů již při překladu, zatímco `dict()` odkládá všechny kontroly typů až na samotný běh programu."
+    ],
+    "answer": 0,
+    "explanation": "Zápis `{}` odpovídá přímo instrukci BUILD_MAP v bajtkódu. Volání `dict()` vyžaduje dohledání jména v globálním/vestavěném jmenném prostoru a teprve poté zavolání callable objektu."
+  },
+  {
+    "id": "q2",
+    "type": "predict_output",
+    "question": "Co vypíše následující kód po úpravě seznamu přes odkaz?",
+    "code": "xs = ['a', 'b', 'c']\nys = xs\nxs.remove('b')\nprint(ys)",
+    "options": [
+      "A) `['a', 'c']` — proměnné `xs` a `ys` odkazují na stejný objekt v paměti, takže změna v `xs` se projeví i v `ys`.",
+      "B) `['a', 'b', 'c']` — přiřazení `ys = xs` vytvoří nezávislou kopii obsahu seznamu, takže `ys` zůstane nezměněn.",
+      "C) `['b']` — metoda `remove()` odstraní ze seznamu zbývající prvky a v odkazované proměnné ponechá pouze vymazaný prvek.",
+      "D) `None` — metoda `remove()` modifikuje seznam na místě a vrací novou prázdnou hodnotu, která se přiřadí do `ys`."
+    ],
+    "answer": 0,
+    "explanation": "V Pythonu přiřazení `ys = xs` nevytváří kopii, ale nový alias k témuž objektu v paměti. Modifikace `xs.remove('b')` upraví samotný objekt, což je viditelné i přes jméno `ys`."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Co vypíše následující kód demonstrující mělkou kopii u vnořených seznamů?",
+    "code": "xs = [1, ['a', 'b']]\nys = xs[:]\nxs[1].pop()\nprint(ys)",
+    "options": [
+      "A) `[1, ['a']]` — mělká kopie zkopíruje pouze vnější seznam, vnitřní seznam zůstává sdílený v obou proměnných.",
+      "B) `[1, ['a', 'b']]` — výřez `xs[:]` vytvoří kompletní hlubokou kopii včetně všech vnořených datových struktur.",
+      "C) `[1, []]` — metoda `pop()` vyprázdní vnořený seznam v primárním objektu i ve všech jeho nezávislých kopiích.",
+      "D) `[['a']]` — zkopírovaný seznam automaticky odstraní celočíselné prvky na nultém indexu při úpravě podseznamu."
+    ],
+    "answer": 0,
+    "explanation": "Výřez `xs[:]` vytvoří mělkou kopii vnějšího seznamu. Prvky uvnitř (vnořený seznam `['a', 'b']`) jsou však stále stejné reference. Úprava `xs[1].pop()` se proto projeví i v `ys`."
+  },
+  {
+    "id": "q4",
+    "type": "true_false_tricky",
+    "question": "Lze n-tici `(1, 2, [3, 4])` použít jako klíč ve slovníku, protože samotná n-tice je immutable typ?",
+    "options": [
+      "A) Nepravda — n-tice je hešovatelná pouze tehdy, pokud jsou hešovatelné všechny prvky, které sama obsahuje.",
+      "B) Pravda — typ `tuple` je neproměnný, takže jeho heš je konstantní bez ohledu na datové typy vnořených prvků."
+    ],
+    "answer": 0,
+    "explanation": "Aby byla n-tice hešovatelná (a použitelná jako klíč slovníku nebo prvek množiny), musejí být hešovatelné i všechny její prvky. Protože obsahuje mutable seznam `[3, 4]`, volání `hash()` vyvolá TypeError."
+  },
+  {
+    "id": "q5",
+    "type": "predict_output",
+    "question": "Co vypíše kód porovnávající vyprázdnění slovníku metodou `clear()` a přiřazením `{}`?",
+    "code": "d1 = d2 = {'a': 1, 'b': 2}\nd1.clear()\nprint(d2)",
+    "options": [
+      "A) `{}` — metoda `clear()` vyprázdní existující objekt v paměti, na který odkazuje jak `d1`, tak `d2`.",
+      "B) `{'a': 1, 'b': 2}` — metoda `clear()` se aplikuje pouze na jméno `d1` a druhý ukazatel `d2` ponechá netknutý.",
+      "C) `None` — zavolání `clear()` smaže celý slovník z paměti a vrátí speciální konduktor `None` pro oba odpovídající proměnné.",
+      "D) `KeyError` — odstranění všech prvků způsobí chybu klíče při pokusu o přistoupení k prázdnému slovníku přes `d2`."
+    ],
+    "answer": 0,
+    "explanation": "Metoda `d1.clear()` modifikuje stávající objekt slovníku přímo v paměti. Protože `d2` odkazuje na tentýž objekt, zobrazí se vyprázdněný slovník `{}`."
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaký je rozdíl v asymptotické časové složitosti operace `x in kontejner` pro seznam (`list`) a množinu (`set`)?",
+    "options": [
+      "A) U seznamu je časová složitost O(n), protože vyžaduje lineární prohledání; u množiny je v průměrném případě O(1) díky hešování.",
+      "B) U seznamu je časová složitost O(1) díky přímému indexování prvků; u množiny je O(n) kvůli nutnosti proít se všemi heši.",
+      "C) Pro oba typy je časová složitost operace `in` zcela shodná a dosahuje nejhoršího možného případu O(log n) pro všechny vstupy.",
+      "D) U seznamu závisí časová složitost na seřazení prvků v rozsahu O(1) až O(n); u množiny je vždy striktně kvadratická O(n^2)."
+    ],
+    "answer": 0,
+    "explanation": "Seznam vyžaduje prohledání prvek po prvku (O(n)). Množina využívá hešovací tabulku, takže vyhledání prvku probíhá v průměrném čase O(1)."
+  },
+  {
+    "id": "q7",
+    "type": "fill_blank_choice",
+    "question": "Jaký konstruktor musíte použít pro vytvoření prázdné množiny?\n\n```python\n# Jaký konstruktor musíte použít pro vytvoření prázdné množiny?\nvysledek = ________\n```",
+    "code": "prazdna_mnozina = ________()\nprint(type(prazdna_mnozina))",
+    "options": [
+      "`set`",
+      "`dict`",
+      "`frozenset`",
+      "`tuple`"
+    ],
+    "answer": 0,
+    "explanation": "V Pythonu zápis `{}` označuje prázdný slovník (`dict`). Pro vytvoření prázdné množiny je nutné použít explicitní konstruktor `set()`."
+  },
+  {
+    "id": "q8",
+    "type": "multiple_choice",
+    "question": "Proč v Pythonu platí `hash(1) == hash(1.0)`, ale `id(1) == id(1.0)` je v obecném případě `False`?",
+    "options": [
+      "A) Funkce `hash()` vrací stejnou hodnotu pro čísla se stejnou matematickou hodnotou, zatímco `id()` vrací unikátní adresu objektu v paměti.",
+      "B) Funkce `hash()` porovnává bajtové kódování typů na disku, zatímco `id()` přepočítává celkový počet alokovaných bajtů v paměti.",
+      "C) Funkce `hash()` převádí všechna reálná čísla na celá čísla, zatímco `id()` zjišťuje aktuální úroveň zanoření objektu v programu.",
+      "D) Funkce `hash()` a `id()` jsou plně zastupitelné a uvedený rozdíl vrací pouze interpretr spuštěný v optimalizačním režimu `-O`."
+    ],
+    "answer": 0,
+    "explanation": "`hash()` je navržen tak, aby pro hodnoty, které se sobě rovnají (`1 == 1.0`), vracel stejný heš. `id()` vrací adresu konkrétní instance objektu v paměti RAM."
+  }
+]

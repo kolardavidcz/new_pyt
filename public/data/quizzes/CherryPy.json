@@ -1,0 +1,117 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jaká je hlavní architektura a úkol knihovny CherryPy při zpracování webových požadavků?",
+    "options": [
+      "A) Přijmout HTTP požadavek a podle URL ho přemapovat na odpovídající metodu třídy serveru.",
+      "B) Automaticky vygenerovat kompletní databázový ORM model a HTML šablony pro celou aplikaci.",
+      "C) Spravovat na klientské straně prohlížeče DOM strom a spouštět asynchronní JavaScript kód.",
+      "D) Zabezpečit šifrování TCP síťových paketů a řídit routování IP adres na úrovni systému."
+    ],
+    "answer": 0,
+    "explanation": "CherryPy je minimalistický Python web framework, jehož hlavním úkolem je přijmout HTTP požadavek, najít podle URL příslušnou vystavenou metodu a vrátit její odpovídající textový či HTML výstup."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Na jakou URL adresu bude reagovat níže uvedená metoda webového serveru CherryPy?\n\nimport cherrypy\n\nclass Vystava:\n    @cherrypy.expose\n    def exponaty(self):\n        return \"Seznam exponátů\"\n\ncherrypy.quickstart(Vystava())",
+    "options": [
+      "A) Na adresu http://localhost:8080/exponaty po odeslání HTTP požadavku GET nebo POST.",
+      "B) Výhradně na kořenovou adresu http://localhost:8080/ jako výchozí úvodní stránka.",
+      "C) Na adresu http://localhost:8080/vystava/exponaty včetně názvu obslužné třídy.",
+      "D) Na adresu http://localhost:8080/api/exponaty s automaticky přidaným prefiksem."
+    ],
+    "answer": 0,
+    "explanation": "CherryPy mapuje název metody přímo na URL pod kořenovým mountpointem (/). Metoda exponaty se tak automaticky zpřístupní na adrese /exponaty."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jak CherryPy předává parametry z HTTP dotazu (metodou GET i POST) do obslužné metody v Pythonu?",
+    "options": [
+      "A) Mapuje parametry dotazu přímo na pojmenované argumenty příslušné obslužné metody.",
+      "B) Ukládá přicházející parametry výhradně do slovníku v objektu request.params.",
+      "C) Vyžaduje manuální rozparsování řetězce dotazu pomocí modulu urllib v metodě.",
+      "D) Předává všechny parametry jako jediný slovník do prvního argumentu metody."
+    ],
+    "answer": 0,
+    "explanation": "Bez ohledu na to, zda byly parametry předány v URL (GET) nebo v těle (POST), CherryPy je automaticky namapuje na pojmenované argumenty metody (např. def info(self, jmeno, vek))."
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Doplňte klíč v konfiguraci CherryPy pro statické soubory určující zapnutí statického adresáře:\n\nconfig = {\n    '/static': {\n        'tools.staticdir.________': True,\n        'tools.staticdir.dir': '/var/www/public'\n    }\n}\n\n```python\n# Doplňte klíč v konfiguraci CherryPy pro statické soubory určující zapnutí statického adresáře:\n\nconfig = {\n    '/static': {\n        'tools.staticdir.________': True,\n        'tools.staticdir.dir': '/var/www/public'\n    }\n}\nvysledek = ________\n```",
+    "options": [
+      "on",
+      "enable",
+      "active",
+      "enabled"
+    ],
+    "answer": 0,
+    "explanation": "Konfigurace statických souborů v CherryPy používá klíč 'tools.staticdir.on': True k aktivaci přímého servírování souborů z daného adresáře."
+  },
+  {
+    "id": "q5",
+    "type": "true_false_tricky",
+    "question": "Vyhodnoťte pravdivost tvrzení o cestách v konfiguraci pro servírování statických souborů v CherryPy:\n\nVšechny cesty k adresářům předávané do nastavení tools.staticdir.dir musí být z bezpečnostních důvodů uvedeny zásadně jako absolutní cesty.",
+    "options": [
+      "A) Pravda – CherryPy vyžaduje v konfiguraci tools.staticdir.dir výhradně absolutní cestu v souborovém systému.",
+      "B) Nepravda – CherryPy preferuje z důvodu přenositelnosti relativní cesty vztažené k aktuálnímu pracovnímu adresáři."
+    ],
+    "answer": 0,
+    "explanation": "CherryPy z bezpečnostních důvodů (vyhnutí se neoprávněnému procházení adresářů) striktně vyžaduje, aby cesty v konfiguraci statických adresářů byly absolutní (lze použít např. os.path.abspath())."
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jak se po zpracování dekorátorem @cherrypy.popargs namapují části URL /art/nirvana/nevermind?\n\nimport cherrypy\n\n@cherrypy.popargs('artist', 'album')\nclass Music:\n    @cherrypy.expose\n    def index(self, artist, album):\n        return f\"{artist} - {album}\"\n\ncherrypy.quickstart(Music(), '/art')",
+    "options": [
+      "A) Hodnotou artist bude 'nirvana' a příslušnou hodnotou album bude 'nevermind'.",
+      "B) Hodnotou artist bude 'art' a příslušnou hodnotou album bude 'nirvana'.",
+      "C) Vyvolá 404 Not Found, protože dekorátor popargs nepodporuje více argumentů.",
+      "D) Hodnotou artist bude 'nevermind' a příslušnou hodnotou album bude 'nirvana'."
+    ],
+    "answer": 0,
+    "explanation": "Dekorátor @cherrypy.popargs('artist', 'album') postupně odebere (popne) z cesty URL následující dvě části a předá je metodě index jako pojmenované argumenty artist='nirvana' a album='nevermind'."
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Jak správně spustit webový server CherryPy s více navzájem nezávislými aplikacemi pripojenými na různé cesty URL?",
+    "options": [
+      "A) Připojením aplikací pomocí cherrypy.tree.mount() a spuštěním engine přes engine.start() a engine.block().",
+      "B) Opakovaným sekvenčním voláním metody cherrypy.quickstart() v cyklu pro každou jednotlivou aplikaci zvlášť.",
+      "C) Vytvořením více samostatných systémových vláken, kde každé vlákno zavolá metodu cherrypy.quickstart().",
+      "D) Sloučením všech tříd aplikací do jedné společné třídy předané jako argument do cherrypy.quickstart()."
+    ],
+    "answer": 0,
+    "explanation": "Metoda quickstart() slouží pouze jako zkratka pro jedinou aplikaci. Pro více aplikací se použije tree.mount(App1(), '/app1'), tree.mount(App2(), '/app2') a server se spustí přes cherrypy.engine.start() a cherrypy.engine.block()."
+  },
+  {
+    "id": "q8",
+    "type": "fill_blank_choice",
+    "question": "Doplňte název metody pro zápis vlastních chybových zpráv do logu v CherryPy:\n\nimport cherrypy\n\nclass App:\n    @cherrypy.expose\n    def index(self):\n        cherrypy.________(\"Došlo k neobvyklé události v aplikaci\")\n        return \"OK\"\n\n```python\n# Doplňte název metody pro zápis vlastních chybových zpráv do logu v CherryPy:\n\nimport cherrypy\n\nclass App:\n    @cherrypy.expose\n    def index(self):\n        cherrypy.________(\"Došlo k neobvyklé události v aplikaci\")\n        return \"OK\"\nvysledek = ________\n```",
+    "options": [
+      "log",
+      "write_log",
+      "error",
+      "logger"
+    ],
+    "answer": 0,
+    "explanation": "Pomocí cherrypy.log(\"zpráva\") lze z libovolného místa aplikace zapisovat vlastní záznamy do chybového logu CherryPy."
+  },
+  {
+    "id": "q9",
+    "type": "multiple_choice",
+    "question": "Jak vyřešit kolizi složených závorek {} při generování HTML obsahu obsahujícího CSS styly přes metodu str.format()?",
+    "options": [
+      "A) Zdvojením složených závorek {{ a }} ve zbylém neformátovaném obsahu šablony.",
+      "B) Předsazením zpětného lomítka \\{ a \\} před každou složenou závorku v CSS stylu.",
+      "C) Obalením celého CSS bloku do HTML značky <raw> zabraňující interpretaci závorek.",
+      "D) Přechodem na nepodporovaný tvar složených závorek s dolarem ${ a } v celém kódu."
+    ],
+    "answer": 0,
+    "explanation": "V Pythonním řetězcové metodě format() se literal složená závorka zapisuje zdvojeně {{ a }}. To zabrání chybě KeyError nebo ValueError při formátování šablony obsahující CSS či JS kód."
+  }
+]

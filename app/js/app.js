@@ -80,17 +80,16 @@ async function boot() {
   });
 
   try {
-    const [course, slides, pages, exercises, quizzes] = await Promise.all([
+    const [course, slides, pages, exercises] = await Promise.all([
       loadJson("/data/course.json"),
       loadJson("/data/slides.json").catch(() => ({})),
       loadJson("/data/pages-index.json").catch(() => ({})),
       loadJson("/data/exercises.json").catch(() => ({})),
-      loadJson("/data/quizzes.json").catch(() => ({})),
     ]);
     state.slides = slides || {};
     state.pagesIndex = pages || {};
     state.exercises = exercises || {};
-    state.quizzes = quizzes || {};
+    state.quizzes = {};
     buildIndexes(course);
     loadRelevanceOverrides();
     renderTree();

@@ -1,0 +1,78 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Který datový typ je v modulu shelve vyžadován pro klíče perzistentního slovníku?",
+    "options": [
+      "A) Výhradně textové řetězce str.",
+      "B) Libovolný immutable typ s hash().",
+      "C) Pouze celá čísla int a str.",
+      "D) Jakýkoliv piklitelný objekt."
+    ],
+    "answer": 0,
+    "explanation": "Backend dbm pod modulem shelve vyžaduje striktně řetězcové klíče (str). Hodnotami v perzistentním slovníku mohou být libovolné serializovatelné pythoní objekty."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jaký účinek má příkaz db['seznam'].append(99) v databázi shelve při výchozím nastavení writeback=False?",
+    "options": [
+      "A) Seznam v databázi zůstane nezměněn, protože modifikace mutable objektu se bez přiřazení nezapsala.",
+      "B) Změna se okamžitě zapíše na disk do souboru databáze bez nutnosti jakéhokoliv dalšího zásahu.",
+      "C) Kód selže a vyvolá výjimku PermissionError kvůli zápisu do neotevřené vyrovnávací paměti.",
+      "D) Změna se uloží do paměťové cache a provede se její zapsání až při volání metody db.close()."
+    ],
+    "answer": 0,
+    "explanation": "Při výchozím writeback=False vrací db['seznam'] odpicklovaný dočasný objekt. Příkaz .append(99) modifikuje tuto kopii. Pro uložení na disk je nutné znovupřiřazení db['seznam'] = temp."
+  },
+  {
+    "id": "q3",
+    "type": "true_false_tricky",
+    "question": "Posuďte výhody a nevýhody otevření databáze shelve s parametrem writeback=True.",
+    "options": [
+      "A) Pravda: Umožňuje přímé modifikace mutable objektů, ale udržuje v paměti cache všech načtených položek.",
+      "B) Nepravda: Zrychluje zavírání databáze, ale zakazuje použití in-place mutable operací na slovníku."
+    ],
+    "answer": 0,
+    "explanation": "Nastavení writeback=True uchovává všechny načtené i upravené položky v paměťovém cache slovníku. To umožňuje in-place úpravy, ale dramaticky zvyšuje spotřebu paměti a zpomaluje sync/close."
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Který mód (flag) předaný funkci shelve.open() vynutí vytvoření nové prázdné databáze s přepisem původní?\n\n```python\ndb = shelve.open('data.db', flag='________')\n```",
+    "options": [
+      "n",
+      "c",
+      "w",
+      "r"
+    ],
+    "answer": 0,
+    "explanation": "Mód 'n' (new) otevře databázi pro čtení i zápis a vždy vytvoří novou prázdnou databázi. Mód 'c' vytvoří novou databázi pouze tehdy, pokud ještě neexistuje."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Jaká omezení platí pro přístup více procesů či skriptů k téže databázi modulu shelve?",
+    "options": [
+      "A) Pro zápis může mít databázi otevřenou současně pouze jediný proces; pro čtení více procesů.",
+      "B) Databáze plně podporuje paralelní zápis z více procesů díky zámkům na úrovni backendu.",
+      "C) Databázi může mít současně otevřenou právě jeden proces bez ohledu na čtení či zápis.",
+      "D) Konkurentní čtení i zápis jsou podporovány výhradně v případě použití backendu dbm.dumb."
+    ],
+    "answer": 0,
+    "explanation": "Modul shelve nezajišťuje zamykání pro paratelní zápis. Zápis z více procesů naráz může poškodit databázi. Paralelní čtení z více procesů je bezpečné."
+  },
+  {
+    "id": "q6",
+    "type": "predict_output",
+    "question": "Které soubory vytvoří záložní backend dbm.dumb na disku při práci s databází pojmenovanou mojedata?",
+    "options": [
+      "A) Soubory mojedata.dat a mojedata.dir (případně mojedata.bak při spuštěném provozu).",
+      "B) Pouze jediný binární soubor s příponou mojedata.db vytvořený ve složce projektu.",
+      "C) Dvojici souborů mojedata.sqlite a mojedata.log pro podporu transakčního logování.",
+      "D) Trojici souborů mojedata.txt, mojedata.json a mojedata.bin v cache adresáři."
+    ],
+    "answer": 0,
+    "explanation": "Čistě pythoní backend dbm.dumb vytváří dvojici souborů .dat a .dir (plus .bak během manipulace), které uchovávají indexy klíčů a samotná bajtová data."
+  }
+]
