@@ -30,54 +30,55 @@ export function openImprovementModal(deckKey, q, qIdx) {
   modal.innerHTML = `
     <div class="modal-card">
       <div class="modal-header">
-        <h3>Navrhnout úpravu</h3>
+        <h3>Nahlásit chybu nebo navrhnout úpravu</h3>
         <button type="button" class="btn-close-modal" aria-label="Zavřít">✕</button>
       </div>
       <div class="modal-body">
         <div class="q-summary-box">
           <div class="q-sum-row"><strong>Prezentace:</strong> <code>${escapeHtml(deckKey)}</code></div>
-          <div class="q-sum-row"><strong>ID Otázky:</strong> <code>${escapeHtml(qId)}</code></div>
+          <div class="q-sum-row"><strong>Otázka:</strong> <code>${escapeHtml(qId)}</code></div>
           <div class="q-stem-preview">${escapeHtml(stemClean.slice(0, 150))}${stemClean.length > 150 ? "…" : ""}</div>
         </div>
 
-        <label class="improve-form-label">Důvod vylepšení / typ chyby:</label>
+        <label class="improve-form-label">Typ připomínky:</label>
         <div class="radio-group">
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="q_a_makes_no_sense" checked />
+            <input type="radio" name="improveReason" value="answer_or_code_error" checked />
             <div class="radio-txt">
-              <strong>1. Otázka nebo odpověď nedává smysl</strong>
-              <small>Chybí klíčová informace, nepřesné zadání nebo nesouhlasí kód</small>
+              <strong>Faktická chyba v odpovědi nebo kódu</strong>
+              <small>Nesprávně označená odpověď, kód nefunguje nebo hází chybu</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="low_quality_not_in_text" />
+            <input type="radio" name="improveReason" value="unclear_formulation_or_typo" />
             <div class="radio-txt">
-              <strong>2. Nekvalitní otázka / mimo prezentaci</strong>
-              <small>Otázka není v prezentaci nebo navrhujete vytvořit novou</small>
+              <strong>Nejasná formulace nebo překlep</strong>
+              <small>Matoucí zadání, dvojznačnost nebo pravopisný překlep</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="style_rewrite_improve" />
+            <input type="radio" name="improveReason" value="off_topic_or_missing_context" />
             <div class="radio-txt">
-              <strong>3. Zlepšit styl, kód nebo formulaci</strong>
-              <small>Přeformulovat text, zlepšit kódový příklad / styl zadání</small>
+              <strong>Mimo probírané téma / chybí kontext</strong>
+              <small>Téma nebylo ve výkladu nebo chybí potřebné vysvětlení</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="other" />
+            <input type="radio" name="improveReason" value="improvement_idea" />
             <div class="radio-txt">
-              <strong>4. Jiný nápad nebo námitka</strong>
+              <strong>Námět na vylepšení nebo novou otázku</strong>
+              <small>Návrh na doplnění otázky, lepší varianty nebo příklad</small>
             </div>
           </label>
         </div>
 
-        <label class="improve-form-label" style="margin-top:14px;">Poznámka k úpravě (co přesně vylepšit):</label>
-        <textarea class="improve-notes-input" placeholder="Popište, co konkrétně vylepšit nebo co chybí..." rows="3"></textarea>
+        <label class="improve-form-label" style="margin-top:14px;">Popis připomínky (co konkrétně upravit):</label>
+        <textarea class="improve-notes-input" placeholder="Popište stručně, v čem je problém nebo jak znění upravit..." rows="3"></textarea>
         <div class="modal-feedback-msg hidden" style="margin-top:10px; font-size:12px; color:#89d185; font-weight:600;"></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-cancel-modal">Zrušit</button>
-        <button type="button" class="btn primary btn-submit-improve">Uložit návrh úpravy</button>
+        <button type="button" class="btn primary btn-submit-improve">Odeslat připomínku</button>
       </div>
     </div>
   `;
@@ -97,17 +98,17 @@ export function openImprovementModal(deckKey, q, qIdx) {
 
   submitBtn?.addEventListener("click", async () => {
     const selectedRadio = modal.querySelector('input[name="improveReason"]:checked');
-    const category = selectedRadio ? selectedRadio.value : "q_a_makes_no_sense";
+    const category = selectedRadio ? selectedRadio.value : "answer_or_code_error";
     
-    let categoryLabel = "Otázka/odpověď nedává smysl";
-    if (category === "low_quality_not_in_text") categoryLabel = "Nekvalitní otázka / vytvořit novou";
-    else if (category === "style_rewrite_improve") categoryLabel = "Zlepšit styl a formulaci";
-    else if (category === "other") categoryLabel = "Jiný nápad";
+    let categoryLabel = "Chyba v odpovědi nebo kódu";
+    if (category === "unclear_formulation_or_typo") categoryLabel = "Nejasná formulace / překlep";
+    else if (category === "off_topic_or_missing_context") categoryLabel = "Mimo probírané téma";
+    else if (category === "improvement_idea") categoryLabel = "Námět na vylepšení";
 
     const userNote = notesInput ? notesInput.value.trim() : "";
 
     submitBtn.disabled = true;
-    submitBtn.textContent = "Ukládám…";
+    submitBtn.textContent = "Odesílám…";
 
     await saveQuestionImprovement({
       deckKey,
@@ -119,14 +120,14 @@ export function openImprovementModal(deckKey, q, qIdx) {
       userNote,
     });
 
-    feedbackMsg.textContent = `✓ Připomínka k otázce ${qId} byla uložena!`;
+    feedbackMsg.textContent = `✓ Připomínka k otázce byla úspěšně odeslána!`;
     feedbackMsg.classList.remove("hidden");
-    submitBtn.textContent = "Uloženo ✓";
+    submitBtn.textContent = "Odesláno ✓";
     submitBtn.style.background = "#16a34a";
 
     setTimeout(() => {
       closeModal();
-    }, 1400);
+    }, 1200);
   });
 }
 
@@ -143,53 +144,54 @@ export function openPresentationImprovementModal(item) {
   modal.innerHTML = `
     <div class="modal-card">
       <div class="modal-header">
-        <h3>Navrhnout úpravu</h3>
+        <h3>Nahlásit chybu nebo navrhnout úpravu</h3>
         <button type="button" class="btn-close-modal" aria-label="Zavřít">✕</button>
       </div>
       <div class="modal-body">
         <div class="q-summary-box">
           <div class="q-sum-row"><strong>Prezentace:</strong> <code>${escapeHtml(title)}</code></div>
-          <div class="q-sum-row"><strong>ID / Cesta:</strong> <code>${escapeHtml(deckKey)}</code></div>
+          <div class="q-sum-row"><strong>Téma / ID:</strong> <code>${escapeHtml(deckKey)}</code></div>
         </div>
 
-        <label class="improve-form-label">Důvod návrhu / typ úpravy:</label>
+        <label class="improve-form-label">Typ připomínky:</label>
         <div class="radio-group">
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="content_error" checked />
+            <input type="radio" name="improveReason" value="code_or_example_error" checked />
             <div class="radio-txt">
-              <strong>1. Chyba v obsahu nebo textu prezentace</strong>
-              <small>Překlep, neaktuální informace nebo nejasná formulace</small>
+              <strong>Chyba v kódu nebo ukázce</strong>
+              <small>Kód v prezentaci nefunguje, má chybnou syntaxi nebo špatný výstup</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="code_example_issue" />
+            <input type="radio" name="improveReason" value="unclear_text_or_typo" />
             <div class="radio-txt">
-              <strong>2. Nesrozumitelný kód nebo příklad</strong>
-              <small>Nefunkční ukázka kódu nebo chybějící vysvětlení příkladu</small>
+              <strong>Nejasný výklad nebo překlep</strong>
+              <small>Text je matoucí, nepřesný nebo obsahuje překlep</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="missing_topic" />
+            <input type="radio" name="improveReason" value="missing_topic_or_context" />
             <div class="radio-txt">
-              <strong>3. Doplnit téma nebo vysvětlení</strong>
-              <small>Vhodné přidat podrobnější popis nebo další příklad</small>
+              <strong>Chybějící téma nebo praktický příklad</strong>
+              <small>Vhodné doplnit podrobnější vysvětlení nebo reálný případ</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="other" />
+            <input type="radio" name="improveReason" value="presentation_idea" />
             <div class="radio-txt">
-              <strong>4. Jiný návrh na zlepšení</strong>
+              <strong>Jiný námět k prezentaci</strong>
+              <small>Návrh na vylepšení struktury nebo obsahu</small>
             </div>
           </label>
         </div>
 
-        <label class="improve-form-label" style="margin-top:14px;">Poznámka k návrhu úpravy:</label>
-        <textarea class="improve-notes-input" placeholder="Popište, co konkrétně navrhujete upravit nebo doplnit..." rows="3"></textarea>
+        <label class="improve-form-label" style="margin-top:14px;">Popis připomínky (co konkrétně upravit):</label>
+        <textarea class="improve-notes-input" placeholder="Popište stručně, v čem je problém nebo jak znění upravit..." rows="3"></textarea>
         <div class="modal-feedback-msg hidden" style="margin-top:10px; font-size:12px; color:#89d185; font-weight:600;"></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-cancel-modal">Zrušit</button>
-        <button type="button" class="btn primary btn-submit-improve">Uložit návrh úpravy</button>
+        <button type="button" class="btn primary btn-submit-improve">Odeslat připomínku</button>
       </div>
     </div>
   `;
@@ -209,17 +211,17 @@ export function openPresentationImprovementModal(item) {
 
   submitBtn?.addEventListener("click", async () => {
     const selectedRadio = modal.querySelector('input[name="improveReason"]:checked');
-    const category = selectedRadio ? selectedRadio.value : "content_error";
+    const category = selectedRadio ? selectedRadio.value : "code_or_example_error";
 
-    let categoryLabel = "Chyba v obsahu prezentace";
-    if (category === "code_example_issue") categoryLabel = "Nesrozumitelný kód/příklad";
-    else if (category === "missing_topic") categoryLabel = "Doplnit téma/vysvětlení";
-    else if (category === "other") categoryLabel = "Jiný návrh prezentace";
+    let categoryLabel = "Chyba v kódu prezentace";
+    if (category === "unclear_text_or_typo") categoryLabel = "Nejasný výklad / překlep";
+    else if (category === "missing_topic_or_context") categoryLabel = "Chybějící téma / vysvětlení";
+    else if (category === "presentation_idea") categoryLabel = "Námět k prezentaci";
 
     const userNote = notesInput ? notesInput.value.trim() : "";
 
     submitBtn.disabled = true;
-    submitBtn.textContent = "Ukládám…";
+    submitBtn.textContent = "Odesílám…";
 
     await saveQuestionImprovement({
       deckKey,
@@ -231,14 +233,14 @@ export function openPresentationImprovementModal(item) {
       userNote,
     });
 
-    feedbackMsg.textContent = `✓ Návrh úpravy prezentace byl uložen!`;
+    feedbackMsg.textContent = `✓ Připomínka k prezentaci byla úspěšně odeslána!`;
     feedbackMsg.classList.remove("hidden");
-    submitBtn.textContent = "Uloženo ✓";
+    submitBtn.textContent = "Odesláno ✓";
     submitBtn.style.background = "#16a34a";
 
     setTimeout(() => {
       closeModal();
-    }, 1400);
+    }, 1200);
   });
 }
 
