@@ -119,7 +119,6 @@ function renderAdminModalContent(activeTab = "improvements") {
               <option value="resolved">vyřešené</option>
               <option value="dismissed">zamítnuté</option>
             </select>
-            <button type="button" class="btn sm v2-submit" id="btnAdmSyncImprovements" style="white-space:nowrap; font-family:var(--font-mono);"><span class="prompt">$</span>sync --cloud</button>
           </div>
           <div class="admin-card-list" id="admImpList"></div>
         </div>
@@ -279,37 +278,19 @@ function renderImprovementsTab() {
     });
   }
 
-  const syncBtn = adminModalEl?.querySelector("#btnAdmSyncImprovements");
-  if (syncBtn) {
-    syncBtn.onclick = async () => {
-      syncBtn.disabled = true;
-      syncBtn.innerHTML = `<span class="prompt">$</span>syncing...`;
-      try {
-        await loadQuestionImprovements();
-        updateList();
-        const openCount = (state.questionImprovements || []).filter((i) => (i.status || "open") === "open").length;
-        const tabBtn = adminModalEl?.querySelector('.admin-tab-btn[data-tab="improvements"]');
-        if (tabBtn) {
-          tabBtn.innerHTML = `[1] vylepšení ${openCount > 0 ? `<span class="admin-badge-count">${openCount}</span>` : ""}`;
-        }
-        syncBtn.innerHTML = `<span class="prompt">$</span>sync --done ✓`;
-        setTimeout(() => {
-          syncBtn.innerHTML = `<span class="prompt">$</span>sync --cloud`;
-          syncBtn.disabled = false;
-        }, 1500);
-      } catch (err) {
-        syncBtn.innerHTML = `<span class="prompt">$</span>sync --error ✕`;
-        setTimeout(() => {
-          syncBtn.innerHTML = `<span class="prompt">$</span>sync --cloud`;
-          syncBtn.disabled = false;
-        }, 2000);
-      }
-    };
-  }
-
   searchInput?.addEventListener("input", updateList);
   statusSelect?.addEventListener("change", updateList);
   updateList();
+
+  // Automatic background refresh from cloud
+  loadQuestionImprovements().then(() => {
+    updateList();
+    const openCount = (state.questionImprovements || []).filter((i) => (i.status || "open") === "open").length;
+    const tabBtn = adminModalEl?.querySelector('.admin-tab-btn[data-tab="improvements"]');
+    if (tabBtn) {
+      tabBtn.innerHTML = `[1] vylepšení ${openCount > 0 ? `<span class="admin-badge-count">${openCount}</span>` : ""}`;
+    }
+  });
 }
 
 function renderUsersTab() {
