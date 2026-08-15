@@ -235,19 +235,22 @@ function renderImprovementsTab() {
       return `
         <div class="admin-item-card" data-id="${item.id}" style="border-radius:2px;">
           <div class="admin-item-head" style="display:flex; justify-content:space-between; align-items:center;">
-            <div>
-              <strong style="color:var(--fg); font-size:13px;">${isSlide ? "Prezentace" : "Kvíz"}:</strong> 
-              <code>${escapeHtml(item.deckKey)}</code>
-              ${!isSlide ? ` · <strong>Otázka:</strong> <code>${escapeHtml(item.questionId)}</code>` : ""}
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span style="font-size:11px; font-weight:600; padding:2px 6px; border-radius:2px; background:${isSlide ? "rgba(56,189,248,0.15)" : "rgba(168,85,247,0.15)"}; color:${isSlide ? "#38bdf8" : "#c084fc"};">
+                ${isSlide ? "Prezentace" : "Kvíz"}
+              </span>
+              <strong style="color:var(--fg); font-size:13px;">${escapeHtml(item.deckKey)}</strong>
+              ${!isSlide ? `<span style="color:var(--fg-muted); font-size:12px;">· Otázka: <code>${escapeHtml(item.questionId)}</code></span>` : ""}
             </div>
             <span class="admin-status-pill ${status}" style="font-weight:600;">${statusLabel}</span>
           </div>
-          <div style="font-size:11.5px; color:var(--fg-muted); margin-top:4px;">
-            <strong>Kategorie:</strong> ${escapeHtml(item.categoryLabel || item.category)}
+          <div style="font-size:12px; color:var(--fg-muted); margin-top:6px; display:flex; align-items:center; gap:6px;">
+            <strong>Kategorie:</strong>
+            <span style="color:#e2b714; font-weight:500;">${escapeHtml(item.categoryLabel || item.category)}</span>
           </div>
-          ${item.questionText ? `<div style="font-size:11.5px; font-style:italic; color:var(--fg-subtle); background:var(--editor); padding:6px 10px; border-radius:2px; margin-top:4px;">"${escapeHtml(item.questionText)}"...</div>` : ""}
+          ${item.questionText ? `<div style="font-size:11.5px; font-style:italic; color:var(--fg-subtle); background:var(--editor); padding:6px 10px; border-radius:2px; margin-top:6px;">"${escapeHtml(item.questionText)}"...</div>` : ""}
           ${item.userNote ? `<div style="font-size:12px; color:var(--fg); margin-top:6px;"><strong>Poznámka:</strong> ${escapeHtml(item.userNote)}</div>` : ""}
-          <div style="font-size:10.5px; color:var(--fg-subtle); margin-top:4px;">${new Date(item.timestamp).toLocaleString("cs-CZ")}</div>
+          <div style="font-size:10.5px; color:var(--fg-subtle); margin-top:6px;">${new Date(item.timestamp).toLocaleString("cs-CZ")}</div>
           <div class="admin-item-actions" style="margin-top:8px;">
             ${status !== "resolved" ? `<button type="button" class="admin-btn-sm success btn-act-resolve" data-id="${item.id}">Vyřešit</button>` : ""}
             ${status !== "dismissed" ? `<button type="button" class="admin-btn-sm btn-act-dismiss" data-id="${item.id}">Zamítnout</button>` : ""}
