@@ -6,54 +6,84 @@
       "id": "id1",
       "idx": 0,
       "title": "Úvod",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <a href=\"http://numba.pydata.org\" class=\"external\"><strong>Numba</strong></a> patří mezi alternativní interpretry Python'u s několika dodanými velmi výraznými vylepšeními. Použít se dá v podstatě dvěma způsoby:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            méně často  pouze jako interpretr pythoního kódu;\r\n        </li>\r\n        <li>\r\n            jako knihovna sloužící k relativně snadnému zrychlení pythoních kódů, obzvláště pokud používají knihovnu <em>Numpy</em>.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Vývoj <em>Numby</em> probíhá dosti rychle, přesto mezi podporovanými <a href=\"http://numba.pydata.org/numba-doc/latest/reference/pysupported.html\" class=\"external\">pythoními</a> a <a href=\"http://numba.pydata.org/numba-doc/latest/reference/numpysupported.html\" class=\"external\">numpyovskými</a> vlastnostmi může zatím chybět to, co zrovna potřebujete. Ale za pokus to vždy stojí.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id2",
       "idx": 1,
       "title": "Poznámka k instalaci",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Poznámka k instalaci</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nainstalovat <em>Numbu</em> není vůbec jednoduché – mimo jiné vyžaduje instalaci správné verze <em>LLVM</em> a jeho pro potřeby Numby upraveného rozhraní pro Python <em>llvmlite</em> plus samozřejmě <em>Numpy</em> (se všemi jeho závislostmi) a ještě několik dalších balíčků.\r\n    </p>\r\n    <p>\r\n        Kde se nezadaří klasické <code>pip install numba</code>, zabere téměř určitě <code>conda install numba</code> (musíte ovšem pracovat minimálně pod <a href=\"/materialy/python/packages/conda_overview.xml\">Minicondou</a>).\r\n    </p>\r\n    <p>\r\n        PS: Podpora CUDA se musí doinstalovat a nastavit zvlášť (viz <a href=\"https://github.com/numba/numba\" class=\"external\">oficiální dokumentace</a>). S <em>Condou</em> to jde jako vždy výrazně jednodušeji.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id3",
       "idx": 2,
       "title": "„@jit“",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">„@jit“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Mezi nejzajímavější prostředky, které <em>Numba</em> nabízí, patří dekorátor <strong><code>@jit</code></strong>. Jeho základní použití je triviální:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        from numba import jit\r\n\r\n        @jit\r\n        def funkce(parametr):\r\n...\r\n    </pre>\r\n    <p>\r\n        <em>Numba</em> se v tomto případě pokusí vstupní i návratové typy odhadnout sama a odekorovanou funkci zJITovat. Ve většině případů je to asi to nejlepší (a rozhodně to nejjednodušší), co můžete udělat.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id4",
       "idx": 3,
       "title": "„@jit“ s typovou anotací",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„@jit“ s typovou anotací</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nechcete-li z nejrůznějších důvodů nechat odhadování typů na <em>Numbě</em>, můžete použít <strong>typovou anotaci</strong>, kterou řeknete, o jaké typy se u dané funkce jedná. Jednoduchý příklad upravený <a href=\"http://numba.pydata.org/numba-doc/latest/user/jit.html#eager-compilation\" class=\"external\">podle dokumentace</a>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        from numba import jit, int16\r\n\r\n        @jit(int16(int16, int16))\r\n        def fn(x, y):\r\n            return x + y\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Zatímco <em>Numba</em> samotná se snaží být co nejobecnější, u vlastních kódů musíte vědět, co děláte, jinak vás čekají překvapení o něco dříve, než s obecným řešením:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; fn(1, 2)\r\n            3\r\n\r\n&gt;&gt;&gt; fn(2**15, 0)\r\n            -32768\r\n&gt;&gt;&gt; fn(2**15, -1)\r\n            32767\r\n        </pre>\r\n    </div></div>\r\n    <p>\r\n        PS: Anotace nemusí být úplná, můžete vynechat typ návratové hodnoty. Podobně se jich dá použít vícero (tedy vyjmenovat více možných <em>otisků funkce</em> pro různé typy), pak už ale záleží na jejich pořadí.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id5",
       "idx": 4,
       "title": "„@jit(nopython=True)“",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">„@jit(nopython=True)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <em>Numba</em> se pokusí odekorovanou funkci zJITovat nejvhodnějším možným způsobem (tzv. <em>nopython mode</em>), ale ne vždy se to podaří, v kterémžto případě automaticky spadne do mnohem pomalejšího – ale na druhou stranu zcela Python C API kompatibilního – módu kompilace <em>object mode</em>.\r\n    </p>\r\n    <p>\r\n        Chcete-li uvedenému automatickému překladu předejít, stačí doplnit dekorátor na tvar <code>@jit(nopython=True)</code> – objeví-li <em>Numba</em> při kompilaci konstrukci, se kterou není optimálně proveditelná, místo přechodu na <em>object mode</em> vyhodí výjimku a zpracování kódu zastaví.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Co pak provedete, je na vás. Ideální je pokusit se dekorovanou funkci upravit tak, aby šla zJITovat a <em>Numba</em> přestala házet výjimku, ale nemusí se to vždy snadno podařit.\r\n    </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id6",
       "idx": 5,
       "title": "„@jit“ – souhrn",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">„@jit“ – souhrn</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Plná varianta dekorátoru <strong>@jit</strong> jest:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        @numba.jit(\r\n            signature=None,\r\n            nopython=False,\r\n            nogil=False,\r\n            cache=False,\r\n            forceobj=False,\r\n            locals={}\r\n        )\r\n    </pre>\r\n    <p>\r\n        Odtud je mimo jiné vidět, proč může být typová anotace zadána beze jména parametru – je totiž první. Podobně přepínač <em>nopython</em> má – především asi pro ladicí účely – doplněk <em>forceobj</em>. A ty další:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <code>nogil</code> – možnost vypnutí nechvalně proslulého <a href=\"http://vyuka/materialy/python/parallelism/overview.xml?slajd=3\">GIL</a>u, ovšem se všemi důsledky z toho plynoucími (tedy pozor na paměť!);\r\n        </li>\r\n        <li>\r\n            <code>cache</code> – možnost uložení již dříve zkompilovaných funkcí na disk;\r\n            <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                    Může-li, skončí výsledek této kompilace v tradičním adresáři <code>__pycache__</code> vedle kódu.\r\n                </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                    Ne pro všechny funkce lze uložení provést – chcete-li vidět zprávu o neúspěchu, nastavte proměnnou prostředí <em>NUMBA_WARNINGS</em> na nenulovou hodnotu.\r\n                </div></div></div>\r\n        </li>\r\n        <li>\r\n            <code>locals</code> – může být použito pro vnucení typů lokálních proměnných funkce (ale nedoporučuje se používat).\r\n        </li>\r\n    </ul>\r\n    <p>\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id7",
       "idx": 6,
       "title": "„@vectorize“",
+      "tags": [],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">„@vectorize“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        TODO\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    </pre>\r\n\r\n</div>"
     },
     {
       "id": "id8",
       "idx": 7,
       "title": "„@guvectorize“",
+      "tags": [],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">„@guvectorize“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        TODO\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    </pre>\r\n\r\n</div>"
     },
     {
       "id": "id9",
       "idx": 8,
       "title": "",
+      "tags": [],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\"></h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    </pre>\r\n\r\n</div>"
     }
   ]

@@ -6,42 +6,56 @@
       "id": "id1",
       "idx": 0,
       "title": "Úvod",
+      "tags": [],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <strong>Bajtová pole</strong> jsou <em>proměnný</em> <a href=\"/materialy/python/types/_sequences.xml\">sekvenční</a> datový typ, jehož prvky jsou <em>celá čísla</em> v rozmezí <code>&lt;0, 255&gt;</code> (tedy vlastně sekvence bajtů).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Existuje k nim i příslušný neproměnný protějšek – <a href=\"bytes.xml\">bajtové řetězce</a>. Rozdíl mezi těmito dvěma objekty je podobný, jako mezi <em>řetězci</em> na jedné straně a <em>seznamy znaků</em> na straně druhé – oboje vypsané po prvcích dá to samé, ale do řetězců nemůžeme „hrabat“, zatímco se seznamy si můžeme dělat, co chceme.\r\n  </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id2",
       "idx": 1,
       "title": "Zavedení – „bytearray()“",
+      "tags": [],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Zavedení – „bytearray()“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <em>Bajtová pole</em> zavádíme konstruktorem <code>bytearray()</code>. Pro jeho parametry platí úplně to samé, co pro paramatry konstruktoru <em>bajtových řetězců</em> <code>bytes()</code>, to znamená:\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Při volání <strong>bez parametru</strong> zavede funkce <em>bytearray()</em> bajtové pole o nulové délce:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray()\r\n&gt;&gt;&gt; xb\r\nbytearray(b'')\r\n  </pre>\r\n  \r\n  <p class=\"enumerate\">\r\n    Je-li vstupním parametrem <strong>řetězec</strong>, musíme navíc přidat i kódování, které bude řídit jeho transformaci na bajtové pole:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray('Ahoj!', 'utf-8')\r\n&gt;&gt;&gt; xb\r\nbytearray(b'Ahoj!')\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Na pozadí se zavolá metoda řetězce <code>'Ahoj!'.encode('utf-8')</code>, která provede příslušnou konverzi.\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Při vstupním parametru <strong>celé číslo</strong> je vytvořeno bajtové pole odpovídající délky obsahující samé nuly:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray(7)\r\n&gt;&gt;&gt; xb\r\nbytearray(b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00')\r\n  </pre>\r\n  \r\n  <p class=\"enumerate\">\r\n    Další možností je zadat na vstupu <strong>iterovatelný objekt</strong> (<em>iterable</em>), který vrací čísla v rozmezí <code>&lt;0, 255&gt;</code>. Tato čísla budou následně použita pro inicializaci (bajtového) pole.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Pokud byste potřebovali převést <em>jedno konkrétní číslo</em> na jednoprvkové bajtové pole, kód <code>bytearray([123])</code> nepřekvapivě vrátí právě <code>bytearray(b'{')</code>. (Dělat konverzi z <em>bytes</em> na <em>bytearray</em> jde samozřejmě také, ale je to tuplovaně nešikovné.)\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Poslední možností je použít na vstupu <strong>bafr</strong> (<em>buffer</em>), v klasickém případě tedy odkaz na otevřený soubor. V takovém případě se pro inicializaci bajtového pole použijí data (jednotlivé bajty) z bafru.\r\n  </p>\r\n\r\n</div>"
     },
     {
       "id": "id3",
       "idx": 2,
       "title": "Bajtová pole jako sekvence",
+      "tags": [],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Bajtová pole jako sekvence</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Bajtová pole podporují standardní operace, jaké bychom u proměnného typu čekali (v podstatě se chovají jako seznamy bajtů):\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray(b'ahoj')\r\n\r\n# délka sekvence\r\n&gt;&gt;&gt; len(xb)\r\n4\r\n\r\n# konkrétní prvek\r\n&gt;&gt;&gt; xb[3]\r\n106\r\n&gt;&gt;&gt; xb[-3]\r\n104\r\n\r\n# různé výřezy\r\n&gt;&gt;&gt; xb[1:3]\r\nbytearray(b'ho')\r\n&gt;&gt;&gt; xb[1::2]\r\nbytearray(b'hj')\r\n&gt;&gt;&gt; xb[2:]\r\nbytearray(b'oj')\r\n&gt;&gt;&gt; xb[-3:]\r\nbytearray(b'hoj')\r\n\r\n# dotaz na výskyt prvku\r\n&gt;&gt;&gt; 111 in xb\r\nTrue\r\n&gt;&gt;&gt; 110 in xb\r\nFalse\r\n&gt;&gt;&gt; b'a' in xb\r\nTrue\r\n&gt;&gt;&gt; b'\\xf1' in xb\r\nFalse\r\n&gt;&gt;&gt; xb.index(b'h')\r\n1\r\n&gt;&gt;&gt; xb.index(b'D')\r\nTraceback (most recent call last):\r\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\r\nValueError: subsection not found\r\n&gt;&gt;&gt; xb.count(b'a')\r\n1\r\n\r\n# dvě spojené kopie\r\n&gt;&gt;&gt; xb * 2\r\nbytearray(b'ahojahoj')\r\n  </pre>\r\n\r\n</div>"
     },
     {
       "id": "id4",
       "idx": 3,
       "title": "Bajtová pole jako sekvence – „for-in“",
+      "tags": [],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Bajtová pole jako sekvence – „for-in“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Stejně tak máme k dispozici tradiční procházení smyčkou <em>for-in</em> ve všech jejích podobách:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray(b'ahoj')\r\n\r\n&gt;&gt;&gt; for x in xb:\r\n...     print(x)\r\n...\r\n97\r\n104\r\n111\r\n106\r\n\r\n&gt;&gt;&gt; for i, x in enumerate(xb):\r\n...     print(i, x)\r\n...\r\n0 97\r\n1 104\r\n2 111\r\n3 106\r\n\r\n&gt;&gt;&gt; for x in reversed(xb):\r\n...   print(x)\r\n...\r\n106\r\n111\r\n104\r\n97\r\n\r\n&gt;&gt;&gt; for x in sorted(xb):\r\n...   print(x)\r\n...\r\n97\r\n104\r\n106\r\n111\r\n  </pre>\r\n\r\n</div>"
     },
     {
       "id": "id5",
       "idx": 4,
       "title": "Bajtová pole jako měnitelné sekvence",
+      "tags": [],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Bajtová pole jako měnitelné sekvence</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Hlavním důvodem pro použití <em>bajtových polí</em> je to, že narozdíl od <em>bajtových řetězců</em> je můžeme měnit ^_~\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray('ahoj', 'ascii')\r\n&gt;&gt;&gt; xb\r\nbytearray(b'ahoj')\r\n\r\n# ukázka měnitelnosti\r\n&gt;&gt;&gt; xb[1]\r\n104\r\n&gt;&gt;&gt; xb[1] = 72\r\n&gt;&gt;&gt; xb\r\nbytearray(b'aHoj')\r\n  </pre>\r\n\r\n</div>"
     },
     {
       "id": "id6",
       "idx": 5,
       "title": "Bajtová pole – přidávání prvků",
+      "tags": [],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Bajtová pole – přidávání prvků</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    Prvky do bajtového pole přidáváme pomocí stejných metod jako u seznamů, tzn.:\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Přidání jednoho bajtu na konec pomocí metody <code>append(BAJT)</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray(b'ahoj')\r\n\r\n&gt;&gt;&gt; xb.append(72)\r\n&gt;&gt;&gt; xb\r\nbytearray(b'ahojH')\r\n  </pre>\r\n  \r\n  <p class=\"enumerate\">\r\n    Vložení jednoho bajtu doprostřed pole pomocí metody <code>insert(PŘED_KTERÝ_INDEX, BAJT)</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray(b'ahoj')\r\n\r\n&gt;&gt;&gt; xb.insert(2, 72)\r\n&gt;&gt;&gt; xb\r\nbytearray(b'ahHoj')\r\n  </pre>\r\n  \r\n  <p class=\"enumerate\">\r\n    Rozšíření pole o dané bajty pomocí metody <code>extend(BAJTY)</code>, resp. pomocí operátoru <code>+</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray(b'Ahoj')\r\n\r\n# a) metodou\r\n&gt;&gt;&gt; xb.extend(b', svete!')\r\n&gt;&gt;&gt; xb\r\nbytearray(b'Ahoj, svete!')\r\n\r\n# b) operátorově\r\n&gt;&gt;&gt; xb + b' Jak se mas?'\r\nbytearray(b'Ahoj, svete! Jak se mas?')\r\n  </pre>\r\n\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Nenechte se zmást tím, že ukázky ukazuji na <em>cestine</em>. Je to jenom proto, že se to čte líp než nějaké sekvence netisknutelných bajtů.\r\n  </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id7",
       "idx": 6,
       "title": "Bajtová pole – odebírání prvků",
+      "tags": [],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Bajtová pole – odebírání prvků</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    Prvky z bajtového pole odstraňujeme pomocí stejných metod jako u seznamů, tzn.:\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Pomocí univerzálního příkazu <code>del</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray(b'Ahoj, svete! Jak se mas?')\r\n\r\n&gt;&gt;&gt; del xb[-1]\r\n&gt;&gt;&gt; xb\r\nbytearray(b'Ahoj, svete! Jak se mas')\r\n\r\n&gt;&gt;&gt; del xb[4:]\r\n&gt;&gt;&gt; xb\r\nbytearray(b'Ahoj')\r\n  </pre>\r\n  \r\n  <p class=\"enumerate\">\r\n    Pomocí metody <code>pop([INDEX])</code>, která navíc vrací odebraný prvek:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray(b'Ahoj, svete! Jak se mas?')\r\n\r\n&gt;&gt;&gt; xb.pop()\r\n63\r\n&gt;&gt;&gt; xb\r\nbytearray(b'Ahoj, svete! Jak se mas')\r\n\r\n&gt;&gt;&gt; xb.pop(0)\r\n65\r\n&gt;&gt;&gt; xb\r\nbytearray(b'hoj, svete! Jak se mas')\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Pokus o odstranění prvku na neexistující pozici nebo z prázdného bajtového pole skončí výjimkou <em>IndexError</em>.\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Pomocí metody <code>remove(PRVEK)</code>, která odstraní první výskyt (zleva) příslušného prvku:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xb = bytearray(b'Ahoj, svete! Jak se mas?')\r\n\r\n&gt;&gt;&gt; xb.remove(101)\r\n&gt;&gt;&gt; xb\r\nbytearray(b'Ahoj, svte! Jak se mas?')\r\n\r\n&gt;&gt;&gt; xb.remove(100)\r\nTraceback (most recent call last):\r\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\r\nValueError: value not found in bytearray\r\n  </pre>\r\n\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Opět: Nenechte se zmást tím, že ukázky ukazuji na <em>cestine</em>. Je to jenom proto, že se to čte líp než nějaké sekvence netisknutelných bajtů.\r\n  </div></div>\r\n\r\n</div>"
     }
   ]

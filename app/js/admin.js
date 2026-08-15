@@ -111,7 +111,7 @@ function renderAdminModalContent(activeTab = "improvements") {
       <div class="modal-body" style="padding:16px 20px;">
         <!-- TAB 1: QUESTION IMPROVEMENTS OVERVIEW -->
         <div class="admin-tab-content ${activeTab === "improvements" ? "active" : ""}" id="tab-improvements">
-          <div class="admin-toolbar" style="display:flex; gap:10px; margin-bottom:12px;">
+          <div class="admin-toolbar" style="display:flex; gap:10px; margin-bottom:12px; align-items:center;">
             <input type="text" class="admin-search-input" id="admSearchImp" placeholder="$ search --query (otázka, ID)..." style="flex:1; font-family:var(--font-mono);" />
             <select class="admin-search-input" id="admFilterStatus" style="min-width:140px; font-family:var(--font-mono);">
               <option value="all">všechny stavy</option>
@@ -119,6 +119,7 @@ function renderAdminModalContent(activeTab = "improvements") {
               <option value="resolved">vyřešené</option>
               <option value="dismissed">zamítnuté</option>
             </select>
+            <button type="button" class="btn sm v2-submit" id="btnAdmSyncImprovements" style="white-space:nowrap; font-family:var(--font-mono);"><span class="prompt">$</span>sync --cloud</button>
           </div>
           <div class="admin-card-list" id="admImpList"></div>
         </div>
@@ -276,6 +277,34 @@ function renderImprovementsTab() {
         }
       });
     });
+  }
+
+  const syncBtn = adminModalEl?.querySelector("#btnAdmSyncImprovements");
+  if (syncBtn) {
+    syncBtn.onclick = async () => {
+      syncBtn.disabled = true;
+      syncBtn.innerHTML = `<span class="prompt">$</span>syncing...`;
+      try {
+        await loadQuestionImprovements();
+        updateList();
+        const openCount = (state.questionImprovements || []).filter((i) => (i.status || "open") === "open").length;
+        const tabBtn = adminModalEl?.querySelector('.admin-tab-btn[data-tab="improvements"]');
+        if (tabBtn) {
+          tabBtn.innerHTML = `[1] vylepšení ${openCount > 0 ? `<span class="admin-badge-count">${openCount}</span>` : ""}`;
+        }
+        syncBtn.innerHTML = `<span class="prompt">$</span>sync --done ✓`;
+        setTimeout(() => {
+          syncBtn.innerHTML = `<span class="prompt">$</span>sync --cloud`;
+          syncBtn.disabled = false;
+        }, 1500);
+      } catch (err) {
+        syncBtn.innerHTML = `<span class="prompt">$</span>sync --error ✕`;
+        setTimeout(() => {
+          syncBtn.innerHTML = `<span class="prompt">$</span>sync --cloud`;
+          syncBtn.disabled = false;
+        }, 2000);
+      }
+    };
   }
 
   searchInput?.addEventListener("input", updateList);

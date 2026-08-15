@@ -6,54 +6,91 @@
       "id": "id1",
       "idx": 0,
       "title": "Úvod",
+      "tags": [
+        "Core"
+      ],
+      "diff": "basics",
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <strong>Anotace funkcí</strong> (myšleno tím jejich argumentů a návratových hodnot) se v Python'u objevily jako první (tlak externích projektů, které uvedené řešily, byl už asi příliš veliký) a <em>obecné anotace proměnných</em> byly pak už – o dva roky později – přidány podle jejich vzoru.\r\n    </p>\r\n    <p>\r\n        Nicméně tato přednáška se věnuje především specifikům anotací u funkcí, proto, pokud je ještě neznáte, se nejdříve seznamte s <a href=\"/materialy/python/types/_annotations.xml\">obecnými anotacemi proměnných</a>.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id2",
       "idx": 1,
       "title": "Zápis",
+      "tags": [
+        "Core"
+      ],
+      "diff": "resyntax",
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Zápis</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Anotovat je u funkcí možno dvě věci:\r\n  </p>\r\n\r\n  <p class=\"enumerate\">\r\n    <strong>Parametry</strong>, a to jak poziční, tak pojmenované (s výchozí hodnotou):\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    def fn(parametr_poziční: VÝRAZ):\r\n...\r\n\r\n    def fn(parametr_pojmenovaný: VÝRAZ = výchozí_hodnota):\r\n...\r\n  </pre>\r\n  <p>\r\n    Parametry se tedy anotují pomocí dvojtečky <code>:</code>, za níž následuje výraz, jehož použití a vyhodnocení je zcela mimo pythoní interpretr – co si s ním která externí knihovna, nástroj či uživatel provedou, je zcela na nich. Výrazem tudíž může být prakticky naprosto cokoliv (tedy samozřejmě pokud je to validní pythoní výraz).\r\n  </p>\r\n\r\n  <p class=\"enumerate\">\r\n    <strong>Návratovou hodnotu</strong> funkce:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    def fn() -&gt; VÝRAZ:\r\n...\r\n  </pre>\r\n  <p>\r\n    Návratová hodnota funkce se tedy anotuje pomocí sekvence znaků <code>-&gt;</code>, za níž následuje validní pythoní výraz, jehož interpretace je opět – stejně jako u anotací parametrů – zcela v rukou externího nástroje.\r\n  </p>\r\n\r\n</div>"
     },
     {
       "id": "id3",
       "idx": 2,
       "title": "Přístup k anotacím",
+      "tags": [
+        "Core"
+      ],
+      "diff": "newconcept",
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Přístup k anotacím</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Přístup k anotacím funkcí se řeší úplně stejně jako pro <a href=\"/materialy/python/types/_annotations.xml?slajd=3\">objekty v globálním jmenném prostoru</a> nebo ještě spíš jako pro <a href=\"/materialy/python/types/_annotations.xml?slajd=5\">atributy tříd</a>, tj. pomocí atributu <strong><code>__annotations__</code></strong> na příslušné funkci:\r\n    </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; def fn(arg1: int, arg2: \"druhý argument\", kwarg1: list = [1, 2, 3]) -&gt; int:\r\n            pass\r\n\r\n&gt;&gt;&gt; fn.__annotations__\r\n{'arg1': &lt;class 'int'&gt;,\r\n     'arg2': 'druhý argument',\r\n     'kwarg1': &lt;class 'list'&gt;,\r\n     'return': &lt;class 'int'&gt;}\r\n  </pre>\r\n  <p>\r\n    <strong>Anotace jsou tedy dostupné ve slovníku pod jménem odpovídajících parametrů. Přitom případná návratová hodnota funkce je dostupná pod předdefinovaným jménem <em>return</em></strong> (to totiž jako jméno parametru nejde pochopitelně použít, takže nemůže dojít ke kolizi názvů).\r\n  </p>\r\n  <p>\r\n    PS: Možnost spravovat anotace z vlastního pythoního kódu nabízí <a href=\"?slajd=6\">docela nečekané možnosti</a>, jak si za chvíli ukážeme. Nejdříve však ještě pár příkladů zápisu anotací.\r\n  </p>\r\n\r\n</div>"
     },
     {
       "id": "id4",
       "idx": 3,
       "title": "Příklady I",
+      "tags": [
+        "Core"
+      ],
+      "diff": "resyntax",
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Příklady I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    První typické použití, které asi napadne každého, bude označení typů parametrů a návratové hodnoty funkce, jak je zvykem (především) u staticky typovaných jazyků:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    def fn(a: int, b: int) -&gt; int:\r\n        pass\r\n  </pre>\r\n  <p>\r\n    Nicméně je třeba opět zdůraznit: <strong>Žádný pythoní interpretr nemá za povinnost tyto anotace nějak zpracovávat!</strong> Jejich jediným úkolem je příslušné anotace poskytnout jako vlastnosti funkce pro další použití, ale sami je (aspoň u většiny) nijak nepoužívají a dále nezpracovávají.\r\n  </p>\r\n\r\n</div>"
     },
     {
       "id": "id5",
       "idx": 4,
       "title": "Příklady II",
+      "tags": [
+        "Core"
+      ],
+      "diff": "resyntax",
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Příklady II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <strong>Anotací však může být libovolný pythoní výraz</strong>, kupříkladu tedy třebas obyčejný řetězec:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    def fn(a: \"parametr funkce\") -&gt; \"návratová hodnota funkce\":\r\n        pass\r\n  </pre>\r\n  <p>\r\n    Třeba je externí knihovna daného projektu použije pro tvorbu vylepšené dokumentace, kdo ví?\r\n  </p>\r\n\r\n</div>"
     },
     {
       "id": "id6",
       "idx": 5,
       "title": "Příklady III",
+      "tags": [
+        "Core"
+      ],
+      "diff": "resyntax",
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Příklady III</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    A asi je vidět, že se oboje dá snadno spojit dohromady – stačí použít všeobjímající n-tici:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; def fn(a: (int, 'parametr')) -&gt; (int, 'návratová hodnota'):\r\n            pass\r\n\r\n&gt;&gt;&gt; fn.__annotations__\r\n{'a': (&lt;class 'int'&gt;, 'parametr'),\r\n     'return': (&lt;class 'int'&gt;, 'návratová hodnota')}\r\n  </pre>\r\n  <p>\r\n    Pokud si externí program, který anotace zpracovává, umí s uvedeným zápisem poradit, je vše v pořádku.\r\n  </p>\r\n\r\n</div>"
     },
     {
       "id": "id7",
       "idx": 6,
       "title": "Příklad použití I",
+      "tags": [
+        "Core",
+        "Legendary"
+      ],
+      "diff": "newconcept",
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Příklad použití I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Důvodem, proč jsem původně tuto přednášku vůbec napsal (běžnému smrtelníkovi totiž zatím pořád ještě nejsou anotace moc platné), je <a href=\"https://stackoverflow.com/a/19684962\" class=\"external\">sada úžasných dekorátorů</a> od Roddyho MacSweenyho (zde hodně upravené):\r\n  </p>\r\n  <example lang=\"python\" src=\"_files/annotations.py\"></example>\r\n  <p>\r\n    Vidíme, že <a href=\"/materialy/python/functions/decorators.xml\">dekorátor</a> <code>@checkargs</code> pomocí anotací a <a href=\"/materialy/python/objects/introspection.xml\">introspekce</a> (funkce <em>isinstance()</em>) ověřuje, zda zadané parametry skutečně splňují předepsaný typ, zatímco dekorátor <code>@coerceargs</code> se dokonce snaží parametry na daný typ převést (přímou aplikací zadaného typového konstruktoru na daný parametr).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    PS: Do dekorátorů jsem připsal ověření typu návratové hodnoty. <a href=\"_files/annotations_signature.py\">Zde</a> je úplnější alternativní implementace pomocí objektu <code>Signature</code>.\r\n  </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id8",
       "idx": 7,
       "title": "Příklad použití II",
+      "tags": [
+        "Core"
+      ],
+      "diff": "newconcept",
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Příklad použití II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nicméně je třeba říci, že použitím kontroly typů přijdeme o klasické pythoní <em>duck typing</em>, tedy zjednodušeně možnost zpracování různých typů, které však implementují stejné metody (zde možnost iterace po prvcích):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# a) sama o sobě se anotace k ničemu nepoužívá\r\n&gt;&gt;&gt; def fn(xs: list):\r\n...     return [x**2 for x in xs]\r\n&gt;&gt;&gt; fn([1, 2, 3, 4])\r\n[1, 4, 9, 16]\r\n&gt;&gt;&gt; fn((1, 2, 3, 4))\r\n[1, 4, 9, 16]\r\n&gt;&gt;&gt; fn({1, 2, 3, 4})\r\n[1, 4, 9, 16]\r\n\r\n# b) anotace ve spojení s dekorátorem @checkargs\r\n&gt;&gt;&gt; @checkargs\r\n... def fn(xs: list):\r\n...     return [x**2 for x in xs]\r\n&gt;&gt;&gt; fn([1, 2, 3, 4])\r\n[1, 4, 9, 16]\r\n&gt;&gt;&gt; fn((1, 2, 3, 4))\r\nTraceback (most recent call last):\r\n  File \"&lt;pyshell#49&gt;\", line 1, in &lt;module&gt;\r\nfn((1, 2, 3, 4))\r\n  File \"&lt;pyshell#43&gt;\", line 11, in _f\r\ncheck_type_error(arguments[index], annotations[argument])\r\n  File \"&lt;pyshell#43&gt;\", line 6, in check_type_error\r\nraise TypeError(f\"{index} is not of type {argument}\")\r\nTypeError: (1, 2, 3, 4) is not of type &lt;class 'list'&gt;\r\n</pre>\r\n\r\n</div>"
     },
     {
       "id": "id9",
       "idx": 8,
       "title": "Poznámka",
+      "tags": [
+        "Core"
+      ],
+      "diff": "basics",
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ačkoli je následující poznámka v podstatě přímou kopií textu z povídání <a href=\"/materialy/python/types/_annotations.xml?slajd=6\">o anotacích v Python'u obecně</a>, pokládám ji za natolik důležitou, že ji zde stejně zopakuji:\r\n    </p>\r\n    <p>\r\n        Je třeba pamatovat na to, že Python byl/je/zůstává dynamicky typovaným jazykem a žádný z jeho interpretrů nemá v popisu práce s anotacemi dělat cokoliv jiného, než je „cpát“ do atributu <em>__annotations__</em>. Anotace v Python'u jsou a dlouho (navěky?) budou pouze pro potřeby externích nástrojů (či editorů), které nemusí vůbec provádět typovou kontrolu, ale klidně něco úplně jiného (například budovat lepší nápovědu).\r\n    </p>\r\n    <p>\r\n        PS: Od Python'u 3.9, v kterém již jde použít pro anotace složených typů běžné typové konstruktory jazyka (např. <code>list[int]</code> apod.), již pro použití anotací znalost modulu <em>typing</em> není nezbytně nutná, ale občas se hodit může.\r\n    </p>\r\n\r\n</div>"
     }
   ]

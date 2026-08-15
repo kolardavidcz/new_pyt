@@ -6,54 +6,91 @@
       "id": "id1",
       "idx": 0,
       "title": "brainfuck",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">brainfuck</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Ukažme si rovnou klasický program „Hello World!“ zapsaný v jazyce <em>brainfuck</em>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n++++++++++[&gt;+++++++&gt;++++++++++&gt;+++&gt;+&lt;&lt;&lt;&lt;-]&gt;++.&gt;+.+++++++..+++.&gt;++.\r\n&lt;&lt;+++++++++++++++.&gt;.+++.------.--------.&gt;+.&gt;.\r\n  </pre>\r\n  <p>\r\n    Jelikož všechno, co není příkazem jazyka <em>brainfuck</em> (a těch je pouze osm), je pokládáno za komentář, můžeme zdrojový kód i pěkně okomentovat:\r\n  </p>\r\n  <example src=\"_files/hello_world.b\" lang=\"python\"></example>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Zdroj: <a href=\"http://en.wikipedia.org/wiki/Brainfuck\">http://en.wikipedia.org/wiki/Brainfuck</a>\r\n  </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id2",
       "idx": 1,
       "title": "Historie",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Historie</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Programovací jazyk <em>brainfuck</em> v moderní podobě je stvoření Urbana Müllera z roku 1993, ačkoli kořeny snah o vytvoření minimalistického Turing-complete programovacího jazyka se dají vystopovat dokonce o několik desítek let nazpět do minulosti – k prakticky stejnému výsledku totiž došel Corrado Böhm už v roce 1964 se svým jazykem <em>P''</em>.\r\n  </p>\r\n\r\n</div>"
     },
     {
       "id": "id3",
       "idx": 2,
       "title": "Varianty interpretru",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Varianty interpretru</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    V podstatě existují dvě varianty jazyka:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        <strong>původní</strong> – Počítala s „paměťovou páskou“ v podobě pole o velikosti 30 000 buněk, všechny jednobajtové a na začátku nastavené na 0. Po této pásce se pohyboval „ukazatel“, který tak určoval, na které paměťové pozici se bude provádět aktuální operace. Na začátku programu ukazoval ukazatel na první buňku pole. Program se vykonává sekvenčně (není-li určeno jinak) a končí dosažením konce zdrojového kódu.\r\n    </li>\r\n    <li>\r\n        <strong>obecná</strong> – Interpretr jazyka <em>brainfuck</em> je představován potenciálně nekonečnou páskou paměťových pozic, do kterých je možné uložit libovolně velké celé číslo, a ukazatelem na aktuální pozici. Před začátkem provádění programu má páska jednu jedinou paměťovou buňku, v níž je uložena 0, a ukazatel je nastaven právě na ni. \r\n    </li>\r\n  </ul>\r\n\r\n</div>"
     },
     {
       "id": "id4",
       "idx": 3,
       "title": "Struktura interpretru",
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Struktura interpretru</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Operací („rezervovaných slov“) jazyka <em>brainfuck</em> je přesně osm a zajišťují číselné operace s jednotlivými paměťovými místy, posun po paměťové pásce plus interakci s prostředím a smyčky. Obecně tedy interpretr jazyka <em>brainfuck</em> představuje čtveřice:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n        <b>instrukční ukazatel</b> (<em>instruction pointer</em>) – ukazatel na příkazy vstupního programu\r\n    </li>\r\n    <li>\r\n        <b>datový ukazatel</b> (<em>data pointer</em>) – ukazatel do paměti\r\n    </li>\r\n    <li>\r\n        <b>proud vstupních bajtů</b> – proud bajtů (typicky ASCII-hodnoty) přicházejících ze vstupu (typicky z klávesnice)\r\n    </li>\r\n    <li>\r\n        <b>proud výstupních bajtů</b> – jako předchozí, ale pro výstup (typicky monitor)\r\n    </li>\r\n  </ol>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    A nikdo nikomu nebrání, aby instrukční a datový ukazatel operovali nad stejnými prvky a program tak přepisoval sám sebe, že ^_~\r\n    \r\n  </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id5",
       "idx": 4,
       "title": "„Rezervovaná slova“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">„Rezervovaná slova“</h2></div><div class=\"section-body\">\r\n\r\n  <table align=\"center\" _style=\"text-align: center;\">\r\n    <tr>\r\n      <th>příkaz</th>\r\n      <td width=\"55\" rowspan=\"12\"></td>\r\n      <th>funkce</th>\r\n    </tr>\r\n    <tr>\r\n      <td align=\"center\">&gt;</td>\r\n      <td>posuň datový ukazatel na následující buňku</td>\r\n    </tr>\r\n    <tr>\r\n      <td align=\"center\">&lt;</td>\r\n      <td>posuň datový ukazatel na předchozí buňku</td>\r\n    </tr>\r\n    <tr>\r\n      <td align=\"center\">+</td>\r\n      <td>inkrementuj buňku pod ukazatelem</td>\r\n    </tr>\r\n    <tr>\r\n      <td align=\"center\">-</td>\r\n      <td>dekrementuj buňku pod ukazatelem</td>\r\n    </tr>\r\n    <tr>\r\n      <td align=\"center\">.</td>\r\n      <td>vytiskni na výstup znak určený hodnotou aktuální buňky</td>\r\n    </tr>\r\n    <tr>\r\n      <td align=\"center\">,</td>\r\n      <td>načti ze vstupu jeden bajt a ulož ho do aktuální buňky</td>\r\n    </tr>\r\n    <tr>\r\n      <td align=\"center\">[</td>\r\n      <td>začátek smyčky – „Poskoč (s instrukčním ukazatelem) vpřed za odpovídající ], je-li v aktuální buňce 0.“</td>\r\n    </tr>\r\n    <tr>\r\n      <td align=\"center\">]</td>\r\n      <td>konec smyčky – „Vrať se zpět (s instrukčním ukazatelem) za odpovídající [, pokud v aktuální buňce není 0.“</td>\r\n    </tr>\r\n  </table>\r\n  \r\n  <p>\r\n    Jakýkoliv jiný znak je považován za prázdnou operaci (<em>nop</em>), takže s trochou invence (tečka a čárka vám asi budou poněkud chybět) můžete v <em>brainfuck</em>u psát pěkně komentované programy, jak bylo ostatně vidět už na prvním slajdu ^_~\r\n  </p>\r\n\r\n</div>"
     },
     {
       "id": "id6",
       "idx": 5,
       "title": "Textové varianty jazyka",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Textové varianty jazyka</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Není asi vůbec překvapivé, že když máme jazyk s pouhými osmi příkazy, dřív nebo později někoho napadne zapsat je nějak úplně jinak. Populární je například varianta jménem <em>Ook!</em>, která kóduje příkazy jazyka do následujících citoslovcí..\r\n  </p>\r\n  <table align=\"center\" _style=\"text-align: center;\">\r\n    <tr>\r\n      <th>Ook!</th>\r\n      <td width=\"55\" rowspan=\"12\"></td>\r\n      <th>brainfuck</th>\r\n    </tr>\r\n    <tr>\r\n      <td>Ook. Ook?</td>\r\n      <td align=\"center\">&gt;</td>\r\n    </tr>\r\n    <tr>\r\n      <td>Ook? Ook.</td>\r\n      <td align=\"center\">&lt;</td>\r\n    </tr>\r\n    <tr>\r\n      <td>Ook. Ook.</td>\r\n      <td align=\"center\">+</td>\r\n    </tr>\r\n    <tr>\r\n      <td>Ook! Ook!</td>\r\n      <td align=\"center\">-</td>\r\n    </tr>\r\n    <tr>\r\n      <td>Ook! Ook.</td>\r\n      <td align=\"center\">.</td>\r\n    </tr>\r\n    <tr>\r\n      <td>Ook.Ook!</td>\r\n      <td align=\"center\">,</td>\r\n    </tr>\r\n    <tr>\r\n      <td>Ook! Ook?</td>\r\n      <td align=\"center\">[</td>\r\n    </tr>\r\n    <tr>\r\n      <td>Ook? Ook!</td>\r\n      <td align=\"center\">]</td>\r\n    </tr>\r\n  </table>\r\n  <p>\r\n    ..takže tradiční <em>Hello World!</em> pak vypadá takto:\r\n  </p>\r\n  <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\nOok. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.\r\nOok. Ook. Ook. Ook. Ook! Ook? Ook. Ook? Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.\r\nOok. Ook. Ook. Ook. Ook. Ook. Ook. Ook? Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.\r\nOok. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook? Ook. Ook.\r\nOok. Ook. Ook. Ook. Ook. Ook? Ook. Ook. Ook? Ook. Ook? Ook. Ook? Ook. Ook? Ook.\r\nOok! Ook! Ook? Ook! Ook. Ook? Ook. Ook. Ook. Ook. Ook! Ook. Ook. Ook? Ook. Ook.\r\nOok! Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.\r\nOok! Ook. Ook! Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook! Ook. Ook. Ook? Ook. Ook.\r\nOok. Ook. Ook! Ook. Ook? Ook. Ook? Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.\r\nOok. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook. Ook.\r\nOok. Ook. Ook. Ook. Ook. Ook. Ook! Ook. Ook. Ook? Ook! Ook. Ook. Ook. Ook. Ook.\r\nOok. Ook. Ook! Ook. Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook!\r\nOok! Ook. Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook! Ook!\r\nOok! Ook! Ook! Ook. Ook. Ook? Ook. Ook. Ook! Ook. Ook. Ook? Ook! Ook.\r\n  </pre>\r\n  \r\n  <p class=\"enumerate\">\r\n    …\r\n  </p>\r\n\r\n</div>"
     },
     {
       "id": "id7",
       "idx": 6,
       "title": "Grafické varianty jazyka",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Grafické varianty jazyka</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Z celé škály grafických variant se podíváme na dvě – jazyky <strong><em>brainloller</em></strong> a <strong><em>braincopter</em></strong>. Oba tyto jazyky mají společné, že instrukce programu kódují pomocí barev pixelů PNG-obrázků. Platí přitom několik dodatečných pravidel a omezení:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n        Počáteční instrukce je v prvním pixelu obrázku, to jest v levém horním rohu, následující pak vpravo od něj (není-li hned první instrukce otáčecí, viz následující bod).\r\n    </li>\r\n    <li>\r\n        Místo předem určeného způsobu načítání lineárního kódu <em>brainfucku</em> v rámci obdélníkového obrázku jsou data zakódována do 2D pomocí dvou dodatečných instrukcí, které otáčí instrukční ukazatel (<em>pointer</em>) doleva a doprava. Koncem programu tak není (nemusí být) očekávaný pravý spodní roh obrázku, nýbrž okamžik, kdy se pokusíme další instrukci načíst „mimo“ obrázek.\r\n    </li>\r\n    <li>\r\n        Všechny testované programy vyžadují jednobajtová paměťová místa na brainfuckovské pásce =&gt; inkrementace 255 o jedničku dá 0, dekrementace 0 naopak 255.\r\n    </li>\r\n    <li>\r\n        Všechny testované programy vyžadují tvrdou zarážku na paměťové pásce v nule (tj. nedá se jít pod adresu 0) – chce-li program pod nulu, zůstane na ní stát.\r\n    </li>\r\n  </ol>\r\n\r\n</div>"
     },
     {
       "id": "id8",
       "idx": 7,
       "title": "brainloller",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">brainloller</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Když si vzpomenete na první přednášku, tak následující obrázek (ten prťavý vlevo, vpravo je pouze jeho zvětšený náhled)..\r\n  </p>\r\n  <p style=\"width: 300px; margin: 0 auto;\">\r\n    <img src=\"_files/HelloWorld.original.png\" width=\"14\" height=\"12\" alt=\"\" title=\"skutečný program\" align=\"left\">\r\n    <img src=\"_files/HelloWorld.magnified.png\" width=\"200\" height=\"171\" alt=\"\" title=\"zvětšená verze programu (jako zdroj samozřejmě nefunkční)\" align=\"right\">\r\n    <br clear=\"all\">\r\n  </p>\r\n  <p>\r\n    ..ve skutečnosti představuje kód v jazyce <em>brailoller</em>, který po přepisu do <em>brainfuck</em>u dá následující program pro výpis <em>Hello World!</em>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;+++++++++[&lt;++++++++&gt;-]&lt;.&gt;+++++++[&lt;++++&gt;-]&lt;+.+++++++..+++.&gt;&gt;&gt;++++++++\r\n[&lt;++++&gt;-]&lt;.&gt;&gt;&gt;++++++++++[&lt;+++++++++&gt;-]&lt;---.&lt;&lt;&lt;&lt;.+++.------.--------.&gt;&gt;+.\r\n  </pre>\r\n  \r\n  <br>\r\n  \r\n  <h3>Dekódovací tabulka</h3>\r\n  <p>\r\n    V jazyce <em>brainloller</em> jsou instrukce zapsány přímo vybranými barvami. Přiřazení je přitom následující:\r\n  </p>\r\n  <table align=\"center\" style=\"text-align: center;\">\r\n    <tr>\r\n      <th>barva</th>\r\n      <td width=\"55\" rowspan=\"12\"></td>\r\n      <th>RGB</th>\r\n      <td width=\"55\" rowspan=\"12\"></td>\r\n      <th>funkce</th>\r\n    </tr>\r\n    <tr>\r\n      <td>red</td>\r\n      <td>(255,0,0)</td>\r\n      <td>&gt;</td>\r\n    </tr>\r\n    <tr>\r\n      <td>darkred</td>\r\n      <td>(128,0,0)</td>\r\n      <td>&lt;</td>\r\n    </tr>\r\n    <tr>\r\n      <td>green</td>\r\n      <td>(0,255,0)</td>\r\n      <td>+</td>\r\n    </tr>\r\n    <tr>\r\n      <td>darkgreen</td>\r\n      <td>(0,128,0)</td>\r\n      <td>-</td>\r\n    </tr>\r\n    <tr>\r\n      <td>blue</td>\r\n      <td>(0,0,255)</td>\r\n      <td>.</td>\r\n    </tr>\r\n    <tr>\r\n      <td>darkblue</td>\r\n      <td>(0,0,128)</td>\r\n      <td>,</td>\r\n    </tr>\r\n    <tr>\r\n      <td>yellow</td>\r\n      <td>(255,255,0)</td>\r\n      <td>[</td>\r\n    </tr>\r\n    <tr>\r\n      <td>darkyellow</td>\r\n      <td>(128,128,0)</td>\r\n      <td>]</td>\r\n    </tr>\r\n    <tr>\r\n      <td>cyan</td>\r\n      <td>(0,255,255)</td>\r\n      <td>rotace IP doprava</td>\r\n    </tr>\r\n    <tr>\r\n      <td>darkcyan</td>\r\n      <td>(0,128,128)</td>\r\n      <td>rotace IP doleva</td>\r\n    </tr>\r\n    <tr>\r\n      <td>ostatní</td>\r\n      <td>n/a</td>\r\n      <td>nop</td>\r\n    </tr>\r\n  </table>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Podle <a href=\"http://esolangs.org/wiki/Brainloller\">http://esolangs.org/wiki/Brainloller</a>\r\n  </div></div>\r\n  \r\n  <br>\r\n\r\n  <h3>Poznámky</h3>\r\n  <p>\r\n    Otáčecí instrukce byly do jazyka přidány poměrně zbytečně, PNG mohlo stejně tak dobře posloužit pro lineární zápis. Na druhou stranu je pravda, že otáčení činí život implementátorů zajímavějším ^_^\r\n  </p>\r\n  <p>\r\n    Dá se čekat, že hodně programů v <i>brainloller</i>u bude asi zapsáno tak, že otáčecí instrukce pouze zajistí přechod na novou řádku a změnu směru čtení (ostatně jako v ukázce), a nebude se snažit o nějaké sofistikovanější kódování do 2D (a využívat tak části vlastního kódu vícekrát). Tak si ostatně můžete asi celkem snadno napsat vlastní generátor obrázků s kódem – stačí pouze navrhnout dostatečněrozměrný obrázek, aby se do něj vaše instrukce (po započítání otáčecích) vešly.\r\n  </p>\r\n\r\n</div>"
     },
     {
       "id": "id9",
       "idx": 8,
       "title": "braincopter",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">braincopter</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Následující PNG-obrázek má rozměry 1729 x 1307 = 2 259 803 pixelů, tzn. že je potenciálně zdrojem více jak 2 MB dat. A v těchto datech je pomocí jazyka <em>braincopter</em> ukryta textová hra „The Lost Kingdom“:\r\n  </p>\r\n  <p>\r\n    <a href=\"_files/TheLostKingdom.original.png\"><img src=\"_files/TheLostKingdom.thumbnail.jpg\" width=\"444\" height=\"336\" alt=\"\" title=\"náhled na program\" align=\"center\"></a>\r\n  </p>\r\n\r\n  <br>\r\n\r\n  <h3>Dekódovací tabulka</h3>\r\n  <p>\r\n    Jazyk <i>braincopter</i> je varianta jazyka <i>brainloller</i>, která místo přesně určených deseti barev používá pro kódování příkazů jazyka <i>brainfuck</i> převodní formuli:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        <code>(65536*R + 256*G + B) % 11</code>, respektive ekvivalentně <code>(-2*R + 3*G + B) % 11</code>\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    To znamená, že pro reprezentaci konkrétního příkazu je možné použít téměř libovolnou barvu (pro konkrétní pixel najdeme nejbližší s odpovídajícím zbytkem po dělení). V důsledku nejsou změny v obrázku téměř viditelné.\r\n  </p>\r\n  <p>\r\n    Jinak je princip úplně stejný jako u jazyka <i>brainloller</i>, dekódovací tabulka následuje:\r\n  </p>\r\n  <table align=\"center\" style=\"text-align: center;\">\r\n    <tr>\r\n      <th>příkaz</th>\r\n      <td width=\"55\" rowspan=\"12\"></td>\r\n      <th>funkce</th>\r\n    </tr>\r\n    <tr>\r\n      <td>0</td>\r\n      <td>&gt;</td>\r\n    </tr>\r\n    <tr>\r\n      <td>1</td>\r\n      <td>&lt;</td>\r\n    </tr>\r\n    <tr>\r\n      <td>2</td>\r\n      <td>+</td>\r\n    </tr>\r\n    <tr>\r\n      <td>3</td>\r\n      <td>-</td>\r\n    </tr>\r\n    <tr>\r\n      <td>4</td>\r\n      <td>.</td>\r\n    </tr>\r\n    <tr>\r\n      <td>5</td>\r\n      <td>,</td>\r\n    </tr>\r\n    <tr>\r\n      <td>6</td>\r\n      <td>[</td>\r\n    </tr>\r\n    <tr>\r\n      <td>7</td>\r\n      <td>]</td>\r\n    </tr>\r\n    <tr>\r\n      <td>8</td>\r\n      <td>rotace IP doprava</td>\r\n    </tr>\r\n    <tr>\r\n      <td>9</td>\r\n      <td>rotace IP doleva</td>\r\n    </tr>\r\n    <tr>\r\n      <td>10</td>\r\n      <td>nop</td>\r\n    </tr>\r\n  </table>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Podle <a href=\"http://esolangs.org/wiki/Braincopter\">http://esolangs.org/wiki/Braincopter</a>\r\n  </div></div>\r\n\r\n</div>"
     }
   ]
