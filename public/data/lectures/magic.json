@@ -6,78 +6,132 @@
       "id": "id1",
       "idx": 0,
       "title": "Úvod",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Během přednášky jsme postupně viděli, že chování objektů v různých situacích je převážně určeno tím, jaké „magické atributy“ na sobě definují.\r\n    </p>\r\n    <p>\r\n        Udělejme si nyní krátkou rekapitulaci a přibližme si některá jejich významná použití.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Výběr volně podle <a href=\"http://diveintopython3.net/special-method-names.html\" class=\"external\">Dive Into Python 3 – Special Methods Names</a>.\r\n    </div></div>\r\n\r\n    <style>\r\n        td { font-family: monospace; }\r\n    </style>\r\n\r\n</div>"
     },
     {
       "id": "id2",
       "idx": 1,
       "title": "Matematika – unární operace",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Matematika – unární operace</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Začněmež od nejjednoduššího, totiž matematických operátorů. A to ještě unárních, ať se tam plete co nejméně „balastu“:\r\n    </p>\r\n    <table class=\"slim center text-align-left\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>interpretace</th>\r\n        </tr>\r\n        <tr>\r\n            <td>-x</td>\r\n            <td>x.__neg__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>+x</td>\r\n            <td>x.__pos__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>abs(x)</td>\r\n            <td>x.__abs__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>~x</td>\r\n            <td>x.__invert__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>complex(x)</td>\r\n            <td>x.__complex__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>int(x)</td>\r\n            <td>x.__int__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>float(x)</td>\r\n            <td>x.__float__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>round(x)</td>\r\n            <td>x.__round__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>round(x, n)</td>\r\n            <td>x.__round__(n)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>math.ceil(x)</td>\r\n            <td>x.__ceil__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>math.floor(x)</td>\r\n            <td>x.__floor__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>math.trunc(x)</td>\r\n            <td>x.__trunc__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>xs[x]</td>\r\n            <td>xs[x.__index__()]</td>\r\n        </tr>\r\n    </table>\r\n    <p>\r\n        Poslední řádek zaslouží vysvětlení: V Python'u je mnoho míst, kde interpret očekává celé číslo, ale byla by škoda se omezit pouze na ně. Zde je jako příklad uveden (celočíselný) index do výřezové notace. Existence magické metody <em>__index__()</em> (posvěcená v <a href=\"https://www.python.org/dev/peps/pep-0357/\" class=\"external\">PEP 357</a>) zajišťuje, že se takto dají použít i jiné objekty než jen a právě celá čísla.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id3",
       "idx": 2,
       "title": "Matematika – binární operace",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Matematika – binární operace</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Matematické binární operace jsou vcelku průhledné. Jen je důležité vědět, že selže-li aplikace levostranné metody na prvním z operandů, pokusí se Python najít odpovídající pravostrannou metodu na druhém z nich:\r\n    </p>\r\n    <table class=\"slim center text-align-left\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>interpretace zleva</th>\r\n            <th>interpretace zprava</th>\r\n        </tr>\r\n        <tr>\r\n            <td>x + y</td>\r\n            <td>x.__add__(y)</td>\r\n            <td>y.__radd__(x)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x - y</td>\r\n            <td>x.__sub__(y)</td>\r\n            <td>y.__rsub__(x)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x * y</td>\r\n            <td>x.__mul__(y)</td>\r\n            <td>y.__rmul__(x)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x / y</td>\r\n            <td>x.__truediv__(y)</td>\r\n            <td>y.__rtruediv__(x)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x // y</td>\r\n            <td>x.__floordiv__(y)</td>\r\n            <td>y.__rfloordiv__(x)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x % y</td>\r\n            <td>x.__mod__(y)</td>\r\n            <td>y.__rmod__(x)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>divmod(x, y)</td>\r\n            <td>x.__divmod__(y)</td>\r\n            <td>y.__rdivmod__(x)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x ** y</td>\r\n            <td>x.__pow__(y)</td>\r\n            <td>y.__rpow__(x)</td>\r\n        </tr>\r\n    </table>\r\n\r\n</div>"
     },
     {
       "id": "id4",
       "idx": 3,
       "title": "Matematika – binární operace zkráceně",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Matematika – binární operace zkráceně</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nepřekvapivě i zkrácené operátory mají své magické metody:\r\n    </p>\r\n    <table class=\"slim center text-align-left\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>interpretace zleva</th>\r\n        </tr>\r\n        <tr>\r\n            <td>x += y</td>\r\n            <td>x.__iadd__(y)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x -= y</td>\r\n            <td>x.__isub__(y)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x *= y</td>\r\n            <td>x.__imul__(y)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x /= y</td>\r\n            <td>x.__itruediv__(y)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x //= y</td>\r\n            <td>x.__ifloordiv__(y)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x %= y</td>\r\n            <td>x.__imod__(y)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x **= y</td>\r\n            <td>x.__ipow__(y)</td>\r\n        </tr>\r\n    </table>\r\n\r\n</div>"
     },
     {
       "id": "id5",
       "idx": 4,
       "title": "Matematika – násobení matic",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Matematika – násobení matic</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Přestože (zatím) žádný z vestavěných pythoních typů neumí operátor <code>@</code>, určený primárně pro násobení matic, využít (jako vždy byl do Python'u přidán pro usnadnění života komunitě kolem <a href=\"/materialy/python/numpy/overview.xml\"><em>Numpy</em></a>, ostatně podobně jako <a href=\"/materialy/python/numpy/slices.xml\">rozšířená výřezová notace</a>), je ho nepřekvapivě možno naimplementovat (tedy od Python'u 3.5 výše) pomocí následujích tří magických metod (nyní už asi s jasným významem):\r\n    </p>\r\n    <table class=\"slim center text-align-left\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>interpretace</th>\r\n        </tr>\r\n        <tr>\r\n            <td>a @ b</td>\r\n            <td>\r\n                a.__matmul__(b)<br>\r\n                b.__rmatmul__(a)\r\n            </td>\r\n        </tr>\r\n        <tr>\r\n            <td>a @= b</td>\r\n            <td>a.__imatmul__(b)</td>\r\n        </tr>\r\n    </table>\r\n    <p>\r\n        Uvedená funkcionalita je popsána v <a href=\"https://www.python.org/dev/peps/pep-0465/\" class=\"external\">PEP 465</a>. Popravdě naprosto nechápu, že se na ni muselo čekat tak dlouho…\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id6",
       "idx": 5,
       "title": "Bitové operace",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Bitové operace</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Bitové operace jsou také implementovány pomocí magických metod:\r\n    </p>\r\n    <table class=\"slim center text-align-left\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>interpretace zleva</th>\r\n            <th>interpretace zprava</th>\r\n        </tr>\r\n        <tr>\r\n            <td>x &lt;&lt; y</td>\r\n            <td>x.__lshift__(y)</td>\r\n            <td>y.__rlshift__(x)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x &gt;&gt; y</td>\r\n            <td>x.__rshift__(y)</td>\r\n            <td>y.__rrshift__(x)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x &amp; y</td>\r\n            <td>x.__and__(y)</td>\r\n            <td>y.__rand__(x)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x ^ y</td>\r\n            <td>x.__xor__(y)</td>\r\n            <td>y.__rxor__(x)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x | y</td>\r\n            <td>x.__or__(y)</td>\r\n            <td>y.__ror__(x)</td>\r\n        </tr>\r\n    </table>\r\n\r\n</div>"
     },
     {
       "id": "id7",
       "idx": 6,
       "title": "Bitové operace zkráceně",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Bitové operace zkráceně</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        A to samozřejmě i ve své zkrácené podobě:\r\n    </p>\r\n    <table class=\"slim center text-align-left\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>interpretace</th>\r\n        </tr>\r\n        <tr>\r\n            <td>x &lt;&lt;= y</td>\r\n            <td>x.__ilshift__(y)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x &gt;&gt;= y</td>\r\n            <td>x.__irshift__(y)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x &amp;= y</td>\r\n            <td>x.__iand__(y)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x ^= y</td>\r\n            <td>x.__ixor__(y)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x |= y</td>\r\n            <td>x.__ior__(y)</td>\r\n        </tr>\r\n    </table>\r\n\r\n</div>"
     },
     {
       "id": "id8",
       "idx": 7,
       "title": "Nápodoba množin…",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Nápodoba množin…</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Objekty chovající se alespoň částečně jako množiny toho zase až tak moc umět nemusí:\r\n    </p>\r\n    <table class=\"slim center text-align-left\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>interpretace</th>\r\n        </tr>\r\n        <tr>\r\n            <td>len(xs)</td>\r\n            <td>xs.__len__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>x in xs</td>\r\n            <td>xs.__contains__(x)</td>\r\n        </tr>\r\n    </table>\r\n    <p>\r\n        Takovéto objekty mají samozřejmě do skutečných množin pekelně daleko – mimo jiné nerozumí jediné z množinových operací. Ale pro základ stačí a hlavně se snadno rozšíří na nápodobu slovníků, jak ukáže hned následující slajd.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id9",
       "idx": 8,
       "title": "…a slovníků",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">…a slovníků</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pokud k předchozím dvěma metodám přidáme ještě následující čtyři, můžeme o našich skoro-množinových objektech pomalu začít předstírat, že to jsou slovníky:\r\n    </p>\r\n    <table class=\"slim center text-align-left\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>interpretace</th>\r\n        </tr>\r\n        <tr>\r\n            <td>xs[klíč]</td>\r\n            <td>xs.__getitem__(klíč)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>xs[klíč] = hodnota</td>\r\n            <td>xs.__setitem__(klíč, hodnota)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>del xs[klíč]</td>\r\n            <td>xs.__delitem__(klíč)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>xs[neexistující_klíč]</td>\r\n            <td>xs.__missing__(neexistující_klíč)</td>\r\n        </tr>\r\n    </table>\r\n    <p>\r\n        PS: Samozřejmě jsou to slovníky asi tak, jako byly objekty z předchozího slajdu množiny ^_~\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id10",
       "idx": 9,
       "title": "Nejen řetězcové reprezentace objektů",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Nejen řetězcové reprezentace objektů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Na mnoha místech se setkáme (a/nebo potřebujeme) objekty v jejich nějaké (nejen) řetězcové reprezentaci. Kupříkladu funkce <em>print()</em> zavolá na své argumenty převodní funkci <em>str()</em> a teprvé poté je pošle na výstup. Potřebných funkcí je však více:\r\n    </p>\r\n    <table class=\"slim center text-align-left\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>interpretace</th>\r\n        </tr>\r\n        <tr>\r\n            <td>repr(x)</td>\r\n            <td>x.__repr__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>str(x)</td>\r\n            <td>x.__str__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>format(x, specifikace_formátování)</td>\r\n            <td>x.__format__(specifikace_formátování)</td>\r\n        </tr>\r\n        <tr>\r\n            <td>bytes(x)</td>\r\n            <td>x.__bytes__()</td>\r\n        </tr>\r\n    </table>\r\n    <p>\r\n        Funkce <em>bytes()</em> by samozřejmě měla vracet binární reprezentaci, funkce <em>repr()</em> zase validní pythoní výraz a specifikace formátování ve funkci <em>format()</em> by se měla držet <a href=\"/materialy/python/cmd/print.xml?slajd=5\">příslušného minijazyka</a>.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id11",
       "idx": 10,
       "title": "Nápodoba funkcí",
+      "tags": [
+        "Legendary",
+        "Tricky"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Nápodoba funkcí</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Funkce se jak známo dají zavolat připsáním závorek <code>()</code> za své jméno:\r\n    </p>\r\n    <table class=\"slim center text-align-left\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>interpretace</th>\r\n        </tr>\r\n        <tr>\r\n            <td>fn()</td>\r\n            <td>fn.__call__()</td>\r\n        </tr>\r\n    </table>\r\n    <p>\r\n        Tohle má samozřejmě dalekosáhlejší použití než jen vytváření volatelných instancí. Zajímavější spíš je, že i samotné funkce definované pomocí klíčového slova <em>def</em> jsou vlastně objekty, na kterých tato metoda existuje a díky níž se dají „zavolat“.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id12",
       "idx": 11,
       "title": "Další užitečné metody",
+      "tags": [
+        "Legendary",
+        "WOW"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Další užitečné metody</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        S mnoha užitečnými metodami jsme se potkali už na příslušných místech (např. potřeba definovat metody <em>__enter__()</em> a <em>__exit__()</em> pro použití uvnitř <a href=\"/materialy/python/files/with.xml?slajd=5\">běhového kontextu <em>with</em></a>), ale některé se dost dobře nikam nehodí, takže je sepíšu ještě tady:\r\n    </p>\r\n    <table class=\"slim center text-align-left\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>interpretace</th>\r\n        </tr>\r\n        <tr>\r\n            <td>dir(x)</td>\r\n            <td>x.__dir__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>hash(x)</td>\r\n            <td>x.__hash__()</td>\r\n        </tr>\r\n        <tr>\r\n            <td>…</td>\r\n            <td>…</td>\r\n        </tr>\r\n    </table>\r\n\r\n</div>"
     },
     {
       "id": "id13",
       "idx": 12,
       "title": "Poznámka",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Tohle samozřejmě ani náhodou nebyly všechny magické metody, které jsou k dispozici v základním Python'u. Spousta z nich je popsána na jiných místech, ale hlavně – „hrabat“ se v magických metodách znamená, že už asi celkem víte co děláte (nebo by to aspoň znamenat mělo ^_~), takže tahle těžce přehledová přednáška je tu spíš proto, aby vás navnadila a ukázala vám některé z možností <strong>magických metod v Python'u</strong>.\r\n    </p>\r\n\r\n</div>"
     }
   ]

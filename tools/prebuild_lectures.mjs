@@ -73,6 +73,17 @@ for (const f of htmlFiles) {
   }
 }
 
+// Load slide tags and difficulty metadata
+let slidesMetadata = {};
+const slidesJsonPath = join(ROOT, "data", "slides.json");
+if (existsSync(slidesJsonPath)) {
+  try {
+    slidesMetadata = JSON.parse(readFileSync(slidesJsonPath, "utf-8"));
+  } catch (err) {
+    console.error("  ❌ Error reading slides.json metadata:", err);
+  }
+}
+
 let prebuiltCount = 0;
 for (const [slug, filePath] of fileMap.entries()) {
   try {
@@ -92,10 +103,17 @@ for (const [slug, filePath] of fileMap.entries()) {
       const hMatch = sectionInner.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i);
       const title = hMatch ? hMatch[1].replace(/<[^>]+>/g, "").trim() : `Section ${idx + 1}`;
 
+      const skey = `${slug}#${sectionId}`;
+      const slideMeta = slidesMetadata[skey];
+      const tags = (slideMeta && Array.isArray(slideMeta.tags)) ? slideMeta.tags : [];
+      const diff = (slideMeta && typeof slideMeta === "object") ? (slideMeta.diff || null) : (typeof slideMeta === "string" ? slideMeta : null);
+
       slides.push({
         id: sectionId,
         idx,
         title,
+        tags,
+        diff,
         html: sectionInner,
       });
       idx++;

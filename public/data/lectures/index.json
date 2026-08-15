@@ -6,72 +6,121 @@
       "id": "id1",
       "idx": 0,
       "title": "Úvod",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Vzhledem k době svého vzniku obsahuje sice většina pythoních distribucí vestavěný nástroj pro tvorbu <em>grafických uživatelských rozhraní</em> (<em>GUI</em>), ovšem tímto nástrojem je nezaslouženou negativitou provázený <strong>Tkinter</strong> aneb pythoní nadstavba nad nástrojem <strong>Tk</strong>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Je pravda, že sám Guido van Rossum kdysi prohlásil, že kdyby <em>wxPython (wxWidgets/wxWindows)</em> existoval dříve, byl by dnes v Python'u zahrnut on, ale není tomu tak. Na druhou stranu se <em>Tk</em> s verzí 8.0 (nativní vzhled) a 8.5 (podpora grafických témat) přesunulo svým vzhledem z počítačové prehistorie do moderní doby, takže si s ním ve většině případů bohatě vystačíte. V základní instalaci ovšem chybí všechny novější komponenty typu <em>zobrazovač HTML</em> a podobně, takže s tím musíte počítat.\r\n    </div></div>\r\n    <p>\r\n        Podpora <em>Tkinter</em>'u externími nástroji není zrovna oslnivá, ale pokud chcete distribuovat pythoní programy s GUI bez minima externích závislostí, je to jediná zaručená volba. (Nehledě na to, že všechny ostatní nástroje mají svůj díl problémů s fungováním na všech platformách.)\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id2",
       "idx": 1,
       "title": "PS: Kontrola instalace",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">PS: Kontrola instalace</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pod Windows se při běžné instalaci Python'u nainstaluje i podpora pro <em>tkinter</em>, ale na ostatních platformách je často v samostatném balíčku. Pro ověření korektní instalace stačí zavolat:\r\n    </p>\r\n    <pre class=\"brush: cmd; gutter: false; toolbar: false; \">\r\n        python -m tkinter\r\n    </pre>\r\n    <p>\r\n        Při funkční instalaci se tím otevře minimalistické testovací GUI.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id3",
       "idx": 2,
       "title": "Vytvoření okna aplikace",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Vytvoření okna aplikace</h2></div><div class=\"section-body\">\r\n\r\n    <example src=\"_files/okno.py\" lang=\"python\"></example>\r\n    <br>\r\n    <img src=\"_files/okno.png\" width=\"208\" height=\"227\" alt=\"screenshot okna\">\r\n    <p>\r\n        Založení okna aplikace je standardní – vytvoříme příslušný objekt (potomek <code>Tk</code>) a spustíme hlavní zpracovávací smyčku GUI-aplikací (tzv. <em>event loop</em>). Tato smyčka stále běží až do ukončení aplikace (ať už korektním uzavřením nebo havárií) a stará se o zpracování událostí, ke kterým v aplikaci dojde.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id4",
       "idx": 3,
       "title": "Vlastnosti okna aplikace",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Vlastnosti okna aplikace</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Založit okno GUI-aplikace je tedy velmi jednoduché, a přitom toto okno už umí prakticky vše, co po něm běžně potřebujeme. Má ovšem výchozí název („tk“) a rozměr (čtverec o hraně ~200 pixelů). Toto vše – i mnoho dalšího – se dá pomocí dalších metod (objektu okna) změnit:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <code>title(\"NÁZEV OKNA\")</code> – nastaví název okna aplikace na uvedený řetězec;\r\n        </li>\r\n        <li>\r\n            <code>geometry(\"400x200+300+100\")</code> – nastaví rozměry okna na 400x200 pixelů a umístí ho levým horním rohem na souřadnice [300, 100] (počítáno od levého horního rohu, osa x běží vpravo, osa y dolů);\r\n        </li>\r\n        <li>\r\n            <code>resizable(width=False, height=True)</code> – oknu bude možné měnit rozměr pouze ve vertikálním směru;\r\n        </li>\r\n        <li>\r\n            <code>attributes('-alpha', 0.7)</code> – nastaví okno na mírně průhledné;\r\n        </li>\r\n        <li>\r\n            <code>attributes('-topmost', True)</code> – způsobí, že okno se bude držet nad všemi ostatními okny i při ztrátě fokusu;\r\n        </li>\r\n        <li>\r\n            <code>iconify()</code> &amp; <code>deiconify()</code> – (z/od)minimalizuje okno na/z pracovní lištu/y;\r\n        </li>\r\n        <li>\r\n            <code>withdraw()</code> – úplně odstraní okno mimo obrazovku (<em>deiconify()</em> ho dokáže vrátit);\r\n        </li>\r\n        <li>\r\n            …\r\n        </li>\r\n    </ul>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            V našem příkladě by se tedy uvedené metody volaly na objektu <em>root</em>.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Ty pomlčky na začátku názvu některých vlastností jsou důsledkem překladu a aplikace názvů z původní implementace v Tk do Python'u.\r\n        </div></div></div>\r\n\r\n</div>"
     },
     {
       "id": "id5",
       "idx": 4,
       "title": "Manažery vzhledu",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Manažery vzhledu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Aby okno také něco dělalo, je třeba naplnit ho nějakými výkonnovými komponentami, jako jsou například tlačítka, menu, texty či obrázky. A tyto komponenty je třeba v rámci okna nějak uspořádat. <em>Tkinter</em> k tomuto účelu poskytuje tři různé (neviditelné) objekty (tzv. <em>layout managers</em>):\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong>pack</strong> – skládá komponenty za sebou do vertikálních a horizontálních boxů, které poté připojuje do okna na vyhovující pozici (nepřekvapivě asi nejvhodnější pro všechna jednodušší rozvržení obsahu okna);\r\n        </li>\r\n        <li>\r\n            <strong>grid</strong> – pozicuje komponenty v ploše do „oken mříže“ (typickým příkladem budiž kalkulačka :-);\r\n        </li>\r\n        <li>\r\n            <strong>place</strong> – pozicuje komponenty podle absolutních souřadnic (nepřekvapivě je těžko přenositelný, jeho použití je tudíž velmi speciální).\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
     {
       "id": "id6",
       "idx": 5,
       "title": "Příklad – obrázek v okně",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Příklad – obrázek v okně</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Bez podrobností si ukažme rovnou, jak v okně aplikace zobrazit obrázek ve formátu GIF:\r\n    </p>\r\n    <example src=\"_files/duha.py\" lang=\"python\"></example>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Části b) a c) mohou být prohozeny.\r\n    </div></div>\r\n    <img src=\"_files/duha.png\" width=\"268\" height=\"287\" alt=\"screenshot okna se zelenou duhou\">\r\n    <p>\r\n        PS: Pokud se nebudete hrabat v <em>geometry()</em>, vlastní okno aplikace se v rámci možností svou velikostí přizpůsobí obsahu.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id7",
       "idx": 6,
       "title": "Poznámka – vlastnosti objektů",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Poznámka – vlastnosti objektů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Všimněte si, že zařazení kanvasu do hierarchie elementů a jeho zobrazení zařídilo zavolání metody <em>pack()</em> přímo na něm. Ve skutečnosti je tato metoda definována na úplně samostatné třídě a všechny jednotlivé komponenty GUI ji díky pythoní vícenásobné dědičnosti sdílejí.\r\n    </p>\r\n    <p>\r\n        Takovýchto tříd, ze kterých komponenty GUI dědí, je více. Výsledkem je, že volání všech potřebných věcí je díky této <em>delegaci</em> (volání metody z komponenty je přesměrováno na příslušný objekt) k dispozici pohodlně na každé komponentě.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Ovšem za cenu řádného znepřehlednění nejen nápovědy – každá GUI-komponenta má průměrně 150 metod, z nichž ovšem naprostá většina je výše uvedeným způsobem poděděná ze sdílených tříd (kterým se většinou říká <em>mixin</em>, protože jejich jediným úkolem je být předky mnoha jiných tříd; často se tak ovšem říká naopak i jejich potomkům).\r\n    </div></div>\r\n    <p>\r\n        Budete-li se chtít podívat, co všechno daný objekt umí, nejlepší je nápověda na příkazové řádce (případně rovnou <a href=\"http://tcl.tk/doc/\" class=\"external\">stránky dokumentace pro Tk</a>…). Někdy však postačí nechat si pro příslušný libovolný objekt GUI vypsat jeho <code>TkObjekt.config()</code> a/nebo <code>TkObjekt.keys()</code>.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id8",
       "idx": 7,
       "title": "Příklad – složitější aplikace (vzhled)",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Příklad – složitější aplikace (vzhled)</h2></div><div class=\"section-body\">\r\n\r\n    <img src=\"_files/aplikace.png\" width=\"272\" height=\"339\" alt=\"screenshot okna aplikace\">\r\n    <br>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Samozřejmě tahle šílená kombinace normálního a vystouplého rámečku k sobě graficky vůbec nepasuje a ve skutečnosti ji nebudete chtít použít. Tady je jenom pro ukázku možností různých základních komponent.\r\n    </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id9",
       "idx": 8,
       "title": "Příklad – složitější aplikace (kód)",
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Příklad – složitější aplikace (kód)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Složitější GUI-aplikaci je zvykem (i z praktických důvodů) zavést spíše jako samostatnou třídu:\r\n    </p>\r\n    <example src=\"_files/aplikace.py\" lang=\"python\"></example>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Volně podle <a href=\"http://effbot.org/tkinterbook/tkinter-hello-again.htm\" class=\"external\">http://effbot.org/tkinterbook/tkinter-hello-again.htm</a> a <a href=\"zetcode.com/gui/tkinter/layout/index.html\" class=\"external\">zetcode.com/gui/tkinter/layout/index.html</a>.\r\n    </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id10",
       "idx": 9,
       "title": "Vlastnosti GUI-komponent",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Vlastnosti GUI-komponent</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Stejně jako hlavní okno GUI-aplikace i jeho jednotlivé komponenty mají spoustu vlastností. Velká část z nich je sdílená (například všechny metody pro <a href=\"?slajd=5\">práci s rozložením</a>), ale pochopitelně má každá komponenta i spoustu vlastností vlastních. Sdílené metody zahrnují například:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <code>bell()</code> – zvoneček ^_~\r\n        </li>\r\n        <li>\r\n            <code>focus()</code> – pokusí se (skrz <em>window manager</em>a) předat fokus na uvedenou komponentu;\r\n        </li>\r\n        <li>\r\n            <code>lift()</code> a <code>lower()</code> – pozvedne/poníží pořadí objektu v sekvenci komponent;\r\n        </li>\r\n        <li>\r\n            <code>update()</code> – zpracování všech čekajících událostí;\r\n        </li>\r\n        <li>\r\n            <code>quit()</code> – zavření aplikace;\r\n        </li>\r\n        <li>\r\n            …\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Uvedené metody se konkrétně týkají objektu <em>Frame()</em>, který má kapku jinou řadu předků než třeba <em>Canvas()</em> – ten z výše uvedených sice má jak <code>focus()</code>, tak <code>lift()</code> a <code>lower()</code>, ale jsou to jeho vlastní metody.\r\n    </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id11",
       "idx": 10,
       "title": "Další „widžety“ a jejich styly",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Další „widžety“ a jejich styly</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož nemám šanci nahradit oficiální i neoficiální materiály na tvorbu GUI pomocí (nejen) <em>tkinter</em>'u, následuje už jen zběžný přehled některých dostupných komponent, abyste si mohli udělat lepší představu, co je v <em>tkinter</em>'u možné:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <em>Frame</em>, <em>LabelFrame</em>, <em>Panedwindow</em>, <em>Notebook</em> – vizuální sgrupování;\r\n        </li>\r\n        <li>\r\n            formulářové prvky <em>Lable</em>, <em>Button</em>, <em>Checkbutton</em>, <em>Radiobutton</em>, <em>Entry</em>, <em>Combobox</em> (aneb „drop-down menu“), <em>Listbox</em> (aneb „select“), <em>Text</em>, <em>Spinbox</em>;\r\n        </li>\r\n        <li>\r\n            pomocné vizuální nástroje jako <em>Scrollbar</em>, <em>SizeGrip</em>, <em>Progressbar</em>, <em>Scale</em>, <em>Separator</em>;\r\n        </li>\r\n        <li>\r\n            <em>Menu</em> – tvorba menu;\r\n        </li>\r\n        <li>\r\n            tabulkové zobrazení pomocí <em>Treeview</em>;\r\n        </li>\r\n        <li>\r\n            <em>Canvas</em> – práce s bitmapami;\r\n        </li>\r\n        <li>\r\n            …\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
     {
       "id": "id12",
       "idx": 11,
       "title": "Na závěr",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Na závěr</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jednoduché – a přenosné – GUI se dá pomocí Tkinter'u napsat poměrně snadno a rychle. Jakmile toho však budete chtít více, začíná přituhovat. (Ostatně dodnes mne žádný programovací jazyk nepřesvědčil, že na navrhování struktury GUI se hodí lépe než XML. Jak ostatně dokazuje pronikání XML-návrhářů do většiny moderních GUI.)\r\n    </p>\r\n    <p>\r\n        Pokud budete chtít <em>tkinter</em> používat více, jste na tom ale na druhou stranu dnes lépe než ještě třeba před deseti lety – máte totiž k dispozici úžasný přehled použití <strong>Tk</strong> v několika jazycích (samozřejmě včetně Python'u :-) na stránkách <a href=\"http://tkdocs.com/\" class=\"external\">TkDocs.com</a>.\r\n    </p>\r\n\r\n</div>"
     }
   ]

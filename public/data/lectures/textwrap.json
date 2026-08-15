@@ -6,48 +6,81 @@
       "id": "id1",
       "idx": 0,
       "title": "Úvod",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ačkoli <a href=\"/materialy/python/types/strings.xml\">datový typ řetězec</a> toho v Python'u umí docela dost, uživatelé kupříkladu Perl'u nad ním mohou po právu ohrnovat nos – regexpy všude těžko něčím jen tak překonáte.\r\n    </p>\r\n    <p>\r\n        Naštěstí obsahuje standardní knihovna několik modulů, které vám při práci s textem mohou velmi pomoci. Jedním z nich je modul <strong><code>textwrap</code></strong>, jehož základní funkcionalitu – řízení výskytu zalomení, odsazení a podobných značek v textu – se pokusím na následujících stránkách přiblížit.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id2",
       "idx": 1,
       "title": "Konstruktor „TextWrapper“",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Konstruktor „TextWrapper“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Na pozadí vší „magie“ modulu <code>textwrap</code> stojí třída <code>TextWrapper</code>. Pro její plnou funkcionalitu se podívejte do <a href=\"https://docs.python.org/3/library/textwrap.html#textwrap.TextWrapper\" class=\"external\">dokumentace</a>, ale již pohled na možnosti konstruktoru vás asi přesvědčí, co všechno se s její pomocí dá zařídit:\r\n    </p>\r\n    <pre>        TextWrapper(\r\n          width=70,\r\n          expand_tabs=True, tabsize=8,\r\n          replace_whitespace=True, drop_whitespace=True,\r\n          initial_indent='', subsequent_indent='',\r\n          fix_sentence_endings=False,\r\n          break_long_words=True, break_on_hyphens=True,\r\n          max_lines=None,\r\n          placeholder=' [...]'\r\n        )\r\n    </pre>\r\n    <p>\r\n        Metody dále uvedené, které obsahují nepovinné pojmenované parametry (<em>**kwargs</em>), se jimi odkazují právě na tyto.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id3",
       "idx": 2,
       "title": "„wrap(text, width=70, **kwargs)“",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">„wrap(text, width=70, **kwargs)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Velmi užitečná funkce pro rozsekání vstupního jednolitého textu na menší kousíčky:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = \"příliš žluťoučký kůň úpěl ďábelské ódy\"\r\n\r\n&gt;&gt;&gt; textwrap.wrap(xs, 8)\r\n        ['příliš ž', 'luťoučký', 'kůň úpěl', 'ďábelské', 'ódy']\r\n</pre>\r\n    <p>\r\n        Všimněte si především, že funkce vrací seznam, je tedy vhodná pro iterativní zpracování svého výstupu.\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id4",
       "idx": 3,
       "title": "„fill(text, width=70, **kwargs)“",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„fill(text, width=70, **kwargs)“</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Tato funkce je doplňkem předchozí, jen místo seznamu vrací již naformátovaný řetězec:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = \"příliš žluťoučký kůň úpěl ďábelské ódy\"\r\n\r\n&gt;&gt;&gt; textwrap.fill(xs, 8)\r\n        'příliš ž\\nluťoučký\\nkůň úpěl\\nďábelské\\nódy'\r\n</pre>\r\n    <p>\r\n        Vlastně je zkratkou za kód: <code>\"\\n\".join(wrap(text, ...))</code>\r\n    </p>\r\n\r\n    <p class=\"enumerate\">\r\n        Mimochodem této (i předchozí) metodě je nepřekvapivě naprosto šumák, jak zalámaný byl vstupní řetězec původně:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ys = \"příliš žluťoučký kůň\\núpěl ďábelské ódy\"\r\n&gt;&gt;&gt; textwrap.fill(ys, 8)\r\n        'příliš ž\\nluťoučký\\nkůň úpěl\\nďábelské\\nódy'\r\n&gt;&gt;&gt; textwrap.wrap(xs, 8)\r\n        ['příliš ž', 'luťoučký', 'kůň úpěl', 'ďábelské', 'ódy']\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: Zjevně probíhá podobná normalizace bílých znaků jako u HTML.\r\n    </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id5",
       "idx": 4,
       "title": "„shorten(text, width, **kwargs)“",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">„shorten(text, width, **kwargs)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Potřebujete-li v textu znormalizovat mezery a zkrátit ho po celých slovech na konkrétní délku, jde to snadno:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = \"příliš   žluťoučký kůň úpěl     ďábelské ódy\"\r\n\r\n        # a) výstup včetně … je dlouhý 17 znaků:\r\n&gt;&gt;&gt; textwrap.shorten(xs, 18, placeholder='…')\r\n        'příliš žluťoučký…'\r\n        \r\n        # b) s výchozím nastavením by to ale po rozsekání na slova už nevyšlo:\r\n&gt;&gt;&gt; textwrap.shorten(xs, 18)\r\n        'příliš [...]'\r\n</pre>\r\n    <p>\r\n    </p>\r\n\r\n</div>"
     },
     {
       "id": "id6",
       "idx": 5,
       "title": "„dedent(text)“",
+      "tags": [
+        "Skip",
+        "WOW"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">„dedent(text)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Někdy (například pro pythonovské dokumentační řetězce ;-) se může hodit funkce umožňující odstranit společné bílé mezery ze začátku řádek textu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = \"\"\"\r\n...     0. příliš žluťoučký kůň úpěl ďábelské ódy\r\n...     1. příliš   žluťoučký kůň úpěl     ďábelské ódy\r\n...     2. Příliš žluťoučký kůň úpěl ďábelské ódy.\r\n... \"\"\"\r\n&gt;&gt;&gt; textwrap.dedent(xs)\r\n        ('\\n'\r\n         '0. příliš žluťoučký kůň úpěl ďábelské ódy\\n'\r\n         '1. příliš   žluťoučký kůň úpěl     ďábelské ódy\\n'\r\n         '2. Příliš žluťoučký kůň úpěl ďábelské ódy.\\n')\r\n</pre>\r\n    <p>\r\n        Pokud ovšem všechny nebudou mít stejný bíloznakový začátek (zde má bod 1 navíc před sebou ještě tabulátor), už to tak úplně nezabere:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = \"\"\"\r\n...     0. příliš žluťoučký kůň úpěl ďábelské ódy\r\n...         1. příliš   žluťoučký kůň úpěl     ďábelské ódy\r\n...     2. Příliš žluťoučký kůň úpěl ďábelské ódy.\r\n... \"\"\"\r\n&gt;&gt;&gt; textwrap.dedent(xs)\r\n        ('\\n'\r\n         '0. příliš žluťoučký kůň úpěl ďábelské ódy\\n'\r\n         '    1. příliš   žluťoučký kůň úpěl     ďábelské ódy\\n'\r\n         '2. Příliš žluťoučký kůň úpěl ďábelské ódy.\\n')\r\n</pre>\r\n\r\n</div>"
     },
     {
       "id": "id7",
       "idx": 6,
       "title": "„indent(text, prefix, predicate=None)“",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">„indent(text, prefix, predicate=None)“</h2></div><div class=\"section-body\">\r\n\r\n    <p _class=\"enumerate\">\r\n        Nepřekvapivě můžete snadno zařídit i přesně opačnou operaci – konfigurovatelné odsazení. Ve výchozím nastavení pouze u neprázdných řádek..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = \"\"\"\r\n... 0. příliš žluťoučký kůň úpěl ďábelské ódy\r\n... \r\n... 1. příliš   žluťoučký kůň úpěl     ďábelské ódy\r\n... 2. Příliš žluťoučký kůň úpěl ďábelské ódy.\r\n... \"\"\"\r\n\r\n&gt;&gt;&gt; textwrap.indent(xs, '~')\r\n        ('\\n'\r\n         '~0. příliš žluťoučký kůň úpěl ďábelské ódy\\n'\r\n         '\\n'\r\n         '~1. příliš   žluťoučký kůň úpěl     ďábelské ódy\\n'\r\n         '~2. Příliš žluťoučký kůň úpěl ďábelské ódy.\\n')\r\n</pre>\r\n    <p>\r\n        ..ale snadno rozšíříte i na ně:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; textwrap.indent(xs, '~', lambda řádka: True)\r\n        ('~\\n'\r\n         '~0. příliš žluťoučký kůň úpěl ďábelské ódy\\n'\r\n         '~\\n'\r\n         '~1. příliš   žluťoučký kůň úpěl     ďábelské ódy\\n'\r\n         '~2. Příliš žluťoučký kůň úpěl ďábelské ódy.\\n')\r\n</pre>\r\n\r\n    <p _class=\"enumerate\">\r\n        PS: S predikátem se zjevně můžete solidně „vyřádit“:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = \"\"\"1 – jedna\r\n... 2 – dva\r\n... 3 – tři\r\n... 4 – čtyři\r\n... 5 – pět\r\n... \"\"\"\r\n\r\n&gt;&gt;&gt; textwrap.indent(xs, '× ', lambda řádka: int(řádka[0]) % 2 == 1)\r\n        '× 1 – jedna\\n2 – dva\\n× 3 – tři\\n4 – čtyři\\n× 5 – pět\\n'\r\n</pre>\r\n\r\n</div>"
     },
     {
       "id": "id8",
       "idx": 7,
       "title": "Poznámka",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Metody <code>wrap()</code>, <code>fill()</code> a <code>shorten()</code> jsou pohodlné na práci, ale skrývají v sobě drobný zádrhel:\r\n    </p>\r\n    <blockquote>\r\n        Při každém jejich použití je vytvořena nová instance třídy <em>TextWrapper</em>, která se již znovu nepoužije.\r\n    </blockquote>\r\n    <p>\r\n        Proto při velkém počtu zpracovávaných textů je lepší zavést si vlastní objekt typu <em>TextWrapper</em> a až ten použít k volání příslušných metod.\r\n    </p>\r\n\r\n</div>"
     }
   ]

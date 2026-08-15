@@ -6,42 +6,71 @@
       "id": "id1",
       "idx": 0,
       "title": "Úvod",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <em>„Zmražené“ či „zamrzlé“ množiny</em> jsou neproměnnou (<em>immutable</em>) variantou <a href=\"sets.xml\">množin</a>. Dá se o nich tedy z větší části říci úplně to samé, co o množinách:\r\n  </p>\r\n  <blockquote>\r\n    <strong>Zmražená množina</strong> je neuspořádaná kolekce jedinečných a neměnných (<em>immutable</em>) hodnot.\r\n  </blockquote>\r\n  <p>\r\n    Narozdíl od množin však tuto kolekci nemůžeme žádným způsobem měnit.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Je mezi nimi tedy tak trochu podobná korespondence jako mezi seznamy a n-ticemi.\r\n  </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id2",
       "idx": 1,
       "title": "Zavedení – „frozenset()“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Zavedení – „frozenset()“</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    K vytvoření <em>zmražené množiny</em> slouží konstruktor <code>frozenset(ITERABLE)</code>, který přebírá na vstupu iterovatelný objekt <em>složený z prvků neproměnných</em> (<em>immutable</em>) typů, ze kterých složí výslednou zmraženou množinu:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = [1, 2, 'ahoj', 3, 'b', 'ahoj', 3, ]\r\n&gt;&gt;&gt; fs = frozenset(xs)\r\n\r\n&gt;&gt;&gt; fs\r\nfrozenset({1, 2, 3, 'ahoj', 'b'})\r\n\r\n&gt;&gt;&gt; type(xs)\r\n&lt;class 'frozenset'&gt;\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Duplikáty ze vstupního objektu byly automaticky odstraněny, protože vyrábíme <em>množinu</em>.\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Vstupem do konstruktoru může být samozřejmě i „obyčejná“ množina – dá se procházet po jejích prvcích plus jsou prvky již automaticky neproměnné a každý je tam navíc již pouze jednou:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; s = { 1, 2, 'ahoj', 3, 'b', }\r\n&gt;&gt;&gt; frozenset(s)\r\nfrozenset({'ahoj', 1, 2, 3, 'b'})\r\n  </pre>\r\n\r\n</div>"
     },
     {
       "id": "id3",
       "idx": 2,
       "title": "Prázná „zmražená“ množina",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Prázná „zmražená“ množina</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <strong>Prázdnou zmraženou množinu</strong> vytvoříme pomocí funkce <code>frozenset()</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; fs = frozenset()\r\n&gt;&gt;&gt; fs\r\nfrozenset()\r\n\r\n&gt;&gt;&gt; type(fs)\r\n&lt;class 'frozenset'&gt;\r\n  </pre>\r\n  <p>\r\n    Žádná odpovídající přímá notace neexistuje, takže se sice upíšeme, ale zase se <a href=\"sets.xml?slajd=2&amp;par=2\">vyhneme zmatení od množin</a>.\r\n  </p>\r\n\r\n</div>"
     },
     {
       "id": "id4",
       "idx": 3,
       "title": "Základní vlastnosti",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Základní vlastnosti</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Ačkoli zmražené množiny nepatří mezi sekvence, některé z vlastností mají – díky své struktuře „balíků na hodnoty“ – společné:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; fs = frozenset( { 1, 2, 'ahoj', 3, 'b', } )\r\n\r\n# dotaz na počet prvků\r\n&gt;&gt;&gt; len(fs)\r\n5\r\n\r\n# dotaz na výskyt prvku\r\n&gt;&gt;&gt; 'b' in fs\r\nTrue\r\n&gt;&gt;&gt; 5 in fs\r\nFalse\r\n  </pre>\r\n  \r\n  <p class=\"enumerate\">\r\n    Podoba se vztahuje dokonce i na procházení prvků množiny smyčkou <em>for-in</em>, jen je příslušné procházení – podobně jako u slovníků – „náhodné“:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; fs = frozenset( { 1, 2, 'ahoj', 3, 'b', } )\r\n\r\n&gt;&gt;&gt; for x in fs:\r\n...     print(x)\r\n...\r\nahoj\r\n1\r\n2\r\n3\r\nb\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Varianta s <em>enumerate()</em> funguje také, ale jelikož pořadí výpisu prvků je v podstatě „náhodné“, tak má poněkud omezenější použití, než u sekvenčních typů. Stejně tak samotný cyklus <em>for-in</em> najde využití spíše pro „množinové“ operace, kde nás zajímají vlastnosti či funkce prvků a nikoli jejich pořadí.\r\n  </div></div>\r\n\r\n</div>"
     },
     {
       "id": "id5",
       "idx": 4,
       "title": "„Zmražené“ množiny jako neproměnný datový typ",
+      "tags": [
+        "Core",
+        "Tricky"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">„Zmražené“ množiny jako neproměnný datový typ</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Protože <em>zmražené množiny</em> jsou neproměnný (<em>immutable</em>) datový typ, veškeré množinové operace, které sloužily k přidávání a odebírání prvků, u nich nejsou pochopitelně podporovány. Konkrétně se tedy jedná o následující operace:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      operace pro přidávání prvků – <code>add()</code>, <code>update()</code>\r\n    </li>\r\n    <li>\r\n      operace pro odebírání prvků – <code>discard()</code>, <code>remove()</code>, <code>pop()</code>, <code>clear()</code>\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    Ostatně podívejme se na výpis podporovaných atributů u zmražené množiny:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; fs = frozenset()\r\n&gt;&gt;&gt; dir(fs)\r\n['__and__', '__class__', '__contains__', '__delattr__', '__doc__', '__eq__',\r\n '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__',\r\n '__iter__', '__le__', '__len__', '__lt__', '__ne__', '__new__', '__or__',\r\n '__rand__', '__reduce__', '__reduce_ex__', '__repr__', '__ror__', '__rsub__',\r\n '__rxor__', '__setattr__', '__sizeof__', '__str__', '__sub__',\r\n '__subclasshook__', '__xor__', 'copy', 'difference', 'intersection',\r\n 'isdisjoint', 'issubset', 'issuperset', 'symmetric_difference', 'union']\r\n  </pre>\r\n\r\n</div>"
     },
     {
       "id": "id6",
       "idx": 5,
       "title": "Množinové operace",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Množinové operace</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Jinak jsou ovšem <em>zmražené množiny</em> stále ještě <em>množinami</em>, takže podporují všechny množinové operace (jak jsme ostatně viděli ve výpisu na předchozím slajdu), a to v obou jejich variantách – operátorově i množinově. Pro jednoduchost si je pouze shrňme a na použití odkažme k příkladům u množin:\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Základní množinové operace:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      průnik – <a href=\"sets.xml?slajd=6&amp;par=1\">&amp;</a>, <a href=\"sets.xml?slajd=7&amp;par=1\">intersection()</a>\r\n    </li>\r\n    <li>\r\n      sjednocení – <a href=\"sets.xml?slajd=6&amp;par=1\">|</a>, <a href=\"sets.xml?slajd=7&amp;par=1\">union()</a>\r\n    </li>\r\n    <li>\r\n      rozdíl – <a href=\"sets.xml?slajd=6&amp;par=1\">-</a>, <a href=\"sets.xml?slajd=7&amp;par=1\">difference()</a>\r\n    </li>\r\n    <li>\r\n      symetrický rozdíl – <a href=\"sets.xml?slajd=6&amp;par=1\">^</a>, <a href=\"sets.xml?slajd=7&amp;par=1\">symmetric_difference()</a>\r\n    </li>\r\n  </ul>\r\n  \r\n  <p class=\"enumerate\">\r\n    Dotazy na množiny:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      test (vlastní) podmnožiny – <a href=\"sets.xml?slajd=6&amp;par=2\">&lt;= &lt;</a>, <a href=\"sets.xml?slajd=7&amp;par=2\">issubset()</a>\r\n    </li>\r\n    <li>\r\n      test (vlastní) nadmnožiny – <a href=\"sets.xml?slajd=6&amp;par=2\">&gt;= &gt;</a>, <a href=\"sets.xml?slajd=7&amp;par=2\">issuperset()</a>\r\n    </li>\r\n    <li>\r\n      test výskytu prvku (pouze operátorově) – <a href=\"sets.xml?slajd=6&amp;par=2\">in</a>, <a href=\"sets.xml?slajd=6&amp;par=2\">not in</a>\r\n    </li>\r\n  </ul>\r\n  \r\n  <p class=\"enumerate\">\r\n    Zjištění nulového průniku (nemá operátorovou variantu):\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      <a href=\"sets.xml?slajd=7&amp;par=3\">isdisjoint()</a>\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
     },
     {
       "id": "id7",
       "idx": 6,
       "title": "Kopie množiny",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Kopie množiny</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Jako jedna z mála datových struktur nabízí zmražená množina i vlastní metodu pro tvorbu kopie – <code>copy()</code>. Narozdíl od slovníku však prvky množiny mohou být pouze <em>hešovatelné</em>, tedy <em>neproměnné</em> (<em>immutable</em>) typy, takže při kopírování nenarazíme na problém s <em>mělkou vs hlubokou kopií</em>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = frozenset( { 1, 2, 'ahoj', 3, 'b', } )\r\n&gt;&gt;&gt; xs\r\nfrozenset({'ahoj', 1, 2, 3, 'b'})\r\n\r\n&gt;&gt;&gt; ys = xs.copy()\r\n&gt;&gt;&gt; ys\r\nfrozenset({'ahoj', 1, 2, 3, 'b'})\r\n\r\n&gt;&gt;&gt; xs = frozenset()   # nahrazení původní zmražené množiny prázdnou\r\n&gt;&gt;&gt; xs\r\nfrozenset()\r\n&gt;&gt;&gt; ys                 # zkopírovaná množina se zachovává\r\nfrozenset({'ahoj', 1, 2, 3, 'b'})\r\n  </pre>\r\n\r\n</div>"
     }
   ]

@@ -126,65 +126,74 @@ export function resetDeckQuizScores(slug) {
 
 export async function saveQuestionImprovement(data) {
   const entry = {
-    id: `imp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-    timestamp: new Date().toISOString(),
+    id: data.id || `imp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    timestamp: data.timestamp || new Date().toISOString(),
     deckKey: data.deckKey || "",
-    questionId: data.questionId || "",
+    questionId: data.questionId || "presentation-content",
     questionText: data.questionText || "",
-    questionType: data.questionType || "",
-    category: data.category || "q_a_makes_no_sense",
-    categoryLabel: data.categoryLabel || "Otázka/odpověď nedává smysl",
+    questionType: data.questionType || "presentation",
+    category: data.category || "content_error",
+    categoryLabel: data.categoryLabel || "Chyba v obsahu prezentace",
     userNote: data.userNote || "",
-    status: "open",
+    status: data.status || "open",
   };
 
   if (!Array.isArray(state.questionImprovements)) state.questionImprovements = [];
   state.questionImprovements.unshift(entry);
-  try {
-    localStorage.setItem(QUESTION_IMPROVEMENTS_KEY, JSON.stringify(state.questionImprovements));
-  } catch { /* ignore */ }
 
-  // 1. Post to local dev server API if available
+  let synced = false;
+
+  // 1. Post to /api/question-improvement (Cloud-first)
   try {
-    await fetch("/api/question-improvement", {
+    const res = await fetch("/api/question-improvement", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(entry),
     });
-  } catch { /* ignore */ }
-
-  // 2. Direct online Upstash Redis Cloud DB sync (Zero-Data-Loss)
-  try {
-    const kvUrl = "https://tough-husky-101028.upstash.io";
-    const kvToken = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
-    
-    const getRes = await fetch(`${kvUrl}/get/pyt:global:question_improvements`, {
-      headers: { Authorization: `Bearer ${kvToken}` },
-    });
-    let remoteList = [];
-    if (getRes.ok) {
-      const gData = await getRes.json();
-      if (gData && gData.result) {
-        remoteList = typeof gData.result === "string" ? JSON.parse(gData.result) : gData.result;
+    if (res.ok) {
+      synced = true;
+      const data = await res.json();
+      if (data && Array.isArray(data.result)) {
+        state.questionImprovements = data.result;
       }
     }
+  } catch { /* fallback to direct Upstash */ }
 
-    const byId = {};
-    for (const item of (Array.isArray(remoteList) ? remoteList : [])) {
-      if (item && item.id) byId[item.id] = item;
-    }
-    for (const item of state.questionImprovements) {
-      if (item && item.id) byId[item.id] = item;
-    }
-    const mergedList = Object.values(byId);
+  // 2. Direct Upstash Redis Cloud DB fallback if serverless proxy unreachable
+  if (!synced) {
+    try {
+      const kvUrl = "https://tough-husky-101028.upstash.io";
+      const kvToken = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
+      
+      const getRes = await fetch(`${kvUrl}/get/pyt:global:question_improvements`, {
+        headers: { Authorization: `Bearer ${kvToken}` },
+      });
+      let remoteList = [];
+      if (getRes.ok) {
+        const gData = await getRes.json();
+        if (gData && gData.result) {
+          let parsed = gData.result;
+          while (typeof parsed === "string") {
+            try { parsed = JSON.parse(parsed); } catch { break; }
+          }
+          remoteList = Array.isArray(parsed) ? parsed : [];
+        }
+      }
 
-    await fetch(`${kvUrl}/set/pyt:global:question_improvements`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${kvToken}` },
-      body: JSON.stringify(JSON.stringify(mergedList)),
-    });
-  } catch (err) {
-    console.warn("[Upstash Redis Cloud DB Sync Warning]", err);
+      const byId = new Map();
+      for (const item of remoteList) if (item && item.id) byId.set(item.id, item);
+      byId.set(entry.id, entry);
+      const mergedList = Array.from(byId.values()).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      await fetch(`${kvUrl}/set/pyt:global:question_improvements`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${kvToken}` },
+        body: JSON.stringify(JSON.stringify(mergedList)),
+      });
+      state.questionImprovements = mergedList;
+    } catch (err) {
+      console.warn("[Upstash Direct Sync Warning]", err);
+    }
   }
 
   notifyStateChange("questionImprovement", { entry });
@@ -194,47 +203,73 @@ export async function saveQuestionImprovement(data) {
 export async function loadQuestionImprovements() {
   const kvUrl = "https://tough-husky-101028.upstash.io";
   const kvToken = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
-  try {
-    const rawLocal = localStorage.getItem(QUESTION_IMPROVEMENTS_KEY);
-    if (rawLocal) {
-      state.questionImprovements = JSON.parse(rawLocal);
-    }
-  } catch { /* ignore */ }
+  
+  let remoteItems = null;
 
+  // 1. Fetch from /api/question-improvement (Cloud-first)
   try {
-    const getRes = await fetch(`${kvUrl}/get/pyt:global:question_improvements`, {
-      headers: { Authorization: `Bearer ${kvToken}` },
-    });
-    if (getRes.ok) {
-      const gData = await getRes.json();
-      if (gData && gData.result) {
-        const remoteList = typeof gData.result === "string" ? JSON.parse(gData.result) : gData.result;
-        if (Array.isArray(remoteList)) {
-          const byId = {};
-          for (const item of remoteList) if (item && item.id) byId[item.id] = item;
-          for (const item of (state.questionImprovements || [])) if (item && item.id) byId[item.id] = item;
-          state.questionImprovements = Object.values(byId).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-          localStorage.setItem(QUESTION_IMPROVEMENTS_KEY, JSON.stringify(state.questionImprovements));
-        }
+    const res = await fetch("/api/question-improvement");
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.result)) {
+        remoteItems = data.result;
       }
     }
-  } catch (err) {
-    console.warn("[Upstash Fetch Improvements Warning]", err);
+  } catch { /* fallback */ }
+
+  // 2. Direct Upstash fallback if /api/question-improvement failed
+  if (!remoteItems) {
+    try {
+      const getRes = await fetch(`${kvUrl}/get/pyt:global:question_improvements`, {
+        headers: { Authorization: `Bearer ${kvToken}` },
+      });
+      if (getRes.ok) {
+        const gData = await getRes.json();
+        if (gData && gData.result) {
+          let parsed = gData.result;
+          while (typeof parsed === "string") {
+            try { parsed = JSON.parse(parsed); } catch { break; }
+          }
+          if (Array.isArray(parsed)) remoteItems = parsed;
+        }
+      }
+    } catch (err) {
+      console.warn("[Upstash Fetch Improvements Warning]", err);
+    }
   }
-  return state.questionImprovements || [];
+
+  if (Array.isArray(remoteItems)) {
+    state.questionImprovements = remoteItems.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  } else if (!Array.isArray(state.questionImprovements)) {
+    state.questionImprovements = [];
+  }
+
+  return state.questionImprovements;
 }
 
-export async function updateQuestionImprovementStatus(id, newStatus) {
-  if (!Array.isArray(state.questionImprovements)) return;
+export async function updateQuestionImprovementStatus(id, newStatus, fixSummary = "") {
+  if (!Array.isArray(state.questionImprovements)) state.questionImprovements = [];
   const idx = state.questionImprovements.findIndex((item) => item.id === id);
   if (idx !== -1) {
     state.questionImprovements[idx].status = newStatus;
     state.questionImprovements[idx].resolvedAt = new Date().toISOString();
-    try {
-      localStorage.setItem(QUESTION_IMPROVEMENTS_KEY, JSON.stringify(state.questionImprovements));
-    } catch { /* ignore */ }
+    if (fixSummary) state.questionImprovements[idx].fixSummary = fixSummary;
+  }
 
-    // Sync to Upstash Redis
+  // Sync to API and Upstash
+  try {
+    const res = await fetch("/api/question-improvement", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "update", id, status: newStatus, fixSummary }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.result)) {
+        state.questionImprovements = data.result;
+      }
+    }
+  } catch {
     try {
       const kvUrl = "https://tough-husky-101028.upstash.io";
       const kvToken = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
@@ -244,27 +279,39 @@ export async function updateQuestionImprovementStatus(id, newStatus) {
         body: JSON.stringify(JSON.stringify(state.questionImprovements)),
       });
     } catch { /* ignore */ }
-
-    notifyStateChange("questionImprovementUpdated", { id, newStatus });
   }
+
+  notifyStateChange("questionImprovementUpdated", { id, newStatus });
 }
 
 export async function deleteQuestionImprovement(id) {
-  if (!Array.isArray(state.questionImprovements)) return;
-  state.questionImprovements = state.questionImprovements.filter((item) => item.id !== id);
-  try {
-    localStorage.setItem(QUESTION_IMPROVEMENTS_KEY, JSON.stringify(state.questionImprovements));
-  } catch { /* ignore */ }
+  if (Array.isArray(state.questionImprovements)) {
+    state.questionImprovements = state.questionImprovements.filter((item) => item.id !== id);
+  }
 
   try {
-    const kvUrl = "https://tough-husky-101028.upstash.io";
-    const kvToken = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
-    await fetch(`${kvUrl}/set/pyt:global:question_improvements`, {
+    const res = await fetch("/api/question-improvement", {
       method: "POST",
-      headers: { Authorization: `Bearer ${kvToken}` },
-      body: JSON.stringify(JSON.stringify(state.questionImprovements)),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete", id }),
     });
-  } catch { /* ignore */ }
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.result)) {
+        state.questionImprovements = data.result;
+      }
+    }
+  } catch {
+    try {
+      const kvUrl = "https://tough-husky-101028.upstash.io";
+      const kvToken = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA";
+      await fetch(`${kvUrl}/set/pyt:global:question_improvements`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${kvToken}` },
+        body: JSON.stringify(JSON.stringify(state.questionImprovements)),
+      });
+    } catch { /* ignore */ }
+  }
 
   notifyStateChange("questionImprovementDeleted", { id });
 }

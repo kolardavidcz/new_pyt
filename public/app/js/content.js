@@ -370,9 +370,8 @@ export async function showPresentation(itemId) {
     );
     const list = el("div", { className: "page-list" });
     pages.forEach((p, i) => {
-      const diff = slideDiff(item.slug, p.id);
-      const skey = `${item.slug}#${p.id}`;
-      const tags = (state.slides[skey] && Array.isArray(state.slides[skey].tags)) ? state.slides[skey].tags : (item.tags || []);
+      const diff = resolveSlideDiff(p, item.slug, p.id);
+      const tags = resolveSlideTags(p, item.slug, p.id);
       const row = el("button", {
         type: "button",
         className: "page-row",
@@ -774,10 +773,26 @@ async function fetchAndExtractExercise(path) {
   return { title, notes: [], tasks, task_count: tasks.length, path };
 }
 
+function resolveSlideTags(slide, slug, pageId) {
+  if (Array.isArray(slide?.tags)) return slide.tags;
+  const skey = `${slug}#${pageId}`;
+  if (state.slides && state.slides[skey] && Array.isArray(state.slides[skey].tags)) {
+    return state.slides[skey].tags;
+  }
+  if (!state.slides || Object.keys(state.slides).length === 0) {
+    return ["Loading…"];
+  }
+  return [];
+}
+
+function resolveSlideDiff(slide, slug, pageId) {
+  if (slide?.diff) return slide.diff;
+  return slideDiff(slug, pageId);
+}
+
 function renderSlide(page, item, num) {
-  const diff = slideDiff(item.slug, page.id);
-  const skey = `${item.slug}#${page.id}`;
-  const tags = (state.slides[skey] && Array.isArray(state.slides[skey].tags)) ? state.slides[skey].tags : (item.tags || []);
+  const diff = resolveSlideDiff(page, item.slug, page.id);
+  const tags = resolveSlideTags(page, item.slug, page.id);
   const slide = el("article", {
     className: "slide",
     id: page.id,

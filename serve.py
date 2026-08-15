@@ -19,6 +19,8 @@ import json
 import mimetypes
 import os
 import sys
+import urllib.parse
+import urllib.request
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
@@ -61,7 +63,12 @@ def save_question_improvement(entry: dict) -> list:
             data = json.loads(resp.read().decode("utf-8"))
             if data and data.get("result"):
                 res_val = data["result"]
-                remote_items = json.loads(res_val) if isinstance(res_val, str) else res_val
+                while isinstance(res_val, str):
+                    try:
+                        res_val = json.loads(res_val)
+                    except Exception:
+                        break
+                remote_items = res_val if isinstance(res_val, list) else []
     except Exception as e:
         sys.stderr.write(f"[Upstash KV Fetch Error] {e}\n")
 
@@ -72,20 +79,26 @@ def save_question_improvement(entry: dict) -> list:
             by_id[item["id"]] = item
 
     if isinstance(entry, dict) and entry.get("id"):
-        by_id[entry["id"]] = entry
+        existing = by_id.get(entry["id"], {})
+        by_id[entry["id"]] = {**existing, **entry}
 
-    merged_list = list(by_id.values())
+    merged_list = sorted(
+        list(by_id.values()),
+        key=lambda x: x.get("timestamp", ""),
+        reverse=True
+    )
 
     # 4. Save merged list to local disk
     data_str = json.dumps(merged_list, indent=2, ensure_ascii=False)
     db_path.write_text(data_str, encoding="utf-8")
-    pub_path.write_text(data_str, encoding="utf-8")
+    if pub_path.parent.exists():
+        pub_path.write_text(data_str, encoding="utf-8")
 
     # 5. Sync merged list to Upstash Redis Cloud DB
     try:
         set_req = urllib.request.Request(
             f"{kv_url}/set/pyt:global:question_improvements",
-            data=json.dumps(data_str).encode("utf-8"),
+            data=json.dumps(json.dumps(merged_list, ensure_ascii=False)).encode("utf-8"),
             headers={"Authorization": f"Bearer {kv_token}"},
             method="POST"
         )
@@ -164,6 +177,48 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urlparse(self.path)
+        if parsed.path == "/api/question-improvement":
+            kv_url = "https://tough-husky-101028.upstash.io"
+            kv_token = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA"
+            db_path = ROOT / "data" / "question_improvements.json"
+            local_items = []
+            if db_path.exists():
+                try:
+                    local_items = json.loads(db_path.read_text(encoding="utf-8"))
+                except Exception:
+                    local_items = []
+            remote_items = []
+            try:
+                req = urllib.request.Request(
+                    f"{kv_url}/get/pyt:global:question_improvements",
+                    headers={"Authorization": f"Bearer {kv_token}"}
+                )
+                with urllib.request.urlopen(req, timeout=4) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    if data and data.get("result"):
+                        res_val = data["result"]
+                        while isinstance(res_val, str):
+                            try:
+                                res_val = json.loads(res_val)
+                            except Exception:
+                                break
+                        remote_items = res_val if isinstance(res_val, list) else []
+            except Exception as e:
+                sys.stderr.write(f"[Upstash KV Fetch Error] {e}\n")
+
+            by_id = {}
+            for item in (remote_items or []) + (local_items or []):
+                if isinstance(item, dict) and item.get("id"):
+                    by_id[item["id"]] = item
+            merged = sorted(list(by_id.values()), key=lambda x: x.get("timestamp", ""), reverse=True)
+            resp_bytes = json.dumps({"status": "ok", "result": merged, "total": len(merged)}).encode("utf-8")
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(resp_bytes)))
+            self.end_headers()
+            self.wfile.write(resp_bytes)
+            return
+
         if parsed.path.startswith("/api/sync"):
             from urllib.parse import parse_qs
             qs = parse_qs(parsed.query)
