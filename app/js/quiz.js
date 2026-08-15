@@ -43,31 +43,31 @@ export function openImprovementModal(deckKey, q, qIdx) {
         <label class="improve-form-label">Typ připomínky:</label>
         <div class="radio-group">
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="answer_or_code_error" checked />
+            <input type="radio" name="improveReason" value="factual_or_unclear" checked />
             <div class="radio-txt">
-              <strong>Faktická chyba v odpovědi nebo kódu</strong>
-              <small>Nesprávně označená odpověď, kód nefunguje nebo hází chybu</small>
+              <strong>Faktická chyba nebo nejasná formulace</strong>
+              <small>Nesprávně označená odpověď, věcná chyba nebo zavádějící zadání</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="unclear_formulation_or_typo" />
+            <input type="radio" name="improveReason" value="style_or_typo" />
             <div class="radio-txt">
-              <strong>Nejasná formulace nebo překlep</strong>
-              <small>Matoucí zadání, dvojznačnost nebo pravopisný překlep</small>
+              <strong>Stylistická chyba (překlep / špatně formulovaný kód)</strong>
+              <small>Gramatický překlep, špatné odsazení nebo formát kódu</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="off_topic_or_missing_context" />
+            <input type="radio" name="improveReason" value="off_topic" />
             <div class="radio-txt">
-              <strong>Mimo probírané téma / chybí kontext</strong>
-              <small>Téma nebylo ve výkladu nebo chybí potřebné vysvětlení</small>
+              <strong>Mimo téma (nepatří sem / chybí kontext)</strong>
+              <small>Otázka neodpovídá látce prezentace nebo patří jinam</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="improvement_idea" />
+            <input type="radio" name="improveReason" value="suggestion_idea" />
             <div class="radio-txt">
-              <strong>Námět na vylepšení nebo novou otázku</strong>
-              <small>Návrh na doplnění otázky, lepší varianty nebo příklad</small>
+              <strong>Námět na zlepšení nebo doplnění</strong>
+              <small>Návrh na novou otázku, lepší varianty odpovědí nebo příklad</small>
             </div>
           </label>
         </div>
@@ -98,12 +98,12 @@ export function openImprovementModal(deckKey, q, qIdx) {
 
   submitBtn?.addEventListener("click", async () => {
     const selectedRadio = modal.querySelector('input[name="improveReason"]:checked');
-    const category = selectedRadio ? selectedRadio.value : "answer_or_code_error";
+    const category = selectedRadio ? selectedRadio.value : "factual_or_unclear";
     
-    let categoryLabel = "Chyba v odpovědi nebo kódu";
-    if (category === "unclear_formulation_or_typo") categoryLabel = "Nejasná formulace / překlep";
-    else if (category === "off_topic_or_missing_context") categoryLabel = "Mimo probírané téma";
-    else if (category === "improvement_idea") categoryLabel = "Námět na vylepšení";
+    let categoryLabel = "Faktická chyba / nejasná formulace";
+    if (category === "style_or_typo") categoryLabel = "Stylistická chyba / překlep / kód";
+    else if (category === "off_topic") categoryLabel = "Mimo téma / chybí kontext";
+    else if (category === "suggestion_idea") categoryLabel = "Námět na zlepšení / doplnění";
 
     const userNote = notesInput ? notesInput.value.trim() : "";
 
@@ -156,31 +156,31 @@ export function openPresentationImprovementModal(item) {
         <label class="improve-form-label">Typ připomínky:</label>
         <div class="radio-group">
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="code_or_example_error" checked />
+            <input type="radio" name="improveReason" value="factual_or_unclear" checked />
             <div class="radio-txt">
-              <strong>Chyba v kódu nebo ukázce</strong>
-              <small>Kód v prezentaci nefunguje, má chybnou syntaxi nebo špatný výstup</small>
+              <strong>Faktická chyba nebo nejasná formulace</strong>
+              <small>Věcná chyba v textu, chybný kód/výklad nebo nesrozumitelné vysvětlení</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="unclear_text_or_typo" />
+            <input type="radio" name="improveReason" value="style_or_typo" />
             <div class="radio-txt">
-              <strong>Nejasný výklad nebo překlep</strong>
-              <small>Text je matoucí, nepřesný nebo obsahuje překlep</small>
+              <strong>Stylistická chyba (překlep / špatně formulovaný kód)</strong>
+              <small>Překlep v textu, typografická chyba nebo špatně formulovaný kód</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="missing_topic_or_context" />
+            <input type="radio" name="improveReason" value="off_topic" />
             <div class="radio-txt">
-              <strong>Chybějící téma nebo praktický příklad</strong>
-              <small>Vhodné doplnit podrobnější vysvětlení nebo reálný případ</small>
+              <strong>Mimo téma (nepatří sem / chybí kontext)</strong>
+              <small>Látka nepatří do této kapitoly nebo chybí návaznost na výklad</small>
             </div>
           </label>
           <label class="radio-opt">
-            <input type="radio" name="improveReason" value="presentation_idea" />
+            <input type="radio" name="improveReason" value="suggestion_idea" />
             <div class="radio-txt">
-              <strong>Jiný námět k prezentaci</strong>
-              <small>Návrh na vylepšení struktury nebo obsahu</small>
+              <strong>Námět na zlepšení nebo doplnění</strong>
+              <small>Návrh na doplnění praktického příkladu, odkazu či tématu</small>
             </div>
           </label>
         </div>
@@ -211,12 +211,12 @@ export function openPresentationImprovementModal(item) {
 
   submitBtn?.addEventListener("click", async () => {
     const selectedRadio = modal.querySelector('input[name="improveReason"]:checked');
-    const category = selectedRadio ? selectedRadio.value : "code_or_example_error";
+    const category = selectedRadio ? selectedRadio.value : "factual_or_unclear";
 
-    let categoryLabel = "Chyba v kódu prezentace";
-    if (category === "unclear_text_or_typo") categoryLabel = "Nejasný výklad / překlep";
-    else if (category === "missing_topic_or_context") categoryLabel = "Chybějící téma / vysvětlení";
-    else if (category === "presentation_idea") categoryLabel = "Námět k prezentaci";
+    let categoryLabel = "Faktická chyba / nejasná formulace";
+    if (category === "style_or_typo") categoryLabel = "Stylistická chyba / překlep / kód";
+    else if (category === "off_topic") categoryLabel = "Mimo téma / chybí kontext";
+    else if (category === "suggestion_idea") categoryLabel = "Námět na zlepšení / doplnění";
 
     const userNote = notesInput ? notesInput.value.trim() : "";
 
