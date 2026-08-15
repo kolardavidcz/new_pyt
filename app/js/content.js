@@ -1705,7 +1705,7 @@ function renderUserProfileDashboard(u) {
   const card = el("div", { className: "v2-card", style: "width:100%; border:none; padding:0; background:transparent;" });
   card.innerHTML = `
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle, #333); padding-bottom:10px; margin-bottom:14px;">
-      <p class="v2-comment" style="margin:0;">// auth/profile.ts</p>
+      <h3 style="margin:0; font-size:15px; font-weight:600; color:var(--fg);">Uživatelský profil</h3>
       <button type="button" class="icon-btn" id="btnCloseProfileModal" title="Zavřít" style="background:transparent; border:none; color:var(--fg-muted); cursor:pointer; font-size:16px;">✕</button>
     </div>
 
@@ -1713,12 +1713,12 @@ function renderUserProfileDashboard(u) {
       <div class="v2-avatar">${escapeHtml(initials)}</div>
       <div>
         <div class="v2-identity-name">${escapeHtml(u.name || u.username)}</div>
-        <div class="v2-identity-meta">${escapeHtml(u.email || u.username + "@vscht.cz")} · VSČHT Praha</div>
+        <div class="v2-identity-meta">${escapeHtml(u.email || u.username + "@vscht.cz")} · VŠCHT Praha</div>
       </div>
     </div>
 
     <div class="v2-status-line">
-      <span class="ok">✓</span> progress <span class="num">${studiedCount}</span>/<span class="num">${total}</span> prostudováno · <span class="num">${pct}%</span> splněno
+      <span class="ok">✓</span> Prostudováno <span class="num">${studiedCount}</span> z <span class="num">${total}</span> kapitol · <span class="num">${pct} %</span> splněno
     </div>
 
     <div class="v2-row">
@@ -1726,10 +1726,10 @@ function renderUserProfileDashboard(u) {
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4.5 12.5h7a2.5 2.5 0 0 0 .3-4.98A3.5 3.5 0 0 0 5.2 6.06 2.75 2.75 0 0 0 4.5 12.5z"/></svg>
       </span>
       <div class="v2-row-main">
-        <strong>cloud_sync</strong>
-        <span>key: <code>pyt:${escapeHtml(u.username)}:*</code></span>
+        <strong>Cloudová synchronizace</strong>
+        <span>Synchronizovat postup studia s online účtem</span>
       </div>
-      <button type="button" class="btn secondary sm" id="btnManualSync">sync</button>
+      <button type="button" class="btn secondary sm" id="btnManualSync">Synchronizovat</button>
     </div>
 
     <div class="v2-row">
@@ -1737,12 +1737,12 @@ function renderUserProfileDashboard(u) {
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="3" width="12" height="8" rx="1"/><path d="M6 13.5h4M8 11v2.5"/></svg>
       </span>
       <div class="v2-row-main">
-        <strong>print_code_theme</strong>
-        <span>appearance in PDF export</span>
+        <strong>Barevné schéma pro tisk</strong>
+        <span>Vzhled ukázek kódu v PDF exportu</span>
       </div>
       <select id="selectCodeBlockColor" class="v2-select">
-        <option value="dark" ${state.codeBlockColor === "dark" ? "selected" : ""}>dark</option>
-        <option value="light" ${state.codeBlockColor === "light" ? "selected" : ""}>light</option>
+        <option value="dark" ${state.codeBlockColor === "dark" ? "selected" : ""}>Tmavé</option>
+        <option value="light" ${state.codeBlockColor === "light" ? "selected" : ""}>Světlé</option>
       </select>
     </div>
 
@@ -1751,23 +1751,23 @@ function renderUserProfileDashboard(u) {
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 2h5l3 3v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M9 2v3h3M5.5 8h5M5.5 10.5h5"/></svg>
       </span>
       <div class="v2-row-main">
-        <strong>print_with_quizzes</strong>
-        <span>takeaway quiz on print</span>
+        <strong>Zahrnout kvízy do tisku</strong>
+        <span>Připojit kontrolní otázky na konec PDF materiálů</span>
       </div>
       <select id="selectPrintWithQuizzes" class="v2-select">
-        <option value="true" ${state.printWithQuizzes ? "selected" : ""}>true</option>
-        <option value="false" ${!state.printWithQuizzes ? "selected" : ""}>false</option>
+        <option value="true" ${state.printWithQuizzes ? "selected" : ""}>Ano</option>
+        <option value="false" ${!state.printWithQuizzes ? "selected" : ""}>Ne</option>
       </select>
     </div>
 
     ${isAdmin ? `
       <div style="margin-top:14px;">
-        <button type="button" class="btn primary sm v2-submit" id="btnProfileOpenAdmin" style="width:100%; border-color:#38bdf8; background:rgba(56,189,248,0.15); color:#38bdf8; font-weight:600;"><span class="prompt">$</span>admin --overview</button>
+        <button type="button" class="btn primary sm v2-submit" id="btnProfileOpenAdmin" style="width:100%; font-weight:600;">Otevřít správu kurzu (Admin)</button>
       </div>
     ` : ""}
 
     <div class="v2-dev">
-      <p class="v2-dev-label">/* dev: switch test account */</p>
+      <p class="v2-dev-label" style="color:var(--fg-muted);">Rychlé přepnutí testovacího účtu:</p>
       <div class="quick-buttons" style="display:flex; gap:6px;">
         <button type="button" class="btn secondary sm" id="btnQuickSwitchKolard" style="flex:1; font-size:11px;">kolard@vscht.cz</button>
         <button type="button" class="btn secondary sm" id="btnQuickSwitchStudent" style="flex:1; font-size:11px;">student1@vscht.cz</button>
@@ -1775,7 +1775,7 @@ function renderUserProfileDashboard(u) {
     </div>
 
     <div class="v2-actions" style="margin-top:14px;">
-      <button type="button" class="btn danger" id="btnPageLogout"><span class="prompt">$</span>logout</button>
+      <button type="button" class="btn danger" id="btnPageLogout">Odhlásit se</button>
     </div>
   `;
 
@@ -1788,12 +1788,12 @@ function renderUserProfileDashboard(u) {
 
     card.querySelector("#btnManualSync")?.addEventListener("click", async (e) => {
       const btn = e.currentTarget;
-      btn.textContent = "syncing…";
+      btn.textContent = "Synchronizuji…";
       btn.disabled = true;
       await syncCloudProgress();
-      btn.textContent = "synced ✓";
+      btn.textContent = "Synchronizováno ✓";
       setTimeout(() => {
-        btn.textContent = "sync";
+        btn.textContent = "Synchronizovat";
         btn.disabled = false;
         showLogin();
       }, 1000);
@@ -1836,77 +1836,76 @@ function renderLoginForm() {
   const card = el("div", { className: "v2-card", style: "width:100%; border:none; padding:0; background:transparent;" });
   card.innerHTML = `
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle, #333); padding-bottom:10px; margin-bottom:14px;">
-      <p class="v2-comment" style="margin:0;">// auth/login.ts</p>
+      <h3 style="margin:0; font-size:15px; font-weight:600; color:var(--fg);">Přihlášení k účtu</h3>
       <button type="button" class="icon-btn" id="btnCloseProfileModal" title="Zavřít" style="background:transparent; border:none; color:var(--fg-muted); cursor:pointer; font-size:16px;">✕</button>
     </div>
 
-    <h2 class="v2-title">Přihlášení studenta / vyučujícího</h2>
-    <p class="v2-desc">Zadejte své školní údaje (@vscht.cz) pro synchronizaci postupu napříč zařízeními.</p>
+    <p class="v2-desc" style="margin-top:0;">Zadejte své školní údaje (@vscht.cz) pro synchronizaci postupu napříč zařízeními.</p>
 
     <!-- Tab Switcher -->
-    <div class="login-tab-bar" style="display:flex; gap:6px; margin-bottom:14px; font-family:var(--font-mono);">
-      <button type="button" class="btn primary sm tab-btn active" id="tabBtnLogin" style="flex:1;">[1] login</button>
-      <button type="button" class="btn secondary sm tab-btn" id="tabBtnRegister" style="flex:1;">[2] register</button>
-      <button type="button" class="btn secondary sm tab-btn" id="tabBtnReset" style="flex:1;">[3] reset</button>
+    <div class="login-tab-bar" style="display:flex; gap:6px; margin-bottom:14px;">
+      <button type="button" class="btn primary sm tab-btn active" id="tabBtnLogin" style="flex:1;">Přihlášení</button>
+      <button type="button" class="btn secondary sm tab-btn" id="tabBtnRegister" style="flex:1;">Registrace</button>
+      <button type="button" class="btn secondary sm tab-btn" id="tabBtnReset" style="flex:1;">Obnovení hesla</button>
     </div>
 
     <!-- 1. Login Form (Email @vscht.cz + Password) -->
     <form id="pageLoginForm" class="v2-form">
-      <div id="loginErrorBanner" style="display:none; font-size:11.5px; color:#ef4444; background:rgba(239,68,68,0.1); padding:8px 10px; border-left:2px solid #ef4444; font-family:var(--font-mono);"></div>
+      <div id="loginErrorBanner" style="display:none; font-size:11.5px; color:#ef4444; background:rgba(239,68,68,0.1); padding:8px 10px; border-left:2px solid #ef4444;"></div>
 
       <div class="v2-field">
-        <label>username_email (@vscht.cz)</label>
-        <input type="email" id="pageInputEmail" value="kolard@vscht.cz" placeholder="např. kolard@vscht.cz" required autocomplete="email" />
+        <label>Školní e-mail (@vscht.cz)</label>
+        <input type="email" id="pageInputEmail" value="kolard@vscht.cz" placeholder="např. novakj@vscht.cz" required autocomplete="email" />
       </div>
 
       <div class="v2-field">
-        <label>password</label>
+        <label>Heslo</label>
         <input type="password" id="pageInputPassword" value="kolard123" placeholder="Zadejte heslo..." required autocomplete="current-password" />
       </div>
 
       <div style="display:flex; justify-content:flex-end;">
-        <button type="button" id="btnGoToReset" style="background:none; border:none; color:var(--accent); font-size:11px; cursor:pointer; text-decoration:underline; font-family:var(--font-mono);">Zapomněli jste heslo?</button>
+        <button type="button" id="btnGoToReset" style="background:none; border:none; color:var(--accent); font-size:11px; cursor:pointer; text-decoration:underline;">Zapomněli jste heslo?</button>
       </div>
 
-      <button type="submit" class="btn primary xl v2-submit" id="btnLoginSubmit" style="margin-top:6px;"><span class="prompt">$</span>login --password</button>
+      <button type="submit" class="btn primary xl v2-submit" id="btnLoginSubmit" style="margin-top:6px;">Přihlásit se</button>
     </form>
 
     <!-- 2. Registration Form -->
     <form id="pageRegisterForm" class="v2-form" style="display:none;">
-      <div id="regErrorBanner" style="display:none; font-size:11.5px; color:#ef4444; background:rgba(239,68,68,0.1); padding:8px 10px; border-left:2px solid #ef4444; font-family:var(--font-mono);"></div>
+      <div id="regErrorBanner" style="display:none; font-size:11.5px; color:#ef4444; background:rgba(239,68,68,0.1); padding:8px 10px; border-left:2px solid #ef4444;"></div>
 
       <div class="v2-field">
-        <label>username_email (@vscht.cz)</label>
+        <label>Školní e-mail (@vscht.cz)</label>
         <input type="email" id="regInputEmail" placeholder="např. novakj@vscht.cz" required autocomplete="email" />
       </div>
 
       <div class="v2-field">
-        <label>password</label>
+        <label>Heslo</label>
         <input type="password" id="regInputPassword" placeholder="Zvolte heslo..." required autocomplete="new-password" />
       </div>
 
-      <button type="submit" class="btn primary xl v2-submit" id="btnRegSubmit" style="margin-top:6px;"><span class="prompt">$</span>register --account</button>
+      <button type="submit" class="btn primary xl v2-submit" id="btnRegSubmit" style="margin-top:6px;">Vytvořit účet</button>
     </form>
 
     <!-- 3. Password Reset Form -->
     <form id="pageResetForm" class="v2-form" style="display:none;">
-      <div id="resetStatusBanner" style="display:none; font-size:11.5px; padding:8px 10px; font-family:var(--font-mono);"></div>
+      <div id="resetStatusBanner" style="display:none; font-size:11.5px; padding:8px 10px;"></div>
 
       <div class="v2-field">
-        <label>reset_email (@vscht.cz)</label>
-        <input type="email" id="resetInputEmail" placeholder="např. kolard@vscht.cz" required autocomplete="email" />
+        <label>Školní e-mail (@vscht.cz)</label>
+        <input type="email" id="resetInputEmail" placeholder="např. novakj@vscht.cz" required autocomplete="email" />
       </div>
 
       <div class="v2-field">
-        <label>new_password</label>
+        <label>Nové heslo</label>
         <input type="password" id="resetInputNewPass" placeholder="Zadejte nové heslo..." required autocomplete="new-password" />
       </div>
 
-      <button type="submit" class="btn primary xl v2-submit" id="btnResetSubmit" style="margin-top:6px;"><span class="prompt">$</span>reset --password</button>
+      <button type="submit" class="btn primary xl v2-submit" id="btnResetSubmit" style="margin-top:6px;">Změnit heslo</button>
     </form>
 
     <div class="v2-dev">
-      <p class="v2-dev-label">/* dev: switch test account */</p>
+      <p class="v2-dev-label" style="color:var(--fg-muted);">Rychlé testovací přihlášení:</p>
       <div class="quick-buttons" style="display:flex; gap:6px;">
         <button type="button" class="btn secondary sm" id="btnQuickKolard" style="flex:1; font-size:11px;">kolard@vscht.cz</button>
         <button type="button" class="btn secondary sm" id="btnQuickStudent" style="flex:1; font-size:11px;">student1@vscht.cz</button>
