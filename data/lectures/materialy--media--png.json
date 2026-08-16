@@ -1,0 +1,149 @@
+{
+  "slug": "materialy--media--png",
+  "total": 13,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Grafický formát PNG (<em>Portable Network Graphics</em>) vznikl jako reakce na licenční politiku kolem formátu GIF (odtud též <em>PNG is Not GIF</em> :) a přestože ho zcela nenahrazoval, byl záhy standardizován a obecně poměrně kladně přijat. V mnoha ohledech konkuruje i jiným formátům, především tím, že je poměrně snadno implementovatelný a jeho struktura zahrnuje volitelné rozšiřování podle potřeb příslušných aplikací. Na druhou stranu jde o čistě RGB-formát, takže nenahrazuje formáty schopné pracovat v jiných barvových prostorech (jako je např. CMYK).\r\n  </p>\r\n  <p>\r\n    PNG podporuje obrázky ve stupních šedi (<em>grayscale</em>; 8- i 16-bitové), plné barevné hloubce (<em>truecolor</em>; běžně 24-, ale i 48-bitové) plus obrázky s barevnou paletou (<em>colormap</em>, <em>index color</em>). Navíc je to vše možno kombinovat s průhledností v podobě až 16-bitového alfa kanálu, zobrazovat prokládaně a přikládat k obrázkům barvové ICC-profily.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Struktura PNG",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Struktura PNG</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Globální struktura PNG-souboru je následující:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      hlavička – vždy stejných 8 bajtů <code>89 50 4E 47 0D 0A 1A 0A</code>, jinak to není PNG\r\n    </li>\r\n    <li>\r\n      série tzv. <em>chunků</em> různých typů, které mají všechny stejnou strukturu:\r\n      <ol>\r\n        <li>\r\n            délka dat chunku [4 bajty]\r\n        </li>\r\n        <li>\r\n            typ chunku [4 bajty]\r\n        </li>\r\n        <li>\r\n            data chunku\r\n        </li>\r\n        <li>\r\n            kontrolní součet (<em>CRC</em>) chunku [4 bajty]\r\n        </li>\r\n      </ol>\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    PS: Struktura hlavičky kromě i lidsky viditelné identifikace (2.-4. bajt představují <code>PNG</code>) slouží k odchycení možných problémů při přenosu – první bajt testuje zachování nejvyššího bitu, další pak překlady řádků nebo <em>EOF</em>.\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Nejjednodušší sekvence chunků, která poskytne validní PNG-obrázek, je takováto:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      <code>IHDR</code> – hlavička; obsahuje všechny informace potřebné k rozkódování obrázku\r\n    </li>\r\n    <li>\r\n      <code>IDAT</code> – vlastní data obrázku\r\n    </li>\r\n    <li>\r\n      <code>IEND</code> – ukončovací chunk (neobsahuje žádná data)\r\n    </li>\r\n  </ul>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Chunků <code>IDAT</code> může být více. Měly by být všechny za sebou.\r\n  </div></div>\r\n  <p>\r\n    PS: Druhý nejjednodušší typ obrázku bude ještě mezi <code>IHDR</code> a <code>IDAT</code> obsahovat barevnou paletu <code>PLTE</code>.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Chunk IHDR",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Chunk IHDR</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Chunk <code>IHDR</code>, je vlastně úplně nejdůležitější – zjistíme z něj totiž obecné informace o obrázku včetně všech potřebných pro jeho dekódování. Struktura jeho datové části je následující:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n      šířka obrázku v pixelech [4 bajty]\r\n    </li>\r\n    <li>\r\n      výška obrázku v pixelech [4 bajty]\r\n    </li>\r\n    <li>\r\n      bitová hloubka [1 bajt]\r\n    </li>\r\n    <li>\r\n      barvový typ [1 bajt]\r\n    </li>\r\n    <li>\r\n      metoda komprese [1 bajt]\r\n    </li>\r\n    <li>\r\n      metoda filtrace [1 bajt]\r\n    </li>\r\n    <li>\r\n      metoda prokládání [1 bajt]\r\n    </li>\r\n  </ol>\r\n  <p>\r\n    Díky tomu, že datová část obsahuje vždy právě 13 bajtů, je začátek chunku <code>IHDR</code> vždy stejný – po délce dat <code>b'\\x00\\x00\\x00\\r'</code> (tedy 13 hexadecimálně) následuje typ chunku <code>b'IHDR'</code>. Dále následuje 13 bajtů údajů a nakonec 4 bajty kontrolního součtu (z hlavičky a dat).\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Chunk IHDR – poznámky",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Chunk IHDR – poznámky</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Chunk <code>IHDR</code> tedy plně určuje strukturu obrázku. My se ze všech možností omezíme pouze na tu nejpodobnější formátu PPM a tedy i nejjednodušší na zpracování (a případné konktrolní zobrazení):\r\n  </p>\r\n  <ul>\r\n    <li> obrázky s osmibitovou barevnou hloubkou (tj. hodnota <code>8</code>) a <em>truecolour</em> (barvový typ <code>2</code>) bez alfa-kanálu, které zaznamenávají pro každý pixel tři barvové hodnoty RGB v rozmezí 0-255; </li>\r\n    <li> komprese a filtrace jsou podle aktuálního standardu vždy typu <code>0</code>; </li>\r\n    <li> prokládání nás nebude zajímat (dost se to s ním – nepřekvapivě – komplikuje), proto námi zpracovávané obrázky zde musí mít <code>0</code>. </li>\r\n  </ul>\r\n  \r\n  <p class=\"enumerate\">\r\n    Několik upřesňujících poznámek:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        „Metoda komprese“ je v aktuálním standardu jedna jediná, a to <code>0</code> (<em>deflate/inflate compression with a sliding window of at most 32768 bytes</em>).\r\n    </li>\r\n    <li>\r\n        „Metoda filtrace“ je v aktuálním standardu jedna jediná, a to <code>0</code> (<em>adaptive filtering with five basic filter types</em>). Číslo zde uvedené nemá s čísly označujícími filtry u jednotlivých <em>scanlines</em> tedy prakticky nic společného, každá <em>scanline</em> může mít filtr 0 až 4 (a všechny patří do aktuální rodiny <code>0</code>).\r\n    </li>\r\n    <li>\r\n        „Metody prokládání“ jsou v aktuálním standardu právě dvě – <code>0</code> (žádné prokládání) a <code>1</code> (prokládání <em>Adam7 interlace</em>).\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Chunk IEND",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Chunk IEND</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Protějškem chunku <code>IHDR</code> je chunk <code>IEND</code>, který označuje konec PNG-obrázku. Slouží tedy jako signál pro ukončení čtení a zpracovávání dat.\r\n  </p>\r\n  \r\n  <p>\r\n    Díky jeho funkci je jeho struktura extrémně jednoduchá:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        4 bajty délka dat chunku – <code>b'\\x00\\x00\\x00\\x00'</code> (je nulová)\r\n    </li>\r\n    <li>\r\n        4 bajty typ chunku – <code>b'IEND'</code>\r\n    </li>\r\n    <li>\r\n        data chunku – <code>b''</code> (žádná nejsou)\r\n    </li>\r\n    <li>\r\n        4 bajty konktrolní součet chunku – <code>b'\\xaeB`\\x82'</code> (tedy <code>0×ae 0×42 0×60 0×82</code>)\r\n    </li>\r\n  </ul>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Hodnotu kontrolního součtu si snadno ověříte pomocí <code>zlib.crc32(b'IEND')</code>.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Chunk(y) IDAT",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Chunk(y) IDAT</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Vlastní data obrázku jsou uložena v jednom nebo více chuncích <code>IDAT</code>. Přitom platí:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      data z více <code>IDAT</code>-chunků se složí dohromady a uvažují jako celek\r\n    </li>\r\n    <li>\r\n      (složená) data jsou zkomprimovaná\r\n    </li>\r\n    <li>\r\n      (rozkomprimovaná) data představují zafiltrované řádky – první hodnota je varianta filtru, následují (zafiltrované) barvy pixelů v řádce (tj. tři pro každý pixel – RGB)\r\n    </li>\r\n    <li>\r\n      rozfiltrované řádky představují už skutečná RGB-data jednotlivých pixelů\r\n    </li>\r\n  </ul>\r\n  \r\n  <p>\r\n    PS: Pro rozkomprimování zakomprimovaných chunků <code>IDAT</code> můžete použít knihovní metodu <em>zlib.decompress()</em>.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Filtrace I",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Filtrace I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Protože RGB-data obrázku se v rámci PNG komprimují, je vhodné je předpřipravit tak, aby se lépe komprimovala (sekvence opakujících se znaků se komprimují lépe než náhodné neopakující se znaky). Pro tyto účely byly vymyšleny tzv. <em>filtry</em>, které slouží k úpravě dat obrázku před jejich kompresí (a tudíž pak opačným směrem i při jejich dekompresi).\r\n  </p>\r\n  <p>\r\n    Nejjednodušší možný filtr (<code>0</code>) přitom data vůbec nemění, další tři (<code>1</code>, <code>2</code> a <code>3</code>) jsou konvoluční filtry (v podstatě detekují postupně hrany vertikální, horizontální a pod úhlem 45°) a poslední z nich (<code>4</code>, Paethův) používá navíc <em>prediktor</em> (pro výběr barevně nejbližšího pixelu z okolních).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Viz <a href=\"http://www.root.cz/clanky/radkove-filtry-v-png/\" class=\"external\">http://www.root.cz/clanky/radkove-filtry-v-png/</a> a ...\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Filtrace II",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Filtrace II</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Filtry operují na aktuálním <b>bajtu</b> a maximálně až na dalších třech (barevně) odpovídajících bajtech v okolních pixelech podle následujícího schématu:\r\n  </p>\r\n  <pre style=\"text-align: center;\">\r\n    <b>c</b> <b>b</b>           (Rc,Gc,Bc) (Rb,Gb,Bb)\r\n    <b>a</b> <b>x</b>           (Ra,Ga,Ba) (Rx,Gx,Bx)\r\n  </pre>\r\n  <p>\r\n    Pixel <b>x</b> ve schématu představuje právě zpracovávaný pixel, pixel <b>a</b> je předcházející na stejné řádce, <b>b</b> je „stejný“ pixel na předchozí řádce a <b>c</b> předcházející pixel na předchozí řádce. Nejsou-li bajty z pixelů <i>a</i>, <i>b</i>, <i>c</i> na aktuální pozici k dispozici (začátek řádku, první řádka), nahrazují se nulami.\r\n  </p>\r\n\r\n  <p class=\"enumerate\">\r\n    Filtry překládající zafiltrované <em>scanlines</em> na cílové RGB berou bajty z pixelů <i>a</i>, <i>b</i>, <i>c</i> <strong>již odfiltrované</strong>.\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Veškeré výpočetní operace jsou provedeny <strong>bez přetečení</strong> v rámci bajtu, výsledek je však samozřejmě následně „nacpán“ zpátky do bajtu jednoho.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Tabulka rekonstrukčních filtrů",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Tabulka rekonstrukčních filtrů</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    Při označení (podle <a href=\"http://www.w3.org/TR/PNG/#9Filters\" class=\"external\">specifikace</a>)..\r\n  </p>\r\n  <ul>\r\n    \r\n    <li>\r\n      <em>Filt(y)</em> – hodnota bajtu <i>y</i> po filtraci\r\n    </li>\r\n    <li>\r\n      <em>Recon()</em> – zrekonstruovaná hodnota bajtu <i>y</i> po odfiltrování (při správném postupu by měla odpovídat originální hodnotě <em>Orig(y)</em>)\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    ..je tabulka rekonstrukčních filtrů (bez redukce zpět na jeden bajt) následující:\r\n  </p>\r\n  <table border=\"1\" align=\"center\">\r\n    <tr>\r\n      <th>typ</th>\r\n      <th>rekonstrukční funkce</th>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        0\r\n      </td>\r\n      <td>\r\n        <code>Recon(x) = Filt(x)</code>\r\n      </td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        1\r\n      </td>\r\n      <td>\r\n        <code>Recon(x) = Filt(x) + Recon(a)</code>\r\n      </td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        2\r\n      </td>\r\n      <td>\r\n        <code>Recon(x) = Filt(x) + Recon(b)</code>\r\n      </td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        3\r\n      </td>\r\n      <td>\r\n        <code>Recon(x) = Filt(x) + (Recon(a) + Recon(b)) // 2</code>\r\n      </td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        4\r\n      </td>\r\n      <td>\r\n        <code>Recon(x) = Filt(x) + PaethPredictor(Recon(a), Recon(b), Recon(c))</code>\r\n      </td>\r\n    </tr>\r\n  </table>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Upraveno podle <a href=\"http://www.w3.org/TR/PNG/#9Filters\" class=\"external\">http://www.w3.org/TR/PNG/#9Filters</a>\r\n  </div></div>\r\n\r\n  <p>\r\n    Definice filtru <em>Paeth</em> (<i>a</i>, <i>b</i>, <i>c</i> jsou jednotlivé <b>bajty</b> odpovídající barvy z příslušných pixelů):\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\ndef paeth(a, b, c):\r\n    p = a + b - c\r\n    pa = abs(p - a)\r\n    pb = abs(p - b)\r\n    pc = abs(p - c)\r\n    if pa &lt;= pb and pa &lt;= pc:\r\n        return a\r\n    elif pb &lt;= pc:\r\n        return b\r\n    else:\r\n        return c\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Příklad – PNG bez palety, 8 bpp",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Příklad – PNG bez palety, 8 bpp</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Podívejme se na zub obrázku <a href=\"_files/sachovnice.png\">sachovnice.png</a>, který je v osmibitové barevné hloubce a neobsahuje barvovou paletu:\r\n  </p>\r\n  <img src=\"_files/sachovnice.scale30.png\" width=\"90\" height=\"90\" alt=\"3x3 px &amp; 24 bpp\" title=\"\" align=\"center\">\r\n  <example src=\"_files/sachovnice.log\" lang=\"python\"></example>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Viz <a href=\"_files/sachovnice.log\">sachovnice.log</a>.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Příklad – PNG s paletou, 4 bpp",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Příklad – PNG s paletou, 4 bpp</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Podívejme se na zub podobnému obrázku <a href=\"_files/sachovnice.PLTE.png\">sachovnice.PLTE.png</a>, tentokrát však s paletou a ve čtyřbitové barevné hloubce:\r\n  </p>\r\n  <img src=\"_files/sachovnice.PLTE.scale30.png\" width=\"90\" height=\"90\" alt=\"3x3 px &amp; 24 bpp\" title=\"\" align=\"center\">\r\n  <example src=\"_files/sachovnice.PLTE.log\" lang=\"python\"></example>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Viz <a href=\"_files/sachovnice.PLTE.log\">sachovnice.PLTE.log</a>.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Poznámky",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Poznámky</h2></div><div class=\"section-body\">\r\n  \r\n  <p class=\"enumerate\">\r\n    Ze způsobu pojmenování typu chunku (tedy podle toho, které bity jsou nastavené; prakticky se to projevuje zápisem buď velkými nebo malými písmeny) se dá poznat mnohem více – zda je příslušný chunk nutný pro přečtení obrázku (např. <em>IDAT</em> versus <em>tEXt</em>), veřejný či privátní (pro nějakou konkrétní aplikaci) nebo zachovává-li se při transformaci obrázku (např. <em>hIST</em>).\r\n  </p>\r\n  <p>\r\n    Praktická stránka věci: Pro zpracování obrázku vás zajímají pouze chunky, jejichž typ je zapsán verzálkami (velkými písmeny).\r\n  </p>\r\n\r\n  <p class=\"enumerate\">\r\n    Vícebajtová čísla (např. délka dat) jsou zakódována v pořadí <em>big endian</em>, tedy od nejvýznamnějšího bajtu vlevo po nejméně významný vpravo (tj. poslední bajt vpravo určuje číslo v rozmezí 0-255, předchozí v násobcích 256 atd.).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Viz <a href=\"http://www.w3.org/TR/PNG/#7Integers-and-byte-order\" class=\"external\">http://www.w3.org/TR/PNG/#7Integers-and-byte-order</a>\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Pro rozkomprimování zakomprimovaných chunků <code>IDAT</code> můžete použít knihovní metodu <em>zlib.decompress()</em>, která implementuje algoritmus <em>DEFLATE</em>.\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Kontrolní součet se provádí nad sekvencí <em>typ chunku + data chunku</em>, je ho tedy možno počítat průběžně. Použitý algoritmus není moc vhodný pro delší data (nedokáže v nich už tak snadno rozpoznat chybu), proto se v praxi datové chunky <code>IDAT</code> dělí obvykle po 8 kB. V zápočtovém programu můžete použít implementaci CRC <em>zlib.crc32()</em>.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Více viz <a href=\"http://www.root.cz/clanky/nepovinne-chunky-v-png-a-kontrola-pomoci-crc/\" class=\"external\">\r\nhttp://www.root.cz/clanky/nepovinne-chunky-v-png-a-kontrola-pomoci-crc/</a>. Pro ukázkovou implementaci CRC-algoritmu viz <a href=\"http://www.w3.org/TR/PNG/#D-CRCAppendix\" class=\"external\">http://www.w3.org/TR/PNG/#D-CRCAppendix</a>.\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Barvová paleta je v datech příslušného chunku <code>PLTE</code> uložena nekomprimovaně.\r\n  </p>\r\n\r\n  <p class=\"enumerate\">\r\n    Prokládání v PNG je jakýsi vtipný kompromis mezi původním GIFem (přenos různých řádků) a formátem JPEG (přenos různě významných členů transformace). Jeho nejmenší složkou jsou bloky 8x8, z nichž se přenáší hodnoty pixelů podle následujícího schématu:\r\n  </p>\r\n  <p style=\"width: 600px; margin: 0 auto;\">\r\n    <img src=\"_files/png-interlacing.gif\" width=\"256\" height=\"256\" alt=\"\" title=\"Ilustrace průběhu prokládání u formátu PNG\" align=\"left\">\r\n    <pre style=\"align: right;\">   1 6 4 6 2 6 4 6\r\n   7 7 7 7 7 7 7 7\r\n   5 6 5 6 5 6 5 6\r\n   7 7 7 7 7 7 7 7\r\n   3 6 4 6 3 6 4 6\r\n   7 7 7 7 7 7 7 7\r\n   5 6 5 6 5 6 5 6\r\n   7 7 7 7 7 7 7 7 </pre>\r\n    <br clear=\"all\">\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Viz <a href=\"http://www.root.cz/clanky/radkove-filtry-v-png/\" class=\"external\">http://www.root.cz/clanky/radkove-filtry-v-png/</a>\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Poznámky k „výrobě“ PNG",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Poznámky k „výrobě“ PNG</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Pokud byste chtěli PNG i ukládat, nejjednodušší je používat filtr <code>0</code> – není to efektivní, ale zase s ním není co složitě počítat.\r\n  </p>\r\n\r\n  <p class=\"enumerate\">\r\n    Stejně tak je jednodušší ukládat obrázky jako plnobarevné v osmibitové barevné hloubce, protože zapisujete přímo jednotlivé RBG-hodnoty pro každý pixel.\r\n  </p>\r\n\r\n  <p class=\"enumerate\">\r\n    Když se budete chtít vyřádit, můžete místo RGB-hodnot ukládat pro každý pixel pouze jeho index v paletě. Ale také ho nechte osmibitový, protože menší počet bitů všechno výrazně zkomplikuje (viz příklady).\r\n  </p>\r\n\r\n</div>"
+    }
+  ]
+}

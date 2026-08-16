@@ -134,8 +134,10 @@ def resolve_url_path(url_path: str) -> Path | None:
 
     if path.startswith("/app/"):
         candidates.append(ROOT / path.lstrip("/"))
+        candidates.append(ROOT / "public" / path.lstrip("/"))
     elif path.startswith("/data/"):
         candidates.append(ROOT / path.lstrip("/"))
+        candidates.append(ROOT / "public" / path.lstrip("/"))
     elif path.startswith("/cjs/"):
         candidates.append(OLD / "cjs" / path[len("/cjs/") :])
         # Also serve app fonts under familiar path if needed

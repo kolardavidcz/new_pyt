@@ -1,0 +1,270 @@
+{
+  "slug": "materialy--python--pypi--CherryPy",
+  "total": 24,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Někdy se hodí míti webové stránky dynamické v tom smyslu, že mohou na dotazy uživatele reagovat nějakými vlastními výpočty nebo dotazy někam jinam. A především – čím dál tím častěji se hodí psát GUI programu přímo webové a neotravovat se s portací nativního na různé platformy (web je totiž všude, jak se ostatně předpokládalo již před dvaceti lety).\r\n    </p>\r\n    <p>\r\n        Tudíž my se nyní podíváme na základy webové komunikace a webových aplikací, a to pochopitelně pěkně z pohodlí programovacího jazyka Python, konkrétně knihovny <a href=\"http://cherrypy.dev\" class=\"external\">CherryPy</a>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Budeme se přitom celkem držet té snadnější – a pro začátek asi i užitečnější – poloviny <a href=\"http://docs.cherrypy.dev/en/latest/tutorials.html\" class=\"external\">tamějšího tutoriálu</a>.\r\n    </div></div>\r\n    <p>\r\n        PS: V této přednášce se pokusím slepit dohromady slušnou hromadu pojmů a technologií, takže se nebudu zdržovat moc velkými podrobnostmi a soustředím se především na vlastní komunikaci mezi klientem (vámi, resp. vaším prohlížečem) a serverem (svým způsobem webovou stránkou, na kterou se zrovna díváte, a tím vším za ní, co už není vidět) a odpovědí, kterou server na váš dotaz vyplodí.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Předpoklady",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Předpoklady</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Když se třebas ve svém mobilu rozhodnete podívat na nějakou stránku, stanou se zrychleně řečeno přibližně následující věci (a v tomto pořadí):\r\n    </p>\r\n    <ol>\r\n        <li>\r\n             prohlížeč (aneb <strong>klient</strong>) ve spolupráci s operačním systémem zajistí, že dotaz bude odeslán na správný počítač v internetu (blíže viz přednáška <a href=\"/materialy/net/overview.xml\">Úvod do TCP/IP</a>);\r\n        </li>\r\n        <li>\r\n             prohlížeč odešle na cílový počítač přesně formulovaný dotaz (nejčastěji pomocí protokolu <a href=\"/materialy/net/http.xml\">HTTP</a>);\r\n        </li>\r\n        <li>\r\n             cílový počítač (aneb <strong>server</strong>) dotaz zpracuje a vyrobí na něj odpovídající odpověď (tím se především budeme zabývat v této přednášce);\r\n        </li>\r\n        <li>\r\n             odpověď je poslána zpátky dotazujícímu (opět pomocí HTTP a TCP/IP);\r\n        </li>\r\n        <li>\r\n             dotazující prohlížeč odpověď zobrazí uživateli (nejčastěji v podobě webové stránky založené na technologii <a href=\"/materialy/web/html/overview.xml\">HTML</a>).\r\n        </li>\r\n    </ol>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Pokusný HTTP-server",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Pokusný HTTP-server</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pro další příklady předpokládejme, že už máte nainstalovanou knihovnu <em>CherryPy</em> (což si za chvíli <a href=\"?slajd=8\">ukážeme</a>) a spustili jsme pomocí ní následující jednoduchý HTTP-server (jehož strukturu dále postupně rozebereme):\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/cherrypy/server-01.py\"></example>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Opravdu, těchhle pár řádek je funkční HTTP-server, ke kterému se může připojit prohlížečem!\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "I – webová stránka s dotazem",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">I – webová stránka s dotazem</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Abyste se mohli <em>serveru</em> na něco zeptat, musíte pro něj vygenerovat správný HTTP-dotaz. To se sice dá i ručně, ale mnohem jednodušší je to nechat na příslušném <em>klientovi</em>. Snad úplně nejjednodušeji se dotaz vytváří z prostředí webového prohlížeče pomocí tzv. <strong>odkazů</strong>, tedy HTML-elementů <code>&lt;a href=\"adresa\"&gt;</code>:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">HTML</div><example src=\"_files/cherrypy/gui-01.html\" lang=\"xml\"></example></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><div class=\"html5-output\"><iframe src=\"_files/cherrypy/gui-01.html\" onload=\"iframeLoaded(this, event)\"></iframe></div></div></div>        \r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "I – odeslání dotazu",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">I – odeslání dotazu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Když se na tento soubor podíváte svým prohlížečem (viz výstup na předchozím slajdu), uvidíte (s největší pravděpodobností) modré podtržené lomítko (což je ten text mezi otvírací a koncovou značkou <code>&lt;a&gt;TEXT&lt;/a&gt;</code>). Důležité však je, že když na něj kliknete myší (nebo po zafokusování TABem odentrujete z klávesnice), prohlížeč pošle serveru<sup>*</sup> následující HTTP-dotaz (zjednodušená, leč stále funkční varianta):\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        GET / HTTP/1.1\r\n        Host: localhost:8080\r\n        ↵\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Aneb počítači, ze kterého danou stránku zobrazuje. Což tedy je v tomto případě náš vlastní počítač schovávající se pod adresou <code>http://localhost:8080</code> (případně <code>http://127.0.0.1:8080</code>, což vyjde nastejno).\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "I – odpověď serveru",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">I – odpověď serveru</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Server na náš požadavek vrátí následující HTTP-odpověď:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        HTTP/1.1 200 OK\r\n        Content-Type: text/html;charset=utf-8\r\n        Server: CherryPy/3.6.0\r\n        Content-Length: 42\r\n        Date: Thu, 16 Apr 2015 16:35:58 GMT\r\n        ↵\r\n        Zdraví Vás Váš osobní webový server!\r\n    </pre>\r\n    <p>\r\n        Z níž nepřekvapivě prohlížeč zobrazí právě text <em>Zdraví Vás Váš osobní webový server!</em>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jehož délka je právě 42 bajtů – 36 ASCII-písmen plus 6 ve dvou bajtech (zakódovaných algoritmem UTF-8).\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "I – implementace serveru",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">I – implementace serveru</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Uvedeným dotazem <code>GET /</code> jsme požádali server, aby nám vrátil svůj tzv. kořenový dokument. Typicky jím bývá statický soubor <em>index.html</em> v hlavním poskytovaném adresáři a výchozí nastavení <em>CherryPy</em> není o moc jiné – odpověď na tento dotaz zpracuje metoda pojmenovaná nepřekvapivě <code>index()</code>:\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/cherrypy/server-01.py\"></example>\r\n    <p>\r\n        A protože text je také vlastně svým způsobem HTML, bohatě stačí, aby nejjednodušší vrácená data od serveru byl obyčejný, nijak formátovaný, řetězec (s českou větou v tomto případě). O všechno další – navázání komunikace, správné HTTP-hlavičky, vyřešení kódování přenášených textů… – se už server i klient postarají sami.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "PS: Instalace „CherryPy“",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">PS: Instalace „CherryPy“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Webový server z předchozího příkladu je tak jednoduchý, že je postavený nad knihovnou <em>CherryPy</em>. Ta není součástí Python'u, takže ji musíte nejdříve nainstalovat. Na to, co všechno umí, je instalace velmi jednoduchá a maličká (pouhých pár set kilobajtů):\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        pip install [--user] cherrypy\r\n    </pre>\r\n    \r\n    <p>\r\n        PS: V začátcích (2015) neměla knihovna <em>CherryPy</em> narozdíl od mnoha jiných knihoven žádné externí závislosti, ale dnes (2024) už to není pravda. Nicméně žádné binární komponenty neobsahuje a všechno je jenom čistý Python.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Což je možné díky tomu, že standardní knihovna již sama o sobě obsahuje vše, co je potřeba ke stavbě webového serveru. Ostatně si můžete zkusit napsat vlastní třeba za pomoci standardního modulu <a href=\"/materialy/python/net/wsgi.xml\">wsgiref</a>, ale to už nebude ani náhodou tak krátký a snadno čitelný kód, jako s <em>CherryPy</em>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "II – další adresa",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">II – další adresa</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ve výchozím nastavení se tedy dotaz na kořenový dokument přemapuje na funkci <em>index()</em>. Kam se ale přemapují dotazy na o fous složitější adresu? V <em>CherryPy</em> je to naštěstí (aspoň v těch nejjednodušších případech) velmi snadné a průhledné – následující kód..\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/cherrypy/server-02.py\"></example>\r\n    <p>\r\n        ..bude schopen reagovat kromě obligátního „kořene“ <code>/</code> (funkcí <code>index()</code>) i na dotaz <code>http://localhost:8080/pokus</code>, tedy žádost o přístup na zdroj <code>/pokus</code> na serveru. A to hezky pěkně pomocí funkce <code>pokus()</code>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jen pro pořádek – příslušný HTTP-dotaz (v nejjednodušší variantě) na tento zdroj vypadá nepřekvapivě takto:\r\n        <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n            GET /pokus HTTP/1.1\r\n            Host: localhost:8080\r\n            ↵\r\n        </pre>\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Poznámka",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Je jasné, že funkcí/metod do třídy serveru – a tím pádem i počet obhospodařovávaných zdrojů na serveru – můžeme přidávat, kolik se nám zlíbí. V zájmu zjednodušení budu další příklady až na výjimky psát pouze s metodou jedinou, totiž tou, kterou budu zrovna v příkladu probírat.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "III – vstupní parametry",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">III – vstupní parametry</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zdroje na serveru také mohou dostávat parametry. V nejjednodušším případě v podobě specielně formátovaného řetězce přímo v adrese dotazu. Zkusme například náš server naučit reagovat na zadání jména a věku, tedy reagovat například na následující dotazy:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><div class=\"html5-output\"><iframe src=\"_files/cherrypy/gui-03.html\" onload=\"iframeLoaded(this, event)\"></iframe></div></div></div>\r\n    <example lang=\"python\" src=\"_files/cherrypy/server-03.py\"></example>\r\n    <p>\r\n        Jak je vidět, uvedený zdroj můžeme samozřejmě zavolat i s prohozenými parametry, neúplnými parametry nebo dokonce úplně bez nich, ale vzhledem k tomu, že se krásně logicky mapují na příslušné pojmenované parametry pythoních funkcí s výchozí hodnotou, o vše je postaráno.\r\n    </p>\r\n    <p>\r\n        PS: HTTP-dotaz pro první z příkladů vypadá takto (azbuka byla nahrazena svojí pro potřeby URL-dotazu iskejpovanou unicodovou podobou):\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        GET /info?jmeno=%D0%90%D0%BB%D0%B8%D1%81%D0%B0&amp;vek=17 HTTP/1.1\r\n        Host: localhost:8080\r\n        ↵\r\n    </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "IV – formuláře a „GET“",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">IV – formuláře a „GET“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Veškeré zatím uvedené dotazy po protokolu HTTP jsou zajištěny tzv. metodou <strong><code>GET</code></strong>. Příslušné dvojce <em>parametr=hodnota</em> je však možno poslat i jiným způsobem než jen pomocí odkazu, totiž pomocí tzv. HTML-formuláře:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">HTML</div><example src=\"_files/cherrypy/gui-03f.html\" lang=\"xml\"></example></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><div class=\"html5-output\"><iframe src=\"_files/cherrypy/gui-03f.html\" onload=\"iframeLoaded(this, event)\"></iframe></div></div></div>\r\n    <p>\r\n        Adresa zdroje je uvedena v atributu <em>@action</em> vlastního formuláře a jména parametrů jsou převzata z atributů <em>@name</em> na příslušných vstupních polích. Příslušný dotaz na server je ve výsledku úplně stejný jako na předchozím slajdu a je obsloužen úplně stejným kódem, takže tady ani jedno neopakuji.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "IV – formuláře a „POST“",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">IV – formuláře a „POST“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        V rámci metody <code>GET</code> jsou data dotazu předávána v rámci samotného URL, což má pochopitelně své mouchy a omezení (těžko třeba aploudovat giga dat na server přes adresu). Formuláře však umožňují i jinou variantu jejich zasílání – pomocí metody <strong><code>POST</code></strong>:\r\n    </p>\r\n    <example lang=\"html\" src=\"_files/cherrypy/gui-03fp.html\"></example>\r\n    <p>\r\n        HTTP-dotaz v tomto případě již vypadá úplně jinak:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        POST /info HTTP/1.1\r\n        Host: localhost:8080\r\n        Content-Type: application/x-www-form-urlencoded\r\n        Content-Length: 43\r\n        jmeno=%D0%90%D0%BB%D0%B8%D1%81%D0%B0&amp;vek=17\r\n        ↵\r\n    </pre>\r\n    <p>\r\n        Parametry jsou sice předávány ve stejné podobě (takže s překódovanou azbukou), ale nyní v těle samotného dotazu, což je mnohem flexibilnější varianta. Pro nás je však důležité, že nezávisle na metodě se náš server chová pořád stejně – i tento dotaz obsloužil <a href=\"_files/cherrypy/server-03.py\">úplně stejný kód jako předtím</a>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Několik poznámek k formulářům",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Několik poznámek k formulářům</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Než si ukážeme ještě pár dalších zajímavých věcí, které <em>CherryPy</em> umí, doplňme si pár zajímavostí o formulářích:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Je zřejmé, že výchozí nastavení atributu <em>@method</em> formuláře je právě <code>get</code> a nemusí se uvádět.\r\n        </li>\r\n        <li>\r\n            Adresa zdroje v parametru <em>@action</em> může být absolutní nebo relativní.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Typicky je stránka s formulářem součástí serveru, na který odkazuje, a pak je často zbytečné uvádět adresu absolutně.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            Při odeslání formuláře submitovacím tlačítkem jsou do parametrů zahrnuty všechny zanořené elementy s atributem <em>@name</em>.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                V rámci HTML5 to jde i jinak, ale netřeba si to teď komplikovat.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            Narozdíl od volání přes URL jsou při komunikaci přes formulář posílány všechny parametry, i když jsou zrovna prázdné (nevyplněné).\r\n        </li>\r\n        <li>\r\n            Formulářových prvků je celá řada (rozbalovací menu, zaškrtávátka, výběry…).\r\n        </li>\r\n        <li>\r\n            Navíc je dokonce možné posílat tzv. <strong>skryté parametry</strong> – ačkoli je uživatel nevidí (pokud nezapátrá po zdrojovém kódu stránky nebo nebude sledovat síťovou komunikaci), jsou odesílány ke zpracování spolu s těmi viditelnými.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Mají podobu <code>&lt;input type=\"hidden\" name=\"PARAMETR\" value=\"HODNOTA\"&gt;</code>.\r\n            </div></div>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "V – statické soubory v adresáři",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">V – statické soubory v adresáři</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Spousta dotazů na server nepotřebuje nic zpracovávat a požadovaná data rovnou vrací (třeba obrázky, <a href=\"/materialy/web/css/overview.xml\">stylopisy</a> a podobně). V takovém případě je naprosto zbytečné pro uvedené soubory vůbec psát nějakou vlastní logiku a <em>CherryPy</em> je umí posílat přímo úpravou konfigurace:\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/cherrypy/server-04.py\"></example>\r\n    <p>\r\n        Smysl tohoto nastavení je takový, že veškeré dotazy na zdroj <code>/static</code> budou vyhodnoceny jako dohledání odpovídajícího souboru v lokálním adresáři serveru <code>public</code>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Při tomto konkrétním zadání se adresář <code>public</code> nachází na stejné úrovni jako vlastní pythoní skript serveru. Soubor stylopisu <em>stylopis.css</em> je pak přímo v něm.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Metoda „quickstart()“",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Metoda „quickstart()“</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        V předchozím příkladu jsem použil plné volání metody <em>quickstart()</em> v podobě:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        cherrypy.quickstart(NášServer(), '/', config)\r\n    </pre>\r\n    <p>\r\n        Uvedeným příkazem je spuštěna cherrypy-<strong>aplikace</strong> <code>NášServer()</code> s doplňkovou konfigurací ze slovníku <code>config</code> naslouchající dotazům na zdroje z adresy začínající na <code>/</code>, to znamená v našem případě z adresy <code>http://localhost:8080</code>.\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Takto můžete spustit aplikaci i pro jiné umístění v rámci URL – například aplikace spuštěná kódem <code>cherrypy.quickstart(Aplikace(), '/app')</code> by naslouchala dotazům z adresy <code>http://localhost:8080/app</code> (samozřejmě včetně všech případných podadres).\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        A konfigurace této aplikace by byla psána relativně pro ni, tzn. že cesta <code>/</code> v její konfiguraci by odpovídala zdroji <code>/app</code> na serveru.\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Jak napovídá název metody, slouží jako <strong>zkratka ke spuštění jedné jediné aplikace</strong>. Reálně však aplikací budete často spuštět vícero. To samozřejmě jde, ale je už třeba udělat <a href=\"http://docs.cherrypy.dev/en/latest/basics.html#hosting-one-or-more-applications\" class=\"external\">více kroků</a>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Prakticky připravíte aplikace pomocí metody <code>tree.mount()</code> a následně spustíte celý cherrypy-server pomocí <code>engine.start()</code> a <code>engine.block()</code>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Poznámky ke konfiguraci",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Poznámky ke konfiguraci</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Předchozí konfigurace je tzv. <strong>globální</strong>. Platí pro ni mimo jiné:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Je sdílena všemi vícero případnými aplikacemi nad stejným cherrypy-serverem.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">Ve všech našich příkladech je aplikace jenom jedna.</div></div>\r\n        </li>\r\n        <li>\r\n            Vlastnosti přes ni zadané se přidají k ostatním globálním nastavením. Prohlédnout si je můžete ve slovníku <em>cherrypy.config</em>.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">Mimo jiné je ve výchozím nastavení automaticky zapnuté logování všeličehož.</div></div>\r\n        </li>\r\n        <li>\r\n            Z bezpečnostních důvodů musí být všechny cesty po souborovém systému v konfiguraci zadány <strong>zásadně jako absolutní</strong>.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "VI – více sdílených adresářů",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">VI – více sdílených adresářů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož všechny cesty k adresářům musí být absolutní, pro více adresářů sdílených serverem ze stejného místa se dá konfigurace zkrátit přesunutím hlavní „kořenové“ cesty do vlastní větve konfigurace <code>\"/\"</code>:\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/cherrypy/server-05.py\"></example>\r\n\r\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "VII – podadresy aplikací",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">VII – podadresy aplikací</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Velmi brzo asi budete chtít podporovat i složitější adresy typu <code>http://server:port/…/…/</code>. Preferované dnešní řešení je následovné:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Pro odkazy typu <code>/aplikace/podaplikace</code> můžete vyrobit „aplikace navěšené na aplikacích“. V podstatě se jedná o mapování tříd podaplikací na atributy nadřazené aplikace. (Podívejte se na <a href=\"https://docs.cherrypy.dev/en/latest/pkg/cherrypy.tutorial.tut04_complex_site.html\" class=\"external\">ukázkový příklad</a> ze zdrojáků.)\r\n        </li>\r\n        <li>\r\n            Pro RESTové odkazy typu <code>/part1/part2/part3</code> – a to jak samostatné pro jednu aplikaci, tak i zanořené v podaplikacích – je nejsnažší použít dekorátor <code>@cherrypy.popargs()</code>.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Ideu demonstrují následující dva příklady, které jsem upravil z návrhu v <a href=\"http://docs.cherrypy.dev/en/latest/advanced.html#restful-style-dispatching\" class=\"external\">dokumentaci</a>.\r\n    </p>\r\n    \r\n\r\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "VII – příklad 1 – rozdělení URL",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">VII – příklad 1 – rozdělení URL</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Dotaz..\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        http://localhost:8080/nirvana/nevermind/06-polly\r\n    </pre>\r\n    <p>\r\n        ..v základním chápání struktury serveru představuje aplikaci na adrese <code>/</code>, přičemž tři následující části URL budou rozloženy do tří parametrů dekorátoru <code>@popargs</code>:\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/cherrypy/server-dispatch-2.py\"></example>\r\n    <p>\r\n        Výstup je pak následující:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><div class=\"html5-output\"><iframe src=\"_files/cherrypy/gui-dispatch-2.out.html\" onload=\"iframeLoaded(this, event)\"></iframe></div></div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "VII – příklad 2 – podaplikace",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">VII – příklad 2 – podaplikace</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Přidržme se nyní více dokumentace a předpokládejme dotaz..\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        http://localhost:8080/nirvana/albums/nevermind/tracks/06/polly\r\n    </pre>\r\n    <p>\r\n        ..se strukturou tří zanořených podaplikací. Příslušný program..\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/cherrypy/server-dispatch-1.py\"></example>\r\n    <p>\r\n        ..pak dá obdobný výstup:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><div class=\"html5-output\"><iframe src=\"_files/cherrypy/gui-dispatch-1.out.html\" onload=\"iframeLoaded(this, event)\"></iframe></div></div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "VIII – logování",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">VIII – logování</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <em>CherryPy</em> samozřejmě podporuje zaznamenávání přístupu ke zdrojům serveru a případných vygenerovaných chyb. Stačí doplnit konfiguraci o umístění logovacích souborů (příslušný adresář – zde <em>logs</em> – musí existovat) a vše další už běží samo:\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/cherrypy/server-logs.py\"></example>\r\n    <p>\r\n        Pěkné je, že pomocí <code>cherrypy.log()</code> můžete do „chybového“ logu předávat i vlastní informace z aplikace.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "Poznámka",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Knihovna <em>CherryPy</em> toho nabízí mnohem více, včetně možnosti tvorby rozšíření (prostudujte si <a href=\"http://docs.cherrypy.dev\" class=\"external\">dokumentaci</a> a především <a href=\"https://docs.cherrypy.dev/en/latest/pkg/cherrypy.tutorial.html\" class=\"external\">příklady ze zdrojových kódů</a>). Ale jejím základním úkolem je podle „jejích“ vlastních slov:\r\n    </p>\r\n    <blockquote>\r\n        Převzít HTTP-požadavek a podle zadaného URL najít nejvhodnější funkci/metodu, která ho má zpracovat. (A pak samozřejmě přeposlat klientovi nazpět odpověď z této metody.)\r\n    </blockquote>\r\n    <p>\r\n        Proto v ní nenajdeme věci typické z jiných webových frejmworků jako je (přímá) podpora komunikace s databázemi či generování výstupního HTML pomocí šablon. Ale na jednoduché šablonování pomocí prostředků jazyka Python se ještě podíváme.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Jednoduché šablony",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Jednoduché šablony</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Přepišme úvodní <a href=\"?slajd=11\">program na vstupní parametry</a> takto:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            → Input: <a href=\"_files/cherrypy/gui-sablona.html\"><em>cherrypy/gui-sablona.html</em></a></div><example src=\"_files/cherrypy/gui-sablona.html\" lang=\"html\"></example></div><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/cherrypy/server-sablona.py\"><em>cherrypy/server-sablona.py</em></a></div><example src=\"_files/cherrypy/server-sablona.py\" lang=\"python\"></example></div></div>\r\n    <p>\r\n        Uvedenou šablonu načtu jednou na začátku<sup>*</sup> a v kódu aplikace ji pak používám za pomoci funkce <em>format()</em> a jejích parametrů pro přehlednější tvorbu návratového řetězce.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <sup>*</sup> Pro jednoduchost tady neřešíme paměťové nároky tohoto způsobu ani zajištění funkčnosti při selhání načtení souboru.\r\n    </div></div>\r\n    <p>\r\n        PS: Nějakou dobu si s tímhle asi vystačíte, než se porozhlédnete po plnohodnotné šablonovací knihovně. Snad jen poznámka ke znakům <code>{}</code>: Jak CSS, tak JavaScript je používají, takže pokusíte-li se je procpat přímo do šablony mezi HTML, výše uvedený kód zhavaruje. Nejsnadnějším (byť ne nutně nejsprávnějším) řešením je asi přejít na starší šablonovací systém pomocí znaku <code>%</code>. V tom případě ale zase pozor na výskyty procentítka jako procenta :-) Naštěstí funguje stejný „trik“ jako s iskejpováním zpětného lomítka – prostě ho zdvojte.\r\n    </p>\r\n\r\n</div>"
+    }
+  ]
+}

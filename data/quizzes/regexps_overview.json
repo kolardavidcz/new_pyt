@@ -1,0 +1,143 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Proč se při kompilaci regulárních výrazů v Pythonu doporučuje používat raw string literály (např. r'\\d+\\w+')?",
+    "options": [
+      "A) Potlačují vyhodnocování zpětných lomítek na úrovni Pythonu a zabraňují nutnosti zdvojování \\\\.",
+      "B) Povolují používání víceřádkových komentářů uvnitř vzoru bez aktivace rozšiřujícího režimu verbose.",
+      "C) Zrychlují kompilaci regulárního výrazu vytvořením konstantního objektu v bytecode před prováděním.",
+      "D) Automaticky převádějí celý vzor na velká písmena bez ohledu na nastavené kompilační příznaky modulu."
+    ],
+    "answer": 0,
+    "explanation": "Použití raw stringu (`r'...'`) zabraňuje interpretu Pythonu ve vyhodnocování sekvencí se zpětným lomítkem (např. `\\n`, `\\t`). Regulární výraz tak dostane přesné zpětné lomítko bez nutnosti psát nepřehledné zdvojené `\\\\`.",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "predict_output",
+    "question": "Co vrací metoda re.finditer(pattern, string) při vyhledání všech zásahů v textu?",
+    "options": [
+      "A) Slovník (dict) mapující názvy pojmenovaných skupin na seznamy jejich nalezených výskytů v textu.",
+      "B) Iterátor postupně generující jednotlivé objekty zásahu (Match objects) obsahující podrobné informace.",
+      "C) Generátor vracející n-tice indexů počátku a konce jednotlivých zásahů bez samotných textových dat.",
+      "D) Seznam (list) obsahující výhradně textové řetězce všech nalezených podřetězců vyhovujících vzoru."
+    ],
+    "answer": 1,
+    "explanation": "Metoda `re.finditer()` vrací iterátor vracející objekty shody (`Match` objects) pro všechny nepřekrývající se výskyty vzoru v textu, což šetří paměť a umožňuje přistupovat k pozicím i podskupinám.",
+    "code": null
+  },
+  {
+    "id": "q3",
+    "type": "predict_output",
+    "question": "Jak se liší výstup metody re.findall() u vzoru bez podskupin oproti vzoru s podskupinami?",
+    "options": [
+      "A) Bez skupin vrací iterátor objektů Match, se skupinami vrací přímý seznam slovníků skupin groupdict.",
+      "B) Bez skupin vrací seznam řetězců, se skupinami vyvolá výjimku re.error kvůli nekompatibilitě typů.",
+      "C) Bez skupin vrací seznam shodných řetězců, se skupinami vrací seznam n-tic zachycených podskupin.",
+      "D) Bez skupin vrací n-tici všech celých zásahů, se skupinami vrací seznam celých shody včetně zápisů."
+    ],
+    "answer": 2,
+    "explanation": "Pokud regulární výraz neobsahuje žádné podskupiny `()`, `findall()` vrací jednoduchý seznam zachycených řetězců. Pokud však výraz podskupiny obsahuje, vrací seznam n-tic (tuples) obsahujících hodnoty jednotlivých podskupin.",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl v chování mezi funkcemi re.match() a re.search()?",
+    "options": [
+      "A) match funguje výhradně s předkompilovanými vzory, zatímco search přijímá i nekompilovaný řetězec.",
+      "B) match vrací pouze Boolean hodnotu True/False, zatímco search vrací plnohodnotný objekt shody Match.",
+      "C) match prohledává celý řetězec kdekoliv, zatímco search vyžaduje shodu přes celý řetězec do konce.",
+      "D) match hledá shodu výhradně od začátku řetězce, zatímco search prohledává celý řetězec kdekoliv."
+    ],
+    "answer": 3,
+    "explanation": "Funkce `re.match()` zkoumá shodu se vzorem pouze na samotném začátku řetězce (index 0). Naproti tomu `re.search()` prohledává celý řetězec a vrátí první nalezenou shodu kdekoliv v textu.",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "predict_output",
+    "question": "Co vrátí volání m.group(1, 2) na objektu Match m, který úspěšně zachytil alespoň dvě podskupiny?",
+    "options": [
+      "A) N-tici (tuple) dvou řetězců odpovídajících první a druhé zachycené podskupině regulárního výrazu.",
+      "B) Seznam (list) obsahující celou shodu m.group(0) a následně obě zachycené podskupiny v pořadí.",
+      "C) Slovník (dict) obsahující celočíselné klíče 1 a 2 mapované na příslušné zachycené řetězce skupin.",
+      "D) Spojený řetězec vzniklý konkatenačním sloučením první a druhé zachycené podskupiny bez oddělovače."
+    ],
+    "answer": 0,
+    "explanation": "Předání více argumentů (indexů nebo jmen skupin) metodě `.group()` vrátí n-tici (tuple) obsahující odpovídající hodnoty pro každý zadaný argument v daném pořadí.",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "fill_blank_choice",
+    "question": "Doplňte metodu pro získání slovníku pojmenovaných skupin ze zachyceného objektu Match:\n\nimport re\npattern = re.compile(r'(?P<user>\\w+):(?P<role>\\w+)')\nmatch = pattern.search('user:admin')\ndata = match.________():",
+    "options": [
+      "namedgroups",
+      "groupdict",
+      "dictgroups",
+      "get_groups"
+    ],
+    "answer": 1,
+    "explanation": "Metoda `groupdict()` na objektu `Match` vrací slovník, kde klíči jsou jména pojmenovaných skupin definovaná pomocí `(?P<name>...)` a hodnotami jsou odpovídající zachycené podřetězce.",
+    "expected": "groupdict",
+    "code": "import re\npattern = re.compile(r'(?P<user>\\w+):(?P<role>\\w+)')\nmatch = pattern.search('user:admin')\ndata = match.________()"
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Jak ovlivní přítomnost podskupiny v regulárním výrazu chování funkce re.split()?",
+    "options": [
+      "A) Rozdělí řetězec pouze na prvním výskytu a ignoruje všechny následující shody v dalším textu.",
+      "B) Odstraní všechny oddělovače z výstupního seznamu a vrací pouze spojené nerozdělené n-tice znaků.",
+      "C) Zahrne zachycené podskupiny jako samostatné prvky do výsledného vráceného seznamu oddělených částí.",
+      "D) Vyvolá výjimku ValueError, protože metoda split nepodporuje regulární výrazy s podskupinami."
+    ],
+    "answer": 2,
+    "explanation": "Pokud regulární výraz v `re.split()` obsahuje podskupiny v závorkách `()`, jsou texty zachycené těmito podskupinami také vloženy do výsledného vráceného seznamu mezi oddělené části.",
+    "code": null
+  },
+  {
+    "id": "q8",
+    "type": "multiple_choice",
+    "question": "Proč se pro odkazování na skupiny v nahrazovacím řetězci metody re.sub() doporučuje zápis \\g<1>0 místo \\10?",
+    "options": [
+      "A) Zrychluje provádění substituce přímým adresováním paměťového ukazatele na zachycenou skupinu.",
+      "B) Umožňuje nahrazování neosetřených Unicode znaků bez nutnosti specifikovat explicitní kódování.",
+      "C) Zajišťuje kompatibilitu se staršími verzemi Pythonu 2, které neuplatňovaly zápis se zpětným lomítkem.",
+      "D) Zabraňuje dvouznačnosti mezi odkazem na skupinu číslo 1 následovanou nulou a skupinou číslo 10."
+    ],
+    "answer": 3,
+    "explanation": "Zápis `\\g<1>0` jednoznačně určuje odkaz na podskupinu číslo 1 následovaný doslovným znakem `0`. Zápis `\\10` by interpret regulárních výrazů vyhodnotil jako odkaz na podskupinu číslo 10.",
+    "code": null
+  },
+  {
+    "id": "q9",
+    "type": "predict_output",
+    "question": "Co je návratovou hodnotou metody re.subn(pattern, repl, string)?",
+    "options": [
+      "A) Dvojice (n-tice) tvořená novým upraveným řetězcem a celkovým počtem provedených nahrazení v textu.",
+      "B) Pouze celočíselný počet provedených substitucí v textu bez samotného vytvořeného nového řetězce.",
+      "C) Seznam všech mezivýsledků vzniklých postupným prováděním jednotlivých nahrazení v řetězci.",
+      "D) Objekt typu Match obsahující podrobné rozbalené údaje o posledním nahrazeném podřetězci."
+    ],
+    "answer": 0,
+    "explanation": "Metoda `re.subn()` provádí stejnou substituci jako `re.sub()`, ale navrací n-tici `(new_string, number_of_subs)`, která obsahuje nový řetězec a celkový počet provedených nahrazení.",
+    "code": null
+  },
+  {
+    "id": "q10",
+    "type": "multiple_choice",
+    "question": "Jak se mění interpretace regulárního výrazu při zapnutí kompilačního příznaku re.VERBOSE?",
+    "options": [
+      "A) Automaticky se zapíná ignorování velikosti písmen a vyhledávání přes více řádků současně.",
+      "B) Ignorují se netisknutelné bílé znaky mimo třídy [] a je povoleno vkládat komentáře pomocí znaku #.",
+      "C) Zvedá se maximální povolený počet zachycených skupin z výchozího limitu 99 na neomezený počet.",
+      "D) Povolují se rozšířené matematické operátory pro počítání opakování prvků v prohledávaném textu."
+    ],
+    "answer": 1,
+    "explanation": "Příznak `re.VERBOSE` (neboli `re.X`) ignoruje mezery a odřádkování ve vzoru (pokud nejsou uvnitř znakové třídy `[]` nebo eskapované) a umožňuje psát poznámky a komentáře uvozené znakem `#`.",
+    "code": null
+  }
+]

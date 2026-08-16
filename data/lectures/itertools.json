@@ -1,0 +1,195 @@
+{
+  "slug": "materialy--python--iterators--itertools",
+  "total": 21,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož <a href=\"iterators.xml\">iterátory</a> jsou v Python'u (zvláště trojkovém) úplně všude, nepřekvapí, že ve standardní knihovně je k dispozici modul, který nabízí přehršel funkcí, které produkují iterátory v nejrůznější podobě:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            potenciálně <a href=\"?slajd=2\">nekonečné</a> iterátory\r\n        </li>\r\n        <li>\r\n            <a href=\"?slajd=5\">kombinatorické</a> iterátory\r\n        </li>\r\n        <li>\r\n            iterátory nad <a href=\"?slajd=9\">skupinou sekvencí</a> a ostatní\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Kompletní dokumentaci najdete na <a href=\"https://docs.python.org/3/library/itertools.html\" class=\"external\">oficiálním webu</a>, zde si ukážeme jenom přehled dostupných funkcí s příklady (většinou podle oficiální dokumentace).\r\n    </p>\r\n    <p>\r\n        PS: Nezapomeňme, že (z historických důvodů) je několik iterátorových funkcí k dispozici už rovnou v základním jemnném prostoru – jmenovitě <code>zip()</code>, <code>map()</code> a <code>filter()</code>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "„count([start=0[, step=1]])“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">„count([start=0[, step=1]])“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nekonečný iterátor začínající na hodnotě <em>start</em> a přičítající v každém kroku <em>step</em>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in count(11, 4):\r\n...     print(x)\r\n...     if x &gt; 20: break\r\n        11\r\n        15\r\n        19\r\n        23\r\n    </pre>\r\n    <p>\r\n        PS: Poněkud překvapivě umí tento iterátor pracovat i s reálnými čísly (byť s přesností to pak pochopitelně bývá poněkud na štíru):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in count(11.2, 0.3):\r\n...     print(x)\r\n...     if x &gt; 13: break\r\n        11.2\r\n        11.5\r\n        11.8\r\n        12.100000000000001\r\n        12.400000000000002\r\n        12.700000000000003\r\n        13.000000000000004\r\n    </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "„cycle(I)“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">„cycle(I)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Iterátor nekonečně opakující prvky ze zadaného objektu <code>I</code>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for i,x in enumerate(cycle('ABC')):\r\n...     if i &gt; 4: break\r\n...     print(x)\r\n        A\r\n        B\r\n        C\r\n        A\r\n        B\r\n    </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "„repeat(E[, n])“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„repeat(E[, n])“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Iterátor donekonečna (případně právě <code>n</code>–krát) opakující prvek <code>E</code>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in repeat('ABC', 3):\r\n...     print(x)\r\n        ABC\r\n        ABC\r\n        ABC\r\n    </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "„product(p, q, …[, repeat=1])“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">„product(p, q, …[, repeat=1])“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Regulérní kartézský součin nad vstupními prvky:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in product('AB', (1, 2, 3)):\r\n...     print(x)\r\n        ('A', 1)\r\n        ('A', 2)\r\n        ('A', 3)\r\n        ('B', 1)\r\n        ('B', 2)\r\n        ('B', 3)\r\n    </pre>\r\n    <p>\r\n        PS: Jelikož vstupy jsou před výpočtem převedeny do paměti, funguje to jenom pro konečné počty vstupních prvků.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "„permutations(I[, r=None])“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">„permutations(I[, r=None])“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Permutace prvků vstupního iterovatelného objektu, a to buď o délce počtu prvků objektu nebo zadané <code>r</code>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in permutations('ABC'):\r\n...     print(x)\r\n        ('A', 'B', 'C')\r\n        ('A', 'C', 'B')\r\n        ('B', 'A', 'C')\r\n        ('B', 'C', 'A')\r\n        ('C', 'A', 'B')\r\n        ('C', 'B', 'A')\r\n\r\n&gt;&gt;&gt; for x in permutations('ABC', 2):\r\n...     print(x)\r\n        ('A', 'B')\r\n        ('A', 'C')\r\n        ('B', 'A')\r\n        ('B', 'C')\r\n        ('C', 'A')\r\n        ('C', 'B')\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pro $0 ≤ r ≤ n$ je jich $n! / (n - r)!$ (výstup <code>math.perm()</code>), pro $r &gt; n$ je jich $0$.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "„combinations(I, r)“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">„combinations(I, r)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <code>r</code>–prvkové kombinace (bez opakování) prvků iterovatelného objektu <code>I</code>, jinak tedy též podmnožina příslušných permutací:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in combinations('ABC', 2):\r\n...     print(x)\r\n        ('A', 'B')\r\n        ('A', 'C')\r\n        ('B', 'C')\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pro $0 ≤ r ≤ n$ je jich $n! / r! / (n - r)!$ (výstup <code>math.comb()</code>), pro $r &gt; n$ je jich $0$.\r\n    </div></div>\r\n    <p>\r\n        PS: Možná trochu nezvykle, ale logicky, se kombinace počítají <strong>na základě pořadí prvků ve vstupním objektu</strong>, nikoli jejich hodnotě! Proto budou jedinečné pouze v případě, že prvky vstupního objektu jsou také jedinečné:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in combinations('ABA', 2):\r\n...     print(x)\r\n        ('A', 'B')\r\n        ('A', 'A')\r\n        ('B', 'A')\r\n    </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "„combinations_with_replacement(I, r)“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">„combinations_with_replacement(I, r)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jako kombinace, ale každý vstupní prvek se může až <code>r</code>–krát opakovat:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in combinations_with_replacement('ABC', 2):\r\n...     print(x)\r\n        ('A', 'A')\r\n        ('A', 'B')\r\n        ('A', 'C')\r\n        ('B', 'B')\r\n        ('B', 'C')\r\n        ('C', 'C')\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Při $n=len(I) &gt; 0$ je jich $(n + r - 1)! / r! / (n - 1)!$.\r\n    </div></div>\r\n    <p>\r\n        PS: A stejně jako u kombinací (bez opakování) se vstupní prvky rozlišují podle pořadí, takže v případě jejich nejedinečnosti může výstup vypadat na první pohled podivně.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "„accumulate()“ (vs „functools.reduce()“)",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">„accumulate()“ (vs „functools.reduce()“)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Co tahle funkce dělá, nejlépe pochopíme srovnáním s blízce příbuznou funkcí <a href=\"/materialy/python/functions/advanced-3.xml?slajd=4\"><code>functools.reduce()</code></a>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # provede ((((5 + 2) + 4) + 3) + 6):\r\n&gt;&gt;&gt; reduce(add, [5, 2, 4, 3, 6])\r\n        20\r\n</pre>\r\n    <p>\r\n        Zatímco <code>reduce()</code> vrátila finální výsledek postupné aplikace příslušné <em>binární funkce</em> (zde obyčejné sčítání pomocí <code>operator.add()</code>), <code>accumulate()</code> vrátí i všechny mezivýsledky:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in accumulate([5, 2, 4, 3, 6], add):\r\n...     print(x)\r\n        5\r\n        7\r\n        11\r\n        14\r\n        20\r\n    </pre>\r\n    <p>\r\n        Stejně jako <code>reduce()</code> také umí <code>accumulate()</code> přebírat i počáteční hodnotu (pomocí pojmenovaného parametru <code>initial=</code>):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in accumulate([5, 2, 4, 3, 6], add, initial=1):\r\n...     print(x)\r\n        1\r\n        6\r\n        8\r\n        12\r\n        15\r\n        21\r\n    </pre>\r\n    <p>\r\n        Obzvláště pěknou aplikací je pak průběžné maximum, resp. minimum z řady hodnot:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; list(accumulate([3, 4, 6, 2, 1, 9, 0, 7, 5, 8], max))\r\n        [3, 4, 6, 6, 6, 9, 9, 9, 9, 9]\r\n\r\n&gt;&gt;&gt; list(accumulate([3, 4, 6, 2, 1, 9, 0, 7, 5, 8], min))\r\n        [3, 3, 3, 2, 1, 1, 0, 0, 0, 0]\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Upraveno z dokumentace.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "„batched(I, n)“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">„batched(I, n)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Rozdělí vstupní data na n-tice o délce <em>n</em>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in batched('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 5):\r\n...     print(x)\r\n        ('A', 'B', 'C', 'D', 'E')\r\n        ('F', 'G', 'H', 'I', 'J')\r\n        ('K', 'L', 'M', 'N', 'O')\r\n        ('P', 'Q', 'R', 'S', 'T')\r\n        ('U', 'V', 'W', 'X', 'Y')\r\n        ('Z',)\r\n    </pre>\r\n    <p>\r\n        PS: Neskutečně užitečná funkce, která mi v Python'u dlooouho chyběla – byla přidána až ve verzi 3.12!\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "„chain()“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">„chain()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Funkce <code>chain()</code> umí zkombinovat libovolný počet iterovatelných objektů do jednoho dlouhého:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in chain('ABC', 'def'):\r\n...     print(x)\r\n        A\r\n        B\r\n        C\r\n        d\r\n        e\r\n        f\r\n    </pre>\r\n    <p>\r\n        Jakmile se prvky jednoho objektu vyčerpají, pokračuje se prvky dalšího. A to tak dlouho, dokud jsou nějaké objekty s prvky k dispozici.\r\n    </p>\r\n    \r\n\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "„compress()“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">„compress()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Trošku zvláštně pojmenovaná metoda, která vlastně dělá tak trochu obdobu <a href=\"/materialy/python/numpy/arrays.slicing.xml?slajd=7\">numpyovských výřezů podle pravdivostní</a> hodnoty:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in compress('ABCDEF', [1,0,1,0,1,1]):\r\n...     print(x)\r\n        A\r\n        C\r\n        E\r\n        F\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Přímo podle dokumentace.\r\n    </div></div>\r\n    <p>\r\n        Tady se využilo toho, že 0 odpovídá nepravdě, zatímco 1 pravdě. Můžete tam samozřejmě psát přímo <em>True/False</em> nebo i cokoliv jiného, jsme v Python'u…\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "„dropwhile()“ &amp; „takewhile()“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">„dropwhile()“ &amp; „takewhile()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zatímco <code>dropwhile()</code> zahazuje všechny prvky, dokud platí podmínka (načež všechny další vrátí), <code>takewhile()</code> naopak vrací prvky, dokud platí podmínka, načež všechny další zahodí:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; list( takewhile(lambda x: x&lt;5, [1,4,6,3,8]) )\r\n[1, 4]\r\n\r\n&gt;&gt;&gt; list( dropwhile(lambda x: x&lt;5, [1,4,6,3,8]) )\r\n[6, 3, 8]\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        V závislosti na podmínce a datech tak <code>dropwhile()</code> může trvat pěkně dlouho, než vyprodukuje nějaký výstup.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "„filterfalse()“ (vs „filter()“)",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">„filterfalse()“ (vs „filter()“)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kde vestavěná funkce <code>filter()</code> vrací prvky, které splňují podmínku..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; [x for x in filter(lambda x: x&lt;5, [1,4,6,3,8])]\r\n        [1, 4, 3]\r\n</pre>\r\n    <p>\r\n        ..tam <code>itertools.filterfalse()</code> nepřekvapivě vrací prvky, které podmínku NEsplňují:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; [x for x in filterfalse(lambda x: x&lt;5, [1,4,6,3,8])]\r\n        [6, 8]\r\n</pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "„groupby()“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">„groupby()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Tato funkce shlukuje dohromady stejné za sebou jdoucí prvky a zároveň s jejich iterátorem vrací i příslušný prvek (tak trochu jako <a href=\"/materialy/python/types/dictionaries.xml?slajd=9\">průchod po slovníku</a>):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for k,g in groupby('AAAABBBCCDAABBB'):\r\n...     print(k, list(g))\r\n        A ['A', 'A', 'A', 'A']\r\n        B ['B', 'B', 'B']\r\n        C ['C', 'C']\r\n        D ['D']\r\n        A ['A', 'A']\r\n        B ['B', 'B', 'B']\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Kde nepřekvapivě <em>k,g</em> mnemotechnicky značí <em>key, group</em>.\r\n    </div></div>\r\n    <p>\r\n        Skupina shluklých prvků <em>group</em> (či <em>g</em>) v každém kroku obsahuje relevantní data odpovídající aktuálnímu klíči <em>key</em> (či <em>k</em>), jen je třeba si dát pozor na to, že <strong>i tato skupina je iterátorem</strong>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "„islice()“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">„islice()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Funkce pro ty, kterým se z nějakého (podivného :) důvodu nelíbí výřezová notace <code>[::]</code>. Akorát nepodporuje záporné indexy:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; [x for x in islice('ABCDEFGHIJKL', 1, 7, 2)]\r\n        ['B', 'D', 'F']\r\n</pre>\r\n    <p>\r\n        A také musíte vždy alespoň dva argumenty zadat (krok je tedy nepovinný). A místo nuly a konce sekvence (pokud je konečná) můžete psát <em>None</em>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "„pairwise()“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">„pairwise()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Potřebujete-li postupně dostávat prvky ze vstupu po (překrývajících se) dvojicích:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; for x in pairwise('ABCDE'):\r\n...     print(x)\r\n        ('A', 'B')\r\n        ('B', 'C')\r\n        ('C', 'D')\r\n        ('D', 'E')\r\n    </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "„starmap()“ (vs „map()“)",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">„starmap()“ (vs „map()“)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kde vestavěná funkce <code>map()</code> „mapuje“ své vstupy postupně na zadanou funkci..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; [x for x in map(operator.add, [1, 2, 3, 4, 5], [1, 2, 3, 4, 5])]\r\n        [2, 4, 6, 8, 10]\r\n</pre>\r\n    <p>\r\n        ..tam <code>itertools.starmap()</code> očekává vstupy již připravené přímo pro použití:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; [x for x in starmap(operator.add, [(1, 1), (2, 2), (3, 3), (4, 4), (5, 5)])]\r\n        [2, 4, 6, 8, 10]\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Aneb asi takový rozdíl, jako mezi <code>funkce(a, b)</code> a <code>funkce(*c)</code>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "„tee(iterable)“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">„tee(iterable)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož konkrétní instanci <em>iterátoru</em> (neplést s <em>iterovatelným objektem</em>!) můžete proiterovat pouze jednou, nabízí <code>itertools.tee()</code> způsob, jak ji použít vícekrát. Srovnejte:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # iterátor se po prvním použití vyčerpal\r\n&gt;&gt;&gt; it = iter(random.randint(0, 10) for _ in range(10))\r\n&gt;&gt;&gt; a, b = list(it), list(it)\r\n&gt;&gt;&gt; a\r\n        [5, 5, 4, 6, 4, 9, 10, 10, 1, 0]\r\n&gt;&gt;&gt; b\r\n        []\r\n\r\n        # iterátor je k dispozici dvakrát\r\n&gt;&gt;&gt; it = iter(randint(0, 10) for _ in range(10))\r\n&gt;&gt;&gt; a, b = tee(it)\r\n&gt;&gt;&gt; list(a)\r\n        [8, 1, 6, 6, 6, 1, 6, 5, 4, 10]\r\n&gt;&gt;&gt; list(b)\r\n        [8, 1, 6, 6, 6, 1, 6, 5, 4, 10]\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Bezva příklad s náhodnými čísly podle <a href=\"https://stackoverflow.com/questions/61854891/tee-function-from-itertools-library\" class=\"external\">SO</a>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "„tee(iterable, n=N)“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">„tee(iterable, n=N)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ve výchozím nastavení vrací <code>tee()</code> dvě „kopie“ toho samého iterátoru v podobě dvojce, ale můžete to změnit pomocí parametru <em>n</em>: <code>a, b, c = tee(it, n=3)</code> (jméno parametru je možno vynechat). Když necháte vrátit pouze jednu kopii, dostanete nazpět také n-tici, ale poměrně nezvyklou – pouze s jedním prvkem, tzv. <strong>jednici</strong>. K té se <a href=\"/materialy/python/types/tuples.xml?slajd=12\">musíte chovat trošku jinak</a>, než jste asi zvyklí, jak ukazuje následující příklad „forknutého“ iterátoru, který umožňuje nahlédnout příští prvky dříve, než skutečně dorazí:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # a) pracovní iterátor\r\n&gt;&gt;&gt; it = iter(randint(0, 10) for _ in range(10))\r\n&gt;&gt;&gt; a, = tee(it, 1)         # získání prvku jednice prvním způsobem\r\n&gt;&gt;&gt; a\r\n        &lt;itertools._tee object at 0x0000020D024292C0&gt;\r\n&gt;&gt;&gt; next(a)\r\n        8\r\n&gt;&gt;&gt; next(a)\r\n        10\r\n\r\n        # b) „fork“ pracovního iterátoru\r\n&gt;&gt;&gt; [forked_a] = tee(a, 1)  # získání prvku jednice druhým způsobem\r\n&gt;&gt;&gt; forked_a\r\n        &lt;itertools._tee object at 0x0000020D0242A3C0&gt;\r\n        # „vidí“, co bude následovat...\r\n&gt;&gt;&gt; next(forked_a)\r\n        8\r\n&gt;&gt;&gt; next(forked_a)\r\n        7\r\n        # ...aniž by to ovlivnilo původní iterátor\r\n&gt;&gt;&gt; next(a)\r\n        8\r\n&gt;&gt;&gt; next(a)\r\n        7\r\n</pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "„zip_longest()“ (vs „zip()“)",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">„zip_longest()“ (vs „zip()“)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož veleužitečná funkce <code>zip()</code> iterující nad odpovídajícími si (pořadím) prvky (libovolného počtu $≥ 1$) vstupních iterovatelných objektů je přímo v globálním jmenném prostoru, její doplněk <code>zip_longest()</code> z modulu <code>itertools</code> už jsem <a href=\"/materialy/python/functions/functional.xml?slajd=7\">popisoval u ní</a>. Pro připomenutí rozdílu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # a) „zip()“ se zastaví na kratším vstupu\r\n&gt;&gt;&gt; list( zip('ahoj', [5, 2, 3, 4, 1]) )\r\n        [('a', 5), ('h', 2), ('o', 3), ('j', 4)]\r\n         \r\n        # b) „zip_longest()“ se zastaví na delším vstupu (s vybranou výplní)\r\n&gt;&gt;&gt; from itertools import zip_longest\r\n&gt;&gt;&gt; list( zip_longest('ahoj', [5, 2, 3, 4, 1]) )\r\n        [('a', 5), ('h', 2), ('o', 3), ('j', 4), (None, 1)]\r\n&gt;&gt;&gt; list( zip_longest('ahoj', [5, 2, 3, 4, 1], fillvalue='X') )\r\n        [('a', 5), ('h', 2), ('o', 3), ('j', 4), ('X', 1)]\r\n</pre>\r\n    <p>\r\n        PS: Ještě jednou pro zdůraznění – vstupních objektů může být libovolně mnoho, dokonce i jenom jeden (pak jsou výstupem <a href=\"/materialy/python/types/tuples.xml?slajd=12\">jednice</a>).\r\n    </p>\r\n\r\n</div>"
+    }
+  ]
+}

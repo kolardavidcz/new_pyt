@@ -1,0 +1,353 @@
+{
+  "slug": "materialy--dvcs--git.advanced",
+  "total": 31,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zvládli-li jste základní nastavení a příkazy z <a href=\"git.xml\">úvodní kapitoly o Gitu</a>, umíte si sami spravovat lokální práci v gitovském repozitáři a případně ji i synchronizovat na vzdálený server. Nicméně Git by nebyl <strong>distribuovaným nástrojem pro správu verzí</strong>, kdyby toho neuměl MNOHEM víc. Především pak:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            práce ve <a href=\"?slajd=2\"><strong>více nezávislých větvích současně</strong></a> – není nic snažšího, než novou funkcionalitu testovat v nezávislé kopii projektu a pouze v případě úspěšného odladění ji promítnout i do hlavní větve;\r\n        </li>\r\n        <li>\r\n            práce s <a href=\"?slajd=7\"><strong>vícero cizími „kopiemi“ repozitáře</strong></a> – scénář, kde všichni pracující na projektu sdílejí změny přes „centrální“ kopii (například na GitHubu) je pouze jeden z možných, stejně dobře totiž mohou všechny spolupracující repozitáře odkazovat navzájem na sebe a <em>push/pull</em> pak musí rozlišit, odkud/kam chcete změny vlastně promítnout;\r\n        </li>\r\n        <li>\r\n            různá kombinace obojího i jiného – mnoho různých zdrojů (<em>remotes</em>) a mnoho různých větví (<em>branches</em>), nejlépe v každém repozitáři úplně jiné ^_~\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Kromě toho dost pravděpodobně budete časem potřebovat milníky ve vývoji také <a href=\"?slajd=23\"><strong>taggovat</strong></a>, aneb označit vhodným jménem (typicky <em>v1.0</em> a podobně), a možná <a href=\"?slajd=28\">ještě něco dalšího</a>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: Následující výklad veden volně především podle knihy <em>Chacon, Scott; Straub, Ben: Pro Git, 2nd Edition.</em>\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "I. Paralelní vývojové větve",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">I. Paralelní vývojové větve</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        V Gitu jsou jednotlivé <em>komity</em> ukládány jako celkový aktuální binární obraz pracovního adresáře (tzv. <em>snapshoty</em>; nebo spíše ukazatele na tyto <em>snapshoty</em>). <strong><em>Větve</em></strong> (<strong><em>branches</em></strong>) pak nejsou nic jiného než ukazatel na vybraný <em>komit</em>, čili vlastně jenom SHA-identifikátor příslušného ukazatele.\r\n    </p>\r\n    <p>\r\n        Jelikož každý <em>komit</em> si musí pamatovat, z jakých rodičů byl vytvořen – typicky z jednoho, totiž předchozího stavu repozitáře, ale může i z více, právě když spojujete (<em>mergujete</em>) z více větví najednou – je pro Git snadné na požádání zrekonstruovat stav repozitáře ve vybraném okamžiku.\r\n    </p>\r\n    <p>\r\n        Speciální <strong>proměnná <em>HEAD</em></strong> pak <strong>ukazuje na aktuálně vybranou pracovní větev</strong> (proto její častý výskyt v mnoha gitích příkazech).\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: HEAD může ukazovat třebas i na konkrétní komit kdekoliv v historii, ale nejčastější je konec právě vybrané („checkoutnuté“) větve.\r\n    </div></div>\r\n    <p>\r\n        Síla Gitu se pak ukazuje ve chvílích, kdy potřebujete práci z vedlejších větví buď zahodit nebo naopak promítnout do větve jiné.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "„branch [VĚTEV]“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">„branch [VĚTEV]“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Bez dalších parametrů vypíše příkaz <strong><em>git branch</em></strong> seznam všech v projektu dostupných větví:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git branch\r\n        * master\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Větev <em>master</em> je výchozí pojmenování první automaticky vytvořené větve (při zavolání <code>git init</code>), takže ji najdete skoro všude, protože ji málokdy někdo přejmenuje.\r\n    </div></div>\r\n    <p>\r\n        Příkaz <strong><em>git branch VĚTEV</em></strong> pak vytvoří novou větev udaného jména, ale <strong>nepřepne na ni</strong>:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git branch testing\r\n\r\n        $ git branch\r\n        * master\r\n          testing\r\n    </pre>\r\n    <p>\r\n        To znamená, že <em>HEAD</em> (označeno hvězdičkou <code>*</code> u jména větve) stále míří na původní větev a jakékoliv další změny v repozitáři se budou odehrávat stále v ní!\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "„checkout|switch VĚTEV“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„checkout|switch VĚTEV“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Chcete-li začít pracovat v jiné větvi (tedy zaměnit pozici <em>HEAD</em>u), musíte se na ni přepnout příkazem <strong><em>git checkout VĚTEV</em></strong> (nebo nověji i <strong><em>git switch VĚTEV</em></strong>):\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git checkout testing\r\n        Switched to branch 'testing'\r\n\r\n        $ git branch\r\n          master\r\n        * testing\r\n    </pre>\r\n    <p>\r\n        Jakékoliv změny, které nyní provedete v repozitáři, se budou zaznamenávat do této nové větve. Což znamená, že <strong>od této chvíle dál můžete provádět změny v obou větvích nezávisle na sobě</strong> (stačí se přepnout na druhou větev, něco v ní nakomitovat, přepnout se zpět a nakomitovat prozměnu něco jiného zde) <strong>a jak soubory, tak adresáře mohou v každé z nich vypadat úplně jinak!</strong>\r\n    </p>\r\n    <p>\r\n        PS: Je možné vytvořit novou větev a rovnou se na ni přepnout pomocí příkazu <code>git checkout -b VĚTEV</code>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "„merge VĚTEV“",
+      "tags": [
+        "Core",
+        "Tricky"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">„merge VĚTEV“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Větve by vám samozřejmě nebyly k ničemu, kdybyste práci z nich nemohli (relativně) snadno promítat do jiných větví. A přesně k tomu slouží příkaz <strong><em>git merge VĚTEV</em></strong>. Je třeba si zapamatovat jedinou věc:\r\n    </p>\r\n    <blockquote>\r\n        Git provede (respektive pokusí se provést, může samozřejmě dojít ke konfliktům) <em>merge</em> <strong>z udané větve do větve aktuální</strong>.\r\n    </blockquote>\r\n    <p>\r\n        Je tedy třeba se nejdříve přepnout na větev (tj. změnit pozici <em>HEAD</em>u), do níž chcete změny zanést:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        # ve větvi 'testing' jsem provedl nějaké změny navíc oproti aktuálnímu stavu větve 'master'\r\n        $ git checkout master\r\n        Switched to branch 'master'\r\n        Your branch is ahead of 'origin/master' by 1 commit.\r\n          (use \"git push\" to publish your local commits)\r\n\r\n        # větev 'testing' je o jeden komit napřed oproti aktuálně vybrané větvi 'master'\r\n        $ git log --oneline --all\r\n        47951fb (testing) drobná změna\r\n        56a8d5a (HEAD -&gt; master, zaloha/master) druhy komit\r\n        448c140 (origin/master, origin/HEAD) prvni komit\r\n\r\n        # promítněmež změny z větve 'testing' do větve 'master'\r\n        $ git branch\r\n        * master\r\n          testing\r\n        $ git merge testing\r\n        Updating 56a8d5a..47951fb\r\n        Fast-forward\r\n         soubor-2.txt | 3 ++-\r\n         1 file changed, 2 insertions(+), 1 deletion(-)\r\n        $ git log --oneline --all\r\n        47951fb (HEAD -&gt; master, testing) drobná změna\r\n        56a8d5a (zaloha/master) druhy komit\r\n        448c140 (origin/master, origin/HEAD) prvni komit\r\n    </pre>\r\n    <p>\r\n        Jak snadno se spojení větví podaří závisí samozřejmě na tom, jak moc se od sebe obě větve během vývoje vzdálily. V jednoduchých případech udělá Git všechnu práci za vás, ve složitějších dojde ke konfliktům a budete je muset ručně vyřešit.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <code>git status</code> je pak nezbytný a konfliktní místa v nezmerdžovaných souborech budou příslušně vyznačena (hledejte znaky <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>, <code>=======</code> a <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>.)\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "„branch --merged“ &amp; „--no-merge“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">„branch --merged“ &amp; „--no-merge“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Když už máte víc větví, ve kterých zkoušíte nové věci (nebo opravujete chyby), tak by vás mohlo zajímat, které z větví už jste promítli – případně naopak ještě nepromítli – typicky například zpátky do hlavní pracovní větve (<em>master</em>). Git na to obsahuje dva přepínače u příkazu <code>git branch</code>:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong>git branch --merged</strong> – ukáže seznam (dosud existujících) větví, které už ale byly promítnuty (zmerdžovány) zpátky do větve, v níž se právě nacházíte;\r\n        </li>\r\n        <li>\r\n            <strong>git branch --no-merged</strong> – naopak ukáže seznam existujících větví, které zatím zpátky do aktuální pracovní větve promítnuty nebyly.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Nejčastější použití asi bude pro případ, že se nacházíte v hlavní pracovní větvi (<em>master</em>) a chcete do ní promítnout (<em>merge</em>) úpravy z větve jiné. Ale stejně dobře můžete stát v úplně jiné větvi, z níž jste časem oddělili ještě další větev. (Jsme v gitu, že ;-)\r\n    </p>\r\n    <p>\r\n        PS: Dodáním názvu větve za příkazy výše můžete dokonce specifikovat, proti jaké větvi vás stav merdžování zajímá.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "II. Vzdálené větve",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">II. Vzdálené větve</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Dříve nebo později začnete <a href=\"git.xml?slajd=16\">pracovat s repozitáři někde jinde</a> (ať už na nějakém centrálním serveru nebo u někoho jiného na jeho počítači). A dříve nebo později se na některém z těchto míst objeví kromě hlavní pracovní větve (onen typický <em>master</em>) i větve jiné.\r\n    </p>\r\n    <p>\r\n        Ve výchozím nastavení bude příkaz <code>git pull</code> aktualizovat kód pouze proti aktuální větvi, takže:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            další větve se k vám ze vzdáleného zdroje ani nedostanou (dokonce o nich ani nebudete vědět);\r\n        </li>\r\n        <li>\r\n            případné jiné větve, které už u sebe budete mít, nebudou aktualizovány na (případný) novější stav.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Netřeba říkat, že to samé se v obráceném směru týká i příkazu <code>git push</code>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "„branch --remote“ &amp; „--all“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">„branch --remote“ &amp; „--all“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <a href=\"?slajd=3\">Jak už víme</a>, příkaz <code>git branch</code> vypíše všechny vaše lokální vývojové větve. Nepřekvapivě tentýž příkaz, avšak s přepínačem <code>--remote</code> (reps. <code>-r</code>), vypíše prozměnu pouze větve na vzdáleném zdroji<sup>*</sup>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <sup>*</sup> Který při klonování cizího repozitáře bez dalších parametrů bude mít výchozí jméno <em>origin</em>.\r\n    </div></div>\r\n    <p>\r\n        PS: S přepínačem <code>--all</code> (resp. <code>-a</code>) obdržíte dohromady všechny jak lokální, tak externí větve.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "„checkout RemoteBranch“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">„checkout RemoteBranch“</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Máte-li dostatečně nový <em>git</em> a není-li ve vašem lokálním repozitáři větev stejného jména, můžete se na vzdálenou větev přepnout i lokálně úplně stejně, jako kdyby to byla vaše lokální:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git clone ...\r\n        $ git branch -a\r\n        $ git checkout VzdálenáVětev\r\n        $ git branch -a\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Toť tedy teorie. Běda vám, pokud máte v aktuální větvi adresář nebo soubor stejného jména jako větev, na kterou se pokoušíte přepnout. Potom jak se říká: <em>„Good luck!“</em>\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Pokud máte lokálně větev stejného jména, musíte tu vzdálenou namapovat na jméno lokálně jiné:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git branch LokálníVětev origin/VzdálenáVětev\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jméno <em>origin</em> je samozřejmě pouze výchozí jméno (naklonovaného) zdroje, ve vašem konkrétním případě může být úplně jiné.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "„push --set-upstream“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">„push --set-upstream“</h2></div><div class=\"section-body\">\r\n    \r\n    <p>\r\n        Pokud potřebujete řešit úplně opačný problém – vyrobili jste u sebe větev, která na vzdáleném konci zatím není – použijete příkaz <strong><em>push -u</em></strong> (nebo v dlouhé verzi <strong><em>push --set-upstream</em></strong>):\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git branch\r\n          master\r\n        * newbranch\r\n          testing\r\n\r\n        $ git remote\r\n        origin\r\n\r\n        $ git push -u origin newbranch\r\n...\r\n        branch newbranch set up to track 'origin/newbranch'.\r\n    </pre>\r\n    <p>\r\n        Název <em>origin</em> zastupuje jméno, pod kterým máte namapovaný váš vzdálený zdroj (a ve výchozím nastavení to bývá právě řetězec <em>origin</em>). Nepamatujete-li si ho, <em>git remote</em> (nebo pohled do <em>.git/config</em>) napoví.\r\n    </p>\r\n    <p>\r\n        PS: Pro pushnutí nové větve na vzdálený server na ni lokálně přepnuti býti nemusíte (i když v ukázce výše to tak je).\r\n    </p>\r\n    \r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "„branch --delete“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">„branch --delete“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Máte-li nějaké větve již plné zuby (nebo jste v ní provedené změny již třeba zanesli do větve hlavní), je na čase se jí zbavit. K tomu nám dopomáhej příkaz <code>git branch --delete VĚTEV</code>, resp. jeho zkrácená varianta <code>git branch -d VĚTEV</code>:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git branch\r\n        * master\r\n          test\r\n\r\n        $ git branch --merge\r\n        * master\r\n          test\r\n\r\n        $ git branch --delete test\r\n        Deleted branch test (was 99118aa).\r\n\r\n        $ git branch\r\n        * master\r\n    </pre>\r\n    <p>\r\n        PS: Máte-li na to práva, můžete smazat i vzdálenou větev na jiném zdroji pomocí například <code>git push origin --delete VĚTEV</code> (s obvyklými poznámkami ke jménu <em>origin</em> a podobně).\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "III. Intermezzo – „tracking branches“",
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">III. Intermezzo – „tracking branches“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož všemožných větví a zdrojů již začíná být trochu moc, nakresleme si pár obrázků „vo čem to všechno vlastně je“. Za příklad si vezmeme asi nejčastější případ práce v hlavní větvi cizího repozitáře (tedy spolupráci několika lidí nad někde – třeba GitHubu – centrálně umístěným repozitářem):\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Velkými písmenky označíme komity z/na serveru, malými ty naše lokální.\r\n    </div></div>\r\n\r\n    <p class=\"enumerate\">\r\n        Naklonujmež si vzdálený repozitář. Jelikož už má nějakou historii, graf jeho stavu na našem počítači bude vypadat nějak takto:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git clone ...\r\n    </pre>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\n        origin/master\r\n              ↓\r\n        A←B←C←D\r\n              ↑\r\n            master\r\n    </pre>\r\n\r\n    <p class=\"enumerate\">\r\n        Udělejmež na „masteru“ lokálně nějakou práci, tj. několikrát <em>git add .; git commit</em>:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git commit -a\r\n    </pre>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\n        origin/master\r\n              ↓\r\n        A←B←C←D←e←f←g\r\n                    ↑\r\n                  master\r\n    </pre>\r\n\r\n    <p class=\"enumerate\">\r\n        Kolegové mezitím na server nahráli také něco nového:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git fetch\r\n    </pre>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\n            origin/master\r\n                  ↓\r\n              ↙←E←F\r\n              ↓\r\n        A←B←C←D←e←f←g\r\n                    ↑\r\n                  master\r\n    </pre>\r\n\r\n    <p class=\"enumerate\">\r\n        Oj, oj – všichni jsme na stejné větvi, ale každý jsme tam od posledně změnili něco jiného! Co teď s tím? Zmerdžovat!\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git merge\r\n        $ git commit -a\r\n    </pre>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\n            origin/master\r\n                  ↓\r\n              /–E←F←––\\\r\n              ↓        \\\r\n        A←B←C←D←e←f←g←––h\r\n                        ↑\r\n                      master\r\n    </pre>\r\n\r\n    <p class=\"enumerate\">\r\n        Bezva, všechny konflikty ze „slejvání“ vyřešeny! Teď to ještě dát vědět i kolegům na serveru:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git push\r\n    </pre>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\n              /–E←F←––\\  origin/master\r\n              ↓        \\ ↙\r\n        A←B←C←D←e←f←g←––h\r\n                        ↑\r\n                      master\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Poznámka: <em>Push</em>nout se dá pouze do tzv. <a href=\"?slajd=20\"><em>bare</em>-repozitáře</a>, tj. repozitáře vyrobeného pomocí <code>git init --bare</code>. Repozitáře vyrobené bez <code>--bare</code> slouží k práci a změny se do nich <em>pull</em>ují.\r\n    </div></div>\r\n\r\n    <p>\r\n        PS 1: Operace <code>git pull</code> je vlastně jenom zkratka (a nadstavba) nad provedením příkazů <em>git fetch</em> a <em>git merge</em> za sebou ručně.\r\n    </p>\r\n    <p>\r\n        PS 2: Nepřekvapí, že tohle všechno můžeme samozřejmě provádět i pro různé větve (jak místní, tak vzdálené). Příslušný graf operací (a SHA-štítků) pak bude jen náležitě „košilatější“ (za každou větev další odbočka ze stromečku).\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "„rebase“",
+      "tags": [
+        "Tricky",
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">„rebase“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Po <a href=\"?slajd=11\">předchozím slajdu a vysvětlení</a> je asi celkem jasné, že když budeme práci z mnoha vedlejších větví promítat zpátky do větve hlavní, tak i při mazání odpovídajících popisek větví (protože nic jiného smazání větve nedělá!) zůstane náš strom vývoje kódu velmi rozvětvený a nepřehledný.\r\n    </p>\r\n    <p>\r\n        A právě pro tyto případy je k dispozici nástroj <code>git rebase</code>, jehož <strong>úkolem je vzít (dosud neslitou) vedlejší větev a „nalepit“ ji za poslední komit větve hlavní</strong> (přičemž se cestou pokusí vyřešit konflikty při „slévání“ stejně jako <code>git merge</code>). Čímž vlastně <strong>změní historii</strong> vývoje, která se nyní bude tvářit lineárně, ačkoli taková nebyla:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git checkout VĚTEV\r\n        $ git rebase master\r\n        $ git checkout master\r\n        $ git merge VĚTEV\r\n    </pre>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\n        # vedlejší pracovní větev\r\n                 ↙←←C6←C7\r\n                 ↓\r\n        C2←C3←C4←c5←c8←c9\r\n\r\n        # obyčejný merge\r\n              ↙←←C6←C7←←←←←←←↖\r\n              ↓               ↖\r\n        C1←C2←C3←c4←c5←c8←c9←←C10\r\n\r\n        # merge pomocí rebase\r\n              ↙←←C6←C7\r\n              ↓\r\n        C1←C2←C3←c4←c5←c8←c9←C6'←C7'\r\n    </pre>\r\n    \r\n    <p>\r\n        PS: Je doufám jasné, že měnit historii je <strong>lhaní</strong>. Nicméně pokud při lokálním vývoji vyrobíte úplnou stromečkovou spoušť, kolegové by vám asi moc nepoděkovali, kdybyste něco takového nacpali do chřtánu i jim. V takovém případě je odůvodněné (a dokonce i pochopitelně očekávané), že ten svůj „bordel“ nejdříve nějak pročistíte a teprve poté ho dáte k dispozici i ostatním. (K dispozici je kromě linearizace pomocí <em>rebase</em> i přepisování – včetně úplného odstranění – starších komitů pomocí <em>rebase -i</em> a dalších nástrojů.)\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "„pull --rebase“",
+      "tags": [
+        "Tricky",
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">„pull --rebase“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Existuje způsob práce s gitem, na který tak polovina vývojářů přísahá a ta druhá je kvůli tomu zase nesnáší ^_~\r\n    </p>\r\n    <p>\r\n        Jde o to, že původně se git prezentoval jako nástroj, kde se všechno dělá ve vlastních <em>branch</em>ích a jen po dodělání se to „zmerdžuje“. Výsledkem je košilatý strom závislostí, který se v případě potřeby „zrybejsuje“. No a ta výše uvedená půlka vývojářů „rybejsuje“ automaticky skoro pokaždé, takže tam žádné větve ani nemá.\r\n    </p>\r\n    <p>\r\n        Jde totiž o to, že kromě obyčejného skládání komitů z různých větví (jako na <a href=\"?slajd=12\">předchozím slajdu</a>) se dají komity také slučovat dohromady (podpříkaz <em>squash</em> pod <em>rebase -i</em>; zde někdo na serveru sloučil dohromady komity D a E do jednoho, ale až poté, co jste si vy mezitím udělali vlastní větev od komitu D):\r\n    </p>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\n                                origin/master           origin/master\r\n                                      ↓                       ↓\r\n        origin/master             ↙←E←F                     ↙←F\r\n              ↓                   ↓                         ↓\r\n        A←B←C←D         →   A←B←C←D←e←f←g       →   A←B←C←(D+E)\r\n              ↑                         ↑                  ↑\r\n            master                    master               ↖←e←f←g\r\n                                                                 ↑\r\n                                                               master\r\n    </pre>\r\n    <p>\r\n        No a tohle už v případě konfliktů snadno nezmerdžujete, protože to bude hlásit nejen konflikty mezi vaším <code>e←f←g</code> a kódem na serveru (až po nové koncové <code>F</code>), ale i kódem v <code>D</code> a <code>E</code> proti serveru, kde mezitím už je jenom jejich sloučení <code>D+E</code>. A v takovouto chvíli vás právě zachrání jedině <code>git pull --rebase</code>, které způsobí následující:\r\n    </p>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\n              origin/master\r\n                    ↓\r\n        A←B←C←(D+E)←F←e←f←g\r\n                          ↑\r\n                        master\r\n    </pre>\r\n    <p>\r\n        Cestou sice ještě budete asi muset vyřešit pár konfliktů, ale ty už budou všechny „klasické“, protože i vaše předchozí historie – vůči které jste vy sami nic neupravovali! – bude už odpovídat stavu na serveru.\r\n    </p>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Pro podrobnosti viz <a href=\"https://gitolite.com/git-pull--rebase\" class=\"external\">what does “git pull –rebase” do?</a> .\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Pokud tak chcete pracovat rovnou a nemyslet na to, nastavte si do preferencí <code>git config --global pull.rebase true</code> .\r\n        </div></div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "IV. Vícero zdrojů",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">IV. Vícero zdrojů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Gitovský repozitář může referencovat různý počet cizích <strong>zdrojů</strong> (<strong><em>remotes</em></strong>):\r\n    </p>\r\n    <ol>\r\n        <li>\r\n            <strong>žádný</strong>, pokud jste ho vytvořili vy sami „na zelené louce“ (pomocí příkazu <code>git init</code>);\r\n        </li>\r\n        <li>\r\n            <strong>přinejmenším jeden</strong>, pokud jste jednoduše naklonovali vzdálený repozitář (pomocí <code>git clone</code>);\r\n        </li>\r\n        <li>\r\n            <strong>různý vyšší počet</strong>, pokud jste naklonovali vzdálený repozitář netriviálním způsobem nebo jste přidali další zdroje do již existujícího repozitáře (pomocí <code>git remote add</code>).\r\n        </li>\r\n    </ol>\r\n    <p>\r\n        Zatímco případu jedna se věnuje <a href=\"git.xml\">úvodní přednáška</a>, na ty další se podíváme zde a nepřekvapivě vás budou zajímat především při práci na větším projektu s několika dalšími vývojáři.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "„remote [-v]“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">„remote [-v]“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pokud jste váš repozitář naklonovali, bude obsahovat přinejmenším právě jeden <em>zdroj</em>, a to pod jménem <strong><code>origin</code></strong>, což je výchozí pojmenování klonovaného zdroje:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git clone server-2/ local\r\n        Cloning into 'local'...\r\n        done.\r\n\r\n        $ git remote\r\n        origin\r\n        $ git remote -v\r\n        origin  /home/pirat/tmp/server-2/ (fetch)\r\n        origin  /home/pirat/tmp/server-2/ (push)\r\n    </pre>\r\n    <p>\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "„remote add“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">„remote add“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Další <em>zdroje</em> můžete snadno přidat pomocí příkazu <strong><em>remote add JMÉNO ADRESA</em></strong>:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        $ git remote add zaloha /home/pirat/tmp/server-1/\r\n\r\n        $ git remote -v\r\n        origin  /home/pirat/tmp/server-2/ (fetch)\r\n        origin  /home/pirat/tmp/server-2/ (push)\r\n        zaloha  /home/pirat/tmp/server-1/ (fetch)\r\n        zaloha  /home/pirat/tmp/server-1/ (push)\r\n    </pre>\r\n    <p>\r\n        <em>JMÉNO</em> je tedy zkratka, pod jakou budete chtít příslušný <em>zdroj</em> referencovat.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "„remote show“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">„remote show“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Abyste se v dostupných zdrojích neztratili, příkaz <strong><em>remote show [ZDROJ]</em></strong> vám o nich podá nezbytné informace:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n$ git remote show\r\norigin\r\nzaloha\r\n\r\n$ git remote show origin\r\n* remote origin\r\n  Fetch URL: /home/pirat/tmp/server-2/\r\n  Push  URL: /home/pirat/tmp/server-2/\r\n  HEAD branch: master\r\n  Remote branch:\r\n    master tracked\r\n  Local branch configured for 'git pull':\r\n    master merges with remote master\r\n  Local ref configured for 'git push':\r\n    master pushes to master (up to date)\r\n\r\n$ git remote show zaloha\r\n* remote zaloha\r\n  Fetch URL: /home/pirat/tmp/server-1/\r\n  Push  URL: /home/pirat/tmp/server-1/\r\n  HEAD branch: master\r\n  Remote branch:\r\n    master tracked\r\n  Local ref configured for 'git push':\r\n    master pushes to master (local out of date)\r\n    </pre>\r\n    <p>\r\n        Zde je mimochodem vidět, že <em>origin</em>, z něhož byl tento repozitář naklonován, je ve stejném stavu, ale záložní zdroj <em>zaloha</em> je zjevně už o nějaký ten komit dále.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "„push REMOTE“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">„push REMOTE“</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Je pochopitelné, že chcete-li promítnout svoje změny na zdroj (aneb „pushnout na vybraný remote“), musíte říct, na jaký:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        git push [REMOTE]\r\n    </pre>\r\n    <p>\r\n        V nejjednodušších případech tedy stačí pouhé <code>git push</code>, které automaticky <strong>vezme vaši aktuální pracovní větev a promítne změny na její odpovídající zdroj</strong>.\r\n    </p>\r\n\r\n    <p class=\"enumerate\">\r\n        Pokud máte na výběr z vícero větví a nemůžete zrovna vše nechat na výchozím výběru, musíte kromě zdroje uvést i větev, která se na něj má promítnout:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n        git push REMOTE BRANCH\r\n    </pre>\r\n    <p>\r\n        PS: <code>git push origin HEAD</code> je zkratka, která promítne na zdroj aktuální větev pod stejným jménem, <code>git push origin HEAD:master</code> pak aktuální větev promítne do větve <em>master</em> nezávisle na jejím lokálním jménu.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "„pull REMOTE“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">„pull REMOTE“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Opačným směrem – tedy od vybraného zdroje do vašeho lokálního repozitáře – je to podobné a vše obstará příkaz <code>git pull ZDROJ [VĚTEV]</code>:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n$ git pull zaloha\r\nYou asked to pull from the remote 'zaloha', but did not specify\r\na branch. Because this is not the default configured remote\r\nfor your current branch, you must specify a branch on the command line.\r\n\r\n$ git pull zaloha master\r\nFrom /home/pirat/tmp/server-1\r\n * branch            master     -&gt; FETCH_HEAD\r\nUpdating 448c140..56a8d5a\r\nFast-forward\r\n soubor-2.txt | 1 +\r\n 1 file changed, 1 insertion(+)\r\n create mode 100644 soubor-2.txt\r\n\r\n$ git remote show zaloha\r\n* remote zaloha\r\n  Fetch URL: /home/pirat/tmp/server-1/\r\n  Push  URL: /home/pirat/tmp/server-1/\r\n  HEAD branch: master\r\n  Remote branch:\r\n    master tracked\r\n  Local ref configured for 'git push':\r\n    master pushes to master (up to date)\r\n    </pre>\r\n    <p>\r\n        PS: <code>git pull</code> je samozřejmě zkratka za stáhnutí změn ze zdroje pomocí <code>git fetch</code> a jejich promítnutí do aktuálního stavu vašeho repozitáře pomocí <code>git merge</code>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "„remote rename“ &amp; „remote remove“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">„remote rename“ &amp; „remote remove“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kromě výše uvedeného můžete zdroje také:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong>přejmenovávat</strong> pomocí <strong><code>git remote rename StaréJménoZdroje NovéJménoZdroje</code></strong>;\r\n        </li>\r\n        <li>\r\n            <strong>mazat</strong> (odstraňovat včetně veškeré související konfigurace) pomocí <strong><code>git remote remove ZDROJ</code></strong>.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Poznámka – repozitáře typu „bare“",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Poznámka – repozitáře typu „bare“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zatím jsme si vesele <em>pull</em>ovali a <em>push</em>ovali všechno všude, ale ve skutečnosti to není tak jednoduché (jsme přece v gitu, že ;-).\r\n    </p>\r\n\r\n    <p class=\"enumerate\">\r\n        Asi původně základním modelem práce v gitu totiž je několik vývojářů, kteří spolupracují na stejném projektu, takže mají u sebe lokálně tzv. <strong>pracovní repozitář</strong> (vytvořený převážně příkazem <code>git clone</code>), a v něm můžete pouze:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            reagovat na tzv. <em>pull-request</em>y od někoho jiného a jejich změny do svého repozitáře promítnout příkazem <code>git pull</code> (resp. <em>fetch &amp; merge</em>);\r\n        </li>\r\n        <li>\r\n            promítat změny do vzdálených repozitářů příkazem <code>git push</code>, ale <strong>pouze do větví, které v cílovém repozitáři nejsou právě <em>checkout</em>nuté</strong> (a ještě na to stejně musíte mít práva).\r\n        </li>\r\n    </ul>\r\n\r\n    <p class=\"enumerate\">\r\n        Pokud chcete, aby všichni mohli <em>push</em>ovat, jak se jim zlíbí, což je typický způsob práce, pokud cílový repozitář slouží jako <strong>centrální záloha</strong> pro všechny vývojáře, nesmí tento repozitář obsahovat žádný <em>checkout</em>nutý kód. A takový repozitář se vyrábí příkazem <code>git init --bare</code>.\r\n    </p>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Takovýto repozitář neobsahuje žádný podadresář <code>.git</code> – místo toho je obsah tohoto adresáře přímo vlastním obsahem <em>bare</em>-repozitáře. Není divu, že nemůže být <em>repozitářem pracovním</em> ve výše uvedeném smyslu.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            PS: A stejně jako všude jinde musíte mít práva, abyste do repozitáře mohli přispívat.\r\n        </div></div></div>\r\n\r\n    \r\n\r\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "V. Záložky („tags“)",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">V. Záložky („tags“)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Při práci na komplexnějším projektu se asi celkem brzo dostanete do stavu, že budete chtít nějaké místo vývoje (tedy určitý komit) označit vhodným jménem pro snadnější pozdější vyhledávání a použití – takové označení verze určené k distribuci zákazníkům se přímo nabízí.\r\n    </p>\r\n    <p>\r\n        Git pochopitelně obsahuje pro toto podporu, a to jak ve formě „rychlých poznámkových značek“ (<em>lightweight tags</em>) pro rychlé označení nějakého místa na stromu vývoje, tak „plnokrevných orazítkování“ nějakého komitu (<em>annotated tags</em>), které obsahují identifikaci tagujícího, datum a zprávu a mohou být dokonce i GPG-podepsané.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "„tag“ &amp; „show“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">„tag“ &amp; „show“</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Veškerou práci s <em>tag</em>ováním zastává příkaz <strong><code>git tag</code></strong> v nejrůznějších variantách:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong><code>git tag -a ZNAČKA -m \"TAGOVACÍ ZPRÁVA\"</code></strong> – kompletní „těžkotonážní“ značka pro aktuální <em>HEAD</em> určená k distribuci do světa;\r\n        </li>\r\n        <li>\r\n            <strong><code>git tag ZNAČKA</code></strong> – „pouze nálepka“ pro aktuální <em>HEAD</em>;\r\n        </li>\r\n        <li>\r\n            <strong><code>git tag ZNAČKA SHA-komitu</code></strong> – nálepka pro libobolný komit v historii;\r\n        </li>\r\n        <li>\r\n            <strong><code>git tag -d ZNAČKA</code></strong> – smazání příslušné značky;\r\n        </li>\r\n    </ul>\r\n\r\n    <p class=\"enumerate\">\r\n        Výpis značek v projektu zajišťuje příkaz <strong><code>git tag</code></strong> bez parametrů, informaci ke konkrétní značce (nebo k aktuálnímu <em>HEAD</em>u) pak podá příkaz <strong><code>git show</code></strong>:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong><code>git tag</code></strong> – výpis všech značek v projektu;\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Přepínač <code>-l</code> umožňuje vypisovat značky filtrované pomocí „divokých“ znaků.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            <strong><code>git show ZNAČKA</code></strong> – ukáže kompletní popis daného komitu včetně všech informací ze značky.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Bez identifikátoru značky obdržíte výpis k aktuálnímu <em>HEAD</em>u – kompletní popis komitu včetně rozdílů vůči rodiči. Má-li <em>HEAD</em> značku, budou tam pak informace i z ní.\r\n            </div></div>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "Příklad",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Příklad</h2></div><div class=\"section-body\">\r\n\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">\r\n# Aktuální stav projektu:\r\n$ git log --pretty=oneline\r\n47951fb298766582fd5dee781ca04054530c97cc (HEAD -&gt; master, origin/testing, testing) drobná změna\r\n56a8d5a0fdf3540fa1b2e0833e2d26519e9c5f41 (zaloha/master) druhy komit\r\n448c140687e6b44c691df2b34935644c719dffc2 (origin/master, origin/HEAD) prvni komit\r\n\r\n# Označmež poslední komit jako důležitou verzi 1.0:\r\n$ git tag -a v1.0 -m \"Projekt: verze 1.0 je připravena k vypuštění do světa.\"\r\n$ git log --pretty=oneline\r\n47951fb298766582fd5dee781ca04054530c97cc (HEAD -&gt; master, tag: v1.0, origin/testing, testing) drobná změna\r\n56a8d5a0fdf3540fa1b2e0833e2d26519e9c5f41 (zaloha/master) druhy komit\r\n448c140687e6b44c691df2b34935644c719dffc2 (origin/master, origin/HEAD) prvni komit\r\n\r\n# Áá, zapomněl jsem si cosi nepodstatného poznamenat v historii!\r\n$ git tag v0.1 448c14\r\n$ git log --pretty=oneline\r\n47951fb298766582fd5dee781ca04054530c97cc (HEAD -&gt; master, tag: v1.0, origin/testing, testing) drobná změna\r\n56a8d5a0fdf3540fa1b2e0833e2d26519e9c5f41 (zaloha/master) druhy komit\r\n448c140687e6b44c691df2b34935644c719dffc2 (tag: v0.1, origin/master, origin/HEAD) prvni komit\r\n\r\n# Výpis všech existujících značek v projektu:\r\n$ git tag\r\nv0.1\r\nv1.0\r\n\r\n# Aha, ono to vážně bylo úplně nepodstatné… Tak to zahodím:\r\n$ git tag -d v0.1\r\nDeleted tag 'v0.1' (was 448c140)\r\n(base) pirat@Hotaru:~/tmp/local\r\n$ git tag\r\nv1.0\r\n$ git log --pretty=oneline\r\n47951fb298766582fd5dee781ca04054530c97cc (HEAD -&gt; master, tag: v1.0, origin/testing, testing) drobná změna\r\n56a8d5a0fdf3540fa1b2e0833e2d26519e9c5f41 (zaloha/master) druhy komit\r\n448c140687e6b44c691df2b34935644c719dffc2 (origin/master, origin/HEAD) prvni komit\r\n    </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Spolupráce se zdroji pomocí „git push“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Spolupráce se zdroji pomocí „git push“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ve výchozím nastavení Git značky na jiné zdroje nepřenáší, ale při klonování nebo <em>pull</em>u je přinese.\r\n    </p>\r\n    <p>\r\n        Na vybraný zdroj je dostanete pomocí příkazu <strong><code>git push ZDROJ ZNAČKA</code></strong> nebo všechny najednou pomocí <strong><code>git push ZDROJ --tags</code></strong>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        A zdrojem bývá nejčastěji <em>origin</em>.\r\n    </div></div>\r\n    <p>\r\n        Ke smazání vybrané značky na zdroji pak slouží příkaz <strong><code>git push ZDROJ --delete ZNAČKA</code></strong>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Důležitá poznámka o „detached HEAD“",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Důležitá poznámka o „detached HEAD“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Stav projektu je sice možné <em>checkout</em>nout pomocí značky (nebo též příslušného SHA-heše), jenže se tím dostanete do stavu tzv. <strong><em>detached HEAD</em></strong>, tj. <strong><code>HEAD</code> bude místo na pojmenovanou větev</strong> (typicky na konec <em>master</em>u, pokud nejste v jiné vývojové větvi) <strong>ukazovat na nějaký historický komit</strong> (značka se ze svého místa pochopitelně nehne):\r\n    </p>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\n          HEAD\r\n           ↓\r\n        C1←C2←C3←C4←C5←C6 (master)\r\n           ↑\r\n          tag\r\n    </pre>\r\n    <p>\r\n        Což má ten efekt, že když na to zapomenete a provedete nějaké komity (zde C7 a C8)..\r\n    </p>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\n               HEAD\r\n                ↓\r\n           ↙←C7←C8\r\n           ↓\r\n        C1←C2←C3←C4←C5←C6 (master)\r\n           ↑\r\n          tag\r\n    </pre>\r\n    <p>\r\n        ..a následně se vrátíte zpátky na <em>master</em> (nebo jinou pojmenovanou větev)..\r\n    </p>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">\r\n           ↙←C7←C8    HEAD\r\n           ↓           ↓\r\n        C1←C2←C3←C4←C5←C6 (master)\r\n           ↑\r\n          tag\r\n    </pre>\r\n    <p>\r\n        ..tak ty zůstanou doslova a dopísmene viset v luftě – nebudou patřit k žádné pojmenované větvi stromu vývoje a dosažitelné budou pouze pomocí svého SHA-heše!\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        A to ještě jenom pokud ho dokážete najít a dokud ho <em>garbage collector</em> gitu někdy v budoucnu nezlikviduje.\r\n    </div></div>\r\n    <p>\r\n        Stane-li se vám tudíž, že budete potřebovat nějaké úpravy po značce (nebo klidně i prostě po nějakém jiném historickém komitu) provést, tak ji <em>checkout</em>něte rovnou do nějaké nové větve (<code>git checkout -b VĚTEV [ZNAČKA|KOMIT]</code>), abyste úpravy viděli v historii.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id28",
+      "idx": 27,
+      "title": "VI. „stash“ing",
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">28</span><h2 class=\"section-title\">VI. „stash“ing</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jinou typickou situací jest, že máte něco rozpracovaného a někdo vám do toho zavolá, ať například co nejdřív aplikujete nějakou úpravu na vedlejší větvi. Poslední, co v takovou chvíli chcete udělat, je cpát do repozitáře vaši nedodělanou práci jen proto, abyste o ni nepřišli. A přesně od toho je příkaz <strong><code>git stash</code></strong>.\r\n    </p>\r\n    <p>\r\n        <code>git stash</code> prostě vezme aktuální rozpracovaný stav vašeho repozitáře – to znamená všechny modifikované (resp. přidané či smazané) soubory včetně změn už zanesených do <em>indexu</em> – a odloží ho na zásobník. Repozitář se tím vrátí do (čistého) stavu posledního komitu a vy máte ruce volné k jiné práci.\r\n    </p>\r\n    <p>\r\n        Když dokončíte vedlejší práci, vrátíte se ideálně do předchozího čistého komitu (tedy i ve stejné větvi) a pomocí <code>git stash pop</code> si ze zásobníku přinesete zpátky rozpracovanou práci.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Horší je, pokud se pokusíte vrátit do repozitáře, který není „vyčištěn“ do původního stavu po příslušném <em>stash</em>i. Pak totiž git musí změny proti sobě „slít“ („zmerdžovat“) a pravděpodobnost výskytu konfliktu je veliká. No, jako u každého jiného běžného <code>git merge</code>…\r\n    </div></div>\r\n    <p>\r\n        PS: Takto si odložit můžete více různých rozpracovaných stavů repozitáře. Jejich přehled vám podá <code>git stash list</code> a vytáhnout jiný než poslední pak můžete pomocí <code>git stash apply [--index] ID</code>. Vrácený stav se tímto ze zásobníku nemaže, k tomu slouží příkaz <code>git stash drop ID</code>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id29",
+      "idx": 28,
+      "title": "VII. Submoduly",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">29</span><h2 class=\"section-title\">VII. Submoduly</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ještě jeden pojem z gitího světa, než se s touto úvodní přednáškou rozloučíme – <strong>submoduly</strong>. V podstatě jde o <strong>repozitáře uvnitř repozitářů</strong>, které jsou obsluhovány nezávisle na hlavním repozitáři.\r\n    </p>\r\n    <p>\r\n        Používají se především tam, kde váš projekt závisí na nějakých externích knihovnách, které si tím pádem k sobě naklonujete a držíte je v odpovídajícím stavu (svými úpravami a občasným promítnutím změn z originálu).\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Submodul má svoji vlastní historii (je to git-repozitář), ale z hlediska hlavního repozitáře se tváří v podstatě jako jeden velký komit. (Takže když apdejtnete submodul na novější verzi a pak nakomitujete hlavní repozitář, dostanou ostatní při získávání dat z vašeho repozitáře právě tuto novou verzi submodulu.)\r\n    </div></div>\r\n    <p>\r\n        Práci se submoduly má na starosti především příkaz <code>git submodule</code> (a přepínač <code>--submodule</code> u spousty dalších příkazů), ale zde ji nebume rozebírat, <a href=\"https://git-scm.com/book/en/v2/Git-Tools-Submodules\" class=\"external\">podívejte se například sem</a>. Jen si ještě zapamatujte, že submoduly s sebou přinesou do repozitáře i konfigurační soubor <em>.gitmodules</em> (který především mapuje adresáře submodulů na adresy jejich zdrojů).\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id30",
+      "idx": 29,
+      "title": "VIII. „Git Hooks“",
+      "tags": [
+        "Tricky",
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">30</span><h2 class=\"section-title\">VIII. „Git Hooks“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Git při obsluze repozitáře dokáže reagovat na některé akce (události) – jako například <em>push</em> nebo <em>commit</em> – a může před jejich vykonáním (případně po) provést další činnosti, v případě jejichž selhání nebude uvedená akce vůbec vykonána. Této funkcionalitě se říká <a href=\"https://githooks.com\" class=\"external\"><strong><em>git hooks</em></strong></a>. Mezi typická použití patří například:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            kontrola dodržování standardů psaní kódu a komitovacích zpráv před každým komitem;\r\n        </li>\r\n        <li>\r\n            odeslání imejlu se zprávou po každém komitu;\r\n        </li>\r\n        <li>\r\n            kontrola úspěšného běhu testů před každým <em>push</em>em;\r\n        </li>\r\n        <li>\r\n            …\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Uvedené akce se zapnout pouhou přítomností odpovídajícím způsobem (podle typu události) pojmenovaného (spustitelného) souboru v adresáři <em>.git/hooks</em>. Jelikož v uvedených souborech může být vlastně cokoliv (například i <a href=\"https://www.omerkatz.com/blog/2013/5/23/git-hooks-part-2-implementing-git-hooks-using-python\" class=\"external\">pythoní skripty</a>), jsou možnosti <em>hook</em>ů značné.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Možná ještě lepší je mít pro <em>hook</em>y vlastní adresář v rámci repozitáře a do cílového místa je pouze symlinkovat. Pak je máte jak verzované, tak je mohou snadno použít i všichni ostatní. (Viz: <a href=\"https://codeinthehole.com/tips/tips-for-using-a-git-pre-commit-hook/\" class=\"external\">Tips for using a git pre-commit hook</a>)\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id31",
+      "idx": 30,
+      "title": "A co dál?",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">31</span><h2 class=\"section-title\">A co dál?</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Dál už nezbývá než studovat dokumentaci <em>Git</em>u a sledovat debaty na internetu ^_^\" Ale přeci jen ještě pár drobných rad:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Hlavní větev (typicky <em>master</em>) by měla být co nejčistší, tzn. že všechny úpravy i změny se zkoušejí ve větvích vedlejších a teprve po jejich odladění se promítají do hlavní.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                V odůvodněných případech i zlinearizované pomocí <em>rebase</em> a podobně.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            Při spolupráci více lidí by měl být <em>master</em> už skoro svatý a o jeho údržbu by se měl starat dedikovaný člověk, který bude slévat <em>pull-request</em>y od jednotlivých vývojářů.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Kteří mohou mít třebas povoleno <em>push</em>ovat pouze do svých větví, ale nikoli <em>master</em>a.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            Projekt s centrálním záložním repozitářem má smysl hostovat na nějakém git-hostingu, protože dostupné nástroje jsou při spolupráci více lidí k nezaplacení.\r\n        </li>\r\n        <li>\r\n            Může-li váš kód něco rozbít (a to tedy může), měl by obsahovat testy. A pokud už obsahuje testy, takový <em>pre-push-hook</em> je opravdu dobrý nápad.\r\n        </li>\r\n        <li>\r\n            …\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    }
+  ]
+}

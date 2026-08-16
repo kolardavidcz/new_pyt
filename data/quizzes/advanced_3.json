@@ -1,0 +1,85 @@
+[
+  {
+    "id": "adv3_q1",
+    "type": "fill_blank_choice",
+    "question": "Doplňte dekorátor ________(func) ze modulu functools pro zachování jména a docstringu obalené funkce.",
+    "options": [
+      "@wraps",
+      "@keep",
+      "@bind",
+      "@copy"
+    ],
+    "answer": 0,
+    "explanation": "Dekorátor @functools.wraps(func) zkopíruje atributy původní funkce (např. __name__, __doc__, __annotations__) na obalující funkci (wrapper), čímž zamezí ztrátě identifikace dekorované funkce.",
+    "expected": "@wraps",
+    "code": "vysledek = ________"
+  },
+  {
+    "id": "adv3_q2",
+    "type": "predict_output",
+    "question": "Jaký bude výstup výpočtu kumulativní operace při použití functools.reduce s počáteční hodnotou 10?",
+    "options": [
+      "A) 2400 (vynásobením konečného součinu 240 ještě jednou hodnotou 10)",
+      "B) 240 (postupným násobením 10 * 2 * 3 * 4 s počáteční hodnotou 10)",
+      "C) 24 (postupným násobením prvků seznamu 2 * 3 * 4 bez započtení 10)",
+      "D) 10 (vrácením pouze počáteční hodnoty bez provedení násobení prvků)"
+    ],
+    "answer": 1,
+    "explanation": "Funkce reduce(lambda x, y: x * y, [2, 3, 4], 10) začíná s inicializační hodnotou 10: ((((10 * 2) * 3) * 4) = 240. Počáteční hodnota vstupuje do první operace na levé straně.",
+    "code": null
+  },
+  {
+    "id": "adv3_q3",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní practicalní rozdíl mezi dekorátory @functools.cache a @functools.lru_cache(maxsize=128)?",
+    "options": [
+      "A) @cache vyžaduje pouze nehešovatelné argumenty na rozdíl od @lru_cache.",
+      "B) @cache funguje výhradně na generátory, zatímco @lru_cache na funkce.",
+      "C) @cache nemá žádný limit velikosti a vynechává logiku odstraňování prvků.",
+      "D) @cache ukládá výsledky na disk, zatímco @lru_cache je uplatňuje v RAM."
+    ],
+    "answer": 2,
+    "explanation": "Zkratka @functools.cache zavedená v Pythonu 3.9 je ekvivalentem @lru_cache(maxsize=None). Je o něco rychlejší a paměťově úspornější než standardní LRU mezipaměť, protože nemusí sledovat a promazávat nejstarší nepoužité položky.",
+    "code": null
+  },
+  {
+    "id": "adv3_q4",
+    "type": "multiple_choice",
+    "question": "Kterou kombinaci magických metod je nutné ručně nadefinovat pro správné fungování dekorátoru @total_ordering?",
+    "options": [
+      "A) Výhradně metody __eq__ a __ne__, přičemž nerovnosti jsou automaticky nahrazeny.",
+      "B) Pouze metody __hash__ a __cmp__, z nichž dekorátor odvodí veškeré zbývající operátory.",
+      "C) Všechny čtyři porovnávací metody __lt__, __le__, __gt__ a __ge__ bez nutnosti definovat __eq__.",
+      "D) Metodu __eq__ a alespoň jednu z porovnávacích metod __lt__, __le__, __gt__ nebo __ge__."
+    ],
+    "answer": 3,
+    "explanation": "Třídní dekorátor @functools.total_ordering vyžaduje, aby třída definovala metodu __eq__() a alespoň jednu ze čtyř relačních metod (__lt__, __le__, __gt__, __ge__). Zbývající porovnávací metody dopopočítá automaticky.",
+    "code": null
+  },
+  {
+    "id": "adv3_q5",
+    "type": "multiple_choice",
+    "question": "Jaký bude výstup volání funkce vytvořené pomocí functools.partial s přednastaveným argumentem exponent=2?",
+    "options": [
+      "A) 25 (vypočte 5 ** 2 s využitím přednastaveného pojmenovaného argumentu exponent=2)",
+      "B) TypeError (protože partial neumožňuje fixovat pojmenované argumenty funkcí)",
+      "C) 10 (vypočte součin 5 * 2 namísto umocňování zadaného základu exponentem)",
+      "D) 32 (vypočte 2 ** 5 prohozením pořadí prvního a předaného argumentu zaklad)"
+    ],
+    "answer": 0,
+    "explanation": "Volání partial(mocnina, exponent=2)(5) zafixuje pojmenovaný argument exponent=2 a předaný argument 5 použije jako prvotní poziční argument zaklad. Vypočítá tedy 5 ** 2 = 25.",
+    "code": null
+  },
+  {
+    "id": "adv3_q6",
+    "type": "true_false_tricky",
+    "question": "Lze dekorátor @functools.lru_cache bezpečně použít pro kešování návratových hodnot asynchronních funkcí nebo generátorů?",
+    "options": [
+      "A) Ne; kešování generátorů či async funkcí nefunguje správně, protože vrací vyčerpané iterátory či coroutiny.",
+      "B) Ano; dekorátor automaticky obnovuje stav generátoru a znova spouští asynchronní coroutine při každém volání."
+    ],
+    "answer": 0,
+    "explanation": "Kešování generátorových nebo asynchronních funkcí pomocí lru_cache vrátí při druhém volání stejný vyčerpaný generátor nebo již vyhodnocený objekt coroutine, což vede k chybám. Kešovat má smysl pouze čisté funkce bez vedlejších efektů vracející datové hodnoty.",
+    "code": null
+  }
+]

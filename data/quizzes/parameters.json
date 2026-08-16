@@ -1,0 +1,116 @@
+[
+  {
+    "id": "q1",
+    "type": "predict_output",
+    "question": "Jaký datový typ mají proměnné args a kwargs uvnitř těla následující funkce?",
+    "options": [
+      "A) args je typu tuple (n-tice) a kwargs je typu dict (slovník).",
+      "B) args je typu list (seznam) a kwargs je typu dict (slovník).",
+      "C) args je typu tuple (n-tice) a kwargs je typu list (seznam).",
+      "D) args je typu list (seznam) a kwargs je typu set (množina)."
+    ],
+    "answer": 0,
+    "explanation": "Operátor * zabalí přebytečné poziční argumenty do n-tice (tuple), zatímco operátor ** zabalí přebytečné pojmenované argumenty do slovníku (dict).",
+    "code": "def f(*args, **kwargs):\n    print(type(args), type(kwargs))\n\nf(1, 2, a=3)"
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jaký výstup vytvoří volání následující funkce s variabilním počtem argumentů?",
+    "options": [
+      "A) Vypíše číslo 10, protože hodnota b=5 přepíše poslední prvek n-tice args a sečte pouze předané hodnoty.",
+      "B) Vypíše číslo 15, protože a=1, args=(2, 3, 4) a b je předáno jako povinný keyword-only argument b=5.",
+      "C) Vyvolá výjimku TypeError, protože argument b se pokusí odebrat hodnotu 4 z n-tice pozičních argumentů.",
+      "D) Vyvolá výjimku SyntaxError, protože parametr s hvězdičkou *args musí být až na úplném konci definice."
+    ],
+    "answer": 1,
+    "explanation": "Parametru a se přiřadí 1, n-tice *args zachytí zbývající poziční argumenty (2, 3, 4) a parametr b umístěný za *args vyžaduje volání jako pojmenovaný argument b=5. Součet 1 + 9 + 5 je 15.",
+    "code": "def f(a, *args, b):\n    return a + sum(args) + b\n\nprint(f(1, 2, 3, 4, b=5))"
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte oddělovač do hlavičky funkce pro kalibraci senzoru, aby parametr `tolerance` byl vyžadován výhradně jako pojmenovaný (keyword-only).",
+    "options": [
+      "**",
+      "*params",
+      "*",
+      "/"
+    ],
+    "answer": 2,
+    "explanation": "Samostatný znak `*` v signatuře funkce způsobuje, že všechny následující parametry (`tolerance`) se stávají tzv. keyword-only argumenty.",
+    "code": "def calibrate_sensor(offset, gain, ________, tolerance=0.01):\n    return (offset, gain, tolerance)\n\n# Volání: calibrate_sensor(0.5, 1.2, tolerance=0.005)",
+    "expected": "*"
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Doplňte oddělovač do signatury funkce, který vynutí předání parametrů `x` a `y` výhradně pozičně (positional-only).",
+    "options": [
+      "!",
+      "**",
+      "*",
+      "/"
+    ],
+    "answer": 3,
+    "explanation": "Znak `/` (představený v Pythonu 3.8) určuje konec pozičně-omezených parametrů; všechny parametry vlevo od něj nelze předat pojmenovaně.",
+    "code": "def compute_titration_curve(x, y, ________, method=\"linear\"):\n    return f\"{method}: {len(x)} points\"\n\n# x a y nelze předat jako compute_titration_curve(x=[...], y=[...])\nresult = compute_titration_curve([1, 2], [3, 4], method=\"spline\")",
+    "expected": "/"
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Jaký výstup vyprodukuje postupné dvojí zavolání funkce s výchozím proměnným argumentem?",
+    "options": [
+      "A) První volání vrátí [1] a druhé volání vrátí [1, 2], protože seznam target se vytvoří pouze jednou.",
+      "B) První volání vrátí [1] a druhé volání vrátí [2], protože seznam target se vytvoří při každém volání.",
+      "C) Obě volání vrátí hodnotu None, protože metoda append upravuje seznam na místě a nic nevrací.",
+      "D) První volání vrátí [1] a druhé volání vyvolá TypeError, protože seznam target nelze opakovaně měnit."
+    ],
+    "answer": 0,
+    "explanation": "Jelikož se výchozí hodnota target=[] vyhodnotí pouze jednou při definici funkce, všichni volající bez zadaného argumentu sdílejí stejný objekt seznamu v paměti. Metoda .append() ho mutuje, takže druhý dotaz obdrží kumulovaný seznam [1, 2].",
+    "code": "def append_to(element, target=[]):\n    target.append(element)\n    return target\n\nprint(append_to(1))\nprint(append_to(2))"
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaký výstup vytvoří následující kód demonstrující předávání proměnných objektů do funkce?",
+    "options": [
+      "A) Vypíše [1, 2], protože všechny argumenty se v Pythonu předávají výhradně hodnotou a lokální změny se neprojeví.",
+      "B) Vypíše [99, 2], protože zápis do prvku lst[0] změní původní objekt, zatímco přiřazení do lst jen předefinuje lokální jméno.",
+      "C) Vyvolá výjimku UnboundLocalError, protože proměnná lst je v těle funkce modifikována i znovu přiřazována.",
+      "D) Vypíše [100, 200], protože přiřazení nového seznamu do proměnné lst přepíše původní objekt data předaný odkazem."
+    ],
+    "answer": 1,
+    "explanation": "Zápis lst[0] = 99 modifikuje obsah původního objektu seznamu v paměti (data). Následující přiřazení lst = [100, 200] pouze přesměruje lokální nálepku lst na úplně nový objekt seznamu, čímž zruší odkaz na data, ale neovlivní již změněný vnější seznam.",
+    "code": "def modify(lst):\n    lst[0] = 99\n    lst = [100, 200]\n\ndata = [1, 2]\nmodify(data)\nprint(data)"
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Jaký je idiomatický způsob řešení výchozí hodnoty pro mutable parametr (např. seznam) v Pythonu?",
+    "options": [
+      "A) Využít dekorátor @classmethod pro automatické vytvoření nové instance seznamu při každém zavolání.",
+      "B) Použít jako výchozí hodnotu prázdnou n-tici () a v těle funkce ji předisponovat pomocí konverze na list(param).",
+      "C) Nastavit výchozí hodnotu na None a uvnitř těla funkce vytvořit nový seznam pomocí podmínky if param is None.",
+      "D) Nastavit výchozí hodnotu na copy.deepcopy([]) přímo v hlavičce definice parametrů dané funkce."
+    ],
+    "answer": 2,
+    "explanation": "Standardním návrhovým vzorem v Pythonu je použít param=None v hlavičce a uvnitř funkce provést if param is None: param = []. Tím se zaručí, že při každém volání bez argumentu vznikne zcela nový samostatný objekt.",
+    "code": null
+  },
+  {
+    "id": "q8",
+    "type": "multiple_choice",
+    "question": "Co se stane při spuštění následujícího kódu s pozičně-omezeným parametrem?",
+    "options": [
+      "A) Vypíše číslo 5, pokud je zadaný parametr y pozičně a x pojmenovaně v libovolném pořadí argumentů.",
+      "B) Vypíše číslo 5, protože lomítko / je pouze orientační záložka a předávání jmen argumentů neomezuje.",
+      "C) Vyvolá SyntaxError, protože lomítko / v definici parametrů není platným syntaktickým prvkem Pythonu.",
+      "D) Vyvolá TypeError, protože parametr x se nachází před lomítkem / a nesmí být předán jako pojmenovaný."
+    ],
+    "answer": 3,
+    "explanation": "Znak / označuje, že všechny před ním uvedené parametry (zde x) jsou positional-only. Pokus o jejich předání pomocí jména x=2 skončí s TypeError: calc() got some positional-only arguments passed as keyword arguments: 'x'.",
+    "code": "def calc(x, /, y):\n    return x + y\n\nprint(calc(x=2, y=3))"
+  }
+]

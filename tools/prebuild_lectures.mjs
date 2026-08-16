@@ -2,6 +2,7 @@
 /**
  * Build-Time Static Slide Pre-Rendering ("Static Shell + Dynamic Dojo")
  * Pre-parses HTML lecture files into optimized JSON slide trees during build time.
+ * Writes to both data/ and public/data/ to guarantee instant resolution in both local dev server and Vercel.
  */
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
@@ -9,29 +10,65 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..");
+const DATA_DIR = join(ROOT, "data");
 const PUB_DIR = join(ROOT, "public");
-const LECTURES_OUT_DIR = join(PUB_DIR, "data", "lectures");
-const QUIZZES_OUT_DIR = join(PUB_DIR, "data", "quizzes");
 
-mkdirSync(LECTURES_OUT_DIR, { recursive: true });
-mkdirSync(QUIZZES_OUT_DIR, { recursive: true });
+const LECTURES_OUT_DIRS = [join(DATA_DIR, "lectures"), join(PUB_DIR, "data", "lectures")];
+const QUIZZES_OUT_DIRS = [join(DATA_DIR, "quizzes"), join(PUB_DIR, "data", "quizzes")];
+
+for (const d of [...LECTURES_OUT_DIRS, ...QUIZZES_OUT_DIRS]) {
+  mkdirSync(d, { recursive: true });
+}
 
 console.log("⚡ Pre-building Quiz Chunks and Static Lectures...");
 
-// 1. SPLIT QUIZZES.JSON INTO PER-DECK JSON CHUNKS
+// 1. SPLIT QUIZZES.JSON INTO PER-DECK AND PER-WEEK JSON CHUNKS
 const quizFile = join(ROOT, "data", "quizzes.json");
+const courseFile = join(ROOT, "data", "course.json");
+
 if (existsSync(quizFile)) {
   try {
     const rawQuizzes = JSON.parse(readFileSync(quizFile, "utf-8"));
     let count = 0;
+    
+    // Per-deck chunks
     for (const [deckKey, questions] of Object.entries(rawQuizzes)) {
       if (deckKey && Array.isArray(questions)) {
-        const outPath = join(QUIZZES_OUT_DIR, `${deckKey}.json`);
-        writeFileSync(outPath, JSON.stringify(questions, null, 2), "utf-8");
+        const payload = JSON.stringify(questions, null, 2);
+        for (const outDir of QUIZZES_OUT_DIRS) {
+          writeFileSync(join(outDir, `${deckKey}.json`), payload, "utf-8");
+        }
         count++;
       }
     }
-    console.log(`  ✓ Split quizzes.json into ${count} per-deck static quiz chunks in public/data/quizzes/`);
+    console.log(`  ✓ Split quizzes.json into ${count} per-deck static quiz chunks in data/quizzes/ and public/data/quizzes/`);
+
+    // Per-week chunks (fallback compatibility)
+    if (existsSync(courseFile)) {
+      const course = JSON.parse(readFileSync(courseFile, "utf-8"));
+      const weekDecks = {};
+      
+      for (const w of course.weeks || []) {
+        const wNum = w.week;
+        const wKey = `w${wNum}`;
+        weekDecks[wKey] = {};
+        
+        for (const lec of w.lectures || []) {
+          const dKey = lec.quiz_deck || lec.slug;
+          if (dKey && rawQuizzes[dKey]) {
+            weekDecks[wKey][dKey] = rawQuizzes[dKey];
+          }
+        }
+      }
+      
+      for (const [wKey, decks] of Object.entries(weekDecks)) {
+        const payload = JSON.stringify(decks, null, 2);
+        for (const outDir of QUIZZES_OUT_DIRS) {
+          writeFileSync(join(outDir, `${wKey}.json`), payload, "utf-8");
+        }
+      }
+      console.log(`  ✓ Generated per-week fallback quiz bundles (w0..w13, w99)`);
+    }
   } catch (err) {
     console.error("  ❌ Error splitting quizzes:", err);
   }
@@ -142,13 +179,15 @@ for (const [relPath, filePath] of fileMap.entries()) {
     if (slides.length > 0) {
       const payload = JSON.stringify({ slug: pathSlug, total: slides.length, slides }, null, 2);
       
-      // Primary: write pathSlug-based JSON (e.g. materialy--python--sorting--overview.json)
-      writeFileSync(join(LECTURES_OUT_DIR, `${pathSlug}.json`), payload, "utf-8");
-      
-      // Secondary: also write baseName if it's not a known duplicate/collision
-      const collisions = ["overview", "basics", "fp", "coroutines", "decorators", "example-1", "magic", "pnm", "procvicovani.2", "_comprehensions"];
-      if (!collisions.includes(baseName)) {
-        writeFileSync(join(LECTURES_OUT_DIR, `${baseName}.json`), payload, "utf-8");
+      // Write to both data/lectures and public/data/lectures
+      for (const outDir of LECTURES_OUT_DIRS) {
+        writeFileSync(join(outDir, `${pathSlug}.json`), payload, "utf-8");
+        
+        // Also write baseName if it's not a known duplicate collision
+        const collisions = ["overview", "basics", "fp", "coroutines", "decorators", "example-1", "example-2", "magic", "pnm", "procvicovani.2", "_comprehensions"];
+        if (!collisions.includes(baseName)) {
+          writeFileSync(join(outDir, `${baseName}.json`), payload, "utf-8");
+        }
       }
 
       prebuiltCount++;
@@ -156,4 +195,4 @@ for (const [relPath, filePath] of fileMap.entries()) {
   } catch { /* ignore */ }
 }
 
-console.log(`  ✓ Pre-rendered ${prebuiltCount} static lecture slide trees into public/data/lectures/`);
+console.log(`  ✓ Pre-rendered ${prebuiltCount} static lecture slide trees into data/lectures/ and public/data/lectures/`);

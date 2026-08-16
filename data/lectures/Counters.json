@@ -1,0 +1,87 @@
+{
+  "slug": "materialy--python--types.plus--Counters",
+  "total": 9,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Třída <strong><code>collections.Counter</code></strong> slouží ke snadnému počítání výskytů hešovatelných objektů:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; from collections import Counter\r\n&gt;&gt;&gt; Counter('abrakadabra')\r\n        Counter({'a': 5, 'r': 2, 'b': 2, 'k': 1, 'd': 1})\r\n</pre>\r\n    <p>\r\n        Principielně jde o slovník, jehož hodnotami by měla být celá čísla. Tento požadavek není při zavedení vynucován, ale nebudete-li se ho držet, můžete se asi dočkat překvapivých výsledků.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Zavedení",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Zavedení</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zcela v duchu pythoní filozofie můžete <em>Counter</em> zavést mnoha rozdílnými způsoby:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # prázdný Counter\r\n&gt;&gt;&gt; Counter()\r\n        Counter()\r\n        \r\n        # z iterovatelného typu (zde řetězce)\r\n&gt;&gt;&gt; Counter('gallahad')\r\n        Counter({'a': 3, 'l': 2, 'g': 1, 'h': 1, 'd': 1})\r\n        \r\n        # ze slovníku\r\n&gt;&gt;&gt; Counter({'red': 4, 'blue': 2})\r\n        Counter({'red': 4, 'blue': 2})\r\n        \r\n        # z pojmenovaných argumentů\r\n&gt;&gt;&gt; Counter(cats=4, dogs=8)\r\n        Counter({'dogs': 8, 'cats': 4})\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Upraveno podle dokumentace.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "„elements()“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">„elements()“</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Metoda <strong><code>elements()</code></strong> vrací iterátor přes každý klíč <em>Counter</em>u, a to tolikrát, kolik činí jeho odpovídající hodnota:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc = Counter('abrakadabra')\r\n&gt;&gt;&gt; xc\r\n        Counter({'a': 5, 'r': 2, 'b': 2, 'k': 1, 'd': 1})\r\n&gt;&gt;&gt; list(xc.elements())\r\n        ['k', 'a', 'a', 'a', 'a', 'a', 'd', 'r', 'r', 'b', 'b']\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pořadí vrácených klíčů je pochopitelně „náhodně“ slovníkové. Pokud už nejste na nějaké novější verzi Python'u (3.7+ s jistotou), kde je pořadí nepřekvapivě podle vstupu:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc\r\n            Counter({'a': 5, 'b': 2, 'r': 2, 'k': 1, 'd': 1})\r\n&gt;&gt;&gt; list( xc.elements() )\r\n            ['a', 'a', 'a', 'a', 'a', 'b', 'b', 'r', 'r', 'k', 'd']\r\n        </pre>\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Klíče s nulovým nebo záporným počtem jsou přitom ignorovány:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc = Counter(a=4, b=2, c=0, d=-2)\r\n&gt;&gt;&gt; list(xc.elements())\r\n        ['a', 'a', 'a', 'a', 'b', 'b']\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Zatímco vynechání klíče s nulovým počtem je jasné, ignorace klíčů se záporným počtem (byť není na první pohled jasné, co by se s nimi mělo dělat) je prostě nadefinované chování.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "„most_common([n])“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„most_common([n])“</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Metoda <strong><code>most_common([n])</code></strong> vrací uspořádaný seznam <em>n</em> dvojic klíčů a jim odpovídajících počtů <em>Counter</em>u s největším počtem (tedy hodnotou klíče):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc = Counter('abrakadabra')\r\n&gt;&gt;&gt; xc.most_common(3)\r\n        [('a', 5), ('r', 2), ('b', 2)]\r\n&gt;&gt;&gt; xc.most_common(2)\r\n        [('a', 5), ('r', 2)]\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pro klíče se stejným počtem je pochopitelně vrácené pořadí slovníkově „náhodné“ a výsledek tak nemusí být vždy to, co by člověk čekal (jak je ostatně vidět v příkladu).\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Bez udání počtu je vrácen celý <em>Counter</em>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc = Counter('abrakadabra')\r\n&gt;&gt;&gt; xc.most_common()\r\n        [('a', 5), ('r', 2), ('b', 2), ('k', 1), ('d', 1)]\r\n</pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Skládání počtů – metodami",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Skládání počtů – metodami</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Dvě metody slouží ke složení počtu prvků dvou <em>Counter</em>ů, resp. <em>Counter</em>u a iterovatelného typu (který je možno použít pro jeho zavedení):\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            metoda <strong><code>substract(ITERABLE)</code></strong> příslušné počty odčítá:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc = Counter('abrakadabra')\r\n&gt;&gt;&gt; xc\r\n                Counter({'a': 5, 'r': 2, 'b': 2, 'k': 1, 'd': 1})\r\n&gt;&gt;&gt; xc.subtract('ananas')\r\n&gt;&gt;&gt; xc\r\n                Counter({'a': 2, 'b': 2, 'r': 2, 'd': 1, 'k': 1, 's': -1, 'n': -2})\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            metoda <strong><code>update(ITERABLE)</code></strong> příslušné počty sčítá:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc = Counter('abrakadabra')\r\n&gt;&gt;&gt; xc\r\n                Counter({'a': 5, 'r': 2, 'b': 2, 'k': 1, 'd': 1})\r\n&gt;&gt;&gt; xc.update('ananas')\r\n&gt;&gt;&gt; xc\r\n                Counter({'a': 8, 'b': 2, 'n': 2, 'r': 2, 'd': 1, 's': 1, 'k': 1})\r\n            </pre>\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        V podstatě se chovají trochu jako metoda slovníků <em>dict().update()</em>, která ovšem hodnoty u stejných klíčů nahrazuje těmi novými.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Skládání počtů – operátorově",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Skládání počtů – operátorově</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Podobně jako u množin máme u <em>Counter</em>ů k dispozici i několik operátorových operací. Jejich specifikem je, že <strong>ignorují klíče se zápornými a nulovými počty</strong>. Předvedeme si je na následujících dvou objektech:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        c1 = Counter(a=2, b=1, c=0, d=-2)\r\n        c2 = Counter(a=3, b=2, c=1, d=-1)\r\n    </pre>\r\n    <ul>\r\n        <li>\r\n            Zatímco na <strong>sčítání</strong> není s uvedenou poznámkou nic překvapivého..\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; c1 + c2\r\n                Counter({'a': 5, 'b': 3, 'c': 1})\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            ..<strong>odčítání</strong> už vypadá na první pohled trošku záhadně:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; c1 - c2\r\n                Counter()\r\n&gt;&gt;&gt; c2 - c1\r\n                Counter({'c': 1, 'a': 1, 'd': 1, 'b': 1})\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            Celé to ovšem funguje díky podpoře <strong>unárních operací</strong> <code>+</code> a <code>-</code>:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; -c1\r\n                Counter({'d': 2})\r\n&gt;&gt;&gt; +c1\r\n                Counter({'a': 2, 'b': 1})\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            Operátorový <strong>průnik <code>&amp;</code></strong> vrací symbolicky <em>min(c1[x], c2[x])</em>:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; c1 &amp; c2\r\n                Counter({'a': 2, 'b': 1})\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            Operátorové <strong>sjednocení <code>|</code></strong> vrací symbolicky <em>max(c1[x], c2[x])</em>:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; c1 | c2\r\n                Counter({'a': 3, 'b': 2, 'c': 1})\r\n            </pre>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Souvislost (a rozdíly) se slovníkem",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Souvislost (a rozdíly) se slovníkem</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kromě uvedených vlastních metod a operací sdílejí <em>Counter</em>y všechny ostatní metody se slovníky, byť občas se některé chovají trošku jinak (jak jsme ostatně už viděli na předchozím slajdu u metody <em>update()</em>):\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            metoda <strong><code>fromkeys()</code></strong> je sice na <em>Counter</em>ech přítomna, není však implementována;\r\n        </li>\r\n        <li>\r\n            dotaz na neexistující prvek neskončí s výjimkou <em>KeyError</em> jako u slovníků, ale zcela logicky vrátí nulu:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc = Counter('abrakadabra')\r\n&gt;&gt;&gt; xc['a']\r\n                5\r\n&gt;&gt;&gt; xc['c']\r\n                0\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            kopie <em>Counter</em>u <em>yd = xc.copy()</em> není překvapivě mělká:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc = Counter('abrakadabra')\r\n&gt;&gt;&gt; xc\r\n                Counter({'a': 5, 'r': 2, 'b': 2, 'k': 1, 'd': 1})\r\n&gt;&gt;&gt; yc = xc.copy()\r\n&gt;&gt;&gt; yc\r\n                Counter({'a': 5, 'r': 2, 'b': 2, 'd': 1, 'k': 1})\r\n&gt;&gt;&gt; del xc['d']\r\n&gt;&gt;&gt; xc\r\n                Counter({'a': 5, 'r': 2, 'b': 2, 'k': 1})\r\n&gt;&gt;&gt; yc\r\n                Counter({'a': 5, 'r': 2, 'b': 2, 'd': 1, 'k': 1})\r\n            </pre>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Klasické slovníkové metody (přehled)",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Klasické slovníkové metody (přehled)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Všechny ostatní metody a způsoby procházení po prvcích jsou pak už stejné jako u <a href=\"/materialy/python/types/dictionaries.xml\">klasických slovníků</a>. Především jde tedy o:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            klasické vlastnosti mapovacích a sekvenčních typů – <em>len(xc)</em>, <em>key in xc</em>, <em>for-in</em> cyklus;\r\n        </li>\r\n        <li>\r\n            přístup k prvkům pomocí pohledů přes klíče (<em>xc</em>, <em>xc.keys()</em>), hodnoty (<em>xc.values()</em>) a dvojce klíč-hodnota (<em>xc.items()</em>);\r\n        </li>\r\n        <li>\r\n            dotazy na prvky – <em>x = get(KLÍČ[, výchozí_hodnota])</em>, <em>x = setdefault(KLÍČ[, výchozí_hodnota])</em>;\r\n        </li>\r\n        <li>\r\n            přidávání prvků – <em>xc[KLÍČ]=HODNOTA</em>;\r\n        </li>\r\n        <li>\r\n            odstraňování prvků – <em>del xc[KLÍČ]</em>, <em>x = xc.pop(KLÍČ[, VýchozíHodnota])</em>, <em>x = xc.popitem()</em>, <em>xc.clear()</em>.\r\n        </li>\r\n    </ul>\r\n    \r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Příklady",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Příklady</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Několik typických operací (přímo podle dokumentace):\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Součet všech počtů:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc = Counter('abrakadabra')\r\n&gt;&gt;&gt; xc\r\n        Counter({'a': 5, 'r': 2, 'b': 2, 'k': 1, 'd': 1})\r\n&gt;&gt;&gt; sum(xc.values())\r\n        11\r\n&gt;&gt;&gt; len('abrakadabra')\r\n        11\r\n</pre>\r\n    \r\n    <p class=\"enumerate\">\r\n        <em>n</em> nejmenších počtů:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc = Counter('abrakadabra')\r\n&gt;&gt;&gt; xc\r\n        Counter({'a': 5, 'r': 2, 'b': 2, 'k': 1, 'd': 1})\r\n&gt;&gt;&gt; xc.most_common()[:-4:-1]\r\n        [('d', 1), ('k', 1), ('b', 2)]\r\n&gt;&gt;&gt; xc.most_common()[:-3:-1]\r\n        [('d', 1), ('k', 1)]\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Předpis tedy zní: <code>xc.most_common()[:-n-1:-1]</code>\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Odstranění klíčů s nulovým a záporným počtem:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xc = Counter(a=2, b=1, c=0, d=-2)\r\n&gt;&gt;&gt; xc\r\n        Counter({'a': 2, 'b': 1, 'c': 0, 'd': -2})\r\n&gt;&gt;&gt; +xc\r\n        Counter({'a': 2, 'b': 1})\r\n</pre>\r\n\r\n</div>"
+    }
+  ]
+}

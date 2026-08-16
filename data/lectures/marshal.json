@@ -1,0 +1,69 @@
+{
+  "slug": "materialy--python--serialization--marshal",
+  "total": 7,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Prakticky jedinou úlohou modulu <strong>marshal</strong> je převod bajtkódu do/z předkompilovaných <em>pyc</em>-souborů.\r\n  </p>\r\n  <p>\r\n    Z těchto důvodů není jeho formát úmyslně ani nijak oficiálně dokumentovaný, aby někdo neměl tendenci používat ho místo modulů <a href=\"/materialy/python/serialization/pickle.xml\">pickle</a>, respektive <a href=\"/materialy/python/serialization/shelve.xml\">shelve</a>.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Metody modulu „marshal“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Metody modulu „marshal“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Modul <code>marshal</code> umí maršalovat a odmaršalovávat pomocí dvou skupin metod:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        metody pro převod mezi pythonovskou strukturou a jí odpovídajícím zamaršalovaným řetězcem:\r\n        <ul>\r\n            <li>\r\n                <code>mo = marshal.dumps(o)</code> – zamaršaluje hodnotu <em>o</em> do bajtového řetězce <em>mo</em>\r\n            </li>\r\n            <li>\r\n                <code>o = marshal.loads(mo)</code> – převede binární zamaršalovaný řetězec na jemu odpovídající pythonovskou hodnotu <em>o</em>\r\n            </li>\r\n        </ul>\r\n        <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Všimněte si koncového <em>s</em> u metod pro práci s binárními řetězci.\r\n        </div></div>\r\n    </li>\r\n    <li>\r\n        metody pro čtení/zápis z/do proudu:\r\n        <ul>\r\n            <li>\r\n                <code>marshal.dump(o, file)</code> – zamaršaluje hodnotu <em>o</em> do binárního souboru <em>file</em>\r\n            </li>\r\n            <li>\r\n                <code>o = marshal.load(file)</code> – převede zamaršalovaný objekt z binárního souboru <em>file</em> na jemu odpovídající pythonovskou hodnotu <em>o</em>\r\n            </li>\r\n        </ul>\r\n    </li>\r\n  </ul>\r\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <em>file</em> je objekt typu <em>stream</em>, tj. <em>file = open('soubor', 'rwb')</em>, nikoli cesta k souboru.\r\n    </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <em>dump</em>-metody mají nepovinný parametr <em>version</em> (verze maršalovacího protokolu), ale ten vám v podstatě může být ukradený.\r\n    </div></div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Co lze zamaršalovat",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Co lze zamaršalovat</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Zamaršalovat jde především:\r\n    </p>\r\n    <ul>\r\n        <li>objekt bajtkódu (který můžete získat např. pomocí funkce <a href=\"/materialy/python/bytecode/compile.xml?slajd=2\">compile()</a>)</li>\r\n    </ul>\r\n    \r\n    <p class=\"enumerate\">\r\n        Ale stejně tak se dají zamaršalovat i následující typy:\r\n    </p>\r\n    <ul>\r\n        <li>jednoduché typy – <em>bool</em>, <em>int</em>, <em>float</em>, <em>complex</em>, <em>str</em>, <em>bytes</em>, <em>bytearray</em></li>\r\n        <li>složené typy – <em>tuple</em>, <em>list</em>, <em>set</em>, <em>frozenset</em>, <em>dict</em> (ale pouze tehdy, pokud obsahují podporované typy)</li>\r\n        <li><em>sigletony</em> – <em>None</em>, <em>Ellipsis</em>, <em>StopIteration</em></li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pokus o zamaršalování rekurzivního seznamu, množiny nebo slovníku způsobí nekonečnou smyčku.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Příklad – bajtkódobjekt",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Příklad – bajtkódobjekt</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co = compile(\"xs = (1, 2, 3)\", \"\", \"exec\")\r\n&gt;&gt;&gt; co\r\n&lt;code object &lt;module&gt; at 0x00AD3C50, file \"\", line 1&gt;\r\n\r\n&gt;&gt;&gt; mo = marshal.dumps(co)\r\n&gt;&gt;&gt; mo\r\nb'c\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x03\\x00\\x00\\x00@\r\n      \\x00\\x00\\x00s\\n\\x00\\x00\\x00d\\x04\\x00Z\\x00\\x00d\\x03\\x00S(\\x05\\x00\\x00\r\n      \\x00i\\x01\\x00\\x00\\x00i\\x02\\x00\\x00\\x00i\\x03\\x00\\x00\\x00N(\\x03\\x00\\x00\r\n      \\x00i\\x01\\x00\\x00\\x00i\\x02\\x00\\x00\\x00i\\x03\\x00\\x00\\x00(\\x01\\x00\\x00\r\n      \\x00u\\x02\\x00\\x00\\x00xs(\\x00\\x00\\x00\\x00(\\x00\\x00\\x00\\x00(\\x00\\x00\\x00\r\n      \\x00u\\x00\\x00\\x00\\x00u\\x08\\x00\\x00\\x00&lt;module&gt;\\x01\\x00\\x00\\x00s\\x00\r\n      \\x00\\x00\\x00'\r\n\r\n&gt;&gt;&gt; o = marshal.loads(mo)\r\n&lt;code object &lt;module&gt; at 0x00C32070, file \"\", line 1&gt;\r\n\r\n&gt;&gt;&gt; import dis\r\n&gt;&gt;&gt; dis.dis(o)\r\n  1           0 LOAD_CONST               4 ((1, 2, 3)) \r\n              3 STORE_NAME               0 (xs) \r\n              6 LOAD_CONST               3 (None) \r\n              9 RETURN_VALUE         \r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Příklad – data",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Příklad – data</h2></div><div class=\"section-body\">\r\n\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = (1, 2, 3)\r\n\r\n&gt;&gt;&gt; mo = marshal.dumps(xs)\r\n&gt;&gt;&gt; mo\r\n   b'(\\x03\\x00\\x00\\x00i\\x01\\x00\\x00\\x00i\\x02\\x00\\x00\\x00i\\x03\\x00\\x00\\x00'\r\n\r\n&gt;&gt;&gt; marshal.loads(mo)\r\n   (1, 2, 3)\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Verze protokolu",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Verze protokolu</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Toho času (Python 3.2) je maršalovací protokol již ve své třetí verzi:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        formát <strong>0</strong> – historický formát\r\n    </li>\r\n    <li>\r\n        formát <strong>1</strong> – internované řetězce jsou sdílené \r\n    </li>\r\n    <li>\r\n        formát <strong>2</strong> – používá binární formát pro zachycení reálných čísel\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    Verzi formátu můžete zjistit dotazem na <code>marshal.version</code>.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Poznámky",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Poznámky</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Maršalovací formát není nijak zabezpečen proti nebezpečným datům =&gt;\r\n    <h1 class=\"security\">Nikdy neodmaršalovávejte cizí data!</h1>\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    A vůbec – modul <em>marshal</em> je skutečně určen jen a pouze pro práci se soubory <em>*.pyc</em>, takže ho radši vážně nezkoušejte nasadit někde jinde.\r\n  </p>\r\n\r\n</div>"
+    }
+  ]
+}

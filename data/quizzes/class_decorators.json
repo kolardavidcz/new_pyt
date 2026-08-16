@@ -1,0 +1,71 @@
+[
+  {
+    "id": "q_decor_1",
+    "type": "multiple_choice",
+    "question": "Kdy přesně dochází k vyhodnocení a aplikaci dekorátoru třídy?",
+    "options": [
+      "A) Při prvním vytvoření instance dané třídy během běhu aplikace.",
+      "B) Při zavolání jakékoliv metody vytvořené instance dané třídy.",
+      "C) Okamžitě po vyhodnocení těla třídy při definici (v čase importu).",
+      "D) Až po ukončení vykonávání bloku if __name__ == '__main__':."
+    ],
+    "answer": 2,
+    "explanation": "Dekorátor třídy se vykoná ihned po zpracování definice třídy interpretem. Výraz `@dec class A: pass` je ekvivalentní zápisu `A = dec(A)`. Aplikace dekorátoru je posledním krokem vytváření objektu třídy a nečeká na tvorbu konkrétních instancí.",
+    "code": null
+  },
+  {
+    "id": "q_decor_2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte dekorátor ze standardní knihovny pro automatické dopočítání porovnávacích metod:",
+    "options": [
+      "order_derivation",
+      "auto_comparisons",
+      "rich_comparisons",
+      "total_ordering"
+    ],
+    "answer": 3,
+    "explanation": "Dekorátor `@functools.total_ordering` vezme třídu, která definuje metodu `__eq__` a jednu z porovnávacích metod (`__lt__`, `__le__`, `__gt__`, `__ge__`), a zbývající porovnávací operátory dopočítá a doplní jako atributy objektu třídy.",
+    "expected": "total_ordering",
+    "code": "from functools import ________\n\n@total_ordering\nclass Bod:\n    def __eq__(self, other): return self.x == other.x\n    def __lt__(self, other): return self.x < other.x"
+  },
+  {
+    "id": "q_decor_3",
+    "type": "multiple_choice",
+    "question": "Jaký požadavek musí třída splňovat, aby na ni šel úspěšně aplikovat dekorátor `@functools.total_ordering`?",
+    "options": [
+      "A) Musí definovat metodu __eq__ a současně alespoň jednu z metod __lt__, __le__, __gt__ nebo __ge__.",
+      "B) Musí definovat metody __hash__ a __eq__ a současně implementovat rozhraní pro řazení v C/Java.",
+      "C) Musí definovat všechny čtyři nerovnostní metody a současně alespoň jednu z metod __eq__ nebo __ne__.",
+      "D) Musí dědit z abstrakce functools.Comparable a současně přetížit rozhraní magické metody __cmp__."
+    ],
+    "answer": 0,
+    "explanation": "Dekorátor `@total_ordering` vyžaduje definici rovnosti (`__eq__`) a alespoň jednoho základního vztahu uspořádání (např. `__lt__`). Ze znalosti rovnosti a jedné relace dokáže matematicky doplňkově generovat zbývající operátory (jako `__gt__` nebo `__ge__`).",
+    "code": null
+  },
+  {
+    "id": "q_decor_4",
+    "type": "true_false_tricky",
+    "question": "Pravda nebo Nepravda: V Pythonu jsou funkce i běžné objekty tříd reprezentovány jako objekty, přičemž volatelnost určuje přítomnost magické metody `__call__`.",
+    "options": [
+      "A) Pravda – Vše v Pythonu je objekt a přidáním metody __call__ do libovolné třídy se její instance stanou callable stejným způsobem jako funkce.",
+      "B) Nepravda – Funkce jsou speciální nízkoúrovňové datové typy interpretu CPython a třídy s metodou __call__ nelze volat syntaxí s kulatými závorkami."
+    ],
+    "answer": 0,
+    "explanation": "Funkce v Pythonu jsou objekty (mají atribut `__call__`). Libovolná třída, jejíž instance implementuje metodu `__call__`, se stává volatelným objektem (callable) a lze ji pak syntakticky používat jako funkci.",
+    "code": null
+  },
+  {
+    "id": "q_decor_5",
+    "type": "multiple_choice",
+    "question": "Jaký bude výstup tohoto kódu při porovnání objektů dekorované třídy pomocí operátoru `>`?",
+    "options": [
+      "A) Vrátí objekt typu NotImplemented, protože porovnávání dvou instancí vyžaduje definici metody __cmp__.",
+      "B) Vrátí hodnotu False, protože @total_ordering automaticky odvodil metodu __gt__ z __eq__ a __lt__.",
+      "C) Vrátí hodnotu True, protože dekorátor @total_ordering při spuštění automaticky obrací pořadí operandů.",
+      "D) Způsobí chybovou výjimku TypeError, protože operátor > nebyl ve třídě explicitně nadefinován."
+    ],
+    "answer": 1,
+    "explanation": "Třída definuje `__eq__` a `__lt__`. Dekorátor `@total_ordering` automaticky doplní `__gt__`. Výraz `p1 > p2` porovná ceny (10 > 20), což vyhodnotí jako `False`. Bez použití `@total_ordering` by kód vyvolal `TypeError`.",
+    "code": "from functools import total_ordering\n\n@total_ordering\nclass Polozka:\n    def __init__(self, cena):\n        self.cena = cena\n    def __eq__(self, jiná):\n        return self.cena == jiná.cena\n    def __lt__(self, jiná):\n        return self.cena < jiná.cena\n\np1 = Polozka(10)\np2 = Polozka(20)\nprint(p1 > p2)"
+  }
+]

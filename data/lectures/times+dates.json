@@ -1,0 +1,141 @@
+{
+  "slug": "materialy--python--modules--times+dates",
+  "total": 12,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Práce s časem a datumem je v Python'u roztroušena na několika místech, především asi podle svého primárního použití. Část metod tak vypadá duplikovaně a některé věci najdete nejspíše tam, kde byste je nehledali.\r\n    </p>\r\n    <p>\r\n        Tato přednáška se nebude ani náhodou pokoušet o ucelený přehled dostupné funkcionality (které je opravdu mnoho), ale zato se pokusí vypíchnout některé důležité koncepty a pár užitečných nástrojů<sup>*</sup>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <sup>*</sup> Tím je pochopitelně míněno především to, co jsem někdy potřeboval, a když už jsem to zjistil, tak by byla škoda to nezapsat ^_~\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Prerekvizity",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Prerekvizity</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        K chování časových operací je třeba mít alespoň povšechné povědomí o několika základních konceptech týkajících se měření času a určování data v počítačovém světě:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Svět počítačový určuje čas podle počtu sekund uběhlých od tzv. <strong>počátku epochy</strong>, kterým je deklarativně začátek – tedy půlnoc – 1. ledna 1970 gregoriánského kalendáře (a zjevně to byl čtvrtek).\r\n        </li>\r\n        <li>\r\n            Nicméně tento <em>epochový čas</em> si většinou nehraje na dorovnávání nepřesností se skutečností pomocí tzv. <strong>přestupných sekund</strong>, takže se za prvé rozjíždí (protože den skutečně nemá právě 86 400 sekund; v dohledné době pro lidi ne až tak moc viditelný efekt) a za druhé některé systémy <em>přestupné sekundy</em> započítávají.\r\n        </li>\r\n        <li>\r\n            Spousta systémů – především z historické doby – ukládá počet sekund jako 32-bitové celé číslo. Což znamená že 19. ledna 2038 (UTC, plus mínus nějaká ta přestupná sekunda ;-) přetečou.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        K těmto obecným ještě pár konkrétnějších poznámek:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Jelikož sekundová přesnost je pro spoustu aplikací naprosto nedostačující, začalo se časem přecházet na <strong>přesnost nanosekundovou</strong>. Nicméně ne všechny systémy a programovací jazyky jí vyhradily dostatečně přesnou datovou reprezentaci, takže občas sem tam nějaká ta třebas mikrosekunda uletí…\r\n        </li>\r\n        <li>\r\n            Každý jistě z vlastní zkušenosti zná zábavu zvanou <strong>letní čas</strong>, případně též související <strong>časové pásmo</strong>. Jak řešit kupříkladu ukládání logovacích souborů při náhlé změně času o hodinu libovolným směrem nebo zda za uživatele „inteligentně“ předvídat, v jakémže konkrétním čase ta která událost tedy vlastně nastala, rozhodně není žádný med…\r\n        </li>\r\n    </ul>\r\n    <p>\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Naivní a informované časové údaje",
+      "tags": [
+        "Core",
+        "Tricky"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Naivní a informované časové údaje</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Při práci s časem je (kromě požadované přesnosti) zdaleka nejdůležitější vědět:\r\n    </p>\r\n    <blockquote>\r\n        Zda používaná operace bere v potaz časová pásma a letní čas nebo nikoli.\r\n    </blockquote>\r\n    <p>\r\n        A toto skutečně nepodceňujte! Kupříkladu všude citovaná funkce <em>time.mktime()</em> vracející počet sekund od začátku epochy (jako reálné číslo) je za prvé závislá na platformě a za druhé provádí automatický přepočet podle lokálního času (respektive toho, co si daný systém myslí, že je lokální čas, což může být ještě horší).\r\n    </p>\r\n    <p>\r\n        Python sice pochopitelně obsahuje základní informace o časových pásmech a letním čase (v podobě třídy <em>timezone</em>), ale z pochopitelných důvodů nejsou příliš obsáhlé (především nejdou moc mimo epochu a jsou často závislé na konkrétní platformě). <strong>Pro jakoukoliv trochu serióznější práci s časovými pásmy a posuny proto použijte externí modul</strong> <a href=\"http://pytz.sourceforge.net\" class=\"external\"><strong>pytz</strong></a> (<em>World Timezone Definitions for Python</em>).\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Naivní a informované časové údaje – „tzinfo“",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Naivní a informované časové údaje – „tzinfo“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Uvedený požadavek na zařazení časových objektů do dvou skupin podle jejich přístupu k (absolutní) interpretaci časového údaje je realizován existencí tzv. <strong>naivních</strong> a <strong>informovaných</strong> časových údajů:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong>informované</strong> (<em>aware</em>) <strong>časové údaje</strong> mají dostatečnou znalost lokálně (a globálně) aplikovaných pravidel pro přesné umístění události v čase (a to samozřejmě včetně časových zón, letního času a podobných vymyšleností) a tím pádem i relativně vůči ostatním informovaným časovým údajům;\r\n        </li>\r\n        <li>\r\n            <strong>naivní</strong> (<em>naive</em>) <strong>časové údaje</strong> postrádají (dostatečnou) znalost pro své umístění v čase (tedy především relativně vůči ostatním časovým objektům).\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Zjednodušeně by se dalo říci, že <em>naivní objekty</em> jsou prostě číslo, jehož interpretace je zcela v rukách programátora, zatímco <em>informované objekty</em> představují naprosto jasný údaj o čase, o kterém se nedá diskutovat.\r\n    </p>\r\n    <p>\r\n        Prakticky se tyto objekty dají rozeznat podle hodnoty svého atributu <strong><em>tzinfo</em></strong> – naivní v něm obsahují hodnotu <code>None</code>, zatímco informované referenci na konkrétní instanci abstraktní třídy <em>tzinfo</em> (kterážto je v Python'u tedy pouze jedna – <em>timezone</em> – a pro všechny ostatní se podívejte na již zmiňovaný <a href=\"http://pytz.sourceforge.net\" class=\"external\"><strong>pytz</strong></a>).\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Formát zápisu data a času",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Formát zápisu data a času</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kromě počtu (nano)sekund od počátku epochy se často čas předává pomocí datové struktury <em>struct_time</em>, která drží kompletní informaci o datu včetně dne v týdnu, v roce a (případné) aplikaci letního posunu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # UTC-čas\r\n&gt;&gt;&gt; time.gmtime()\r\n        time.struct_time(\r\n            tm_year=2018, tm_mon=6, tm_mday=7, tm_hour=12, tm_min=53, tm_sec=53,\r\n            tm_wday=3, tm_yday=158, tm_isdst=0\r\n        )\r\n\r\n        # lokální čas\r\n&gt;&gt;&gt; time.localtime()\r\n        time.struct_time(\r\n            tm_year=2018, tm_mon=6, tm_mday=7, tm_hour=14, tm_min=54, tm_sec=27,\r\n            tm_wday=3, tm_yday=158, tm_isdst=1\r\n        )\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Zalámáno pro lepší čitelnost.\r\n    </div></div>\r\n    <p>\r\n        Některé metody vrací datum/čas právě v této podobě, jiné ho zase jsou schopné v této podobě přijímat.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Parsování data z/do řetězce",
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Parsování data z/do řetězce</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Častou operací je převod data a času z nějakého řetězcového zápisu do počítačové reprezentace a zpět. Python na pro uvedenou funkcionalitu volá (platformně závislou) céčkovskou knihovní funkci <em>strftime()</em>. Příklad:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; from datetime import datetime\r\n\r\n        # z řetězce na objekt\r\n&gt;&gt;&gt; datetime.strptime(\"20180427_171439\", '%Y%m%d_%H%M%S')\r\n        datetime.datetime(2018, 4, 27, 17, 14, 39)\r\n\r\n        # z objektu na řetězec\r\n&gt;&gt;&gt; t = datetime.strptime(\"20180427_171439\", '%Y%m%d_%H%M%S')\r\n&gt;&gt;&gt; t.strftime('%c')    # lokálně závislý plný výpis\r\n        'Fri Apr 27 17:14:39 2018'\r\n&gt;&gt;&gt; t.strftime('%d. %B %Y, %H:%M:%S, %A, %j. den roku') # vlastní výpis\r\n        '27. April 2018, 17:14:39, Friday, 117. den roku'\r\n\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: „Poloviční“ objekty pouze pro datum <em>date</em> nebo pouze pro čas <em>time</em> pochopitelně nadbytečné údaje nepotřebují a pokud je přesto zadáte, nemusí to vždy dopadnout podle vašich představ.\r\n    </div></div>\r\n    <p>\r\n        Jelikož formátovacích příznaků je opravdu hodně (a to i jenom těch platformně nezávislých), odkazuji pro ně na <a href=\"https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior\" class=\"external\">oficiální dokumentaci</a>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "„replace()“ &amp; „fold“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">„replace()“ &amp; „fold“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Velmi užitečná metoda <em>replace()</em> zamění na vstupním časovém objektu pouze ty části, které dostane jako své parametry:\r\n    </p>\r\n    <blockquote>\r\n        datetime.replace(year=self.year, month=self.month, day=self.day, hour=self.hour, minute=self.minute, second=self.second, microsecond=self.microsecond, tzinfo=self.tzinfo, *, fold=0)\r\n    </blockquote>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Parametr <em>fold</em> slouží (od verze Python'u 3.6) k rozlišení pořadí časových okamžiků, které kvůli skokové změně času (např. přechod na letní čas) ukazují zdánlivě na stejnou hodnotu (0 obdrží ten dřívější, 1 ten pozdější).\r\n    </div></div>\r\n    <p>\r\n        Několik příkladů:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; from datetime import datetime, timezone\r\n&gt;&gt;&gt; dt = datetime.strptime(\"20180427_171439\", '%Y%m%d_%H%M%S')\r\n&gt;&gt;&gt; dt\r\n        datetime.datetime(2018, 4, 27, 17, 14, 39)\r\n\r\n        # naivní časový objekt\r\n&gt;&gt;&gt; dt.replace(year=2017)\r\n        datetime.datetime(2017, 4, 27, 17, 14, 39)\r\n\r\n        # informovaný časový objekt\r\n&gt;&gt;&gt; dt.replace(tzinfo=timezone.utc)\r\n        datetime.datetime(2018, 4, 27, 17, 14, 39, tzinfo=datetime.timezone.utc)\r\n</pre>\r\n    <p>\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Převod z data na sekundy",
+      "tags": [
+        "Core",
+        "Tricky"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Převod z data na sekundy</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Od Python'u 3.3 je asi nejsnadnějším způsobem, jak získat počet sekund od začátku epochy k danému časovému okamžiku, metoda <strong><em>datetime.datetime.timestamp()</em></strong>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; from datetime import datetime\r\n&gt;&gt;&gt; datetime.timestamp( datetime.now() )\r\n        1529340048.165769\r\n</pre>\r\n    <p>\r\n        Nicméně i zde je schovaný zádrhel:\r\n    </p>\r\n    <blockquote>\r\n        Pokud je použitý <em>datetime</em> objekt <strong>naivní</strong>, je předpokládán čas zadaný jako lokální a ke konverzi je použita platformní céčkovská funkce <em>mktime()</em>, zatímco pokud je objekt <strong>informovaný</strong>, je výsledná hodnota spočítána jako <code>dt.replace(tzinfo=timezone.utc).timestamp()</code> .\r\n    </blockquote>\r\n    <p>\r\n        Kromě toho, že podle povahy vstupního časového objektu můžete dostat různé výsledky, má také céčkovská funkce <em>mktime()</em> menší rozsah platnosti než odpovídající pythoní objekt, takže někdy můžete při zcela nevinném dotazu obdržet výjimku <em>OverflowError</em>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Převod ze sekund na datum",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Převod ze sekund na datum</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nepřekvapivě k předchozímu převodu existuje inverzní metoda <strong><em>datetime.fromtimestamp(timestamp, tz=None)</em></strong> provádějící opačnou konverzi\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; from datetime import datetime, timezone\r\n\r\n&gt;&gt;&gt; dt = datetime.timestamp( datetime.now() )\r\n&gt;&gt;&gt; dt\r\n        1529409724.25855\r\n&gt;&gt;&gt; datetime.fromtimestamp(dt)\r\n        datetime.datetime(2018, 6, 19, 14, 2, 4, 258550)\r\n</pre>\r\n    <p>\r\n        A nepřekvapivě poznámky k ní jsou úplně stejné jako k předchozí, tzn. že bez udání časové zóny <em>tzinfo</em> se předpokládá lokální čas a vrácený časový objekt je naivní.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "„time.gmtime()“ a „calendar.timegm()“",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">„time.gmtime()“ a „calendar.timegm()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Inverzní funkce k funkci <strong><em>time.gmtime([SEKUNDY])</em></strong> se trochu překvapivě schovává v modulu <em>calendar</em> – <strong><em>calendar.timegm([ČasováNtice])</em></strong>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; import time\r\n&gt;&gt;&gt; import calendar\r\n\r\n&gt;&gt;&gt; dt = time.gmtime(0)\r\n&gt;&gt;&gt; dt\r\n        time.struct_time(\r\n            tm_year=1970, tm_mon=1, tm_mday=1, tm_hour=0, tm_min=0, tm_sec=0,\r\n            tm_wday=3, tm_yday=1, tm_isdst=0\r\n        )\r\n\r\n&gt;&gt;&gt; calendar.timegm(dt)\r\n        0\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Zalámáno pro lepší čitelnost.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "„os.utime()“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">„os.utime()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Tato funkce slouží k nastavení času modifikace a posledního přístupu k zadané cestě<sup>*</sup>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <sup>*</sup> Dejte si pozor, že <em>cesta</em> může podle platformy znamenat různé věci! Kupříkladu na Windows mezi podporované cesty nepatří adresáře (protože nejsou implementovány jako soubory).\r\n    </div></div>\r\n    <p>\r\n        K základnímu použití patří tři následující způsoby volání:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong><code>utime(CESTA)</code></strong> – nastaví čas přístupu a modifikace na aktuální;\r\n        </li>\r\n        <li>\r\n            <strong><code>utime(CESTA, times=(atime, mtime))</code></strong> – nastaví parametry souboru podle sekund od začátku epochy (v pořadí poslední přístup – poslední modifikace);\r\n        </li>\r\n        <li>\r\n            <strong><code>utime(CESTA, ns=(atime_ns, mtime_ns))</code></strong> – totéž jako předchozí, ale s přesností na nasekundy.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Sekundy a nanosekundy nelze míchat. Jinak se naštěstí metoda chová očekávatelně – co do ní pošlete, to zapíše.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Odkazy",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Odkazy</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož problematika času je neuvěřitelně rozsáhlá, místo závěru odkazy do oficiální dokumentace, až budete (a že budete!) potřebovat více:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            modul <a href=\"https://docs.python.org/3/library/datetime.html\" class=\"external\"><em>datetime</em></a> (podmoduly <em>datetime</em> plus <em>date</em> a <em>time</em>, <em>tzinfo</em> a <em>timezone</em>, <em>timedelta</em>)\r\n        </li>\r\n        <li>\r\n            modul <a href=\"https://docs.python.org/3/library/time.html\" class=\"external\"><em>time</em></a>\r\n        </li>\r\n        <li>\r\n            modul <a href=\"https://docs.python.org/3/library/calendar.html\" class=\"external\"><em>calendar</em></a>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    }
+  ]
+}
