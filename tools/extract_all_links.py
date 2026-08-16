@@ -20,7 +20,7 @@ for w in course["weeks"]:
             "id": l["id"]
         }
 
-print(f"Loaded {len(valid_lecture_paths)} lectures from course.json")
+print(f"  ✓ Loaded {len(valid_lecture_paths)} lectures from course.json")
 
 all_extracted_links = []
 
@@ -42,9 +42,9 @@ for html_file in root.rglob("*.html"):
                 "raw_href": href
             })
     except Exception as e:
-        print(f"Error reading {html_file}: {e}")
+        print(f"    ❌ Error reading {html_file}: {e}")
 
-print(f"Total extracted links across all presentations: {len(all_extracted_links)}")
+print(f"  ✓ Total extracted links across all presentations: {len(all_extracted_links)}")
 
 # Save to scratch/all_presentation_links.json
 out_file = Path("scratch/all_presentation_links.json")
@@ -52,4 +52,4 @@ out_file.parent.mkdir(exist_ok=True)
 with open(out_file, "w", encoding="utf-8") as f:
     json.dump(all_extracted_links, f, indent=2, ensure_ascii=False)
 
-print(f"Saved link audit dataset to {out_file}")
+print(f"  ✓ Saved link audit dataset to {out_file}")

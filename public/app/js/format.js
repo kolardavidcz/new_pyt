@@ -21,27 +21,42 @@ function escapeHtml(s) {
 export function formatInlineCode(str) {
   if (!str) return "";
 
-  const formatSnippet = (s) => {
-    let res = s.replace(/`([^`]+)`/g, (_, codeStr) => {
-      const highlighted = highlightCode(codeStr, "python");
-      return `<code class="inline-code">${highlighted}</code>`;
-    });
+  // Split by backticks: even indices are text, odd indices are code snippets
+  const parts = String(str).split(/`([^`]+)`/g);
+  const out = [];
 
-    const parts = res.split(/(<[^>]+>)/g);
-    for (let i = 0; i < parts.length; i++) {
-      if (!parts[i].startsWith("<")) {
-        parts[i] = parts[i].replace(DYNAMIC_PY_FUNC_REGEX, '<code class="inline-code"><span class="tok-builtin">$1</span>()</code>');
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 1) {
+      // Code snippet: highlight raw code directly (single clean escape in highlighter)
+      const rawCode = parts[i];
+      const highlighted = highlightCode(rawCode, "python");
+      out.push(`<code class="inline-code">${highlighted}</code>`);
+    } else {
+      // Text fragment: escape HTML safely for text nodes (preserve existing HTML tags if any)
+      const textFrag = parts[i];
+      if (!textFrag) continue;
+
+      const HTML_TAG_REGEX = /(<\/?(?:span|code|pre|div|input|button|label|strong|em|small|details|summary|b|i|a|p|ul|li|ol)[^>]*>)/gi;
+      if (HTML_TAG_REGEX.test(textFrag)) {
+        const subParts = textFrag.split(HTML_TAG_REGEX);
+        for (let j = 0; j < subParts.length; j++) {
+          if (!HTML_TAG_REGEX.test(subParts[j])) {
+            const escaped = escapeHtml(subParts[j]);
+            const withBuiltins = escaped.replace(DYNAMIC_PY_FUNC_REGEX, '<code class="inline-code"><span class="tok-builtin">$1</span>()</code>');
+            out.push(withBuiltins);
+          } else {
+            out.push(subParts[j]);
+          }
+        }
+      } else {
+        const escaped = escapeHtml(textFrag);
+        const withBuiltins = escaped.replace(DYNAMIC_PY_FUNC_REGEX, '<code class="inline-code"><span class="tok-builtin">$1</span>()</code>');
+        out.push(withBuiltins);
       }
     }
-    return parts.join("");
-  };
-
-  if (str.includes("<") && str.includes(">")) {
-    return formatSnippet(str);
   }
 
-  const safe = escapeHtml(str);
-  return formatSnippet(safe);
+  return out.join("");
 }
 
 export function isFlexibleCodeFillCorrect(userVal, expectedVal, options = [], answerIdx = null) {

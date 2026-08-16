@@ -146,16 +146,16 @@ for item in all_links:
         failures.append({"source": item["source_file"], "raw": item["raw_href"], "reason": reason})
 
 print("\n========================================================")
-print("AUTOMATED ALL-LINK IN-APP VERIFICATION SUITE")
+print("  # AUTOMATED ALL-LINK IN-APP VERIFICATION SUITE")
 print("========================================================")
-print(f"Total links verified: {len(all_links)}")
-print(f"PASSED: {passed} / {len(all_links)} (100.0%)")
-print(f"FAILED: {len(failures)}")
+print(f"  Total links verified: {len(all_links)}")
+print(f"  PASSED: {passed} / {len(all_links)} (100.0%)")
+print(f"  FAILED: {len(failures)}")
 
 if failures:
-    print("\nFailures:")
+    print("\n  # Failures:")
     for f in failures:
-        print(f"  [{f['source']}] raw: {f['raw']} -> {f['reason']}")
+        print(f"    [{f['source']}] raw: {f['raw']} -> {f['reason']}")
 
 assert len(failures) == 0, f"Link verification suite failed with {len(failures)} failures!"
-print("\n✅ ALL LINKS PASSED VERIFICATION SUITE CLEANLY WITH ZERO FAILURES!")
+print("\n  ✅ ALL LINKS PASSED VERIFICATION SUITE CLEANLY WITH ZERO FAILURES!\n")
