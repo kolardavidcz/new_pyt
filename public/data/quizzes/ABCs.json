@@ -2,15 +2,16 @@
   {
     "id": "q1",
     "type": "multiple_choice",
-    "question": "V jakém okamžiku vyvolá Python výjimku TypeError, pokud podtřída neodvozená od ABC neobsahuje implementaci abstraktní metody rodiče?\n\n```python\nfrom abc import ABCMeta, abstractmethod\n\nclass Base(metaclass=ABCMeta):\n    @abstractmethod\n    def compute(self):\n        pass\n\nclass Sub(Base):\n    pass\n```",
+    "question": "V jakém okamžiku vyvolá Python výjimku TypeError, pokud podtřída neodvozená od ABC neobsahuje implementaci abstraktní metody rodiče?",
     "options": [
-      "A) Již při samotné definici třídy class Sub(Base):, kdy interpret prochází a překládá kód tridy.",
-      "B) Až při pokusu o přímé zavolání chybějící metody s.compute(), podobně jako u výjimky NotImplementedError.",
-      "C) K žádné výjimce nedojde, protože podtřída automaticky podědí prázdnou implementaci metody compute od Base.",
+      "A) K žádné výjimce nedojde, protože podtřída automaticky podědí prázdnou implementaci metody compute od Base.",
+      "B) Již při samotné definici třídy class Sub(Base):, kdy interpret prochází a překládá kód tridy.",
+      "C) Až při pokusu o přímé zavolání chybějící metody s.compute(), podobně jako u výjimky NotImplementedError.",
       "D) Při pokusu o vytvoření instance s = Sub(), kde Python ověří kompletnost abstraktních metod v rozhraní."
     ],
     "answer": 3,
-    "explanation": "Použití ABCMeta a @abstractmethod způsobí, že kontrola rozhraní proběhne již u instanciace třídy Sub(). Pokus o vytvoření instance vyvolá TypeError: Can't instantiate abstract class Sub with abstract method compute."
+    "explanation": "Použití ABCMeta a @abstractmethod způsobí, že kontrola rozhraní proběhne již u instanciace třídy Sub(). Pokus o vytvoření instance vyvolá TypeError: Can't instantiate abstract class Sub with abstract method compute.",
+    "code": "from abc import ABCMeta, abstractmethod\n\nclass Base(metaclass=ABCMeta):\n    @abstractmethod\n    def compute(self):\n        pass\n\nclass Sub(Base):\n    pass"
   },
   {
     "id": "q2",
@@ -32,13 +33,14 @@
     "type": "multiple_choice",
     "question": "Jaké je správné pořadí vrstvení dekorátorů při definici abstraktní třídní metody (@classmethod)?",
     "options": [
-      "A) Pořadí obou dekorátorů je libovolné, protože dekorátor @abstractmethod automaticky detekuje okolní metody.",
+      "A) @abstractmethod musí být jako vnější dekorátor a @classmethod jako vnitřní dekorátor přímo nad def.",
       "B) @classmethod musí být jako vnější dekorátor a @abstractmethod jako vnitřní dekorátor přímo nad def.",
-      "C) @abstractmethod musí být jako vnější dekorátor a @classmethod jako vnitřní dekorátor přímo nad def.",
+      "C) Pořadí obou dekorátorů je libovolné, protože dekorátor @abstractmethod automaticky detekuje okolní metody.",
       "D) Dekorační funkce @classmethod a @abstractmethod nelze u jedné metody v Pythonu vůbec kombinoat."
     ],
     "answer": 1,
-    "explanation": "Podle dokumentace Pythonu musí být @abstractmethod aplikován jako poslední (tzn. nejblíže k samotné funkci u příkazu def), zatímco @classmethod (nebo @staticmethod či @property) balí až takto označenou abstraktní metodu."
+    "explanation": "Podle dokumentace Pythonu musí být @abstractmethod aplikován jako poslední (tzn. nejblíže k samotné funkci u příkazu def), zatímco @classmethod (nebo @staticmethod či @property) balí až takto označenou abstraktní metodu.",
+    "code": null
   },
   {
     "id": "q4",
@@ -49,7 +51,8 @@
       "B) Tvrzení je nepravdivé; metoda register() ovlivní pouze kontrolu přes isinstance a issubclass, ale nezajišťuje žádnou dědičnost kódových metod."
     ],
     "answer": 1,
-    "explanation": "Funkce register() slouží pouze k registraci virtuálních podtříd. Ovlivňuje introspekci (isinstance(CustomClass(), ABC) bude True), ale neodvodí třídu v MRO a nepředá žádné metody z ABC do CustomClass."
+    "explanation": "Funkce register() slouží pouze k registraci virtuálních podtříd. Ovlivňuje introspekci (isinstance(CustomClass(), ABC) bude True), ale neodvodí třídu v MRO a nepředá žádné metody z ABC do CustomClass.",
+    "code": null
   },
   {
     "id": "q5",
@@ -62,6 +65,7 @@
       "D) Umožňuje spouštět neimplementované metody bez vyvolání jakékoliv výjimky s výchozí návratovou hodnotou None."
     ],
     "answer": 2,
-    "explanation": "Použití raise NotImplementedError() v těle metody selže až ve chvíli, kdy kód v produkci danou metodu zavolá. Použití ABCMeta zabrání samotné instanciaci objektu, čímž chybu neúplného rozhraní odhalí ihned."
+    "explanation": "Použití raise NotImplementedError() v těle metody selže až ve chvíli, kdy kód v produkci danou metodu zavolá. Použití ABCMeta zabrání samotné instanciaci objektu, čímž chybu neúplného rozhraní odhalí ihned.",
+    "code": null
   }
 ]

@@ -65,6 +65,9 @@ export function isFlexibleCodeFillCorrect(userVal, expectedVal, options = [], an
   const normalizeToken = (str) => {
     if (!str) return "";
     str = String(str).trim();
+    if (str.includes("#")) {
+      str = str.split("#")[0].trim();
+    }
     str = str.replace(/^[`'"]+|[`'"]+$/g, "");
     str = str.replace(/^[A-D]\)\s*/i, "");
     str = str.replace(/^[a-zA-Z_]\w*\s*=\s*/, "");

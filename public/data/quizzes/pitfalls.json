@@ -2,20 +2,21 @@
   {
     "id": "q1",
     "type": "multiple_choice",
-    "question": "Co vypíše následující kód při druhém volání funkce pridat(2)?\n\ndef pridat(val, prpkn=[]):\n    prpkn.append(val)\n    return prpkn\n\npridat(1)\nres = pridat(2)\nprint(res)",
+    "question": "Co vypíše následující kód při druhém volání funkce pridat(2)?",
     "options": [
-      "A) Výjimku UnboundLocalError, protože proměnná prpkn nebyla označena jako global.",
+      "A) Seznam [2], protože při každém volání bez argumentu se alokuje nový seznam   .",
       "B) N-tici (1, 2), protože výchozí argumenty se v paměti mění na imutabilní typ  .",
-      "C) Seznam [2], protože při každém volání bez argumentu se alokuje nový seznam   .",
+      "C) Výjimku UnboundLocalError, protože proměnná prpkn nebyla označena jako global.",
       "D) Seznam [1, 2], protože výchozí objekt [] se vytvoří jen při definici funkce  ."
     ],
     "answer": 3,
-    "explanation": "Výchozí hodnoty parametrů funkcí jsou v Pythonu vyhodnoceny pouze jednou při definici (překladu) funkce. Pokud je výchozí hodnotou mutabilní objekt (např. seznam []), všechna volání využívající výchozí parametr sdílejí přesně jednu a tu samou instanci v paměti."
+    "explanation": "Výchozí hodnoty parametrů funkcí jsou v Pythonu vyhodnoceny pouze jednou při definici (překladu) funkce. Pokud je výchozí hodnotou mutabilní objekt (např. seznam []), všechna volání využívající výchozí parametr sdílejí přesně jednu a tu samou instanci v paměti.",
+    "code": "def pridat(val, prpkn=[]):\n    prpkn.append(val)\n    return prpkn\n\npridat(1)\nres = pridat(2)\nprint(res)"
   },
   {
     "id": "q2",
     "type": "multiple_choice",
-    "question": "Co vypíše příkaz print(d['b']) po úpravě prvku s klíčem 'a'?\n\nd = dict.fromkeys(['a', 'b'], [])\nd['a'].append(1)\nprint(d['b'])",
+    "question": "Co vypíše příkaz print(d['b']) po úpravě prvku s klíčem 'a'?\n\nd = dict.fromkeys(['a', 'b'], [])\nd['a'].append(1)\nprint(d['b']):",
     "options": [
       "A) Seznam [1], protože všechny klíče sdílejí v paměti odkaz na stejný seznam       .",
       "B) Výjimku KeyError, protože klíč 'b' nebyl ve vytvořeném slovníku inicializován   .",
@@ -23,59 +24,64 @@
       "D) Seznam [], protože nově vytvořené klíče dostanou samostatné instance seznamů    ."
     ],
     "answer": 0,
-    "explanation": "Metoda dict.fromkeys(keys, default) předává výchozí hodnotu odkazem. Pokud předáte mutabilní objekt jako [], všechny klíče ve slovníku budou odkazovat na identickou instanci v paměti (id(d['a']) == id(d['b'])), takže změna pod jedním klíčem se projeví u všech ostatních."
+    "explanation": "Metoda dict.fromkeys(keys, default) předává výchozí hodnotu odkazem. Pokud předáte mutabilní objekt jako [], všechny klíče ve slovníku budou odkazovat na identickou instanci v paměti (id(d['a']) == id(d['b'])), takže změna pod jedním klíčem se projeví u všech ostatních.",
+    "code": null
   },
   {
     "id": "q3",
     "type": "multiple_choice",
-    "question": "Jaký bude obsah proměnné t po proběhnutí bloku try-except?\n\nt = ([1],)\ntry:\n    t[0] += [2]\nexcept TypeError:\n    pass\nprint(t)",
+    "question": "Jaký bude obsah proměnné t po proběhnutí bloku try-except?\n\nt = ([1],)\ntry:\n    t[0] += [2]\nexcept TypeError:\n    pass\nprint(t):",
     "options": [
-      "A) Hodnotu None, protože selhání zapsání do n-tice vymaže celý datový objekt .",
+      "A) N-tici ([1], [2]), protože nepřihlášený prvek se vloží až na konec n-tice .",
       "B) N-tici ([1, 2],), protože operátor += upraví seznam v n-tici před výjimkou.",
       "C) N-tici ([1],), protože vyvolaná výjimka TypeError ob obnoví původní n-tici.",
-      "D) N-tici ([1], [2]), protože nepřihlášený prvek se vloží až na konec n-tice ."
+      "D) Hodnotu None, protože selhání zapsání do n-tice vymaže celý datový objekt ."
     ],
     "answer": 1,
-    "explanation": "Příkaz t[0] += [2] provede dvě věci: 1) Zavolá in-place rozšíření t[0].__iadd__([2]), což seznam úspěšně upraví na [1, 2]. 2) Pokusí se uložit výsledek zpět do t[0], což selže s TypeError, protože n-tice nepodporuje přiřazení prvku. Seznam uvnitř n-tice však již upraven zůstane."
+    "explanation": "Příkaz t[0] += [2] provede dvě věci: 1) Zavolá in-place rozšíření t[0].__iadd__([2]), což seznam úspěšně upraví na [1, 2]. 2) Pokusí se uložit výsledek zpět do t[0], což selže s TypeError, protože n-tice nepodporuje přiřazení prvku. Seznam uvnitř n-tice však již upraven zůstane.",
+    "code": null
   },
   {
     "id": "q4",
     "type": "multiple_choice",
-    "question": "Jak reaguje interpret Pythonu při zavolání funkce zmen()?\n\nval = 10\ndef zmen():\n    print(val)\n    val = 20\n\nzmen()",
+    "question": "Jak reaguje interpret Pythonu při zavolání funkce zmen()?\n\nval = 10\ndef zmen():\n    print(val)\n    val = 20\n\nzmen():",
     "options": [
-      "A) Vypíše 10 a lokální proměnná val zastíní globální až na řádku za příkazem print.",
-      "B) Vypíše 10 a následně globální hodnotu val v paměti okamžitě přepíše na číslo 20.",
+      "A) Vypíše 10 a následně globální hodnotu val v paměti okamžitě přepíše na číslo 20.",
+      "B) Vypíše 20, protože interpret Pythonu provede interní optimalizaci pořadí kódu  .",
       "C) Vyvolá UnboundLocalError, protože přiřazení val=20 z ní dělá lokální proměnnou .",
-      "D) Vypíše 20, protože interpret Pythonu provede interní optimalizaci pořadí kódu  ."
+      "D) Vypíše 10 a lokální proměnná val zastíní globální až na řádku za příkazem print."
     ],
     "answer": 2,
-    "explanation": "Při analýze těla funkce Python v době překladu zjistí, že se do val v těle přiřazuje (val = 20), a označí val za lokální proměnnou pro celou funkci. Při spuštění pak řádek print(val) selže s UnboundLocalError, protože přistupuje k lokální proměnné dříve, než do ní byla uložena hodnota."
+    "explanation": "Při analýze těla funkce Python v době překladu zjistí, že se do val v těle přiřazuje (val = 20), a označí val za lokální proměnnou pro celou funkci. Při spuštění pak řádek print(val) selže s UnboundLocalError, protože přistupuje k lokální proměnné dříve, než do ní byla uložena hodnota.",
+    "code": null
   },
   {
     "id": "q5",
     "type": "multiple_choice",
-    "question": "Co vypíše výraz print([f() for f in funcs])?\n\nfuncs = [lambda: i for i in range(3)]\nprint([f() for f in funcs])",
+    "question": "Co vypíše výraz print([f() for f in funcs])?\n\nfuncs = [lambda: i for i in range(3)]\nprint([f() for f in funcs]):",
     "options": [
-      "A) Výjimku NameError, protože proměnná i po dokončení generování z paměti zmizí  .",
-      "B) Seznam [0, 1, 2], protože proměnná i se při vytváření těla lambdy ihned sváže .",
-      "C) Seznam [0, 0, 0], protože počáteční hodnota cyklu i=0 zůstane zachována v těle.",
+      "A) Seznam [0, 0, 0], protože počáteční hodnota cyklu i=0 zůstane zachována v těle.",
+      "B) Výjimku NameError, protože proměnná i po dokončení generování z paměti zmizí  .",
+      "C) Seznam [0, 1, 2], protože proměnná i se při vytváření těla lambdy ihned sváže .",
       "D) Seznam [2, 2, 2], protože anonymní lambda funkce hledají i až při spuštění    ."
     ],
     "answer": 3,
-    "explanation": "V Pythonu dochází v uzávěrech k tzv. late binding (zpožděnému vázání): proměnná i se v těle lambda funkce vyhodnocuje až ve chvíli zavolání f(), kdy už má po dokončení cyklu hodnotu 2. Všechny vytvořené lambda funkce tak vrátí 2. Opravou je použití výchozího parametru lambda i=i: i."
+    "explanation": "V Pythonu dochází v uzávěrech k tzv. late binding (zpožděnému vázání): proměnná i se v těle lambda funkce vyhodnocuje až ve chvíli zavolání f(), kdy už má po dokončení cyklu hodnotu 2. Všechny vytvořené lambda funkce tak vrátí 2. Opravou je použití výchozího parametru lambda i=i: i.",
+    "code": null
   },
   {
     "id": "q6",
     "type": "multiple_choice",
-    "question": "Jaká hodnota se vytiskne při volání print(y) po dokončení list comprehension v Pythonu 3.8+?\n\nres = [y for x in range(3) if (y := x * 2)]\nprint(y)",
+    "question": "Jaká hodnota se vytiskne při volání print(y) po dokončení list comprehension v Pythonu 3.8+?",
     "options": [
       "A) Hodnota 4, protože proměnná z walrus operátoru := uniká do okolního rozsahu         .",
       "B) Výjimka NameError, protože všechny proměnné v list comprehension jsou lokální       .",
-      "C) Hodnota 2, protože walrus operátor uchová pouze první úspěšně uložený prvek         .",
-      "D) Hodnota None, protože walrus operátor vrací při zápisu v podmínce prázdný datový typ."
+      "C) Hodnota None, protože walrus operátor vrací při zápisu v podmínce prázdný datový typ.",
+      "D) Hodnota 2, protože walrus operátor uchová pouze první úspěšně uložený prvek         ."
     ],
     "answer": 0,
-    "explanation": "Zatímco běžné proměnné cyklu v list comprehension v Pythonu 3 neunikají z lokálního rozsahu comprehension, proměnné vytvořené přiřazovacím operátorem walrus (:=) unikat do nadřazeného rozsahu záměrně mohou. V proměnné y tak po dokončení zůstane hodnota z poslední iterace, tedy 4."
+    "explanation": "Zatímco běžné proměnné cyklu v list comprehension v Pythonu 3 neunikají z lokálního rozsahu comprehension, proměnné vytvořené přiřazovacím operátorem walrus (:=) unikat do nadřazeného rozsahu záměrně mohou. V proměnné y tak po dokončení zůstane hodnota z poslední iterace, tedy 4.",
+    "code": "res = [y for x in range(3) if (y := x * 2)]\nprint(y)"
   },
   {
     "id": "q7",
@@ -97,25 +103,27 @@
     "type": "multiple_choice",
     "question": "Ke kterému adresáři se vztahují relativní cesty při otevírání souborů pomocí open('data.txt')?",
     "options": [
-      "A) K systémovému dočasnému adresáři určenému systémem pro běžného uživatele v OS  .",
-      "B) K adresáři, ve kterém se nachází samotný právě vykonávaný skript s příponou .py.",
+      "A) K kořenovému adresáři projektu určenému v proměnné prostředí zvané PYTHONPATH  .",
+      "B) K systémovému dočasnému adresáři určenému systémem pro běžného uživatele v OS  .",
       "C) K aktuálnímu pracovnímu adresáři (CWD), odkud byl spuštěn interpret Pythonu    .",
-      "D) K kořenovému adresáři projektu určenému v proměnné prostředí zvané PYTHONPATH  ."
+      "D) K adresáři, ve kterém se nachází samotný právě vykonávaný skript s příponou .py."
     ],
     "answer": 2,
-    "explanation": "Relativní cesty v Pythonu se nevztahují k umístění zdrojového souboru .py, ale k aktuálnímu pracovnímu adresáři (Current Working Directory), ze kterého byl interpret spuštěn. Spuštění skriptu z jiného adresáře tak bez úpravy cest vyvolá FileNotFoundError."
+    "explanation": "Relativní cesty v Pythonu se nevztahují k umístění zdrojového souboru .py, ale k aktuálnímu pracovnímu adresáři (Current Working Directory), ze kterého byl interpret spuštěn. Spuštění skriptu z jiného adresáře tak bez úpravy cest vyvolá FileNotFoundError.",
+    "code": null
   },
   {
     "id": "q9",
     "type": "multiple_choice",
-    "question": "Co bude výstupem příkazu print(cisla) po odebrání prvků během iterace?\n\ncisla = [1, 2, 3, 4]\nfor x in cisla:\n    if x % 2 != 0:\n        cisla.remove(x)\nprint(cisla)",
+    "question": "Co bude výstupem příkazu print(cisla) po odebrání prvků během iterace?\n\ncisla = [1, 2, 3, 4]\nfor x in cisla:\n    if x % 2 != 0:\n        cisla.remove(x)\nprint(cisla):",
     "options": [
-      "A) Seznam [2, 4], protože metoda remove bezpečně aktualizuje ukazatel cyklu for.",
-      "B) Výjimka RuntimeError, protože Python zakazuje modifikaci iterovaného pole   .",
-      "C) Seznam [], protože odebrání prvku vymaže všechny zbývající prvky ze seznamu .",
+      "A) Seznam [], protože odebrání prvku vymaže všechny zbývající prvky ze seznamu .",
+      "B) Seznam [2, 4], protože metoda remove bezpečně aktualizuje ukazatel cyklu for.",
+      "C) Výjimka RuntimeError, protože Python zakazuje modifikaci iterovaného pole   .",
       "D) Seznam [2, 3, 4], protože odebráním prvku 1 se posunou vnitřní indexy prvků ."
     ],
     "answer": 3,
-    "explanation": "Při modifikaci seznamu během iterace se interní index posouvá v původním seznamu. Odebráním prvku 1 na indexu 0 se prvek 2 posune na index 0 a prvek 3 na index 1. Smyčka v následujícím kroku přejde na index 1 (kde je nyní 3), čímž prvek 2 úplně přeskočí! Ve výsledku zůstane [2, 3, 4]."
+    "explanation": "Při modifikaci seznamu během iterace se interní index posouvá v původním seznamu. Odebráním prvku 1 na indexu 0 se prvek 2 posune na index 0 a prvek 3 na index 1. Smyčka v následujícím kroku přejde na index 1 (kde je nyní 3), čímž prvek 2 úplně přeskočí! Ve výsledku zůstane [2, 3, 4].",
+    "code": null
   }
 ]

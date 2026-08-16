@@ -4,13 +4,14 @@
     "type": "multiple_choice",
     "question": "Který příkaz vypíše pouze ty nainstalované balíčky, pro které existuje na PyPI novější verze?",
     "options": [
-      "A) pip check --updates",
+      "A) pip show --outdated",
       "B) pip list --outdated",
-      "C) pip show --outdated",
+      "C) pip check --updates",
       "D) pip search --upgrade"
     ],
     "answer": 1,
-    "explanation": "Přepínač `--outdated` (nebo zkráceně `-o`) u příkazu `pip list` vyfiltruje balíčky, které mají na PyPI novější verzi."
+    "explanation": "Přepínač `--outdated` (nebo zkráceně `-o`) u příkazu `pip list` vyfiltruje balíčky, které mají na PyPI novější verzi.",
+    "code": null
   },
   {
     "id": "q2",
@@ -23,20 +24,22 @@
       "D) Do globálního systémového adresáře site-packages přístupného pro všechny uživatele počítače."
     ],
     "answer": 2,
-    "explanation": "Přepínač `--user` nainstaluje balíček do uživatelského profilu (hodnota `site.USER_SITE`), což nevyžaduje práva zapisovat do systémové instalace Pythonu."
+    "explanation": "Přepínač `--user` nainstaluje balíček do uživatelského profilu (hodnota `site.USER_SITE`), což nevyžaduje práva zapisovat do systémové instalace Pythonu.",
+    "code": null
   },
   {
     "id": "q3",
     "type": "multiple_choice",
     "question": "Proč je nutné při instalaci konkrétní verze balíčku v příkazové řádce použít uvozovky, např. pip install \"numpy>=1.20\"?",
     "options": [
-      "A) Uvozovky informují instalátor, že se jedná o balíček s binárními komponentami kompilovanými v C.",
-      "B) Bez uvozovek příkazová řádka automaticky nainstaluje nejstarší dostupnou verzi daného balíčku.",
+      "A) Bez uvozovek příkazová řádka automaticky nainstaluje nejstarší dostupnou verzi daného balíčku.",
+      "B) Uvozovky informují instalátor, že se jedná o balíček s binárními komponentami kompilovanými v C.",
       "C) Interpretr pip vyžaduje uvozovky pro správné zakódování názvu balíčku do standardu UTF-8.",
       "D) Znaky jako > a < slouží v shellu k přesměrování vstupů a výstupů a bez uvozovek by způsobily chybu."
     ],
     "answer": 3,
-    "explanation": "Znaky `<` a `>` interpretuje příkazová řádka (bash/cmd/PowerShell) jako přesměrování souborového vstupu a výstupu. Uvozovky zabrání shellu v jejich vyhodnocení."
+    "explanation": "Znaky `<` a `>` interpretuje příkazová řádka (bash/cmd/PowerShell) jako přesměrování souborového vstupu a výstupu. Uvozovky zabrání shellu v jejich vyhodnocení.",
+    "code": null
   },
   {
     "id": "q4",
@@ -45,9 +48,9 @@
     "code": "# Instalace všech knihoven pro zpracování spektrálních dat ze souboru\npip install ________ requirements.txt",
     "options": [
       "-r",
-      "-d",
       "-u",
-      "-f"
+      "-f",
+      "-d"
     ],
     "answer": 0,
     "explanation": "Přepínač -r (zkratka pro --requirement) předává instalátoru pip textový soubor se seznamem požadovaných balíčků a verzí.",
@@ -59,10 +62,10 @@
     "question": "Jaké informace NEUKLÁDÁ příkaz `pip freeze > requirements.txt` do výstupního souboru?",
     "code": "$ pip freeze > requirements.txt",
     "options": [
-      "A) Verze sekundárních závislostí, které byly nainstalovány automaticky s balíčky.",
+      "A) Názvy a verze instalovaných balíčků z lokálního adresáře site-packages prostředí.",
       "B) Přesnou verzi samotného nástroje pip a verzi nainstalovaného interpretru Pythonu.",
       "C) Seznam balíčků, které byly do prostředí nainstalovány přímo z formátu wheel (.whl).",
-      "D) Názvy a verze instalovaných balíčků z lokálního adresáře site-packages prostředí."
+      "D) Verze sekundárních závislostí, které byly nainstalovány automaticky s balíčky."
     ],
     "answer": 1,
     "explanation": "`pip freeze` zaznamená všechny nainstalované balíčky v `site-packages` (včetně jejich podzávislostí), ale vynechává verzi samotného Pythonu a balíčků `pip` či `setuptools`."
@@ -73,25 +76,27 @@
     "question": "Co se stane se závislostmi balíčku při spuštění příkazu `pip uninstall balicek`?",
     "options": [
       "A) Správce pip smaže celé virtuální prostředí včetně všech ostatních balíčků a konfigurace.",
-      "B) Automaticky se odinstalují i všechny závislosti, které daný balíček ke svému běhu vyžadoval.",
+      "B) Odinstalace selže, pokud předem ručně neodinstalujete všechny navázané závislosti.",
       "C) Odinstaluje se pouze zadaný balíček; jeho závislosti zůstanou v prostředí nainstalované.",
-      "D) Odinstalace selže, pokud předem ručně neodinstalujete všechny navázané závislosti."
+      "D) Automaticky se odinstalují i všechny závislosti, které daný balíček ke svému běhu vyžadoval."
     ],
     "answer": 2,
-    "explanation": "Na rozdíl od instalace neprovádí `pip uninstall` automatické čištění nepotřebných podzávislostí. Ty zůstanou v `site-packages` a jejich případné odstranění je na vývojáři."
+    "explanation": "Na rozdíl od instalace neprovádí `pip uninstall` automatické čištění nepotřebných podzávislostí. Ty zůstanou v `site-packages` a jejich případné odstranění je na vývojáři.",
+    "code": null
   },
   {
     "id": "q7",
     "type": "multiple_choice",
     "question": "Co je to formát wheel (soubory s příponou .whl) v ekosystému balíčků Pythonu?",
     "options": [
-      "A) Zdrojový soubor v jazyce C, který se musí při každé instalaci kompilovat pomocí rozhraní MinGW.",
-      "B) Šifrovaný skript určený výhradně pro instalaci balíčků do systémového prostředí operačního systému.",
+      "A) Šifrovaný skript určený výhradně pro instalaci balíčků do systémového prostředí operačního systému.",
+      "B) Zdrojový soubor v jazyce C, který se musí při každé instalaci kompilovat pomocí rozhraní MinGW.",
       "C) Konfigurační soubor určující adresářovou strukturu pro spouštění skriptů ve vývojovém prostředí.",
       "D) Zazipovaný archiv s definovanou strukturou obsahující předkompilované binární komponenty a metadata."
     ],
     "answer": 3,
-    "explanation": "`wheel` (`.whl`) je standardizovaný distribuční formát (ZIP archiv), který obsahuje již zkompilované binární rozšíření a metadata, takže instalace přes `pip` nevyžaduje C kompilátor."
+    "explanation": "`wheel` (`.whl`) je standardizovaný distribuční formát (ZIP archiv), který obsahuje již zkompilované binární rozšíření a metadata, takže instalace přes `pip` nevyžaduje C kompilátor.",
+    "code": null
   },
   {
     "id": "q8",
@@ -102,6 +107,7 @@
       "B) Nepravda – instalace přes sudo je oficiálně doporučovaným a nejbezpečnějším způsobem správy balíčků v Linuxu."
     ],
     "answer": 0,
-    "explanation": "Mnohé linuxové distribuce spoléhají na systémový Python a jeho knihovny pro klíčové systémové nástroje. Instalace či přepsání verzí balíčků přes `sudo pip` může rozbít samotný operační systém."
+    "explanation": "Mnohé linuxové distribuce spoléhají na systémový Python a jeho knihovny pro klíčové systémové nástroje. Instalace či přepsání verzí balíčků přes `sudo pip` může rozbít samotný operační systém.",
+    "code": null
   }
 ]

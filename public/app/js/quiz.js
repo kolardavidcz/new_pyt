@@ -465,9 +465,20 @@ export async function renderQuizSection(item) {
         const hintDetails = el("details", { className: "quiz-fill-hints-details" });
         const pillsHtml = q.options.map((opt) => {
           const cleanOpt = opt.replace(/^[A-D]\)\s*/, "").trim();
-          const rawCodeVal = cleanOpt.replace(/^[`'"]+|[`'"]+$/g, "");
-          const formattedPillContent = formatInlineCode(cleanOpt.startsWith("`") ? cleanOpt : `\`${cleanOpt}\``);
-          return `<button type="button" class="fill-hint-pill draggable-chip" draggable="true" data-code="${escapeHtml(rawCodeVal)}">${formattedPillContent}</button>`;
+          let rawCodeVal = cleanOpt;
+          let formattedPillContent = "";
+
+          if (cleanOpt.includes("#")) {
+            const [codePart, ...commParts] = cleanOpt.split("#");
+            rawCodeVal = codePart.trim();
+            const commVal = commParts.join("#").trim();
+            const codeHl = formatInlineCode(rawCodeVal.startsWith("`") ? rawCodeVal : `\`${rawCodeVal}\``);
+            formattedPillContent = `${codeHl} <span class="pill-comm" style="color:var(--syntax-comment, #6a9955); font-size:0.85em; font-family:var(--font-mono, monospace); margin-left:4px;"># ${escapeHtml(commVal)}</span>`;
+          } else {
+            rawCodeVal = cleanOpt.replace(/^[`'"]+|[`'"]+$/g, "");
+            formattedPillContent = formatInlineCode(cleanOpt.startsWith("`") ? cleanOpt : `\`${cleanOpt}\``);
+          }
+          return `<button type="button" class="fill-hint-pill draggable-chip" draggable="true" data-code="${escapeHtml(rawCodeVal)}" title="Vložit kód '${escapeAttr(rawCodeVal)}'">${formattedPillContent}</button>`;
         }).join(" ");
         hintDetails.innerHTML = `
           <summary class="fill-options-summary">Zobrazit nápovědu / možnosti ke vložení</summary>

@@ -5,35 +5,37 @@
     "question": "Jaký je hlavní rozdíl mezi datovým deskriptorem (data descriptor) a nedatovým deskriptorem (non-data descriptor) při vyhledávání atributů na instanci?",
     "options": [
       "A) Datový definuje metodu __set__ nebo __delete__ a má přednost před __dict__ instance, nedatový definuje jen __get__.",
-      "B) Nedatový deskriptor nelze na instanci vůbec přepsat novou hodnotou, kdežto datový deskriptor lze snadno nahradit.",
-      "C) Nedatový definuje metodu __set__ a má přednost před __dict__ instance, zatímco datový definuje výhradně __get__.",
-      "D) Datový deskriptor se ukládá přímo do __dict__ instance, zatímco nedatový deskriptor se ukládá do __dict__ třídy."
+      "B) Datový deskriptor se ukládá přímo do __dict__ instance, zatímco nedatový deskriptor se ukládá do __dict__ třídy.",
+      "C) Nedatový deskriptor nelze na instanci vůbec přepsat novou hodnotou, kdežto datový deskriptor lze snadno nahradit.",
+      "D) Nedatový definuje metodu __set__ a má přednost před __dict__ instance, zatímco datový definuje výhradně __get__."
     ],
     "answer": 0,
-    "explanation": "Datový deskriptor implementuje __set__ (nebo __delete__), což způsobuje, že přístup i zápis k tomuto atributu má vždy přednost před slovníkem __dict__ instance. Nedatový deskriptor implementuje pouze __get__ (např. metody), takže uložení atributu do __dict__ instance nedatový deskriptor překryje."
+    "explanation": "Datový deskriptor implementuje __set__ (nebo __delete__), což způsobuje, že přístup i zápis k tomuto atributu má vždy přednost před slovníkem __dict__ instance. Nedatový deskriptor implementuje pouze __get__ (např. metody), takže uložení atributu do __dict__ instance nedatový deskriptor překryje.",
+    "code": null
   },
   {
     "id": "q2",
     "type": "multiple_choice",
-    "question": "Jak se liší chování metod __getattr__ a __getattribute__ při přístupu k atributu instance?\n\n```python\nclass Demo:\n    def __getattribute__(self, item):\n        return \"ALWAYS\"\n    def __getattr__(self, item):\n        return \"FALLBACK\"\n\nd = Demo()\nprint(d.anything)\n```",
+    "question": "Jak se liší chování metod __getattr__ a __getattribute__ při přístupu k atributu instance?",
     "options": [
-      "A) Vypíše FALLBACK, protože atribut anything není v __dict__ definován a __getattr__ má při vyhledávání vyšší prioritu.",
+      "A) Vypíše ALWAYS FALLBACK, protože Python při neexistenci atributu postupně zavolá obě obslužné metody v definovaném pořadí.",
       "B) Vypíše ALWAYS, protože __getattribute__ se volá bezpodmínečně při každém přístupu k atributu a __getattr__ se nezavolá.",
-      "C) Vypíše ALWAYS FALLBACK, protože Python při neexistenci atributu postupně zavolá obě obslužné metody v definovaném pořadí.",
+      "C) Vypíše FALLBACK, protože atribut anything není v __dict__ definován a __getattr__ má při vyhledávání vyšší prioritu.",
       "D) Vyvolá RecursionError, protože implementace __getattribute__ bez použití super() vyvolá nekonečnou rekurzi přístupu."
     ],
     "answer": 1,
-    "explanation": "Metoda __getattribute__ se volá vždy při jakémkoliv přístupu k atributu. Protože v kódu vrátil návratovou hodnotu ihned bez AttributeError, k volání __getattr__ (které se spouští až po selhání běžného hledání) vůbec nedojde."
+    "explanation": "Metoda __getattribute__ se volá vždy při jakémkoliv přístupu k atributu. Protože v kódu vrátil návratovou hodnotu ihned bez AttributeError, k volání __getattr__ (které se spouští až po selhání běžného hledání) vůbec nedojde.",
+    "code": "class Demo:\n    def __getattribute__(self, item):\n        return \"ALWAYS\"\n    def __getattr__(self, item):\n        return \"FALLBACK\"\n\nd = Demo()\nprint(d.anything)"
   },
   {
     "id": "q3",
     "type": "fill_blank_choice",
     "question": "Doplňte metodu protokolu deskriptorů volanou při čtení hodnoty atributu z instance:",
     "options": [
+      "__getattr__",
       "__getitem__",
-      "__getattribute__",
       "__get__",
-      "__getattr__"
+      "__getattribute__"
     ],
     "answer": 2,
     "explanation": "Deskriptorový protokol definuje metodu __get__(self, instance, owner) pro čtení hodnoty spravovaného atributu.",
@@ -45,26 +47,28 @@
     "type": "multiple_choice",
     "question": "Jak Python vnitřně přeloží zápis p.barva = \"zelená\", je-li barva datovým deskriptorem definovaným na třídě Plocha?",
     "options": [
-      "A) p.__set__(type(p).__dict__['barva'], \"zelená\")",
-      "B) Plocha.__setattr__(p, 'barva', \"zelená\")",
-      "C) p.__dict__['barva'].__set__(type(p), \"zelená\")",
+      "A) Plocha.__setattr__(p, 'barva', \"zelená\")",
+      "B) p.__dict__['barva'].__set__(type(p), \"zelená\")",
+      "C) p.__set__(type(p).__dict__['barva'], \"zelená\")",
       "D) type(p).__dict__['barva'].__set__(p, \"zelená\")"
     ],
     "answer": 3,
-    "explanation": "Přístup k datovému deskriptoru z instance se přeloží vyhledáním objektu deskriptoru v __dict__ třídy dané instance a zavoláním jeho metody __set__(instance, value)."
+    "explanation": "Přístup k datovému deskriptoru z instance se přeloží vyhledáním objektu deskriptoru v __dict__ třídy dané instance a zavoláním jeho metody __set__(instance, value).",
+    "code": null
   },
   {
     "id": "q5",
     "type": "multiple_choice",
-    "question": "Co se stane při pokusu o spuštění následujícího kódu vytvářejícího vlastnost s dekorátory?\n\n```python\nclass Square:\n    def __init__(self, size):\n        self._size = size\n    \n    @property\n    def size(self):\n        return self._size\n    \n    @size.setter\n    def size(self, value):\n        if value < 0:\n            raise ValueError(\"Velikost musí být nezáporná\")\n        self._size = value\n\ns = Square(10)\ns.size = -5\n```",
+    "question": "Co se stane při pokusu o spuštění následujícího kódu vytvářejícího vlastnost s dekorátory?",
     "options": [
       "A) Vyvolá výjimku ValueError, protože přiřazení do s.size spustí metodu označenou dekorátorem @size.setter.",
-      "B) Kód selže již při definici třídy s výjimkou NameError, neboť dekorátor @size.setter neodkazuje na existující proměnnou.",
-      "C) Atribut s.size se změní na -5, protože dekorátor @size.setter se uplatní pouze u instancí třídy object.",
-      "D) Vyvolá výjimku AttributeError, protože metody pro getter a setter musí mít odlišné názvy (např. get_size)."
+      "B) Vyvolá výjimku AttributeError, protože metody pro getter a setter musí mít odlišné názvy (např. get_size).",
+      "C) Kód selže již při definici třídy s výjimkou NameError, neboť dekorátor @size.setter neodkazuje na existující proměnnou.",
+      "D) Atribut s.size se změní na -5, protože dekorátor @size.setter se uplatní pouze u instancí třídy object."
     ],
     "answer": 0,
-    "explanation": "Zápis @size.setter navazuje na dříve definovanou property size. Při uložení s.size = -5 se zavolá setter metoda, která ověří podmínku a vyvolá ValueError(\"Velikost musí být nezáporná\")."
+    "explanation": "Zápis @size.setter navazuje na dříve definovanou property size. Při uložení s.size = -5 se zavolá setter metoda, která ověří podmínku a vyvolá ValueError(\"Velikost musí být nezáporná\").",
+    "code": "class Square:\n    def __init__(self, size):\n        self._size = size\n    \n    @property\n    def size(self):\n        return self._size\n    \n    @size.setter\n    def size(self, value):\n        if value < 0:\n            raise ValueError(\"Velikost musí být nezáporná\")\n        self._size = value\n\ns = Square(10)\ns.size = -5"
   },
   {
     "id": "q6",
@@ -75,6 +79,7 @@
       "B) Tvrzení je pravdivé; všechny druhy metod implementují __set__ i __get__, což znemožňuje jakékoliv dynamické nahrazení metod přímo na úrovni jediné instance."
     ],
     "answer": 0,
-    "explanation": "Metody jsou nedatové deskriptory (non-data descriptors), protože definují pouze metodu __get__. Protože nedefinují __set__, lze název metody na konkrétní instanci snadno přepsat přiřazením nové hodnoty do instance.__dict__."
+    "explanation": "Metody jsou nedatové deskriptory (non-data descriptors), protože definují pouze metodu __get__. Protože nedefinují __set__, lze název metody na konkrétní instanci snadno přepsat přiřazením nové hodnoty do instance.__dict__.",
+    "code": null
   }
 ]
