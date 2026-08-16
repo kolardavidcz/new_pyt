@@ -4,10 +4,10 @@
     "type": "multiple_choice",
     "question": "Jaká hodnota vrácená z metody __exit__() způsobí potlačení výjimky vzniklé uvnitř bloku with?",
     "options": [
-      "A) Objekt výjimky typu BaseException, který nahradí původně vyvolanou výjimku v aktuálním kontextu.",
-      "B) Řetězec s názvem zachycené výjimky, který se předá nadřazenému bloku try-except k logování.",
+      "A) Řetězec s názvem zachycené výjimky, který se předá nadřazenému bloku try-except k logování.",
+      "B) Nepravdivá hodnota False (nebo None), která interpretu sdělí, že byla výjimka úspěšně zpracována.",
       "C) Pravdivá hodnota True (nebo jakýkoliv pravdivý objekt), která interpretu sdělí, že byla výjimka zpracována.",
-      "D) Nepravdivá hodnota False (nebo None), která interpretu sdělí, že byla výjimka úspěšně zpracována."
+      "D) Objekt výjimky typu BaseException, který nahradí původně vyvolanou výjimku v aktuálním kontextu."
     ],
     "answer": 2,
     "explanation": "Pokud __exit__() vrátí True (pravdivou hodnotu), Python výjimku potlačí a kód pokračuje za blokem with. Pokud vrátí False nebo None, výjimka se propaguje výše."
@@ -17,9 +17,9 @@
     "type": "multiple_choice",
     "question": "Jaký bude výstup následujícího kódu využívajícího generátorový kontextový manažer?\n\n```python\nfrom contextlib import contextmanager\n\n@contextmanager\ndef my_ctx():\n    print(\"START\")\n    yield \"DATA\"\n    print(\"END\")\n\ncm = my_ctx()\nwith cm as val:\n    print(val)\nwith cm as val:\n    print(val)\n```",
     "options": [
-      "A) Vypíše START, DATA, END a při druhém vstupu neprovede nic, protože proměnná val již obsahuje řetězec DATA.",
+      "A) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku StopIteration kvůli vyčerpání generátoru.",
       "B) Vypíše START, DATA, END dvakrát za sebou, protože generátor se při dalším vstupu automaticky restartuje.",
-      "C) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku StopIteration kvůli vyčerpání generátoru.",
+      "C) Vypíše START, DATA, END a při druhém vstupu neprovede nic, protože proměnná val již obsahuje řetězec DATA.",
       "D) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku RuntimeError: generator didn't yield."
     ],
     "answer": 3,
@@ -31,9 +31,9 @@
     "question": "Doplňte klíčové slovo pro předání spravovaného prostředku z kontextového manažeru @contextmanager:",
     "options": [
       "yield",
+      "pass",
       "send",
-      "return",
-      "pass"
+      "return"
     ],
     "answer": 0,
     "explanation": "Generátorový kontextový manažer předává spravovaný objekt do bloku with pomocí klíčového slova yield.",
@@ -45,10 +45,10 @@
     "type": "multiple_choice",
     "question": "Jaké argumenty obdrží metoda __exit__(self, exc_type, exc_val, exc_tb) při normálním ukončení bloku with bez výjimky?",
     "options": [
-      "A) Argument exc_type bude StopIteration, zatímco zbývající dva budou None.",
+      "A) Metoda __exit__() se při bezchybném doběhu bloku with vůbec nevolá.",
       "B) Všechny tři argumenty exc_type, exc_val a exc_tb budou mít hodnotu None.",
-      "C) Argumenty obdrží instanci třídy SuccessState s informací o bezchybném průběhu.",
-      "D) Metoda __exit__() se při bezchybném doběhu bloku with vůbec nevolá."
+      "C) Argument exc_type bude StopIteration, zatímco zbývající dva budou None.",
+      "D) Argumenty obdrží instanci třídy SuccessState s informací o bezchybném průběhu."
     ],
     "answer": 1,
     "explanation": "Dokončí-li se blok with bez vyvolání výjimky, Python zavolá __exit__ s argumenty (None, None, None)."
@@ -58,10 +58,10 @@
     "type": "multiple_choice",
     "question": "Co bude vytištěno při spuštění následujícího kódu s vlastní třídou kontextového manažeru?\n\n```python\nclass Manager:\n    def __enter__(self):\n        return \"RESOURCE\"\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        return False\n\nm = Manager()\nwith m as res:\n    print(res is m, res)\n```",
     "options": [
-      "A) Vypíše True RESOURCE, protože proměnná res v příkazu as vždy odkazuje přímo na kontextový manažer m.",
-      "B) Vyvolá výjimku AttributeError, protože metoda __enter__() musí vracet výhradně samotný objekt self.",
+      "A) Vyvolá výjimku AttributeError, protože metoda __enter__() musí vracet výhradně samotný objekt self.",
+      "B) Vypíše False None, protože výstup z __enter__() se zahodí a proměnná res se inicializuje na None.",
       "C) Vypíše False RESOURCE, protože res dostane návratovou hodnotu z __enter__(), nikoliv objekt m.",
-      "D) Vypíše False None, protože výstup z __enter__() se zahodí a proměnná res se inicializuje na None."
+      "D) Vypíše True RESOURCE, protože proměnná res v příkazu as vždy odkazuje přímo na kontextový manažer m."
     ],
     "answer": 2,
     "explanation": "Proměnná za klíčovým slovem as přebírá návratovou hodnotu metody __enter__(). Jelikož ta vrátila řetězec \"RESOURCE\", proměnná res drží tento řetězec a nikoliv objekt m (res is m je tedy False)."
@@ -71,9 +71,9 @@
     "type": "fill_blank_choice",
     "question": "Doplňte návratovou hodnotu metody __exit__, která potlačí vzniklou výjimku a zabrání jejímu dalšímu šíření:",
     "options": [
+      "None",
       "self",
       "False",
-      "None",
       "True"
     ],
     "answer": 3,

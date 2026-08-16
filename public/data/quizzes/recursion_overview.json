@@ -5,10 +5,10 @@
     "question": "Jak se zachová následující rekurzivní funkce bez definované kotvy rekurze?",
     "code": "def nekonecno(n):\n    return nekonecno(n + 1)\nnekonecno(1)",
     "options": [
-      "A) Program se zacyklí do nekonečna bez vyvolání chyby a postupně zaplní paměť procesoru.",
+      "A) Python automaticky převede funkci na cyklus while a po dosažení limitu vrátí hodnotu None.",
       "B) Program selže s výjimkou RecursionError po dosažení maximální hloubky zásobníku volání.",
-      "C) Nastane výjimka MemoryError z důvodu alokace paměti pro nekonečný seznam dat na haldě.",
-      "D) Python automaticky převede funkci na cyklus while a po dosažení limitu vrátí hodnotu None."
+      "C) Program se zacyklí do nekonečna bez vyvolání chyby a postupně zaplní paměť procesoru.",
+      "D) Nastane výjimka MemoryError z důvodu alokace paměti pro nekonečný seznam dat na haldě."
     ],
     "answer": 1,
     "explanation": "Python má z bezpečnostních důvodů nastaven limit pro maximální hloubku zanoření rekurze (standardně cca 1000 volání). Při jeho překročení vyvolá interpretr výjimku RecursionError."
@@ -16,17 +16,17 @@
   {
     "id": "q2",
     "type": "fill_blank_choice",
-    "question": "Doplňte bázovou podmínku (kotvu rekurze) pro bezpečný výpočet faktoriálu celého čísla.",
-    "code": "def factorial(n: int) -> int:\n    if ________:\n        return 1\n    return n * factorial(n - 1)\n\n# Vystup: factorial(4) -> 24",
+    "question": "Doplňte správnou podmínku pro zavedení kotvy rekurze při výpočtu faktoriálu.\n\n```python\n# Doplňte správnou podmínku pro zavedení kotvy rekurze při výpočtu faktoriálu.\nvysledek = ________\n```",
+    "code": "def faktorial(n):\n    if ________:\n        return 1\n    return n * faktorial(n - 1)",
     "options": [
-      "n > 1",
-      "n == 0",
-      "n <= 1",
-      "n < 0"
+      "n == 100 — ukončí rekurzi po dosažení stého kroku výpočtu a vrátí mezivýsledek.",
+      "n > 1 — pokračuje v rekurzivním volání dokud je n větší než základní konstanta 1.",
+      "n <= 1 — zastaví rekurzivní volání",
+      "n % 2 == 0 — zastavuje rekurzi pouze"
     ],
     "answer": 2,
-    "explanation": "Kotva rekurze n <= 1 zastaví rekurzivní volání pro hodnoty 0 a 1 (0! = 1! = 1) a zamezí zápornému zanoření.",
-    "expected": "n <= 1"
+    "explanation": "Kotva rekurze (base case) musí zastavit další rekurzivní volání. Pro faktoriál je definováno 0! = 1! = 1, tedy podmínka n <= 1 vrací hodnotu 1 a zamezuje zápornému zanoření.",
+    "expected": "n <= 1 — zastaví rekurzivní volání"
   },
   {
     "id": "q3",
@@ -60,8 +60,8 @@
     "options": [
       "A) 10 — rekurzivně se přičítá první prvek a volá se funkce na zbytek seznamu až do prázdného.",
       "B) [1, 2, 3, 4] — funkce vrátí nezměněný původní seznam z důvodu absence operace násobení.",
-      "C) 4 — rekurzivní funkce vrátí pouze celkovou délku původního zadaného seznamu namísto součtu.",
-      "D) 0 — kotva rekurze vrátí nulovou hodnotu, která přemaže veškeré předchozí mezivýsledky."
+      "C) 0 — kotva rekurze vrátí nulovou hodnotu, která přemaže veškeré předchozí mezivýsledky.",
+      "D) 4 — rekurzivní funkce vrátí pouze celkovou délku původního zadaného seznamu namísto součtu."
     ],
     "answer": 0,
     "explanation": "V prvním kroku 1 + suma([2,3,4]), pak 2 + suma([3,4]), 3 + suma([4]), 4 + suma([]). Prázdný seznam vrátí 0, celkový součet je 1 + 2 + 3 + 4 + 0 = 10."
@@ -71,10 +71,10 @@
     "type": "multiple_choice",
     "question": "Jaká je paměťová složitost rekurzivní funkce pro faktoriál vyžadující n zanořených volání?",
     "options": [
-      "A) Exponenciální O(2^n) — zásobník volání se pro každou úroveň zdvojuje do stromové struktury.",
+      "A) Kvadratická O(n^2) — pro každý rekurzivní krok se alokuje kopie celého kódu funkce v RAM.",
       "B) Lineární O(n) — v paměti musí být v nejhlubším bodě zanoření uloženo n rámců zásobníku.",
       "C) Konstantní O(1) — paměťové nároky nezávisí na n, protože se přepisuje pouze jedna proměnná.",
-      "D) Kvadratická O(n^2) — pro každý rekurzivní krok se alokuje kopie celého kódu funkce v RAM."
+      "D) Exponenciální O(2^n) — zásobník volání se pro každou úroveň zdvojuje do stromové struktury."
     ],
     "answer": 1,
     "explanation": "Každé rekurzivní volání si ukládá svůj stav (rámec funkce s lokálními proměnnými a návratovou adresou) na zásobník. Při zanoření do hloubky n je na zásobníku zároveň n rámců, což odpovídá paměťové složitosti O(n)."
@@ -84,10 +84,10 @@
     "type": "multiple_choice",
     "question": "Proč je iterativní řešení výpočtu Fibonacciho posloupnosti pomocí smyčky výhodnější než naivní rekurze?",
     "options": [
-      "A) Umožňuje automatické paralelní zpracování celého výpočtu na všech dostupných jádrech procesoru.",
-      "B) Zamezuje přetečení číselného rozsahu proměnných při výpočtu velkých členů posloupnosti v RAM.",
+      "A) Převádí výpočet celých čísel na operace s plovoucí řádkovou čárkou pro vyšší přesnost a rychlost.",
+      "B) Umožňuje automatické paralelní zpracování celého výpočtu na všech dostupných jádrech procesoru.",
       "C) Snižuje časovou složitost na O(n) a paměťovou složitost na O(1) udržováním dvou posledních hodnot.",
-      "D) Převádí výpočet celých čísel na operace s plovoucí řádkovou čárkou pro vyšší přesnost a rychlost."
+      "D) Zamezuje přetečení číselného rozsahu proměnných při výpočtu velkých členů posloupnosti v RAM."
     ],
     "answer": 2,
     "explanation": "Iterativní přístup si pamatuje pouze dva předchozí členy v proměnných, což vyžaduje konstantní paměť O(1) a lineární čas O(n) bez nebezpečí přetečení zásobníku nebo opakovaného výpočtu stejných prvků."

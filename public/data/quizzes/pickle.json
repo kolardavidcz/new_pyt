@@ -4,8 +4,8 @@
     "type": "multiple_choice",
     "question": "Který mód otevření souboru je vyžadován při zápisu zapiklených dat metodou pickle.dump()?",
     "options": [
-      "A) 'a+' — modul pickle vyžaduje režim připsání na konec souboru pro správnou serializaci.",
-      "B) 'r+' — modul pickle potřebuje režim pro čtení i zápis z důvodu kontroly zapsaných dat.",
+      "A) 'r+' — modul pickle potřebuje režim pro čtení i zápis z důvodu kontroly zapsaných dat.",
+      "B) 'a+' — modul pickle vyžaduje režim připsání na konec souboru pro správnou serializaci.",
       "C) 'wt' — modul pickle generuje textový výstup kódovaný automaticky v systémech UTF-8.",
       "D) 'wb' — modul pickle vytváří binární bajtový tok, který vyžaduje přímý binární zápis."
     ],
@@ -19,9 +19,9 @@
     "code": "import pickle\n\nserialized_sample = b\"\\x80\\x04\\x95\\x19\\x00\\x00\\x00\\x00\\x00\\x00\\x00}\\x94\\x8c\\x06sample\\x94\\x8c\\x07ethanol\\x94s.\"\nmeasurement = pickle.________(serialized_sample)\n# Vystup: {'sample': 'ethanol'}",
     "options": [
       "loads",
+      "load",
       "dump",
-      "dumps",
-      "load"
+      "dumps"
     ],
     "answer": 0,
     "explanation": "Funkce pickle.loads() načítá a deserializuje objekt z předaného bajtového řetězce v paměti, zatímco pickle.load() čte ze souborového proudu.",
@@ -32,10 +32,10 @@
     "type": "multiple_choice",
     "question": "Co se stane při pokusu o zapiklení uživatelsky definované funkce v Pythonu?",
     "options": [
-      "A) Vyvolá se okamžitě výjimka PicklingError, protože funkce nelze v Pythonu piklit.",
+      "A) Uloží se kompletní zdrojový kód funkce i se všemi lokálními proměnnými v těle funkce.",
       "B) Uloží se pouze plně kvalifikované jméno funkce a název modulu, nikoli její zdrojový kód.",
-      "C) Funkce se automaticky převede na anonymní lambda výraz a uloží jako spustitelný bajtkód.",
-      "D) Uloží se kompletní zdrojový kód funkce i se všemi lokálními proměnnými v těle funkce."
+      "C) Vyvolá se okamžitě výjimka PicklingError, protože funkce nelze v Pythonu piklit.",
+      "D) Funkce se automaticky převede na anonymní lambda výraz a uloží jako spustitelný bajtkód."
     ],
     "answer": 1,
     "explanation": "Modul pickle neukládá bytecode ani zdrojový kód funkcí a tříd. Zapisuje pouze referenci v podobě jejich plného jména a mateřského modulu, takže při unpicklování musí daná funkce v cílovém prostředí existovat pod stejným jménem."
@@ -57,10 +57,10 @@
     "question": "Jaká výjimka nastane při pokusu o zapiklení generátorového výrazu pomocí pickle.dumps()?",
     "code": "import pickle\ngen = (x**2 for x in range(10))\npickle.dumps(gen)",
     "options": [
-      "A) AttributeError — objekt generátoru nemá vytvořen atribut __dict__ pro uložení vnitřního stavu.",
+      "A) TypeError — operace dumps() přijímá pouze sekvenční typy jako seznamy nebo n-tice v paměti.",
       "B) ValueError — generátorový výraz vyžaduje explicitní konverzi na seznam před serializací dat.",
       "C) PicklingError — generátory udržují vnitřní stav iterátoru a nepatří mezi piklitelné objekty.",
-      "D) TypeError — operace dumps() přijímá pouze sekvenční typy jako seznamy nebo n-tice v paměti."
+      "D) AttributeError — objekt generátoru nemá vytvořen atribut __dict__ pro uložení vnitřního stavu."
     ],
     "answer": 2,
     "explanation": "Generátory, otevřené soubory, síťová spojení nebo databázová připojení nelze serializovat. Pokus o zapiklení nepiklitelného objektu vyvolá výjimku pickle.PicklingError."
@@ -70,9 +70,9 @@
     "type": "multiple_choice",
     "question": "K čemu primárně slouží modul pickletools ve standardní knihovně Pythonu?",
     "options": [
-      "A) Automaticky převádí binární struktury modulu pickle do lidsky čitelného formátu JSON či XML.",
-      "B) Šifruje zapiklená data pomocí symetrického šifrovacího klíče před uložením na lokální disk.",
-      "C) Zrychluje vykonávání metod pickle.dump() a pickle.load() pomocí C-rozšíření interpretru.",
+      "A) Zrychluje vykonávání metod pickle.dump() a pickle.load() pomocí C-rozšíření interpretru.",
+      "B) Automaticky převádí binární struktury modulu pickle do lidsky čitelného formátu JSON či XML.",
+      "C) Šifruje zapiklená data pomocí symetrického šifrovacího klíče před uložením na lokální disk.",
       "D) Umožňuje inspekci a disasemblaci instrukcí piklicího protokolu bez spuštění nebezpečného kódu."
     ],
     "answer": 3,

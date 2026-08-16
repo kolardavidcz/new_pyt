@@ -5,9 +5,9 @@
     "question": "Proč je zápis `{}` pro vytvoření prázdného slovníku rychlejší než volání `dict()`?",
     "options": [
       "A) Zápis `{}` překládá interpretr přímo na jedinou bajtkódovou instrukci, zatímco `dict()` vyžaduje dohledání jména v globálním prostoru.",
-      "B) Zápis `{}` alokuje paměť přímo v paměti procesoru, zatímco `dict()` vytváří objekt v dynamické paměti RAM pro celé prostředí.",
+      "B) Zápis `{}` provádí kontrolu typů klíčů již při překladu, zatímco `dict()` odkládá všechny kontroly typů až na samotný běh programu.",
       "C) Zápis `{}` automaticky zamkne slovník proti úpravám, zatímco `dict()` vytváří dynamickou a libovolně měnitelnou datovou strukturu.",
-      "D) Zápis `{}` provádí kontrolu typů klíčů již při překladu, zatímco `dict()` odkládá všechny kontroly typů až na samotný běh programu."
+      "D) Zápis `{}` alokuje paměť přímo v paměti procesoru, zatímco `dict()` vytváří objekt v dynamické paměti RAM pro celé prostředí."
     ],
     "answer": 0,
     "explanation": "Zápis `{}` odpovídá přímo instrukci BUILD_MAP v bajtkódu. Volání `dict()` vyžaduje dohledání jména v globálním/vestavěném jmenném prostoru a teprve poté zavolání callable objektu."
@@ -32,8 +32,8 @@
     "question": "Co vypíše následující kód demonstrující mělkou kopii u vnořených seznamů?",
     "code": "xs = [1, ['a', 'b']]\nys = xs[:]\nxs[1].pop()\nprint(ys)",
     "options": [
-      "A) `[1, ['a', 'b']]` — výřez `xs[:]` vytvoří kompletní hlubokou kopii včetně všech vnořených datových struktur.",
-      "B) `[1, []]` — metoda `pop()` vyprázdní vnořený seznam v primárním objektu i ve všech jeho nezávislých kopiích.",
+      "A) `[1, []]` — metoda `pop()` vyprázdní vnořený seznam v primárním objektu i ve všech jeho nezávislých kopiích.",
+      "B) `[1, ['a', 'b']]` — výřez `xs[:]` vytvoří kompletní hlubokou kopii včetně všech vnořených datových struktur.",
       "C) `[1, ['a']]` — mělká kopie zkopíruje pouze vnější seznam, vnitřní seznam zůstává sdílený v obou proměnných.",
       "D) `[['a']]` — zkopírovaný seznam automaticky odstraní celočíselné prvky na nultém indexu při úpravě podseznamu."
     ],
@@ -71,9 +71,9 @@
     "question": "Jaký je rozdíl v asymptotické časové složitosti operace `x in kontejner` pro seznam (`list`) a množinu (`set`)?",
     "options": [
       "A) U seznamu je časová složitost O(n), protože vyžaduje lineární prohledání; u množiny je v průměrném případě O(1) díky hešování.",
-      "B) U seznamu závisí časová složitost na seřazení prvků v rozsahu O(1) až O(n); u množiny je vždy striktně kvadratická O(n^2).",
-      "C) U seznamu je časová složitost O(1) díky přímému indexování prvků; u množiny je O(n) kvůli nutnosti proít se všemi heši.",
-      "D) Pro oba typy je časová složitost operace `in` zcela shodná a dosahuje nejhoršího možného případu O(log n) pro všechny vstupy."
+      "B) U seznamu je časová složitost O(1) díky přímému indexování prvků; u množiny je O(n) kvůli nutnosti proít se všemi heši.",
+      "C) Pro oba typy je časová složitost operace `in` zcela shodná a dosahuje nejhoršího možného případu O(log n) pro všechny vstupy.",
+      "D) U seznamu závisí časová složitost na seřazení prvků v rozsahu O(1) až O(n); u množiny je vždy striktně kvadratická O(n^2)."
     ],
     "answer": 0,
     "explanation": "Seznam vyžaduje prohledání prvek po prvku (O(n)). Množina využívá hešovací tabulku, takže vyhledání prvku probíhá v průměrném čase O(1)."
@@ -84,9 +84,9 @@
     "question": "Doplňte konstruktor pro vytvoření prázdné množiny (protože literál {} vytvoří prázdný slovník):",
     "code": "# Vytvoření prázdné měnitelné množiny:\nempty_set = ________()\nprint(type(empty_set))  # <class 'set'>",
     "options": [
-      "frozenset",
-      "set",
       "dict",
+      "set",
+      "frozenset",
       "tuple"
     ],
     "answer": 1,
@@ -98,8 +98,8 @@
     "type": "multiple_choice",
     "question": "Proč v Pythonu platí `hash(1) == hash(1.0)`, ale `id(1) == id(1.0)` je v obecném případě `False`?",
     "options": [
-      "A) Funkce `hash()` a `id()` jsou plně zastupitelné a uvedený rozdíl vrací pouze interpretr spuštěný v optimalizačním režimu `-O`.",
-      "B) Funkce `hash()` převádí všechna reálná čísla na celá čísla, zatímco `id()` zjišťuje aktuální úroveň zanoření objektu v programu.",
+      "A) Funkce `hash()` převádí všechna reálná čísla na celá čísla, zatímco `id()` zjišťuje aktuální úroveň zanoření objektu v programu.",
+      "B) Funkce `hash()` a `id()` jsou plně zastupitelné a uvedený rozdíl vrací pouze interpretr spuštěný v optimalizačním režimu `-O`.",
       "C) Funkce `hash()` vrací stejnou hodnotu pro čísla se stejnou matematickou hodnotou, zatímco `id()` vrací unikátní adresu objektu v paměti.",
       "D) Funkce `hash()` porovnává bajtové kódování typů na disku, zatímco `id()` přepočítává celkový počet alokovaných bajtů v paměti."
     ],

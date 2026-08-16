@@ -5,9 +5,9 @@
     "question": "Jaký je hlavní rozdíl mezi Unicode Code Pointem a kódováním UTF-8?",
     "options": [
       "A) Code point je abstrakce přiřazující číselnou hodnotu znaku, zatímco UTF-8 definuje uložení této hodnoty v bajtech.",
-      "B) Code point určuje pořadí bajtů v paměti (BOM), zatímco UTF-8 omezuje počet všech dostupných znaků na 256.",
+      "B) Code point slouží výhradně pro zápis v HTML entitách, zatímco UTF-8 je specifikace pro terminálový výstup.",
       "C) Code point představuje osmibitovou bajtovou sekvencí, zatímco UTF-8 je název univerzální tabulky všech znaků.",
-      "D) Code point slouží výhradně pro zápis v HTML entitách, zatímco UTF-8 je specifikace pro terminálový výstup."
+      "D) Code point určuje pořadí bajtů v paměti (BOM), zatímco UTF-8 omezuje počet všech dostupných znaků na 256."
     ],
     "answer": 0,
     "explanation": "Code point (např. U+0041) je pouze abstrakce a pořadové číslo znaku v Unicode tabulce, zatímco kódování jako UTF-8 definuje konkrétní algoritmus a bajtovou reprezentaci tohoto čísla v paměti či souboru."
@@ -17,9 +17,9 @@
     "type": "multiple_choice",
     "question": "Kolik bajtů zabere český znak s diakritikou (např. 'ě') při zakódování do UTF-8?",
     "options": [
-      "A) Právě 1 bajt, protože všechna latinská písmena mají v kódování UTF-8 vždy pevné jednobajtové zastoupení.",
+      "A) Právě 3 bajty, protože evropské národní abecedy vyžadují v UTF-8 stejný počet bajtů jako asijské znaky.",
       "B) Právě 2 bajty, protože codepoint leží v rozsahu 128 až 2047, který UTF-8 kóduje dvěma oktety.",
-      "C) Právě 3 bajty, protože evropské národní abecedy vyžadují v UTF-8 stejný počet bajtů jako asijské znaky.",
+      "C) Právě 1 bajt, protože všechna latinská písmena mají v kódování UTF-8 vždy pevné jednobajtové zastoupení.",
       "D) Právě 4 bajty, což je maximální délka libovolného kódovaného Unicode znaku podle současného standardu."
     ],
     "answer": 1,
@@ -31,9 +31,9 @@
     "question": "K čemu slouží sekvence BOM (Byte Order Mark) na začátku textových souborů?",
     "options": [
       "A) Komprimuje textové řetězce odstraněním nadbytečných nulových bitů z každého osmitaktového bajtu.",
-      "B) Převádí automaticky všechny znaky v souboru z kódové stránky CP1250 na univerzální kódování ISO 8859-2.",
+      "B) Šifruje textový obsah souboru, aby nemohl být přečten jiným textovým editorem než v původním systému.",
       "C) Určuje pořadí bajtů (big/little endian) u vícebajtových kódování jako UTF-16 a indikuje kódování souboru.",
-      "D) Šifruje textový obsah souboru, aby nemohl být přečten jiným textovým editorem než v původním systému."
+      "D) Převádí automaticky všechny znaky v souboru z kódové stránky CP1250 na univerzální kódování ISO 8859-2."
     ],
     "answer": 2,
     "explanation": "BOM (např. FE FF pro UTF-16) slouží k detekci pořadí bajtů (endianness). U UTF-8 (EF BB BF) je BOM zbytečný, protože UTF-8 pracuje s jednoliitými bajty."
@@ -44,9 +44,9 @@
     "question": "Doplňte metodu řetězce str pro jeho zakódování do posloupnosti bajtů (bytes) ve formátu UTF-8:",
     "code_snippet": "bajtovy_retezec = \"svět\".________('utf-8')",
     "options": [
+      "pack",
       "decode",
       "to_bytes",
-      "pack",
       "encode"
     ],
     "answer": 3,
@@ -60,9 +60,9 @@
     "question": "Jak rozpozná dekodér UTF-8, že bajt je pokračováním (2., 3. nebo 4. bajtem) vícebajtového znaku?",
     "options": [
       "A) Jeho nejvýznamnější bity (předpona) mají vždy přesnou binární hodnotu 10xxxxxx.",
-      "B) Obsahuje výhradně samé nuly na všech osmi bitových pozicích daného bajtu.",
-      "C) Jeho nejvýznamnější bity (předpona) mají vždy přesnou binární hodnotu 110zzzyy.",
-      "D) Jeho nejnižší bity (přípona) mají vždy přesnou binární hodnotu xxxxxx00."
+      "B) Jeho nejnižší bity (přípona) mají vždy přesnou binární hodnotu xxxxxx00.",
+      "C) Obsahuje výhradně samé nuly na všech osmi bitových pozicích daného bajtu.",
+      "D) Jeho nejvýznamnější bity (předpona) mají vždy přesnou binární hodnotu 110zzzyy."
     ],
     "answer": 0,
     "explanation": "V UTF-8 bajty začínající bity `10` předznamenávají následný (pokračující) bajt vícebajtového znaku. Úvodní bajt vícebajtové sekvence začíná `110...`, `1110...` nebo `11110...` podle počtu celkových bajtů."
@@ -83,10 +83,10 @@
     "type": "predict_output",
     "question": "Jaký bude výstup kódu 'svět'.encode('utf-8')?",
     "options": [
-      "A) b'sv\\x00\\x9bt' — bajtový řetězec o 5 bajtech, kde diakritický znak ě je nahrazen nulovým bajtem.",
+      "A) b'sv\\u011bt' — neplatný bajtový řetězec obsahující neinterpretovanou Unicode únikovou sekvenci.",
       "B) b'sv\\xc4\\x9bt' — bajtový řetězec o 5 bajtech, kde diakritický znak ě zabírá dva bajty \\xc4\\x9b.",
-      "C) b'sv\\u011bt' — neplatný bajtový řetězec obsahující neinterpretovanou Unicode únikovou sekvenci.",
-      "D) b'sv\\xebt' — bajtový řetězec o 4 bajtech, kde diakritický znak ě zabírá pouze jeden bajt."
+      "C) b'sv\\xebt' — bajtový řetězec o 4 bajtech, kde diakritický znak ě zabírá pouze jeden bajt.",
+      "D) b'sv\\x00\\x9bt' — bajtový řetězec o 5 bajtech, kde diakritický znak ě je nahrazen nulovým bajtem."
     ],
     "answer": 1,
     "explanation": "Znaky s, v, t spadají do ASCII (1 bajt), zatiaľ čo 'ě' má codepoint 283 a v UTF-8 se kóduje dvěma bajty 0xC4 0x9B. Celková délka výstupního bajtového řetězce je tedy 5 bajtů."

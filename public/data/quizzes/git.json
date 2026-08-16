@@ -4,8 +4,8 @@
     "type": "multiple_choice",
     "question": "Jakým způsobem ukládá Git historii změn v projektu uvnitř adresáře .git?",
     "options": [
-      "A) Ukládá postupné řádkové rozdíly (delty) mezi jednotlivými verzemi souborů.",
-      "B) Ukládá komprimované ZIP archivy celého adresáře pro každý jednotlivý commit.",
+      "A) Ukládá komprimované ZIP archivy celého adresáře pro každý jednotlivý commit.",
+      "B) Ukládá postupné řádkové rozdíly (delty) mezi jednotlivými verzemi souborů.",
       "C) Ukládá pouze změněné řádky textu bez vazby na celkovou strukturu adresářů.",
       "D) Ukládá kompletní snímky (snapshoty) stavu projektu označené SHA-1 hešem."
     ],
@@ -42,10 +42,10 @@
     "question": "Kterým příkazem odeberete soubor ze staging area (unstage) bez ztráty rozpracovaných úprav v pracovním adresáři?",
     "code": "# Vyřazení souboru ze staging area před vytvořením commitu\ngit ________ HEAD titration_data.py",
     "options": [
-      "checkout",
+      "revert",
       "reset",
-      "remove",
-      "revert"
+      "checkout",
+      "remove"
     ],
     "answer": 1,
     "explanation": "Příkaz git reset HEAD soubor vyjme soubor z indexu (staging area), ale ponechá veškeré změny v souboru na disku nedotčené.",
@@ -56,10 +56,10 @@
     "type": "multiple_choice",
     "question": "Který příkaz zobrazí rozdíl mezi změnami připravenými v indexu (staging area) a posledním komitem v HEAD?",
     "options": [
-      "A) git log -p pro zobrazení kompletní historie všech commitů v celém projektu.",
-      "B) git diff HEAD pro porovnání neuvolněných změn na disku přímo s repozitářem.",
+      "A) git diff bez přepínačů pro porovnání pracovní složky se stavem v indexu.",
+      "B) git log -p pro zobrazení kompletní historie všech commitů v celém projektu.",
       "C) git diff --cached pro porovnání stavu indexu s aktuálním komitem v repozitáři.",
-      "D) git diff bez přepínačů pro porovnání pracovní složky se stavem v indexu."
+      "D) git diff HEAD pro porovnání neuvolněných změn na disku přímo s repozitářem."
     ],
     "answer": 2,
     "explanation": "`git diff` bez parametrů porovnává pracovní složku vůči indexu. Pro porovnání změn zanesených do indexu vůči posledním nakomitovaným změnám v repozitáři slouží přepínač `git diff --cached` (případně `--staged`). Příkaz `git diff HEAD` porovnává nekomitovanou pracovní složku přímo s HEAD."
@@ -69,9 +69,9 @@
     "type": "multiple_choice",
     "question": "Jaký je hlavní rozdíl mezi příkazy git reset HEAD~1 a git reset --soft HEAD~1?",
     "options": [
-      "A) reset HEAD~1 funguje na vzdáleném serveru, zatímco --soft funguje pouze lokálně.",
-      "B) reset HEAD~1 vytvoří nový komit v historii, zatímco --soft komit vymaže z reflogu.",
-      "C) reset HEAD~1 smaže úpravy na disku, zatímco --soft zachová soubory v pracovní složce.",
+      "A) reset HEAD~1 vytvoří nový komit v historii, zatímco --soft komit vymaže z reflogu.",
+      "B) reset HEAD~1 smaže úpravy na disku, zatímco --soft zachová soubory v pracovní složce.",
+      "C) reset HEAD~1 funguje na vzdáleném serveru, zatímco --soft funguje pouze lokálně.",
       "D) reset HEAD~1 vrátí komit a zruší staging změn, zatímco --soft ponechá změny v indexu."
     ],
     "answer": 3,
@@ -83,8 +83,8 @@
     "question": "Který nástroj zprostředkuje nalezení SHA-1 heše smazaného komitu po nechtěném spuštění git reset --hard?",
     "options": [
       "A) git reflog pro výpis kompletní historie pohybů ukazatele HEAD v lokálním repozitáři.",
-      "B) git fsck pro vyčištění nepoužívaných datových objektů z vnitřní databáze repozitáře.",
-      "C) git remote pro ověření stavu vzdáleného serveru a stažení chybějících komitů.",
+      "B) git remote pro ověření stavu vzdáleného serveru a stažení chybějících komitů.",
+      "C) git fsck pro vyčištění nepoužívaných datových objektů z vnitřní databáze repozitáře.",
       "D) git status pro zobrazení pracovního stromu a seznamu nezarovnaných souborů na disku."
     ],
     "answer": 0,
@@ -95,10 +95,10 @@
     "type": "multiple_choice",
     "question": "Jaký dopad má spuštění příkazu git rm --cached data.txt na soubor data.txt?",
     "options": [
-      "A) Příkaz vyvolá chybu selhání, protože ze staging area nelze odebrat existující soubor.",
+      "A) Soubor se přesune do adresáře .git a označí se jako dočasná záloha pracovního stromu.",
       "B) Soubor se přestane verzovat v indexu Gitu, ale zůstane zachován na lokálním disku.",
-      "C) Soubor se přesune do adresáře .git a označí se jako dočasná záloha pracovního stromu.",
-      "D) Soubor se okamžitě vymaže z lokálního disku i ze všech předchozích komitů v historii."
+      "C) Soubor se okamžitě vymaže z lokálního disku i ze všech předchozích komitů v historii.",
+      "D) Příkaz vyvolá chybu selhání, protože ze staging area nelze odebrat existující soubor."
     ],
     "answer": 1,
     "explanation": "Přepínač `--cached` dá příkazu `git rm` pokyn odebrat soubor ze staging area a přestat jej sledovat v Gitu, ale neprovádí fyzické smazání souboru ze souborového systému na disku."
@@ -120,10 +120,10 @@
     "question": "Kterým příkazem stáhnete nové commity ze vzdáleného repozitáře do lokální databáze bez automatického sloučení do pracovní větve?",
     "code": "# Stažení nových commitů ze vzdáleného serveru bez úpravy pracovních souborů\ngit ________ origin\ngit log HEAD..origin/main",
     "options": [
+      "checkout",
       "commit",
-      "clone",
       "fetch",
-      "checkout"
+      "clone"
     ],
     "answer": 2,
     "explanation": "Příkaz git fetch stáhne historii a objekty ze vzdáleného repozitáře do lokální kopie bez zásahu do aktuální pracovní větve.",

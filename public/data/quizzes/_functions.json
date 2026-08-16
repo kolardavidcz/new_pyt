@@ -19,10 +19,10 @@
     "question": "Doplňte token do definice funkce pro výpočet pH, který vynutí zadání parametru `temperature` výhradně jako pojmenovaného argumentu.",
     "code_snippet": "def fn(a, b, ________, c=10):\n    return a + b + c",
     "options": [
+      "/",
       "**",
-      "*args",
       "*",
-      "/"
+      "*args"
     ],
     "answer": 2,
     "explanation": "Samostatná hvězdička `*` v hlavičce funkce označuje hranici keyword-only parametrů — všechny parametry uvedené za ní musí být volány s názvem argumentu.",
@@ -51,8 +51,8 @@
     "options": [
       "A) [1, 2] — výchozí seznam se vytvoří pouze jednou při definici funkce a jeho modifikace přetrvávají mezi voláními.",
       "B) [2] — při každém volání bez druhého argumentu se inicializuje nový prázdný seznam a starý je smazán z paměti.",
-      "C) AttributeError — metoda append vyvolá výjimku, protože výchozí parametr je vyhodnocen jako neměnná n-tice.",
-      "D) [1] — funkce vrací předchozí stav seznamu před přidáním nového prvku z důvodu nesynchronizovaného zápisu."
+      "C) [1] — funkce vrací předchozí stav seznamu před přidáním nového prvku z důvodu nesynchronizovaného zápisu.",
+      "D) AttributeError — metoda append vyvolá výjimku, protože výchozí parametr je vyhodnocen jako neměnná n-tice."
     ],
     "answer": 0,
     "explanation": "Seznam [] ve výchozím parametru je vytvořen pouze jednou při definici funkce def. Všechna volání fn() bez druhého argumentu sdílejí stejný objekt v paměti. Volání fn(1) do něj přidá 1 a volání fn(2) přidá 2, takže výsledek je [1, 2]."
@@ -64,8 +64,8 @@
     "options": [
       "A) fn(1, 2, 3) — hodnota pro parametr c nesmí být předána pozičně, pokud jsou předchozí parametry odděleny lomítkem.",
       "B) fn(a=1, b=2, c=3) — parametry před lomítkem / jsou definovány jako výhradně poziční a nelze je volat jménem.",
-      "C) fn(1, 2, c=3) — parametr c za lomítkem vyžaduje povinné předání jménem a nelze mu předat poziční hodnotu.",
-      "D) fn(a=1, 2, 3) — poziční argumenty nesmí předcházet pojmenovaným argumentům při jakémkoliv volání funkce."
+      "C) fn(a=1, 2, 3) — poziční argumenty nesmí předcházet pojmenovaným argumentům při jakémkoliv volání funkce.",
+      "D) fn(1, 2, c=3) — parametr c za lomítkem vyžaduje povinné předání jménem a nelze mu předat poziční hodnotu."
     ],
     "answer": 1,
     "explanation": "Lomítko / v definici parametrů označuje, že všechny parametry stojící před ním (a a b) jsou positional-only. Zkuste-li je předat pomocí jména (a=1, b=2), Python vyvolá TypeError. Parametr c za lomítkem lze předat jak pozičně (fn(1, 2, 3)), tak pojmenovaně (fn(1, 2, c=3))."
@@ -77,9 +77,9 @@
     "code_snippet": "def make_multiplier(factor):\n    def multiply(number):\n        return number * factor\n    return multiply\n\ndouble = make_multiplier(2)\nprint(double(5))",
     "options": [
       "A) 25 — vnitřní funkce vynásobí předaný argument sám sebou a ignoruje proměnnou zapsanou ve vnějším rozsahu.",
-      "B) NameError — proměnná factor z vnější funkce již po návratu neexistuje a vnitřní funkce k ní nemá přístup.",
+      "B) TypeError — vrácená vnitřní funkce vyžaduje při spuštění dva argumenty včetně původního parametru factor.",
       "C) 10 — vnitřní funkce si uchovává přístup k proměnné factor z vnějšího rozsahu i po skončení vnější funkce.",
-      "D) TypeError — vrácená vnitřní funkce vyžaduje při spuštění dva argumenty včetně původního parametru factor."
+      "D) NameError — proměnná factor z vnější funkce již po návratu neexistuje a vnitřní funkce k ní nemá přístup."
     ],
     "answer": 2,
     "explanation": "Jde o princip uzávěru (closure). Vnitřní funkce multiply si při svém vzniku zapamatuje lexikální kontext vnější funkce, v tomto případě hodnotu factor = 2. Volání double(5) tedy spočítá 5 * 2 = 10."
@@ -101,8 +101,8 @@
     "question": "Co se stane při pokusu o spuštění následujícího kódu?",
     "code_snippet": "def fn(x, y=3):\n    return x ** y\n\nres = fn(x=2, 4)",
     "options": [
-      "A) Nastane TypeError, protože parametr x obdrží dvě různé hodnoty a parametr y zůstane bez zadané výchozí hodnoty.",
-      "B) Proběhne výpočet s výsledkem 8, protože první pojmenovaný argument vyruší platnost druhého zadaného argumentu.",
+      "A) Proběhne výpočet s výsledkem 8, protože první pojmenovaný argument vyruší platnost druhého zadaného argumentu.",
+      "B) Nastane TypeError, protože parametr x obdrží dvě různé hodnoty a parametr y zůstane bez zadané výchozí hodnoty.",
       "C) Proběhne výpočet s výsledkem 16, protože Python automaticky přiřadí druhý argument 4 zbývajícímu parametru y.",
       "D) Nastane SyntaxError, protože v definici volání funkce nesmí žádný poziční argument následovat za pojmenovaným argumentem."
     ],

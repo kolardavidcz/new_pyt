@@ -17,10 +17,10 @@
     "type": "multiple_choice",
     "question": "Co vrátí atribut p.stem pro cestu p = Path('/var/log/app.tar.gz')?",
     "options": [
-      "A) .tar.gz",
+      "A) app.tar.gz",
       "B) app",
       "C) app.tar",
-      "D) app.tar.gz"
+      "D) .tar.gz"
     ],
     "answer": 2,
     "explanation": "Atribut .stem odsekne pouze poslední příponu (.gz), takže vrátí 'app.tar'. Celé jméno je 'app.tar.gz' (.name) a seznam všech přípon je ['.tar', '.gz'] (.suffixes)."
@@ -31,8 +31,8 @@
     "question": "Jaký datový typ mají prvky vrácené generátorem p.iterdir()?",
     "options": [
       "A) Souborové popisovače (file descriptors) otevřené pro čtení obsahu adresáře.",
-      "B) N-tice (tuple) obsahující název souboru a jeho metadata vrácená ze systémového stat.",
-      "C) Prosté řetězce (str) obsahující relativní cesty k jednotlivým souborům a složkám.",
+      "B) Prosté řetězce (str) obsahující relativní cesty k jednotlivým souborům a složkám.",
+      "C) N-tice (tuple) obsahující název souboru a jeho metadata vrácená ze systémového stat.",
       "D) Objekty typu Path (PosixPath nebo WindowsPath) reprezentující příslušné položky."
     ],
     "answer": 3,
@@ -44,9 +44,9 @@
     "question": "Jaký je hlavní rozdíl mezi třídami PurePath a Path v modulu pathlib?",
     "options": [
       "A) PurePath provádí pouze řetězcové operace bez přístupu k souborovému systému.",
-      "B) PurePath slouží k načítání textových souborů, zatímco Path spravuje binární soubory.",
-      "C) PurePath podporuje výhradně operační systém Linux, zatímco Path funguje i na Windows.",
-      "D) PurePath je starší zastaralá třída určená pro zpětnou kompatibilitu s Pythonem 2."
+      "B) PurePath je starší zastaralá třída určená pro zpětnou kompatibilitu s Pythonem 2.",
+      "C) PurePath slouží k načítání textových souborů, zatímco Path spravuje binární soubory.",
+      "D) PurePath podporuje výhradně operační systém Linux, zatímco Path funguje i na Windows."
     ],
     "answer": 0,
     "explanation": "PurePath a její podtřídy provádí pouze syntaktické úpravy cest v paměti bez přímého I/O volání OS. Třída Path dědí z PurePath a přidává reálné operace se souborovým systémem."
@@ -57,10 +57,10 @@
     "question": "Doplňte metodu objektu Path pro rekurzivní vyhledání souborů odpovídajících vzoru ve všech podsložkách:",
     "code_snippet": "from pathlib import Path\np = Path('/projekty')\npy_files = list(p.________('*.py'))",
     "options": [
-      "glob_all",
+      "iterdir",
       "rglob",
-      "find",
-      "iterdir"
+      "glob_all",
+      "find"
     ],
     "answer": 1,
     "explanation": "Metoda Path.rglob(pattern) rekurzivně prochází adresář i všechny jeho podsložky a vyhledává shody s daným vzorem.",
@@ -73,9 +73,9 @@
     "question": "Co provede metoda p.resolve() na objektu Path?",
     "options": [
       "A) Změní přístupová práva souboru tak, aby odpovídala absolutním právům vlastníka.",
-      "B) Vytvoří nový soubor na zadané cestě, pokud daný soubor na disku dosud neexistuje.",
+      "B) Pouze připojí aktuální pracovní adresář před relativní cestu bez řešení symlinků.",
       "C) Převede cestu na kanonickou, odstraní symbolické odkazy a eliminujeme sekvence ..",
-      "D) Pouze připojí aktuální pracovní adresář před relativní cestu bez řešení symlinků."
+      "D) Vytvoří nový soubor na zadané cestě, pokud daný soubor na disku dosud neexistuje."
     ],
     "answer": 2,
     "explanation": "Metoda resolve() vytvoří absolutní kanonickou cestu – nahradí symbolické odkazy jejich cílem a odstraní relativní složky jako '.' a '..'. Metoda absolute() pouze připojí cwd bez řešení symlinků."

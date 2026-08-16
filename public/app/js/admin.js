@@ -133,7 +133,7 @@ function renderAdminModalContent(activeTab = "improvements") {
           </div>
 
           <div class="admin-toolbar" style="display:flex; gap:10px; margin-bottom:12px; align-items:center;">
-            <input type="text" class="admin-search-input" id="admSearchImp" placeholder="Hledat podle otázky, tématu nebo poznámky..." style="flex:1;" />
+            <input type="text" class="admin-search-input" id="admSearchImp" name="search_admin_improvements_filter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" data-1p-ignore placeholder="Hledat podle otázky, tématu nebo poznámky..." style="flex:1;" />
             <select class="admin-search-input" id="admFilterStatus" style="min-width:150px;">
               <option value="all">Všechny stavy</option>
               <option value="open" selected>Pouze otevřené (${openCount})</option>

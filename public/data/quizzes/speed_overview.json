@@ -4,10 +4,10 @@
     "type": "multiple_choice",
     "question": "Jakým způsobem probíhá vývoj a překlad samotného interpretu PyPy?",
     "options": [
-      "A) Zdrojový kód PyPy se kompiluje přímo do systémového assembleru procesoru přes LLVM bez mezikroku v C.",
+      "A) PyPy funguje jako skript v čistém Pythonu, který dynamicky upravuje bytecode CPythonu před spuštěním.",
       "B) PyPy je napsán v C++ a využívá rozhraní Java Virtual Machine pro dynamický překlad bytekódu v paměti.",
       "C) Kód napsaný v RPythonu se přeloží do jazyka C a následně zkompiluje do spustitelné binárky interpretu.",
-      "D) PyPy funguje jako skript v čistém Pythonu, který dynamicky upravuje bytecode CPythonu před spuštěním."
+      "D) Zdrojový kód PyPy se kompiluje přímo do systémového assembleru procesoru přes LLVM bez mezikroku v C."
     ],
     "answer": 2,
     "explanation": "Vývoj PyPy probíhá tak, že je napsán v omezené podmnožině Pythonu zvané RPython (Restricted Python). RPython je přeložen do C a následně zkompilován běžným C kompilátorem."
@@ -15,7 +15,7 @@
   {
     "id": "q2",
     "type": "fill_blank_choice",
-    "question": "Doplňte parametr dekorátoru @jit z knihovny Numba, který vynutí čistou kompilaci do strojového kódu bez závislosti na Python runtime (C-API):",
+    "question": "Doplňte parametr dekorátoru @jit, který zaručí vyhození výjimky při neschopnosti zkompilovat kód bez Python C-API:\n\n```python\nfrom numba import jit\n\n@jit(________=True)\ndef vypocet(x):\n    return x.sum()\n```",
     "options": [
       "fastmath",
       "strict",
@@ -23,8 +23,7 @@
       "nopython"
     ],
     "answer": 3,
-    "explanation": "Parametr nopython=True (ekvivalent dekorátoru @njit) zakazuje pomalý object mode a vyvolá chybu, pokud Numba nedokáže funkci přeložit do čistého strojového kódu.",
-    "code": "from numba import jit\n\n# Vynucení čistého nativního překladu bez fallbacku do object mode:\n@jit(________=True)\ndef compute_sum(arr):\n    total = 0.0\n    for val in arr:\n        total += val\n    return total",
+    "explanation": "Parametr nopython=True (nebo samostatný dekorátor @njit) zakáže fallback do pomalého object mode. Pokud Numba nemůže kód přeložit do čistého nativního kódu bez Python C-API, vyvolá výjimku.",
     "expected": "nopython"
   },
   {
@@ -34,8 +33,8 @@
     "options": [
       "A) Vytvoří ze skalární funkce univerzální funkce (ufunc) schopnou pracovat nad vícerozměrnými poli.",
       "B) Uvolní Globální zámek interpretu (GIL) a automaticky rozloží výpočet mezi více samostatných OS procesů.",
-      "C) Zabezpečí automatickou konverzi Python objektů na C-struktury bez nutnosti instalace knihovny LLVM.",
-      "D) Přeloží Python kód dopředu (AOT) do samostatného dynamického knihovního souboru .so nebo .dll na disku."
+      "C) Přeloží Python kód dopředu (AOT) do samostatného dynamického knihovního souboru .so nebo .dll na disku.",
+      "D) Zabezpečí automatickou konverzi Python objektů na C-struktury bez nutnosti instalace knihovny LLVM."
     ],
     "answer": 0,
     "explanation": "Dekorátor @vectorize umožňuje napsat funkci pro skalární hodnoty a automaticky z ní vygeneruje NumPy ufunc, která podporuje broadcasting a operace nad vícerozměrnými n-dimenzionálními poli."
@@ -45,10 +44,10 @@
     "type": "predict_output",
     "question": "Co umožní nastavení parametru nogil=True u dekorátoru @jit v Numbě během provádění zkompilované funkce?",
     "options": [
-      "A) Vypne kontrolu přetečení paměti u polí NumPy a zrychlí indexaci prvků vynecháním platnostních testů.",
+      "A) Přesune provádění výpočtu z procesoru CPU přímo na grafický akcelerátor GPU s využitím rozhraní CUDA.",
       "B) Uvolní Globální zámek interpretu (GIL), takže zkompilovaná funkce může běžet souběžně ve více vláknech.",
       "C) Zaručí, že funkce bude moci přistupovat k dynamickým objektům typu dict a list bez použití zámku.",
-      "D) Přesune provádění výpočtu z procesoru CPU přímo na grafický akcelerátor GPU s využitím rozhraní CUDA."
+      "D) Vypne kontrolu přetečení paměti u polí NumPy a zrychlí indexaci prvků vynecháním platnostních testů."
     ],
     "answer": 1,
     "explanation": "Parametr nogil=True instruuje Numbu, aby během vykonávání zkompilovaného nativního kódu uvolnila GIL (Global Interpreter Lock). Díky tomu mohou jiná Python vlákna běžet současně na jiných CPU jádrech."

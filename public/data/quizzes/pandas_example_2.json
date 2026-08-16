@@ -1,0 +1,82 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jak se změní datový typ celočíselného sloupce v Pandas DataFrame, pokud obsahuje chybějící hodnoty načtené jako np.nan?",
+    "options": [
+      "A) Celý sloupec zůstane nezměněn jako np.int64 a np.nan se nahradí nulou bez upozornění vývojáře.",
+      "B) Sloupec se automaticky převede na textový řetězec str, přičemž všechny nuly se vymažou z dat.",
+      "C) Celý sloupec se automaticky přetypuje na plovoucí řádkovou čárku np.float64 nebo obecný typ object.",
+      "D) Vyvolá se runtime výjimka ValueError, protože standardní číselné pole v Pandas nedovoluje np.nan."
+    ],
+    "answer": 2,
+    "explanation": "Standardní NumPy typ np.int64 neumí reprezentovat chybějící hodnotu NaN. Přítomnost np.nan v celočíselném poli proto v Pandas vynutí přetypování celého sloupce na np.float64."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jak zabránit přetypování celočíselného sloupce s chybějícími hodnotami na float64 při načítání dat v Pandas?",
+    "options": [
+      "A) Přetypováním všech chybějících hodnot na řetězec 'null' pomocí metody replace() po importu tabulky.",
+      "B) Použitím standardního typu int v Pythonu, který na rozdíl od np.int64 nativně podporuje np.nan.",
+      "C) Nastavením globálního parametru pd.options.mode.use_inf_as_na = True před načtením excelovského souboru.",
+      "D) Předepsáním rozšiřujícího typu 'Int64' (alias pro pd.Int64Dtype()) v parametru dtype při importu dat."
+    ],
+    "answer": 3,
+    "explanation": "Pandas nabízí nullable celočíselné datové typy (např. 'Int64' s velkým 'I'), které udržují celá čísla a pro chybějící pozice používají speciální konstantu <NA> bez přetypování na float."
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Kterou metodou nahradíte všechny chybějící hodnoty (NaN / <NA>) ve sloupci df['DOSPELCI'] hodnotou 0?\n\n```python\n# Kterou metodou nahradíte všechny chybějící hodnoty (NaN / <NA>) ve sloupci df['DOSPELCI'] hodnotou 0?\nvysledek = ________\n```",
+    "options": [
+      "df['DOSPELCI'].fillna(0)",
+      "df['DOSPELCI'].null_to_zero()",
+      "df['DOSPELCI'].replace_na(0)",
+      "df['DOSPELCI'].dropna(value=0)"
+    ],
+    "answer": 0,
+    "explanation": "Metoda fillna(value) nahrazuje všechny chybějící hodnoty (np.nan, pd.NA) v Series nebo DataFrame zadanou náhradní hodnotou.",
+    "expected": "df['DOSPELCI'].fillna(0)"
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl mezi voláním df['DRUH_CZ'].unique() a df['DRUH_CZ'].nunique() v Pandas?",
+    "options": [
+      "A) unique() seřadí hodnoty podle abecedy, zatímco nunique() je ponechá v původním pořadí výskytu v datatframu.",
+      "B) unique() vrací pole (ndarray) s unikátními prvky sloupce, zatímco nunique() vrací celkový počet těchto unikátních prvků.",
+      "C) unique() automaticky zahrnuje chybějící hodnoty NaN, zatímco nunique() vždy vyvolá chybu paměti.",
+      "D) nunique() vrací pole (ndarray) s unikátními prvky sloupce, zatímco unique() vrací celkový počet těchto unikátních prvků."
+    ],
+    "answer": 1,
+    "explanation": "Metoda unique() vrací pole unikátních hodnot (včetně případných NaN), kdežto nunique() vrací celé číslo udávající počet unikátních neprázdných prvků."
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Jaký účinek má kód out_df.loc[len(out_df)] = [druh, pocet_ptaku, pocet_rybniku] na existujícím DataFrame out_df s číselným indexem?",
+    "options": [
+      "A) Vyvolá výjimku IndexError, protože index len(out_df) leží mimo rozsah existujících řádků v paměti.",
+      "B) Přepíše první řádek v DataFrame pod indexem 0 a vymaže veškerá dříve uložená data v datatframu.",
+      "C) Přidá nový řádek s danými hodnotami na konec DataFrame pod index rovnající se aktuálnímu počtu řádků.",
+      "D) Vytvoří nový sloupec s názvem odpovídajícím hodnotě proměnné druh na konci tabulky DataFrame."
+    ],
+    "answer": 2,
+    "explanation": "Jelikož v nula odvozeném indexu je len(out_df) přesně následující volný index, zápis do out_df.loc[len(out_df)] efektivně připojí nový řádek na konec tabulky."
+  },
+  {
+    "id": "q6",
+    "type": "fill_blank_choice",
+    "question": "Který parametr metody to_excel() zamezí zbytečnému ukládání číselného indexu řádků do nového Excel souboru output.to_excel('vysledek.xlsx', ________)?\n\n```python\n# Který parametr metody to_excel() zamezí zbytečnému ukládání číselného indexu řádků do nového Excel souboru output.to_excel('vysledek.xlsx', ________)?\nvysledek = ________\n```",
+    "options": [
+      "row_names=False",
+      "no_index=True",
+      "header=False",
+      "index=False"
+    ],
+    "answer": 3,
+    "explanation": "Parametr index=False potlačí export nultého sloupce s řádkovým indexem DataFrame do výsledného souboru Excel nebo CSV.",
+    "expected": "index=False"
+  }
+]

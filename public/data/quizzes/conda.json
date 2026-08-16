@@ -5,9 +5,9 @@
     "question": "Jaký příkaz vytvoří virtuální prostředí s názvem chem a Pythonem verze 3.11?",
     "options": [
       "A) conda create -n chem python=3.11 pro definici názvu prostředí a konkrétní verze Pythonu.",
-      "B) conda make -p chem python-3.11 pro nastavení lokální cesty a stažení interpretru Pythonu.",
+      "B) conda new --name chem python3.11 pro vygenerování výchozí konfigurace balíčků v Condě.",
       "C) conda init -e chem python==3.11 pro inicializaci nového izolovaného adresáře v systému.",
-      "D) conda new --name chem python3.11 pro vygenerování výchozí konfigurace balíčků v Condě."
+      "D) conda make -p chem python-3.11 pro nastavení lokální cesty a stažení interpretru Pythonu."
     ],
     "answer": 0,
     "explanation": "Příkaz conda create s přepínačem -n (nebo --name) specifikuje název prostředí a za ním následují specifikace balíčků včetně verze v zápisu python=3.11."
@@ -18,10 +18,10 @@
     "question": "Který přepínač příkazu conda remove je nutné zadat pro úplné odstranění celého virtuálního prostředí i se všemi balíčky?",
     "code": "# Kompletní smazání existujícího prostředí pro spektrometrii\nconda remove --name chem_env ________",
     "options": [
-      "--force",
+      "--clean",
       "--all",
-      "--purge",
-      "--clean"
+      "--force",
+      "--purge"
     ],
     "answer": 1,
     "explanation": "Bez přepínače --all by conda remove --name <env> pouze čekala na konkrétní balíčky ke smazání; přepínač --all smaže celé prostředí.",
@@ -33,10 +33,10 @@
     "question": "Co se stane s aktivním virtuálním prostředím po zadání příkazu conda deactivate?",
     "code": "(myenv) $ conda deactivate",
     "options": [
-      "A) Příkaz způsobí chybové hlášení, protože v Condě je nutné specifikovat název prostředí.",
-      "B) Příkaz zruší aktivní prostředí a trvale smaže jeho adresář z pevného disku počítače.",
+      "A) Příkaz ukončí běžící terminál a restartuje systémovou proměnnou prostředí PATH.",
+      "B) Příkaz způsobí chybové hlášení, protože v Condě je nutné specifikovat název prostředí.",
       "C) Příkaz prostředí deaktivuje a přepne uživatele zpět do základního prostředí base.",
-      "D) Příkaz ukončí běžící terminál a restartuje systémovou proměnnou prostředí PATH."
+      "D) Příkaz zruší aktivní prostředí a trvale smaže jeho adresář z pevného disku počítače."
     ],
     "answer": 2,
     "explanation": "Zavoláním conda deactivate bez argumentů dojde k opuštění aktuálního prostředí a automatickému přepnutí do výchozího (kořenového) prostředí base."
@@ -46,9 +46,9 @@
     "type": "multiple_choice",
     "question": "Proč příkaz conda update --all nepovýší Python 3.8 na verzi 3.10, i když je 3.10 v repozitáři dostupná?",
     "options": [
-      "A) Vyžaduje nejdříve kompletní odinstalaci příkazu conda a jeho znovunainstalování v nejnovější verzi.",
-      "B) Aktualizuje pouze balíčky instalované pomocí pipu a systémové knihovny C++, Python ignoruje.",
-      "C) Povyšuje balíčky výhradně na úrovni mikro-verzí a neumožňuje žádnou manuální změnu hlavní verze Pythonu.",
+      "A) Aktualizuje pouze balíčky instalované pomocí pipu a systémové knihovny C++, Python ignoruje.",
+      "B) Povyšuje balíčky výhradně na úrovni mikro-verzí a neumožňuje žádnou manuální změnu hlavní verze Pythonu.",
+      "C) Vyžaduje nejdříve kompletní odinstalaci příkazu conda a jeho znovunainstalování v nejnovější verzi.",
       "D) Zachovává konzistenci prostředí, protože ostatní nainstalované balíčky nemusí verzi 3.10 ještě podporovat."
     ],
     "answer": 3,
@@ -61,8 +61,8 @@
     "code": "# Uložení definice prostředí s přesnými verzemi pro reprodukovatelnost\nconda env ________ > environment.yml",
     "options": [
       "export",
-      "save",
       "dump",
+      "save",
       "freeze"
     ],
     "answer": 0,
@@ -74,10 +74,10 @@
     "type": "multiple_choice",
     "question": "Co se stane, pokud do vytvořeného prostředí nainstalujete balíček pomocí příkazu pip install?",
     "options": [
-      "A) Instalace selže s chybovým hlášením, protože pip a Conda nesdílejí stejné instalační adresáře.",
+      "A) Balíček se nainstaluje do globální systémové instalace Pythonu a naruší systémové proměnné.",
       "B) Balíček se nainstaluje do aktivního prostředí Condy a příkaz conda list jej bude normálně evidovat.",
-      "C) Conda automaticky smaže celé virtuální prostředí z důvodu ochrany konzistence závislostí.",
-      "D) Balíček se nainstaluje do globální systémové instalace Pythonu a naruší systémové proměnné."
+      "C) Instalace selže s chybovým hlášením, protože pip a Conda nesdílejí stejné instalační adresáře.",
+      "D) Conda automaticky smaže celé virtuální prostředí z důvodu ochrany konzistence závislostí."
     ],
     "answer": 1,
     "explanation": "Při aktivním virtuálním prostředí směřuje PATH do složky tohoto prostředí. Spuštění pip install nainstaluje balíček přímo tam a conda list jej zobrazí (s příznakem kanálu pypi)."
@@ -100,9 +100,9 @@
     "code": "# Vytvoření nového prostředí na základě sdíleného konfiguračního souboru\nconda env create ________ environment.yml",
     "options": [
       "-r",
-      "-c",
+      "-i",
       "-f",
-      "-i"
+      "-c"
     ],
     "answer": 2,
     "explanation": "Přepínač -f (zkratka pro --file) specifikuje cestu ke konfiguračnímu souboru formátu YAML s definicí nového Conda prostředí.",

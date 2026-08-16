@@ -4,10 +4,10 @@
     "type": "multiple_choice",
     "question": "K čemu slouží vestavěný modul ctypes v Pythonu?",
     "options": [
-      "A) Zabezpečuje šifrování komunikace mezi procesy při přenosu objektů přes síťové sokety v lokální síti.",
-      "B) Slouží k automatické paralelizaci Python smyček vytvořením více systémových vláken bez zámku GIL.",
+      "A) Slouží k automatické paralelizaci Python smyček vytvořením více systémových vláken bez zámku GIL.",
+      "B) Překládá zdrojový kód Pythonu do samostatného spustitelného binárního souboru bez nutnosti C kompilátoru.",
       "C) Umožňuje přímé volání funkcí ze sdílených C knihoven (.dll / .so) a poskytuje datové typy kompatibilní s C.",
-      "D) Překládá zdrojový kód Pythonu do samostatného spustitelného binárního souboru bez nutnosti C kompilátoru."
+      "D) Zabezpečuje šifrování komunikace mezi procesy při přenosu objektů přes síťové sokety v lokální síti."
     ],
     "answer": 2,
     "explanation": "Modul ctypes je FFI (Foreign Function Interface) knihovna v Pythonu, která dovoluje načítat sdílené dynamické knihovny napsané v C (DLL/.so) a předávat jim C-kompatibilní datové typy."
@@ -15,16 +15,15 @@
   {
     "id": "q2",
     "type": "fill_blank_choice",
-    "question": "Doplňte atribut načtené C funkce v modulu ctypes, kterým se specifikují datové typy vstupních argumentů:",
+    "question": "Doplňte atribut objektu funkce z načtené knihovny v ctypes pro definici očekávaných typů vstupních parametrů:\n\n```python\nimport ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.spoctu_suma.________ = [ctypes.c_int, ctypes.c_int]\n```",
     "options": [
-      "signature",
       "restype",
+      "signature",
       "param_types",
       "argtypes"
     ],
     "answer": 3,
-    "explanation": "Atribut argtypes přebírá posloupnost typů z ctypes pro kontrolu a konverzi vstupních parametrů volané C funkce.",
-    "code": "import ctypes\n\nlib = ctypes.CDLL(\"./libmath.so\")\n# Definice očekávaných typů vstupních argumentů (dva int parametry):\nlib.add_integers.________ = [ctypes.c_int, ctypes.c_int]",
+    "explanation": "Atribut argtypes určuje seznam typů z modulu ctypes, které C funkce přijímá. Atribut restype se používá pro definici návratového typu.",
     "expected": "argtypes"
   },
   {
@@ -33,9 +32,9 @@
     "question": "Jak vyvolat v ctypes C funkci ze sdílené knihovny lib, jejíž název není platným identifikátorem v Pythonu (např. my-func)?",
     "options": [
       "A) Voláním funkce přes vestavěnou funkci getattr(lib, \"my-func\") předáním názvu jako řetězce.",
-      "B) Přepsáním pomlčky na podtržítko v Python skriptu, což ctypes automaticky namapuje v paměti.",
-      "C) Volání takové funkce není v ctypes možné a C knihovna se musí překompilovat s jiným názvem.",
-      "D) Načtením knihovny s parametrem rename_rules={\"my-func\": \"my_func\"} v konstruktoru CDLL."
+      "B) Načtením knihovny s parametrem rename_rules={\"my-func\": \"my_func\"} v konstruktoru CDLL.",
+      "C) Přepsáním pomlčky na podtržítko v Python skriptu, což ctypes automaticky namapuje v paměti.",
+      "D) Volání takové funkce není v ctypes možné a C knihovna se musí překompilovat s jiným názvem."
     ],
     "answer": 0,
     "explanation": "Pokud název exportované funkce v C knihovně není platný Python identifikátor (obsahuje např. pomlčku nebo tečku), nelze použít tečkovou notaci lib.my-func. Místo toho se použije getattr(lib, \"my-func\")."
@@ -54,16 +53,15 @@
   {
     "id": "q5",
     "type": "fill_blank_choice",
-    "question": "Doplňte atribut načtené C funkce v modulu ctypes, kterým se nastavuje datový typ její návratové hodnoty:",
+    "question": "Doplňte atribut pro nastavení návratového typu C funkce vracející 64bitové číslo s plovoucí čárkou:\n\n```python\nimport ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.vypocti_prumer.________ = ctypes.c_double\n```",
     "options": [
       "return_type",
       "restype",
-      "result",
-      "argtypes"
+      "argtypes",
+      "result"
     ],
     "answer": 1,
-    "explanation": "Atribut restype specifikuje typ z modulu ctypes, na který má modul převést návratovou hodnotu z C funkce (výchozí je c_int).",
-    "code": "import ctypes\n\nlib = ctypes.CDLL(\"./libmath.so\")\n# Nastavení návratového typu funkce na 64bitové číslo s plovoucí čárkou:\nlib.compute_mean.________ = ctypes.c_double",
+    "explanation": "Atribut restype říká modulu ctypes, jaký typ (např. ctypes.c_double nebo ctypes.c_int) C funkce vrací, aby mohla být návratová hodnota správně přetypována na Python objekt.",
     "expected": "restype"
   }
 ]

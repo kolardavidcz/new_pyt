@@ -5,9 +5,9 @@
     "question": "Jaký výstup vytvoří následující kód testující lokální a globální proměnné?\n\nx = 10\n\ndef f():\n    x = 20\n\nf()\nprint(x)",
     "options": [
       "A) Vypíše číslo 10, protože přiřazení x = 20 uvnitř f() vytvoří novou lokální proměnnou a globální x nezmění.",
-      "B) Vyvolá výjimku UnboundLocalError, protože lokální proměnná x stíní globální proměnnou před přiřazením.",
+      "B) Vyvolá výjimku NameError, protože globální proměnná x není uvnitř funkce f() explicitně deklarována.",
       "C) Vypíše číslo 20, protože proměnná x je globální a přiřazení v těle funkce upraví její hodnotu v modulu.",
-      "D) Vyvolá výjimku NameError, protože globální proměnná x není uvnitř funkce f() explicitně deklarována."
+      "D) Vyvolá výjimku UnboundLocalError, protože lokální proměnná x stíní globální proměnnou před přiřazením."
     ],
     "answer": 0,
     "explanation": "Přiřazení do proměnné uvnitř funkce bez explicitního klíčového slova global vytvoří novou proměnnou v lokálním rozsahu funkce. Globální proměnná x na úrovni modulu zůstane nedotčena (10)."
@@ -30,10 +30,10 @@
     "type": "multiple_choice",
     "question": "Jaký výstup vyprodukuje kód s vnořenou funkcí a klíčovým slovem nonlocal?\n\ndef outer():\n    x = 'původní'\n    def inner():\n        nonlocal x\n        x = 'změněná'\n    inner()\n    return x\n\nprint(outer())",
     "options": [
-      "A) Vyvolá výjimku NameError, protože proměnná x ve vnitřní funkci stíní stejnojmennou proměnnou vnější funkce.",
-      "B) Vypíše řetězec 'původní', protože nonlocal umožňuje proměnnou x ve vnitřní funkci pouze číst, nikoli měnit.",
+      "A) Vypíše řetězec 'původní', protože nonlocal umožňuje proměnnou x ve vnitřní funkci pouze číst, nikoli měnit.",
+      "B) Vyvolá výjimku SyntaxError, protože klíčové slovo nonlocal vyžaduje, aby proměnná x existovala v globálním scope.",
       "C) Vypíše řetězec 'změněná', protože nonlocal x odkazuje na proměnnou x v nejbližším nadřazeném ne-globálním rozsahu.",
-      "D) Vyvolá výjimku SyntaxError, protože klíčové slovo nonlocal vyžaduje, aby proměnná x existovala v globálním scope."
+      "D) Vyvolá výjimku NameError, protože proměnná x ve vnitřní funkci stíní stejnojmennou proměnnou vnější funkce."
     ],
     "answer": 2,
     "explanation": "Klíčové slovo nonlocal umožní vnitřní funkci modifikovat proměnnou v nejbližším obklopujícím (enclosing) oboru viditelnosti, v tomto případě lokální proměnnou funkce outer."
@@ -57,8 +57,8 @@
     "question": "V jakém pořadí Python prohledává obory viditelnosti při dohledávání jména proměnné podle pravidla LEGB?",
     "options": [
       "A) Local -> Enclosing -> Global -> Built-in",
-      "B) Enclosing -> Local -> Global -> Built-in",
-      "C) Global -> Local -> Enclosing -> Built-in",
+      "B) Global -> Local -> Enclosing -> Built-in",
+      "C) Enclosing -> Local -> Global -> Built-in",
       "D) Local -> Global -> Enclosing -> Built-in"
     ],
     "answer": 0,
@@ -69,10 +69,10 @@
     "type": "multiple_choice",
     "question": "Co se stane při pokusu o použití nonlocal na proměnnou, která neexistuje v žádném nadřazeném ne-globálním oboru viditelnosti?\n\ndef f():\n    nonlocal y\n    y = 1",
     "options": [
-      "A) Vyvolá NameError až při spuštění funkce f(), zatímco samotná definice funkce proběhne v pořádku.",
+      "A) Vytvoří novou globální proměnnou y s hodnotou 1, pokud proměnná dosud neexistovala v modulu.",
       "B) Vyvolá SyntaxError, protože nonlocal vyžaduje existenci proměnné v některém z vnějších vnořených oborů viditelnosti.",
-      "C) Vytvoří novou lokální proměnnou y ve funkci f() a ignoruje absenci vnější definice bez chyby.",
-      "D) Vytvoří novou globální proměnnou y s hodnotou 1, pokud proměnná dosud neexistovala v modulu."
+      "C) Vyvolá NameError až při spuštění funkce f(), zatímco samotná definice funkce proběhne v pořádku.",
+      "D) Vytvoří novou lokální proměnnou y ve funkci f() a ignoruje absenci vnější definice bez chyby."
     ],
     "answer": 1,
     "explanation": "Na rozdíl od global vyžaduje deklarace nonlocal, aby proměnná daného jména již dříve existovala v některém z nadřazených (obklopujících) nespádových rozsahů funkcí. Pokud takový rozsah neexistuje, interpret vyvolá SyntaxError: no binding for nonlocal 'y' found již při překladu kódového bloku."
