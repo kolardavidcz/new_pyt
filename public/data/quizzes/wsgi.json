@@ -54,15 +54,17 @@
   {
     "id": "q5",
     "type": "fill_blank_choice",
-    "question": "Kterou funkcí ze standardní knihovny rozložíte řetězec z environ['QUERY_STRING'] na slovník dvojic klíč-hodnota ________(environ['QUERY_STRING'])?\n\n```python\n# Kterou funkcí ze standardní knihovny rozložíte řetězec z environ['QUERY_STRING'] na slovník dvojic klíč-hodnota ________(environ['QUERY_STRING'])?\nvysledek = ________\n```",
+    "question": "Která funkce ze standardní knihovny rozparsuje parametry z URL dotazu (QUERY_STRING) do slovníku seznamů hodnot?",
     "options": [
       "urllib.parse.parse_qs",
-      "cgi.parse_header",
-      "http.cookies.SimpleCookie",
-      "email.parser.BytesParser"
+      "urllib.parse.urlsplit",
+      "urllib.parse.unquote",
+      "urllib.parse.urlencode"
     ],
     "answer": 0,
-    "explanation": "urllib.parse.parse_qs() parsuje URL-encoded řetězce v QUERY_STRING a vrací slovník, kde hodnotami jsou seznamy řetězců."
+    "explanation": "Funkce urllib.parse.parse_qs() parsuje URL kódovaný řetězec v QUERY_STRING a vrací slovník, kde hodnotami jsou seznamy řetězců.",
+    "code": "import urllib.parse\n\ndef application(environ, start_response):\n    query_string = environ.get(\"QUERY_STRING\", \"\")\n    params = ________(query_string)\n    # Pro \"sample=benzene&temp=25\" vrati {'sample': ['benzene'], 'temp': ['25']}",
+    "expected": "urllib.parse.parse_qs"
   },
   {
     "id": "q6",
@@ -80,14 +82,16 @@
   {
     "id": "q7",
     "type": "fill_blank_choice",
-    "question": "Který třetí (nepovinný) parametr lze předat funkci start_response(status, headers, ________) při ošetření výjimky?\n\n```python\n# Který třetí (nepovinný) parametr lze předat funkci start_response(status, headers, ________) při ošetření výjimky?\nvysledek = ________\n```",
+    "question": "Který výraz se v rozhraní WSGI předává jako volitelný třetí argument exc_info funkci start_response při zpracování výjimky?",
     "options": [
       "sys.exc_info()",
       "traceback.format_exc()",
-      "BaseException",
-      "logging.getLogger()"
+      "sys.last_traceback",
+      "traceback.print_exc()"
     ],
     "answer": 0,
-    "explanation": "Třetí parametr exc_info přijímá n-tici z vrácenou funkcí sys.exc_info(), což serveru umožňuje přepsat již nastavené hlavičky, pokud ještě nebyly odeslány klientovi."
+    "explanation": "Třetí parametr exc_info přijímá n-tici vrácenou funkcí sys.exc_info(), což serveru umožňuje správně ošetřit chybu a přepsat hlavičky odpovědi.",
+    "code": "import sys\n\ndef application(environ, start_response):\n    try:\n        data = calculate_concentrations()\n        start_response(\"200 OK\", [(\"Content-Type\", \"text/plain\")])\n        return [data.encode(\"utf-8\")]\n    except Exception:\n        start_response(\"500 Internal Server Error\", [(\"Content-Type\", \"text/plain\")], ________)\n        return [b\"Chyba vypoctu\"]",
+    "expected": "sys.exc_info()"
   }
 ]

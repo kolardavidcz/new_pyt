@@ -28,28 +28,32 @@
   {
     "id": "q3",
     "type": "fill_blank_choice",
-    "question": "Doplňte syntakticky správné zachycení dvou výjimek současně v jedné větví except:\n\n```python\n# Doplňte syntakticky správné zachycení dvou výjimek současně v jedné větví except:\nvysledek = ________\n```",
+    "question": "Doplňte hlavičku bloku `except` pro současné odchycení výjimek `ValueError` a `TypeError`.",
     "options": [
-      "except (TypeError, ValueError):",
-      "except {TypeError, ValueError}:",
-      "except [TypeError, ValueError]:",
-      "except <TypeError, ValueError>:"
+      "except (ValueError, TypeError)",
+      "except [ValueError, TypeError]",
+      "except {ValueError, TypeError}",
+      "except ValueError, TypeError"
     ],
     "answer": 0,
-    "explanation": "Pro zachycení více typů výjimek současně v jedné větvi except musí být tyto třídy zapsány jako n-tice (tuple) v závorkách."
+    "explanation": "Pro zachycení více typů výjimek v jedné větvi `except` musí být třídy výjimek sdruženy do n-tice (tuple) v kulatých závorkách.",
+    "code": "def parse_measurement(val):\n    try:\n        return float(val)\n    ________:\n        return None\n\nprint(parse_measurement(\"chyba\"))  # None\nprint(parse_measurement([1, 2]))   # None",
+    "expected": "except (ValueError, TypeError)"
   },
   {
     "id": "q4",
     "type": "fill_blank_choice",
-    "question": "Doplňte příkaz pro opětovné vyvolání právě odchycené výjimky dále po hierarchii:\n\n```python\n# Doplňte příkaz pro opětovné vyvolání právě odchycené výjimky dále po hierarchii:\nvysledek = ________\n```",
+    "question": "Doplňte klíčové slovo pro opětovné přeposlání (re-raise) zachycené výjimky výše v zásobníku volání po zalogování chyby.",
     "options": [
       "raise",
       "throw",
-      "yield",
-      "retry"
+      "rethrow",
+      "pass"
     ],
     "answer": 0,
-    "explanation": "Příkaz raise bez argumentu uvnitř bloku except znovu vyvolá aktuálně zpracovávanou výjimku směrem nahoru ve volajícím zásobníku."
+    "explanation": "Příkaz `raise` bez argumentů uvnitř bloku `except` znovu vyvolá aktuálně zpracovávanou výjimku včetně jejího původního trasování (traceback).",
+    "code": "def log_and_rethrow(func, *args):\n    try:\n        return func(*args)\n    except Exception as err:\n        print(f\"Chyba při běhu: {err}\")\n        ________  # Znovu vyvolá původní zachycenou výjimku",
+    "expected": "raise"
   },
   {
     "id": "q5",

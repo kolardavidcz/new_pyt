@@ -15,15 +15,17 @@
   {
     "id": "q2",
     "type": "fill_blank_choice",
-    "question": "Která metoda generické funkce vrátí konkrétní zaregistrovanou funkci pro zadaný typ bez jejího spuštění?\n\n```python\nimpl = mojemetoda.________(int)\n```",
+    "question": "Která metoda generické funkce vytvořené dekorátorem @singledispatch vrátí implementaci zaregistrovanou pro daný typ bez jejího spuštění?",
     "options": [
       "dispatch",
-      "register",
-      "registry",
-      "resolve"
+      "resolve",
+      "get_handler",
+      "lookup"
     ],
     "answer": 0,
-    "explanation": "Metoda dispatch(cls) slouží k dotázání výběrového algoritmu na funkci zaregistrovanou pro datový typ cls. Atribut registry je přímo slovník všech registrací."
+    "explanation": "Metoda dispatch(cls) slouží k dotázání výběrového mechanismu singledispatch na funkci zaregistrovanou pro konkrétní datový typ.",
+    "code": "from functools import singledispatch\n\n@singledispatch\ndef format_result(val):\n    return str(val)\n\n@format_result.register\ndef _(val: float):\n    return f\"{val:.4f} mol/L\"\n\nhandler = format_result.________(float)\n# Vrati funkci zaregistrovanou pro datovy typ float",
+    "expected": "dispatch"
   },
   {
     "id": "q3",

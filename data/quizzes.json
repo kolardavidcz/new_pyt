@@ -29,16 +29,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Který modul standardní knihovny obsahuje rozhraní Callable v Pythonu 3.10+?\n\n```python\n# Který modul standardní knihovny obsahuje rozhraní Callable v Pythonu 3.10+?\nvysledek = ________\n```",
-      "code": "import collections.abc\nis_func = isinstance(obj, ________.Callable)",
+      "question": "Doplňte správný modul standardní knihovny pro kontrolu typu Callable v Pythonu 3.10+.",
+      "code": "import collections.abc\n\ndef execute_measurement(sensor_id, parser):\n    # Ověření, zda je předaný objekt volatelná funkce\n    if isinstance(parser, ________.Callable):\n        return parser(sensor_id)\n    raise TypeError(\"Parser musí být volatelný objekt.\")",
       "options": [
         "collections.abc",
+        "collections",
         "typing.builtins",
-        "sys.modules",
-        "importlib.machinery"
+        "types"
       ],
       "answer": 0,
-      "explanation": "Od verze Python 3.10 byly abstraktní třídy (ABC) definitivně přesunuty z modulu `collections` do `collections.abc`. Použití `collections.Callable` vyvolá AttributeError."
+      "explanation": "Od verze Python 3.10 byly abstraktní třídy (ABC) definitivně přesunuty z collections do collections.abc. Použití collections.Callable vyvolá AttributeError.",
+      "expected": "collections.abc"
     },
     {
       "id": "q4",
@@ -109,8 +110,8 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Kterým parametrem spouštěče py ve Windows přetlačíte interní shebang a vynutíte spuštění v Pythonu 3?\n\n```python\n# Kterým parametrem spouštěče py ve Windows přetlačíte interní shebang a vynutíte spuštění v Pythonu 3?\nvysledek = ________\n```",
-      "code": "> py ________ skript.py",
+      "question": "Kterým přepínačem spouštěče py ve Windows vynutíte spuštění skriptu v Pythonu verze 3 bez ohledu na shebang v souboru?",
+      "code": "# Vynucení spuštění laboratorního skriptu v Pythonu 3\npy ________ experiment_titration.py",
       "options": [
         "-3",
         "--python3",
@@ -118,7 +119,8 @@
         "-env:python3"
       ],
       "answer": 0,
-      "explanation": "Příkazový spouštěč `py.exe` ve Windows přijímá parametr `-3`, který má nejvyšší prioritu a přetlačí jak shebang zapsaný v souboru, tak proměnné prostředí."
+      "explanation": "Příkazový spouštěč py.exe ve Windows přijímá parametr -3, který má přednost před shebang řádkem v souboru i výchozí asociací v systému.",
+      "expected": "-3"
     },
     {
       "id": "q3",
@@ -214,8 +216,8 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Které rozhraní standardní knihovny spolu s nastavením sys.prefix řídí načítání modulů z site-packages?\n\n```python\n# Které rozhraní standardní knihovny spolu s nastavením sys.prefix řídí načítání modulů z site-packages?\nvysledek = ________\n```",
-      "code": "import ________\n# Modul zabezpečující přidání adresáře site-packages do sys.path",
+      "question": "Který vestavěný modul Pythonu se automaticky spouští při startu interpretu a registruje cesty k site-packages do sys.path?",
+      "code": "import ________\n\n# Výpis všech automaticky nakonfigurovaných cest k balíčkům\npackage_paths = site.getsitepackages()\n# Výstup: ['/usr/local/lib/python3.11/dist-packages', ...]",
       "options": [
         "site",
         "sys.path",
@@ -223,7 +225,8 @@
         "importlib"
       ],
       "answer": 0,
-      "explanation": "Modul `site` se automaticky spouští při startu Pythonu a přenastavuje vyhledávací cesty v `sys.path` podle toho, zda byl detekován konfigurační soubor `pyvenv.cfg`."
+      "explanation": "Modul site se automaticky načítá při startu Pythonu a stará se o konfiguraci sys.path podle přítomnosti pyvenv.cfg nebo výchozích systémových cest.",
+      "expected": "site"
     },
     {
       "id": "q5",
@@ -294,8 +297,8 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Kterým příkazem v prostředí Linux bash aktivujete virtuální prostředí umístěné v adresáři .venv?\n\n```python\n# Kterým příkazem v prostředí Linux bash aktivujete virtuální prostředí umístěné v adresáři .venv?\nvysledek = ________\n```",
-      "code": "$ ________ .venv/bin/activate",
+      "question": "Kterým shellovým příkazem v systému Linux nebo macOS aktivujete virtuální prostředí v aktuální relaci terminálu?",
+      "code": "# Aktivace virtuálního prostředí pro bioinformatický projekt\n________ .venv/bin/activate",
       "options": [
         "source",
         "python",
@@ -303,7 +306,8 @@
         "execute"
       ],
       "answer": 0,
-      "explanation": "Příkaz `source` (nebo `.`) provede skript `activate` přímo v probíhající relaci shellu, díky čemuž upraví jeho proměnnou PATH."
+      "explanation": "Příkaz source (případně tečka .) provede skript activate přímo v běžícím shellu, díky čemuž nastaví proměnné prostředí PATH a VIRTUAL_ENV.",
+      "expected": "source"
     },
     {
       "id": "q6",
@@ -373,8 +377,8 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Kterým přepínačem při spuštění pip install nainstalujete balíčky ze souboru requirements.txt?\n\n```python\n# Kterým přepínačem při spuštění pip install nainstalujete balíčky ze souboru requirements.txt?\nvysledek = ________\n```",
-      "code": "$ pip install ________ requirements.txt",
+      "question": "Který přepínač příkazu pip install slouží k instalaci všech balíčků uvedených v souboru se závislostmi?",
+      "code": "# Instalace všech knihoven pro zpracování spektrálních dat ze souboru\npip install ________ requirements.txt",
       "options": [
         "-r",
         "-f",
@@ -382,7 +386,8 @@
         "-d"
       ],
       "answer": 0,
-      "explanation": "Přepínač `-r` (dlouze `--requirement`) instructuje `pip install`, aby přečetl seznam balíčků a specifikovaných verzí ze zadaného textového souboru."
+      "explanation": "Přepínač -r (zkratka pro --requirement) předává instalátoru pip textový soubor se seznamem požadovaných balíčků a verzí.",
+      "expected": "-r"
     },
     {
       "id": "q5",
@@ -466,8 +471,8 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Jakým přepínačem nainstalujete balíček RDKit přímo z komunitního kanálu rdkit?\n\n```python\n# Jakým přepínačem nainstalujete balíček RDKit přímo z komunitního kanálu rdkit?\nvysledek = ________\n```",
-      "code": "conda install ________ rdkit rdkit",
+      "question": "Kterým parametrem příkazu conda install specifikujete kanál (channel), ze kterého se má balíček stáhnout?",
+      "code": "# Instalace chemoinformatického balíčku RDKit z dedikovaného kanálu\nconda install ________ rdkit",
       "options": [
         "-c rdkit",
         "-p rdkit",
@@ -475,7 +480,8 @@
         "-e rdkit"
       ],
       "answer": 0,
-      "explanation": "Přepínač -c (channel) určuje kanál v repozitáři Anaconda.org, ze kterého se má požadovaný balíček a jeho specifické závislosti stáhnout."
+      "explanation": "Přepínač -c (zkratka pro --channel) říká Condě, v jakém kanálu repozitáře Anaconda.org má vyhledat požadovaný balíček a jeho závislosti.",
+      "expected": "-c rdkit"
     },
     {
       "id": "q4",
@@ -519,8 +525,8 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Který přepínač je nezbytný pro kompletní smazání virtuálního prostředí moje_env?\n\n```python\n# Který přepínač je nezbytný pro kompletní smazání virtuálního prostředí moje_env?\nvysledek = ________\n```",
-      "code": "conda remove -n moje_env ________",
+      "question": "Který přepínač příkazu conda remove je nutné zadat pro úplné odstranění celého virtuálního prostředí i se všemi balíčky?",
+      "code": "# Kompletní smazání existujícího prostředí pro spektrometrii\nconda remove --name chem_env ________",
       "options": [
         "--all",
         "--force",
@@ -528,7 +534,8 @@
         "--purge"
       ],
       "answer": 0,
-      "explanation": "Bez přepínače --all by conda remove -n moje_env pouze smazala vybrané balíčky, ale samotné virtuální prostředí by zůstalo zachováno."
+      "explanation": "Bez přepínače --all by conda remove --name <env> pouze čekala na konkrétní balíčky ke smazání; přepínač --all smaže celé prostředí.",
+      "expected": "--all"
     },
     {
       "id": "q3",
@@ -560,8 +567,8 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Jak uložíte přesnou konfiguraci aktivního prostředí Condy do YAML souboru pro kolegyni?\n\n```python\n# Jak uložíte přesnou konfiguraci aktivního prostředí Condy do YAML souboru pro kolegyni?\nvysledek = ________\n```",
-      "code": "conda env ________ > environment.yml",
+      "question": "Který podpříkaz nástroje conda env slouží k vyexportování kompletní specifikace aktivního prostředí do souboru formátu YAML?",
+      "code": "# Uložení definice prostředí s přesnými verzemi pro reprodukovatelnost\nconda env ________ > environment.yml",
       "options": [
         "export",
         "save",
@@ -569,7 +576,8 @@
         "freeze"
       ],
       "answer": 0,
-      "explanation": "conda env export vygeneruje popis prostředí v rozhraní YAML (obsahující název, kanály a přesné verze balíčků), který lze načíst pomocí conda env create -f environment.yml."
+      "explanation": "Příkaz conda env export vygeneruje YAML soubor obsahující název prostředí, kanály i kompletní seznam instalovaných balíčků včetně přesných verzí.",
+      "expected": "export"
     },
     {
       "id": "q6",
@@ -598,8 +606,8 @@
     {
       "id": "q8",
       "type": "fill_blank_choice",
-      "question": "Který příkaz slouží k vytvoření nového prostředí přímo ze zadaného souboru environment.yml?\n\n```python\n# Který příkaz slouží k vytvoření nového prostředí přímo ze zadaného souboru environment.yml?\nvysledek = ________\n```",
-      "code": "conda env create ________ environment.yml",
+      "question": "Kterým přepínačem předáte soubor environment.yml příkazu conda env create pro sestavení nového prostředí?",
+      "code": "# Vytvoření nového prostředí na základě sdíleného konfiguračního souboru\nconda env create ________ environment.yml",
       "options": [
         "-f",
         "-i",
@@ -607,7 +615,8 @@
         "-c"
       ],
       "answer": 0,
-      "explanation": "Přepínač -f (file) specifikuje vstupní konfigurační soubor s definicí virtuálního prostředí pro conda env create."
+      "explanation": "Přepínač -f (zkratka pro --file) specifikuje cestu ke konfiguračnímu souboru formátu YAML s definicí nového Conda prostředí.",
+      "expected": "-f"
     }
   ],
   "overview": [
@@ -640,7 +649,7 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Který moderní Python operátor provádí algebraické maticové násobení dvou np.ndarray objektů?\n\n```python\nres = matrix_a ________ matrix_b\n```",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
       "options": [
         "@",
         "*",
@@ -648,7 +657,9 @@
         "&"
       ],
       "answer": 0,
-      "explanation": "Od Pythonu 3.5 byl zaveden operátor @ (např. matrix_a @ matrix_b) přímo pro maticové násobení vícerozměrných polí."
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
     },
     {
       "id": "q4",
@@ -706,8 +717,8 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Která klávesová zkratka v příkazovém módu okamžitě smaže aktuálně vybranou buňku?\n\n```python\n# Která klávesová zkratka v příkazovém módu okamžitě smaže aktuálně vybranou buňku?\nvysledek = ________\n```",
-      "code": "[Příkazový mód (modrý okraj)] -> ________",
+      "question": "Která klávesová zkratka v příkazovém režimu (Command Mode) Jupyter Notebooku okamžitě smaže vybranou buňku?",
+      "code": "# Jupyter Command Mode (modrý pruh vlevo po stisku Esc)\n# Smazání aktivní buňky:\n________",
       "options": [
         "DD",
         "XX",
@@ -715,7 +726,8 @@
         "BS"
       ],
       "answer": 0,
-      "explanation": "V příkazovém módu (modrý okraj) stisknutí klávesy D dvakrát za sebou (DD) smaže vybranou buňku."
+      "explanation": "V příkazovém režimu Jupyteru (Command Mode) stisknutí klávesy D dvakrát za sebou (DD) okamžitě odstraní aktuální buňku.",
+      "expected": "DD"
     },
     {
       "id": "q4",
@@ -747,8 +759,8 @@
     {
       "id": "q6",
       "type": "fill_blank_choice",
-      "question": "Který magický příkaz zapíše celý obsah aktuální buňky do samostatného souboru na disk?\n\n```python\n# Který magický příkaz zapíše celý obsah aktuální buňky do samostatného souboru na disk?\nvysledek = ________\n```",
-      "code": "________ skript.py\ndef main():\n    print(\"Hello\")",
+      "question": "Který buňkový magický příkaz (cell magic) v Jupyter Notebooku uloží veškerý kód dané buňky do souboru na disku?",
+      "code": "________ analysis_module.py\n\ndef calculate_molarity(moles, volume_liters):\n    \"\"\"Výpočet látkové koncentrace roztoku.\"\"\"\n    return moles / volume_liters",
       "options": [
         "%%writefile",
         "%exportfile",
@@ -756,7 +768,8 @@
         "%filedump"
       ],
       "answer": 0,
-      "explanation": "Celobuňkový magický příkaz %%writefile SOUBOR vezme veškerý text v buňce a zapíše jej do daného souboru."
+      "explanation": "Magický příkaz %%writefile nazev_souboru.py vezme obsah celé buňky v notebooku a zapíše jej do souboru na disku.",
+      "expected": "%%writefile"
     },
     {
       "id": "q7",
@@ -774,8 +787,8 @@
     {
       "id": "q8",
       "type": "fill_blank_choice",
-      "question": "Kterým magickým příkazem v Jupyter Notebooku zobrazíte podrobné informace a seznam aktuálně definovaných proměnných?\n\n```python\n# Kterým magickým příkazem v Jupyter Notebooku zobrazíte podrobné informace a seznam aktuálně definovaných proměnných?\nvysledek = ________\n```",
-      "code": "In [5]: ________",
+      "question": "Který řádkový magický příkaz v Jupyter Notebooku přehledně zobrazí tabulku všech aktivních proměnných, jejich typů a obsahu?",
+      "code": "sample_name = \"Kyselina benzoová\"\ntemperatures = [21.5, 22.0, 21.8]\nmolar_mass = 122.12\n\n# Zobrazení přehledu proměnných v paměti kernelu\n________",
       "options": [
         "%whos",
         "%vars",
@@ -783,7 +796,8 @@
         "%list"
       ],
       "answer": 0,
-      "explanation": "Magický příkaz %whos zobrazí tabulku existujících proměnných v paměti kernelu (název, typ, paměťový otisk/hodnota)."
+      "explanation": "Magický příkaz %whos zobrazí strukturovanou tabulku proměnných v paměti interaktivního kernelu včetně jejich datových typů a velikosti.",
+      "expected": "%whos"
     },
     {
       "id": "q9",
@@ -854,8 +868,8 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Kterým přepínačem příkazu git branch zjistíte, které lokální větve již byly sloučeny do aktuální větve?\n\n```python\n# Kterým přepínačem příkazu git branch zjistíte, které lokální větve již byly sloučeny do aktuální větve?\nvysledek = ________\n```",
-      "code": "$ git branch ________",
+      "question": "Který parametr příkazu git branch vypíše pouze ty větve, jejichž změny už byly kompletně sloučeny do aktuální větve?",
+      "code": "# Zjištění lokálních větví již začleněných do větve 'main'\ngit branch ________",
       "options": [
         "--merged",
         "--all",
@@ -863,7 +877,8 @@
         "--delete"
       ],
       "answer": 0,
-      "explanation": "git branch --merged vypíše pouze ty větve, které už byly včleněny do větve, na které se právě nacházíte (a je tedy bezpečné je případně smazat přes -d)."
+      "explanation": "Příkaz git branch --merged filtruje větve, které již byly plně začleněny do aktuálního commitu (HEAD), takže je bezpečné je smazat.",
+      "expected": "--merged"
     },
     {
       "id": "q5",
@@ -908,8 +923,8 @@
     {
       "id": "q8",
       "type": "fill_blank_choice",
-      "question": "Kterým příkazem vrátíte zpět do pracovní složky naposledy odložené nekomitované změny ze zásobníku stash?\n\n```python\n# Kterým příkazem vrátíte zpět do pracovní složky naposledy odložené nekomitované změny ze zásobníku stash?\nvysledek = ________\n```",
-      "code": "$ git stash ________",
+      "question": "Který podpříkaz git stash aplikuje naposledy odložené změny zpět do pracovního stromu a současně je odstraní ze zásobníku?",
+      "code": "# Obnovení odložených úprav skriptu a jejich odstranění ze stash zásobníku\ngit stash ________",
       "options": [
         "pop",
         "drop",
@@ -917,7 +932,8 @@
         "list"
       ],
       "answer": 0,
-      "explanation": "git stash pop aplikuje nejnovější uložené změny z vrcholu zásobníku stash na pracovní strom a zároveň tento prvek ze stash listu odstraní (na rozdíl od apply, který jej ponechá)."
+      "explanation": "Příkaz git stash pop aplikuje uložený stav na aktuální pracovní adresář a zároveň daný záznam vyjme ze zásobníku stash (na rozdíl od apply, který ho ponechá).",
+      "expected": "pop"
     },
     {
       "id": "q9",
@@ -946,8 +962,8 @@
     {
       "id": "q11",
       "type": "fill_blank_choice",
-      "question": "Kde v struktuře repozitáře Git vyhledává a spouští automatické skripty uživatelských událostí (hooks)?\n\n```python\n# Kde v struktuře repozitáře Git vyhledává a spouští automatické skripty uživatelských událostí (hooks)?\nvysledek = ________\n```",
-      "code": "/mojeprojekt/________/hooks/",
+      "question": "Ve kterém skrytém adresáři repozitáře vyhledává Git automatické spouštěcí skripty událostí (hooks jako pre-commit)?",
+      "code": "# Umístění validačního skriptu spouštěného před commitem\nchmod +x /projekty/analyza_mereni/________/hooks/pre-commit",
       "options": [
         ".git",
         "src",
@@ -955,7 +971,8 @@
         "bin"
       ],
       "answer": 0,
-      "explanation": "Git hledá spouštěcí hook skripty v adresáři .git/hooks/ v kořeni repozitáře. Tyto skripty mohou být psány např. v Bash nebo Pythonu a reagují na akce jako pre-commit nebo pre-push."
+      "explanation": "Skripty pro hooky (např. automatická kontrola linteru před commitem) se nacházejí v adresáři .git/hooks/ v kořeni lokálního repozitáře.",
+      "expected": ".git"
     },
     {
       "id": "q12",
@@ -1012,8 +1029,8 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Kterým příkazem odeberete soubor script.py ze staging area bez ztráty změn v pracovní složce?\n\n```python\n# Kterým příkazem odeberete soubor script.py ze staging area bez ztráty změn v pracovní složce?\nvysledek = ________\n```",
-      "code": "$ git ________ HEAD script.py",
+      "question": "Kterým příkazem odeberete soubor ze staging area (unstage) bez ztráty rozpracovaných úprav v pracovním adresáři?",
+      "code": "# Vyřazení souboru ze staging area před vytvořením commitu\ngit ________ HEAD titration_data.py",
       "options": [
         "reset",
         "remove",
@@ -1021,7 +1038,8 @@
         "revert"
       ],
       "answer": 0,
-      "explanation": "Příkaz `git reset HEAD SOUBOR` odebere změny daného souboru ze staging area (vytvoří unstage), ale zanechá provedené úpravy v pracovní složce na disku nedotčené."
+      "explanation": "Příkaz git reset HEAD soubor vyjme soubor z indexu (staging area), ale ponechá veškeré změny v souboru na disku nedotčené.",
+      "expected": "reset"
     },
     {
       "id": "q5",
@@ -1089,8 +1107,8 @@
     {
       "id": "q10",
       "type": "fill_blank_choice",
-      "question": "Kterým příkazem stáhnou se změny ze vzdáleného repozitáře bez jejich automatického sloučení do pracovní složky?\n\n```python\n# Kterým příkazem stáhnou se změny ze vzdáleného repozitáře bez jejich automatického sloučení do pracovní složky?\nvysledek = ________\n```",
-      "code": "$ git ________\n$ git merge FETCH_HEAD",
+      "question": "Kterým příkazem stáhnete nové commity ze vzdáleného repozitáře do lokální databáze bez automatického sloučení do pracovní větve?",
+      "code": "# Stažení nových commitů ze vzdáleného serveru bez úpravy pracovních souborů\ngit ________ origin\ngit log HEAD..origin/main",
       "options": [
         "fetch",
         "clone",
@@ -1098,7 +1116,8 @@
         "commit"
       ],
       "answer": 0,
-      "explanation": "Příkaz `git pull` interně kombinuje `git fetch` (stažení nových objektů a větví ze vzdáleného repozitáře do lokální databáze bez úpravy pracovního adresáře) a `git merge FETCH_HEAD` (sloučení stažené větve do aktuální lokální větve)."
+      "explanation": "Příkaz git fetch stáhne historii a objekty ze vzdáleného repozitáře do lokální kopie bez zásahu do aktuální pracovní větve.",
+      "expected": "fetch"
     }
   ],
   "times+dates": [
@@ -1118,7 +1137,7 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte název funkce z modulu calendar, která provádí zpětnou konverzi z UTC n-tice struct_time na sekundy od epochy:\n\nimport time, calendar\nst = time.gmtime(0)\nepoch_seconds = calendar.________(st)\n\n```python\n# Doplňte název funkce z modulu calendar, která provádí zpětnou konverzi z UTC n-tice struct_time na sekundy od epochy:\n\nimport time, calendar\nst = time.gmtime(0)\nepoch_seconds = calendar.________(st)\nvysledek = ________\n```",
+      "question": "Doplňte funkci z modulu calendar, která převede časovou n-tici struct_time v čase UTC na počet sekund od počátku epochy (timestamp).",
       "options": [
         "timegm",
         "mktime",
@@ -1126,7 +1145,9 @@
         "mktimes"
       ],
       "answer": 0,
-      "explanation": "Funkce calendar.timegm() přijímá časovou n-tici struct_time v UTC a vrací počet sekund od epochy (1. 1. 1970). Naopak time.mktime() očekává časovou n-tici v lokálním čase."
+      "explanation": "Funkce calendar.timegm() zpracovává struct_time v UTC a vrací počet sekund od unixové epochy (na rozdíl od time.mktime(), který předpokládá lokální čas).",
+      "code": "import time\nimport calendar\n\n# Časová struktura v koordinovaném světovém čase (UTC)\ntime_struct = time.gmtime()\n\n# Převod UTC struktury na unixový timestamp\nepoch_seconds = calendar.________(time_struct)\n# Výstup: 1770000000",
+      "expected": "timegm"
     },
     {
       "id": "q3",
@@ -1155,7 +1176,7 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící volání metody pro převedení naivního objektu dt na informovaný v pásu UTC bez změny složek času:\n\nfrom datetime import datetime, timezone\ndt = datetime(2026, 8, 9, 14, 0, 0)\ndt_aware = dt.________(tzinfo=timezone.utc)\n\n```python\n# Doplňte chybějící volání metody pro převedení naivního objektu dt na informovaný v pásu UTC bez změny složek času:\n\nfrom datetime import datetime, timezone\ndt = datetime(2026, 8, 9, 14, 0, 0)\ndt_aware = dt.________(tzinfo=timezone.utc)\nvysledek = ________\n```",
+      "question": "Doplňte metodu, která přiřadí naivnímu objektu datetime časovou zónu UTC beze změny hodnot hodin a minut.",
       "options": [
         "replace",
         "convert",
@@ -1163,7 +1184,9 @@
         "set_tz"
       ],
       "answer": 0,
-      "explanation": "Metoda dt.replace(tzinfo=timezone.utc) vrátí nový objekt datetime se stejnými složkami roku, měsíce, hodin atd., ale s nastaveným atributem tzinfo. Metoda astimezone() se používá k přepočtu informovaného času z jedné zóny do druhé."
+      "explanation": "Metoda datetime.replace(tzinfo=...) vytvoří novou instanci se zadanou časovou zónou bez časového posunu hodnot hodin a minut.",
+      "code": "from datetime import datetime, timezone\n\n# Naivní čas záznamu z laboratorního spektrometru\nnaive_dt = datetime(2026, 8, 9, 14, 30, 0)\n\n# Přiřazení časové zóny UTC při zachování identického času 14:30\naware_dt = naive_dt.________(tzinfo=timezone.utc)\n# Výstup: datetime.datetime(2026, 8, 9, 14, 30, tzinfo=datetime.timezone.utc)",
+      "expected": "replace"
     },
     {
       "id": "q6",
@@ -1222,7 +1245,7 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte parametr do funkce read_excel() pro načtení konkrétního listu sešitu pojmenovaného data:\n\nimport pandas as pd\ndf = pd.read_excel('klementinum.xlsx', ________='data')\n\n```python\n# Doplňte parametr do funkce read_excel() pro načtení konkrétního listu sešitu pojmenovaného data:\n\nimport pandas as pd\ndf = pd.read_excel('klementinum.xlsx', ________='data')\nvysledek = ________\n```",
+      "question": "Doplňte název parametru funkce pandas.read_excel() pro načtení konkrétního listu z excelovského sešitu.",
       "options": [
         "sheet_name",
         "sheet",
@@ -1230,7 +1253,9 @@
         "work_sheet"
       ],
       "answer": 0,
-      "explanation": "Parametr sheet_name ve funkci pd.read_excel() určuje, který list sešitu se má načíst (lze předat název jako řetězec, číslo listu od 0, nebo seznam pro načtení více listů)."
+      "explanation": "Parametr sheet_name ve funkci pd.read_excel() určuje název listu (str), jeho pořadové číslo od nuly (int) nebo seznam listů pro načtení.",
+      "code": "import pandas as pd\n\n# Načtení konkrétního listu se záznamy měření\ndf = pd.read_excel(\"klementinum_teploty.xlsx\", ________=\"mereni_2025\")\n# Výstup: DataFrame obsahující data ze specifikovaného listu",
+      "expected": "sheet_name"
     },
     {
       "id": "q3",
@@ -1261,7 +1286,7 @@
     {
       "id": "q1",
       "type": "fill_blank_choice",
-      "question": "Doplňte název funkce pro automatické spuštění doctestů aktuálního modulu z kódu:\n\n```python\nimport doctest\n\nif __name__ == '__main__':\n    doctest.________()\n```",
+      "question": "Doplňte funkci modulu doctest, která prohledá docstringy aktuálního modulu a automaticky spustí všechny nalezené interaktivní testy.",
       "options": [
         "testmod",
         "run_all",
@@ -1269,7 +1294,9 @@
         "testfile"
       ],
       "answer": 0,
-      "explanation": "Funkce doctest.testmod() prohledá aktuální modul (nebo zadaný modul) a spustí všechny testy nalezené v docstringách. unittest.main() patří k rozhraní unittest."
+      "explanation": "Funkce doctest.testmod() prozkoumá docstringy všech funkcí a tříd v modulu a ověří, zda jejich návratové hodnoty odpovídají zapsaným testům.",
+      "code": "import doctest\n\ndef calculate_ph(h_concentration: float) -> float:\n    \"\"\"\n    Výpočet pH z koncentrace oxoniových iontů.\n    >>> calculate_ph(1e-7)\n    7.0\n    \"\"\"\n    import math\n    return round(-math.log10(h_concentration), 2)\n\nif __name__ == \"__main__\":\n    doctest.________()",
+      "expected": "testmod"
     },
     {
       "id": "q2",
@@ -1300,7 +1327,7 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte zápis v docstringu pro přeskočení vyhodnocení konkrétního řádku příkladu:\n\n```python\ndef moja_funkce():\n    \"\"\"\n    >>> moja_funkce()\n    'vysledek' # doctest: ________\n    \"\"\"\n    pass\n```",
+      "question": "Doplňte direktivu doctestu, která přikáže přeskočit testování výstupu na daném řádku docstringu.",
       "options": [
         "+SKIP",
         "IGNORE",
@@ -1308,7 +1335,9 @@
         "PASS"
       ],
       "answer": 0,
-      "explanation": "Direktiva # doctest: +SKIP (případně se znaménkem +) řekne doctestu, aby výstup daného příkladu v docstringu přeskočil a neporovnával ho."
+      "explanation": "Direktiva # doctest: +SKIP instruuje modul doctest, aby ignoroval a netestoval výstup daného řádku (např. u náhodných nebo nedeterministických výsledků).",
+      "code": "def generate_random_spectrum():\n    \"\"\"\n    Generuje náhodná spektrometrická data.\n\n    >>> generate_random_spectrum()  # doctest: ________\n    [0.124, 0.985, 0.432]\n    \"\"\"\n    import random\n    return [round(random.random(), 3) for _ in range(3)]",
+      "expected": "+SKIP"
     },
     {
       "id": "q5",
@@ -1473,7 +1502,7 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte příkazový přepínač pro zadání inicializačního kódu setup při spouštění timeit z CLI:\n\n```bash\npython -m timeit ________ \"x = 5\" \"x**2\"\n```",
+      "question": "Kterým přepínačem předáte modulu timeit v příkazové řádce inicializační kód (setup), který se provede pouze jednou před měřením?",
       "options": [
         "-s",
         "-t",
@@ -1481,7 +1510,9 @@
         "-n"
       ],
       "answer": 0,
-      "explanation": "Přepínač -s (setup) v rozhraní příkazové řádky modulu timeit definuje kód pro inicializaci prostředí. -n určuje počet opakování smyčky."
+      "explanation": "Přepínač -s (zkratka pro --setup) v modulu timeit definuje kód, který se provede pouze jednou při inicializaci před měřicí smyčkou.",
+      "code": "# Změření rychlosti výpočtu molární hmotnosti s jednorázovým importem knihovny\npython -m timeit ________ \"import math; val = 12.011\" \"math.sqrt(val)\"",
+      "expected": "-s"
     },
     {
       "id": "q5",
@@ -1553,7 +1584,7 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte kód pro načtení právě jednoho řádku z výsledkové sady databázového dotazu:\n\n```python\ncursor.execute(\"SELECT name FROM users WHERE id = 1\")\nrow = cursor.________()\n```",
+      "question": "Doplňte metodu kurzoru z rozhraní Python DB-API 2.0 (např. sqlite3), která načte z výsledku SQL dotazu právě jeden následující řádek.",
       "options": [
         "fetchone",
         "fetchrow",
@@ -1561,7 +1592,9 @@
         "readline"
       ],
       "answer": 0,
-      "explanation": "Metoda cursor.fetchone() vrátí následující řádek z výsledné sady jako n-tici (tuple), nebo None, pokud už žádné další řádky nezbývají."
+      "explanation": "Metoda cursor.fetchone() vrátí jeden následující řádek z výsledku SQL dotazu jako n-tici (tuple), nebo None, pokud již žádný další záznam neexistuje.",
+      "code": "import sqlite3\n\nconn = sqlite3.connect(\"laborator.db\")\ncursor = conn.cursor()\n\ncursor.execute(\"SELECT vzorek_id, koncentrace FROM mereni WHERE id = ?\", (42,))\n# Načtení jediného nalezeného záznamu jako tuple\nrow = cursor.________()\n# Výstup: ('VZ-42', 0.015) nebo None",
+      "expected": "fetchone"
     },
     {
       "id": "q6",
@@ -1581,7 +1614,7 @@
     {
       "id": "q1",
       "type": "fill_blank_choice",
-      "question": "Doplňte název funkce pro zjištění aktuálně používaného renderovacího backendu v Matplotlibu:\n\nimport matplotlib\nbackend_name = matplotlib.________()\n\n```python\n# Doplňte název funkce pro zjištění aktuálně používaného renderovacího backendu v Matplotlibu:\n\nimport matplotlib\nbackend_name = matplotlib.________()\nvysledek = ________\n```",
+      "question": "Doplňte funkci pro zjištění aktuálně aktivního renderovacího backendu knihovny Matplotlib:",
       "options": [
         "get_backend",
         "current_backend",
@@ -1589,7 +1622,9 @@
         "get_renderer"
       ],
       "answer": 0,
-      "explanation": "Funkce `matplotlib.get_backend()` vrací název aktuálně vybraného renderovacího backendu (např. 'QtAgg', 'TkAgg', 'module://matplotlib_inline.backend_inline')."
+      "explanation": "Funkce matplotlib.get_backend() vrací název právě nastaveného backendu pro vykreslování grafů (např. 'QtAgg', 'TkAgg' nebo 'inline').",
+      "code": "import matplotlib\n\n# Zjištění aktivního grafického backendu:\nbackend = matplotlib.________()\n# Výstup např.: 'QtAgg' nebo 'inline'",
+      "expected": "get_backend"
     },
     {
       "id": "q2",
@@ -1687,7 +1722,7 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte parametr pro automatické vyhození výjimky CalledProcessError při návratovém kódu různém od nuly:\n\n```python\nimport subprocess\nsubprocess.run([\"ls\", \"/nonexistent\"], ________=True)\n```",
+      "question": "Doplňte parametr funkce subprocess.run(), který při nenulovém návratovém kódu automaticky vyvolá výjimku CalledProcessError:",
       "options": [
         "check",
         "strict",
@@ -1695,7 +1730,9 @@
         "exception"
       ],
       "answer": 0,
-      "explanation": "Parametr check=True způsobí, že v případě nebyl-li návratový kód externího procesu 0 (způsobil chybu), vyvolá subprocess.run() výjimku subprocess.CalledProcessError."
+      "explanation": "Parametr check=True zajistí, že pokud proces skončí s nenulovým návratovým kódem, funkce subprocess.run() okamžitě vyvolá výjimku CalledProcessError.",
+      "code": "import subprocess\n\n# Vyvolání výjimky CalledProcessError při chybovém návratovém kódu:\nresult = subprocess.run([\"ls\", \"/neexistujici_cesta\"], ________=True)",
+      "expected": "check"
     },
     {
       "id": "q3",
@@ -1713,7 +1750,7 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte parametr, který zajistí automatický převod standardního výstupu ze surových bajtů (bytes) na řetězec (str):\n\n```python\nimport subprocess\nres = subprocess.run([\"whoami\"], stdout=subprocess.PIPE, ________=\"utf-8\")\n```",
+      "question": "Doplňte parametr funkce subprocess.run(), který dekóduje zachycený výstup ze surových bajtů do textového řetězce pomocí zvoleného kódování:",
       "options": [
         "encoding",
         "decode",
@@ -1721,7 +1758,9 @@
         "charset"
       ],
       "answer": 0,
-      "explanation": "Nastavení parametru encoding=\"utf-8\" (nebo text=True) způsobí, že proudy stdout, stderr a stdin pracují s textovými řetězci typu str namísto bajtového objektu bytes."
+      "explanation": "Parametr encoding=\"utf-8\" (nebo zkráceně text=True) způsobí, že zachycený proud stdout a stderr je automaticky dekódován na řetězec str.",
+      "code": "import subprocess\n\n# Automatické dekódování stdout na str místo bytes:\nres = subprocess.run([\"whoami\"], capture_output=True, ________=\"utf-8\")\nprint(type(res.stdout))  # <class 'str'>",
+      "expected": "encoding"
     },
     {
       "id": "q5",
@@ -1778,7 +1817,7 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte parametr dekorátoru @jit, který zaručí vyhození výjimky při neschopnosti zkompilovat kód bez Python C-API:\n\n```python\nfrom numba import jit\n\n@jit(________=True)\ndef vypocet(x):\n    return x.sum()\n```",
+      "question": "Doplňte parametr dekorátoru @jit z knihovny Numba, který vynutí čistou kompilaci do strojového kódu bez závislosti na Python runtime (C-API):",
       "options": [
         "nopython",
         "strict",
@@ -1786,7 +1825,9 @@
         "fastmath"
       ],
       "answer": 0,
-      "explanation": "Parametr nopython=True (nebo samostatný dekorátor @njit) zakáže fallback do pomalého object mode. Pokud Numba nemůže kód přeložit do čistého nativního kódu bez Python C-API, vyvolá výjimku."
+      "explanation": "Parametr nopython=True (ekvivalent dekorátoru @njit) zakazuje pomalý object mode a vyvolá chybu, pokud Numba nedokáže funkci přeložit do čistého strojového kódu.",
+      "code": "from numba import jit\n\n# Vynucení čistého nativního překladu bez fallbacku do object mode:\n@jit(________=True)\ndef compute_sum(arr):\n    total = 0.0\n    for val in arr:\n        total += val\n    return total",
+      "expected": "nopython"
     },
     {
       "id": "q3",
@@ -1908,7 +1949,7 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte atribut objektu funkce z načtené knihovny v ctypes pro definici očekávaných typů vstupních parametrů:\n\n```python\nimport ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.spoctu_suma.________ = [ctypes.c_int, ctypes.c_int]\n```",
+      "question": "Doplňte atribut načtené C funkce v modulu ctypes, kterým se specifikují datové typy vstupních argumentů:",
       "options": [
         "argtypes",
         "restype",
@@ -1916,7 +1957,9 @@
         "signature"
       ],
       "answer": 0,
-      "explanation": "Atribut argtypes určuje seznam typů z modulu ctypes, které C funkce přijímá. Atribut restype se používá pro definici návratového typu."
+      "explanation": "Atribut argtypes přebírá posloupnost typů z ctypes pro kontrolu a konverzi vstupních parametrů volané C funkce.",
+      "code": "import ctypes\n\nlib = ctypes.CDLL(\"./libmath.so\")\n# Definice očekávaných typů vstupních argumentů (dva int parametry):\nlib.add_integers.________ = [ctypes.c_int, ctypes.c_int]",
+      "expected": "argtypes"
     },
     {
       "id": "q3",
@@ -1945,7 +1988,7 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte atribut pro nastavení návratového typu C funkce vracející 64bitové číslo s plovoucí čárkou:\n\n```python\nimport ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.vypocti_prumer.________ = ctypes.c_double\n```",
+      "question": "Doplňte atribut načtené C funkce v modulu ctypes, kterým se nastavuje datový typ její návratové hodnoty:",
       "options": [
         "restype",
         "return_type",
@@ -1953,7 +1996,9 @@
         "result"
       ],
       "answer": 0,
-      "explanation": "Atribut restype říká modulu ctypes, jaký typ (např. ctypes.c_double nebo ctypes.c_int) C funkce vrací, aby mohla být návratová hodnota správně přetypována na Python objekt."
+      "explanation": "Atribut restype specifikuje typ z modulu ctypes, na který má modul převést návratovou hodnotu z C funkce (výchozí je c_int).",
+      "code": "import ctypes\n\nlib = ctypes.CDLL(\"./libmath.so\")\n# Nastavení návratového typu funkce na 64bitové číslo s plovoucí čárkou:\nlib.compute_mean.________ = ctypes.c_double",
+      "expected": "restype"
     }
   ],
   "cython_overview": [
@@ -1973,7 +2018,7 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte klíčové slovo Cythonu pro definici staticky typované celočíselné C proměnné i:\n\n```cython\ndef suma(int n):\n    ________ int i\n    cdef int s = 0\n    for i in range(n):\n        s += i\n    return s\n```",
+      "question": "Doplňte klíčové slovo Cythonu pro deklaraci staticky typované proměnné bez režie PyObject:",
       "options": [
         "cdef",
         "static",
@@ -1981,7 +2026,9 @@
         "typed"
       ],
       "answer": 0,
-      "explanation": "Klíčové slovo cdef slouží v Cythonu k definici staticky typovaných C proměnných, funkcí nebo struktur. Proměnné vytvořené přes cdef nemají režii Python objektů (PyObject)."
+      "explanation": "Klíčové slovo cdef v Cythonu slouží k deklaraci nativních C proměnných, struktur a funkcí s nulovou režií Python objektů.",
+      "code": "# Cython deklarace staticky typovaných C proměnných:\ndef compute_sum(int n):\n    ________ int total = 0\n    cdef int i\n    for i in range(n):\n        total += i\n    return total",
+      "expected": "cdef"
     },
     {
       "id": "q3",
@@ -2077,7 +2124,7 @@
     {
       "id": "fp_q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte název interní funkce sys.________() pro získání aktuálního rámce zásobníku (stack frame).\n\n```python\n# Doplňte název interní funkce sys.________() pro získání aktuálního rámce zásobníku (stack frame).\nvysledek = ________\n```",
+      "question": "Doplňte funkci z modulu sys pro získání aktuálního rámce volání na zásobníku (stack frame):",
       "options": [
         "_getframe",
         "get_stack",
@@ -2085,7 +2132,9 @@
         "fetch_frame"
       ],
       "answer": 0,
-      "explanation": "V modulu sys slouží funkce sys._getframe() k přímému přístupu k aktuálnímu nebo předchozímu paměťovému rámci zásobníku (stack frame), což se využívá při nízkoúrovňových inspekcích či realizaci plných uzávěrů."
+      "explanation": "Funkce sys._getframe(depth) vrací stack frame objekt na zadané hloubce volání zásobníku (0 je aktuální funkce, 1 je volající).",
+      "code": "import sys\n\ndef inspect_caller():\n    # Získání stack frame předchozího volajícího (úroveň 1):\n    frame = sys.________(1)\n    return frame.f_code.co_name",
+      "expected": "_getframe"
     },
     {
       "id": "fp_q6",
@@ -2131,7 +2180,7 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící příkaz tak, aby funkce obal transparentně obousměrně delegovala komunikaci do korutiny:\n\ndef korutina():\n    while True:\n        val = (yield)\n        print(val)\n\ndef obal(gen):\n    ________ gen\n\n```python\n# Doplňte chybějící příkaz tak, aby funkce obal transparentně obousměrně delegovala komunikaci do korutiny:\n\ndef korutina():\n    while True:\n        val = (yield)\n        print(val)\n\ndef obal(gen):\n    ________ gen\nvysledek = ________\n```",
+      "question": "Doplňte syntaxi pro obousměrnou delegaci hodnot, výjimek a volání send() do vnitřního generátoru / korutiny:",
       "options": [
         "yield from",
         "yield send",
@@ -2139,12 +2188,14 @@
         "delegate to"
       ],
       "answer": 0,
-      "explanation": "Konstrukce `yield from` zajišťuje plnou obousměrnou delegaci: vrací hodnoty z podgenerátoru směrem ven a zároveň přeposílá vstupy zaslané přes send(), stejně jako výjimky z throw() a close(), přímo do vnitřní korutiny."
+      "explanation": "Konstrukce yield from zajišťuje plnou obousměrnou delegaci iterace, včetně předávání hodnot z metody send() a výjimek přímo do podgenerátoru.",
+      "code": "def subgenerator():\n    yield \"start\"\n    yield \"data\"\n\ndef outer_wrapper():\n    # Transparentní delegace na podgenerátor:\n    ________ subgenerator()",
+      "expected": "yield from"
     },
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící volání do dekorátoru tak, aby automaticky nastartoval vracenou korutinu na první yield:\n\ndef coroutine(func):\n    def wrapper(*args, **kwargs):\n        gen = func(*args, **kwargs)\n        ________\n        return gen\n    return wrapper\n\n```python\n# Doplňte chybějící volání do dekorátoru tak, aby automaticky nastartoval vracenou korutinu na první yield:\n\ndef coroutine(func):\n    def wrapper(*args, **kwargs):\n        gen = func(*args, **kwargs)\n        ________\n        return gen\n    return wrapper\nvysledek = ________\n```",
+      "question": "Doplňte volání do dekorátoru pro automatické nastartování (priming) korutiny k prvnímu výrazu yield:",
       "options": [
         "next(gen)",
         "gen.init()",
@@ -2152,7 +2203,9 @@
         "gen.run()"
       ],
       "answer": 0,
-      "explanation": "Dekorátor pro inicializaci (priming) korutiny vykoná `next(gen)` (což je ekvivalentní `gen.send(None)`), čímž posune provádění kódu v generátoru k prvním příkazu `(yield)` ještě před jeho vrácením volajícímu."
+      "explanation": "Volání next(gen) (nebo gen.send(None)) posune provádění kódu nově vytvořené korutiny k prvnímu příkazu yield, takže je ihned připravena přijímat data.",
+      "code": "def coroutine_primer(func):\n    def wrapper(*args, **kwargs):\n        gen = func(*args, **kwargs)\n        # Posun generátoru k prvnímu výrazu (yield):\n        ________\n        return gen\n    return wrapper",
+      "expected": "next(gen)"
     },
     {
       "id": "q5",
@@ -2276,15 +2329,17 @@
     {
       "id": "q7",
       "type": "fill_blank_choice",
-      "question": "Jaký zápis f-stringu chybí na místě ________ pro vytištění hodnoty v složených závorkách?\n\njmeno = \"VŠCHT\"\n# Výsledný řetězec má být: \"{VŠCHT}\"\ns = f\"________\"\n\n```python\n# Jaký zápis f-stringu chybí na místě ________ pro vytištění hodnoty v složených závorkách?\n\njmeno = \"VŠCHT\"\n# Výsledný řetězec má být: \"{VŠCHT}\"\ns = f\"________\"\nvysledek = ________\n```",
+      "question": "Doplňte výraz do f-stringu tak, aby byl výsledný řetězec obalen ve složených závorkách {VŠCHT}:",
       "options": [
-        "{{{jmeno}}} — trojité složené závorky vkládají proměnnou do jednoho páru závorek    .",
-        "\\{{jmeno\\}} — zpětné lomítko ruší speciální význam složené závorky v textu f-stringu.",
-        "{{jmeno}} — dvojité složené závorky automaticky vyhodnotí zadanou proměnnou v kódu  .",
-        "{\\{jmeno\\}} — vnější závorky tvoří výraz a vnitřní eskapování vytvoří čistý text    ."
+        "{{{jmeno}}}",
+        "{{jmeno}}",
+        "\\{{jmeno\\}}",
+        "{\\{jmeno\\}}"
       ],
       "answer": 0,
-      "explanation": "V f-stringu se složená závorka eskapuje jejím zdvojením ({{ vypíše {). Pokud chceme vypsat složené závorky obsahující hodnotu proměnné, musíme použít trojité závorky {{{jmeno}}}: vnější pár {{ vytvoří textovou {, vnitřní {jmeno} vyhodnotí proměnnou a zbylé }} vytvoří uzavírací }."
+      "explanation": "V f-stringu se složené závorky eskapují zdvojením {{ a }}. Trojité složené závorky {{{jmeno}}} vytvoří literální {, vyhodnotí proměnnou a uzavřou literální }.",
+      "code": "jmeno = \"VŠCHT\"\n# Výsledkem má být text: \"{VŠCHT}\"\ntext = f\"________\"\n# Výstup: {VŠCHT}",
+      "expected": "{{{jmeno}}}"
     },
     {
       "id": "q8",
@@ -2396,16 +2451,17 @@
     {
       "id": "q7",
       "type": "fill_blank_choice",
-      "question": "Jaký konstruktor musíte použít pro vytvoření prázdné množiny?\n\n```python\n# Jaký konstruktor musíte použít pro vytvoření prázdné množiny?\nvysledek = ________\n```",
-      "code": "prazdna_mnozina = ________()\nprint(type(prazdna_mnozina))",
+      "question": "Doplňte konstruktor pro vytvoření prázdné množiny (protože literál {} vytvoří prázdný slovník):",
+      "code": "# Vytvoření prázdné měnitelné množiny:\nempty_set = ________()\nprint(type(empty_set))  # <class 'set'>",
       "options": [
-        "`set`",
-        "`dict`",
-        "`frozenset`",
-        "`tuple`"
+        "set",
+        "dict",
+        "frozenset",
+        "tuple"
       ],
       "answer": 0,
-      "explanation": "V Pythonu zápis `{}` označuje prázdný slovník (`dict`). Pro vytvoření prázdné množiny je nutné použít explicitní konstruktor `set()`."
+      "explanation": "Zápis {} vytváří prázdný slovník (dict), proto se pro inicializaci prázdné množiny musí volat konstruktor set().",
+      "expected": "set"
     },
     {
       "id": "q8",
@@ -2439,16 +2495,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Kterou vestavěnou funkci použijete pro získání indexu i hodnoty při průchodu sekvencí ve smyčce `for`?\n\n```python\n# Kterou vestavěnou funkci použijete pro získání indexu i hodnoty při průchodu sekvencí ve smyčce `for`?\nvysledek = ________\n```",
-      "code": "sekvence = ['a', 'b', 'c']\nfor idx, val in ________(sekvence):\n    print(idx, val)",
+      "question": "Doplňte vestavěnou funkci pro současné získání indexu a hodnoty prvku při iteraci ve for cyklu:",
+      "code": "names = [\"Alice\", \"Bob\", \"Charlie\"]\n\n# Iterace s automatickým číslováním indexů:\nfor idx, name in ________(names):\n    print(f\"{idx}: {name}\")\n# Výstup: 0: Alice, 1: Bob, 2: Charlie",
       "options": [
-        "`enumerate`",
-        "`zip`",
-        "`range`",
-        "`sorted`"
+        "enumerate",
+        "zip",
+        "range",
+        "sorted"
       ],
       "answer": 0,
-      "explanation": "Funkce `enumerate(sekvence)` vrací iterátor generující dvojice `(index, prvek)` v přirozeném pořadí průchodu."
+      "explanation": "Funkce enumerate(iterable) vrací iterátor dvojic (index, prvek) počínaje indexem 0 (nebo zadaným start).",
+      "expected": "enumerate"
     },
     {
       "id": "q3",
@@ -2559,7 +2616,7 @@
     {
       "id": "basics_q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte správný dekorátor ________ před def increment(cls): pro metodu třídy s prvním implicitním argumentem cls.\n\n```python\n# Doplňte správný dekorátor ________ před def increment(cls): pro metodu třídy s prvním implicitním argumentem cls.\nvysledek = ________\n```",
+      "question": "Doplňte dekorátor pro vytvoření metody třídy, která jako první argument přijímá referenci na třídu (cls):",
       "options": [
         "@classmethod",
         "@staticmethod",
@@ -2567,7 +2624,9 @@
         "@classproperty"
       ],
       "answer": 0,
-      "explanation": "Dekorátor @classmethod způsobí, že dekorovaná metoda dostane při volání na třídě i na instanci jako první implicitní parametr referenci na objekt třídy (konvenčně pojmenovaný cls)."
+      "explanation": "Dekorátor @classmethod předává metodě jako první argument samotnou třídu (cls) namísto instance (self).",
+      "code": "class Counter:\n    count = 0\n\n    # Metoda třídy s přístupem ke třídním atributům:\n    ________\n    def increment(cls):\n        cls.count += 1",
+      "expected": "@classmethod"
     },
     {
       "id": "basics_q6",
@@ -2585,7 +2644,7 @@
     {
       "id": "basics_q7",
       "type": "fill_blank_choice",
-      "question": "Doplňte správný výraz ________.__init__(name) pro volání konstruktoru rodičovské třídy v Python 3.\n\n```python\n# Doplňte správný výraz ________.__init__(name) pro volání konstruktoru rodičovské třídy v Python 3.\nvysledek = ________\n```",
+      "question": "Doplňte výraz pro zavolání konstruktoru nadřazené třídy v potomkovi dle standardu Pythonu 3:",
       "options": [
         "super()",
         "parent()",
@@ -2593,7 +2652,9 @@
         "self()"
       ],
       "answer": 0,
-      "explanation": "V Pythonu 3 nahrazuje volání super().__init__(...) starší bezargumentový i explicitní zápis super(AktuálníTřída, self).__init__(...). Zjišťuje rodičovské třídy automaticky z MRO."
+      "explanation": "Funkce super() vrací proxy objekt delegující volání metod na předka dle Method Resolution Order (MRO).",
+      "code": "class Animal:\n    def __init__(self, name):\n        self.name = name\n\nclass Dog(Animal):\n    def __init__(self, name, breed):\n        # Volání konstruktoru rodičovské třídy:\n        ________.__init__(name)\n        self.breed = breed",
+      "expected": "super()"
     },
     {
       "id": "basics_q8",
@@ -2654,16 +2715,17 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Který parametr musíte předat převodní funkci `int()`, aby převedla řetězec z hexadecimální soustavy?\n\n```python\n# Který parametr musíte předat převodní funkci `int()`, aby převedla řetězec z hexadecimální soustavy?\nvysledek = ________\n```",
-      "code": "cislo = int(\"1a\", ________=16)\nprint(cislo)",
+      "question": "Doplňte parametr funkce int() určující číselnou soustavu pro převod hexadecimálního řetězce na celé číslo:",
+      "code": "# Převod hexadecimálního řetězce '1f' na celé číslo:\nvalue = int(\"1f\", ________=16)\n# Výstup: 31",
       "options": [
-        "`base`",
-        "`radix`",
-        "`format`",
-        "`system`"
+        "base",
+        "radix",
+        "format",
+        "system"
       ],
       "answer": 0,
-      "explanation": "Konstruktor `int(string, base=N)` přijímá pojmenovaný parametr `base` určující základ číselné soustavy (zde 16 pro hexadecimální převod)."
+      "explanation": "Funkce int(x, base=10) přijímá parametr base, kterým specifikujeme základ číselné soustavy vstupního řetězce (např. 2, 8, 16).",
+      "expected": "base"
     },
     {
       "id": "q5",
@@ -2735,16 +2797,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Kterou novou metodou z Pythonu 3.9+ bezpečně odstraníte specifikovanou předponu z řetězce?\n\n```python\n# Kterou novou metodou z Pythonu 3.9+ bezpečně odstraníte specifikovanou předponu z řetězce?\nvysledek = ________\n```",
-      "code": "nazev = \"tmp_data.txt\"\ncisty_nazev = nazev.________(\"tmp_\")\nprint(cisty_nazev)",
+      "question": "Doplňte metodu řetězce zavedenou v Pythonu 3.9 pro bezpečné odstranění zadané předpony:",
+      "code": "filename = \"raw_experiment_data.csv\"\n\n# Odstranění předpony 'raw_':\nclean_name = filename.________(\"raw_\")\n# Výstup: 'experiment_data.csv'",
       "options": [
-        "`removeprefix`",
-        "`lstrip`",
-        "`delete_start`",
-        "`trim_left`"
+        "removeprefix",
+        "lstrip",
+        "removesuffix",
+        "strip"
       ],
       "answer": 0,
-      "explanation": "Metoda `removeprefix('tmp_')` v Pythonu 3.9+ odstraní zadanou předponu, pokud řetězec touto předponou začíná."
+      "explanation": "Metoda str.removeprefix(prefix) odstraní přesný řetězec předpony bez nežádoucího ořezávání jednotlivých znaků jako u lstrip().",
+      "expected": "removeprefix"
     },
     {
       "id": "q4",
@@ -2842,16 +2905,18 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Který název metody doplníte na místo podtržítka pro převod řetězce na bajty v UTF-8?\n\n```python\n# Který název metody doplníte na místo podtržítka pro převod řetězce na bajty v UTF-8?\nvysledek = ________\n```",
+      "question": "Doplňte metodu řetězce str pro jeho zakódování do posloupnosti bajtů (bytes) ve formátu UTF-8:",
       "code_snippet": "bajtovy_retezec = \"svět\".________('utf-8')",
       "options": [
-        "encode — metoda typu str",
-        "decode — metoda typu bytes",
-        "to_bytes — funkce",
-        "pack — funkce z modulu struct"
+        "encode",
+        "decode",
+        "to_bytes",
+        "pack"
       ],
       "answer": 0,
-      "explanation": "Metoda .encode('utf-8') se volá nad řetězcem typu str a vrací bajty (bytes). Opačný převod z bytes na str zajišťuje metoda .decode('utf-8')."
+      "explanation": "Metoda str.encode(encoding) převádí text na bajtový řetězec bytes. Pro opačný směr slouží metoda bytes.decode(encoding).",
+      "code": "text = \"VŠCHT Praha\"\n\n# Zakódování textového řetězce (str) do bajtů (bytes):\nraw_bytes = text.________(\"utf-8\")\nprint(type(raw_bytes))  # <class 'bytes'>",
+      "expected": "encode"
     },
     {
       "id": "q5",
@@ -2908,16 +2973,18 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte názvem parametru funkce print(), který přesměruje výstup do chybového proudu sys.stderr.\n\n```python\n# Doplňte názvem parametru funkce print(), který přesměruje výstup do chybového proudu sys.stderr.\nvysledek = ________\n```",
+      "question": "Doplňte parametr funkce print(), kterým přesměrujete výpis do standardního chybového proudu (sys.stderr):",
       "code_snippet": "print(\"Chyba aplikace\", ________=sys.stderr)",
       "options": [
-        "file — akceptuje objekt",
-        "stream — akceptuje datový proud",
-        "output — určuje cílový výstupní kontejner",
-        "target — určuje ukazatel na cílový souborový popisovač operačního systému uživatele."
+        "file",
+        "stream",
+        "output",
+        "target"
       ],
       "answer": 0,
-      "explanation": "Parametr file vyžaduje objekt podporující metodu write(string). Výchozí hodnotou je sys.stdout."
+      "explanation": "Parametr file funkce print() přijímá jakýkoliv objekt s metodou write(string), výchozí hodnotou je sys.stdout.",
+      "code": "import sys\n\n# Vypsání chybového hlášení do proudu stderr:\nprint(\"Chyba: Soubor nebyl nalezen!\", ________=sys.stderr)",
+      "expected": "file"
     },
     {
       "id": "q3",
@@ -2976,16 +3043,18 @@
     {
       "id": "q7",
       "type": "fill_blank_choice",
-      "question": "Který prvek specifikátoru formátu doplníte pro zarovnání textu na střed?\n\n```python\n# Který prvek specifikátoru formátu doplníte pro zarovnání textu na střed?\nvysledek = ________\n```",
+      "question": "Doplňte znak zarovnání ve formátovacím specifikátoru f-stringu pro vycentrování textu na šířku 10 znaků:",
       "code_snippet": "text = \"Python\"\nprint(f\"{text:________10}\")",
       "options": [
-        "^ — zarovná tisknutý řetězec na střed v rámci zadané šířky výstupního pole.",
-        "< — zarovná tisknutý řetězec k levému okraji v rámci zadané šířky výstupního pole.",
-        "> — zarovná tisknutý řetězec k pravému okraji v rámci zadané šířky výstupního pole.",
-        "= — vloží výplňové znaky mezi znaménko čísla a vlastní číselnou hodnotu výstupu."
+        "^",
+        "<",
+        ">",
+        "="
       ],
       "answer": 0,
-      "explanation": "V minijazyku formátování určuje `^` zarovnání na střed, `<` doleva, `>` doprava a `=` výplň mezi znaménkem a číslem."
+      "explanation": "Ve formátovacím minijazyku Pythonu znak ^ zarovnává na střed, < doleva a > doprava.",
+      "code": "title = \"VŠCHT\"\n\n# Zarovnání textu na střed s celkovou šířkou pole 10 znaků:\nformatted = f\"{title:________10}\"\n# Výstup: '  VŠCHT   '",
+      "expected": "^"
     }
   ],
   "_comprehensions": [
@@ -3018,7 +3087,7 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící část zápisu generátorové notace pro vytvoření slovníku dvojic (číslo: mocnina):\n\nd = {________ for x in range(3)}\n\n```python\n# Doplňte chybějící část zápisu generátorové notace pro vytvoření slovníku dvojic (číslo: mocnina):\n\nd = {________ for x in range(3)}\nvysledek = ________\n```",
+      "question": "Doplňte výraz slovníkové komprehence (dict comprehension) pro vytvoření mapování čísla na jeho druhou mocninu:",
       "options": [
         "x: x**2",
         "x -> x**2",
@@ -3026,7 +3095,9 @@
         "x = x**2"
       ],
       "answer": 0,
-      "explanation": "Generátorová notace slovníku vyžaduje ve své úvodní transformační části syntaktickou strukturu KLÍČ: HODNOTA obalenou ve složených závorkách."
+      "explanation": "Slovníková komprehence vyžaduje zápis klic: hodnota uvnitř složených závorek před klauzulí for.",
+      "code": "# Vytvoření slovníku mocnin pro čísla 0 až 3:\npowers = {________ for x in range(4)}\n# Výstup: {0: 0, 1: 1, 2: 4, 3: 9}",
+      "expected": "x: x**2"
     },
     {
       "id": "q4",
@@ -3109,15 +3180,17 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte operátor tak, aby proměnná `res` obsahovala `True` pouze v případě, že objekt `a` i `b` odkazují na stejnou paměťovou adresu:\n\nres = a ________ b\n\n```python\n# Doplňte operátor tak, aby proměnná `res` obsahovala `True` pouze v případě, že objekt `a` i `b` odkazují na stejnou paměťovou adresu:\n\nres = a ________ b\nvysledek = ________\n```",
+      "question": "Doplňte operátor pro ověření identity objektů (zda odkazují na stejné místo v paměti):",
       "options": [
+        "is",
         "==",
         "in",
-        "is",
         "id"
       ],
-      "answer": 2,
-      "explanation": "Operátor is testuje identitu objektů (zda id(a) == id(b)), zatímco operátor == porovnává hodnotový obsah objektů."
+      "answer": 0,
+      "explanation": "Operátor is porovnává identitu objektů v paměti (id(a) == id(b)), zatímco operátor == porovnává rovnost jejich hodnot.",
+      "code": "a = [1, 2, 3]\nb = a\n\n# Ověření paměťové identity (shody id objektů):\nsame_object = a ________ b\n# Výstup: True",
+      "expected": "is"
     },
     {
       "id": "q5",
@@ -3163,15 +3236,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte kód tak, aby proměnná `head` získala první prvek sekvence a proměnná `tail` seznam všech zbývajících prvků:\n\nhead, ________ tail = (10, 20, 30, 40)\n\n```python\n# Doplňte kód tak, aby proměnná `head` získala první prvek sekvence a proměnná `tail` seznam všech zbývajících prvků:\n\nhead, ________ tail = (10, 20, 30, 40)\nvysledek = ________\n```",
+      "question": "Doplňte operátor rozšířeného rozbalování (extended unpacking) pro zachycení zbývajících prvků n-tice do seznamu tail:",
       "options": [
-        "&",
         "*",
+        "&",
         "...",
         "in"
       ],
-      "answer": 1,
-      "explanation": "Operátor rozšířeného rozbalování * před názvem proměnné zachytí zbývající prvky sekvence a uloží je do seznamu tail."
+      "answer": 0,
+      "explanation": "Hvězdičkový operátor * (extended iterable unpacking dle PEP 3132) zachytí libovolný počet zbývajících prvků do nového seznamu list.",
+      "code": "data = (10, 20, 30, 40, 50)\n\n# Rozbalení prvního prvku a zbytku sekvence:\nhead, ________tail = data\n# Výstup: head = 10, tail = [20, 30, 40, 50]",
+      "expected": "*"
     },
     {
       "id": "q3",
@@ -3280,15 +3355,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte kód pro vytvoření nové instance `Point` s upravenou souřadnicí `x`, aniž by se změnila původní neměnná instance `p`:\n\nPoint = namedtuple('Point', 'x y')\np = Point(1, 2)\nnew_p = p.________(x=10)\n\n```python\n# Doplňte kód pro vytvoření nové instance `Point` s upravenou souřadnicí `x`, aniž by se změnila původní neměnná instance `p`:\n\nPoint = namedtuple('Point', 'x y')\np = Point(1, 2)\nnew_p = p.________(x=10)\nvysledek = ________\n```",
+      "question": "Doplňte metodu pojmenované n-tice (namedtuple) pro vytvoření nové kopie s upravenou hodnotou vybraného atributu:",
       "options": [
+        "_replace",
         "replace",
         "_make",
-        "_replace",
-        "update"
+        "_update"
       ],
-      "answer": 2,
-      "explanation": "Metoda _replace(**kwargs) vytvoří novou pojmenovanou n-tici s aktualizovanými hodnotami prvků, zatímco původní instance zůstane nezměněna."
+      "answer": 0,
+      "explanation": "Metoda _replace(**kwargs) vytvoří novou instanci namedtuple se změněnými hodnotami zadaných polí, protože pojmenované n-tice jsou neměnné (immutable).",
+      "code": "from collections import namedtuple\n\nPoint = namedtuple(\"Point\", [\"x\", \"y\"])\np = Point(1, 2)\n\n# Vytvoření nové instance se změněnou souřadnicí x:\nnew_p = p.________(x=10)\n# Výstup: Point(x=10, y=2)",
+      "expected": "_replace"
     },
     {
       "id": "q3",
@@ -3371,15 +3448,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte metodu tak, aby do seznamu `a` byly přidány jednotlivé prvky ze seznamu `b` jako samostatné položky (nikoli jako zanořený seznam):\n\na = [1, 2]\nb = [3, 4]\na.________(b)\n\n```python\n# Doplňte metodu tak, aby do seznamu `a` byly přidány jednotlivé prvky ze seznamu `b` jako samostatné položky (nikoli jako zanořený seznam):\n\na = [1, 2]\nb = [3, 4]\na.________(b)\nvysledek = ________\n```",
+      "question": "Doplňte metodu seznamu pro přidání všech prvků z jiné iterovatelné sekvence na jeho konec (in-place rozšíření):",
       "options": [
+        "extend",
         "append",
         "insert",
-        "extend",
         "concat"
       ],
-      "answer": 2,
-      "explanation": "Metoda extend(iterable) přidá prvky předané sekvence jednotlivě na konec seznamu."
+      "answer": 0,
+      "explanation": "Metoda list.extend(iterable) rozbalí prvky předané sekvence a připojí je na konec seznamu, zatímco append() by vložil celou sekvenci jako jeden vnořený prvek.",
+      "code": "items = [1, 2]\nmore_items = [3, 4]\n\n# Přidání jednotlivých položek z more_items na konec seznamu items:\nitems.________(more_items)\n# Výstup: items je [1, 2, 3, 4]",
+      "expected": "extend"
     },
     {
       "id": "q4",
@@ -3475,15 +3554,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte název metody, která převede typované pole `array` na binární řetězec bajtů:\n\nfrom array import array\nar = array('h', [10, 20, 30])\nraw_bytes = ar.________()\n\n```python\n# Doplňte název metody, která převede typované pole `array` na binární řetězec bajtů:\n\nfrom array import array\nar = array('h', [10, 20, 30])\nraw_bytes = ar.________()\nvysledek = ________\n```",
+      "question": "Doplňte metodu třídy `array`, která serializuje obsah typovaného číselného pole do surových bajtů (`bytes`).",
       "options": [
-        "tofile",
         "tobytes",
+        "tofile",
         "tolist",
         "encode"
       ],
-      "answer": 1,
-      "explanation": "Metoda tobytes() vyexportuje souvislý paměťový blok pole do objektu typu bytes."
+      "answer": 0,
+      "explanation": "Metoda `tobytes()` vyexportuje souvislý paměťový blok prvků pole jako neměnný binární řetězec bajtů (`bytes`).",
+      "code": "from array import array\n\n# Typ 'h' představuje 16bitová celá čísla (short)\ndata = array('h', [100, 250, 500])\nraw_data = data.________()\n\nprint(type(raw_data))  # <class 'bytes'>",
+      "expected": "tobytes"
     },
     {
       "id": "q3",
@@ -3595,16 +3676,18 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte kód pro setřídění seznamu n-tic podle jejich druhé položky za pomoci funkce z modulu operator.\n`python\nfrom operator import ________\npairs = [('a', 3), ('b', 1), ('c', 2)]\nresult = sorted(pairs, key=itemgetter(1))\n`\n\n```python\n# Doplňte kód pro setřídění seznamu n-tic podle jejich druhé položky za pomoci funkce z modulu operator.\n`python\nfrom operator import ________\npairs = [('a', 3), ('b', 1), ('c', 2)]\nresult = sorted(pairs, key=itemgetter(1))\n`\nvysledek = ________\n```",
+      "question": "Doplňte funkci z modulu `operator`, která vytvoří extraktor hodnoty na zadaném indexu n-tice pro řazení.",
       "code_snippet": "from operator import ________\npairs = [('a', 3), ('b', 1), ('c', 2)]\nresult = sorted(pairs, key=itemgetter(1))",
       "options": [
-        "itemgetter — funkce z modulu operator vytvářející klíčový objekt",
-        "attrgetter — funkce z modulu operator přistupující k pojmenovaným atributům daných objektů.",
-        "methodcaller — funkce z modulu operator volající specifikovanou metodu nad každým prvkem.",
-        "elementwise — funkce z modulu operator umožňující vektorské porovnávání prvků sekvence."
+        "itemgetter",
+        "attrgetter",
+        "methodcaller",
+        "item"
       ],
       "answer": 0,
-      "explanation": "operator.itemgetter(1) vytvoří callable objekt, který pro předaný prvek vrací x[1]. Je to výkonnější a čitelnější ekvivalent lambda funkce lambda x: x[1]."
+      "explanation": "Funkce `operator.itemgetter(1)` zkonstruuje rychlý extraktor pro přístup k indexu 1, což slouží jako efektivní ekvivalent `lambda x: x[1]` pro funkci `sorted()`.",
+      "code": "from operator import ________\n\n# Seznam naměřených vzorků: (id_vzorku, absorbance)\nsamples = [(\"S1\", 0.45), (\"S2\", 0.12), (\"S3\", 0.89)]\nsorted_samples = sorted(samples, key=itemgetter(1))\n# Výstup: [('S2', 0.12), ('S1', 0.45), ('S3', 0.89)]",
+      "expected": "itemgetter"
     },
     {
       "id": "q6",
@@ -3634,16 +3717,18 @@
     {
       "id": "q8",
       "type": "fill_blank_choice",
-      "question": "Doplňte parametr funkce sorted() pro obrácení pořadí prvků od největšího po nejmenší.\n`python\nnumbers = [1, 5, 3, 2, 4]\nresult = sorted(numbers, ________=True)\n`\n\n```python\n# Doplňte parametr funkce sorted() pro obrácení pořadí prvků od největšího po nejmenší.\n`python\nnumbers = [1, 5, 3, 2, 4]\nresult = sorted(numbers, ________=True)\n`\nvysledek = ________\n```",
+      "question": "Doplňte pojmenovaný argument funkce `sorted()`, který zajistí sestupné seřazení naměřených teplot.",
       "code_snippet": "numbers = [1, 5, 3, 2, 4]\nresult = sorted(numbers, ________=True)",
       "options": [
-        "reverse — pojmenovaný boolean parametr otočující směr porovnávání všech prvků při řazení.",
-        "inverted — pojmenovaný parametr způsobující předřazení záporného znaménka u číselných typů.",
-        "descending — nepovinný argument přepínající algoritmus do režimu sestupného třídění prvků.",
-        "backward — příznak určující načítání vstupního iterovatelného objektu od posledního prvku."
+        "reverse",
+        "descending",
+        "inverted",
+        "backward"
       ],
       "answer": 0,
-      "explanation": "Funkce sorted() i metoda list.sort() přebírají nepovinný pojmenovaný parametr reverse. Při nastavení reverse=True probíhá třídění v opačném (sestupném) pořadí."
+      "explanation": "Pojmenovaný argument `reverse=True` u `sorted()` a `list.sort()` otočí výchozí vzestupné řazení na sestupné.",
+      "code": "temperatures = [21.5, 38.2, 19.0, 42.1, 27.8]\ndescending = sorted(temperatures, ________=True)\n\n# Výstup: [42.1, 38.2, 27.8, 21.5, 19.0]\nprint(descending)",
+      "expected": "reverse"
     }
   ],
   "files_overview": [
@@ -3663,16 +3748,18 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte klíčový parametr funkce open() zaručující správný převod bajtů na textové znaky.\n`python\nwith open('data.txt', mode='r', ________='utf-8') as f:\n    content = f.read()\n`\n\n```python\n# Doplňte klíčový parametr funkce open() zaručující správný převod bajtů na textové znaky.\n`python\nwith open('data.txt', mode='r', ________='utf-8') as f:\n    content = f.read()\n`\nvysledek = ________\n```",
+      "question": "Doplňte pojmenovaný argument funkce `open()`, kterým se explicitně určuje znaková sada pro čtení textového souboru.",
       "code_snippet": "with open('data.txt', mode='r', ________='utf-8') as f:\n    content = f.read()",
       "options": [
-        "encoding — parametr definující znakové kódování použité",
-        "charset — parametr určující znakovou sadu",
-        "format — parametr předepisující požadované formátování textového souboru na systémové úrovni.",
-        "codec — parametr předávající šifrovací klíč"
+        "encoding",
+        "charset",
+        "codec",
+        "format"
       ],
       "answer": 0,
-      "explanation": "Parametr encoding='utf-8' explicitně stanovuje kódování pro čtení nebo zápis textových souborů. Nespoléhání se na výchozí kódování systému je zásadní pro přenositelnost kódu mezi různorodými operačními systémy."
+      "explanation": "Parametr `encoding='utf-8'` explicitně určuje kódování znaků pro dekódování bajtů ze souboru a předchází chybám `UnicodeDecodeError` na různých platformách.",
+      "code": "with open(\"mereni.csv\", mode=\"r\", ________=\"utf-8\") as f:\n    header = f.readline().strip()\n    data = [line.strip().split(\",\") for line in f]",
+      "expected": "encoding"
     },
     {
       "id": "q3",
@@ -3732,16 +3819,18 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte název konstruktoru pro vytvoření prázdné zmražené množiny.\n`python\nempty_fs = ________()\nprint(type(empty_fs).__name__)\n`\n\n```python\n# Doplňte název konstruktoru pro vytvoření prázdné zmražené množiny.\n`python\nempty_fs = ________()\nprint(type(empty_fs).__name__)\n`\nvysledek = ________\n```",
+      "question": "Doplňte název vestavěného konstruktoru pro vytvoření prázdné neměnné (hashovatelné) množiny.",
       "code_snippet": "empty_fs = ________()\nprint(type(empty_fs).__name__)",
       "options": [
-        "frozenset — konstruktor vytvářející prázdnou neproměnnou množinu",
-        "fset — zkratkový konstruktor definující prázdnou zmraženou množinu v globálním prostoru.",
-        "frozen — klíčové slovo dekorující standardní množinový objekt",
-        "set.freeze — statická metoda třídy set převádějící existující množinu na immutable typ."
+        "frozenset",
+        "fset",
+        "frozen",
+        "set.freeze"
       ],
       "answer": 0,
-      "explanation": "Na rozdíl od běžných množin nemá frozenset žádnou přímou notaci (jako {} pro dict nebo set()). Prázdnou zmraženou množinu lze vytvořit pouze zavoláním konstruktoru frozenset()."
+      "explanation": "Typ `frozenset()` představuje neměnnou (immutable) variantu množiny, která je díky své neměnnosti hashovatelná a může sloužit jako klíč ve slovníku.",
+      "code": "# Vytvoření prázdné neměnné množiny pro použití jako klíč ve slovníku\nempty_immutable_set = ________()\n\ncache = {empty_immutable_set: \"vychozi_stav\"}\nprint(type(empty_immutable_set).__name__)  # frozenset",
+      "expected": "frozenset"
     },
     {
       "id": "q3",
@@ -3829,15 +3918,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte metodu pro bezpečné získání hodnoty klíče 'k' s výchozí hodnotou 0:\n\n```python\n# Doplňte metodu pro bezpečné získání hodnoty klíče 'k' s výchozí hodnotou 0:\nvysledek = ________\n```",
+      "question": "Doplňte volání metody pro bezpečné přečtení koncentrace prvku ze slovníku s výchozí hodnotou 0.0 při absenci klíče.",
       "options": [
-        "val = data.get('k', 0)",
-        "val = data.pop('k', 0)",
-        "val = data.find('k', 0)",
-        "val = data.read('k', 0)"
+        "get",
+        "pop",
+        "find",
+        "setdefault"
       ],
       "answer": 0,
-      "explanation": "Metoda get(key, default) bezpečně vrací hodnotu pro daný klíč, nebo zadanou výchozí hodnotu (0), pokud klíč neexistuje. Metoda setdefault by klíč navíc do slovníku vložila."
+      "explanation": "Metoda `dict.get(key, default)` vrátí hodnotu pro daný klíč, nebo zadanou výchozí hodnotu, pokud klíč ve slovníku chybí (aniž by vyvolala `KeyError`).",
+      "code": "elements = {\"Fe\": 55.85, \"Cu\": 63.55, \"Zn\": 65.38}\n\n# Bezpečné čtení neznámého prvku bez KeyError\nconcentration = elements.________(\"Au\", 0.0)\nprint(concentration)  # 0.0",
+      "expected": "get"
     },
     {
       "id": "q4",
@@ -3879,15 +3970,17 @@
     {
       "id": "q7",
       "type": "fill_blank_choice",
-      "question": "Doplňte výraz pro vytvoření slovníku čtverců sudých čísel od 0 do 4:\n\n```python\n# Doplňte výraz pro vytvoření slovníku čtverců sudých čísel od 0 do 4:\nvysledek = ________\n```",
+      "question": "Doplňte klíčové slovo v generátorové notaci slovníku (dict comprehension) pro odfiltrování prvků splňujících podmínku.",
       "options": [
-        "squares = {x: x**2 for x in range(5) if x % 2 == 0}",
-        "squares = {x: x**2 for x in range(5) in x % 2 == 0}",
-        "squares = {x: x**2 for x in range(5) as x % 2 == 0}",
-        "squares = {x: x**2 for x in range(5) is x % 2 == 0}"
+        "if",
+        "when",
+        "where",
+        "filter"
       ],
       "answer": 0,
-      "explanation": "V generátorové notaci slovníku se filtr označuje klíčovým slovem if umístěným za iterací for."
+      "explanation": "V generátorových notacích (comprehensions) slouží klíčové slovo `if` na konci výrazu k filtrování prvků na základě pravdivostní podmínky.",
+      "code": "molar_masses = {\"H\": 1.008, \"He\": 4.003, \"C\": 12.011, \"Na\": 22.990, \"Cl\": 35.453}\n\n# Filtrujeme pouze značky prvků o délce 2 znaky\ntwo_letter = {elem: mass for elem, mass in molar_masses.items() ________ len(elem) == 2}\n# Výstup: {'He': 4.003, 'Na': 22.99, 'Cl': 35.453}",
+      "expected": "if"
     },
     {
       "id": "q8",
@@ -3933,15 +4026,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte vytvoření defaultdict, který pro chybějící klíč automaticky vrací hodnotu 0:\n\n```python\n# Doplňte vytvoření defaultdict, který pro chybějící klíč automaticky vrací hodnotu 0:\nvysledek = ________\n```",
+      "question": "Doplňte tovární funkci do `defaultdict`, která zajistí výchozí číselnou hodnotu 0 pro dosud neevidované prvky.",
       "options": [
-        "d = defaultdict(int)",
-        "d = defaultdict(str)",
-        "d = defaultdict(set)",
-        "d = defaultdict(dict)"
+        "int",
+        "float",
+        "0",
+        "int()"
       ],
       "answer": 0,
-      "explanation": "Argumentem defaultdict musí být callable (tovární funkce). Volání int() bez argumentů vrací 0."
+      "explanation": "Předáním konstruktoru `int` jako tovární funkce (default_factory) vrací `defaultdict` při přístupu k novému klíči hodnotu `int()`, tedy `0`.",
+      "code": "from collections import defaultdict\n\n# Počítadlo výskytů atomů v molekule\natom_counts = defaultdict(________)\n\nfor atom in [\"C\", \"H\", \"C\", \"H\", \"O\", \"H\"]:\n    atom_counts[atom] += 1\n\nprint(atom_counts[\"C\"])  # 2\nprint(atom_counts[\"N\"])  # 0 (automaticky inicializováno)",
+      "expected": "int"
     },
     {
       "id": "q4",
@@ -3998,15 +4093,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte metodu pro odstranění prvku z množiny bez vyvolání výjimky při jeho absenci:\n\n```python\n# Doplňte metodu pro odstranění prvku z množiny bez vyvolání výjimky při jeho absenci:\nvysledek = ________\n```",
+      "question": "Doplňte metodu množiny pro odebrání rozpouštědla ze seznamu použitých látek, která nevyvolá výjimku, pokud prvek v množině není.",
       "options": [
-        "s.discard(element)",
-        "s.remove(element)",
-        "s.delete(element)",
-        "s.detach(element)"
+        "discard",
+        "remove",
+        "pop",
+        "delete"
       ],
       "answer": 0,
-      "explanation": "Metoda discard(x) odstraní prvek x z množiny a při jeho absenci nic nedělá. Metoda remove(x) by vyvolala výjimku KeyError."
+      "explanation": "Metoda `discard()` odebere prvek z množiny, a pokud v ní prvek není, tiše pokračuje bez chyby. Oproti tomu `remove()` by při absenci prvku vyvolala `KeyError`.",
+      "code": "solvents = {\"voda\", \"ethanol\", \"aceton\"}\n\n# Bezpečné odebrání prvku 'methanol', i když v množině neexistuje\nsolvents.________(\"methanol\")\n\nprint(\"ethanol\" in solvents)  # True",
+      "expected": "discard"
     },
     {
       "id": "q4",
@@ -4050,15 +4147,17 @@
     {
       "id": "q7",
       "type": "fill_blank_choice",
-      "question": "Doplňte generátorovou notaci pro vytvoření množiny slov bez samohlásek:\n\n```python\n# Doplňte generátorovou notaci pro vytvoření množiny slov bez samohlásek:\nvysledek = ________\n```",
+      "question": "Doplňte klíčové slovo pro filtrování prvků v množinové generátorové notaci (set comprehension).",
       "options": [
-        "no_vowels = {c for c in text if c not in 'aeiou'}",
-        "no_vowels = {c for c in text in c not in 'aeiou'}",
-        "no_vowels = {c for c in text as c not in 'aeiou'}",
-        "no_vowels = {c for c in text is c not in 'aeiou'}"
+        "if",
+        "when",
+        "where",
+        "filter"
       ],
       "answer": 0,
-      "explanation": "Filtr v množinové generátorové notaci se zapisuje pomocí klíčového slova if."
+      "explanation": "V množinové komprehenzi se filtrovací podmínka uvozuje klíčovým slovem `if` za iterační klauzulí `for`.",
+      "code": "formula = \"C2H5OH\"\n# Vytvoření množiny unikátních nečíselných znaků ze vzorce\nelements = {char for char in formula ________ not char.isdigit()}\n\n# Výstup: {'C', 'H', 'O'}\nprint(elements)",
+      "expected": "if"
     }
   ],
   "exceptions": [
@@ -4091,28 +4190,32 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte syntakticky správné zachycení dvou výjimek současně v jedné větví except:\n\n```python\n# Doplňte syntakticky správné zachycení dvou výjimek současně v jedné větví except:\nvysledek = ________\n```",
+      "question": "Doplňte hlavičku bloku `except` pro současné odchycení výjimek `ValueError` a `TypeError`.",
       "options": [
-        "except (TypeError, ValueError):",
-        "except {TypeError, ValueError}:",
-        "except [TypeError, ValueError]:",
-        "except <TypeError, ValueError>:"
+        "except (ValueError, TypeError)",
+        "except [ValueError, TypeError]",
+        "except {ValueError, TypeError}",
+        "except ValueError, TypeError"
       ],
       "answer": 0,
-      "explanation": "Pro zachycení více typů výjimek současně v jedné větvi except musí být tyto třídy zapsány jako n-tice (tuple) v závorkách."
+      "explanation": "Pro zachycení více typů výjimek v jedné větvi `except` musí být třídy výjimek sdruženy do n-tice (tuple) v kulatých závorkách.",
+      "code": "def parse_measurement(val):\n    try:\n        return float(val)\n    ________:\n        return None\n\nprint(parse_measurement(\"chyba\"))  # None\nprint(parse_measurement([1, 2]))   # None",
+      "expected": "except (ValueError, TypeError)"
     },
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte příkaz pro opětovné vyvolání právě odchycené výjimky dále po hierarchii:\n\n```python\n# Doplňte příkaz pro opětovné vyvolání právě odchycené výjimky dále po hierarchii:\nvysledek = ________\n```",
+      "question": "Doplňte klíčové slovo pro opětovné přeposlání (re-raise) zachycené výjimky výše v zásobníku volání po zalogování chyby.",
       "options": [
         "raise",
         "throw",
-        "yield",
-        "retry"
+        "rethrow",
+        "pass"
       ],
       "answer": 0,
-      "explanation": "Příkaz raise bez argumentu uvnitř bloku except znovu vyvolá aktuálně zpracovávanou výjimku směrem nahoru ve volajícím zásobníku."
+      "explanation": "Příkaz `raise` bez argumentů uvnitř bloku `except` znovu vyvolá aktuálně zpracovávanou výjimku včetně jejího původního trasování (traceback).",
+      "code": "def log_and_rethrow(func, *args):\n    try:\n        return func(*args)\n    except Exception as err:\n        print(f\"Chyba při běhu: {err}\")\n        ________  # Znovu vyvolá původní zachycenou výjimku",
+      "expected": "raise"
     },
     {
       "id": "q5",
@@ -4183,16 +4286,18 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Který znak doplníte na místo podtržítka v definici hlavičky funkce, aby parametr c musel být při volání předán výhradně jako pojmenovaný argument?\n\n```python\n# Který znak doplníte na místo podtržítka v definici hlavičky funkce, aby parametr c musel být při volání předán výhradně jako pojmenovaný argument?\nvysledek = ________\n```",
+      "question": "Doplňte token do definice funkce pro výpočet pH, který vynutí zadání parametru `temperature` výhradně jako pojmenovaného argumentu.",
       "code_snippet": "def fn(a, b, ________, c=10):\n    return a + b + c",
       "options": [
-        "* — hvězdička odděluje poziční parametry od parametrů, které je při volání nutné zadat výhradně pomocí jejich jména.",
-        "/ — lomítko odděluje parametry vyžadující pojmenování od parametrů, které lze zadávat výhradně pozičním způsobem.",
-        "** — dvojitá hvězdička zachytává všechny zbývající nepotřebné argumenty a vynucuje jejich povinnou výchozí hodnotu.",
-        "& — ampersand slouží v definici parametrů funkce jako operátor"
+        "*",
+        "/",
+        "**",
+        "*args"
       ],
       "answer": 0,
-      "explanation": "Samostatná hvězdička * v definici hlavičky funkce určuje hranici: všechny následující parametry (zde c) musí být při volání předány výhradně jako pojmenované argumenty (např. fn(1, 2, c=5)), jinak vznikne TypeError."
+      "explanation": "Samostatná hvězdička `*` v hlavičce funkce označuje hranici keyword-only parametrů — všechny parametry uvedené za ní musí být volány s názvem argumentu.",
+      "code": "def calculate_ph(h_concentration, ________, temperature=298.15):\n    import math\n    return -math.log10(h_concentration)\n\n# Platné volání: calculate_ph(1e-7, temperature=300)\n# Neplatné volání: calculate_ph(1e-7, 300) -> TypeError",
+      "expected": "*"
     },
     {
       "id": "q3",
@@ -4305,28 +4410,32 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící token do definice funkce tak, aby parametr key musel být volán výhradně jako pojmenovaný argument:\n\ndef compare(a, b, ________, key=None):\n    pass\n\n```python\n# Doplňte chybějící token do definice funkce tak, aby parametr key musel být volán výhradně jako pojmenovaný argument:\n\ndef compare(a, b, ________, key=None):\n    pass\nvysledek = ________\n```",
+      "question": "Doplňte oddělovač do hlavičky funkce pro kalibraci senzoru, aby parametr `tolerance` byl vyžadován výhradně jako pojmenovaný (keyword-only).",
       "options": [
         "*",
         "/",
         "**",
-        "*args"
+        "*params"
       ],
       "answer": 0,
-      "explanation": "Samostatná hvězdička * v seznamu parametrů vynucuje, že všechny následující parametry mohou být předány pouze jako pojmenované (keyword-only)."
+      "explanation": "Samostatný znak `*` v signatuře funkce způsobuje, že všechny následující parametry (`tolerance`) se stávají tzv. keyword-only argumenty.",
+      "code": "def calibrate_sensor(offset, gain, ________, tolerance=0.01):\n    return (offset, gain, tolerance)\n\n# Volání: calibrate_sensor(0.5, 1.2, tolerance=0.005)",
+      "expected": "*"
     },
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící token do definice funkce tak, aby parametry a a b musely být volány výhradně pozičně:\n\ndef process(a, b, ________, mode='fast'):\n    pass\n\n```python\n# Doplňte chybějící token do definice funkce tak, aby parametry a a b musely být volány výhradně pozičně:\n\ndef process(a, b, ________, mode='fast'):\n    pass\nvysledek = ________\n```",
+      "question": "Doplňte oddělovač do signatury funkce, který vynutí předání parametrů `x` a `y` výhradně pozičně (positional-only).",
       "options": [
         "/",
         "*",
         "**",
-        "*pos"
+        "!"
       ],
       "answer": 0,
-      "explanation": "Znak / (od Pythonu 3.8) určuje hranici pozičně-omezených parametrů (positional-only). Všechny parametry před / nesmí být při volání předány pomocí jména."
+      "explanation": "Znak `/` (představený v Pythonu 3.8) určuje konec pozičně-omezených parametrů; všechny parametry vlevo od něj nelze předat pojmenovaně.",
+      "code": "def compute_titration_curve(x, y, ________, method=\"linear\"):\n    return f\"{method}: {len(x)} points\"\n\n# x a y nelze předat jako compute_titration_curve(x=[...], y=[...])\nresult = compute_titration_curve([1, 2], [3, 4], method=\"spline\")",
+      "expected": "/"
     },
     {
       "id": "q5",
@@ -4612,15 +4721,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte název magické proměnné pro omezení exportovaných jmen při `from module import *`:\n\n```python\n________ = ['funkce1', 'funkce2']\n```",
+      "question": "Doplňte název speciální proměnné modulu, která definuje veřejný export symbolů při importu pomocí hvězdičky (`from module import *`).",
       "options": [
         "__all__",
         "__export__",
         "__public__",
-        "__imports__"
+        "__exports__"
       ],
       "answer": 0,
-      "explanation": "Proměnná __all__ definuje seznam řetězců se jmény objektů, které se mají vyexportovat při importu pomocí hvězdičky (from module import *). Pokud __all__ = [], nevyexportuje se nic."
+      "explanation": "Proměnná `__all__` obsahuje seznam řetězců se jmény identifikátorů, které budou importovány při volání `from modul import *`.",
+      "code": "# Modul chem_tools.py\n________ = [\"calculate_molarity\", \"dilute_solution\"]\n\ndef calculate_molarity(moles, volume):\n    return moles / volume\n\ndef dilute_solution(c1, v1, c2):\n    return (c1 * v1) / c2\n\ndef _internal_helper():\n    pass",
+      "expected": "__all__"
     },
     {
       "id": "q3",
@@ -4729,15 +4840,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte název funkce pro výběr k neopakujících se prvků ze sekvence bez modifikace původního seznamu:\n\n```python\nvyber = random.________(populace, k=3)\n```",
+      "question": "Doplňte funkci modulu `random` pro náhodný výběr `k` unikátních (neopakujících se) vzorků z populace bez vracení.",
       "options": [
         "sample",
+        "choices",
         "choice",
-        "shuffle",
-        "choices"
+        "shuffle"
       ],
       "answer": 0,
-      "explanation": "Funkce random.sample(population, k) vybere k unikátních prvků z populace bez vrácení a původní seznam nijak nemění."
+      "explanation": "Funkce `random.sample(population, k)` vybere k unikátních prvků bez vracení. Oproti tomu `random.choices()` provádí výběr s opakováním.",
+      "code": "import random\n\nall_samples = [f\"Vzorek_{i:02d}\" for i in range(1, 21)]\n\n# Náhodný výběr 4 unikátních vzorků pro kontrolní měření\nselected = random.________(all_samples, k=4)\nprint(len(set(selected)))  # 4",
+      "expected": "sample"
     },
     {
       "id": "q4",
@@ -4796,15 +4909,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte název funkce modulu `fileinput`, která vrací číslo řádku v rámci PRÁVĚ ZPRACOVÁVANÉHO souboru:\n\n```python\nimport fileinput\n\nfor line in fileinput.input():\n    print(fileinput.________(), line)\n```",
+      "question": "Doplňte funkci modulu `fileinput`, která vrací pořadové číslo řádku v rámci právě otevřeného souboru (resetované na 1 pro každý soubor).",
       "options": [
         "filelineno",
         "lineno",
-        "line_number",
-        "file_index"
+        "fileno",
+        "line_number"
       ],
       "answer": 0,
-      "explanation": "filelineno() vrací číslo řádku v aktuálním souboru (od 1), zatímco lineno() vrací kumulativní celkový počet přečtených řádků přes všechny zpracovávané soubory."
+      "explanation": "`fileinput.filelineno()` vrací číslo řádku v aktuálním souboru (od 1), zatímco `fileinput.lineno()` vrací kumulativní celkový počet řádků přes všechny soubory.",
+      "code": "import fileinput\n\n# Zpracování souborů mereni_1.log a mereni_2.log\nfor line in fileinput.input(files=(\"mereni_1.log\", \"mereni_2.log\")):\n    # Získání čísla řádku v rámci aktuálního souboru\n    current_line = fileinput.________()\n    print(f\"{fileinput.filename()}:{current_line} -> {line.strip()}\")",
+      "expected": "filelineno"
     },
     {
       "id": "q4",
@@ -4863,15 +4978,17 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte klíčové slovo pro vytvoření anonymní jednorádkové funkce v Pythonu:\n\n```python\nmocnina = ________ x: x ** 2\n```",
+      "question": "Doplňte klíčové slovo pro vytvoření anonymní jednořádkové funkce převádějící teplotu ze stupňů Celsia na Kelviny.",
       "options": [
         "lambda",
         "def",
         "fn",
-        "func"
+        "function"
       ],
       "answer": 0,
-      "explanation": "Anonymní funkce se v Pythonu vytvářejí pomocí klíčového slova lambda. Mohou obsahovat pouze jediný výraz, jehož výsledek se automaticky vrátí."
+      "explanation": "Klíčové slovo `lambda` slouží k definici anonymních jednořádkových funkcí, jejichž tělo tvoří jediný výraz, jehož hodnota je automaticky vrácena.",
+      "code": "# Anonymní funkce pro převod Celsia na Kelviny (T_K = T_C + 273.15)\nto_kelvin = ________ celsius: celsius + 273.15\n\nprint(to_kelvin(25.0))  # 298.15",
+      "expected": "lambda"
     },
     {
       "id": "q5",
@@ -4928,15 +5045,17 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící druhý argument funkce next tak, aby při vyčerpání generátoru kód neskončil výjimkou, ale vrátil hodnotu None:\n\ng = (x for x in range(1))\nnext(g)\nres = next(g, ________)\n\n```python\n# Doplňte chybějící druhý argument funkce next tak, aby při vyčerpání generátoru kód neskončil výjimkou, ale vrátil hodnotu None:\n\ng = (x for x in range(1))\nnext(g)\nres = next(g, ________)\nvysledek = ________\n```",
+      "question": "Doplňte výchozí návratovou hodnotu do volání funkce `next()`, která zabrání vyvolání výjimky `StopIteration` při vyčerpání generátoru spektra.",
       "options": [
         "None",
-        "default=None",
         "StopIteration",
-        "False"
+        "False",
+        "default=None"
       ],
       "answer": 0,
-      "explanation": "Vestavěná funkce next(iterator, default) přijímá nepovinný druhý argument jako výchozí hodnotu, která se vrátí v případě vyvolání StopIteration při vyčerpání iterátoru."
+      "explanation": "Funkce `next(iterator, default)` přijímá volitelný druhý poziční argument, který se vrátí místo vyvolání výjimky `StopIteration`, pokud je iterátor vyčerpán.",
+      "code": "peaks = (val for val in [120.5, 340.2])\n\nfirst_peak = next(peaks)\nsecond_peak = next(peaks)\n# Třetí volání na prázdném generátoru vrátí zadanou výchozí hodnotu\nthird_peak = next(peaks, ________)\n\nprint(third_peak)  # None",
+      "expected": "None"
     },
     {
       "id": "q5",
@@ -4967,7 +5086,7 @@
     {
       "id": "q7",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící zápis tak, aby generátor delegoval postupně všechna data ze sub-generátoru subgen():\n\ndef hlavni():\n    ________ subgen()\n    yield 'konec'\n\n```python\n# Doplňte chybějící zápis tak, aby generátor delegoval postupně všechna data ze sub-generátoru subgen():\n\ndef hlavni():\n    ________ subgen()\n    yield 'konec'\nvysledek = ________\n```",
+      "question": "Doplňte klíčová slova pro delegování generování hodnot na vnořený generátor naměřených dat ze subroutiny.",
       "options": [
         "yield from",
         "yield for",
@@ -4975,7 +5094,9 @@
         "delegate yield"
       ],
       "answer": 0,
-      "explanation": "Konstrukce yield from slouží k delegování generování hodnot na podřazený generátor nebo iterovatelnou strukturu."
+      "explanation": "Konstrukce `yield from` deleguje generování hodnot na jiný iterovatelný objekt nebo generátor a zároveň zprostředkovává obousměrnou komunikaci.",
+      "code": "def load_sensor_batch():\n    yield 10.1\n    yield 10.4\n\ndef stream_all_sensors():\n    # Delegování iterace na podřízený generátor\n    ________ load_sensor_batch()\n    yield 0.0  # Koncová značka kalibrace\n\nprint(list(stream_all_sensors()))  # [10.1, 10.4, 0.0]",
+      "expected": "yield from"
     }
   ],
   "advanced-1": [
@@ -5021,15 +5142,17 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící klíčový argument pro seřazení seznamu dvojiček [('B', 3), ('A', 1)] podle druhého prvku:\n\nres = sorted(data, key=________)\n\n```python\n# Doplňte chybějící klíčový argument pro seřazení seznamu dvojiček [('B', 3), ('A', 1)] podle druhého prvku:\n\nres = sorted(data, key=________)\nvysledek = ________\n```",
+      "question": "Doplňte lambda funkci do parametru `key`, která zajistí seřazení chemických prvků podle jejich protonového čísla (druhé položky n-tice).",
       "options": [
         "lambda x: x[1]",
         "lambda x[1]",
         "x[1]",
-        "def (x): return x[1]"
+        "def(x): return x[1]"
       ],
       "answer": 0,
-      "explanation": "Klíčový argument key funkce sorted očekává funkci. Anonymní funkce lambda x: x[1] vrátí druhý prvek (index 1) z každé dvojičky."
+      "explanation": "Výraz `lambda x: x[1]` definuje anonymní funkci přijímající n-tici `x` a vracející její druhý prvek na indexu 1 jako klíč pro řazení.",
+      "code": "# Seznam prvků ve formátu (značka, protonové_číslo)\nelements = [(\"O\", 8), (\"H\", 1), (\"C\", 6), (\"N\", 7)]\n\nsorted_by_z = sorted(elements, key=________)\n# Výstup: [('H', 1), ('C', 6), ('N', 7), ('O', 8)]",
+      "expected": "lambda x: x[1]"
     },
     {
       "id": "q5",
@@ -5075,15 +5198,17 @@
     {
       "id": "q_decor_2",
       "type": "fill_blank_choice",
-      "question": "Doplňte dekorátor ze standardní knihovny pro automatické dopočítání porovnávacích metod:\n```python\nfrom functools import ________\n\n@total_ordering\nclass Bod:\n    def __eq__(self, other): return self.x == other.x\n    def __lt__(self, other): return self.x < other.x\n```",
+      "question": "Doplňte název třídního dekorátoru z modulu `functools`, který z definovaných metod `__eq__` a `__lt__` automaticky dopočítá zbývající porovnávací metody (`<=`, `>`, `>=`).",
       "options": [
         "total_ordering",
-        "auto_comparisons",
         "rich_comparisons",
+        "auto_ordering",
         "order_derivation"
       ],
       "answer": 0,
-      "explanation": "Dekorátor `@functools.total_ordering` vezme třídu, která definuje metodu `__eq__` a jednu z porovnávacích metod (`__lt__`, `__le__`, `__gt__`, `__ge__`), a zbývající porovnávací operátory dopočítá a doplní jako atributy objektu třídy."
+      "explanation": "Dekorátor `@functools.total_ordering` doplňuje zbývající bohaté porovnávací metody (`__le__`, `__gt__`, `__ge__`) za předpokladu, že třída definuje `__eq__` a alespoň jednu z nerovností (`__lt__`, `__le__`, `__gt__`, `__ge__`).",
+      "code": "from functools import ________\n\n@total_ordering\nclass Molecule:\n    def __init__(self, formula, weight):\n        self.formula = formula\n        self.weight = weight\n\n    def __eq__(self, other):\n        return self.weight == other.weight\n\n    def __lt__(self, other):\n        return self.weight < other.weight",
+      "expected": "total_ordering"
     },
     {
       "id": "q_decor_3",
@@ -5179,15 +5304,17 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící typ výjimky zachytávané při kontrole přítomnosti vstupu v memoizačním slovníku memo:\n\ndef f(n):\n    try:\n        return memo[n]\n    except ________:\n        res = spocti(n)\n        memo[n] = res\n        return res\n\n```python\n# Doplňte chybějící typ výjimky zachytávané při kontrole přítomnosti vstupu v memoizačním slovníku memo:\n\ndef f(n):\n    try:\n        return memo[n]\n    except ________:\n        res = spocti(n)\n        memo[n] = res\n        return res\nvysledek = ________\n```",
+      "question": "Doplňte typ výjimky, která vznikne při pokusu o čtení neexistujícího klíče ze slovníku a zachytává se při ruční implementaci memoizace.",
       "options": [
         "KeyError",
-        "ValueError",
         "IndexError",
-        "AttributeError"
+        "ValueError",
+        "LookupError"
       ],
       "answer": 0,
-      "explanation": "Při přístupu ke klíči memo[n], který dosud neexistuje ve slovníku, vyvolá Python výjimku KeyError. Zachycení KeyError slouží jako vzor pro vyhodnocení dosud nespočteného vstupu."
+      "explanation": "Při přístupu ke klíči, který se ve standardním slovníku `dict` nenachází, vyvolá Python výjimku `KeyError`.",
+      "code": "memo = {}\n\ndef compute_fibonacci(n):\n    try:\n        return memo[n]\n    except ________:\n        if n < 2:\n            memo[n] = n\n        else:\n            memo[n] = compute_fibonacci(n - 1) + compute_fibonacci(n - 2)\n        return memo[n]",
+      "expected": "KeyError"
     },
     {
       "id": "q6",
@@ -5233,15 +5360,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte název funkce modulu os pro rekurzivní vytvoření adresáře včetně všech neexistujících nadřazených složek:\n\nimport os\nos.________('a/b/c')\n\n```python\n# Doplňte název funkce modulu os pro rekurzivní vytvoření adresáře včetně všech neexistujících nadřazených složek:\n\nimport os\nos.________('a/b/c')\nvysledek = ________\n```",
+      "question": "Doplňte funkci modulu `os`, která rekurzivně vytvoří celou cestu k adresáři včetně všech chybějících mezilehlých složek.",
       "options": [
         "makedirs",
-        "mkpathdir",
-        "createdir",
-        "maketree"
+        "mkdir",
+        "create_dirs",
+        "mkpath"
       ],
       "answer": 0,
-      "explanation": "Funkce `os.mkdir()` selže, pokud některý z nadřazených adresářů neexistuje. Pro rekurzivní vytvoření celé adresářové cesty (obdoba `mkdir -p` v Unixu) slouží funkce `os.makedirs()`."
+      "explanation": "Funkce `os.makedirs(path, exist_ok=True)` vytvoří koncový adresář i všechny chybějící nadřazené adresáře podél cesty (obdoba příkazu `mkdir -p`).",
+      "code": "import os\n\n# Rekurzivní vytvoření stromu složek pro ukládání exportů\noutput_dir = \"vysledky/mereni_2026/spektra\"\nos.________(output_dir, exist_ok=True)\n\nprint(os.path.isdir(output_dir))  # True",
+      "expected": "makedirs"
     },
     {
       "id": "q4",
@@ -5259,15 +5388,17 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte rozbalení trojice hodnot z generátoru os.walk tak, aby kód správně přistupoval k proměnným root a files:\n\nimport os\nfor ________ in os.walk('.'):\n    print(f'Adresář {root} obsahuje {len(files)} souborů.')\n\n```python\n# Doplňte rozbalení trojice hodnot z generátoru os.walk tak, aby kód správně přistupoval k proměnným root a files:\n\nimport os\nfor ________ in os.walk('.'):\n    print(f'Adresář {root} obsahuje {len(files)} souborů.')\nvysledek = ________\n```",
+      "question": "Doplňte rozbalení n-tice z generátoru os.walk() pro iteraci přes adresářový strom:",
       "options": [
         "root, dirs, files",
         "root, files, dirs",
-        "path, subdirs, doc",
-        "base, dirs, items"
+        "dirs, root, files",
+        "path, subdirs, files"
       ],
       "answer": 0,
-      "explanation": "Generátor `os.walk()` v každém kroku iterace vrací n-tici tří prvků: `(root, dirs, files)`, kde `root` je řetězec s cestou k aktuálnímu adresáři, `dirs` je seznam jeho podadresářů a `files` je seznam jeho neadresářových souborů."
+      "explanation": "Generátor os.walk() v každém kroku vrací trojici (cesta_k_adresáři, seznam_podadresářů, seznam_souborů).",
+      "code": "import os\n\nfor ________ in os.walk('.'):\n    print(f\"Složka {root} obsahuje {len(files)} souborů.\")",
+      "expected": "root, dirs, files"
     },
     {
       "id": "q6",
@@ -5365,7 +5496,7 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte dekorátor tak, aby metoda `přidej_školáka` dostávala jako první argument přímo třídu `cls`:\n\nclass Školák:\n    školáků = 0\n\n    ________\n    def přidej_školáka(cls):\n        cls.školáků += 1\n\n```python\n# Doplňte dekorátor tak, aby metoda `přidej_školáka` dostávala jako první argument přímo třídu `cls`:\n\nclass Školák:\n    školáků = 0\n\n    ________\n    def přidej_školáka(cls):\n        cls.školáků += 1\nvysledek = ________\n```",
+      "question": "Doplňte dekorátor pro vytvoření třídní metody předávající třídu cls jako první argument:",
       "options": [
         "@classmethod",
         "@staticmethod",
@@ -5373,7 +5504,9 @@
         "@instancemethod"
       ],
       "answer": 0,
-      "explanation": "Dekorátor `@classmethod` způsobí, že metoda při zavolání obdrží jako první implicitní argument přímo třídu (`cls`), nikoli konkrétní instanci (`self`)."
+      "explanation": "Dekorátor @classmethod předává metodě jako první argument samotnou třídu (obvykle cls) namísto instance self.",
+      "code": "class Student:\n    total_students = 0\n\n    ________\n    def increment_count(cls):\n        cls.total_students += 1",
+      "expected": "@classmethod"
     },
     {
       "id": "q4",
@@ -5469,15 +5602,17 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte název atributu pro získání n-tice s pořadím prohledávání metod (MRO) třídy `MojeTrida`:\n\nporadi = MojeTrida.________\n\n```python\n# Doplňte název atributu pro získání n-tice s pořadím prohledávání metod (MRO) třídy `MojeTrida`:\n\nporadi = MojeTrida.________\nvysledek = ________\n```",
+      "question": "Doplňte název atributu třídy obsahujícího n-tici s pořadím prohledávání metod (MRO):",
       "options": [
         "__mro__",
         "__order__",
         "__hierarchy__",
-        "__parents__"
+        "__bases__"
       ],
       "answer": 0,
-      "explanation": "Atribut `__mro__` na třídě obsahuje n-tici (tuple) ukazující přesné linealizované pořadí tříd, ve kterém Python vyhledává atributy a metody."
+      "explanation": "Speciální atribut __mro__ (Method Resolution Order) obsahuje n-tici tříd určující prioritu vyhledávání metod a atributů.",
+      "code": "class Base: pass\nclass Derived(Base): pass\n\nresolution_order = Derived.________\n# Výstup: (<class '__main__.Derived'>, <class '__main__.Base'>, <class 'object'>)",
+      "expected": "__mro__"
     },
     {
       "id": "q5",
@@ -5521,7 +5656,7 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte název magické metody, která umožňuje použít uživatelský objekt jako celočíselný index ve výřezu:\n\nclass Indexer:\n    def ________(self):\n        return 2\n\nlst = [10, 20, 30, 40]\nprint(lst[Indexer()])\n\n```python\n# Doplňte název magické metody, která umožňuje použít uživatelský objekt jako celočíselný index ve výřezu:\n\nclass Indexer:\n    def ________(self):\n        return 2\n\nlst = [10, 20, 30, 40]\nprint(lst[Indexer()])\nvysledek = ________\n```",
+      "question": "Doplňte magickou metodu umožňující bezeztrátový převod objektu na celé číslo pro indexování sekvencí:",
       "options": [
         "__index__",
         "__int__",
@@ -5529,7 +5664,9 @@
         "__slice__"
       ],
       "answer": 0,
-      "explanation": "Magická metoda `__index__()` (zavedená v PEP 357) umožňuje objektu vrátit celé číslo v situacích, kdy interpret očekává celočíselný index (např. při indexaci a výřezech seznamů)."
+      "explanation": "Metoda __index__() slouží k převodu objektu na celočíselný index pro krájení (slicing) a indexaci sekvencí v Pythonu.",
+      "code": "class CustomIndex:\n    def __init__(self, pos):\n        self.pos = pos\n\n    def ________(self):\n        return self.pos\n\nitems = [\"A\", \"B\", \"C\", \"D\"]\nprint(items[CustomIndex(2)])  # Vypíše: C",
+      "expected": "__index__"
     },
     {
       "id": "q3",
@@ -5547,7 +5684,7 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte název metody pro přetížení infixového operátoru násobení matic `@` v Pythonu:\n\nclass Matice:\n    def ________(self, other):\n        # maticové násobení\n        pass\n\n```python\n# Doplňte název metody pro přetížení infixového operátoru násobení matic `@` v Pythonu:\n\nclass Matice:\n    def ________(self, other):\n        # maticové násobení\n        pass\nvysledek = ________\n```",
+      "question": "Doplňte magickou metodu pro přetížení infixového operátoru maticového násobení (@):",
       "options": [
         "__matmul__",
         "__matrix__",
@@ -5555,7 +5692,9 @@
         "__dot__"
       ],
       "answer": 0,
-      "explanation": "Operátor `@` zavedený v PEP 465 pro maticové násobení využívá magickou metodu `__matmul__(self, other)` (a pravostrannou variantu `__rmatmul__`)."
+      "explanation": "Operátor @ volá magickou metodu __matmul__(self, other) definovanou v PEP 465 pro maticové násobení.",
+      "code": "class Matrix:\n    def __init__(self, data):\n        self.data = data\n\n    def ________(self, other):\n        # Implementace maticového násobení pro operátor @\n        pass",
+      "expected": "__matmul__"
     },
     {
       "id": "q5",
@@ -5625,7 +5764,7 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící návratový výraz metody `__iter__()` v definici vlastní třídy iterátoru:\n\nclass MojIterator:\n    def __iter__(self):\n        return ________\n\n    def __next__(self):\n        return 42\n\n```python\n# Doplňte chybějící návratový výraz metody `__iter__()` v definici vlastní třídy iterátoru:\n\nclass MojIterator:\n    def __iter__(self):\n        return ________\n\n    def __next__(self):\n        return 42\nvysledek = ________\n```",
+      "question": "Doplňte návratovou hodnotu metody __iter__() pro splnění iterátorového protokolu:",
       "options": [
         "self",
         "next(self)",
@@ -5633,7 +5772,9 @@
         "self.__next__()"
       ],
       "answer": 0,
-      "explanation": "Pokud třída sama implementuje metodu `__next__()`, její metoda `__iter__()` musí vracet samu sebe (`return self`), čímž vyhoví iterátorovému protokolu."
+      "explanation": "Objekt implementující __next__() musí ve své metodě __iter__() vracet sám sebe (self), aby vyhověl iterátorovému protokolu.",
+      "code": "class CountdownIterator:\n    def __init__(self, count):\n        self.count = count\n\n    def __iter__(self):\n        return ________\n\n    def __next__(self):\n        if self.count <= 0:\n            raise StopIteration\n        self.count -= 1\n        return self.count + 1",
+      "expected": "self"
     },
     {
       "id": "q4",
@@ -5690,15 +5831,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte název dekorátoru modulu `functools` pro automatické dopočítání chybějících porovnávacích metod:\n\nfrom functools import ________\n\n@________\nclass Bod:\n    def __init__(self, x):\n        self.x = x\n    def __eq__(self, other):\n        return self.x == other.x\n    def __lt__(self, other):\n        return self.x < other.x\n\n```python\n# Doplňte název dekorátoru modulu `functools` pro automatické dopočítání chybějících porovnávacích metod:\n\nfrom functools import ________\n\n@________\nclass Bod:\n    def __init__(self, x):\n        self.x = x\n    def __eq__(self, other):\n        return self.x == other.x\n    def __lt__(self, other):\n        return self.x < other.x\nvysledek = ________\n```",
+      "question": "Doplňte dekorátor z modulu functools pro automatické dopočítání všech relačních operátorů:",
       "options": [
         "total_ordering",
         "full_ordering",
-        "comparison_order",
+        "ordering",
         "auto_ordering"
       ],
       "answer": 0,
-      "explanation": "Dekorátor `@functools.total_ordering` automaticky dopočítá zbývající bohaté porovnávací metody (`__le__`, `__gt__`, `__ge__`), pokud třída definuje `__eq__` a alespoň jednu z metod `__lt__`, `__le__`, `__gt__`, `__ge__`."
+      "explanation": "Dekorátor @total_ordering doplní zbývající relační operátory (__le__, __gt__, __ge__), pokud je definováno __eq__ a alespoň jeden z operátorů nerovnosti.",
+      "code": "from functools import total_ordering\n\n@________\nclass Point:\n    def __init__(self, x, y):\n        self.x, self.y = x, y\n\n    def __eq__(self, other):\n        return (self.x, self.y) == (other.x, other.y)\n\n    def __lt__(self, other):\n        return (self.x, self.y) < (other.x, other.y)",
+      "expected": "total_ordering"
     },
     {
       "id": "q4",
@@ -5744,15 +5887,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte správné klíčové slovo pro předání obsluhované hodnoty z generátorového kontextového manažeru do proměnné za as:\n\n```python\nfrom contextlib import contextmanager\n\n@contextmanager\ndef managed_resource():\n    resource = acquire()\n    ________ resource\n    release(resource)\n```",
+      "question": "Doplňte klíčové slovo pro předání spravovaného prostředku z kontextového manažeru @contextmanager:",
       "options": [
         "yield",
         "return",
         "send",
-        "defer"
+        "pass"
       ],
       "answer": 0,
-      "explanation": "V generátorových kontextových manažerech předává klíčové slovo yield hodnotu do příkazu as a pozastavuje vykonávání funkce do opuštění bloku with."
+      "explanation": "Generátorový kontextový manažer předává spravovaný objekt do bloku with pomocí klíčového slova yield.",
+      "code": "from contextlib import contextmanager\n\n@contextmanager\ndef open_database(host):\n    conn = connect(host)\n    try:\n        ________ conn\n    finally:\n        conn.close()",
+      "expected": "yield"
     },
     {
       "id": "q4",
@@ -5783,7 +5928,7 @@
     {
       "id": "q6",
       "type": "fill_blank_choice",
-      "question": "Doplňte chybějící návratovou hodnotu metody __exit__, aby třída při výskytu výjimky zachytila chybu a zabránila jejímu šíření výše:\n\n```python\nclass ExceptionSuppressor:\n    def __enter__(self):\n        return self\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        return ________\n```",
+      "question": "Doplňte návratovou hodnotu metody __exit__, která potlačí vzniklou výjimku a zabrání jejímu dalšímu šíření:",
       "options": [
         "True",
         "False",
@@ -5791,7 +5936,9 @@
         "self"
       ],
       "answer": 0,
-      "explanation": "Vrácení True z metody __exit__ oznamuje Pythonu, že vzniklá výjimka byla úspěšně zpracována a nemá se šířit dál."
+      "explanation": "Pokud metoda __exit__() vrátí pravdivou hodnotu (True), Python výjimku potlačí a nepokračuje v jejím šíření.",
+      "code": "class SuppressErrors:\n    def __enter__(self):\n        return self\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        if exc_type is not None:\n            print(f\"Zachycena výjimka: {exc_val}\")\n            return ________",
+      "expected": "True"
     },
     {
       "id": "q7",
@@ -5835,7 +5982,7 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte správné magické jméno metody v protokolu deskriptorů volané při čtení hodnota atributu z instance:\n\n```python\nclass VerboseAttribute:\n    def ________(self, instance, owner):\n        print(f\"Accessing attribute from {instance} of class {owner}\")\n        return instance._value\n```",
+      "question": "Doplňte metodu protokolu deskriptorů volanou při čtení hodnoty atributu z instance:",
       "options": [
         "__get__",
         "__getattr__",
@@ -5843,7 +5990,9 @@
         "__getitem__"
       ],
       "answer": 0,
-      "explanation": "Metoda __get__(self, instance, owner) je standardní magickou metodou protokolu deskriptorů volanou při čtení atributu z instance."
+      "explanation": "Deskriptorový protokol definuje metodu __get__(self, instance, owner) pro čtení hodnoty spravovaného atributu.",
+      "code": "class ReadOnlyField:\n    def __init__(self, value):\n        self._value = value\n\n    def ________(self, instance, owner=None):\n        return self._value",
+      "expected": "__get__"
     },
     {
       "id": "q4",
@@ -5913,7 +6062,7 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte vestavěnou introspekční funkci, která bezpečně ověří existenci atributu zadávaného jako řetězec bez vyvolání AttributeError:\n\n```python\nclass Student:\n    def __init__(self, name):\n        self.name = name\n\ns = Student(\"Pavel\")\nif ________(s, \"gpa\"):\n    print(s.gpa)\n```",
+      "question": "Doplňte vestavěnou funkci pro bezpečné ověření přítomnosti atributu v instanci podle jeho názvu:",
       "options": [
         "hasattr",
         "getattr",
@@ -5921,7 +6070,9 @@
         "isinstance"
       ],
       "answer": 0,
-      "explanation": "Funkce hasattr(object, name) přijímá název atributu jako řetězec a vrací True nebo False podle toho, zda daný atribut na objektu existuje."
+      "explanation": "Funkce hasattr(object, name) vrací True, pokud objekt obsahuje atribut zadaného textového jména.",
+      "code": "class Sample:\n    def __init__(self, value):\n        self.value = value\n\ns = Sample(42)\nif ________(s, \"value\"):\n    print(\"Atribut existuje\")",
+      "expected": "hasattr"
     },
     {
       "id": "q4",
@@ -5980,15 +6131,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte správný název metatřídy z modulu abc, která umožňuje definici abstraktních tříd a metod:\n\n```python\nfrom abc import ________, abstractmethod\n\nclass Plugin(metaclass=________):\n    @abstractmethod\n    def run(self):\n        pass\n```",
+      "question": "Doplňte metatřídu z modulu abc pro vynucení implementace abstraktních metod v odvozených třídách:",
       "options": [
         "ABCMeta",
         "ABC",
-        "AbstractClass",
-        "BaseMeta"
+        "AbstractMeta",
+        "TypeMeta"
       ],
       "answer": 0,
-      "explanation": "Třída ABCMeta z modulu abc je metatřída určující chování abstraktních tříd v Pythonu."
+      "explanation": "ABCMeta je metatřída z modulu abc, která zabraňuje instanciaci tříd s neimplementovanými abstraktními metodami.",
+      "code": "from abc import ABCMeta, abstractmethod\n\nclass BasePlugin(metaclass=________):\n    @abstractmethod\n    def execute(self):\n        pass",
+      "expected": "ABCMeta"
     },
     {
       "id": "q3",
@@ -6058,15 +6211,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte správné pořadí argumentů pro dynamické vytvoření třídy pomocí tříargumentového volání metatřídy type():\n\n```python\nMyClass = type(________, (object,), {\"x\": 10})\n```",
+      "question": "Doplňte první argument pro dynamické vytvoření třídy pomocí metatřídy type():",
       "options": [
-        "\"MyClass\"",
+        "\"DynamicClass\"",
+        "DynamicClass",
         "object",
-        "{\"x\": 10}",
-        "MyClass"
+        "{\"x\": 10}"
       ],
       "answer": 0,
-      "explanation": "Tříargumentové volání type(name, bases, dict) přijímá jako 1. argument název třídy v podobě řetězce (zde \"MyClass\"), jako 2. argument n-tici rodičů a jako 3. argument slovník atributů třídy."
+      "explanation": "Tříargumentové volání type(name, bases, dict) přebírá jako první parametr název třídy jako řetězec (str).",
+      "code": "# Dynamické vytvoření třídy s atributem x=10:\nDynamicClass = type(________, (object,), {\"x\": 10})\nprint(DynamicClass.__name__)  # Výstup: DynamicClass",
+      "expected": "\"DynamicClass\""
     },
     {
       "id": "q4",
@@ -6097,7 +6252,7 @@
     {
       "id": "q6",
       "type": "fill_blank_choice",
-      "question": "Doplňte správnou syntaxi hlavičky třídy pro specifikaci vlastní metatřídy Meta:\n\n```python\nclass CustomClass(________=Meta):\n    pass\n```",
+      "question": "Doplňte klíčový parametr v hlavičce třídy pro určení vlastní metatřídy:",
       "options": [
         "metaclass",
         "meta",
@@ -6105,7 +6260,9 @@
         "base"
       ],
       "answer": 0,
-      "explanation": "V Pythonu 3 se předpis metatřídy předává v hlavičce definice třídy pomocí pojmenovaného argumentu metaclass=Meta."
+      "explanation": "V Pythonu 3 se metatřída specifikuje jako pojmenovaný parametr metaclass v závorce za názvem třídy.",
+      "code": "class Meta(type):\n    pass\n\nclass CustomService(________=Meta):\n    pass",
+      "expected": "metaclass"
     }
   ],
   "CherryPy": [
@@ -6151,7 +6308,7 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte klíč v konfiguraci CherryPy pro statické soubory určující zapnutí statického adresáře:\n\nconfig = {\n    '/static': {\n        'tools.staticdir.________': True,\n        'tools.staticdir.dir': '/var/www/public'\n    }\n}\n\n```python\n# Doplňte klíč v konfiguraci CherryPy pro statické soubory určující zapnutí statického adresáře:\n\nconfig = {\n    '/static': {\n        'tools.staticdir.________': True,\n        'tools.staticdir.dir': '/var/www/public'\n    }\n}\nvysledek = ________\n```",
+      "question": "Doplňte konfigurační klíč pro aktivaci nástroje obsluhy statických souborů ve frameworku CherryPy:",
       "options": [
         "on",
         "enable",
@@ -6159,7 +6316,9 @@
         "enabled"
       ],
       "answer": 0,
-      "explanation": "Konfigurace statických souborů v CherryPy používá klíč 'tools.staticdir.on': True k aktivaci přímého servírování souborů z daného adresáře."
+      "explanation": "CherryPy používá konvenci tools.<název_nástroje>.on: True pro zapnutí jednotlivých vestavěných modulů a nástrojů.",
+      "code": "config = {\n    \"/static\": {\n        \"tools.staticdir.________\": True,\n        \"tools.staticdir.dir\": \"/var/www/public\"\n    }\n}",
+      "expected": "on"
     },
     {
       "id": "q5",
@@ -6201,7 +6360,7 @@
     {
       "id": "q8",
       "type": "fill_blank_choice",
-      "question": "Doplňte název metody pro zápis vlastních chybových zpráv do logu v CherryPy:\n\nimport cherrypy\n\nclass App:\n    @cherrypy.expose\n    def index(self):\n        cherrypy.________(\"Došlo k neobvyklé události v aplikaci\")\n        return \"OK\"\n\n```python\n# Doplňte název metody pro zápis vlastních chybových zpráv do logu v CherryPy:\n\nimport cherrypy\n\nclass App:\n    @cherrypy.expose\n    def index(self):\n        cherrypy.________(\"Došlo k neobvyklé události v aplikaci\")\n        return \"OK\"\nvysledek = ________\n```",
+      "question": "Doplňte metodu frameworku CherryPy pro zápis zprávy do systémového logu:",
       "options": [
         "log",
         "write_log",
@@ -6209,7 +6368,9 @@
         "logger"
       ],
       "answer": 0,
-      "explanation": "Pomocí cherrypy.log(\"zpráva\") lze z libovolného místa aplikace zapisovat vlastní záznamy do chybového logu CherryPy."
+      "explanation": "Funkce cherrypy.log(msg) zapíše předanou zprávu do standardního aplikačního logu CherryPy serveru.",
+      "code": "import cherrypy\n\nclass WebService:\n    @cherrypy.expose\n    def process_data(self):\n        cherrypy.________(\"Zpracování požadavku dokončeno\")\n        return \"Hotovo\"",
+      "expected": "log"
     },
     {
       "id": "q9",
@@ -6281,16 +6442,18 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte metodu pro rekurzivní vyhledání všech souborů s příponou .py ve složce i v podsložkách:\n\n```python\n# Doplňte metodu pro rekurzivní vyhledání všech souborů s příponou .py ve složce i v podsložkách:\nvysledek = ________\n```",
+      "question": "Doplňte metodu objektu Path pro rekurzivní vyhledání souborů odpovídajících vzoru ve všech podsložkách:",
       "code_snippet": "from pathlib import Path\np = Path('/projekty')\npy_files = list(p.________('*.py'))",
       "options": [
         "rglob",
-        "findall",
+        "glob_all",
         "iterdir",
-        "walk"
+        "find"
       ],
       "answer": 0,
-      "explanation": "Metoda rglob('*.py') je zkratka pro rekurzivní vyhledávání glob('**/*.py'). Běžná metoda glob('*.py') vyhledává pouze v první úrovni adresáře."
+      "explanation": "Metoda Path.rglob(pattern) rekurzivně prochází adresář i všechny jeho podsložky a vyhledává shody s daným vzorem.",
+      "code": "from pathlib import Path\n\nproject_root = Path(\".\")\n# Rekurzivní vyhledání všech Python skriptů v podadresářích:\npy_files = list(project_root.________(\"*.py\"))",
+      "expected": "rglob"
     },
     {
       "id": "q6",
@@ -6373,16 +6536,18 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte metodu pro převod bajtového řetězce v kódování UTF-8 na textový řetězec str:\n\n```python\n# Doplňte metodu pro převod bajtového řetězce v kódování UTF-8 na textový řetězec str:\nvysledek = ________\n```",
+      "question": "Doplňte metodu pro dekódování bajtového řetězce bytes na textový řetězec str:",
       "code_snippet": "raw_bytes = b'\\xc5\\x99etezec'\ntext = raw_bytes.________('utf-8')",
       "options": [
         "decode",
         "encode",
         "parse",
-        "convert"
+        "to_str"
       ],
       "answer": 0,
-      "explanation": "Metoda decode('utf-8') převádí bajty (bytes) na textový Unicode řetězec (str). Opačný směrový převod ze str na bytes zajišťuje metoda encode('utf-8')."
+      "explanation": "Metoda bytes.decode() převádí binární bajty na textový řetězec str pomocí specifikovaného kódování.",
+      "code": "raw_bytes = b\"V\\xc5\\xa0CHT Praha\"\ntext = raw_bytes.________(\"utf-8\")\n# Výstup: 'VŠCHT Praha'",
+      "expected": "decode"
     },
     {
       "id": "q6",
@@ -6454,16 +6619,18 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte výjimku vyžadovanou ve vlastní konverzní funkci pro parametr type v argparse:\n\n```python\n# Doplňte výjimku vyžadovanou ve vlastní konverzní funkci pro parametr type v argparse:\nvysledek = ________\n```",
+      "question": "Doplňte speciální výjimku modulu argparse pro signalizaci neplatné hodnoty z vlastní konverzní funkce:",
       "code_snippet": "from argparse import ArgumentParser, ________\n\ndef positive_int(val):\n    n = int(val)\n    if n <= 0:\n        raise ________('Číslo musí být kladné!')\n    return n",
       "options": [
         "ArgumentTypeError",
-        "ValueError",
-        "ArgumentError",
-        "TypeError"
+        "ArgumentValueError",
+        "ParseError",
+        "InvalidOptionError"
       ],
       "answer": 0,
-      "explanation": "Vlastní validátory a konverzní funkce předávané do type= musí při neplatném vstupu vyhodit ArgumentTypeError. Parser ji zachytí a vypíše přívětivé chybové hlášení."
+      "explanation": "Vlastní validační funkce v type= modulu argparse vyhazují argparse.ArgumentTypeError, kterou parser zpracuje a zobrazí chybovou hlášku CLI.",
+      "code": "import argparse\n\ndef positive_int(val):\n    num = int(val)\n    if num <= 0:\n        raise argparse.________(\"Číslo musí být kladné\")\n    return num",
+      "expected": "ArgumentTypeError"
     },
     {
       "id": "q6",
@@ -6641,28 +6808,32 @@
     {
       "id": "q6",
       "type": "fill_blank_choice",
-      "question": "Který atribut umožňuje u elementu <input type=\"file\" ________> vybrat více souborů současně?\n\n```python\n# Který atribut umožňuje u elementu <input type=\"file\" ________> vybrat více souborů současně?\nvysledek = ________\n```",
+      "question": "Doplňte HTML atribut vstupního pole pro výběr více souborů najednou:",
       "options": [
         "multiple",
         "multiline",
         "allowmany",
-        "selection"
+        "all"
       ],
       "answer": 0,
-      "explanation": "Boolean atribut multiple u <input type=\"file\"> povoluje uživateli zvolit v dialogovém okně více souborů najednou."
+      "explanation": "Logický atribut multiple u elementu <input type=\"file\"> umožňuje uživateli v dialogu vybrat a odeslat více souborů najednou.",
+      "code": "<form method=\"post\" enctype=\"multipart/form-data\">\n    <input type=\"file\" name=\"documents\" ________>\n</form>",
+      "expected": "multiple"
     },
     {
       "id": "q7",
       "type": "fill_blank_choice",
-      "question": "Kterým atributem se propojí <input type=\"text\" ________=\"mesta\"> se seznamem předdefinovaných nápověd <datalist id=\"mesta\">?\n\n```python\n# Kterým atributem se propojí <input type=\"text\" ________=\"mesta\"> se seznamem předdefinovaných nápověd <datalist id=\"mesta\">?\nvysledek = ________\n```",
+      "question": "Doplňte HTML atribut pro propojení vstupního textového pole se seznamem předdefinovaných hodnot datalist:",
       "options": [
         "list",
-        "form",
-        "data",
-        "name"
+        "datalist",
+        "source",
+        "items"
       ],
       "answer": 0,
-      "explanation": "Atribut list u <input> přijímá jako hodnotu id příslušného elementu <datalist>, ze kterého se uživateli našeptávají možnosti při psaní."
+      "explanation": "Atribut list u elementu <input> odkazuje na hodnotu atributu id příslušného prvku <datalist> pro našeptávání hodnot.",
+      "code": "<input type=\"text\" ________=\"cities\">\n<datalist id=\"cities\">\n    <option value=\"Praha\">\n    <option value=\"Brno\">\n</datalist>",
+      "expected": "list"
     },
     {
       "id": "q8",
@@ -6734,15 +6905,17 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Kterým přepínačem lze předat komitovací zprávu přímo z příkazové řádky bez otevření textového editoru hg commit ________ \"První verze\"?\n\n```python\n# Kterým přepínačem lze předat komitovací zprávu přímo z příkazové řádky bez otevření textového editoru hg commit ________ \"První verze\"?\nvysledek = ________\n```",
+      "question": "Doplňte přepínač příkazu hg commit pro předání commit zprávy přímo na příkazové řádce:",
       "options": [
         "-m",
         "-c",
-        "-l",
-        "-v"
+        "-msg",
+        "-t"
       ],
       "answer": 0,
-      "explanation": "Přepínač -m (\"message\") předá popisek komitu přímo z CLI a obchází tak automatické spuštění výchozího textového editoru."
+      "explanation": "Přepínač -m (\"message\") umožňuje zadat textovou zprávu revize přímo jako argument příkazu hg commit.",
+      "code": "# Vytvoření nového commitu s textovou zprávou v Mercurial (hg):\n$ hg commit ________ \"Oprava výpočtu koncentrace\"",
+      "expected": "-m"
     },
     {
       "id": "q6",
@@ -6801,15 +6974,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Kterou metodou nahradíte všechny chybějící hodnoty (NaN / <NA>) ve sloupci df['DOSPELCI'] hodnotou 0?\n\n```python\n# Kterou metodou nahradíte všechny chybějící hodnoty (NaN / <NA>) ve sloupci df['DOSPELCI'] hodnotou 0?\nvysledek = ________\n```",
+      "question": "Doplňte metodu pandas Series pro nahrazení chybějících hodnot (NaN) nulou:",
       "options": [
-        "df['DOSPELCI'].fillna(0)",
-        "df['DOSPELCI'].replace_na(0)",
-        "df['DOSPELCI'].dropna(value=0)",
-        "df['DOSPELCI'].null_to_zero()"
+        "fillna",
+        "replace_na",
+        "dropna",
+        "set_na"
       ],
       "answer": 0,
-      "explanation": "Metoda fillna(value) nahrazuje všechny chybějící hodnoty (np.nan, pd.NA) v Series nebo DataFrame zadanou náhradní hodnotou."
+      "explanation": "Metoda fillna(0) v pandas nahrazuje všechny chybějící hodnoty (NaN, NA) ve sloupci zadanou hodnotou.",
+      "code": "import pandas as pd\n\ndf = pd.DataFrame({\"DOSPELCI\": [2, None, 1, None]})\ndf[\"DOSPELCI\"] = df[\"DOSPELCI\"].________(0)\n# Výstup: [2.0, 0.0, 1.0, 0.0]",
+      "expected": "fillna"
     },
     {
       "id": "q4",
@@ -6840,15 +7015,17 @@
     {
       "id": "q6",
       "type": "fill_blank_choice",
-      "question": "Který parametr metody to_excel() zamezí zbytečnému ukládání číselného indexu řádků do nového Excel souboru output.to_excel('vysledek.xlsx', ________)?\n\n```python\n# Který parametr metody to_excel() zamezí zbytečnému ukládání číselného indexu řádků do nového Excel souboru output.to_excel('vysledek.xlsx', ________)?\nvysledek = ________\n```",
+      "question": "Doplňte argument metody to_excel() pro potlačení zápisu číselného indexu řádků do nového souboru:",
       "options": [
         "index=False",
         "no_index=True",
         "header=False",
-        "row_names=False"
+        "row_index=False"
       ],
       "answer": 0,
-      "explanation": "Parametr index=False potlačí export nultého sloupce s řádkovým indexem DataFrame do výsledného souboru Excel nebo CSV."
+      "explanation": "Parametr index=False v metodě to_excel() zabrání exportu numerických řádkových indexů do samostatného sloupce.",
+      "code": "import pandas as pd\n\ndf = pd.DataFrame({\"Mereni\": [10.2, 12.5, 14.1]})\n# Uložení do Excelu bez sloupce s řádkovými indexy:\ndf.to_excel(\"vystup.xlsx\", ________)",
+      "expected": "index=False"
     }
   ],
   "textwrap": [
@@ -6894,15 +7071,17 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Jak se změní chování funkce textwrap.indent(text, prefix, predicate=...), pokud jako parametr predicate předáme lambda row: True?\n\n```python\n# Jak se změní chování funkce textwrap.indent(text, prefix, predicate=...), pokud jako parametr predicate předáme lambda row: True?\nvysledek = ________\n```",
+      "question": "Doplňte predikát funkce textwrap.indent() pro vynucení odsazení všech řádků včetně prázdných:",
       "options": [
-        "Předpona prefix se přidá ke všem řádkům textu",
-        "Předpona prefix se přidá pouze k neprázdným řádkům, zatímco prázdné řádky zůstanou nedotčeny.",
-        "Funkce vyvolá výjimku TypeError, protože predicate musí vracet celočíselný index odsazení.",
-        "Odsazení se aplikuje výhradně na sudé řádky v textu a liché řádky se zcela vymažou z výstupu."
+        "lambda line: True",
+        "lambda line: bool(line)",
+        "lambda line: line.strip()",
+        "lambda line: False"
       ],
       "answer": 0,
-      "explanation": "Ve výchozím nastavení predikát u indent() přesakuje prázdné řádky (lambda r: bool(r.strip())). Předání lambda row: True vynutí odsazení úplně všech řádků."
+      "explanation": "Výchozí predikát vynechává prázdné řádky; předáním lambda line: True se prefix vloží před každý řádek bez výjimky.",
+      "code": "import textwrap\n\ntext = \"první\\n\\ndruhý\"\n# Odsadit všechny řádky včetně prázdných:\nresult = textwrap.indent(text, \"    \", predicate=________)",
+      "expected": "lambda line: True"
     },
     {
       "id": "q5",
@@ -6920,15 +7099,17 @@
     {
       "id": "q6",
       "type": "fill_blank_choice",
-      "question": "Který parametr konstruktoru TextWrapper(________=False) zamezí rozdělování slov delších než zadaná šířka width?\n\n```python\n# Který parametr konstruktoru TextWrapper(________=False) zamezí rozdělování slov delších než zadaná šířka width?\nvysledek = ________\n```",
+      "question": "Který parametr třídy TextWrapper zabrání rozdělení dlouhých slov přesahujících zadanou šířku řádku?",
       "options": [
         "break_long_words",
+        "break_on_hyphens",
         "drop_whitespace",
-        "replace_whitespace",
-        "break_on_hyphens"
+        "replace_whitespace"
       ],
       "answer": 0,
-      "explanation": "Parametr break_long_words=False v třídě TextWrapper způsobí, že slova přesahující šířku width nebudou násilně roztržena na více řádků."
+      "explanation": "Parametr break_long_words=False v třídě TextWrapper způsobí, že slova přesahující šířku width nebudou násilně roztržena na více řádků.",
+      "code": "import textwrap\n\nwrapper = textwrap.TextWrapper(width=20, ________=False)\ntext = \"Supercalifragilisticexpialidocious je velmi dlouhe slovo\"\nlines = wrapper.wrap(text)\n# Dlouhe slovo zustane v celku na samostatnem radku",
+      "expected": "break_long_words"
     }
   ],
   "wsgi": [
@@ -6987,15 +7168,17 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Kterou funkcí ze standardní knihovny rozložíte řetězec z environ['QUERY_STRING'] na slovník dvojic klíč-hodnota ________(environ['QUERY_STRING'])?\n\n```python\n# Kterou funkcí ze standardní knihovny rozložíte řetězec z environ['QUERY_STRING'] na slovník dvojic klíč-hodnota ________(environ['QUERY_STRING'])?\nvysledek = ________\n```",
+      "question": "Která funkce ze standardní knihovny rozparsuje parametry z URL dotazu (QUERY_STRING) do slovníku seznamů hodnot?",
       "options": [
         "urllib.parse.parse_qs",
-        "cgi.parse_header",
-        "http.cookies.SimpleCookie",
-        "email.parser.BytesParser"
+        "urllib.parse.urlsplit",
+        "urllib.parse.unquote",
+        "urllib.parse.urlencode"
       ],
       "answer": 0,
-      "explanation": "urllib.parse.parse_qs() parsuje URL-encoded řetězce v QUERY_STRING a vrací slovník, kde hodnotami jsou seznamy řetězců."
+      "explanation": "Funkce urllib.parse.parse_qs() parsuje URL kódovaný řetězec v QUERY_STRING a vrací slovník, kde hodnotami jsou seznamy řetězců.",
+      "code": "import urllib.parse\n\ndef application(environ, start_response):\n    query_string = environ.get(\"QUERY_STRING\", \"\")\n    params = ________(query_string)\n    # Pro \"sample=benzene&temp=25\" vrati {'sample': ['benzene'], 'temp': ['25']}",
+      "expected": "urllib.parse.parse_qs"
     },
     {
       "id": "q6",
@@ -7013,15 +7196,17 @@
     {
       "id": "q7",
       "type": "fill_blank_choice",
-      "question": "Který třetí (nepovinný) parametr lze předat funkci start_response(status, headers, ________) při ošetření výjimky?\n\n```python\n# Který třetí (nepovinný) parametr lze předat funkci start_response(status, headers, ________) při ošetření výjimky?\nvysledek = ________\n```",
+      "question": "Který výraz se v rozhraní WSGI předává jako volitelný třetí argument exc_info funkci start_response při zpracování výjimky?",
       "options": [
         "sys.exc_info()",
         "traceback.format_exc()",
-        "BaseException",
-        "logging.getLogger()"
+        "sys.last_traceback",
+        "traceback.print_exc()"
       ],
       "answer": 0,
-      "explanation": "Třetí parametr exc_info přijímá n-tici z vrácenou funkcí sys.exc_info(), což serveru umožňuje přepsat již nastavené hlavičky, pokud ještě nebyly odeslány klientovi."
+      "explanation": "Třetí parametr exc_info přijímá n-tici vrácenou funkcí sys.exc_info(), což serveru umožňuje správně ošetřit chybu a přepsat hlavičky odpovědi.",
+      "code": "import sys\n\ndef application(environ, start_response):\n    try:\n        data = calculate_concentrations()\n        start_response(\"200 OK\", [(\"Content-Type\", \"text/plain\")])\n        return [data.encode(\"utf-8\")]\n    except Exception:\n        start_response(\"500 Internal Server Error\", [(\"Content-Type\", \"text/plain\")], ________)\n        return [b\"Chyba vypoctu\"]",
+      "expected": "sys.exc_info()"
     }
   ],
   "png": [
@@ -7065,7 +7250,7 @@
     {
       "id": "png_q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte do výrazu zlib.________(idat_data) správnou metodu knihovny zlib pro dekompresi sloučených dat z chunků IDAT.\n\n```python\n# Doplňte do výrazu zlib.________(idat_data) správnou metodu knihovny zlib pro dekompresi sloučených dat z chunků IDAT.\nvysledek = ________\n```",
+      "question": "Doplňte funkci knihovny zlib pro dekompresi sloučených binárních dat z datových bloků IDAT v PNG souboru.",
       "options": [
         "zlib.decompress",
         "zlib.inflate",
@@ -7073,7 +7258,9 @@
         "zlib.decode"
       ],
       "answer": 0,
-      "explanation": "Pro rozkomprimování datových bloků IDAT (které jsou stlačeny algoritmem DEFLATE) se v Pythonu používá standardní metoda zlib.decompress(). Název inflate je známý z algoritmu, ale Python knihovna zlib používá názvy compress/decompress."
+      "explanation": "Pro dekompresi dat komprimovaných algoritmem DEFLATE se v modulu zlib používá standardní funkce zlib.decompress().",
+      "code": "import zlib\n\ncompressed_idat_stream = b\"x\\x9c\\xcbH\\xcd\\xc9\\xc9W(\\xcf/\\xcaI\\x01\\x00\\x1a\\x0b\\x04]\"\ndecompressed_bytes = ________(compressed_idat_stream)\n# Vystup: bajty nekomprimovanych pixelovych radek",
+      "expected": "zlib.decompress"
     },
     {
       "id": "png_q5",
@@ -7119,15 +7306,17 @@
     {
       "id": "adv3_q1",
       "type": "fill_blank_choice",
-      "question": "Doplňte dekorátor ________(func) ze modulu functools pro zachování jména a docstringu obalené funkce.\n\n```python\n# Doplňte dekorátor ________(func) ze modulu functools pro zachování jména a docstringu obalené funkce.\nvysledek = ________\n```",
+      "question": "Který dekorátor z modulu functools se aplikuje na vnitřní obalující funkci (wrapper), aby zůstala zachována původní metadata dekorované funkce?",
       "options": [
         "@wraps",
-        "@copy",
-        "@keep",
-        "@bind"
+        "@preserve",
+        "@keep_meta",
+        "@delegate"
       ],
       "answer": 0,
-      "explanation": "Dekorátor @functools.wraps(func) zkopíruje atributy původní funkce (např. __name__, __doc__, __annotations__) na obalující funkci (wrapper), čímž zamezí ztrátě identifikace dekorované funkce."
+      "explanation": "Dekorátor @functools.wraps(func) zkopíruje atributy původní funkce (__name__, __doc__, __annotations__) na obalující funkci.",
+      "code": "from functools import wraps\n\ndef log_experiment(func):\n    ________(func)\n    def wrapper(*args, **kwargs):\n        print(f\"Spoustim experiment: {func.__name__}\")\n        return func(*args, **kwargs)\n    return wrapper",
+      "expected": "@wraps"
     },
     {
       "id": "adv3_q2",
@@ -7249,15 +7438,17 @@
     {
       "id": "3vs2_q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte správné klíčové slovo ________ ValueError as err: pro odchycení výjimky v Python 3.\n\n```python\n# Doplňte správné klíčové slovo ________ ValueError as err: pro odchycení výjimky v Python 3.\nvysledek = ________\n```",
+      "question": "Doplňte klíčové slovo pro odchycení specifické výjimky v bloku try-except v Pythonu.",
       "options": [
         "except",
         "catch",
         "rescue",
-        "obtain"
+        "handle"
       ],
       "answer": 0,
-      "explanation": "V Pythonu 3 se blok výjimek uvádí klíčovým slovem except ValueError as err:. Stará syntaxe z Pythonu 2 s čárkou (except ValueError, err:) již v Pythonu 3 není podporována."
+      "explanation": "V Pythonu se větve pro zachycení výjimek uvádějí klíčovým slovem except (syntaxe except TypVyjimky as err:).",
+      "code": "def parse_temperature(raw_input: str) -> float:\n    try:\n        return float(raw_input)\n    ________ ValueError as err:\n        print(f\"Chyba prevodu hodnoty: {err}\")\n        return 0.0",
+      "expected": "except"
     },
     {
       "id": "3vs2_q6",
@@ -7275,7 +7466,7 @@
     {
       "id": "3vs2_q7",
       "type": "fill_blank_choice",
-      "question": "Doplňte pojmenovaný argument class MyModel(________=MetaClass): pro nastavení metatřídy v Python 3.\n\n```python\n# Doplňte pojmenovaný argument class MyModel(________=MetaClass): pro nastavení metatřídy v Python 3.\nvysledek = ________\n```",
+      "question": "Doplňte pojmenovaný argument v hlavičce třídy pro přiřazení metatřídy v Pythonu 3.",
       "options": [
         "metaclass",
         "superclass",
@@ -7283,7 +7474,9 @@
         "classmeta"
       ],
       "answer": 0,
-      "explanation": "V Python 3 se metatřída zadává přímo v závorce definice třídy pomocí pojmenovaného parametru class MojeTřída(metaclass=MetaClass):. V Python 2 se používala magická proměnná __metaclass__ uvnitř těla třídy."
+      "explanation": "V Pythonu 3 se metatřída zadává přímo v závorce hlavičky třídy pomocí parametru metaclass=... namísto dřívější proměnné __metaclass__.",
+      "code": "class ChemistryMeta(type):\n    def __new__(cls, name, bases, namespace):\n        return super().__new__(cls, name, bases, namespace)\n\nclass Substance(________=ChemistryMeta):\n    pass",
+      "expected": "metaclass"
     },
     {
       "id": "3vs2_q8",
@@ -7316,15 +7509,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Který parametr předaný třídě PhotoImage načítá grafická data přímo ze souboru na disku?\n\n```python\nimg = PhotoImage(________='ikona.gif')\n```",
+      "question": "Který pojmenovaný parametr konstruktoru PhotoImage v Tkinteru slouží k načtení grafických dat ze souboru na disku?",
       "options": [
         "file",
         "path",
         "filename",
-        "source"
+        "src"
       ],
       "answer": 0,
-      "explanation": "Třída PhotoImage v Tkinteru přijímá pro cestu k souboru výhradně pojmenovaný parametr file. Parametry jako path nebo filename nejsou rozpoznány."
+      "explanation": "Třída tkinter.PhotoImage přijímá pro cestu k souboru na disku pojmenovaný parametr file.",
+      "code": "import tkinter as tk\n\nroot = tk.Tk()\nlogo_img = tk.PhotoImage(________=\"assets/vscht_logo.png\")\nlabel = tk.Label(root, image=logo_img)\nlabel.pack()",
+      "expected": "file"
     },
     {
       "id": "q3",
@@ -7381,15 +7576,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Která metoda generické funkce vrátí konkrétní zaregistrovanou funkci pro zadaný typ bez jejího spuštění?\n\n```python\nimpl = mojemetoda.________(int)\n```",
+      "question": "Která metoda generické funkce vytvořené dekorátorem @singledispatch vrátí implementaci zaregistrovanou pro daný typ bez jejího spuštění?",
       "options": [
         "dispatch",
-        "register",
-        "registry",
-        "resolve"
+        "resolve",
+        "get_handler",
+        "lookup"
       ],
       "answer": 0,
-      "explanation": "Metoda dispatch(cls) slouží k dotázání výběrového algoritmu na funkci zaregistrovanou pro datový typ cls. Atribut registry je přímo slovník všech registrací."
+      "explanation": "Metoda dispatch(cls) slouží k dotázání výběrového mechanismu singledispatch na funkci zaregistrovanou pro konkrétní datový typ.",
+      "code": "from functools import singledispatch\n\n@singledispatch\ndef format_result(val):\n    return str(val)\n\n@format_result.register\ndef _(val: float):\n    return f\"{val:.4f} mol/L\"\n\nhandler = format_result.________(float)\n# Vrati funkci zaregistrovanou pro datovy typ float",
+      "expected": "dispatch"
     },
     {
       "id": "q3",
@@ -7498,15 +7695,17 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte správné pořadí uložení bajtů barvových složek pro každý pixel v binárním formátu P6.\n\n```text\nPo hlavičce následují pro každý pixel 3 bajty v pořadí: ________\n```",
+      "question": "Doplňte rozbalení trojice barevných kanálů v binárním formátu PPM (P6), kde jsou pixely uloženy v pořadí červená, zelená, modrá.",
       "options": [
-        "R, G, B (červená, zelená, modrá)",
-        "B, G, R (modrá, zelená, červená)",
-        "G, R, B (zelená, červená, modrá)",
-        "R, G, B, A (červená, zelená, modrá, alfa)"
+        "r, g, b",
+        "b, g, r",
+        "g, r, b",
+        "r, g, b, a"
       ],
       "answer": 0,
-      "explanation": "Formát PPM ukládá barevné složky striktně v kanálovém pořadí R (Red), G (Green), B (Blue). V P6 připadají na každý pixel právě tyto 3 bajty."
+      "explanation": "Binární formát PPM (P6) ukládá pro každý pixel právě 3 bajty v pevném pořadí složek R (červená), G (zelená) a B (modrá).",
+      "code": "import struct\n\ndef parse_p6_pixel(pixel_bytes: bytes) -> tuple[int, int, int]:\n    # Formát P6 ukládá 3 bajty na pixel v kanálovém pořadí:\n    ________ = struct.unpack(\"3B\", pixel_bytes[:3])\n    return (r, g, b)",
+      "expected": "r, g, b"
     },
     {
       "id": "q6",
@@ -7561,15 +7760,17 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Který mód (flag) předaný funkci shelve.open() vynutí vytvoření nové prázdné databáze s přepisem původní?\n\n```python\ndb = shelve.open('data.db', flag='________')\n```",
+      "question": "Která hodnota parametru flag ve funkci shelve.open() vynutí vytvoření nové prázdné databáze s přepsáním existujícího souboru?",
       "options": [
-        "n",
-        "c",
-        "w",
-        "r"
+        "'n'",
+        "'c'",
+        "'w'",
+        "'r'"
       ],
       "answer": 0,
-      "explanation": "Mód 'n' (new) otevře databázi pro čtení i zápis a vždy vytvoří novou prázdnou databázi. Mód 'c' vytvoří novou databázi pouze tehdy, pokud ještě neexistuje."
+      "explanation": "Příznak flag='n' (new) otevře databázi pro čtení i zápis a vždy vytvoří novou prázdnou databázi s přepsáním původního souboru.",
+      "code": "import shelve\n\n# Otevření databáze pro zápis s vynuceným vytvořením nového souboru\nwith shelve.open(\"lab_results.db\", flag=________) as db:\n    db[\"experiment_1\"] = {\"yield\": 0.85, \"purity\": 0.99}",
+      "expected": "'n'"
     },
     {
       "id": "q5",
@@ -7602,15 +7803,17 @@
     {
       "id": "q1",
       "type": "fill_blank_choice",
-      "question": "Kterým příkazem v příkazové řádce ověříte správnou instalaci a funkčnost modulu tkinter?\n\n```bash\npython -m ________\n```",
+      "question": "Kterým CLI příkazem ověříte v terminálu přítomnost a správnou funkčnost knihovny Tkinter?",
       "options": [
         "tkinter",
         "tk",
-        "gui",
-        "tkdocs"
+        "tcl",
+        "gui"
       ],
       "answer": 0,
-      "explanation": "Příkaz python -m tkinter otevře malé integrované okno s rozhraním Tcl/Tk a informacemi o jeho verzi, čímž ověří funkčnost instalace."
+      "explanation": "Příkaz python -m tkinter otevře demonstrační Tcl/Tk okno s informacemi o verzi a ověří funkčnost grafické knihovny.",
+      "code": "# Spuštění vestavěného demo okna pro test podpory GUI\npython -m ________",
+      "expected": "tkinter"
     },
     {
       "id": "q2",
@@ -7693,16 +7896,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte název metody modulu pickle pro načtení serializovaného objektu přímo z paměťového bajtového řetězce.\n\n```python\n# Doplňte název metody modulu pickle pro načtení serializovaného objektu přímo z paměťového bajtového řetězce.\nvysledek = ________\n```",
-      "code": "data_bytes = b'...'\nobjekt = pickle.________(data_bytes)",
+      "question": "Která funkce modulu pickle deserializuje objekt přímo z bajtového řetězce (bytes) v paměti?",
+      "code": "import pickle\n\nserialized_sample = b\"\\x80\\x04\\x95\\x19\\x00\\x00\\x00\\x00\\x00\\x00\\x00}\\x94\\x8c\\x06sample\\x94\\x8c\\x07ethanol\\x94s.\"\nmeasurement = pickle.________(serialized_sample)\n# Vystup: {'sample': 'ethanol'}",
       "options": [
-        "loads — načítá a deserializuje objekt z předaného bajtového řetězce v paměti.",
-        "load — načítá a deserializuje objekt z otevřeného binárního souborového proudu.",
-        "read — přečte bajtový řetězec z paměti",
-        "decode — dekóduje bajtový řetězec na textový objekt"
+        "loads",
+        "load",
+        "dumps",
+        "dump"
       ],
       "answer": 0,
-      "explanation": "Metoda pickle.loads() (s koncovým 's' jako string/stream in memory) slouží k rozbalení binárního řetězce z paměti. Metoda pickle.load() bez 's' přijímá jako parametr souborový objekt (stream)."
+      "explanation": "Funkce pickle.loads() načítá a deserializuje objekt z předaného bajtového řetězce v paměti, zatímco pickle.load() čte ze souborového proudu.",
+      "expected": "loads"
     },
     {
       "id": "q3",
@@ -7787,16 +7991,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte správnou podmínku pro zavedení kotvy rekurze při výpočtu faktoriálu.\n\n```python\n# Doplňte správnou podmínku pro zavedení kotvy rekurze při výpočtu faktoriálu.\nvysledek = ________\n```",
-      "code": "def faktorial(n):\n    if ________:\n        return 1\n    return n * faktorial(n - 1)",
+      "question": "Doplňte bázovou podmínku (kotvu rekurze) pro bezpečný výpočet faktoriálu celého čísla.",
+      "code": "def factorial(n: int) -> int:\n    if ________:\n        return 1\n    return n * factorial(n - 1)\n\n# Vystup: factorial(4) -> 24",
       "options": [
-        "n <= 1 — zastaví rekurzivní volání",
-        "n == 100 — ukončí rekurzi po dosažení stého kroku výpočtu a vrátí mezivýsledek.",
-        "n > 1 — pokračuje v rekurzivním volání dokud je n větší než základní konstanta 1.",
-        "n % 2 == 0 — zastavuje rekurzi pouze"
+        "n <= 1",
+        "n == 0",
+        "n > 1",
+        "n < 0"
       ],
       "answer": 0,
-      "explanation": "Kotva rekurze (base case) musí zastavit další rekurzivní volání. Pro faktoriál je definováno 0! = 1! = 1, tedy podmínka n <= 1 vrací hodnotu 1 a zamezuje zápornému zanoření."
+      "explanation": "Kotva rekurze n <= 1 zastaví rekurzivní volání pro hodnoty 0 a 1 (0! = 1! = 1) a zamezí zápornému zanoření.",
+      "expected": "n <= 1"
     },
     {
       "id": "q3",
@@ -7880,16 +8085,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte atribut elementu <label> pro jeho svázání s konkrétním formulářovým prvkem podle jeho id.\n\n```python\n# Doplňte atribut elementu <label> pro jeho svázání s konkrétním formulářovým prvkem podle jeho id.\nvysledek = ________\n```",
-      "code": "<label ________=\"user_email\">E-mailová adresa:</label>\n<input id=\"user_email\" type=\"email\" />",
+      "question": "Doplňte HTML atribut tagu <label> pro jeho provázání s jednoznačným identifikátorem příslušného vstupního pole.",
+      "code": "<label ________=\"user_email\">E-mailová adresa:</label>\n<input id=\"user_email\" type=\"email\" name=\"email\" />",
       "options": [
-        "for — specifikuje jednoznačný identifikátor id prvku, ke kterému popisovaný label patří.",
-        "form — přiřazuje popisek k celé skupině prvků ohraničené příslušným formulářovým tagem.",
-        "name — odkazuje na název proměnné odesílané v těle požadavku na zpracovatelský server.",
-        "target — určuje cílové okno prohlížeče, ve kterém se má po kliknutí zobrazit prvek vstupu."
+        "for",
+        "form",
+        "name",
+        "target"
       ],
       "answer": 0,
-      "explanation": "Atribut for u elementu <label> odkazuje na hodnotu atributu id cílového vstupu. Kliknutí na popisek pak automaticky přesune fokus na příslušný vstupní prvek."
+      "explanation": "Atribut for u elementu <label> odkazuje na hodnotu atributu id cílového vstupu, což zajistí správné provázání a aktivaci pole při kliknutí.",
+      "expected": "for"
     },
     {
       "id": "q3",
@@ -7918,16 +8124,17 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte atribut, který umožňuje propojit prvek <input> s formulářem s id=\"main_form\", i když leží mimo tag <form>.\n\n```python\n# Doplňte atribut, který umožňuje propojit prvek <input> s formulářem s id=\"main_form\", i když leží mimo tag <form>.\nvysledek = ________\n```",
-      "code": "<form id=\"main_form\" action=\"/submit\"></form>\n<input type=\"text\" ________=\"main_form\" name=\"query\" />",
+      "question": "Který HTML5 atribut umožňuje propojit prvek <input> s formulářem, i když se nachází v kódu mimo tag <form>?",
+      "code": "<form id=\"measurement_form\" action=\"/api/save\" method=\"post\">\n    <button type=\"submit\">Odeslat</button>\n</form>\n\n<!-- Vstupní pole umístěné v DOM mimo tag form -->\n<input type=\"text\" name=\"sample_name\" ________=\"measurement_form\" />",
       "options": [
-        "form — propojuje vstupní prvek ležící mimo tag formuláře",
-        "for — přiřazuje prvek k nadřazenému skriptu",
-        "target — směruje odesílaná formulářová data ze vstupu do určeného rámu nebo okna prohlížeče.",
-        "action — přepisuje výchozí cílovou URL adresu definovanou přímo v hlavním formuláři."
+        "form",
+        "for",
+        "action",
+        "target"
       ],
       "answer": 0,
-      "explanation": "HTML5 zavedl atribut form u ovládacích prvků (<input>, <button>, <select> atd.). Díky němu může prvek fyzicky ležet kdekoliv v DOM dokumentu mimo tag <form> a přesto se jeho hodnota odešle s formulářem se shodným id."
+      "explanation": "HTML5 atribut form u vstupních prvků umožňuje jejich přiřazení k formuláři se shodným id, i když leží mimo tělo tagu <form>.",
+      "expected": "form"
     },
     {
       "id": "q6",
@@ -7973,16 +8180,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte název metody objektu čáry z Matplotlib pro aktualizaci zobrazovaných dat v probíhající animaci.\n\n```python\n# Doplňte název metody objektu čáry z Matplotlib pro aktualizaci zobrazovaných dat v probíhající animaci.\nvysledek = ________\n```",
-      "code": "line, = plt.plot([], [])\ndef update(x_new, y_new):\n    line.________(x_new, y_new)\n    plt.draw()",
+      "question": "Která metoda objektu Line2D v knihovně Matplotlib aktualizuje souřadnice bodů vykreslené čáry během animace?",
+      "code": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots()\nline, = ax.plot([], [], \"r-\")\n\ndef update(frame):\n    x = np.linspace(0, 2 * np.pi, 100)\n    y = np.sin(x + frame / 10.0)\n    line.________(x, y)\n    return line,",
       "options": [
-        "set_data — aktualizuje souřadnice bodů existujícího vykreslovacího objektu čáry.",
-        "update_plot — vyvolá znovuvykreslení celého plátna grafu",
-        "set_values — nastaví nové pole hodnot",
-        "append_data — přidá nové souřadnice bodů na konec stávajícího datového pole čáry."
+        "set_data",
+        "update_data",
+        "set_points",
+        "set_values"
       ],
       "answer": 0,
-      "explanation": "Metoda Line2D.set_data(xdata, ydata) přijímá nové sekvence souřadnic X a Y a přiřadí je existujícímu objektu čáry, což je klíčové pro plynulé a výkonné animace."
+      "explanation": "Metoda Line2D.set_data(x, y) přiřadí existujícímu objektu čáry nové pole souřadnic bez nutnosti překreslovat celý graf.",
+      "expected": "set_data"
     },
     {
       "id": "q3",
@@ -8053,16 +8261,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte příkaz nástroje Git pro přesunutí připravených změn z pracovního adresáře do odkládací plochy (staging area).\n\n```python\n# Doplňte příkaz nástroje Git pro přesunutí připravených změn z pracovního adresáře do odkládací plochy (staging area).\nvysledek = ________\n```",
-      "code": "git ________ soubor.py\ngit commit -m \"Úprava souboru\"",
+      "question": "Doplňte příkaz nástroje Git pro přesunutí změn souboru z pracovního adresáře do indexu (staging area).",
+      "code": "# Zařazení skriptu s chemickými výpočty do staging area\ngit ________ analysis.py\ngit commit -m \"feat: pridana kalibracni krivka\"",
       "options": [
-        "add — přidá zadané soubory do indexu (staging area) před samotným komitem do historie.",
-        "stage — vytvoří záložní kopii souboru v dočasné mezipaměti lokálního operačního systému.",
-        "push — nahraje modifikovaný soubor přímo do vzdáleného repozitáře na servery GitHubu.",
-        "save — uloží stávající pracovní změny do lokálního archivu"
+        "add",
+        "stage",
+        "push",
+        "track"
       ],
       "answer": 0,
-      "explanation": "Git vyžaduje dvoukrokový proces komitování — příkaz git add přesune změny do tzv. indexu (staging area) a teprve git commit vytvoří trvalý záznam v historii repozitáře."
+      "explanation": "Příkaz git add přesune změny souborů do indexu (staging area) před jejich trvalým uložením do historie pomocí git commit.",
+      "expected": "add"
     },
     {
       "id": "q3",
@@ -8172,15 +8381,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Která funkce NumPy vytvoří matici velikosti 3x3 s jedničkami na vedlejší diagonále posunuté o +1 navrch?\n\n```python\nm = np.________(3, k=1)\n```",
+      "question": "Která funkce knihovny NumPy vytvoří 2D matici s jedničkami na zadané diagonále (posunuté parametrem k) a nulami jinde?",
       "options": [
         "eye",
-        "tri",
-        "row",
-        "diag"
+        "identity",
+        "diag",
+        "tri"
       ],
       "answer": 0,
-      "explanation": "Funkce np.eye(N, k=k) generuje 2D matici s jedničkami na diagonále definované parametrem k (k=0 hlavní, k=1 nadúhlopříčka)."
+      "explanation": "Funkce np.eye(N, k=k) generuje 2D matici s jedničkami na diagonále určené parametrem k (k=0 hlavní diagonála, k=1 nadúhlopříčka).",
+      "code": "import numpy as np\n\n# Vytvoření matice 3x3 s jedničkami na diagonále posunuté o +1 nad hlavní\nmatrix = np.________(3, k=1)\n# Vystup:\n# array([[0., 1., 0.],\n#        [0., 0., 1.],\n#        [0., 0., 0.]])",
+      "expected": "eye"
     },
     {
       "id": "q4",
@@ -8326,15 +8537,17 @@
     {
       "id": "q6",
       "type": "fill_blank_choice",
-      "question": "Která univerzální funkce (ufunc) z modulu numpy spočítá přirozený logaritmus po prvcích pole?\n\n```python\nres = np.________(x)\n```",
+      "question": "Která univerzální funkce (ufunc) z modulu NumPy spočítá přirozený logaritmus (ln) po prvcích pole?",
       "options": [
         "log",
-        "exp",
-        "sin",
-        "tan"
+        "ln",
+        "log10",
+        "exp"
       ],
       "answer": 0,
-      "explanation": "np.log(x) je ufunc počítající přirozený logaritmus (ln) po prvcích pole x."
+      "explanation": "Funkce np.log() počítá v NumPy přirozený logaritmus (ln) prvek po prvku. Pro dekadický logaritmus slouží np.log10().",
+      "code": "import numpy as np\n\nconcentrations = np.array([1.0, np.e, np.e**2])\nln_c = np.________(concentrations)\n# Vystup: array([0., 1., 2.])",
+      "expected": "log"
     }
   ],
   "arrays.slicing": [
@@ -8367,15 +8580,17 @@
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Který operátor použijete pro přidání nové dimenze k poli a v indexu sloupců pro účely broadcasting?\n\n```python\na_2d = a[:, np.________]\n```",
+      "question": "Který objekt modulu NumPy se používá při indexaci k přidání nové dimenze o velikosti 1 do pole?",
       "options": [
         "newaxis",
         "addaxis",
-        "setaxis",
-        "subaxis"
+        "expand",
+        "dim"
       ],
       "answer": 0,
-      "explanation": "np.newaxis (alias pro None) vloží na dané místo v indexaci novou dimenzi o velikosti 1 (např. z tvaru (N,) vznikne (N, 1))."
+      "explanation": "Konstanta np.newaxis (alias pro None) vloží na danou pozici v indexu novou osu o velikosti 1.",
+      "code": "import numpy as np\n\nvector = np.array([10, 20, 30])  # shape: (3,)\ncolumn_matrix = vector[:, np.________]  # shape: (3, 1)\n# Vystup: array([[10], [20], [30]])",
+      "expected": "newaxis"
     },
     {
       "id": "q4",
@@ -8484,15 +8699,17 @@
     {
       "id": "q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte kód tak, aby jednorozměrné pole a o tvaru (4,) získalo tvar (4, 1) a šlo sečíst s 1D polem o tvaru (3,).\n\n```python\nres = a[:, np.________] + b\n```",
+      "question": "Doplňte výraz pro povýšení 1D pole a o rozměru (4,) na sloupcový vektor (4, 1) umožňující broadcasting s polem o rozměru (3,).",
       "options": [
         "newaxis",
-        "addaxis",
-        "setaxis",
-        "subaxis"
+        "expand",
+        "axis",
+        "reshape"
       ],
       "answer": 0,
-      "explanation": "Příkaz a[:, np.newaxis] vytvoří z 1D pole o tvaru (4,) sloupcovou matici o tvaru (4, 1), která při sečtení s 1D polem (3,) vytvoří výstup (4, 3) přes broadcasting."
+      "explanation": "Výraz a[:, np.newaxis] vytvoří z 1D pole sloupcovou matici o tvaru (4, 1), která se při sčítání s polem (3,) automaticky rozšíří na tvar (4, 3).",
+      "code": "import numpy as np\n\na = np.array([1, 2, 3, 4])  # shape: (4,)\nb = np.array([10, 20, 30])   # shape: (3,)\n\n# Vytvoření matice součtů tvaru (4, 3) přes broadcasting\ngrid = a[:, np.________] + b\n# grid.shape je (4, 3)",
+      "expected": "newaxis"
     }
   ],
   "vectorization": [
@@ -8512,15 +8729,17 @@
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte dekorátor, který umožní skalární Python funkci zpracovávat celá NumPy pole prvek po prvku:\n\nfrom numpy import ________\n\n@vectorize\ndef mysign(x):\n    return 1 if x >= 0 else -1\n\n```python\n# Doplňte dekorátor, který umožní skalární Python funkci zpracovávat celá NumPy pole prvek po prvku:\n\nfrom numpy import ________\n\n@vectorize\ndef mysign(x):\n    return 1 if x >= 0 else -1\nvysledek = ________\n```",
+      "question": "Kterou funkci modulu numpy použijete jako dekorátor pro převod skalární Python funkce na funkci pracující s NumPy poli prvek po prvku?",
       "options": [
         "vectorize",
-        "array_func",
-        "ufunc_map",
-        "elementwise"
+        "elementwise",
+        "ufunc",
+        "array_func"
       ],
       "answer": 0,
-      "explanation": "Funkce a dekorátor `vectorize` z modulu `numpy` převezme skalární Python funkci a vytvoří z ní univerzální funkci (ufunc), která dokáže aplikovat původní skalární logiku na vícerozměrná NumPy pole prvek po prvku."
+      "explanation": "Dekorátor np.vectorize převede běžnou skalární Python funkci na univerzální funkci aplikovatelnou na celá NumPy pole prvek po prvku.",
+      "code": "import numpy as np\n\n@np.________\ndef classify_ph(val: float) -> str:\n    if val < 7.0:\n        return \"acidic\"\n    elif val > 7.0:\n        return \"basic\"\n    return \"neutral\"\n\nph_array = np.array([2.5, 7.0, 11.2])\n# classify_ph(ph_array) -> array(['acidic', 'neutral', 'basic'], dtype='<U7')",
+      "expected": "vectorize"
     },
     {
       "id": "q3",
@@ -8550,16 +8769,18 @@
     },
     {
       "id": "q5",
-      "type": "multiple_choice",
-      "question": "Jaký je efektivní zápis skalárního součinu vektoru v se sebou samým v NumPy?\n\nimport numpy as np\nv = np.array([1, 2, 3])\nres = ________",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provede v Pythonu a NumPy maticové násobení či skalární součin dvou 1D vektorů?",
       "options": [
-        "A) v @ v — operátor @ provede vektorové násobení a navrátí skalární součet prvků 1*1 + 2*2 + 3*3.",
-        "B) v * v — operátor * provede skalární násobení a navrátí skalární součet prvků 1*1 + 2*2 + 3*3.",
-        "C) v.dot() — metoda .dot() bez parametrů vypočítá a navrátí skalární součet vektoru se sebou samým.",
-        "D) v ** 2 — umocnění na druhou automaticky sečte všechny prvky daného vektoru do skalární hodnoty."
+        "@",
+        "*",
+        "**",
+        "^"
       ],
       "answer": 0,
-      "explanation": "V Pythonu 3.5+ představuje infixový operátor `@` maticové a vektorové násobení. Pro 1D vektory spočítá skalární součin `v_1*v_1 + v_2*v_2 + ...`. Naproti tomu operátor `*` i umocnění `** 2` provádí operaci prvek po prvku a vracejí opět vektor."
+      "explanation": "Infixový operátor @ provádí v NumPy maticové a vektorové násobení (skalární součin u 1D vektorů), zatímco operátor * násobí prvky po složkách.",
+      "code": "import numpy as np\n\nv = np.array([1.0, 2.0, 3.0])\n# Skalární součin vektoru v se sebou samým: 1*1 + 2*2 + 3*3\ndot_product = v ________ v\n# Vystup: 14.0",
+      "expected": "@"
     }
   ],
   "struct": [
@@ -8605,15 +8826,17 @@
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte kód pro efektivní opakované rozbalování binárních dat pomocí předkompilovaného objektu:\n\nimport struct\n\nst = struct.________('>i')\nval = st.unpack(b'\\x00\\x00\\x00\\x2a')\n\n```python\n# Doplňte kód pro efektivní opakované rozbalování binárních dat pomocí předkompilovaného objektu:\n\nimport struct\n\nst = struct.________('>i')\nval = st.unpack(b'\\x00\\x00\\x00\\x2a')\nvysledek = ________\n```",
+      "question": "Která třída z modulu struct slouží k předkompilování binárního formátovacího řetězce pro efektivní opakované balení a rozbalování dat?",
       "options": [
         "Struct",
-        "Compiler",
         "Format",
+        "Packer",
         "Pattern"
       ],
       "answer": 0,
-      "explanation": "Třída `struct.Struct(fmt)` předkompiluje formátovací řetězec do objektu. Při opakovaném použití metody `.unpack()` nebo `.pack()` na tomto objektu se šetří čas režie neustálé opakované kompilace formátovacího řetězce."
+      "explanation": "Třída struct.Struct(fmt) vytvoří předkompilovaný objekt formátu, jehož metody pack() a unpack() jsou výrazně rychlejší při opakovaném volání.",
+      "code": "import struct\n\n# Předkompilování formátu pro 32bitové celé číslo (big-endian)\nunpacker = struct.________(\">i\")\nvalue, = unpacker.unpack(b\"\\x00\\x00\\x00\\x2a\")\n# Vystup: 42",
+      "expected": "Struct"
     },
     {
       "id": "q5",

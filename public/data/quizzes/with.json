@@ -28,15 +28,17 @@
   {
     "id": "q3",
     "type": "fill_blank_choice",
-    "question": "Doplňte správné klíčové slovo pro předání obsluhované hodnoty z generátorového kontextového manažeru do proměnné za as:\n\n```python\nfrom contextlib import contextmanager\n\n@contextmanager\ndef managed_resource():\n    resource = acquire()\n    ________ resource\n    release(resource)\n```",
+    "question": "Doplňte klíčové slovo pro předání spravovaného prostředku z kontextového manažeru @contextmanager:",
     "options": [
       "yield",
       "return",
       "send",
-      "defer"
+      "pass"
     ],
     "answer": 0,
-    "explanation": "V generátorových kontextových manažerech předává klíčové slovo yield hodnotu do příkazu as a pozastavuje vykonávání funkce do opuštění bloku with."
+    "explanation": "Generátorový kontextový manažer předává spravovaný objekt do bloku with pomocí klíčového slova yield.",
+    "code": "from contextlib import contextmanager\n\n@contextmanager\ndef open_database(host):\n    conn = connect(host)\n    try:\n        ________ conn\n    finally:\n        conn.close()",
+    "expected": "yield"
   },
   {
     "id": "q4",
@@ -67,7 +69,7 @@
   {
     "id": "q6",
     "type": "fill_blank_choice",
-    "question": "Doplňte chybějící návratovou hodnotu metody __exit__, aby třída při výskytu výjimky zachytila chybu a zabránila jejímu šíření výše:\n\n```python\nclass ExceptionSuppressor:\n    def __enter__(self):\n        return self\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        return ________\n```",
+    "question": "Doplňte návratovou hodnotu metody __exit__, která potlačí vzniklou výjimku a zabrání jejímu dalšímu šíření:",
     "options": [
       "True",
       "False",
@@ -75,7 +77,9 @@
       "self"
     ],
     "answer": 0,
-    "explanation": "Vrácení True z metody __exit__ oznamuje Pythonu, že vzniklá výjimka byla úspěšně zpracována a nemá se šířit dál."
+    "explanation": "Pokud metoda __exit__() vrátí pravdivou hodnotu (True), Python výjimku potlačí a nepokračuje v jejím šíření.",
+    "code": "class SuppressErrors:\n    def __enter__(self):\n        return self\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        if exc_type is not None:\n            print(f\"Zachycena výjimka: {exc_val}\")\n            return ________",
+    "expected": "True"
   },
   {
     "id": "q7",

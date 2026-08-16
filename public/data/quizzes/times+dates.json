@@ -15,7 +15,7 @@
   {
     "id": "q2",
     "type": "fill_blank_choice",
-    "question": "Doplňte název funkce z modulu calendar, která provádí zpětnou konverzi z UTC n-tice struct_time na sekundy od epochy:\n\nimport time, calendar\nst = time.gmtime(0)\nepoch_seconds = calendar.________(st)\n\n```python\n# Doplňte název funkce z modulu calendar, která provádí zpětnou konverzi z UTC n-tice struct_time na sekundy od epochy:\n\nimport time, calendar\nst = time.gmtime(0)\nepoch_seconds = calendar.________(st)\nvysledek = ________\n```",
+    "question": "Doplňte funkci z modulu calendar, která převede časovou n-tici struct_time v čase UTC na počet sekund od počátku epochy (timestamp).",
     "options": [
       "timegm",
       "mktime",
@@ -23,7 +23,9 @@
       "mktimes"
     ],
     "answer": 0,
-    "explanation": "Funkce calendar.timegm() přijímá časovou n-tici struct_time v UTC a vrací počet sekund od epochy (1. 1. 1970). Naopak time.mktime() očekává časovou n-tici v lokálním čase."
+    "explanation": "Funkce calendar.timegm() zpracovává struct_time v UTC a vrací počet sekund od unixové epochy (na rozdíl od time.mktime(), který předpokládá lokální čas).",
+    "code": "import time\nimport calendar\n\n# Časová struktura v koordinovaném světovém čase (UTC)\ntime_struct = time.gmtime()\n\n# Převod UTC struktury na unixový timestamp\nepoch_seconds = calendar.________(time_struct)\n# Výstup: 1770000000",
+    "expected": "timegm"
   },
   {
     "id": "q3",
@@ -52,7 +54,7 @@
   {
     "id": "q5",
     "type": "fill_blank_choice",
-    "question": "Doplňte chybějící volání metody pro převedení naivního objektu dt na informovaný v pásu UTC bez změny složek času:\n\nfrom datetime import datetime, timezone\ndt = datetime(2026, 8, 9, 14, 0, 0)\ndt_aware = dt.________(tzinfo=timezone.utc)\n\n```python\n# Doplňte chybějící volání metody pro převedení naivního objektu dt na informovaný v pásu UTC bez změny složek času:\n\nfrom datetime import datetime, timezone\ndt = datetime(2026, 8, 9, 14, 0, 0)\ndt_aware = dt.________(tzinfo=timezone.utc)\nvysledek = ________\n```",
+    "question": "Doplňte metodu, která přiřadí naivnímu objektu datetime časovou zónu UTC beze změny hodnot hodin a minut.",
     "options": [
       "replace",
       "convert",
@@ -60,7 +62,9 @@
       "set_tz"
     ],
     "answer": 0,
-    "explanation": "Metoda dt.replace(tzinfo=timezone.utc) vrátí nový objekt datetime se stejnými složkami roku, měsíce, hodin atd., ale s nastaveným atributem tzinfo. Metoda astimezone() se používá k přepočtu informovaného času z jedné zóny do druhé."
+    "explanation": "Metoda datetime.replace(tzinfo=...) vytvoří novou instanci se zadanou časovou zónou bez časového posunu hodnot hodin a minut.",
+    "code": "from datetime import datetime, timezone\n\n# Naivní čas záznamu z laboratorního spektrometru\nnaive_dt = datetime(2026, 8, 9, 14, 30, 0)\n\n# Přiřazení časové zóny UTC při zachování identického času 14:30\naware_dt = naive_dt.________(tzinfo=timezone.utc)\n# Výstup: datetime.datetime(2026, 8, 9, 14, 30, tzinfo=datetime.timezone.utc)",
+    "expected": "replace"
   },
   {
     "id": "q6",

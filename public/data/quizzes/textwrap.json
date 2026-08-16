@@ -41,15 +41,17 @@
   {
     "id": "q4",
     "type": "fill_blank_choice",
-    "question": "Jak se změní chování funkce textwrap.indent(text, prefix, predicate=...), pokud jako parametr predicate předáme lambda row: True?\n\n```python\n# Jak se změní chování funkce textwrap.indent(text, prefix, predicate=...), pokud jako parametr predicate předáme lambda row: True?\nvysledek = ________\n```",
+    "question": "Doplňte predikát funkce textwrap.indent() pro vynucení odsazení všech řádků včetně prázdných:",
     "options": [
-      "Předpona prefix se přidá ke všem řádkům textu",
-      "Předpona prefix se přidá pouze k neprázdným řádkům, zatímco prázdné řádky zůstanou nedotčeny.",
-      "Funkce vyvolá výjimku TypeError, protože predicate musí vracet celočíselný index odsazení.",
-      "Odsazení se aplikuje výhradně na sudé řádky v textu a liché řádky se zcela vymažou z výstupu."
+      "lambda line: True",
+      "lambda line: bool(line)",
+      "lambda line: line.strip()",
+      "lambda line: False"
     ],
     "answer": 0,
-    "explanation": "Ve výchozím nastavení predikát u indent() přesakuje prázdné řádky (lambda r: bool(r.strip())). Předání lambda row: True vynutí odsazení úplně všech řádků."
+    "explanation": "Výchozí predikát vynechává prázdné řádky; předáním lambda line: True se prefix vloží před každý řádek bez výjimky.",
+    "code": "import textwrap\n\ntext = \"první\\n\\ndruhý\"\n# Odsadit všechny řádky včetně prázdných:\nresult = textwrap.indent(text, \"    \", predicate=________)",
+    "expected": "lambda line: True"
   },
   {
     "id": "q5",
@@ -67,14 +69,16 @@
   {
     "id": "q6",
     "type": "fill_blank_choice",
-    "question": "Který parametr konstruktoru TextWrapper(________=False) zamezí rozdělování slov delších než zadaná šířka width?\n\n```python\n# Který parametr konstruktoru TextWrapper(________=False) zamezí rozdělování slov delších než zadaná šířka width?\nvysledek = ________\n```",
+    "question": "Který parametr třídy TextWrapper zabrání rozdělení dlouhých slov přesahujících zadanou šířku řádku?",
     "options": [
       "break_long_words",
+      "break_on_hyphens",
       "drop_whitespace",
-      "replace_whitespace",
-      "break_on_hyphens"
+      "replace_whitespace"
     ],
     "answer": 0,
-    "explanation": "Parametr break_long_words=False v třídě TextWrapper způsobí, že slova přesahující šířku width nebudou násilně roztržena na více řádků."
+    "explanation": "Parametr break_long_words=False v třídě TextWrapper způsobí, že slova přesahující šířku width nebudou násilně roztržena na více řádků.",
+    "code": "import textwrap\n\nwrapper = textwrap.TextWrapper(width=20, ________=False)\ntext = \"Supercalifragilisticexpialidocious je velmi dlouhe slovo\"\nlines = wrapper.wrap(text)\n# Dlouhe slovo zustane v celku na samostatnem radku",
+    "expected": "break_long_words"
   }
 ]
