@@ -10,6 +10,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        V <a href=\"oop.xml?slajd=11\">úvodní přednášce o OOP v Python'u</a> jsem zmiňoval, že volání příslušných rodičovských metod z jejich redefinice na potomcích obstarává funkce <code>super()</code>.\r\n    </p>\r\n    <p>\r\n        Jelikož funkce <code>super()</code> toho ale umí mnohem víc, podíváme se jí v této přednášce na zoubek.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -20,6 +21,7 @@
         "Tricky"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Možnosti dědění</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Vytvoříte-li třídu jako výsledek dědění, máte v Python'u obecně následující dvě možnosti, kde v řetězci dědičnosti se hledaný atribut (typicky metoda) nachází:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Je-li třída potomkem „dlouhého“ rodu, může být hledaný atribut v kterémkoli z předků.\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n                class A: ...\r\n\r\n                class B(A): ...\r\n                \r\n                class C(B): ...\r\n\r\n                class D(C): ...\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            Má-li třída vícero rodičů, může být hledaný atribut na kterémkoli z nich.\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n                class A: ...\r\n                \r\n                class B: ...\r\n                \r\n                class C: ...\r\n\r\n                class D(A, B, C): ...\r\n            </pre>\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Jelikož kterýkoli z předků je v principu vytvořen stejnými způsoby, může ve výsledku býti možností skutečně mnoho ^_~\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -30,6 +32,7 @@
         "Tricky"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Dlouhý řetězec předků I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Instance třídy <em>D</em> hledá metodu <em>mtd()</em> v řetězci předků postupně do historie, až ji najde:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_1a.py\"></example></div><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_1b.py\"></example></div></div>\r\n    <p>\r\n        Tady asi není co řešit, tohle by člověk čekal.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -40,6 +43,7 @@
         "Tricky"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Dlouhý řetězec předků II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Parametry u <code>super()</code> to však mohou celé změnit:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_2a.py\"></example></div><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_2b.py\"></example></div></div>\r\n    <p>\r\n        Předepsáním <code>super(B, self)</code> jsme totiž řekli, že uvedená metoda se má hledat až od předků třídy <em>B</em>. A první na ráně s hledanou metodou je třída <em>A</em> (a nezáleží pochopitelně na tom, že v tomto případě je to už poslední předek).\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -50,6 +54,7 @@
         "Tricky"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Více rodičů I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        U více rodičů se hledá postupně zleva doprava:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_3a.py\"></example></div><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_3b.py\"></example></div></div>\r\n    <p>\r\n        Také nic, co by člověka překvapilo.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -60,6 +65,7 @@
         "Tricky"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Více rodičů II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Dokud se do toho zase nenaveze <code>super()</code>:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_4a.py\"></example></div><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_4b.py\"></example></div></div>\r\n    <p>\r\n        Tady už vysvětlení, proč <code>super(B, self)</code> vrátí metodu z třídy <em>C</em>, vyžaduje trochu kreativního přemýšlení – při čtení zleva doprava je prostě po třídě <em>B</em> dalším předkem třída <em>C</em>. Abychom si v tom udělali pořádek – dojdou-li předci přímí, dalšími jsou <em>sourozenci</em>.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -70,6 +76,7 @@
         "Tricky"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">„MRO“ (Method Resolution Order) I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Smícháme-li oba přístupy dohromady, projeví se naplno <a href=\"/materialy/python/modules/inspect.xml?slajd=8\">algoritmus <em>MRO</em></a> v akci:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_5a.py\"></example></div><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_5b.py\"></example></div></div>\r\n    <p>\r\n        Ve zkratce: <strong>Zleva doprava, ale pro každou pozici nejdříve prozkoumat její předky.</strong> (Neboli: Prozkoumávají se sourozenci v pořadí zápisu v hlavičce třídy, ale než se přejde k dalšímu, prozkoumá se celý rodokmen aktuálního sourozence.)\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -80,6 +87,7 @@
         "Tricky"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">„MRO“ (Method Resolution Order) II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pořadí prohledávání je zachováno i při použití <code>super()</code> s parametry:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_6a.py\"></example></div><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_6b.py\"></example></div></div>\r\n    <p>\r\n        Jen jsme prostě vnutili začátek hledání v rámci řetězce <em>MRO</em> do jiného místa (zde do předka třídy <em>B2</em>).\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -90,6 +98,7 @@
         "Tricky"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">„MRO“ (Method Resolution Order) III</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kdo by tomu nevěřil, zde je trošku zašmodrchanější příklad:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_7b.py\"></example></div><div class=\"example-col\"><example lang=\"python\" src=\"_files/super/super_7c.py\"></example></div></div>\r\n    <p>\r\n        Bez parametrů najde <code>super()</code> metodu <em>mtd()</em> postupným prohledáváním podle <em>MRO</em> až na třídě <em>B1</em>. Když však přes <code>super(B1, self)</code> předepíšeme, aby začal prohledávání v rámci <em>MRO</em> až od prvku předcházejícího třídě <em>B1</em>, prvním vyhovujícím předkem bude třída <em>C2</em>.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -100,6 +109,7 @@
         "Tricky"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Souhrn</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Předpokládám, že složitější příklady už uvádět nemusím. Prostě trošku neintuitivně:\r\n    </p>\r\n    <blockquote>\r\n        První parametr metody <code>super(type, object_or_type)</code> určuje místo v řetězci dědičnosti určeném algoritmem <em>MRO</em> (= <em>Method Resolution Order</em>) pro předky instance určené druhým parametrem, od jehož předchůdce budeme pokračovat ve hledání.\r\n    </blockquote>\r\n    <p>\r\n        Uvnitř metody třídy můžete oba parametry vynechat (jako v našich příkladech) – do <em>type</em> se dosadí příslušná třída a <em>object_or_type</em> se doplní podle prvního parametru příslušné funkce.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        V našich příkladech – a asi ve většině reálných použití – je příslušnou funkcí metoda instance, takže první parametr bude tato instance. Pokud však použijete <code>super()</code> například ve funkci zanořené uvnitř metody, se zlou se potážete, tak pozor na to!\r\n    </div></div>\r\n    <p>\r\n        PS: Na druhou stranu to znamená, že <code>super()</code> s parametry můžete použít i kdekoliv jinde než jen uvnitř metod třídy – její dva parametry plně určují, jaký řetězec dědičnosti <em>MRO</em> a od kterého předka (či sourozence) se bude prohledávat.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -110,6 +120,7 @@
         "Tricky"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Použití</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Podle <a href=\"https://docs.python.org/3/library/functions.html#super\" class=\"external\">oficiální dokumentace</a> má <code>super()</code> dvě základní použití:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            V případě <strong>jednoduché dědičnosti</strong> (pouze jeden rodič) <em>super()</em> bez parametrů zpřehledňuje kód a činí ho méně náchylným k chybám (kvůli opakování jmen základních tříd).\r\n        </li>\r\n        <li>\r\n            V případě <strong>vícenásobné dědičnosti</strong> (více rodičů) řeší <em>super()</em> s parametry <em>problém kooperace v prostředí dynamické exekuce</em>. Méně učeně řečeno – umožňuje efektivně použít „diamantovou dědičnost“, kde více základních tříd implementuje stejnou metodu.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                PS: Kdybyste to hledali, tak anglicky je to <em>cooperative multiple inheritance in a dynamic execution environment</em>.\r\n            </div></div>\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Více se dozvíte v článku <a href=\"https://rhettinger.wordpress.com/2011/05/26/super-considered-super/\" class=\"external\"><em>Python’s super() considered super!</em></a> od Raymonda Hettingera (což je taková šedá eminence Python'u, kdo to neví).\r\n    </p>\r\n\r\n</div>"
     }
   ]

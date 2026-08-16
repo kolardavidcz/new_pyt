@@ -10,6 +10,7 @@
         "Core"
       ],
       "diff": "paradigm",
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Funkce jako „first-class citizen“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Chování funkcí z předchozích slajdů je přímým důsledkem toho, že funkce v Python'u jsou tzv. <em>first-class object/citizen</em>. To především znamená, že je možné je předávat jako parametry do jiných funkcí, vracet je jako návratové hodnoty z funkcí a ukládat je v datových strukturách.\r\n  </p>\r\n  <p>\r\n    Na dalších slajdech si postupně ukážeme tato jednotlivá použití.\r\n  </p>\r\n\r\n</div>"
     },
     {
@@ -20,6 +21,7 @@
         "Core"
       ],
       "diff": "paradigm",
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Funkce jako objekty</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Jméno funkce je – stejně jako u „obyčejných“ proměnných – odkazem na objekt a tudíž:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\ndef celociselne_deleni_se_zbytkem(co, cim):\r\n    \"\"\"Vrať výsledek celočíselného dělení a též zbytek po něm.\"\"\"\r\n    return co // cim, co % cim\r\n\r\n&gt;&gt;&gt; celociselne_deleni_se_zbytkem\r\n&lt;function celociselne_deleni_se_zbytkem at 0x00C06B70&gt;\r\n\r\n# Po přiřazení odkazuje „popiska“ fn na stejný objekt, jako původní jméno funkce..\r\n&gt;&gt;&gt; fn = celociselne_deleni_se_zbytkem\r\n&gt;&gt;&gt; fn\r\n&lt;function celociselne_deleni_se_zbytkem at 0x00C06B70&gt;\r\n\r\n# ..můžeme ji tedy použít stejným způsobem k jejímu zavolání:\r\n&gt;&gt;&gt; fn(13, 4)\r\n(3, 1)\r\n  </pre>\r\n\r\n</div>"
     },
     {
@@ -30,6 +32,7 @@
         "Core"
       ],
       "diff": "paradigm",
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Funkce jako „hodnoty“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Funkce mohou tudíž nepřekvapivě být součástí jiných datových struktur:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# uložení „odkazů“ na funkce do slovníku\r\n&gt;&gt;&gt; ds = {\r\n...     'metoda_a': abs,\r\n...     'metoda_b': len,\r\n... }\r\n&gt;&gt;&gt; ds\r\n{'metoda_a': &lt;built-in function abs&gt;, 'metoda_b': &lt;built-in function len&gt;}\r\n\r\n# přístup k funkcím slovníkovou notací\r\n&gt;&gt;&gt; ds['metoda_a']( -3.14 )\r\n3.14\r\n&gt;&gt;&gt; ds['metoda_b']( [1, 'dva', 3.0, ] )\r\n3\r\n  </pre>\r\n\r\n</div>"
     },
     {
@@ -40,6 +43,7 @@
         "Core"
       ],
       "diff": "paradigm",
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Funkce jako návratové typy</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Už jsme viděli, že návratová hodnota z funkce může být libovolného typu. A jedním z nich je stejně tak dobře právě i funkce:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# A) „normální“ varianta:\r\ndef slovo(i):\r\n    def vnitrni(txt):\r\n        return txt.split()[i]\r\n    return vnitrni\r\n\r\n# B) totéž za pomoci lambda-funkce:\r\ndef slovo(i):\r\n    return lambda txt: txt.split()[i]\r\n\r\n\r\n# Využití uzávěrů:\r\n&gt;&gt;&gt; slovo_1 = slovo(0)\r\n&gt;&gt;&gt; slovo_1( 'Ahoj, světe! Jak se máš?' )\r\n'Ahoj,'\r\n&gt;&gt;&gt; slovo_3 = slovo(2)\r\n&gt;&gt;&gt; slovo_3( 'Ahoj, světe! Jak se máš?' )\r\n'Jak'\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Zde tedy např. přiřazení <code>slovo_1 = slovo(2)</code> efektivně „vyrobí“ objekt <code>slovo_1</code> typu funkce, který se bude chovat stejně jako jeho zavedení definicí:\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\ndef slovo_1(txt):\r\n    return txt.split()[2]\r\n    </pre>\r\n  </div></div>\r\n\r\n</div>"
     },
     {
@@ -50,6 +54,7 @@
         "Core"
       ],
       "diff": "paradigm",
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Funkce jako vstupní typy</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Stejně tak může být funkce vstupním parametrem do jiné funkce:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\ndef mymap(fn, xs):\r\n    return [ fn(x) for x in xs ]\r\n\r\n\r\n# Příklad volání:\r\n&gt;&gt;&gt; mymap( abs, [2, -3, 5.4, -7.6, ] )\r\n[2, 3, 5.4, 7.6]\r\n&gt;&gt;&gt; mymap( ord, 'Ahoj, světe!' )\r\n[65, 104, 111, 106, 44, 32, 115, 118, 283, 116, 101, 33]\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Jelikož <code>abs</code> i <code>ord</code> jsou v Python'u jednoduše odkazy na objekty typu funkce, volání funkce <em>mymap(FUNKCE, ITERABLE)</em> vrátí seznam (vybudovaný pomocí generátorové notace) složený z prvků vstupního iterovatelného objektu ITERABLE, na něž je aplikována uvedená FUNKCE.\r\n  </div></div>\r\n\r\n</div>"
     },
     {
@@ -60,6 +65,7 @@
         "Core"
       ],
       "diff": "paradigm",
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Příklad</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Výše uvedené koncepty ilustruje souhrnně následující příklad:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# funkce pro umocňování, která vrací funkci\r\ndef mocni(na):\r\n    return lambda co: co ** na\r\n\r\n# seznam složený ze čtyř různých umocňovacích funkcí – x^0, x^1, x^2, x^3\r\nmocneni = [ mocni(na=i) for i in range(4) ]\r\n\r\n# „kontrolní“ výpis\r\n&gt;&gt;&gt; mocneni\r\n[&lt;function &lt;lambda&gt; at 0x00DD0B28&gt;,\r\n &lt;function &lt;lambda&gt; at 0x00DD0B70&gt;,\r\n &lt;function &lt;lambda&gt; at 0x00DD0BB8&gt;,\r\n &lt;function &lt;lambda&gt; at 0x00DD0C00&gt;]\r\n&gt;&gt;&gt; mocneni[0]\r\n&lt;function &lt;lambda&gt; at 0x00DD0B28&gt;\r\n\r\n# volání\r\n&gt;&gt;&gt; mocneni[0](2)\r\n1\r\n&gt;&gt;&gt; mocneni[1](2)\r\n2\r\n&gt;&gt;&gt; mocneni[2](2)\r\n4\r\n&gt;&gt;&gt; mocneni[3](2)\r\n8\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    PS: Také to můžete napsat rovnou pomocí lambda-funkce:\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        mocneni = [lambda x, na=i: x ** na for i in range(4)]\r\n    </pre>\r\n  </div></div>\r\n\r\n</div>"
     },
     {
@@ -70,6 +76,7 @@
         "Core"
       ],
       "diff": "paradigm",
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">PS: Funkce jako objekty</h2></div><div class=\"section-body\">\r\n  \r\n  <p class=\"enumerate\">\r\n    V Python'u jsou funkce kupodivu vlastně také objekty. A dokonce jim můžete přidávat vlastní atributy:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; def fn():\r\n...     pass\r\n&gt;&gt;&gt; fn.můj_atribut = \"To je fór!\"\r\n&gt;&gt;&gt; fn.můj_atribut\r\n'To je fór!'\r\n  </pre>\r\n  \r\n  <p class=\"enumerate\">\r\n    Že se funkce dají \"zavolat\", pak zajišťuje magická metoda <em>__call__()</em>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; def fn():\r\n...     print('Ahoj!')\r\n&gt;&gt;&gt; fn\r\n&lt;function fn at 0x000002093214E040&gt;\r\n&gt;&gt;&gt; fn()\r\nAhoj!\r\n&gt;&gt;&gt; fn.__call__\r\n&lt;method-wrapper '__call__' of function object at 0x000002093214E040&gt;\r\n&gt;&gt;&gt; fn.__call__()\r\nAhoj!\r\n  </pre>\r\n  \r\n</div>"
     }
   ]

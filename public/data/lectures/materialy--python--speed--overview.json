@@ -10,6 +10,7 @@
         "Skip"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Na spoustu věcí je Python rychlý až až, ale na skoro stejně velkou množinu použití se svojí „rychlostí“ nehodí vůbec. Nicméně ani v rychlostně více náročných aplikacích není třeba hned házet flintu do žita a jít všechno naprogramovat v něčem jiném!\r\n    </p>\r\n\r\n    <p class=\"enumerate\">\r\n        Předně můžete prostě jenom vyzkoušet jiný interpret Pythonu než klasický výchozí <em>CPython</em>. Většinou to asi žádné zázraky nebudou, ale za pokus to stojí. Možností je mnoho, já se krátce zmíním pouze o:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <a href=\"?slajd=2\"><em>PyPy</em></a>\r\n        </li>\r\n        <li>\r\n            <a href=\"?slajd=3\"><em>Numba</em></a>\r\n        </li>\r\n    </ul>\r\n\r\n    <p class=\"enumerate\">\r\n        Častěji ale asi budete muset kód trochu poupravit, tu více, tu méně, ovšem s výrazně většími efekty. Možností je opět mnoho\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            používejte <em>Numpy</em>, kde to má smysl;\r\n        </li>\r\n        <li>\r\n            kupodivu opět <a href=\"?slajd=4\"><em>Numba</em></a>, tentokrát kvůli zabudované JIT-kompilaci;\r\n        </li>\r\n        <li>\r\n            univerzální „kanón na komára“ <a href=\"?slajd=5\"><em>Cython</em></a>.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
     {
@@ -20,6 +21,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">PyPy</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <a href=\"http://pypy.org\" class=\"external\"><em>PyPy</em></a> je alternativní interpretr Python'u s několika zajímavými vlastnostmi:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            je napsán v Python'u;\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Což sice už není tak úplně pravda, ale stejně. Dnes probíhá vývoj na ose Python → jeho omezená podmnožina RPython → překlad do Céčka → kompilace.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            obsahuje JIT-kompilátor;\r\n        </li>\r\n        <li>\r\n            umožňuje psát skutečně paralelní programy (a s jistými omezeními i velmi rekurzivní);\r\n        </li>\r\n        <li>\r\n            často má menší paměťové nároky než <em>CPython</em>..\r\n        </li>\r\n        <li>\r\n            ..se kterým je ovšem maximálně kompatibilní.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Bohužel na takto velký projekt je placen převážně z dobrovolných příspěvků, a tak je celkem pochopitelně poněkud pozadu s kompatibilitou s novějšími verzemi Python'u (oficiálně uvádí 2.7.12 a 3.3.5, přičemž trojková řada je navíc docela novinka) a některými knihovnami (kupříkladu právě podpora <em>Numpy</em> nebývala nijak dobrá).\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -30,6 +32,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Numba</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Do podobného balíku jako <em>PyPy</em> spadá i <a href=\"http://numba.pydata.org\" class=\"external\"><em>Numba</em></a>:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            je vysoce kompatibilní se <em>CPython</em>em;\r\n        </li>\r\n        <li>\r\n            vyznačuje se vysokou podporou balíku <em>Numpy</em> (což je obzvláště významné);\r\n        </li>\r\n        <li>\r\n            obsahuje JIT- a AOT-kompilaci;\r\n        </li>\r\n        <li>\r\n            kód běží nad <a href=\"http://llvm.org\" class=\"external\">LLVM</a>.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Kdyby ji měl člověk používat jenom jako alternativní interpret, ne vždy si pomůže (<em>Numba</em> z <em>Condy</em> pro Python 3.5 byla na mém počítači asi o čtvrtinu pomalejší než <em>CPython</em>). Nicméně to není její jediná a hlavní silná stránka, jak se dozvíme hned <a href=\"?slajd=4\">na dalším slajdu</a>.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -41,6 +44,7 @@
         "WOW"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Numba – „@jit“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kromě nasazení jako alternativní interpretr <em>Numba</em> umí i několik velmi zajímavých vychytávek navíc. Mezi nejzajímavější patří asi:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Dekorátor <em>@jit</em>, který <em>Numbě</em> umožňuje na základě aktuálních dostupných možností odekorovanou funkci zJITovat (a tedy výrazně zrychlit její vykonávání).\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Jeho chování se dá řídit mimo jiné parametrem <code>nopython</code>, kterým můžete zabránit v tvorbě méně efektivního kódu, nedá-li se funkce rozumně zkompilovat (za cenu vyhození výjimky), nebo třeba <code>nogil</code>, kterým můžete vypnout nechvalně proslulý <a href=\"http://vyuka/materialy/python/parallelism/overview.xml?slajd=3\">GIL</a>.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            Dekorátory <em>@vectorize</em> a <em>@guvectorize</em>, které za vás doplní odekorované funkce napsané pro skalární vstupy na funkce, které zcela v duchu <em>Numpy</em> dokážou pracovat nad mnohorozměrnými poli (a to včetně vychytávek typu <a href=\"/materialy/python/numpy/broadcasting.xml\">„broadcasting“</a> a dalších).\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Podporuje-li JIT v <em>Numbě</em> vámi požadované operace, můžete takříkajíc za málo peněz získat hodně muziky – zrychlení kódu o několik desítek nebo dokonce stovek procent díky přidání dvou řádků kódu do originálního pythoního zdrojáku za pokus určitě stojí, ne?\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -51,6 +55,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Cython</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nepomohla-li <em>Numba</em>, dalším krokem je zkusit <a href=\"http://cython.org\" class=\"external\"><em>Cython</em></a>:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            provádí vlastní překlad pythoních zdrojáků (doplněných nepovinnými typy) do Céčka, které pak kompiluje a spouští často rychleji než <em>CPython</em>;\r\n        </li>\r\n        <li>\r\n            generuje kód plně kompatibilní s céčkovským API <em>CPython</em>u, takže ho můžete použít pro psaní (rychlých) knihoven prakticky v Python'u;\r\n        </li>\r\n        <li>\r\n            rozumí si velmi dobře (nejen) s <em>Numpy</em>.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Pouhé doplnění typů proměnných (a funkcí) může zabrat, ale častěji spíš nebude stačit. Pak vás ovšem čekají úpravy, které originální pythoní zdroják změní místy k nepoznání (jako například nahrazení jednořádkových kódů s univerzálními operacemi zanořenými smyčkami, které na první pohled vypadá úplně nelogicky).\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -61,6 +66,7 @@
         "Skip"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Závěr</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        TODO\r\n    </p>\r\n\r\n</div>"
     }
   ]

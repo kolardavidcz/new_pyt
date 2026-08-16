@@ -10,6 +10,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jednou z nejpomalejších částí Python'u jsou smyčky, obzvláště zanořené. Přitom operace nad poli probíhají nad jejich prvky a nepřekvapivě jsou nejsnáze realizovatelné právě pomocí zanořených smyček (typicky postupně přes všechny dimenze pole). Je tudíž asi celkem jasné, že pokud by se operace v Numpy zapisovaly pomocí pythonovských smyček, byly by ukrutně pomalé.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        A navíc pěkně nepřehledné – porovnejte si zápis skalárního součinu vektoru se sebou (jednodušší to už být nemůže) pomocí smyčky a dedikovaným operátorem:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n            # smyčka přes prvky\r\n&gt;&gt;&gt; v = np.array([1, 2, 3])\r\n&gt;&gt;&gt; sum(x*x for x in v)\r\n            14\r\n            \r\n            # dedikovaný operátor\r\n&gt;&gt;&gt; v @ v\r\n            14\r\n        </pre>\r\n    </div></div>\r\n    <p>\r\n        Není tudíž divu, že operace a funkce v Numpy jsou vymyšlené a postavené tak, aby na svých vstupech přijímaly celá různorozměrná pole a pro jejich smysluplné kombinace dávaly výsledky opět v podobě odpovídajících numpyovských polí.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -20,6 +21,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Příklad – funkce „signum()“ I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Matematicky je funkce <em>signum()</em> definována jednoduše:\r\n    </p>\r\n    $$\r\n        sgn(x) = \\{ {\\table x&gt;0 ⇒ +1; x=0 ⇒ 0; x&lt;0 ⇒ -1 }\r\n    $$\r\n    <p>\r\n        A této definici přesně odpovídá numpyovská funkce <code>numpy.sign()</code>.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -30,6 +32,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Příklad – funkce „signum()“ II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Aplikace této funkce na různěrozměrná pole dopadne očekávaně:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# 0D – číslo\r\n&gt;&gt;&gt; np.sign(-3)\r\n-1\r\n\r\n# 1D – vektor\r\n&gt;&gt;&gt; a = np.array([-3, 2, 0, -7, 4])\r\n&gt;&gt;&gt; np.sign(a)\r\narray([-1,  1,  0, -1,  1])\r\n\r\n# 2D – pole (matice)\r\n&gt;&gt;&gt; b = np.array([[-3, 2, 0, -7, 4], [6, -9, 5, 0, -2]])\r\n&gt;&gt;&gt; np.sign(b)\r\narray([[-1,  1,  0, -1,  1],\r\n       [ 1, -1,  1,  0, -1]])\r\n</pre>\r\n    <p>\r\n        Všimněte si především, že funkci <code>numpy.sign()</code> je srdečně jedno, jak rozměrné pole jí předhodíte! Ve všech případech aplikuje požadovanou operaci prvek po prvku.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -40,6 +43,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Co je to „vektorizace“?</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Obecně v Numpy <strong>vektorizace</strong> znamená, že danou operaci popíšete na úrovni celých polí (ať už jsou to matice, vektory nebo něco jiného) a nemusíte kvůli ní vytvářet zanořené smyčky přes všechny prvky objektu.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Správný numpyovský kód také poznáte podle toho, že je v maximální možné míře vektorizovaný. Protože pak je nejrychlejší. Bohužel je to zároveň ta nejtěžší věc, kterou se kdy v Numpy pokusíme naučit.\r\n    </div></div>\r\n    <p>\r\n        V podstatě to znamená, že takovéto tzv. <strong>univerzální funkce</strong> (<em>ufunc</em>) v Numpy jsou schopny po prvcích zpracovat pole různých rozměrů a – což je pro nás nyní důležité – dokonce je možno si takové funkce sami vytvořit.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -50,6 +54,7 @@
         "Legendary"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Dekorátor „@numpy.vectorize()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <strong>Vektorizovanou funkci</strong> vytvoříme velmi jednoduše:\r\n    </p>\r\n    <blockquote>\r\n        Napíšeme funkci pro skalární vstup a opatříme ji dekorátorem <code>@numpy.vectorize</code>.\r\n    </blockquote>\r\n    <p>\r\n        Světe div se, tohle opravdu stačí. Dekorátor se totiž postará o aplikaci uvedené funkce na všechny (skalární) prvky příslušného vstupního pole, ať je jakkoli složité.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -60,6 +65,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Příklad – modifikovaná funkce „signum()“ I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        V některých úlohách (např. <a href=\"/materialy/techs/neurons/hopfield.xml\">Hopfieldovy neuronové sítě</a>) by se nám hodila funkce <em>signum()</em> s trošku jiným chováním:\r\n    </p>\r\n    $$\r\n        sgn(x) = \\{ {\\table x≥0 ⇒ +1; x&lt;0 ⇒ -1 }\r\n    $$\r\n    <p>\r\n        Vidíme, že od běžné funkce <em>signum()</em> se liší chováním v nule. Jak ji ale napsat?\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -70,6 +76,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Příklad – modifikovaná funkce „signum()“ II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nejsnažší bude rovnou ukázat řešení:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        from numpy import vectorize\r\n        \r\n        @vectorize\r\n        def mysign(x):\r\n            if x &gt;= 0:\r\n                return 1\r\n            else:\r\n                return -1\r\n    </pre>\r\n    <p>\r\n        Všimněte si, že <strong>funkce je napsána pro skalární vstup</strong>! Nicméně numpyovský dekorátor <code>@vectorize</code> zajistí, že se bude chovat přesně tak, jak potřebujeme.\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -80,6 +87,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Příklad – modifikovaná funkce „signum()“ III</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Což si snadno ověříme (srovnejte <a href=\"?slajd=3\">s prvním příkladem</a>):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# 0D – číslo\r\n&gt;&gt;&gt; mysign(-3)\r\n-1\r\n\r\n# 1D – vektor\r\n&gt;&gt;&gt; a = np.array([-3, 2, 0, -7, 4])\r\n&gt;&gt;&gt; mysign(a)\r\narray([-1,  1,  1, -1,  1])\r\n\r\n# 2D – pole (matice)\r\n&gt;&gt;&gt; b = np.array([[-3, 2, 0, -7, 4], [6, -9, 5, 0, -2]])\r\n&gt;&gt;&gt; mysign(b)\r\narray([[-1,  1,  1, -1,  1],\r\n       [ 1, -1,  1,  1, -1]])\r\n</pre>\r\n    <p>\r\n    </p>\r\n\r\n</div>"
     },
     {
@@ -90,6 +98,7 @@
         "Core"
       ],
       "diff": null,
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ve skutečnosti <em>vektorizovat kód</em> tak, aby jeho běh byl v Numpy optimální, je <a href=\"/materialy/python/speed/example-1.xml?slajd=12\">PEKELNĚ netriviální záležitost</a>. V podstatě když nevíte, co máte přesně udělat, tak to ani nenajdete na netu.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        No, dneska (psáno na jaře 2023) vám to už možná předžvejká <em>ChatGPT</em>, ale výsledek si ověřte – má neuvěřitelné sklony k vydávání výmyslů za pravdu. A ještě vám je zabalí do ukrutně uhlazené a nafoukané omáčky balastu.\r\n    </div></div>\r\n    <p>\r\n        V této přednášce jsme si z rozsáhlého oboru vektorizace kódu v <em>Numpy</em> ukázali pouze jedinou věc – jak si napsat vlastní <em>univerzální funkci</em>. Nicméně pro začátek to snad stačí.\r\n    </p>\r\n\r\n</div>"
     }
   ]
