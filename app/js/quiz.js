@@ -351,7 +351,8 @@ export async function renderQuizSection(item) {
         rawCorrect = q.options[ansIdx] || q.options[0];
       }
 
-      const expectedClean = rawCorrect.replace(/^[A-D]\)\s*/, "").trim();
+      const expectedClean = rawCorrect.replace(/^[A-D]\)\s*/, "").split("#")[0].trim();
+      const blankLen = Math.max(6, Math.min(24, expectedClean.length + 2));
 
       if (codeWrapEl) {
         codeWrapEl.dataset.hl = "1";
@@ -359,7 +360,7 @@ export async function renderQuizSection(item) {
         if (cn) cn.dataset.hl = "1";
       }
 
-      const inlineInputHtml = `<input type="text" class="inline-code-fill-input" size="${Math.max(6, expectedClean.length + 1)}" autocomplete="off" spellcheck="false" placeholder="doplňte kód..." aria-label="Napište chybějící kód" />`;
+      const inlineInputHtml = `<input type="text" class="inline-code-fill-input" size="${blankLen}" style="--blank-len:${blankLen};" data-len="${blankLen}" autocomplete="off" spellcheck="false" placeholder="doplňte kód..." aria-label="Napište chybějící kód" />`;
       let inserted = false;
       if (codeWrapEl) {
         const codeNode = codeWrapEl.querySelector("code");
@@ -606,12 +607,16 @@ export async function renderQuizSection(item) {
   const answerKeyEl = el("div", { className: "quiz-answer-key-upsidedown" });
   let answerKeyItems = questions.map((q, i) => {
     let ansStr = "";
-    if (typeof q.answer === "number" && q.options && q.options[q.answer]) {
-      ansStr = q.options[q.answer];
+    if (q.type === "fill_blank_choice" || q.type === "code_fill") {
+      const exp = q.expected || (q.options && typeof q.answer === "number" ? q.options[q.answer] : String(q.answer || ""));
+      const cleanToken = exp.split("#")[0].replace(/^[A-D]\)\s*/, "").trim();
+      ansStr = `<code class="inline-code">${escapeHtml(cleanToken)}</code>`;
+    } else if (typeof q.answer === "number" && q.options && q.options[q.answer]) {
+      ansStr = formatInlineCode(q.options[q.answer]);
     } else {
-      ansStr = String(q.answer || "");
+      ansStr = formatInlineCode(String(q.answer || ""));
     }
-    return `<li><strong>Otázka ${i + 1}:</strong> ${formatInlineCode(ansStr)}</li>`;
+    return `<li><strong>Otázka ${i + 1}:</strong> ${ansStr}</li>`;
   }).join("");
 
   answerKeyEl.innerHTML = `
