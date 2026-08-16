@@ -4,8 +4,8 @@
     "type": "multiple_choice",
     "question": "Co přesně představuje projekt Cython z hlediska architektury?",
     "options": [
-      "A) Grafické vývojové prostředí určené pro automatický přepis Python skriptů do jazyka Java.",
-      "B) JIT kompilátor napsaný v C++, který nahrazuje standardní virtuální stroj CPython za běhu.",
+      "A) JIT kompilátor napsaný v C++, který nahrazuje standardní virtuální stroj CPython za běhu.",
+      "B) Grafické vývojové prostředí určené pro automatický přepis Python skriptů do jazyka Java.",
       "C) Jazyk rozšiřující Python o statické typy a kompilátor překládající tento kód do jazyka C/C++.",
       "D) Samostatný interpret Pythonu nezařazený do CPythonu, který nevyžaduje použití kompilátoru C."
     ],
@@ -15,16 +15,15 @@
   {
     "id": "q2",
     "type": "fill_blank_choice",
-    "question": "Doplňte klíčové slovo Cythonu pro deklaraci staticky typované proměnné bez režie PyObject:",
+    "question": "Doplňte klíčové slovo Cythonu pro definici staticky typované celočíselné C proměnné i:\n\n```cython\ndef suma(int n):\n    ________ int i\n    cdef int s = 0\n    for i in range(n):\n        s += i\n    return s\n```",
     "options": [
+      "static",
       "typed",
       "var",
-      "static",
       "cdef"
     ],
     "answer": 3,
-    "explanation": "Klíčové slovo cdef v Cythonu slouží k deklaraci nativních C proměnných, struktur a funkcí s nulovou režií Python objektů.",
-    "code": "# Cython deklarace staticky typovaných C proměnných:\ndef compute_sum(int n):\n    ________ int total = 0\n    cdef int i\n    for i in range(n):\n        total += i\n    return total",
+    "explanation": "Klíčové slovo cdef slouží v Cythonu k definici staticky typovaných C proměnných, funkcí nebo struktur. Proměnné vytvořené přes cdef nemají režii Python objektů (PyObject).",
     "expected": "cdef"
   },
   {
@@ -33,9 +32,9 @@
     "question": "Jakého zrychlení typicky dosáhne čistý Python skript bez typových anotací pouhým překladem pomocí Cythonu?",
     "options": [
       "A) Zrychlení o 20 % až 50 % díky eliminaci režie interpretace bajtkódu virtuálním strojem.",
-      "B) Zrychlení o 100x až 1000x, protože Cython automaticky odvodí všechny statické C typy.",
-      "C) Zpomalení o 50 %, protože volání C-API přes vygenerované C soubory přináší novou režii.",
-      "D) Žádného zrychlení, protože bez klíčového slova cdef se vygeneruje identický bajtkód."
+      "B) Zpomalení o 50 %, protože volání C-API přes vygenerované C soubory přináší novou režii.",
+      "C) Žádného zrychlení, protože bez klíčového slova cdef se vygeneruje identický bajtkód.",
+      "D) Zrychlení o 100x až 1000x, protože Cython automaticky odvodí všechny statické C typy."
     ],
     "answer": 0,
     "explanation": "Čistý Python kód (bez cdef) přeložený Cythonem běží přes C-API CPythonu. Odstraní se pouze režie interpretace eval-smyčky bytekódu, což typicky přináší zrychlení o cca 20 % až 50 %."

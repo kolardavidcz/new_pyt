@@ -4,8 +4,8 @@
     "type": "multiple_choice",
     "question": "Co bude výsledkem následujícího spojení cest pomocí os.path.join v POSIX systému?\n\nimport os\nprint(os.path.join('data', 'projects', '/etc', 'config.txt'))",
     "options": [
-      "A) Vrátí 'data/projects/etc/config.txt', protože funkce automaticky odstraní úvodní lomítka ze všech vnitřních částí.",
-      "B) Vyvolá výjimku ValueError, protože absolutní cesty nelze podle specifikace předávat doprostřed seznamu argumentů.",
+      "A) Vyvolá výjimku ValueError, protože absolutní cesty nelze podle specifikace předávat doprostřed seznamu argumentů.",
+      "B) Vrátí 'data/projects/etc/config.txt', protože funkce automaticky odstraní úvodní lomítka ze všech vnitřních částí.",
       "C) Vrátí 'data/projects//etc/config.txt', protože metoda zachová dvě lomítka vedle sebe bez jakékoli úpravy řetězce.",
       "D) Vrátí '/etc/config.txt', protože výskyt absolutní cesty způsobený počátečním lomítkem zahodí všechny předchozí části."
     ],
@@ -45,10 +45,10 @@
     "type": "multiple_choice",
     "question": "Který modul a funkce se v Pythonu používají pro zkopírování souboru včetně zachování jeho metadat?",
     "options": [
-      "A) Funkce os.path.copy(), protože modul os.path přímo manipuluje s objektovými strukturami souborového systému.",
-      "B) Funkce os.copyfile(), protože nízkoúrovňový modul os jako jediný garantuje přímý nízkoúrovňový přenos metadat.",
+      "A) Funkce os.copyfile(), protože nízkoúrovňový modul os jako jediný garantuje přímý nízkoúrovňový přenos metadat.",
+      "B) Funkce shutil.move(), protože při přesunu souboru dochází ke kaskádovému kopírování metadat bez ztráty dat.",
       "C) Funkce shutil.copy2(), protože na rozdíl od základního os či shutil.copy() uchovává i časová razítka a atributy.",
-      "D) Funkce shutil.move(), protože při přesunu souboru dochází ke kaskádovému kopírování metadat bez ztráty dat."
+      "D) Funkce os.path.copy(), protože modul os.path přímo manipuluje s objektovými strukturami souborového systému."
     ],
     "answer": 2,
     "explanation": "Základní modul `os` neobsahuje funkce pro kopírování souborů. K tomuto účelu slouží modul `shutil`. Zatímco `shutil.copy()` kopíruje pouze obsah a práva, `shutil.copy2()` navíc kopíruje i všechna ostatní dostupná metadata (např. čas posledního přístupu a modifikace)."
@@ -59,8 +59,8 @@
     "question": "Doplňte rozbalení n-tice z generátoru os.walk() pro iteraci přes adresářový strom:",
     "options": [
       "root, files, dirs",
-      "dirs, root, files",
       "path, subdirs, files",
+      "dirs, root, files",
       "root, dirs, files"
     ],
     "answer": 3,
@@ -74,9 +74,9 @@
     "question": "Co se stane při volání funkce os.remove() na cestu, která ukazuje na neprázdný adresář?",
     "options": [
       "A) Python vyvolá výjimku (např. IsADirectoryError či OSError), protože os.remove() slouží výhradně k mazání souborů.",
-      "B) Adresář se bez varování smazá včetně veškerého obsahu, protože os.remove() funguje rekurzivně pro všechny cesty.",
-      "C) Python automaticky přesune adresář do dočasné systémové složky a vyvolá varování typu DeprecationWarning.",
-      "D) Funkce smaže pouze prázdný adresář, ale pokud obsahuje soubory, ticho vrací hodnotu False bez vyvolání výjimky."
+      "B) Python automaticky přesune adresář do dočasné systémové složky a vyvolá varování typu DeprecationWarning.",
+      "C) Funkce smaže pouze prázdný adresář, ale pokud obsahuje soubory, ticho vrací hodnotu False bez vyvolání výjimky.",
+      "D) Adresář se bez varování smazá včetně veškerého obsahu, protože os.remove() funguje rekurzivně pro všechny cesty."
     ],
     "answer": 0,
     "explanation": "`os.remove()` (rovněž přístupný jako `os.unlink()`) odstraňuje výhradně soubory. Pokud je předaná cesta adresářem, operační systém / Python vyvolá výjimku `IsADirectoryError` (na POSIXu) nebo `PermissionError`/`OSError` (na Windows). Pro odstranění adresáře je nutné použít `os.rmdir()` (pro prázdný) nebo `shutil.rmtree()` (pro celý strom)."
@@ -86,10 +86,10 @@
     "type": "multiple_choice",
     "question": "Jak se chová objekt os.environ s proměnnými prostředí během běhu Python skriptu?",
     "options": [
-      "A) Vytváří izolovanou kopii pro každou funkci ve skriptu, takže změny provedené v jedné funkci se nešíří dál.",
+      "A) Dynamicky dotazuje operační systém při každém čtení klíče, takže ihned reflektuje změny externích procesů.",
       "B) Načte proměnné prostředí při prvním importu modulu os a přímou modifikací os.environ zapsané změny promítne.",
-      "C) Dynamicky dotazuje operační systém při každém čtení klíče, takže ihned reflektuje změny externích procesů.",
-      "D) Je to pouze neproměnný objekt typu tuple, do kterého nelze během běhu skriptu přidávat ani měnit klíče."
+      "C) Je to pouze neproměnný objekt typu tuple, do kterého nelze během běhu skriptu přidávat ani měnit klíče.",
+      "D) Vytváří izolovanou kopii pro každou funkci ve skriptu, takže změny provedené v jedné funkci se nešíří dál."
     ],
     "answer": 1,
     "explanation": "`os.environ` je slovníku podobný objekt (mapování), který se naplní hodnotami proměnných prostředí v momentě prvního importu modulu `os`. Úpravy provedené přímo v `os.environ` se uplatní v běžícím skriptu i v podprocesech vytvářených z Pythonu."
@@ -99,10 +99,10 @@
     "type": "multiple_choice",
     "question": "Proč je v Pythonu preferováno otevírat soubor v bloku try-except místo předchozí kontroly přes os.access()?",
     "options": [
-      "A) Metoda os.access() funguje pouze na operačním systému Windows a na Unixu způsobuje neplatné selhání přístupu.",
-      "B) Volání funkce os.access() je v Pythonu zastaralé a vyvolá při použití v novějších verzích DeprecationWarning.",
+      "A) Blok try-except automaticky uzamkne soubor na úrovni operačního systému proti zápisu ostatními procesy.",
+      "B) Metoda os.access() funguje pouze na operačním systému Windows a na Unixu způsobuje neplatné selhání přístupu.",
       "C) Předchází se tím souběhu (TOCTOU) mezi kontrolou a otevřením a kód lépe odpovídá pythonímu principu EAFP.",
-      "D) Blok try-except automaticky uzamkne soubor na úrovni operačního systému proti zápisu ostatními procesy."
+      "D) Volání funkce os.access() je v Pythonu zastaralé a vyvolá při použití v novějších verzích DeprecationWarning."
     ],
     "answer": 2,
     "explanation": "Kontrola přístupových práv předem pomocí `os.access()` trpí problémem zvaným TOCTOU (Time-of-Check to Time-of-Use): mezi kontrolou a samotným otevřením souboru se stav souborového systému může změnit. Python proto prosazuje přístup EAFP (Easier to ask for forgiveness than permission) – rovnou se pokusit soubor otevřít a případnou chybu zachytit."

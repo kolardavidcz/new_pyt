@@ -4,10 +4,10 @@
     "type": "multiple_choice",
     "question": "Proč modul timeit při měření doby vykonávání kódu standardně vypíná garbage collector (GC)?",
     "options": [
-      "A) Zabraňuje havárii interpreteru při opakovaném vytváření proměnných v globálním prostoru.",
-      "B) GC v Pythonu nelze spustit uvnitř vedlejšího vlákna, ve kterém modul měření provádí.",
+      "A) GC v Pythonu nelze spustit uvnitř vedlejšího vlákna, ve kterém modul měření provádí.",
+      "B) Vypnutí GC je nutné pro převod pythonního kódu do rychlých instrukcí C v paměti.",
       "C) Zajišťuje tím stabilnější a reprodukovatelnější výsledky neovlivněné úklidem paměti.",
-      "D) Vypnutí GC je nutné pro převod pythonního kódu do rychlých instrukcí C v paměti."
+      "D) Zabraňuje havárii interpreteru při opakovaném vytváření proměnných v globálním prostoru."
     ],
     "answer": 2,
     "explanation": "Běh garbage collectoru zanáší do měření nahodilé časové odchylky. Proto jej timeit ve výchozím stavu vypíná, aby poskytl konzistentnější výsledky."
@@ -18,8 +18,8 @@
     "question": "K čemu slouží parametr setup při vytváření instance timeit.Timer(stmt, setup)?",
     "options": [
       "A) Definuje seznam C knihoven, které mají mít přednost před čistou implementací Pythonu.",
-      "B) Určuje cestu k profilovacímu souboru, do kterého se uloží kompletní výstup cProfile.",
-      "C) Nastavuje časový limit v sekundách, po jehož překročení je měření skriptu stornováno.",
+      "B) Nastavuje časový limit v sekundách, po jehož překročení je měření skriptu stornováno.",
+      "C) Určuje cestu k profilovacímu souboru, do kterého se uloží kompletní výstup cProfile.",
       "D) Obsahuje kód pro inicializaci proměnných, který se provede, ale nezapočítává do měření."
     ],
     "answer": 3,
@@ -43,10 +43,10 @@
     "type": "fill_blank_choice",
     "question": "Kterým přepínačem předáte modulu timeit v příkazové řádce inicializační kód (setup), který se provede pouze jednou před měřením?",
     "options": [
-      "-i",
-      "-s",
       "-n",
-      "-t"
+      "-s",
+      "-t",
+      "-i"
     ],
     "answer": 1,
     "explanation": "Přepínač -s (zkratka pro --setup) v modulu timeit definuje kód, který se provede pouze jednou při inicializaci před měřicí smyčkou.",
@@ -59,9 +59,9 @@
     "question": "Co se stane, pokud při měření přes CLI python -m timeit nespecifikujeme počet opakování přepínačem -n?",
     "options": [
       "A) Vykoná se přesně 1 000 000 opakování bez ohledu na to, jak dlouho výpočet kódu trvá.",
-      "B) Kód se spustí pouze jednou a naměřený čas se vynásobí konstanta frekvence procesoru.",
+      "B) Měření selže s chybou ValueError, protože počet opakování je povinný argument CLI.",
       "C) Modul automaticky zvyšuje počet opakování, dokud celková doba nedosáhne alespoň 0,2 s.",
-      "D) Měření selže s chybou ValueError, protože počet opakování je povinný argument CLI."
+      "D) Kód se spustí pouze jednou a naměřený čas se vynásobí konstanta frekvence procesoru."
     ],
     "answer": 2,
     "explanation": "Pokud -n není zadáno, timeit automaticky zkouší sekvence 1, 2, 5, 10, 20, 50... opakování, dokud celková doba celého běhu nepřesáhne 0,2 sekundy."

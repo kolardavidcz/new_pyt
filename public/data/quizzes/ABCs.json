@@ -4,9 +4,9 @@
     "type": "multiple_choice",
     "question": "V jakém okamžiku vyvolá Python výjimku TypeError, pokud podtřída neodvozená od ABC neobsahuje implementaci abstraktní metody rodiče?\n\n```python\nfrom abc import ABCMeta, abstractmethod\n\nclass Base(metaclass=ABCMeta):\n    @abstractmethod\n    def compute(self):\n        pass\n\nclass Sub(Base):\n    pass\n```",
     "options": [
-      "A) K žádné výjimce nedojde, protože podtřída automaticky podědí prázdnou implementaci metody compute od Base.",
-      "B) Již při samotné definici třídy class Sub(Base):, kdy interpret prochází a překládá kód tridy.",
-      "C) Až při pokusu o přímé zavolání chybějící metody s.compute(), podobně jako u výjimky NotImplementedError.",
+      "A) Již při samotné definici třídy class Sub(Base):, kdy interpret prochází a překládá kód tridy.",
+      "B) Až při pokusu o přímé zavolání chybějící metody s.compute(), podobně jako u výjimky NotImplementedError.",
+      "C) K žádné výjimce nedojde, protože podtřída automaticky podědí prázdnou implementaci metody compute od Base.",
       "D) Při pokusu o vytvoření instance s = Sub(), kde Python ověří kompletnost abstraktních metod v rozhraní."
     ],
     "answer": 3,
@@ -18,8 +18,8 @@
     "question": "Doplňte metatřídu z modulu abc pro vynucení implementace abstraktních metod v odvozených třídách:",
     "options": [
       "ABCMeta",
-      "TypeMeta",
       "ABC",
+      "TypeMeta",
       "AbstractMeta"
     ],
     "answer": 0,
@@ -34,8 +34,8 @@
     "options": [
       "A) Pořadí obou dekorátorů je libovolné, protože dekorátor @abstractmethod automaticky detekuje okolní metody.",
       "B) @classmethod musí být jako vnější dekorátor a @abstractmethod jako vnitřní dekorátor přímo nad def.",
-      "C) Dekorační funkce @classmethod a @abstractmethod nelze u jedné metody v Pythonu vůbec kombinoat.",
-      "D) @abstractmethod musí být jako vnější dekorátor a @classmethod jako vnitřní dekorátor přímo nad def."
+      "C) @abstractmethod musí být jako vnější dekorátor a @classmethod jako vnitřní dekorátor přímo nad def.",
+      "D) Dekorační funkce @classmethod a @abstractmethod nelze u jedné metody v Pythonu vůbec kombinoat."
     ],
     "answer": 1,
     "explanation": "Podle dokumentace Pythonu musí být @abstractmethod aplikován jako poslední (tzn. nejblíže k samotné funkci u příkazu def), zatímco @classmethod (nebo @staticmethod či @property) balí až takto označenou abstraktní metodu."
@@ -57,9 +57,9 @@
     "question": "Proč je použití ABCMeta a @abstractmethod pedagogicky i architektonicky výhodnější než pouhé vyvolávání raise NotImplementedError() v těle metod rodiče?",
     "options": [
       "A) Automaticky vygeneruje výchozí prázdné implementace pro všechny abstraktní metody přímo u odvozené třídy.",
-      "B) Umožňuje spouštět neimplementované metody bez vyvolání jakékoliv výjimky s výchozí návratovou hodnotou None.",
+      "B) Zajišťuje výrazné zrychlení běhu kódu zkompilováním abstraktních metod do nativních instrukcí CPythonu.",
       "C) Odhalí neúplnou implementaci API již při tvorbě instance, nikoliv až v momentu zavolání neimplementované metody.",
-      "D) Zajišťuje výrazné zrychlení běhu kódu zkompilováním abstraktních metod do nativních instrukcí CPythonu."
+      "D) Umožňuje spouštět neimplementované metody bez vyvolání jakékoliv výjimky s výchozí návratovou hodnotou None."
     ],
     "answer": 2,
     "explanation": "Použití raise NotImplementedError() v těle metody selže až ve chvíli, kdy kód v produkci danou metodu zavolá. Použití ABCMeta zabrání samotné instanciaci objektu, čímž chybu neúplného rozhraní odhalí ihned."

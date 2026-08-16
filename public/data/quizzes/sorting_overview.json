@@ -18,9 +18,9 @@
     "type": "multiple_choice",
     "question": "Jaký je hlavní rozdíl mezi funkcí sorted() a metodou list.sort()?",
     "options": [
-      "A) sorted() vyžaduje povinný parametr key, zatímco metoda list.sort() řadí prvky výhradně bez klíče.",
-      "B) sorted() funguje výhradně pro číselná pole, zatímco metoda list.sort() je určená pouze pro textové řetězce.",
-      "C) sorted() mění původní datovou strukturu v místě, zatímco list.sort() vrací zkopírovaný setříděný seznam.",
+      "A) sorted() mění původní datovou strukturu v místě, zatímco list.sort() vrací zkopírovaný setříděný seznam.",
+      "B) sorted() vyžaduje povinný parametr key, zatímco metoda list.sort() řadí prvky výhradně bez klíče.",
+      "C) sorted() funguje výhradně pro číselná pole, zatímco metoda list.sort() je určená pouze pro textové řetězce.",
       "D) sorted() akceptuje libovolný iterovatelný objekt a vrací nový seznam, zatímco list.sort() mění seznam v místě."
     ],
     "answer": 3,
@@ -33,9 +33,9 @@
     "code_snippet": "res = [1, ['a', 'c']] < [1, ['a', 'b'], 3]\nprint(res)",
     "options": [
       "A) False — o výsledku rozhodla první neshodná dvojice prvků ('c' > 'b'), délka seznamu se neuvažuje.",
-      "B) True — řetězec 'c' má v tabulce Unicode vyšší pořadové číslo než 'b', což dává přednost levé straně.",
-      "C) TypeError — vnořené seznamy nelze porovnávat přímo bez předchozího převedení na jednoduché n-tice.",
-      "D) True — druhý seznam je delší a obsahuje více prvků, takže má při lexikografickém porovnání přednost."
+      "B) True — druhý seznam je delší a obsahuje více prvků, takže má při lexikografickém porovnání přednost.",
+      "C) True — řetězec 'c' má v tabulce Unicode vyšší pořadové číslo než 'b', což dává přednost levé straně.",
+      "D) TypeError — vnořené seznamy nelze porovnávat přímo bez předchozího převedení na jednoduché n-tice."
     ],
     "answer": 0,
     "explanation": "V Pythonu probíhá porovnávání sekvencí lexikograficky prvek po prvku. Na druhém indexu se porovnávají podseznamy ['a', 'c'] a ['a', 'b']. V nich je prvním neshodným prvkem 'c' a 'b'. Jelikož 'c' > 'b', je výraz ['a', 'c'] < ['a', 'b'] nepravdivý (False). Délka vnějšího seznamu už nehraje roli."
@@ -46,10 +46,10 @@
     "question": "Co se stane při pokusu o setřídění seznamu obsahujícího smíšené typy?\n`python\nxs = ['a', 5, 'c']\nprint(sorted(xs))\n`",
     "code_snippet": "xs = ['a', 5, 'c']\nprint(sorted(xs))",
     "options": [
-      "A) ['5', 'a', 'c'] — čísla se v předstihu implicitně přetypují na textové řetězce a seřadí abecedně.",
+      "A) [5, 'a', 'c'] — číselné hodnoty se automaticky seřadí před textové řetězce podle systémového typu.",
       "B) TypeError — v Pythonu 3 nejsou typy str a int navzájem porovnatelné pomocí operátoru menší než.",
       "C) ['a', 5, 'c'] — seznam zůstane v původním pořadí, protože porovnání nekompatibilních typů se přeskočí.",
-      "D) [5, 'a', 'c'] — číselné hodnoty se automaticky seřadí před textové řetězce podle systémového typu."
+      "D) ['5', 'a', 'c'] — čísla se v předstihu implicitně přetypují na textové řetězce a seřadí abecedně."
     ],
     "answer": 1,
     "explanation": "V Pythonu 3 vyžaduje řazení, aby prvky byly navzájem porovnatelné (<). Protože relace 'a' < 5 mezi str a int není definována, vyvolá volání sorted() výjimku TypeError: unorderable types: str() < int()."
@@ -57,18 +57,17 @@
   {
     "id": "q5",
     "type": "fill_blank_choice",
-    "question": "Doplňte funkci z modulu `operator`, která vytvoří extraktor hodnoty na zadaném indexu n-tice pro řazení.",
+    "question": "Doplňte kód pro setřídění seznamu n-tic podle jejich druhé položky za pomoci funkce z modulu operator.\n`python\nfrom operator import ________\npairs = [('a', 3), ('b', 1), ('c', 2)]\nresult = sorted(pairs, key=itemgetter(1))\n`\n\n```python\n# Doplňte kód pro setřídění seznamu n-tic podle jejich druhé položky za pomoci funkce z modulu operator.\n`python\nfrom operator import ________\npairs = [('a', 3), ('b', 1), ('c', 2)]\nresult = sorted(pairs, key=itemgetter(1))\n`\nvysledek = ________\n```",
     "code_snippet": "from operator import ________\npairs = [('a', 3), ('b', 1), ('c', 2)]\nresult = sorted(pairs, key=itemgetter(1))",
     "options": [
-      "item",
-      "attrgetter",
-      "itemgetter",
-      "methodcaller"
+      "methodcaller — funkce z modulu operator volající specifikovanou metodu nad každým prvkem.",
+      "attrgetter — funkce z modulu operator přistupující k pojmenovaným atributům daných objektů.",
+      "itemgetter — funkce z modulu operator vytvářející klíčový objekt",
+      "elementwise — funkce z modulu operator umožňující vektorské porovnávání prvků sekvence."
     ],
     "answer": 2,
-    "explanation": "Funkce `operator.itemgetter(1)` zkonstruuje rychlý extraktor pro přístup k indexu 1, což slouží jako efektivní ekvivalent `lambda x: x[1]` pro funkci `sorted()`.",
-    "code": "from operator import ________\n\n# Seznam naměřených vzorků: (id_vzorku, absorbance)\nsamples = [(\"S1\", 0.45), (\"S2\", 0.12), (\"S3\", 0.89)]\nsorted_samples = sorted(samples, key=itemgetter(1))\n# Výstup: [('S2', 0.12), ('S1', 0.45), ('S3', 0.89)]",
-    "expected": "itemgetter"
+    "explanation": "operator.itemgetter(1) vytvoří callable objekt, který pro předaný prvek vrací x[1]. Je to výkonnější a čitelnější ekvivalent lambda funkce lambda x: x[1].",
+    "expected": "itemgetter — funkce z modulu operator vytvářející klíčový objekt"
   },
   {
     "id": "q6",
@@ -77,8 +76,8 @@
     "code_snippet": "data = ['Wendy', 'Pete', 'Jane', 'Ix']\nprint(sorted(data, key=lambda x: (len(x), x)))",
     "options": [
       "A) ['Jane', 'Pete', 'Wendy', 'Ix'] — sekundární abecední kritérium seřadí prvky od nejdelšího slova.",
-      "B) ['Wendy', 'Pete', 'Jane', 'Ix'] — použití n-tice v lambda funkci způsobí chyba vyhodnocení klíče.",
-      "C) ['Ix', 'Pete', 'Jane', 'Wendy'] — prvky se stejnou délkou si zachovají své původní pořadí ze vstupu.",
+      "B) ['Ix', 'Pete', 'Jane', 'Wendy'] — prvky se stejnou délkou si zachovají své původní pořadí ze vstupu.",
+      "C) ['Wendy', 'Pete', 'Jane', 'Ix'] — použití n-tice v lambda funkci způsobí chyba vyhodnocení klíče.",
       "D) ['Ix', 'Jane', 'Pete', 'Wendy'] — prvky jsou seřazeny primárně podle délky a sekundárně abecedně."
     ],
     "answer": 3,
@@ -98,17 +97,16 @@
   {
     "id": "q8",
     "type": "fill_blank_choice",
-    "question": "Doplňte pojmenovaný argument funkce `sorted()`, který zajistí sestupné seřazení naměřených teplot.",
+    "question": "Doplňte parametr funkce sorted() pro obrácení pořadí prvků od největšího po nejmenší.\n`python\nnumbers = [1, 5, 3, 2, 4]\nresult = sorted(numbers, ________=True)\n`\n\n```python\n# Doplňte parametr funkce sorted() pro obrácení pořadí prvků od největšího po nejmenší.\n`python\nnumbers = [1, 5, 3, 2, 4]\nresult = sorted(numbers, ________=True)\n`\nvysledek = ________\n```",
     "code_snippet": "numbers = [1, 5, 3, 2, 4]\nresult = sorted(numbers, ________=True)",
     "options": [
-      "reverse",
-      "backward",
-      "inverted",
-      "descending"
+      "reverse — pojmenovaný boolean parametr otočující směr porovnávání všech prvků při řazení.",
+      "descending — nepovinný argument přepínající algoritmus do režimu sestupného třídění prvků.",
+      "inverted — pojmenovaný parametr způsobující předřazení záporného znaménka u číselných typů.",
+      "backward — příznak určující načítání vstupního iterovatelného objektu od posledního prvku."
     ],
     "answer": 0,
-    "explanation": "Pojmenovaný argument `reverse=True` u `sorted()` a `list.sort()` otočí výchozí vzestupné řazení na sestupné.",
-    "code": "temperatures = [21.5, 38.2, 19.0, 42.1, 27.8]\ndescending = sorted(temperatures, ________=True)\n\n# Výstup: [42.1, 38.2, 27.8, 21.5, 19.0]\nprint(descending)",
-    "expected": "reverse"
+    "explanation": "Funkce sorted() i metoda list.sort() přebírají nepovinný pojmenovaný parametr reverse. Při nastavení reverse=True probíhá třídění v opačném (sestupném) pořadí.",
+    "expected": "reverse — pojmenovaný boolean parametr otočující směr porovnávání všech prvků při řazení."
   }
 ]

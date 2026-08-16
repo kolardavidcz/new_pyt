@@ -1,0 +1,106 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jaký datový typ vrací funkce input() po zadání vstupu uživatelem v Pythonu 3?",
+    "options": [
+      "A) Objekt typu bytes reprezentující surovou bajtovou posloupnost ze vstupu.",
+      "B) Speciální objekt typu UserInput zapouzdřující text i časové razítko.",
+      "C) Vždy řetězec str bez ohledu na to, zda vstup obsahuje číslice nebo písmena.",
+      "D) Automaticky odvozený typ int, float nebo str podle obsahu vstupu."
+    ],
+    "answer": 2,
+    "explanation": "Funkce input() v Pythonu 3 vrací výhradně řetězec typu str. Pokud je potřeba číslo, musí se navrácený řetězec explicitně převést např. pomocí int()."
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jaký výstup vytvoří následující kód při spuštění příkazem python3 app.py data.txt?\n\nimport sys\nprint(f\"{sys.argv[0]}:{sys.argv[1]}\")",
+    "options": [
+      "A) Vypíše text python3:app.py představující spouštěč a název skriptu v CLI.",
+      "B) Vyvolá IndexError, protože seznam sys.argv obsahuje pouze předané argumenty.",
+      "C) Vypíše text data.txt:app.py představující první argument a název skriptu.",
+      "D) Vypíše text app.py:data.txt představující název skriptu a první argument."
+    ],
+    "answer": 3,
+    "explanation": "V seznamu sys.argv je na indexu 0 vždy uložen název spouštěného skriptu (app.py), zatímco první uživatelský argument předaný skriptu je na indexu 1 (data.txt)."
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte porovnávací výraz pro kontrolu, že skript obdržel právě dva uživatelské argumenty:\n\nimport sys\nif len(sys.argv) ________ 3:\n    print(\"Chyba: Očekávány přesně 2 argumenty!\")\n    sys.exit(1)\n\n```python\n# Doplňte porovnávací výraz pro kontrolu, že skript obdržel právě dva uživatelské argumenty:\n\nimport sys\nif len(sys.argv) ________ 3:\n    print(\"Chyba: Očekávány přesně 2 argumenty!\")\n    sys.exit(1)\nvysledek = ________\n```",
+    "options": [
+      "!=",
+      "==",
+      "<=",
+      "<"
+    ],
+    "answer": 0,
+    "explanation": "Seznam sys.argv obsahuje název skriptu na indexu 0 plus předané argumenty. Pro přesně 2 uživatelské argumenty musí mít len(sys.argv) hodnotu 3, proto při != 3 vypíšeme chybu a ukončíme skript.",
+    "expected": "!="
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Jak předat v Unixovém terminálu skriptu přes sys.argv jeden argument obsahující mezeru?",
+    "options": [
+      "A) Nahrazením mezery podtržítkem ještě před předáním skriptu na příkazové řádce.",
+      "B) Obalením argumentu do uvozovek nebo použitím zpětného lomítka před mezerou.",
+      "C) Vložením středníku přímo na místo mezery mezi jednotlivými slovy v argumentu.",
+      "D) Předřazením znaku plus před každé slovo tvořící hodnotu zadaného argumentu."
+    ],
+    "answer": 1,
+    "explanation": "Unixový shell rozděluje argumenty podle mezer. Pokud má argument mezeru obsahovat, musí se ohradit uvozovkami \"arg s mezerou\" nebo mezera odescapovat arg\\ s\\ mezerou."
+  },
+  {
+    "id": "q5",
+    "type": "true_false_tricky",
+    "question": "Vyhodnoťte pravdivost tvrzení o modulu getopt z příkazové řádky Pythonu:\n\nModul getopt automaticky generuje nápovědu --help a provádí validaci typu parametrů bez nutnosti psát vlastní obslužný kód.",
+    "options": [
+      "A) Nepravda – getopt pouze naparkuje přepínače a argumenty do seznamu, nápovědu --help i validaci typu musí vývojář napsat ručně.",
+      "B) Pravda – getopt vestavěně kontroluje typy argumentů i povinnost přepínačů a při předání --help automaticky vypíše nápovědu."
+    ],
+    "answer": 0,
+    "explanation": "Modul getopt je nejstarší C-style modul. Pouze rozparsuje přepínače na dvojice (o, a) a seznam argumentů. Veškerou validaci, typové konverze i formátování nápovědy si vývojář musí implementovat sám."
+  },
+  {
+    "id": "q6",
+    "type": "predict_output",
+    "question": "Jaký datový typ bude mít proměnná opts_dict po spuštění níže uvedeného kódu?\n\nfrom optparse import OptionParser\nparser = OptionParser()\nparser.add_option(\"-f\", \"--file\", dest=\"filename\")\noptions, args = parser.parse_args([\"-f\", \"test.txt\"])\nopts_dict = vars(options)",
+    "options": [
+      "A) Objekt třídy Values z modulu optparse uchovávající načtené nastavení.",
+      "B) Uspořádaná n-tice tuple obsahující dvojice název přepínače a jeho hodnota.",
+      "C) Standardní Python slovník dict mapující názvy cílových klíčů na jejich hodnoty.",
+      "D) Seznam řetězců list uchovávající původní přepínače z příkazové řádky."
+    ],
+    "answer": 2,
+    "explanation": "Funkce parse_args() vrací objekt optparse.Values. Pro jeho převod na běžný slovník dict slouží vestavěná funkce vars(), která vrací slovník atributů daného objektu."
+  },
+  {
+    "id": "q7",
+    "type": "fill_blank_choice",
+    "question": "Doplňte chybějící parametr do add_option v modulu optparse tak, aby přepínač akceptoval pouze vybrané hodnoty ze seznamu:\n\nparser.add_option(\n    \"-e\", \"--env\",\n    action=\"store\",\n    dest=\"environment\",\n    type=\"choice\",\n    ________=[\"production\", \"staging\", \"testing\"]\n)\n\n```python\n# Doplňte chybějící parametr do add_option v modulu optparse tak, aby přepínač akceptoval pouze vybrané hodnoty ze seznamu:\n\nparser.add_option(\n    \"-e\", \"--env\",\n    action=\"store\",\n    dest=\"environment\",\n    type=\"choice\",\n    ________=[\"production\", \"staging\", \"testing\"]\n)\nvysledek = ________\n```",
+    "options": [
+      "allowed",
+      "options",
+      "values",
+      "choices"
+    ],
+    "answer": 3,
+    "explanation": "Při použití type=\"choice\" v optparse se povolené hodnoty přepínače specifikují v parametru choices jako seznam nebo n-tice řetězců.",
+    "expected": "choices"
+  },
+  {
+    "id": "q8",
+    "type": "multiple_choice",
+    "question": "Který z modulů pro práci s argumenty v příkazové řádce představuje v historii Pythonu nejnovější generaci přidanou v Pythonu 3.2?",
+    "options": [
+      "A) argparse – novější standardní modul poskytující pokročilé parsování a nápovědu.",
+      "B) getopt – nízkoúrovňový modul podle vzoru klasické céčkovské funkce getopt().",
+      "C) optparse – starší modul představený v Pythonu 2.3 a dnes označený za zastaralý.",
+      "D) click – moderní externí knihovna z PyPI založená výhradně na dekorátorech."
+    ],
+    "answer": 0,
+    "explanation": "Vývoj v Pythonu šel od sys.argv přes getopt a optparse (od Py 2.3) až k modulu argparse představenému v Pythonu 3.2. Modul click je knihovna třetí strany z PyPI."
+  }
+]

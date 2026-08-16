@@ -4,10 +4,10 @@
     "type": "multiple_choice",
     "question": "Jakou signaturu (poziční parametry) musí mít volatelný objekt WSGI aplikace podle standardu PEP 3333?",
     "options": [
-      "A) application(server, client_socket)",
+      "A) application(headers, body_stream)",
       "B) application(environ, start_response)",
-      "C) application(request, response)",
-      "D) application(headers, body_stream)"
+      "C) application(server, client_socket)",
+      "D) application(request, response)"
     ],
     "answer": 1,
     "explanation": "WSGI standard stanovuje, že aplikace je callable se dvěma pozičními argumenty: environ (slovník proměnných prostředí) a start_response (funkce pro zahájení HTTP hlaviček)."
@@ -17,10 +17,10 @@
     "type": "multiple_choice",
     "question": "V jakém datovém typu a struktuře musí WSGI aplikace vracet tělo HTTP odpovědi?",
     "options": [
-      "A) Jako otevřený souborový objekt připravený pro čtení v textovém režimu 'r'.",
-      "B) Jako prostý textový řetězec (str) zakódovaný do UTF-8 bez použití iterátoru.",
+      "A) Jako prostý textový řetězec (str) zakódovaný do UTF-8 bez použití iterátoru.",
+      "B) Jako slovník (dict) obsahující klíče 'headers' a 'body' s bajtovými daty.",
       "C) Jako iterovatelný objekt (např. list), jehož prvky jsou bajtové řetězce (bytes).",
-      "D) Jako slovník (dict) obsahující klíče 'headers' a 'body' s bajtovými daty."
+      "D) Jako otevřený souborový objekt připravený pro čtení v textovém režimu 'r'."
     ],
     "answer": 2,
     "explanation": "WSGI vyžaduje vrácení iterable vracejícího bajty (b'bytes'). Samotný bajtový řetězec b'...' sice je iterable, ale iteroval by se po jednotlivých bajtech (což je neefektivní/chybové), proto se balí do např. [b'data']."
@@ -44,9 +44,9 @@
     "question": "Jakým způsobem se z objektu environ['wsgi.input'] správně načítají data zaslaná v těle POST dotazu?",
     "options": [
       "A) Přečtením přesného počtu bajtů získávaných z environ['CONTENT_LENGTH'] pomocí metody read(length).",
-      "B) Iterací přes řádky pomocí for line in environ['wsgi.input'] a jejich následným spojením.",
-      "C) Převedením objektu wsgi.input na standardní slovník pomocí funkce dict(environ['wsgi.input']).",
-      "D) Neomezeným voláním metody read() bez parametrů, dokud stream nevátí prázdný řetězec \"\"."
+      "B) Neomezeným voláním metody read() bez parametrů, dokud stream nevátí prázdný řetězec \"\".",
+      "C) Iterací přes řádky pomocí for line in environ['wsgi.input'] a jejich následným spojením.",
+      "D) Převedením objektu wsgi.input na standardní slovník pomocí funkce dict(environ['wsgi.input'])."
     ],
     "answer": 0,
     "explanation": "WSGI stream wsgi.input nevyžaduje EOF na konci dotazu. Pro správné přečtení těla POST je nutné převést environ['CONTENT_LENGTH'] na celé číslo a zavolat read(length)."
@@ -56,9 +56,9 @@
     "type": "fill_blank_choice",
     "question": "Která funkce ze standardní knihovny rozparsuje parametry z URL dotazu (QUERY_STRING) do slovníku seznamů hodnot?",
     "options": [
-      "urllib.parse.urlencode",
-      "urllib.parse.parse_qs",
       "urllib.parse.urlsplit",
+      "urllib.parse.parse_qs",
+      "urllib.parse.urlencode",
       "urllib.parse.unquote"
     ],
     "answer": 1,
@@ -71,10 +71,10 @@
     "type": "multiple_choice",
     "question": "Jaký je vztah mezi oddělovacím řetězcem z hlavičky boundary a oddělovači v samotném těle multipart/form-data zprávy?",
     "options": [
-      "A) Hodnota v těle zprávy je identická s atributem boundary bez jakýchkoliv přídavných znaků.",
+      "A) Atribut boundary obsahuje md5 hash, zatímco v těle zprávy se používá pouze znak odřádkování.",
       "B) Oddělovače v těle zprávy mají na konci navíc dvě mínuska (--) oproti hodnotě z atributu boundary.",
       "C) Oddělovače v těle zprávy mají na začátku navíc dvě mínuska (--) oproti hodnotě z atributu boundary.",
-      "D) Atribut boundary obsahuje md5 hash, zatímco v těle zprávy se používá pouze znak odřádkování."
+      "D) Hodnota v těle zprávy je identická s atributem boundary bez jakýchkoliv přídavných znaků."
     ],
     "answer": 2,
     "explanation": "MIME specifikace (RFC 1341) určuje, že zapouzdřovací hranice (encapsulation boundary) v těle zprávy začínají dvěma pomlčkami '--' následovanými řetězcem z hlavičky Content-Type: boundary=..."

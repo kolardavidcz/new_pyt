@@ -4,9 +4,9 @@
     "type": "multiple_choice",
     "question": "Který datový typ je v modulu shelve vyžadován pro klíče perzistentního slovníku?",
     "options": [
-      "A) Libovolný immutable typ s hash().",
+      "A) Pouze celá čísla int a str.",
       "B) Výhradně textové řetězce str.",
-      "C) Pouze celá čísla int a str.",
+      "C) Libovolný immutable typ s hash().",
       "D) Jakýkoliv piklitelný objekt."
     ],
     "answer": 1,
@@ -17,10 +17,10 @@
     "type": "multiple_choice",
     "question": "Jaký účinek má příkaz db['seznam'].append(99) v databázi shelve při výchozím nastavení writeback=False?",
     "options": [
-      "A) Kód selže a vyvolá výjimku PermissionError kvůli zápisu do neotevřené vyrovnávací paměti.",
-      "B) Změna se okamžitě zapíše na disk do souboru databáze bez nutnosti jakéhokoliv dalšího zásahu.",
+      "A) Změna se okamžitě zapíše na disk do souboru databáze bez nutnosti jakéhokoliv dalšího zásahu.",
+      "B) Změna se uloží do paměťové cache a provede se její zapsání až při volání metody db.close().",
       "C) Seznam v databázi zůstane nezměněn, protože modifikace mutable objektu se bez přiřazení nezapsala.",
-      "D) Změna se uloží do paměťové cache a provede se její zapsání až při volání metody db.close()."
+      "D) Kód selže a vyvolá výjimku PermissionError kvůli zápisu do neotevřené vyrovnávací paměti."
     ],
     "answer": 2,
     "explanation": "Při výchozím writeback=False vrací db['seznam'] odpicklovaný dočasný objekt. Příkaz .append(99) modifikuje tuto kopii. Pro uložení na disk je nutné znovupřiřazení db['seznam'] = temp."
@@ -42,8 +42,8 @@
     "question": "Která hodnota parametru flag ve funkci shelve.open() vynutí vytvoření nové prázdné databáze s přepsáním existujícího souboru?",
     "options": [
       "'c'",
-      "'w'",
       "'r'",
+      "'w'",
       "'n'"
     ],
     "answer": 3,
@@ -57,9 +57,9 @@
     "question": "Jaká omezení platí pro přístup více procesů či skriptů k téže databázi modulu shelve?",
     "options": [
       "A) Pro zápis může mít databázi otevřenou současně pouze jediný proces; pro čtení více procesů.",
-      "B) Konkurentní čtení i zápis jsou podporovány výhradně v případě použití backendu dbm.dumb.",
-      "C) Databáze plně podporuje paralelní zápis z více procesů díky zámkům na úrovni backendu.",
-      "D) Databázi může mít současně otevřenou právě jeden proces bez ohledu na čtení či zápis."
+      "B) Databázi může mít současně otevřenou právě jeden proces bez ohledu na čtení či zápis.",
+      "C) Konkurentní čtení i zápis jsou podporovány výhradně v případě použití backendu dbm.dumb.",
+      "D) Databáze plně podporuje paralelní zápis z více procesů díky zámkům na úrovni backendu."
     ],
     "answer": 0,
     "explanation": "Modul shelve nezajišťuje zamykání pro paratelní zápis. Zápis z více procesů naráz může poškodit databázi. Paralelní čtení z více procesů je bezpečné."

@@ -4,10 +4,10 @@
     "type": "multiple_choice",
     "question": "Jaký je zásadní rozdíl v přístupu k historii mezi distribuovanými (DVCS) a centralizovanými (VCS) systémy?",
     "options": [
-      "A) V DVCS existuje pouze jeden centrální server, ze kterého se stahuje vždy aktuální stav.",
-      "B) V centralizovaných VCS operují příkazy vždy globálně na celý projekt bez ohledu na adresář.",
+      "A) V centralizovaných VCS lze běžně provádět potvrzení změn (commit) zcela bez připojení k síti.",
+      "B) V DVCS existuje pouze jeden centrální server, ze kterého se stahuje vždy aktuální stav.",
       "C) V DVCS má každý vývojář kompletní lokální kopii celého repozitáře včetně veškeré historie.",
-      "D) V centralizovaných VCS lze běžně provádět potvrzení změn (commit) zcela bez připojení k síti."
+      "D) V centralizovaných VCS operují příkazy vždy globálně na celý projekt bez ohledu na adresář."
     ],
     "answer": 2,
     "explanation": "U distribuovaných systémů (Git, Mercurial) má každý uživatel u sebe plnohodnotný repozitář s kompletní historií. Může tak komitovat a prohlížet historii offline, zatímco u centralizovaných systémů (SVN) existuje historie jen na centrálním serveru."
@@ -15,17 +15,17 @@
   {
     "id": "q2",
     "type": "fill_blank_choice",
-    "question": "Doplňte příkaz nástroje Git pro přesunutí změn souboru z pracovního adresáře do indexu (staging area).",
-    "code": "# Zařazení skriptu s chemickými výpočty do staging area\ngit ________ analysis.py\ngit commit -m \"feat: pridana kalibracni krivka\"",
+    "question": "Doplňte příkaz nástroje Git pro přesunutí připravených změn z pracovního adresáře do odkládací plochy (staging area).\n\n```python\n# Doplňte příkaz nástroje Git pro přesunutí připravených změn z pracovního adresáře do odkládací plochy (staging area).\nvysledek = ________\n```",
+    "code": "git ________ soubor.py\ngit commit -m \"Úprava souboru\"",
     "options": [
-      "push",
-      "track",
-      "stage",
-      "add"
+      "push — nahraje modifikovaný soubor přímo do vzdáleného repozitáře na servery GitHubu.",
+      "stage — vytvoří záložní kopii souboru v dočasné mezipaměti lokálního operačního systému.",
+      "save — uloží stávající pracovní změny do lokálního archivu",
+      "add — přidá zadané soubory do indexu (staging area) před samotným komitem do historie."
     ],
     "answer": 3,
-    "explanation": "Příkaz git add přesune změny souborů do indexu (staging area) před jejich trvalým uložením do historie pomocí git commit.",
-    "expected": "add"
+    "explanation": "Git vyžaduje dvoukrokový proces komitování — příkaz git add přesune změny do tzv. indexu (staging area) a teprve git commit vytvoří trvalý záznam v historii repozitáře.",
+    "expected": "add — přidá zadané soubory do indexu (staging area) před samotným komitem do historie."
   },
   {
     "id": "q3",
@@ -56,10 +56,10 @@
     "type": "multiple_choice",
     "question": "K čemu slouží soubory jako .gitignore nebo .hgignore v kořenovém adresáři repozitáře?",
     "options": [
-      "A) Seznamují překladač se soubory, které mají být vyloučeny ze závěrečného sestavení projektu.",
+      "A) Šifrují citlivá přístupová hesla a klíče před jejich automatickým odesláním na vzdálený server.",
       "B) Definují pravidla pro soubory, které nemá verzovací systém sledovat ani nabízet ke komitu.",
-      "C) Šifrují citlivá přístupová hesla a klíče před jejich automatickým odesláním na vzdálený server.",
-      "D) Ukládají kompletní historii smazaných souborů pro jejich případné obnovení v budoucích verzích."
+      "C) Ukládají kompletní historii smazaných souborů pro jejich případné obnovení v budoucích verzích.",
+      "D) Seznamují překladač se soubory, které mají být vyloučeny ze závěrečného sestavení projektu."
     ],
     "answer": 1,
     "explanation": "Ignore listy obsahují masky souborů (např. kompilovaný kód, dočasné soubory editorů, .pyc), které verzovací systém ignoruje. Zamezuje se tak jejich nechtěnému zanesení do repozitáře při generických příkazech."
@@ -69,10 +69,10 @@
     "type": "multiple_choice",
     "question": "Jak reagují verzovací příkazy v DVCS na umístění v podadresáři projektu ve srovnání s centralizovaným SVN?",
     "options": [
-      "A) Příkazy v DVCS selžou s chybou, pokud nejste spuštěni přímo v kořenovém adresáři repozitáře.",
-      "B) Příkazy v DVCS operují výhradně na podstromu složky, ve které se zrovna uživatel nachází.",
+      "A) Příkazy v DVCS operují výhradně na podstromu složky, ve které se zrovna uživatel nachází.",
+      "B) Příkazy v DVCS automaticky vytvoří samostatný pod-repozitář pro každý podadresář projektu.",
       "C) Příkazy v DVCS fungují globálně pro celý repozitář bez ohledu na aktuální podadresář.",
-      "D) Příkazy v DVCS automaticky vytvoří samostatný pod-repozitář pro každý podadresář projektu."
+      "D) Příkazy v DVCS selžou s chybou, pokud nejste spuštěni přímo v kořenovém adresáři repozitáře."
     ],
     "answer": 2,
     "explanation": "V DVCS (Git, Mercurial) se pracovní strom a jeho historie spravuje jako celek. Spuštění příkazu (např. git status nebo git commit) uvnitř podadresáře ovlivňuje celý projekt, zatímco v SVN fungovaly příkazy lokálně pro danou složku."
@@ -83,9 +83,9 @@
     "question": "Co se stane v Gitu po smazání větve pomocí příkazu git branch -d nova-funkce?",
     "code": "git checkout master\ngit branch -d nova-funkce",
     "options": [
-      "A) Smažou se všechny soubory a komity, které byly v rámci této větvě kdykoli v minulosti vytvořeny.",
+      "A) Větev se automaticky převede na vzdálený označený tag na serveru GitHub pro archivní účely.",
       "B) Git vyvolá fatalní chybové hlášení a zablokuje lokální repozitář pro jakékoli další úpravy.",
-      "C) Větev se automaticky převede na vzdálený označený tag na serveru GitHub pro archivní účely.",
+      "C) Smažou se všechny soubory a komity, které byly v rámci této větvě kdykoli v minulosti vytvořeny.",
       "D) Odstraní se pouze ukazatel na větev, přičemž začleněné komity v historii masteru zůstanou zachovány."
     ],
     "answer": 3,
@@ -97,9 +97,9 @@
     "question": "Proč je pro udržení vysoké rychlosti a malých nároků na disk u velkých Git repozitářů vhodné občas spustit git gc?",
     "options": [
       "A) Provádí úklid a kompresi objektové databáze repozitáře (garbage collection) a odstraňuje nedosažitelné objekty.",
-      "B) Promaže starší historii zpráv komitů starších než jeden rok pro zrychlení zpracování výstupů.",
+      "B) Automaticky stahuje a aktualizuje nejnovější verze závislostí definovaných v souboru requirements.txt.",
       "C) Odstraňuje z celého pracovního adresáře projekty všechny nezpracované soubory s koncovkami .py a .txt.",
-      "D) Automaticky stahuje a aktualizuje nejnovější verze závislostí definovaných v souboru requirements.txt."
+      "D) Promaže starší historii zpráv komitů starších než jeden rok pro zrychlení zpracování výstupů."
     ],
     "answer": 0,
     "explanation": "Příkaz git gc (garbage collection) komprimuje voľné objekty repozitáře do tzv. packfiles, odstraňuje nedosažitelné komity a optimalizuje indexy, což dramaticky zrychluje operace nad velkými repozitáři."

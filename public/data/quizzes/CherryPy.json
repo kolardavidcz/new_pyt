@@ -4,10 +4,10 @@
     "type": "multiple_choice",
     "question": "Jaká je hlavní architektura a úkol knihovny CherryPy při zpracování webových požadavků?",
     "options": [
-      "A) Automaticky vygenerovat kompletní databázový ORM model a HTML šablony pro celou aplikaci.",
+      "A) Zabezpečit šifrování TCP síťových paketů a řídit routování IP adres na úrovni systému.",
       "B) Přijmout HTTP požadavek a podle URL ho přemapovat na odpovídající metodu třídy serveru.",
-      "C) Spravovat na klientské straně prohlížeče DOM strom a spouštět asynchronní JavaScript kód.",
-      "D) Zabezpečit šifrování TCP síťových paketů a řídit routování IP adres na úrovni systému."
+      "C) Automaticky vygenerovat kompletní databázový ORM model a HTML šablony pro celou aplikaci.",
+      "D) Spravovat na klientské straně prohlížeče DOM strom a spouštět asynchronní JavaScript kód."
     ],
     "answer": 1,
     "explanation": "CherryPy je minimalistický Python web framework, jehož hlavním úkolem je přijmout HTTP požadavek, najít podle URL příslušnou vystavenou metodu a vrátit její odpovídající textový či HTML výstup."
@@ -17,8 +17,8 @@
     "type": "multiple_choice",
     "question": "Na jakou URL adresu bude reagovat níže uvedená metoda webového serveru CherryPy?\n\nimport cherrypy\n\nclass Vystava:\n    @cherrypy.expose\n    def exponaty(self):\n        return \"Seznam exponátů\"\n\ncherrypy.quickstart(Vystava())",
     "options": [
-      "A) Na adresu http://localhost:8080/vystava/exponaty včetně názvu obslužné třídy.",
-      "B) Na adresu http://localhost:8080/api/exponaty s automaticky přidaným prefiksem.",
+      "A) Na adresu http://localhost:8080/api/exponaty s automaticky přidaným prefiksem.",
+      "B) Na adresu http://localhost:8080/vystava/exponaty včetně názvu obslužné třídy.",
       "C) Na adresu http://localhost:8080/exponaty po odeslání HTTP požadavku GET nebo POST.",
       "D) Výhradně na kořenovou adresu http://localhost:8080/ jako výchozí úvodní stránka."
     ],
@@ -31,8 +31,8 @@
     "question": "Jak CherryPy předává parametry z HTTP dotazu (metodou GET i POST) do obslužné metody v Pythonu?",
     "options": [
       "A) Předává všechny parametry jako jediný slovník do prvního argumentu metody.",
-      "B) Ukládá přicházející parametry výhradně do slovníku v objektu request.params.",
-      "C) Vyžaduje manuální rozparsování řetězce dotazu pomocí modulu urllib v metodě.",
+      "B) Vyžaduje manuální rozparsování řetězce dotazu pomocí modulu urllib v metodě.",
+      "C) Ukládá přicházející parametry výhradně do slovníku v objektu request.params.",
       "D) Mapuje parametry dotazu přímo na pojmenované argumenty příslušné obslužné metody."
     ],
     "answer": 3,
@@ -45,8 +45,8 @@
     "options": [
       "on",
       "enabled",
-      "active",
-      "enable"
+      "enable",
+      "active"
     ],
     "answer": 0,
     "explanation": "CherryPy používá konvenci tools.<název_nástroje>.on: True pro zapnutí jednotlivých vestavěných modulů a nástrojů.",
@@ -69,10 +69,10 @@
     "type": "multiple_choice",
     "question": "Jak se po zpracování dekorátorem @cherrypy.popargs namapují části URL /art/nirvana/nevermind?\n\nimport cherrypy\n\n@cherrypy.popargs('artist', 'album')\nclass Music:\n    @cherrypy.expose\n    def index(self, artist, album):\n        return f\"{artist} - {album}\"\n\ncherrypy.quickstart(Music(), '/art')",
     "options": [
-      "A) Hodnotou artist bude 'art' a příslušnou hodnotou album bude 'nirvana'.",
+      "A) Vyvolá 404 Not Found, protože dekorátor popargs nepodporuje více argumentů.",
       "B) Hodnotou artist bude 'nirvana' a příslušnou hodnotou album bude 'nevermind'.",
-      "C) Vyvolá 404 Not Found, protože dekorátor popargs nepodporuje více argumentů.",
-      "D) Hodnotou artist bude 'nevermind' a příslušnou hodnotou album bude 'nirvana'."
+      "C) Hodnotou artist bude 'nevermind' a příslušnou hodnotou album bude 'nirvana'.",
+      "D) Hodnotou artist bude 'art' a příslušnou hodnotou album bude 'nirvana'."
     ],
     "answer": 1,
     "explanation": "Dekorátor @cherrypy.popargs('artist', 'album') postupně odebere (popne) z cesty URL následující dvě části a předá je metodě index jako pojmenované argumenty artist='nirvana' a album='nevermind'."
@@ -82,10 +82,10 @@
     "type": "multiple_choice",
     "question": "Jak správně spustit webový server CherryPy s více navzájem nezávislými aplikacemi pripojenými na různé cesty URL?",
     "options": [
-      "A) Opakovaným sekvenčním voláním metody cherrypy.quickstart() v cyklu pro každou jednotlivou aplikaci zvlášť.",
+      "A) Vytvořením více samostatných systémových vláken, kde každé vlákno zavolá metodu cherrypy.quickstart().",
       "B) Sloučením všech tříd aplikací do jedné společné třídy předané jako argument do cherrypy.quickstart().",
       "C) Připojením aplikací pomocí cherrypy.tree.mount() a spuštěním engine přes engine.start() a engine.block().",
-      "D) Vytvořením více samostatných systémových vláken, kde každé vlákno zavolá metodu cherrypy.quickstart()."
+      "D) Opakovaným sekvenčním voláním metody cherrypy.quickstart() v cyklu pro každou jednotlivou aplikaci zvlášť."
     ],
     "answer": 2,
     "explanation": "Metoda quickstart() slouží pouze jako zkratka pro jedinou aplikaci. Pro více aplikací se použije tree.mount(App1(), '/app1'), tree.mount(App2(), '/app2') a server se spustí přes cherrypy.engine.start() a cherrypy.engine.block()."
@@ -95,9 +95,9 @@
     "type": "fill_blank_choice",
     "question": "Doplňte metodu frameworku CherryPy pro zápis zprávy do systémového logu:",
     "options": [
-      "error",
       "logger",
       "write_log",
+      "error",
       "log"
     ],
     "answer": 3,
@@ -111,9 +111,9 @@
     "question": "Jak vyřešit kolizi složených závorek {} při generování HTML obsahu obsahujícího CSS styly přes metodu str.format()?",
     "options": [
       "A) Zdvojením složených závorek {{ a }} ve zbylém neformátovaném obsahu šablony.",
-      "B) Obalením celého CSS bloku do HTML značky <raw> zabraňující interpretaci závorek.",
-      "C) Předsazením zpětného lomítka \\{ a \\} před každou složenou závorku v CSS stylu.",
-      "D) Přechodem na nepodporovaný tvar složených závorek s dolarem ${ a } v celém kódu."
+      "B) Přechodem na nepodporovaný tvar složených závorek s dolarem ${ a } v celém kódu.",
+      "C) Obalením celého CSS bloku do HTML značky <raw> zabraňující interpretaci závorek.",
+      "D) Předsazením zpětného lomítka \\{ a \\} před každou složenou závorku v CSS stylu."
     ],
     "answer": 0,
     "explanation": "V Pythonním řetězcové metodě format() se literal složená závorka zapisuje zdvojeně {{ a }}. To zabrání chybě KeyError nebo ValueError při formátování šablony obsahující CSS či JS kód."

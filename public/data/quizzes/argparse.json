@@ -4,10 +4,10 @@
     "type": "predict_output",
     "question": "Jaká hodnota se uloží do args.v při volání bez argumentů?\n\nimport argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-v', nargs='?', const='VERBOSE', default='SILENT')\nargs = parser.parse_args([])\nprint(args.v)",
     "options": [
-      "A) None",
+      "A) VERBOSE",
       "B) SILENT",
       "C) True",
-      "D) VERBOSE"
+      "D) None"
     ],
     "answer": 1,
     "explanation": "U přepínače s nargs='?' se hodnota const použije v případě, že je přepínač -v na příkazové řádce přítomen bez hodnoty. Pokud přepínač není zadán vůbec, použije se hodnota default ('SILENT')."
@@ -17,10 +17,10 @@
     "type": "predict_output",
     "question": "Jakou výchozí hodnotu má přepínač s nastavením action='store_true'?\n\nimport argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-f', '--force', action='store_true')\nargs = parser.parse_args([])\nprint(args.force)",
     "options": [
-      "A) True",
-      "B) None",
+      "A) AttributeError",
+      "B) True",
       "C) False",
-      "D) AttributeError"
+      "D) None"
     ],
     "answer": 2,
     "explanation": "Akce store_true automaticky nastavuje výchozí hodnotu na boolovské False. Pokud uživatel přepínač na příkazové řádce použije, hodnota v atributu force se změní na True."
@@ -31,8 +31,8 @@
     "question": "Jaký bude výstup parseru při opakovaném použití přepínače s action='append'?\n\nimport argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-i', '--include', action='append')\nargs = parser.parse_args(['-i', 'a.py', '-i', 'b.py'])\nprint(args.include)",
     "options": [
       "A) ['b.py']",
-      "B) ('a.py', 'b.py')",
-      "C) 'b.py'",
+      "B) 'b.py'",
+      "C) ('a.py', 'b.py')",
       "D) ['a.py', 'b.py']"
     ],
     "answer": 3,
@@ -45,8 +45,8 @@
     "options": [
       "A) Dvojici (Namespace s rozpoznanými argumenty, seznam nerozpoznaných argumentů).",
       "B) Pouze slovník s rozpoznanými argumenty, přičemž neznámé argumenty zcela ignoruje.",
-      "C) Objekt typu Namespace obsahující jak rozpoznané, tak neznámé argumenty dohromady.",
-      "D) Výjimku UnrecognizedArgumentError, pokud se v příkazu objeví neznámý přepínač."
+      "C) Výjimku UnrecognizedArgumentError, pokud se v příkazu objeví neznámý přepínač.",
+      "D) Objekt typu Namespace obsahující jak rozpoznané, tak neznámé argumenty dohromady."
     ],
     "answer": 0,
     "explanation": "Metoda parse_known_args() při výskytu neznámých argumentů neselže, ale vrátí n-tici: první prvek je Namespace s parsovanými argumenty a druhý je seznam zbylých nerozpoznaných řetězců."
@@ -73,9 +73,9 @@
     "question": "Jaké chování zajistí kód group = parser.add_mutually_exclusive_group(required=True)?",
     "options": [
       "A) Skupina automaticky skryje nápovědu pro všechny obsažené přepínače z výpisu -h.",
-      "B) Přepínače ze skupiny se stanou povinné všechny současně při spuštění skriptu.",
+      "B) Uživatel může zadat všechny přepínače ze zadané skupiny naráz v libovolném pořadí.",
       "C) Uživatel musí zadat právě jeden argument z dané skupiny, jinak parser selže.",
-      "D) Uživatel může zadat všechny přepínače ze zadané skupiny naráz v libovolném pořadí."
+      "D) Přepínače ze skupiny se stanou povinné všechny současně při spuštění skriptu."
     ],
     "answer": 2,
     "explanation": "add_mutually_exclusive_group() vynucuje, že lze vybrat nejvýše jeden argument ze skupiny. Parametr required=True navíc zaručuje, že alespoň jeden z nich musí být povinně zadán."
@@ -85,8 +85,8 @@
     "type": "predict_output",
     "question": "Jaká hodnota převáží při spuštění skriptu bez argumentů?\n\nimport argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-x', default='alpha')\nparser.set_defaults(x='beta')\nargs = parser.parse_args([])\nprint(args.x)",
     "options": [
-      "A) ['alpha', 'beta']",
-      "B) alpha",
+      "A) alpha",
+      "B) ['alpha', 'beta']",
       "C) None",
       "D) beta"
     ],

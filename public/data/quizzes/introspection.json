@@ -4,10 +4,10 @@
     "type": "multiple_choice",
     "question": "Jaký bude výstup spuštění následujícího kódu demonstrujícího chování funkce id() u dočasných objektů v cyklu?\n\n```python\nids = []\nfor i in range(3):\n    ids.append(id([]))\nprint(len(set(ids)) < 3)\n```",
     "options": [
-      "A) Vyvolá výjimku TypeError, protože funkce id() neakceptuje měnitelné datové typy jako je prázdný seznam [].",
+      "A) Vypíše False, protože seznam ids udrží reference na všechny vytvořené objekty a zabrání jejich smazání.",
       "B) Vypíše True, protože dočasně vytvořené seznamy jsou ihned zrušeny a paměťová adresa z id() se znova použije.",
-      "C) Vypíše False, protože funkce id() garantuje unikátní identifikátor pro každý nově alokovaný objekt v programu.",
-      "D) Vypíše False, protože seznam ids udrží reference na všechny vytvořené objekty a zabrání jejich smazání."
+      "C) Vyvolá výjimku TypeError, protože funkce id() neakceptuje měnitelné datové typy jako je prázdný seznam [].",
+      "D) Vypíše False, protože funkce id() garantuje unikátní identifikátor pro každý nově alokovaný objekt v programu."
     ],
     "answer": 1,
     "explanation": "Výraz [] vytvoří anonymní seznam, jehož adresa se předá do id() a objekt se okamžitě zahodí. V dalším průchodu cyklu Python alokuje nový objekt na stejné uvolněné adrese, takže seznam ids obsahuje duplicitní adresy a len(set(ids)) < 3 je True."
@@ -17,10 +17,10 @@
     "type": "multiple_choice",
     "question": "Jaký je zásadní rozdíl mezi testem isinstance(obj, Trida) a porovnáním type(obj) == Trida?",
     "options": [
-      "A) Obě varianty jsou v Pythonu 3 naprosto identické a mají identické chování i v přítomnosti vícenásobné dědičnosti.",
+      "A) isinstance pracuje výhradně s vestavěnými typy Pythonu, zatímco porovnání pomocí type() funguje pouze pro uživatelské třídy.",
       "B) type(obj) == Trida zohledňuje kompletní řetězec dědičnosti, zatímco isinstance ověřuje pouze nejbližšího rodiče.",
       "C) isinstance zohledňuje dědičnost v celém stromu předků, zatímco type(obj) == Trida vyžaduje přesnou shodu třídy.",
-      "D) isinstance pracuje výhradně s vestavěnými typy Pythonu, zatímco porovnání pomocí type() funguje pouze pro uživatelské třídy."
+      "D) Obě varianty jsou v Pythonu 3 naprosto identické a mají identické chování i v přítomnosti vícenásobné dědičnosti."
     ],
     "answer": 2,
     "explanation": "isinstance(obj, Trida) vrátí True i v případě, kdy obj je instancí jakékoliv podtřídy třídy Trida. Naproti tomu type(obj) == Trida zjišťuje pouze to, zda byl objekt vytvořen přímo touto konkrétní třídou."
@@ -30,9 +30,9 @@
     "type": "fill_blank_choice",
     "question": "Doplňte vestavěnou funkci pro bezpečné ověření přítomnosti atributu v instanci podle jeho názvu:",
     "options": [
-      "isinstance",
-      "callable",
       "getattr",
+      "callable",
+      "isinstance",
       "hasattr"
     ],
     "answer": 3,
@@ -46,9 +46,9 @@
     "question": "Jaký dopad má zavedení __slots__ v definici třídy na její instance z hlediska introspekce a paměti?",
     "options": [
       "A) Šetří paměť zamezením vytvoření slovníku __dict__, čímž současně znemožňuje dynamické pridávání libovolných atributů.",
-      "B) Automaticky zakazuje dědičnost od této třídy a znemožňuje použití introspekčních funkcí jako dir() nebo getattr().",
-      "C) Slouží jako bezplatný mechanizmus pro vytváření neprolomitelných soukromých atributů (private attributes) v CPythonu.",
-      "D) Zrychluje přístup k atributům vytvořením přídavného slovníku __dict__, který uchovává pouze statické typy atributů."
+      "B) Slouží jako bezplatný mechanizmus pro vytváření neprolomitelných soukromých atributů (private attributes) v CPythonu.",
+      "C) Zrychluje přístup k atributům vytvořením přídavného slovníku __dict__, který uchovává pouze statické typy atributů.",
+      "D) Automaticky zakazuje dědičnost od této třídy a znemožňuje použití introspekčních funkcí jako dir() nebo getattr()."
     ],
     "answer": 0,
     "explanation": "__slots__ alokuje pro atributy pevný prostor namísto dynamického slovníku __dict__ na každé instanci. Tím výrazně šetří paměť u milionů instancí, ale znemožňuje instancím přidávat libovolné nové atributy mimo ty uvedené v __slots__."
@@ -58,10 +58,10 @@
     "type": "multiple_choice",
     "question": "Co vrátí volání introspekční funkce issubclass(Base, Base) pro libovolnou třídu Base v Pythonu?",
     "options": [
-      "A) Vrátí None, neboť operace vyhodnocuje pouze striktní (vlastní) podtřídy v hiearchii objektů.",
+      "A) Vrátí False, protože třída nemůže být svým vlastním potomkem bez přímé definice dědičnosti.",
       "B) Vrátí True, protože v Pythonu je každá třída považována za podtřídu (subclass) sama sebe.",
       "C) Vyvolá výjimku TypeError, protože funkce issubclass vyžaduje dvě různé třídy v argumentech.",
-      "D) Vrátí False, protože třída nemůže být svým vlastním potomkem bez přímé definice dědičnosti."
+      "D) Vrátí None, neboť operace vyhodnocuje pouze striktní (vlastní) podtřídy v hiearchii objektů."
     ],
     "answer": 1,
     "explanation": "Podle specifikace objektového modelu Pythonu platí issubclass(C, C) == True pro jakoukoliv platnou třídu C."
@@ -71,10 +71,10 @@
     "type": "multiple_choice",
     "question": "Jaký bude výsledek vyhodnocení funkcí callable() na datovém atributu a metodě objektu?\n\n```python\nclass Worker:\n    def __init__(self):\n        self.age = 30\n    def work(self):\n        pass\n\nw = Worker()\nprint(callable(w.age), callable(w.work))\n```",
     "options": [
-      "A) Vypíše True True, protože v Pythonu je úplně všechno objekt a všechny atributy třídy lze spustit.",
-      "B) Vypíše False False, protože předáním atributů přes tečku se vyhodnotí jejich hodnoty a ne funkce.",
+      "A) Vyvolá výjimku AttributeError, protože metoda callable() přijímá pouze samotné názvy atributů v řetězci.",
+      "B) Vypíše True True, protože v Pythonu je úplně všechno objekt a všechny atributy třídy lze spustit.",
       "C) Vypíše False True, protože celočíselný atribut age nelze volat, zatímco navázanou metodu work ano.",
-      "D) Vyvolá výjimku AttributeError, protože metoda callable() přijímá pouze samotné názvy atributů v řetězci."
+      "D) Vypíše False False, protože předáním atributů přes tečku se vyhodnotí jejich hodnoty a ne funkce."
     ],
     "answer": 2,
     "explanation": "callable(obj) zjišťuje, zda má objekt definovanou metodu __call__. Pro číslo w.age (30) vrátí False, pro svázanou metodu w.work vrátí True."

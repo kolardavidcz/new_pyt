@@ -18,9 +18,9 @@
     "question": "Jaký bude výsledek vykonání následujícího kódu při přístupu k atributu `p.a`?\n\nclass Rodic:\n    def __init__(self):\n        self.a = 10\n\nclass Potomek(Rodic):\n    def __init__(self):\n        self.b = 20\n\np = Potomek()\nprint(p.a)",
     "options": [
       "A) Vypíše hodnotu 10, protože konstruktor rodiče se v Pythonu volá automaticky jako první.",
-      "B) Vypíše hodnotu None, protože atribut 'a' existuje na rodiči, ale nebyl inicializován.",
+      "B) Vyvolá TypeError, protože třída Potomek musí povinně zavolat super().__init__() v těle.",
       "C) Vyvolá AttributeError, protože konstruktor rodiče nebyl v potomkovi explicitně zavolán.",
-      "D) Vyvolá TypeError, protože třída Potomek musí povinně zavolat super().__init__() v těle."
+      "D) Vypíše hodnotu None, protože atribut 'a' existuje na rodiči, ale nebyl inicializován."
     ],
     "answer": 2,
     "explanation": "V Pythonu se při definici vlastní metody `__init__()` v potomkovi automaticky nezavolá konstruktor rodičovské třídy (na rozdíl od C++ či Javy). Jelikož `Potomek.__init__` neobsahuje volání `super().__init__()` ani `Rodic.__init__(self)`, atribut `a` na instanci vůbec nevznikne."
@@ -30,9 +30,9 @@
     "type": "fill_blank_choice",
     "question": "Doplňte dekorátor pro vytvoření třídní metody předávající třídu cls jako první argument:",
     "options": [
+      "@instancemethod",
       "@property",
       "@staticmethod",
-      "@instancemethod",
       "@classmethod"
     ],
     "answer": 3,
@@ -46,9 +46,9 @@
     "question": "Co se stane při zavolání metody `tisk()` přes instanci `p` v níže uvedeném kódu?\n\nclass Pomocnik:\n    def tisk():\n        print(\"Ahoj\")\n\np = Pomocnik()\np.tisk()",
     "options": [
       "A) Vyvolá TypeError, protože instance předá sebe jako první argument nezadekorované metodě.",
-      "B) Vypíše řetězec 'Ahoj', protože Python automaticky rozpozná metodu bez parametrů jako statickou.",
-      "C) Vyvolá AttributeError, protože metody bez parametru self nelze v Pythonu na třídě definovat.",
-      "D) Vypíše hodnotu None, protože funkce nemá návratovou hodnotu a neobsahuje parametr self."
+      "B) Vyvolá AttributeError, protože metody bez parametru self nelze v Pythonu na třídě definovat.",
+      "C) Vypíše hodnotu None, protože funkce nemá návratovou hodnotu a neobsahuje parametr self.",
+      "D) Vypíše řetězec 'Ahoj', protože Python automaticky rozpozná metodu bez parametrů jako statickou."
     ],
     "answer": 0,
     "explanation": "Bez dekorátoru `@staticmethod` se každá běžná metoda na třídě chová jako instanční. Při volání přes instanci `p.tisk()` předá Python automaticky objekt `p` jako první argument (`Pomocnik.tisk(p)`), což selže na `TypeError: Pomocnik.tisk() takes 0 positional arguments but 1 was given`."
@@ -58,10 +58,10 @@
     "type": "multiple_choice",
     "question": "Jaký bude výsledek vykonání následujícího kódu při práci se seznamem v atributu třídy?\n\nclass Kosik:\n    polozky = []\n\nk1 = Kosik()\nk2 = Kosik()\nk1.polozky.append(\"jablko\")\nprint(k2.polozky)",
     "options": [
-      "A) Vypíše prázdný seznam [], protože k1 a k2 mají přiřazeny své vlastní nezávislé instance.",
+      "A) Vyvolá TypeError, protože seznamy nelze v definici třídy používat jako výchozí hodnoty.",
       "B) Vypíše ['jablko'], protože polozky je třídní atribut sdílený všemi instancemi třídy Kosik.",
       "C) Vyvolá AttributeError, protože seznam polozky nebyl inicializován v metodě __init__().",
-      "D) Vyvolá TypeError, protože seznamy nelze v definici třídy používat jako výchozí hodnoty."
+      "D) Vypíše prázdný seznam [], protože k1 a k2 mají přiřazeny své vlastní nezávislé instance."
     ],
     "answer": 1,
     "explanation": "Proměnná `polozky` definovaná přímo v těle třídy je třídním atributem. Je sdílena mezi všemi instancemi třídy `Kosik`, takže modifikace obsahu seznamu přes `k1` se projeví i při čtení přes `k2`."
@@ -71,10 +71,10 @@
     "type": "multiple_choice",
     "question": "Která dvojice dekorátorů je potřeba pro vytvoření vlastnosti `barva` umožňující čtení i zápis?",
     "options": [
-      "A) Obě metody se zadekorují `@property` a liší se pouze počtem přijímaných argumentů self.",
-      "B) První metoda se zadekoruje `@property` a druhá metoda se stejným názvem `@property.set`.",
+      "A) První metoda se zadekoruje `@property` a druhá metoda se stejným názvem `@property.set`.",
+      "B) První metoda se zadekoruje `@getter` a druhá metoda se zadekoruje dekorátorem `@setter`.",
       "C) První metoda se zadekoruje `@property` a druhá metoda se stejným názvem `@barva.setter`.",
-      "D) První metoda se zadekoruje `@getter` a druhá metoda se zadekoruje dekorátorem `@setter`."
+      "D) Obě metody se zadekorují `@property` a liší se pouze počtem přijímaných argumentů self."
     ],
     "answer": 2,
     "explanation": "V Pythonu přístup pro čtení zavedete dekorátorem `@property` nad metodou `barva(self)`. Pro vytvoření setteru se použije dekorátor pojmenovaný podle dané vlastnosti: `@barva.setter` nad druhou metodou `barva(self, val)`."

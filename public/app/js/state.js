@@ -876,6 +876,7 @@ export async function getQuizForDeck(item) {
 export async function getQuizFor(item) {
   if (!item) return null;
   const item_id = item.id || "";
+  const quiz_deck = item.quiz_deck || "";
   const slug = item.slug || "";
   const path = (item.path || "").replace(/\\/g, "/");
   const cleanPath = path.replace(/^vyuka_downloaded\/materialy\//, "").replace(/^vyuka_downloaded\//, "");
@@ -886,15 +887,16 @@ export async function getQuizFor(item) {
   const idClean = item_id.replace(/^lecture:/, "").replace(/^exercise:/, "");
 
   const candidates = [
+    quiz_deck,
+    slug,
+    lastTwo,
     item_id,
     cleanPathNoExt,
-    lastTwo,
     base,
-    slug,
     path,
     idClean,
     "lecture:" + cleanPath,
-  ];
+  ].filter(Boolean);
 
   const checkMemory = () => {
     for (const c of candidates) {
@@ -913,7 +915,7 @@ export async function getQuizFor(item) {
   let found = checkMemory();
   if (!found) {
     // 1. Try per-deck chunk
-    const targetKey = item.slug || item.id || idClean || "";
+    const targetKey = quiz_deck || slug || lastTwo || idClean || "";
     if (targetKey) {
       try {
         const res = await fetch(`data/quizzes/${targetKey}.json`);

@@ -17,10 +17,10 @@
     "type": "multiple_choice",
     "question": "Jak se liší chování metod __getattr__ a __getattribute__ při přístupu k atributu instance?\n\n```python\nclass Demo:\n    def __getattribute__(self, item):\n        return \"ALWAYS\"\n    def __getattr__(self, item):\n        return \"FALLBACK\"\n\nd = Demo()\nprint(d.anything)\n```",
     "options": [
-      "A) Vyvolá RecursionError, protože implementace __getattribute__ bez použití super() vyvolá nekonečnou rekurzi přístupu.",
+      "A) Vypíše FALLBACK, protože atribut anything není v __dict__ definován a __getattr__ má při vyhledávání vyšší prioritu.",
       "B) Vypíše ALWAYS, protože __getattribute__ se volá bezpodmínečně při každém přístupu k atributu a __getattr__ se nezavolá.",
-      "C) Vypíše FALLBACK, protože atribut anything není v __dict__ definován a __getattr__ má při vyhledávání vyšší prioritu.",
-      "D) Vypíše ALWAYS FALLBACK, protože Python při neexistenci atributu postupně zavolá obě obslužné metody v definovaném pořadí."
+      "C) Vypíše ALWAYS FALLBACK, protože Python při neexistenci atributu postupně zavolá obě obslužné metody v definovaném pořadí.",
+      "D) Vyvolá RecursionError, protože implementace __getattribute__ bez použití super() vyvolá nekonečnou rekurzi přístupu."
     ],
     "answer": 1,
     "explanation": "Metoda __getattribute__ se volá vždy při jakémkoliv přístupu k atributu. Protože v kódu vrátil návratovou hodnotu ihned bez AttributeError, k volání __getattr__ (které se spouští až po selhání běžného hledání) vůbec nedojde."
@@ -31,9 +31,9 @@
     "question": "Doplňte metodu protokolu deskriptorů volanou při čtení hodnoty atributu z instance:",
     "options": [
       "__getitem__",
-      "__getattr__",
+      "__getattribute__",
       "__get__",
-      "__getattribute__"
+      "__getattr__"
     ],
     "answer": 2,
     "explanation": "Deskriptorový protokol definuje metodu __get__(self, instance, owner) pro čtení hodnoty spravovaného atributu.",
@@ -45,9 +45,9 @@
     "type": "multiple_choice",
     "question": "Jak Python vnitřně přeloží zápis p.barva = \"zelená\", je-li barva datovým deskriptorem definovaným na třídě Plocha?",
     "options": [
-      "A) p.__dict__['barva'].__set__(type(p), \"zelená\")",
-      "B) p.__set__(type(p).__dict__['barva'], \"zelená\")",
-      "C) Plocha.__setattr__(p, 'barva', \"zelená\")",
+      "A) p.__set__(type(p).__dict__['barva'], \"zelená\")",
+      "B) Plocha.__setattr__(p, 'barva', \"zelená\")",
+      "C) p.__dict__['barva'].__set__(type(p), \"zelená\")",
       "D) type(p).__dict__['barva'].__set__(p, \"zelená\")"
     ],
     "answer": 3,

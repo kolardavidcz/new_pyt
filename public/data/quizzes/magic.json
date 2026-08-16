@@ -6,8 +6,8 @@
     "options": [
       "A) Vypíše hodnotu 15, protože při selhání levostranné metody int zavolá Python pravostrannou __radd__.",
       "B) Vyvolá TypeError, protože celé číslo 5 stojí vlevo a nepodporuje sčítání s uživatelským objektem.",
-      "C) Vypíše hodnotu 10, protože pravostranné metody ignorují levý operand a vracejí pouze vnitřní hodnotu.",
-      "D) Vyvolá AttributeError, protože pro operaci 5 + v musíme definovat výhradně levostrannou metodu __add__."
+      "C) Vyvolá AttributeError, protože pro operaci 5 + v musíme definovat výhradně levostrannou metodu __add__.",
+      "D) Vypíše hodnotu 10, protože pravostranné metody ignorují levý operand a vracejí pouze vnitřní hodnotu."
     ],
     "answer": 0,
     "explanation": "Při výrazu `5 + v` se nejprve zavolá levostranná metoda `(5).__add__(v)`. Jelikož vestavěný typ `int` objekt typu `Vector` nezná, vrátí `NotImplemented`. Python následně vyzkouší pravostrannou metodu `v.__radd__(5)`, která vrátí `10 + 5 = 15`."
@@ -17,9 +17,9 @@
     "type": "fill_blank_choice",
     "question": "Doplňte magickou metodu umožňující bezeztrátový převod objektu na celé číslo pro indexování sekvencí:",
     "options": [
-      "__slice__",
-      "__index__",
       "__getitem__",
+      "__index__",
+      "__slice__",
       "__int__"
     ],
     "answer": 1,
@@ -32,10 +32,10 @@
     "type": "multiple_choice",
     "question": "Jaký bude výsledek zavolání instance `trojnasobek(5)` v následujícím kódu?\n\nclass Nasobek:\n    def __init__(self, n):\n        self.n = n\n    def __call__(self, x):\n        return self.n * x\n\ntrojnasobek = Nasobek(3)\nprint(trojnasobek(5))",
     "options": [
-      "A) Vyvolá AttributeError, protože metoda __call__ vyžaduje ještě explicitní zadekorování @callable.",
-      "B) Vypíše hodnotu 3, protože zavolání instance vrátí pouze hodnotu atributu n předanou v konstruktoru.",
+      "A) Vypíše hodnotu 3, protože zavolání instance vrátí pouze hodnotu atributu n předanou v konstruktoru.",
+      "B) Vyvolá TypeError, protože instance třídy nelze volat pomocí závorek jako běžné pythoní funkce.",
       "C) Vypíše hodnotu 15, protože definice metody __call__ činí instanci třídy přímo volatelnou jako funkci.",
-      "D) Vyvolá TypeError, protože instance třídy nelze volat pomocí závorek jako běžné pythoní funkce."
+      "D) Vyvolá AttributeError, protože metoda __call__ vyžaduje ještě explicitní zadekorování @callable."
     ],
     "answer": 2,
     "explanation": "Definice magické metody `__call__(self, ...)` způsobuje, že se instance třídy chová jako callable objekt. Zavolání `trojnasobek(5)` se přeloží na `trojnasobek.__call__(5)`, což vrátí `3 * 5 = 15`."
@@ -61,9 +61,9 @@
     "question": "Co vypíše následující kód při přístupu k neexistujícímu klíči `d['b']`?\n\nclass MojeSlovnik(dict):\n    def __missing__(self, key):\n        return key.upper()\n\nd = MojeSlovnik({'a': 'apple'})\nprint(d['b'])",
     "options": [
       "A) Vypíše řetězec 'B', protože metoda __missing__ se zavolá automaticky při nenalezení klíče v slovníku.",
-      "B) Vyvolá KeyError, protože __missing__ je pouze dekorativní metoda a nezabraňuje vyhození výjimky.",
-      "C) Vypíše hodnotu None, protože neexistující klíče v odvozených slovnících automaticky vrací prázdný objekt.",
-      "D) Vyvolá AttributeError, protože přístup přes hranaté závorky vyžaduje přetížení metody __getitem__."
+      "B) Vyvolá AttributeError, protože přístup přes hranaté závorky vyžaduje přetížení metody __getitem__.",
+      "C) Vyvolá KeyError, protože __missing__ je pouze dekorativní metoda a nezabraňuje vyhození výjimky.",
+      "D) Vypíše hodnotu None, protože neexistující klíče v odvozených slovnících automaticky vrací prázdný objekt."
     ],
     "answer": 0,
     "explanation": "V podtřídách slovníku `dict` zavolá metoda `__getitem__()` při nenalezení požadovaného klíče metodu `__missing__(key)`. Její návratová hodnota se pak vrátí jako výsledek vyhledávání."
@@ -73,10 +73,10 @@
     "type": "multiple_choice",
     "question": "Jaký je hlavní rozdíl v určení magických metod `__repr__()` a `__str__()`?",
     "options": [
-      "A) Obě metody vracejí výhradně bajtové sekvence a liší se pouze možností přijímat formátovací specifikátory.",
+      "A) __repr__ se volá automaticky funkcí print(), zatímco __str__ se volá výhradně v diagnostickém debuggeru.",
       "B) __repr__ slouží pro oficiální technickou reprezentaci objektu, zatímco __str__ pro čitelný textový výstup.",
-      "C) __str__ slouží pro oficiální technickou reprezentaci objektu, zatímco __repr__ pro čitelný textový výstup.",
-      "D) __repr__ se volá automaticky funkcí print(), zatímco __str__ se volá výhradně v diagnostickém debuggeru."
+      "C) Obě metody vracejí výhradně bajtové sekvence a liší se pouze možností přijímat formátovací specifikátory.",
+      "D) __str__ slouží pro oficiální technickou reprezentaci objektu, zatímco __repr__ pro čitelný textový výstup."
     ],
     "answer": 1,
     "explanation": "Metoda `__repr__()` má vracet jednoznačnou, pokud možno validní pythonní reprezentaci objektu (vhodnou pro vývojáře/debugger), zatímco `__str__()` poskytuje uživatelsky přívětivý textový výstup (využívaný např. funkcí `print()`)."
