@@ -125,6 +125,7 @@ for (const [relPath, filePath] of fileMap.entries()) {
 
       const tags = (slideMeta && Array.isArray(slideMeta.tags)) ? slideMeta.tags : [];
       const diff = (slideMeta && typeof slideMeta === "object") ? (slideMeta.diff || null) : (typeof slideMeta === "string" ? slideMeta : null);
+      const alreadyStudiedIn = (slideMeta && typeof slideMeta === "object") ? (slideMeta.already_studied_in || null) : null;
 
       slides.push({
         id: sectionId,
@@ -132,6 +133,7 @@ for (const [relPath, filePath] of fileMap.entries()) {
         title,
         tags,
         diff,
+        already_studied_in: alreadyStudiedIn,
         html: sectionInner,
       });
       idx++;

@@ -798,9 +798,18 @@ function resolveSlideDiff(slide, slug, pageId) {
   return slideDiff(slug, pageId);
 }
 
+function resolveAlreadyStudied(slide, slug, pageId) {
+  if (slide?.already_studied_in) return slide.already_studied_in;
+  const key = `${slug}#${pageId}`;
+  if (state.slides?.[key]?.already_studied_in) return state.slides[key].already_studied_in;
+  return null;
+}
+
 function renderSlide(page, item, num) {
   const diff = resolveSlideDiff(page, item.slug, page.id);
   const tags = resolveSlideTags(page, item.slug, page.id);
+  const alreadyStudied = resolveAlreadyStudied(page, item.slug, page.id);
+
   const slide = el("article", {
     className: "slide",
     id: page.id,
@@ -813,6 +822,27 @@ function renderSlide(page, item, num) {
     ${diff ? flavorHtml(diff) : ""}
   `;
   slide.appendChild(header);
+
+  if (alreadyStudied) {
+    const recapBanner = el("div", { className: "slide-recap-banner" });
+    const primWeek = alreadyStudied.week === 99 ? "Gray" : `W${alreadyStudied.week}`;
+    const primLec = alreadyStudied.lecture_title || "původní přednášce";
+    recapBanner.innerHTML = `
+      <span class="recap-pill">[JIŽ PROBRÁNO]</span>
+      <span class="recap-desc">Tento výklad / příklad byl původně probrán v:</span>
+      <button type="button" class="recap-link-btn" title="Přejít na původní výklad">
+        <strong>${primWeek} ${escapeHtml(primLec)}</strong> (slajd #${escapeHtml(alreadyStudied.slide_id)}) →
+      </button>
+    `;
+    const linkBtn = recapBanner.querySelector(".recap-link-btn");
+    if (linkBtn && alreadyStudied.lecture_id) {
+      linkBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.__pcsNavigate?.({ kind: "lecture", id: alreadyStudied.lecture_id, pageId: alreadyStudied.slide_id });
+      });
+    }
+    slide.appendChild(recapBanner);
+  }
 
   const body = el("div", { className: "slide-body" });
   body.innerHTML = rewriteContentUrls(page.html || "", item.path);
