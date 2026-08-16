@@ -15,15 +15,17 @@
   {
     "id": "q_decor_2",
     "type": "fill_blank_choice",
-    "question": "Doplňte dekorátor ze standardní knihovny pro automatické dopočítání porovnávacích metod:\n```python\nfrom functools import ________\n\n@total_ordering\nclass Bod:\n    def __eq__(self, other): return self.x == other.x\n    def __lt__(self, other): return self.x < other.x\n```",
+    "question": "Doplňte název třídního dekorátoru z modulu `functools`, který z definovaných metod `__eq__` a `__lt__` automaticky dopočítá zbývající porovnávací metody (`<=`, `>`, `>=`).",
     "options": [
       "total_ordering",
-      "auto_comparisons",
       "rich_comparisons",
+      "auto_ordering",
       "order_derivation"
     ],
     "answer": 0,
-    "explanation": "Dekorátor `@functools.total_ordering` vezme třídu, která definuje metodu `__eq__` a jednu z porovnávacích metod (`__lt__`, `__le__`, `__gt__`, `__ge__`), a zbývající porovnávací operátory dopočítá a doplní jako atributy objektu třídy."
+    "explanation": "Dekorátor `@functools.total_ordering` doplňuje zbývající bohaté porovnávací metody (`__le__`, `__gt__`, `__ge__`) za předpokladu, že třída definuje `__eq__` a alespoň jednu z nerovností (`__lt__`, `__le__`, `__gt__`, `__ge__`).",
+    "code": "from functools import ________\n\n@total_ordering\nclass Molecule:\n    def __init__(self, formula, weight):\n        self.formula = formula\n        self.weight = weight\n\n    def __eq__(self, other):\n        return self.weight == other.weight\n\n    def __lt__(self, other):\n        return self.weight < other.weight",
+    "expected": "total_ordering"
   },
   {
     "id": "q_decor_3",

@@ -2,7 +2,7 @@
   {
     "id": "q1",
     "type": "fill_blank_choice",
-    "question": "Doplňte název funkce pro automatické spuštění doctestů aktuálního modulu z kódu:\n\n```python\nimport doctest\n\nif __name__ == '__main__':\n    doctest.________()\n```",
+    "question": "Doplňte funkci modulu doctest, která prohledá docstringy aktuálního modulu a automaticky spustí všechny nalezené interaktivní testy.",
     "options": [
       "testmod",
       "run_all",
@@ -10,7 +10,9 @@
       "testfile"
     ],
     "answer": 0,
-    "explanation": "Funkce doctest.testmod() prohledá aktuální modul (nebo zadaný modul) a spustí všechny testy nalezené v docstringách. unittest.main() patří k rozhraní unittest."
+    "explanation": "Funkce doctest.testmod() prozkoumá docstringy všech funkcí a tříd v modulu a ověří, zda jejich návratové hodnoty odpovídají zapsaným testům.",
+    "code": "import doctest\n\ndef calculate_ph(h_concentration: float) -> float:\n    \"\"\"\n    Výpočet pH z koncentrace oxoniových iontů.\n    >>> calculate_ph(1e-7)\n    7.0\n    \"\"\"\n    import math\n    return round(-math.log10(h_concentration), 2)\n\nif __name__ == \"__main__\":\n    doctest.________()",
+    "expected": "testmod"
   },
   {
     "id": "q2",
@@ -41,7 +43,7 @@
   {
     "id": "q4",
     "type": "fill_blank_choice",
-    "question": "Doplňte zápis v docstringu pro přeskočení vyhodnocení konkrétního řádku příkladu:\n\n```python\ndef moja_funkce():\n    \"\"\"\n    >>> moja_funkce()\n    'vysledek' # doctest: ________\n    \"\"\"\n    pass\n```",
+    "question": "Doplňte direktivu doctestu, která přikáže přeskočit testování výstupu na daném řádku docstringu.",
     "options": [
       "+SKIP",
       "IGNORE",
@@ -49,7 +51,9 @@
       "PASS"
     ],
     "answer": 0,
-    "explanation": "Direktiva # doctest: +SKIP (případně se znaménkem +) řekne doctestu, aby výstup daného příkladu v docstringu přeskočil a neporovnával ho."
+    "explanation": "Direktiva # doctest: +SKIP instruuje modul doctest, aby ignoroval a netestoval výstup daného řádku (např. u náhodných nebo nedeterministických výsledků).",
+    "code": "def generate_random_spectrum():\n    \"\"\"\n    Generuje náhodná spektrometrická data.\n\n    >>> generate_random_spectrum()  # doctest: ________\n    [0.124, 0.985, 0.432]\n    \"\"\"\n    import random\n    return [round(random.random(), 3) for _ in range(3)]",
+    "expected": "+SKIP"
   },
   {
     "id": "q5",

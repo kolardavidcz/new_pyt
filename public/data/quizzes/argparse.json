@@ -54,16 +54,18 @@
   {
     "id": "q5",
     "type": "fill_blank_choice",
-    "question": "Doplňte výjimku vyžadovanou ve vlastní konverzní funkci pro parametr type v argparse:\n\n```python\n# Doplňte výjimku vyžadovanou ve vlastní konverzní funkci pro parametr type v argparse:\nvysledek = ________\n```",
+    "question": "Doplňte speciální výjimku modulu argparse pro signalizaci neplatné hodnoty z vlastní konverzní funkce:",
     "code_snippet": "from argparse import ArgumentParser, ________\n\ndef positive_int(val):\n    n = int(val)\n    if n <= 0:\n        raise ________('Číslo musí být kladné!')\n    return n",
     "options": [
       "ArgumentTypeError",
-      "ValueError",
-      "ArgumentError",
-      "TypeError"
+      "ArgumentValueError",
+      "ParseError",
+      "InvalidOptionError"
     ],
     "answer": 0,
-    "explanation": "Vlastní validátory a konverzní funkce předávané do type= musí při neplatném vstupu vyhodit ArgumentTypeError. Parser ji zachytí a vypíše přívětivé chybové hlášení."
+    "explanation": "Vlastní validační funkce v type= modulu argparse vyhazují argparse.ArgumentTypeError, kterou parser zpracuje a zobrazí chybovou hlášku CLI.",
+    "code": "import argparse\n\ndef positive_int(val):\n    num = int(val)\n    if num <= 0:\n        raise argparse.________(\"Číslo musí být kladné\")\n    return num",
+    "expected": "ArgumentTypeError"
   },
   {
     "id": "q6",

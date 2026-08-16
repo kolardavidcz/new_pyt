@@ -15,7 +15,7 @@
   {
     "id": "q2",
     "type": "fill_blank_choice",
-    "question": "Doplňte parametr dekorátoru @jit, který zaručí vyhození výjimky při neschopnosti zkompilovat kód bez Python C-API:\n\n```python\nfrom numba import jit\n\n@jit(________=True)\ndef vypocet(x):\n    return x.sum()\n```",
+    "question": "Doplňte parametr dekorátoru @jit z knihovny Numba, který vynutí čistou kompilaci do strojového kódu bez závislosti na Python runtime (C-API):",
     "options": [
       "nopython",
       "strict",
@@ -23,7 +23,9 @@
       "fastmath"
     ],
     "answer": 0,
-    "explanation": "Parametr nopython=True (nebo samostatný dekorátor @njit) zakáže fallback do pomalého object mode. Pokud Numba nemůže kód přeložit do čistého nativního kódu bez Python C-API, vyvolá výjimku."
+    "explanation": "Parametr nopython=True (ekvivalent dekorátoru @njit) zakazuje pomalý object mode a vyvolá chybu, pokud Numba nedokáže funkci přeložit do čistého strojového kódu.",
+    "code": "from numba import jit\n\n# Vynucení čistého nativního překladu bez fallbacku do object mode:\n@jit(________=True)\ndef compute_sum(arr):\n    total = 0.0\n    for val in arr:\n        total += val\n    return total",
+    "expected": "nopython"
   },
   {
     "id": "q3",

@@ -54,7 +54,7 @@
   {
     "id": "q5",
     "type": "fill_blank_choice",
-    "question": "Doplňte kód pro načtení právě jednoho řádku z výsledkové sady databázového dotazu:\n\n```python\ncursor.execute(\"SELECT name FROM users WHERE id = 1\")\nrow = cursor.________()\n```",
+    "question": "Doplňte metodu kurzoru z rozhraní Python DB-API 2.0 (např. sqlite3), která načte z výsledku SQL dotazu právě jeden následující řádek.",
     "options": [
       "fetchone",
       "fetchrow",
@@ -62,7 +62,9 @@
       "readline"
     ],
     "answer": 0,
-    "explanation": "Metoda cursor.fetchone() vrátí následující řádek z výsledné sady jako n-tici (tuple), nebo None, pokud už žádné další řádky nezbývají."
+    "explanation": "Metoda cursor.fetchone() vrátí jeden následující řádek z výsledku SQL dotazu jako n-tici (tuple), nebo None, pokud již žádný další záznam neexistuje.",
+    "code": "import sqlite3\n\nconn = sqlite3.connect(\"laborator.db\")\ncursor = conn.cursor()\n\ncursor.execute(\"SELECT vzorek_id, koncentrace FROM mereni WHERE id = ?\", (42,))\n# Načtení jediného nalezeného záznamu jako tuple\nrow = cursor.________()\n# Výstup: ('VZ-42', 0.015) nebo None",
+    "expected": "fetchone"
   },
   {
     "id": "q6",

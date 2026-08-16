@@ -15,15 +15,17 @@
   {
     "id": "q2",
     "type": "fill_blank_choice",
-    "question": "Doplňte dekorátor, který umožní skalární Python funkci zpracovávat celá NumPy pole prvek po prvku:\n\nfrom numpy import ________\n\n@vectorize\ndef mysign(x):\n    return 1 if x >= 0 else -1\n\n```python\n# Doplňte dekorátor, který umožní skalární Python funkci zpracovávat celá NumPy pole prvek po prvku:\n\nfrom numpy import ________\n\n@vectorize\ndef mysign(x):\n    return 1 if x >= 0 else -1\nvysledek = ________\n```",
+    "question": "Kterou funkci modulu numpy použijete jako dekorátor pro převod skalární Python funkce na funkci pracující s NumPy poli prvek po prvku?",
     "options": [
       "vectorize",
-      "array_func",
-      "ufunc_map",
-      "elementwise"
+      "elementwise",
+      "ufunc",
+      "array_func"
     ],
     "answer": 0,
-    "explanation": "Funkce a dekorátor `vectorize` z modulu `numpy` převezme skalární Python funkci a vytvoří z ní univerzální funkci (ufunc), která dokáže aplikovat původní skalární logiku na vícerozměrná NumPy pole prvek po prvku."
+    "explanation": "Dekorátor np.vectorize převede běžnou skalární Python funkci na univerzální funkci aplikovatelnou na celá NumPy pole prvek po prvku.",
+    "code": "import numpy as np\n\n@np.________\ndef classify_ph(val: float) -> str:\n    if val < 7.0:\n        return \"acidic\"\n    elif val > 7.0:\n        return \"basic\"\n    return \"neutral\"\n\nph_array = np.array([2.5, 7.0, 11.2])\n# classify_ph(ph_array) -> array(['acidic', 'neutral', 'basic'], dtype='<U7')",
+    "expected": "vectorize"
   },
   {
     "id": "q3",
@@ -53,15 +55,17 @@
   },
   {
     "id": "q5",
-    "type": "multiple_choice",
-    "question": "Jaký je efektivní zápis skalárního součinu vektoru v se sebou samým v NumPy?\n\nimport numpy as np\nv = np.array([1, 2, 3])\nres = ________",
+    "type": "fill_blank_choice",
+    "question": "Který operátor provede v Pythonu a NumPy maticové násobení či skalární součin dvou 1D vektorů?",
     "options": [
-      "A) v @ v — operátor @ provede vektorové násobení a navrátí skalární součet prvků 1*1 + 2*2 + 3*3.",
-      "B) v * v — operátor * provede skalární násobení a navrátí skalární součet prvků 1*1 + 2*2 + 3*3.",
-      "C) v.dot() — metoda .dot() bez parametrů vypočítá a navrátí skalární součet vektoru se sebou samým.",
-      "D) v ** 2 — umocnění na druhou automaticky sečte všechny prvky daného vektoru do skalární hodnoty."
+      "@",
+      "*",
+      "**",
+      "^"
     ],
     "answer": 0,
-    "explanation": "V Pythonu 3.5+ představuje infixový operátor `@` maticové a vektorové násobení. Pro 1D vektory spočítá skalární součin `v_1*v_1 + v_2*v_2 + ...`. Naproti tomu operátor `*` i umocnění `** 2` provádí operaci prvek po prvku a vracejí opět vektor."
+    "explanation": "Infixový operátor @ provádí v NumPy maticové a vektorové násobení (skalární součin u 1D vektorů), zatímco operátor * násobí prvky po složkách.",
+    "code": "import numpy as np\n\nv = np.array([1.0, 2.0, 3.0])\n# Skalární součin vektoru v se sebou samým: 1*1 + 2*2 + 3*3\ndot_product = v ________ v\n# Vystup: 14.0",
+    "expected": "@"
   }
 ]

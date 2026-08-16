@@ -28,7 +28,7 @@
   {
     "id": "q3",
     "type": "fill_blank_choice",
-    "question": "Doplňte chybějící příkaz tak, aby funkce obal transparentně obousměrně delegovala komunikaci do korutiny:\n\ndef korutina():\n    while True:\n        val = (yield)\n        print(val)\n\ndef obal(gen):\n    ________ gen\n\n```python\n# Doplňte chybějící příkaz tak, aby funkce obal transparentně obousměrně delegovala komunikaci do korutiny:\n\ndef korutina():\n    while True:\n        val = (yield)\n        print(val)\n\ndef obal(gen):\n    ________ gen\nvysledek = ________\n```",
+    "question": "Doplňte syntaxi pro obousměrnou delegaci hodnot, výjimek a volání send() do vnitřního generátoru / korutiny:",
     "options": [
       "yield from",
       "yield send",
@@ -36,12 +36,14 @@
       "delegate to"
     ],
     "answer": 0,
-    "explanation": "Konstrukce `yield from` zajišťuje plnou obousměrnou delegaci: vrací hodnoty z podgenerátoru směrem ven a zároveň přeposílá vstupy zaslané přes send(), stejně jako výjimky z throw() a close(), přímo do vnitřní korutiny."
+    "explanation": "Konstrukce yield from zajišťuje plnou obousměrnou delegaci iterace, včetně předávání hodnot z metody send() a výjimek přímo do podgenerátoru.",
+    "code": "def subgenerator():\n    yield \"start\"\n    yield \"data\"\n\ndef outer_wrapper():\n    # Transparentní delegace na podgenerátor:\n    ________ subgenerator()",
+    "expected": "yield from"
   },
   {
     "id": "q4",
     "type": "fill_blank_choice",
-    "question": "Doplňte chybějící volání do dekorátoru tak, aby automaticky nastartoval vracenou korutinu na první yield:\n\ndef coroutine(func):\n    def wrapper(*args, **kwargs):\n        gen = func(*args, **kwargs)\n        ________\n        return gen\n    return wrapper\n\n```python\n# Doplňte chybějící volání do dekorátoru tak, aby automaticky nastartoval vracenou korutinu na první yield:\n\ndef coroutine(func):\n    def wrapper(*args, **kwargs):\n        gen = func(*args, **kwargs)\n        ________\n        return gen\n    return wrapper\nvysledek = ________\n```",
+    "question": "Doplňte volání do dekorátoru pro automatické nastartování (priming) korutiny k prvnímu výrazu yield:",
     "options": [
       "next(gen)",
       "gen.init()",
@@ -49,7 +51,9 @@
       "gen.run()"
     ],
     "answer": 0,
-    "explanation": "Dekorátor pro inicializaci (priming) korutiny vykoná `next(gen)` (což je ekvivalentní `gen.send(None)`), čímž posune provádění kódu v generátoru k prvním příkazu `(yield)` ještě před jeho vrácením volajícímu."
+    "explanation": "Volání next(gen) (nebo gen.send(None)) posune provádění kódu nově vytvořené korutiny k prvnímu příkazu yield, takže je ihned připravena přijímat data.",
+    "code": "def coroutine_primer(func):\n    def wrapper(*args, **kwargs):\n        gen = func(*args, **kwargs)\n        # Posun generátoru k prvnímu výrazu (yield):\n        ________\n        return gen\n    return wrapper",
+    "expected": "next(gen)"
   },
   {
     "id": "q5",

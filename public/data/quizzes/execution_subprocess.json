@@ -15,7 +15,7 @@
   {
     "id": "q2",
     "type": "fill_blank_choice",
-    "question": "Doplňte parametr pro automatické vyhození výjimky CalledProcessError při návratovém kódu různém od nuly:\n\n```python\nimport subprocess\nsubprocess.run([\"ls\", \"/nonexistent\"], ________=True)\n```",
+    "question": "Doplňte parametr funkce subprocess.run(), který při nenulovém návratovém kódu automaticky vyvolá výjimku CalledProcessError:",
     "options": [
       "check",
       "strict",
@@ -23,7 +23,9 @@
       "exception"
     ],
     "answer": 0,
-    "explanation": "Parametr check=True způsobí, že v případě nebyl-li návratový kód externího procesu 0 (způsobil chybu), vyvolá subprocess.run() výjimku subprocess.CalledProcessError."
+    "explanation": "Parametr check=True zajistí, že pokud proces skončí s nenulovým návratovým kódem, funkce subprocess.run() okamžitě vyvolá výjimku CalledProcessError.",
+    "code": "import subprocess\n\n# Vyvolání výjimky CalledProcessError při chybovém návratovém kódu:\nresult = subprocess.run([\"ls\", \"/neexistujici_cesta\"], ________=True)",
+    "expected": "check"
   },
   {
     "id": "q3",
@@ -41,7 +43,7 @@
   {
     "id": "q4",
     "type": "fill_blank_choice",
-    "question": "Doplňte parametr, který zajistí automatický převod standardního výstupu ze surových bajtů (bytes) na řetězec (str):\n\n```python\nimport subprocess\nres = subprocess.run([\"whoami\"], stdout=subprocess.PIPE, ________=\"utf-8\")\n```",
+    "question": "Doplňte parametr funkce subprocess.run(), který dekóduje zachycený výstup ze surových bajtů do textového řetězce pomocí zvoleného kódování:",
     "options": [
       "encoding",
       "decode",
@@ -49,7 +51,9 @@
       "charset"
     ],
     "answer": 0,
-    "explanation": "Nastavení parametru encoding=\"utf-8\" (nebo text=True) způsobí, že proudy stdout, stderr a stdin pracují s textovými řetězci typu str namísto bajtového objektu bytes."
+    "explanation": "Parametr encoding=\"utf-8\" (nebo zkráceně text=True) způsobí, že zachycený proud stdout a stderr je automaticky dekódován na řetězec str.",
+    "code": "import subprocess\n\n# Automatické dekódování stdout na str místo bytes:\nres = subprocess.run([\"whoami\"], capture_output=True, ________=\"utf-8\")\nprint(type(res.stdout))  # <class 'str'>",
+    "expected": "encoding"
   },
   {
     "id": "q5",
