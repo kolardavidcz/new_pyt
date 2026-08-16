@@ -1,0 +1,78 @@
+{
+  "slug": "materialy--python--bytecode--compile",
+  "total": 8,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Objekt zkompilovaného kódu má k dispozici mnoho vlastností:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co = compile('xs = [1]', '&lt;string&gt;', 'exec')\r\n\r\n&gt;&gt;&gt; co\r\n&lt;code object &lt;module&gt; at 0x00ABA980, file \"&lt;string&gt;\", line 1&gt;\r\n\r\n&gt;&gt;&gt; dir(co)\r\n['__class__', '__delattr__', '__doc__', '__eq__', '__format__', '__ge__',\r\n '__getattribute__', '__gt__', '__hash__', '__init__', '__le__', '__lt__',\r\n '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__',\r\n '__sizeof__', '__str__', '__subclasshook__', 'co_argcount', 'co_cellvars',\r\n 'co_code', 'co_consts', 'co_filename', 'co_firstlineno', 'co_flags',\r\n 'co_freevars', 'co_kwonlyargcount', 'co_lnotab', 'co_name', 'co_names',\r\n 'co_nlocals', 'co_stacksize', 'co_varnames']\r\n  </pre>\r\n  <p>\r\n    V dalším si ty nejdůležitější (na uvedeném příkladu <code>xs = [1]</code>) postupně probereme.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Popis a rozdělení podle <a href=\"http://tech.blog.aknin.name/2010/07/03/pythons-innards-code-objects/\" class=\"external\">Python’s Innards: Code Objects</a> a podle dokumentace k modulu <a href=\"http://docs.python.org/3/library/inspect.html\" class=\"external\"><code>inspect</code></a>.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Funkce „compile“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Funkce „compile“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Na bajtkód příslušející danému zdrojovému kódu se můžete asi nejsnáze podívat tak, že ho jako řetězec „předhodíte“ funkci <code>compile()</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co = compile('xs = [1]', '&lt;string&gt;', 'exec')\r\n&gt;&gt;&gt; co.co_code\r\nb'd\\x00\\x00g\\x01\\x00Z\\x00\\x00d\\x01\\x00S'\r\n  </pre>\r\n  <p>\r\n    Ta má více parametrů, ale povinné jsou pouze první tři z nich (tedy všechny zde použité):\r\n  </p>\r\n  <ol>\r\n    <li>\r\n        <em>source</em> – zdrojový kód jako řetězec nebo AST-objekt\r\n    </li>\r\n    <li>\r\n        <em>filename</em> – soubor obsahující načtený zdrojový kód (pokud jsme kód nenačetli ze souboru, typicky se zde uvádí právě <code>&lt;string&gt;</code>, ale projdou i jiné snadno zařaditelné hodnoty)\r\n    </li>\r\n    <li>\r\n        <em>mode</em> – způsob kompilace zdrojového kódu (<em>exec</em> pro posloupnost příkazů, <em>eval</em> pro jeden konkrétní výraz, <em>single</em> pro jeden konkrétní interaktivní příkaz)\r\n    </li>\r\n  </ol>\r\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Tedy je-li prvním paramatrem (i víceřádkový) zdrojový kód Python'u, je obsahem dalších dvou typicky právě <code>&lt;string&gt;</code> (aneb „kód není načítán ze souboru“) a <code>exec</code> (aneb „vykonej kód pomocí funkce <em>exec()</em>“).\r\n      </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        V dřívejších verzích Python'u musel řetězec na vstupu funkce <em>compile()</em> končit na novou řádku. Avšak od verze 3.2 při použití metody <code>exec()</code> to již není potřeba. Zároveň pro ostatní metody je možno použít libovolné konce řádků (tedy jak z Windows, tak z Unixu).\r\n      </div></div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Identifikace objektu",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Identifikace objektu</h2></div><div class=\"section-body\">\r\n\r\n    <ul>\r\n        <li>\r\n            jméno tohoto <em>code-objektu</em> (pro zkompilované funkcí <code>compile()</code> je zde vždy <em>&lt;module&gt;</em>):\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_name\r\n                    '&lt;module&gt;'\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            jméno souboru, ze kterého byl kód zkompilován:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_filename\r\n                    '&lt;string&gt;'\r\n            </pre>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Jména proměnných",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Jména proměnných</h2></div><div class=\"section-body\">\r\n\r\n    <ul>\r\n        <li>\r\n            n-tice jmen argumentů a lokálních proměnných:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_varnames\r\n                    ()\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            n-tice jmen lokálních proměnných, která jsou uložena v <em>buňkách</em> (tedy proměnných, které jsou referencované z více míst s různou viditelností):\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_cellvars\r\n                    ()\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            n-tice jmen volných proměnných:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_freevars\r\n                    ()\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            n-tice jmen (lokálních proměnných), která nezapadají do žádné výše uvedené škatulky:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_names\r\n                    ('xs',)\r\n            </pre>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Čítače a ukazatele",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Čítače a ukazatele</h2></div><div class=\"section-body\">\r\n\r\n    <ul>\r\n        <li>\r\n            počet očekávaných argumentů (pozičních i pojmenovaných, ale bez <code>*</code> a <code>**</code>):\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_argcount\r\n                    0\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            počet očekávaných pojmenovaných argumentů:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_kwonlyargcount\r\n                    0\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            počet využitých lokálních proměnných (včetně argumentů):\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_nlocals\r\n                    0\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            relativní pozice prvního řádku kódu vůči modulu, v němž je definován:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_firstlineno\r\n                    1\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            potřebná velikost zásobníku (kompilátor ji zjistí analýzou kódu):\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_stacksize\r\n                    1\r\n            </pre>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Ostatní vlastnosti",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Ostatní vlastnosti</h2></div><div class=\"section-body\">\r\n\r\n    <ul>\r\n        <li>\r\n            binární řetězec operačních instrukcí bajtkódu a jejich argumentů (tyto argumenty jsou většinou indexy do ostatních polí objektu <em>co</em>):\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_code\r\n                    b'd\\x00\\x00g\\x01\\x00Z\\x00\\x00d\\x01\\x00S'\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            n-tice všech konstantních hodnot (<em>literals</em>) použitých bajtkódem:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_consts\r\n                    (1, None)\r\n            </pre>\r\n        </li>\r\n        <li>\r\n            binární řetězec sloužící k uložení mapování relativních pozic (<em>offsetů</em>) bajtkódu na čísla řádek:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_lnotab\r\n                    b''\r\n            </pre>\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">Jméno pochází z <em>line number table</em>.</div></div>\r\n        </li>\r\n        <li>\r\n            číslo složené z příznaků indikujících způsob vytvoření objektu:\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; co.co_flags\r\n                    64\r\n            </pre>\r\n            <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">64 odpovídá <code>0x0040</code>, tj. příznaku <em>CO_NOFREE</em></div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">Složení příslušných osmi bitů je: <code>1=optimized | 2=newlocals | 4=*arg | 8=**arg</code></div></div></div>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Speciální vlastnosti",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Speciální vlastnosti</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Několik dalších položek (<em>fields</em>) definovaných na struktuře (<em>struct</em>) <em>PyCodeObject</em> není dostupných přímo v Python'u:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        \r\n        <code>co_zombieframe</code> – interní použití pro optimalizaci (recyklace <em>rámců</em>; viz <em>frameobject.c</em>)\r\n    </li>\r\n    <li>\r\n        \r\n        <code>co_cell2arg</code> – provázání <em>buňkových</em> proměnných, které jsou argumenty\r\n    </li>\r\n    <li>\r\n        \r\n        <code>co_weakreflist</code> – pro podporu <em>slabých referencí</em> na <em>bajtkód-objekty</em>\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "„dis.show_code()“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">„dis.show_code()“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Některé z těchto vlastností vám s výhodou okomentovaně vypíše i metoda <code>show_code()</code> objektu <em>dis</em>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; dis.show_code('xs = [1]')\r\nName:              &lt;module&gt;\r\nFilename:          &lt;code_info&gt;\r\nArgument count:    0\r\nKw-only arguments: 0\r\nNumber of locals:  0\r\nStack size:        1\r\nFlags:             NOFREE\r\nConstants:\r\n   0: 1\r\n   1: None\r\nNames:\r\n   0: xs\r\n  </pre>\r\n\r\n</div>"
+    }
+  ]
+}

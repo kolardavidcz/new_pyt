@@ -1,0 +1,85 @@
+[
+  {
+    "id": "q1",
+    "type": "predict_output",
+    "question": "Co vytiskne příkaz `print(ar.typecode, ar.itemsize)` pro pole `ar = array('i', [1, 2, 3])`?",
+    "options": [
+      "A) `signed 2` — typový kód je název typu `'signed'` a velikost prvku jsou 2 bajty.",
+      "B) `i 4` — typový kód je řetězec `'i'` a velikost celého čísla `int` jsou 4 bajty.",
+      "C) `i 8` — typový kód je řetězec `'i'` a velikost celého čísla `int` je 8 bajtů.",
+      "D) `int 4` — typový kód je název typu `'int'` a velikost prvku jsou 4 bajty."
+    ],
+    "answer": 1,
+    "explanation": "Atribut typecode vrací řetězec 'i' a itemsize vrací 4 (velikost C int v bajtech).",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte metodu třídy `array`, která serializuje obsah typovaného číselného pole do surových bajtů (`bytes`).",
+    "options": [
+      "tofile",
+      "tolist",
+      "tobytes",
+      "encode"
+    ],
+    "answer": 2,
+    "explanation": "Metoda `tobytes()` vyexportuje souvislý paměťový blok prvků pole jako neměnný binární řetězec bajtů (`bytes`).",
+    "code": "from array import array\n\n# Typ 'h' představuje 16bitová celá čísla (short)\ndata = array('h', [100, 250, 500])\nraw_data = data.________()\n\nprint(type(raw_data))  # <class 'bytes'>",
+    "expected": "tobytes"
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Co se stane při pokusu o spuštění příkazu `ar.append(3.14)` pro `ar = array('i', [1, 2, 3])`?",
+    "options": [
+      "A) Hodnota se automaticky ořízne na `3` a bez chyby se vloží do stávajícího pole celých čísel.",
+      "B) Vyvolá se `ValueError`, protože desítkové číslo `3.14` přesahuje povolený paměťový rozsah.",
+      "C) Hodnota se úspěšně vloží jako float a typový kód pole se automaticky přetypuje na kód `'f'`.",
+      "D) Vyvolá se `TypeError`, protože pole akceptuje pouze celé číslo odpovídající typovému kódu `'i'`."
+    ],
+    "answer": 3,
+    "explanation": "Pole z modulu array vyžaduje homogenní nativní C typ. Při vložení floatu do celočíselného pole se vyhodí TypeError.",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl v paměťovém uspořádání mezi Python seznamem a polem z modulu `array`?",
+    "options": [
+      "A) `array` ukládá hodnoty v souvislém paměťovém bloku, zatímco seznam ukládá pole ukazatelů.",
+      "B) Seznam ukládá hodnoty v souvislém paměťovém bloku, zatímco `array` vytváří spojový seznam.",
+      "C) `array` je neproměnný typ v souvislé paměti, zatímco seznam podporuje modifikace v místě.",
+      "D) Seznam je určen výhradně pro souvislá čísla, zatímco `array` ukládá heterogenní ukazatele."
+    ],
+    "answer": 0,
+    "explanation": "Standardní seznam ukládá ukazatele na rozptýlené PyObjecty, zatímco array uchovává nativní C hodnoty v souvislém paměťovém bloku.",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "predict_output",
+    "question": "Co vytiskne příkaz `print(hex(ar[0]))` po provedení `ar = array('h', [0x1234]); ar.byteswap()`?",
+    "options": [
+      "A) `RuntimeError` — výjimka vyvolaná nepodporovanou velikostí prvku.",
+      "B) `0x3412` — prochození obou bajtů dvoubajtové hodnoty `0x1234`.",
+      "C) `0x1234` — původní nezměněná hodnota předávaného elementu.",
+      "D) `-0x1234` — záporná hodnota vzniklá změnou znaménkového bitu."
+    ],
+    "answer": 1,
+    "explanation": "Metoda .byteswap() otočí pořadí bajtů každého prvku (0x1234 -> 0x3412).",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "true_false_tricky",
+    "question": "Pro všestranné a rychlé výpočty s vícerozměrnými číselnými poli se v Pythonu standardně používá vestavěný modul `array`.",
+    "options": [
+      "A) Tvrzení je nepravdivé, protože modul `array` podporuje pouze jednorozměrná pole a pro matice se používá NumPy.",
+      "B) Tvrzení je pravdivé, protože modul `array` obsahuje kompletní lineární algebru a maticové výpočty přímo v CPythonu."
+    ],
+    "answer": 0,
+    "explanation": "Vestavěný modul array je pouze 1D homogenní číselné pole. Pro multidimenzionální pole a vědecké výpočty se používá balíček NumPy.",
+    "code": null
+  }
+]

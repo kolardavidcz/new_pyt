@@ -1,0 +1,102 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jakou signaturu (poziční parametry) musí mít volatelný objekt WSGI aplikace podle standardu PEP 3333?",
+    "options": [
+      "A) application(request, response)",
+      "B) application(environ, start_response)",
+      "C) application(headers, body_stream)",
+      "D) application(server, client_socket)"
+    ],
+    "answer": 1,
+    "explanation": "WSGI standard stanovuje, že aplikace je callable se dvěma pozičními argumenty: environ (slovník proměnných prostředí) a start_response (funkce pro zahájení HTTP hlaviček).",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "V jakém datovém typu a struktuře musí WSGI aplikace vracet tělo HTTP odpovědi?",
+    "options": [
+      "A) Jako otevřený souborový objekt připravený pro čtení v textovém režimu 'r'.",
+      "B) Jako prostý textový řetězec (str) zakódovaný do UTF-8 bez použití iterátoru.",
+      "C) Jako iterovatelný objekt (např. list), jehož prvky jsou bajtové řetězce (bytes).",
+      "D) Jako slovník (dict) obsahující klíče 'headers' a 'body' s bajtovými daty."
+    ],
+    "answer": 2,
+    "explanation": "WSGI vyžaduje vrácení iterable vracejícího bajty (b'bytes'). Samotný bajtový řetězec b'...' sice je iterable, ale iteroval by se po jednotlivých bajtech (což je neefektivní/chybové), proto se balí do např. [b'data'].",
+    "code": null
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Která proměnná prostředí ve slovníku environ obsahuje cestu HTTP dotazu začínající znakem /?",
+    "options": [
+      "A) HTTP_HOST",
+      "B) REQUEST_URI",
+      "C) QUERY_STRING",
+      "D) PATH_INFO"
+    ],
+    "answer": 3,
+    "explanation": "PATH_INFO obsahuje cestu v aplikaci požadovanou klientem (začíná lomítkem '/'). QUERY_STRING obsahuje parametry za otazníkem '?'.",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Jakým způsobem se z objektu environ['wsgi.input'] správně načítají data zaslaná v těle POST dotazu?",
+    "options": [
+      "A) Přečtením přesného počtu bajtů získávaných z environ['CONTENT_LENGTH'] pomocí metody read(length).",
+      "B) Převedením objektu wsgi.input na standardní slovník pomocí funkce dict(environ['wsgi.input']).",
+      "C) Iterací přes řádky pomocí for line in environ['wsgi.input'] a jejich následným spojením.",
+      "D) Neomezeným voláním metody read() bez parametrů, dokud stream nevátí prázdný řetězec \"\"."
+    ],
+    "answer": 0,
+    "explanation": "WSGI stream wsgi.input nevyžaduje EOF na konci dotazu. Pro správné přečtení těla POST je nutné převést environ['CONTENT_LENGTH'] na celé číslo a zavolat read(length).",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "fill_blank_choice",
+    "question": "Která funkce ze standardní knihovny rozparsuje parametry z URL dotazu (QUERY_STRING) do slovníku seznamů hodnot?",
+    "options": [
+      "urllib.parse.unquote",
+      "urllib.parse.parse_qs",
+      "urllib.parse.urlsplit",
+      "urllib.parse.urlencode"
+    ],
+    "answer": 1,
+    "explanation": "Funkce urllib.parse.parse_qs() parsuje URL kódovaný řetězec v QUERY_STRING a vrací slovník, kde hodnotami jsou seznamy řetězců.",
+    "code": "import urllib.parse\n\ndef application(environ, start_response):\n    query_string = environ.get(\"QUERY_STRING\", \"\")\n    params = ________(query_string)\n    # Pro \"sample=benzene&temp=25\" vrati {'sample': ['benzene'], 'temp': ['25']}",
+    "expected": "urllib.parse.parse_qs"
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaký je vztah mezi oddělovacím řetězcem z hlavičky boundary a oddělovači v samotném těle multipart/form-data zprávy?",
+    "options": [
+      "A) Oddělovače v těle zprávy mají na konci navíc dvě mínuska (--) oproti hodnotě z atributu boundary.",
+      "B) Atribut boundary obsahuje md5 hash, zatímco v těle zprávy se používá pouze znak odřádkování.",
+      "C) Oddělovače v těle zprávy mají na začátku navíc dvě mínuska (--) oproti hodnotě z atributu boundary.",
+      "D) Hodnota v těle zprávy je identická s atributem boundary bez jakýchkoliv přídavných znaků."
+    ],
+    "answer": 2,
+    "explanation": "MIME specifikace (RFC 1341) určuje, že zapouzdřovací hranice (encapsulation boundary) v těle zprávy začínají dvěma pomlčkami '--' následovanými řetězcem z hlavičky Content-Type: boundary=...",
+    "code": null
+  },
+  {
+    "id": "q7",
+    "type": "fill_blank_choice",
+    "question": "Který výraz se v rozhraní WSGI předává jako volitelný třetí argument exc_info funkci start_response při zpracování výjimky?",
+    "options": [
+      "sys.last_traceback",
+      "traceback.format_exc()",
+      "traceback.print_exc()",
+      "sys.exc_info()"
+    ],
+    "answer": 3,
+    "explanation": "Třetí parametr exc_info přijímá n-tici vrácenou funkcí sys.exc_info(), což serveru umožňuje správně ošetřit chybu a přepsat hlavičky odpovědi.",
+    "code": "import sys\n\ndef application(environ, start_response):\n    try:\n        data = calculate_concentrations()\n        start_response(\"200 OK\", [(\"Content-Type\", \"text/plain\")])\n        return [data.encode(\"utf-8\")]\n    except Exception:\n        start_response(\"500 Internal Server Error\", [(\"Content-Type\", \"text/plain\")], ________)\n        return [b\"Chyba vypoctu\"]",
+    "expected": "sys.exc_info()"
+  }
+]

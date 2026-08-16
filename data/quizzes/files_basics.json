@@ -1,0 +1,86 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Proč je volání open('data.txt') bez parametru encoding v Pythonu nepřenositelné?",
+    "options": [
+      "A) Soubor se otevře v binárním režimu a čtení vrátí bajtový objekt místo řetězce.",
+      "B) Výchozí kódování závisí na operačním systému a jeho lokálním nastavení prostředí.",
+      "C) Funkce vyžaduje parametr encoding povinně, jinak vyhodí výjimku TypeError.",
+      "D) Výchozí kódování je vždy ASCII a neumí automaticky dekódovat české znaky UTF-8."
+    ],
+    "answer": 1,
+    "explanation": "Bez parametru encoding použije Python locale.getpreferredencoding(False), což se liší mezi OS (např. Windows používá cp1250 a Linux UTF-8). Výchozí kódování není pevný ASCII (B) ani binární režim (D) a parametr není syntakticky povinný (C).",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "predict_output",
+    "question": "Jaký výstup vypíše kód při čtení vícebajtového znaku UTF-8?",
+    "options": [
+      "A) 1",
+      "B) 4",
+      "C) 3",
+      "D) 6"
+    ],
+    "answer": 2,
+    "explanation": "Znak '狼' zabírá v UTF-8 přesně 3 bajty. Metoda read(1) přečte 1 znak, ale tell() vrací aktuální offset v souboru vyjádřený v bajtech (3). Hodnota 1 představuje mýtus, že tell() počítá přečtené znaky.",
+    "code": "with open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('狼.cz')\n\nwith open('data.txt', 'r', encoding='utf-8') as f:\n    char = f.read(1)\n    print(f.tell())"
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte klíčové slovo pro bezpečné správcování kontextu souboru:",
+    "code_snippet": "________ open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('test')",
+    "options": [
+      "try",
+      "using",
+      "context",
+      "with"
+    ],
+    "answer": 3,
+    "explanation": "Příkaz with v Pythonu aktivuje kontextový manažer, který automaticky zavolá __enter__() při vstupu a __exit__() při opuštění bloku, čímž spolehlivě uzavře soubor. Slovo using pochází z C#.",
+    "expected": "with",
+    "code": "vysledek = ________"
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Jak se liší režim otevření souboru 'x' od režimu 'w'?",
+    "options": [
+      "A) Režim 'x' selže s výjimkou FileExistsError, pokud cíl již existuje.",
+      "B) Režim 'x' otevře soubor pro čtení i zápis bez smazání jeho obsahu.",
+      "C) Režim 'x' vytváří dočasný soubor, který se po zavření sám vymaže.",
+      "D) Režim 'x' slouží výhradně k otvírání binárních souborů na systém Windows."
+    ],
+    "answer": 0,
+    "explanation": "Režim 'x' (exkluzivní vytvoření) selže s FileExistsError, pokud soubor již existuje, což brání nechtěnému přepsání dat. Režim 'w' naopak existující soubor okamžitě smaže a přepíše.",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Co se stane při nastavení pozice ukazatele seek(1) na vícebajtový znak UTF-8?",
+    "options": [
+      "A) Metoda seek(1) úspěšně přeskočí celý znak '狼' a metoda read(1) vrátí tečku '.'.",
+      "B) Kód vyhodí výjimku UnicodeDecodeError, protože pozice 1 je uprostřed znaku.",
+      "C) Kód přečte druhý bajt znaku a vrátí odpovídající jednobajtový znak ASCII.",
+      "D) Kód vyhodí výjimku IndexError, protože pozice 1 neodpovídá hranici znaků."
+    ],
+    "answer": 1,
+    "explanation": "Znak '狼' má v UTF-8 délku 3 bajty. Přesun na offset 1 skočí do středu bajtové sekvence tohoto znaku. Následné čtení read(1) selže s UnicodeDecodeError, protože dekodér narazí na neplatný počáteční bajt.",
+    "code": "with open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('狼.cz')\n\nwith open('data.txt', 'r', encoding='utf-8') as f:\n    f.seek(1)\n    f.read(1)"
+  },
+  {
+    "id": "q6",
+    "type": "true_false_tricky",
+    "question": "Rozhodněte o pravdivosti tvrzení: V Pythonu 3 lze u textového souboru zcela vypnout bafrování nastavením argumentu buffering=0.",
+    "options": [
+      "A) Tvrzení je pravdivé. Nastavení buffering=0 plně vypíná mezipaměť jak u binárních, tak u všech textových souborů.",
+      "B) Tvrzení je nepravdivé. Nastavení buffering=0 je povoleno pouze v binárním režimu; v textovém vyhodí výjimku ValueError."
+    ],
+    "answer": 1,
+    "explanation": "V textovém režimu Python nepodporuje unbuffered I/O (buffering=0 vyhodí ValueError). Textové soubory podporují pouze buffering=1 (řádkové bafrování) nebo celočíselnou velikost mezipaměti > 1.",
+    "code": null
+  }
+]

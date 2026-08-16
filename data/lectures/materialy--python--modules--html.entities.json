@@ -1,0 +1,51 @@
+{
+  "slug": "materialy--python--modules--html.entities",
+  "total": 5,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Modul <code>html.entities</code> obsahuje tři slovníky sloužící k vzájemnému překladu vybrané podmnožiny <em>pojmenovaných entit</em> ze standardu <em>XHTML 1.0</em> (viz <a href=\"/materialy/text/encoding_xML.xml?slajd=5\">znakové entity</a>) na jejich odpovídající unicodové hodnoty (<em>code-point</em>y) a také přímo znaky:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        <code>name2codepoint</code> – převod ze jména na <em>code-point</em>\r\n    </li>\r\n    <li>\r\n        <code>codepoint2name</code> – převod z <em>code-point</em>u na jméno\r\n    </li>\r\n    <li>\r\n        <code>entitydefs</code> – převod ze jména na znak\r\n    </li>\r\n  </ul>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    „Převodem z na“ se pochopitelně myslí, že první z položek je klíčem v příslušném slovníku, zatímco druhá hodnotou.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "„name2codepoint“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">„name2codepoint“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Jádrem modulu jest slovník <code>name2codepoint</code>, který má za klíče vybraná jména <em>pojmenovaných entit</em> a za hodnoty jim odpovídající unicodové hodnoty (<em>code-point</em>y). Tento slovník je v modulu zaveden explicitně v následujícím tvaru:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\nname2codepoint = {\r\n    'AElig':    0x00c6, # latin capital letter AE = latin capital ligature AE, U+00C6 ISOlat1\r\n    'Aacute':   0x00c1, # latin capital letter A with acute, U+00C1 ISOlat1\r\n    'Acirc':    0x00c2, # latin capital letter A with circumflex, U+00C2 ISOlat1\r\n    'Agrave':   0x00c0, # latin capital letter A with grave = latin capital letter A grave, U+00C0 ISOlat1\r\n    'Alpha':    0x0391, # greek capital letter alpha, U+0391\r\n    'Aring':    0x00c5, # latin capital letter A with ring above = latin capital letter A ring, U+00C5 ISOlat1\r\n    'Atilde':   0x00c3, # latin capital letter A with tilde, U+00C3 ISOlat1\r\n    'Auml':     0x00c4, # latin capital letter A with diaeresis, U+00C4 ISOlat1\r\n    …   # několik set řádek vynecháno\r\n}\r\n  </pre>\r\n  \r\n  <p>\r\n    Ukázka:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; import html.entities\r\n&gt;&gt;&gt; html.entities.name2codepoint['Aring']\r\n197\r\n&gt;&gt;&gt; chr(_)\r\n'Å'\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Znak <code>_</code> (podtržítko) znamená, že jako vstup se má použít předchozí výstup interpretru.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "„codepoint2name“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">„codepoint2name“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Slovník <code>codepoint2name</code> provádí přesně opačnou činnost, než <em>name2codepoint</em> – pro unicodový <em>code-point</em> (aneb číslo v libovolném tvaru) najde odpovídající XHTML-entitu:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; import html.entities\r\n\r\n&gt;&gt;&gt; html.entities.codepoint2name[0x00c5]\r\n'Aring'\r\n\r\n&gt;&gt;&gt; html.entities.codepoint2name[0xc5]\r\n'Aring'\r\n\r\n&gt;&gt;&gt; html.entities.codepoint2name[197]\r\n'Aring'\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "„entitydefs“",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„entitydefs“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Poslední ze slovníků – <code>entitydefs</code> – pak provádí konverzi ze jména přímo na znaky:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; import html.entities\r\n\r\n&gt;&gt;&gt; html.entities.entitydefs['Aring']\r\n'Å'\r\n  </pre>\r\n  <p>\r\n    Dnes je to asi nejužitečnější část modulu <em>html.entities</em>, protože dnešní terminály a editory již většinou nemají problém se zobrazováním a zapisováním „exotických“ znaků Unicodu.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Implementace",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Implementace</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Na celém modulu je nejzajímavější asi jeho implementace – poslední dva slovníky jsou totiž z hlavního <em>name2codepoint</em> vytvořeny za běhu (tedy při importu modulu) následujícím kódem:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\ncodepoint2name = {}\r\nentitydefs = {}\r\n\r\nfor (name, codepoint) in name2codepoint.items():\r\n    codepoint2name[codepoint] = name\r\n    entitydefs[name] = chr(codepoint)\r\n\r\ndel name, codepoint\r\n  </pre>\r\n  <p>\r\n    Při importu modulu <code>html.entities</code> se tedy stane následující:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        Slovník <code>name2codepoint</code> je ihned přítomen v jeho jmenném prostoru.\r\n    </li>\r\n    <li>\r\n        Z něj jsou následně pomocí smyčky <em>for-in</em> vytvořeny slovníky <code>codepoint2name</code> a <code>entitydefs</code> (samozřejmě také ve jmenném prostoru modulu).\r\n    </li>\r\n    <li>\r\n        Při tvorbě těchto dvou slovníků jsou použity proměnné <em>name</em> a <em>codepoint</em>, které se tak dostanou do globálního jmenného prostoru modulu, kde po doběhnutí smyčky zbytečně zabírají místo (a navíc obsahují odkaz na poslední zpracovávaný záznam slovníku <em>name2codepoint</em>, což je dost nešikovné). Proto jsou na poslední řádce příkazem <code>del name, codepoint</code> z tohoto jmenného prostoru odstraněny (a nikdo se tak na ně už nemůže dostat).\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
+    }
+  ]
+}

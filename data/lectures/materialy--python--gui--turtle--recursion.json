@@ -1,0 +1,96 @@
+{
+  "slug": "materialy--python--gui--turtle--recursion",
+  "total": 10,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jedním z velmi zábavných (a navíc ještě užitečných :-) použití želví grafiky je kreslení fraktálních obrazců pomocí rekurze (nebo smyček). V této přednášce si na příkladu stromu rozebereme základní principy, a pak se je pokusíme ještě trochu vylepšit.\r\n    </p>\r\n    <p>\r\n        PS: Mimochodem existují i rozšíření želví grafiky do tří rozměrů, která se používají kupříkladu pro reálně vypadající imitace rostlin.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Zadání příkladu",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Zadání příkladu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Naším úkolem je nakreslit přibližně následující „stromeček“:\r\n    </p>\r\n    <img src=\"_files/stromecek_0.png\" width=\"319\" height=\"245\" alt=\"\" title=\"Fraktální stromeček\">\r\n    <p>\r\n        Na první pohled to vypadá asi skoro nemožně, leč už na ten druhý je jasné, že stromeček je tvořen vždy dvěma zmenšenými kopiemi svého kmene na jeho konci, a to tak dále na každé kopii až po nějakou mez.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Rozbor zadání I",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Rozbor zadání I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Co musí naše „želva“ udělat, aby požadovaný stromeček nakreslila? Následující:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            z výchozího místa nakreslit kmen zadané délky;\r\n        </li>\r\n        <li>\r\n            na jeho konci nakreslit větev (= kmen kratší délky) pod jistým úhlem doleva;\r\n        </li>\r\n        <li>\r\n            na jeho konci nakreslit větev (= kmen kratší délky) pod jistým úhlem doprava;\r\n        </li>\r\n        <li>\r\n            na koncích obou větví zopakovat úplně to samé.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Rozbor zadání II – invariantní funkce",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Rozbor zadání II – invariantní funkce</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Rekurzivní krok je asi celkem jasný – na konci každého kmene/větve s želvou otočenou příslušným směrem ji necháme nakreslit kopii předchozí práce ve zmenšeném měřítku. A to hned dvakrát – jednou směrem vlevo, podruhé vpravo.\r\n    </p>\r\n    <p>\r\n        Zároveň je asi také jasné, že aby to mohlo fungovat, musí „želva“ po dokončení práce na příslušné (zmenšené) kopii stát opět na konci předchozí větve, jinak by pokus o vykreslení kopie druhým směrem začal na úplně špatném místě.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Což mimochodem znamená, že po dokončení kreslení stromu bude „želva“ stát ve výchozí pozici otočená stejným směrem jako na začátku!\r\n    </div></div>\r\n    <p>\r\n        Odborně se tomu říká, že (příslušná rekurzivní) funkce musí být <strong>stavovým invariantem</strong> (<em>state invariant</em>) – jejím voláním se sice něco stalo (nakreslily se další části stromu), nicméně po jejím ukončení se „želva“ nachází ve stejném stavu jako na jejím začátku.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Náčrt bez rekurze",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Náčrt bez rekurze</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ukažme si vykreslení do druhé úrovně (tedy pouze kmen a první dvojce větví) procedurálním kódem bez jakékoliv rekurze:\r\n    </p>\r\n    <img src=\"_files/stromecek_1.png\" width=\"151\" height=\"179\" alt=\"\" title=\"Fraktální stromeček – náčrt\">\r\n    <example lang=\"python\" src=\"_files/stromecek_1.py\"></example>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "A nyní s rekurzí",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">A nyní s rekurzí</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zkusme to nyní celé zapsat rekurzivně:\r\n    </p>\r\n    <example lang=\"python\" src=\"_files/stromecek_2.py\"></example>\r\n    <p>\r\n        Tohle pochopitelně ještě nebude fungovat, protože rekurze se bude donekonečna zanořovat pořád na levou část stromu. Ale už je aspoň vidět, jak to celé vypadá.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Ukončení rekurze",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Ukončení rekurze</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož rekurze se musí někdy zarazit, nemá-li býti nekonečná, náš program se kapku zesložití o ukončovací podmínku (tou může být třebas jako zde vykreslovaná délka větví nebo počet zanoření do rekurze). Zároveň jsem přesunul spočítání délky nových větví do vlastní proměnné:\r\n    </p>\r\n    <img src=\"_files/stromecek_3.png\" width=\"365\" height=\"266\" alt=\"\" title=\"Fraktální stromeček\">\r\n    <example lang=\"python\" src=\"_files/stromecek_3.py\"></example>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Reálněji vypadající strom I",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Reálněji vypadající strom I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ačkoli jsem v předchozím příkladu trochu upravil úhly a vzdálenosti, výsledek je stejně takový nemastný neslaný – je totiž až příliš symetrický. A má málo listů ^_^ Ale nikdo nám vlastně nenakázal, že oba rekurzivní kroky musí být úplně stejné. Nebo že musí být právě jenom dva. A už vůbec ne, že všechny „větve“ musí vycházet ze stejného místa:\r\n    </p>\r\n    <img src=\"_files/stromecek_4.png\" width=\"210\" height=\"264\" alt=\"\" title=\"Fraktální stromeček\">\r\n    <example lang=\"python\" src=\"_files/stromecek_4.py\"></example>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Upraveno podle: <a href=\"https://www.cs.berkeley.edu/~bh/v1ch10/turtle.html\" class=\"external\"><em>Computer Science Logo Style -- Volume 1: Symbolic Computing</em></a>\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Reálněji vypadající strom II",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Reálněji vypadající strom II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Když už jsme v tom, přihodíme ještě i barvu. Jen nesmíme zapomenout dodržovat invarianci i pro ni:\r\n    </p>\r\n    <img src=\"_files/stromecek_4c.png\" width=\"206\" height=\"261\" alt=\"\" title=\"Fraktální stromeček barevně\">\r\n    <example lang=\"python\" src=\"_files/stromecek_4c.py\"></example>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "L-systémy – simulace (nejen) růstu organismů",
+      "tags": [],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">L-systémy – simulace (nejen) růstu organismů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Po posledním příkladě asi nepřekvapí, že už dávno někoho napadlo použít želví grafiku, rekurzi a fraktály k simulaci skutečných rostlin, respektive obecně k simulaci růstu organismů. Konkrétně to byl Aristid Lindenmayer v roce 1968, který vymyslel tzv. <strong>L-systémy</strong> (aka <em>Lindenmayerovy systémy</em>). O těch ale <a href=\"/materialy/techs/L-systems/overview.xml\">až jinde</a>.\r\n    </p>\r\n\r\n</div>"
+    }
+  ]
+}

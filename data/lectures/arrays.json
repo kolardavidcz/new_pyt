@@ -1,0 +1,168 @@
+{
+  "slug": "materialy--python--types.plus--arrays",
+  "total": 14,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pokud člověk začíná s Python'em jako prvním programovacím jazykem, klasický datový typ <em>pole</em> (aneb <em>array</em>) mu nijak zvlášť nechybí. Ostatně Python jako dynamicky typovaný a interpretovaný jazyk k nějaké superoptimalizaci z hlediska datových typů nijak nevede.\r\n    </p>\r\n    <p>\r\n        Situace je jiná, pokud znáte <em>pole</em> ze staticky typovaných jazyků nebo vás rychlost trápí – pak vám se „samozřejmě“ se místo pole nabízející datovou strukturou <em>seznamu</em> asi poměrně rychle dojde trpělivost. A právě pro tyto případy je v pythoní knihovně k dispozici modul <strong><code>array</code></strong> – na první pohled jakoby seznam, ale s omezením na jeden konkrétní a dopředu vybraný datový typ (a to v podstatě jenom číselný).\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "„array“ versus „seznam“",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">„array“ versus „seznam“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Rozdíl mezi seznamem a (tradičním) polem z hlediska paměťové a časové náročnosti je velmi snadno zdůvodnitelný. Schematicky:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # seznam\r\n        [neznámý typ 1, neznámý typ 2, neznámý typ 3, …]\r\n        \r\n        # pole\r\n        [typ 1, typ 1, typ 1, …]\r\n    </pre>\r\n    <p>\r\n        Tudíž zatímco u seznamu nikdy nevíte, co na daném místě je, dokud se tam nepodíváte (v Python'u se typy drží hodnot, nikoli proměnných), což s sebou mimo jiné nese, že je občas docela problém zjistit, kam v paměti se po příslušném prvku vlastně podívat (i když záleží na implementaci samozřejmě) plus jak s ním vůbec zacházet (protože to zjistíte, až se na něj podíváte), u pole je tohle všechno naprosto jasné dávno dopředu už při jeho zavedení.\r\n    </p>\r\n    <p>\r\n        Z toho ovšem také nepřekvapivě vyplývá, že (nejen) pythoní typ <em>array</em> bude mít dosti omezenou množinu ukládatelných hodnot (mimo jiné aby všechny položky v paměti zabíraly stejné místo). Což samozřejmě vůbec není na škodu, když je to právě to, co potřebujete. Narozdíl od některých striktnějších jazyků však v Python'u není třeba dopředu znát velikost pole a podobně.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Zavedení – prázdné pole daného typu",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Zavedení – prázdné pole daného typu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Vzhledem k výše uvedenému je nutnou součástí zavedení pole určení typu dat v něm uložených. Jednoduchý příklad na zavedení pole celých čísel (klasický „int“):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # naimportování konstrukturu pole „array“ z příslušného modulu\r\n&gt;&gt;&gt; from array import array\r\n        \r\n        # zavedení pole celých čísel\r\n&gt;&gt;&gt; ar = array('i')\r\n        \r\n        # pole je zatím prázdné\r\n&gt;&gt;&gt; len(ar)\r\n        0\r\n        \r\n        # je to skutečně pole „int“ů\r\n&gt;&gt;&gt; ar.typecode\r\n        'i'\r\n        \r\n        # jeden prvek zabírá 4 bajty\r\n&gt;&gt;&gt; ar.itemsize\r\n        4\r\n</pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Zavedení – neprázdné pole daného typu",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Zavedení – neprázdné pole daného typu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Naplnit pole prvky jde mnoha různými způsoby (podobně jako u seznamu). Typicky při zavedení však můžete použít seznam vhodných prvků jako zde pro reálná čísla (klasické „float“y):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # naimportování modulu „array“\r\n&gt;&gt;&gt; import array\r\n        \r\n        # zavedení pole reálných čísel s několika počátečními prvky\r\n&gt;&gt;&gt; ar = array.array('f', [1, 2.0, 3.14])\r\n        \r\n        # jak je vidět, konstruktur si na vstupu poradil s celými čísly\r\n&gt;&gt;&gt; ar\r\n        array('f', [1.0, 2.0, 3.140000104904175])        \r\n        \r\n        # pole obsahuje tři prvky\r\n&gt;&gt;&gt; len(ar)\r\n        3\r\n        \r\n        # je to skutečně pole „float“ů\r\n&gt;&gt;&gt; ar.typecode\r\n        'f'\r\n        \r\n        # jeden prvek zabírá 4 bajty\r\n&gt;&gt;&gt; ar.itemsize\r\n        4\r\n</pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Podrobnosti k inicializaci",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Podrobnosti k inicializaci</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Objekt použitý pro zavedení výchozích prvků pole může být tří různých variant:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            seznam – na jeho zpracování je zavolána metoda <strong><code>array.fromlist(xs)</code></strong> (která funguje stejně jako smyčka s <code>for x in xs: ar.append(x)</code>, ale v případě chyby nebude původní pole změněno);\r\n        </li>\r\n        <li>\r\n            binární řetězec – na jeho zpracování je zavolána metoda <strong><code>array.frombytes(xb)</code></strong>;\r\n        </li>\r\n        <li>\r\n            iterovatelný objekt – na jeho zpracování je zavolána metoda <code>array.extend(iterable)</code>.\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        A samozřejmě ještě teoreticky deprikovaná možnost inicializace z unicodového řetězce pomocí <code>array.fromunicode(s)</code>.\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Již existující pole můžeme také doplnit prvky ze souboru pomocí metody <strong><code>array.fromfile(PROUD, PočetPrvků)</code></strong>. Obsahuje-li dostupný proud méně než požadovaný počet prvků, dojde k vyhození výjimky <code>EOFError</code>.\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        K uvedeným <em>from</em>-metodám nepřekvapivě existují i odpovídající <em>to</em>-metody:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong><code>array.tolist()</code></strong> – převede typované pole na standardní pythoní seznam;\r\n        </li>\r\n        <li>\r\n            <strong><code>array.tofile(PROUD)</code></strong> – zapíše bajty do otevřeného binárního souboru;\r\n        </li>\r\n        <li>\r\n            <strong><code>array.tobytes()</code></strong> – vrátí stejnou binární reprezentaci pole jako jsou data zapsaná předchozí metodou.\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Plus samozřejmě teoreticky deprikovaná metoda <code>array.tounicode()</code> pro pole typu <code>'u'</code>. Pro pole jiného typu se dá požadovaného výsledku dosáhnout pomocí <code>array.tobytes().decode(KÓDOVÁNÍ)</code>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Dostupné typy",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Dostupné typy</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Seznam identifikátorů aktuálně dostupných typů si můžete nechat vypsat:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; import array\r\n&gt;&gt;&gt; array.typecodes\r\n        'bBuhHiIlLqQfd'\r\n</pre>\r\n    <p>\r\n    </p>\r\n    <table style=\"font-family: monospace;\" class=\"centerTable slim\">\r\n        <tr>\r\n            <th>kód</th>\r\n            <th>C</th>\r\n            <th>Python</th>\r\n        </tr>\r\n        <tr>\r\n            <td>'b'</td>\r\n            <td>signed char</td>\r\n            <td>int</td>\r\n        </tr>\r\n        <tr>\r\n            <td>'B'</td>\r\n            <td>unsigned char</td>\r\n            <td>int</td>\r\n        </tr>\r\n        <tr>\r\n            <td>'h'</td>\r\n            <td>signed short</td>\r\n            <td>int</td>\r\n        </tr>\r\n        <tr>\r\n            <td>'H'</td>\r\n            <td>unsigned short</td>\r\n            <td>int</td>\r\n        </tr>\r\n        <tr>\r\n            <td>'i'</td>\r\n            <td>signed int</td>\r\n            <td>int</td>\r\n        </tr>\r\n        <tr>\r\n            <td>'I'</td>\r\n            <td>unsigned int</td>\r\n            <td>int</td>\r\n        </tr>\r\n        <tr>\r\n            <td>'l'</td>\r\n            <td>signed long</td>\r\n            <td>int</td>\r\n        </tr>\r\n        <tr>\r\n            <td>'L'</td>\r\n            <td>unsigned long</td>\r\n            <td>int</td>\r\n        </tr>\r\n        <tr>\r\n            <td>'q'</td>\r\n            <td>signed long long</td>\r\n            <td>int</td>\r\n        </tr>\r\n        <tr>\r\n            <td>'Q'</td>\r\n            <td>unsigned long long</td>\r\n            <td>int</td>\r\n        </tr>\r\n        <tr>\r\n            <td>'f'</td>\r\n            <td>float</td>\r\n            <td>float</td>\r\n        </tr>\r\n        <tr>\r\n            <td>'d'</td>\r\n            <td>double</td>\r\n            <td>float</td>\r\n        </tr>\r\n    </table>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Pythoní <em>int</em> je „nafukovací“ a <em>float</em> odpovídá rovnou céčkovskému <em>double</em>.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Typy <code>'q'</code> a <code>'Q'</code> nemusí být dostupné všude (záleží na podpoře <em>long long</em>, resp. <em>__int64</em>).\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Zatím je stále ještě dostupný také typ <code>'u'</code>, aneb unicodový znak, ale od verze Python'u 3.3 je nedoporučován k použití (<em>depricated</em>) a ve verzi 4.0 bude (spolu s odpovídajícím API <em>Py_UNICODE</em>) odstraněn.\r\n        </div></div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Pole jako sekvence",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Pole jako sekvence</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Typovaná pole sice obsahují spoustu metod specifických pouze pro ně, ale v mnoha dalších ohledech se chovají jako sekvenční typ, jmenovitě jako <em>seznam</em>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; from array import array\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3, 4, 5])\r\n        \r\n        # délka sekvence\r\n&gt;&gt;&gt; len(ar)\r\n        5\r\n        \r\n        # konkrétní prvek\r\n&gt;&gt;&gt; ar[3]\r\n        4\r\n&gt;&gt;&gt; ar[-3]\r\n        3\r\n        \r\n        # různé výřezy\r\n&gt;&gt;&gt; ar[1:3]\r\n        array('i', [2, 3])\r\n&gt;&gt;&gt; ar[1::2]\r\n        array('i', [2, 4])\r\n&gt;&gt;&gt; ar[3:]\r\n        array('i', [4, 5])\r\n&gt;&gt;&gt; ar[-3:]\r\n        array('i', [3, 4, 5])\r\n        \r\n        # dotaz na výskyt prvku\r\n&gt;&gt;&gt; 1 in ar\r\n        True\r\n&gt;&gt;&gt; 6 in ar\r\n        False\r\n        \r\n        # dvě spojené kopie\r\n&gt;&gt;&gt; ar * 2\r\n        array('i', [1, 2, 3, 4, 5, 1, 2, 3, 4, 5])\r\n</pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Pole jako sekvence – smyčka „for-in“",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Pole jako sekvence – smyčka „for-in“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Po polích se přirozeně prochází smyčkou, a to ve všech jejích základních variantách (protože prvky pole jsou stejného typu, a tudíž <em>srovnatelné</em>):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; from array import array\r\n&gt;&gt;&gt; ar = array('i', [5,2,3,1,4])\r\n        \r\n&gt;&gt;&gt; for x in ar:\r\n...   print(x)\r\n...\r\n        5\r\n        2\r\n        3\r\n        1\r\n        4\r\n        \r\n&gt;&gt;&gt; for i,x in enumerate(ar):\r\n...   print(i,x)\r\n...\r\n        0 5\r\n        1 2\r\n        2 3\r\n        3 1\r\n        4 4\r\n        \r\n&gt;&gt;&gt; for x in reversed(ar):\r\n...   print(x)\r\n...\r\n        4\r\n        1\r\n        3\r\n        2\r\n        5\r\n        \r\n&gt;&gt;&gt; for x in sorted(ar):\r\n...   print(x)\r\n...\r\n        1\r\n        2\r\n        3\r\n        4\r\n        5\r\n    </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Pole jako měnitelné sekvence",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Pole jako měnitelné sekvence</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Stejně jako seznamy jsou pole sekvence <strong>měnitelné</strong> (<em>mutable</em>), což znamená, že jejich obsah po vytvoření můžeme libovolně upravovat: \r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3, 4, 5])\r\n        \r\n&gt;&gt;&gt; ar[3]\r\n        4\r\n&gt;&gt;&gt; ar[3] = 7\r\n&gt;&gt;&gt; ar[3]\r\n        7\r\n&gt;&gt;&gt; ar\r\n        array('i', [1, 2, 3, 7, 5])\r\n</pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Dotazování na prvky",
+      "tags": [
+        "Already Studied"
+      ],
+      "diff": "basics",
+      "already_studied_in": {
+        "lecture_id": "lecture:materialy/python/types/lists.html",
+        "lecture_title": "Seznamy (Lists) & array",
+        "lecture_path": "vyuka_downloaded/materialy/python/types/lists.html",
+        "slide_id": "id7",
+        "slide_title": "Dotazování na prvky – „in“, „index()“, „count()“",
+        "week": 2,
+        "reason": "71% text similarity (37 shared concept words)"
+      },
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Dotazování na prvky</h2></div><div class=\"section-body\">\r\n  \r\n    <p class=\"enumerate\">\r\n        Kromě již dříve uvedeného a všem sekvencím společného operátoru <code>in</code>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3, 4, 5])\r\n\r\n&gt;&gt;&gt; 3 in ar\r\n        True\r\n&gt;&gt;&gt; 7 in ar\r\n        False\r\n</pre>\r\n    \r\n    <p class=\"enumerate\">\r\n        ...mají pole stejně jako seznamy k dispozici i metodu <code>index(PRVEK)</code>, která slouží k navrácení pozice prvního výskytu prvku s uvedenou hodnotou:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3, 4, 5])\r\n\r\n&gt;&gt;&gt; ar.index(1)\r\n        0\r\n&gt;&gt;&gt; ar.index(3)\r\n        2\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Není-li takový prvek v seznamu k dispozici, obdržíme výjimku <em>ValueError</em>.\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Kromě toho můžeme i počítat výskyty zadaného prvku pomocí metody <code>count(PRVEK)</code>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3, 1, 5, 6])\r\n\r\n&gt;&gt;&gt; ar.count(1)\r\n        2\r\n&gt;&gt;&gt; ar.count(2)\r\n        1\r\n&gt;&gt;&gt; ar.count(7)\r\n        0\r\n</pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Přidávání prvků",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Přidávání prvků</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jak už jsme říkali, <a href=\"?slajd=5\">metody používané interně pro inicializaci z přímého zadání pole</a> je také možné použít přímo pro přidávání prvků. Kromě nich ale nepřekvapivě funguje i standardní armáda operací ze seznamů, jen samozřejmě musíme přidávat prvky stejného typu:\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Předně můžeme využít metody pole <code>append(PRVEK)</code> pro přidání jednoho nového prvku na konec:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3])\r\n        \r\n&gt;&gt;&gt; ar.append(4)\r\n&gt;&gt;&gt; ar\r\n        array('i', [1, 2, 3, 4])\r\n</pre>\r\n    \r\n    <p class=\"enumerate\">\r\n        Jeden prvek také můžeme pomocí metody <code>insert(NA_KTERÝ_NOVÝ_INDEX, PRVEK)</code> (resp. <code>PŘED_KTERÝ_STARÝ_INDEX</code>) vložit na vybrané místo:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3])\r\n        \r\n&gt;&gt;&gt; ar.insert(1, 4)\r\n&gt;&gt;&gt; ar\r\n        array('i', [1, 4, 2, 3])\r\n        \r\n&gt;&gt;&gt; ar.insert(-1, 5)\r\n&gt;&gt;&gt; ar\r\n        array('i', [1, 4, 2, 5, 3])\r\n</pre>\r\n    \r\n    <p class=\"enumerate\">\r\n        Na konec pole můžeme také přidat více prvků jiného iterovatelného objektu (pochopitelně pouze pokud obsahuje prvky stejného typu), a to buď pomocí metody <code>extend(ITERABLE)</code>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3])\r\n        \r\n&gt;&gt;&gt; ar.extend( array('i', [4, 5]) )\r\n&gt;&gt;&gt; ar\r\n        array('i', [1, 2, 3, 4, 5])\r\n</pre>\r\n    \r\n    <p class=\"enumerate\">\r\n        ..nebo pomocí „obyčejného“ slepování sekvencí pomocí operátoru <code>+</code>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3])\r\n        \r\n&gt;&gt;&gt; ar += array('i', [4, 5])\r\n&gt;&gt;&gt; ar\r\n        array('i', [1, 2, 3, 4, 5])\r\n</pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Odebírání prvků",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Odebírání prvků</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Odebírání prvků z pole je prakticky kompletní kopií práce se seznamem:\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Odebrat prvek, resp. prvky, na základě jeho, resp. jejich, pozice (indexu) nám umožňuje univerzální příkaz <code>del</code> standardním způsobem pomocí výřezů:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; del ar[1]\r\n&gt;&gt;&gt; ar\r\n        array('i', [1, 3, 4, 5, 6])\r\n        \r\n&gt;&gt;&gt; del ar[3:]\r\n&gt;&gt;&gt; ar\r\n        array('i', [1, 3, 4])\r\n</pre>\r\n    \r\n    <p class=\"enumerate\">\r\n        Pro jeden prvek víceméně totéž zařídí metoda seznamu <code>pop([INDEX=-1])</code>. Rozdíl je v tom, že odebraný prvek je metodou vrácen:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3, 4, 5, 6])\r\n        \r\n&gt;&gt;&gt; ar.pop()     # ostraní poslední prvek\r\n        6\r\n&gt;&gt;&gt; ar\r\n        array('i', [1, 2, 3, 4, 5])\r\n        \r\n&gt;&gt;&gt; ar.pop(0)    # ostraní první prvek\r\n        1\r\n&gt;&gt;&gt; ar\r\n        array('i', [2, 3, 4, 5])\r\n        \r\n&gt;&gt;&gt; ar.pop(2)    # odstraní prvek na pozici 2, tj. třetí\r\n        4\r\n&gt;&gt;&gt; ar\r\n        array('i', [2, 3, 5])\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pokus o odstranění prvku na neexistující pozici nebo z prázdného seznamu skončí výjimkou <em>IndexError</em>.\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Poslední možností je odstranit prvek na základě jeho obsahu, a nikoli indexu. O to se stará metoda <code>remove(PRVEK)</code>. Odstraněn je vždy první výskyt (zleva) daného prvku:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3, 2, 5, 6])\r\n    \r\n&gt;&gt;&gt; ar.remove(2)\r\n&gt;&gt;&gt; ar\r\narray('i', [1, 3, 2, 5, 6])\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pokus o odstranění prvku, který se v seznamu nenachází, skončí výjimkou <em>ValueError</em>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Další metody polí",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Další metody polí</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Metoda <strong><code>array.reverse()</code></strong> nepřekvapivě obrátí pořadí prvků v poli:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; ar = array('i', [1, 2, 3])\r\n&gt;&gt;&gt; ar.reverse()\r\n&gt;&gt;&gt; ar\r\n        array('i', [3, 2, 1])\r\n</pre>\r\n    \r\n    <p class=\"enumerate\">\r\n        Naproti tomu metoda <strong><code>array.byteswap()</code></strong> otočí pořadí jednotlivých bajtů každé konkrétní hodnoty pole – šikovné pro práci s daty z architektury s jiným pořadím zápisu bajtů vícebajtových hodnot.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Metoda zabere pouze na data, jejichž hodnoty jsou zapsány pomocí právě 1, 2, 4 nebo 8 bajtů, jinak vyhodí výjimku <code>RuntimeError</code>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "A kam dál?",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">A kam dál?</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jak je vidět, modul <em>array</em> toho zase až tak moc nenabízí – vlastně jen umí vytvořit a spravovat jednorozměrná pole homogenních číselných typů. Práce s ním je standardně pythonovsky příjemná, protože je to <em>sekvenční typ</em>, ale vlastně nic navíc oproti seznamům neumí (kromě toho, že zjevně bude „přívětivější“ na paměť i na rychlost).\r\n    </p>\r\n    <p>\r\n        Pokud člověk potřebuje pořádnou práci s vícerozměrnými číselnými poli a nejlépe ještě i příslušné matematické operace nad nimi, musí se podívat někam dál, konkrétně na balík <a href=\"http://NumPy.org\" class=\"external\">NumPy</a> (jinak vlastně samostatná součást většího balíku pro vědecké a technické výpočty <a href=\"http://SciPy.org\" class=\"external\">SciPy</a>).\r\n    </p>\r\n\r\n</div>"
+    }
+  ]
+}

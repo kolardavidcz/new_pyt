@@ -1,0 +1,114 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jak je v knihovně Pandas vnitřně koncepčně strukturován objekt DataFrame?",
+    "options": [
+      "A) Jako jednorozměrný spojový seznam řádků, kde každý prvek obsahuje n-tici s libovolně proměnnými typy dat.",
+      "B) Jako trojrozměrný tenzor v NumPy, kde první dimenze drží datové typy a zbylé dvě drží hodnoty tabulky.",
+      "C) Jako slovník sloupců, kde klíče jsou názvy sloupců a hodnotami jsou objekty Series sdílející společný index.",
+      "D) Jako statická pole C-struktur alokovaná v souvislém bloku paměti s pevně zafixovaným počtem řádků i sloupců."
+    ],
+    "answer": 2,
+    "explanation": "DataFrame je v podstatě mapování (slovník) z názvů sloupců na jednorozměrná pole Series, přičemž všechny sloupce sdílejí stejný řádkový index. Přidání sloupce je proto levné, zatímco přidání řádku je náročné.",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "true_false_tricky",
+    "question": "Vyhodnoťte pravdivost tvrzení o procházení řádků v Pandas pomocí cyklu for nebo metody iterrows():\n\nRuční iterace po řádcích DataFrame pomocí cyklu for nebo iterrows() je doporučený a nejrychlejší způsob úpravy dat v Pandas.",
+    "options": [
+      "A) Nepravda – iterace po řádcích je v Pandas považována za antipattern; pro efektivní zpracování se používají vektorizované operace.",
+      "B) Pravda – iterace po řádcích přímo využívá C-API Pythonu, a je proto znatelně rychlejší než vektorizovaný výpočet přes sloupce."
+    ],
+    "answer": 0,
+    "explanation": "Procházení po řádcích u sloupcově orientovaného DataFrame vyžaduje opakovaný přístup napříč všemi samostatnými objekty Series. Vytváří obrovskou režii, proto jde v Pandas o známý antipattern.",
+    "code": null
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte chybějící syntaxi závorek pro výběr pod-tabulky se sloupci A a B jako nového DataFrame:\n\nimport pandas as pd\ndf = pd.DataFrame({'A': [1, 2], 'B': [3, 4], 'C': [5, 6]})\nsub_df = df________'A', 'B'________:",
+    "options": [
+      "([ a ])",
+      "[ a ]",
+      "{( a )}",
+      "[[ a ]]"
+    ],
+    "answer": 3,
+    "explanation": "Jednoduché hranaté závorky df['A'] vrací jednorozměrný objekt Series. Pro výběr více sloupců a zachování typu DataFrame se seznam názvů sloupců předává uvnitř dvojitých závorek df[['A', 'B']].",
+    "expected": "[[ a ]]",
+    "code": "import pandas as pd\ndf = pd.DataFrame({'A': [1, 2], 'B': [3, 4], 'C': [5, 6]})\nsub_df = df________'A', 'B'________"
+  },
+  {
+    "id": "q4",
+    "type": "predict_output",
+    "question": "Jaký datový typ vrátí metoda df['kategorie'].unique() při zavolání na sloupec Pandas?",
+    "options": [
+      "A) NumPy pole ndarray obsahující pouze unikátní hodnoty z daného sloupce.",
+      "B) Vestavěnou pythonovskou množinu set bez zachování původního pořadí prvků.",
+      "C) Nový objekt typu Pandas Series indexovaný celými čísly od nuly nahoru.",
+      "D) Standardní pythonovský seznam list všech unikátních řetězců v datovém sloupci."
+    ],
+    "answer": 0,
+    "explanation": "Metoda .unique() na objektu Series nevrací Python list ani set, ale NumPy jednorozměrné pole ndarray unikátních hodnot v pořadí jejich prvního výskytu.",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Proč se při vyhodnocování složených podmínek ve fancy indexingu v Pandas musí používat operátory &, | a ~ místo and, or a not?",
+    "options": [
+      "A) Operátory and a or pracují výhradně s celými čísly, zatímco bitové operátory & a | fungují i pro řetězce a desetinná čísla.",
+      "B) Bitové operátory jsou přetíženy pro prvek po prvku (element-wise), zatímco Python and/or vyhodnocují pravdivost celého objektu.",
+      "C) Slova and a or jsou v syntaxi Pandas vyrazena z důvodu zrychlení parsování výrazů při spuštění kódu v C-rozhraní.",
+      "D) Bitové operátory automaticky konvertují chybějící hodnoty NaN na False, což klíčová slova and a or nedokážou zaručit."
+    ],
+    "answer": 1,
+    "explanation": "Klíčová slova and a or se snaží zkonvertovat celý objekt Series na jedinou logickou hodnotu (vyvolá ValueError: Truth value of a Series is ambiguous). Pro porovnání po prvcích se musí použít bitové operátory &, |, ~ a podmínky obalit v závorkách.",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "fill_blank_choice",
+    "question": "Doplňte chybějící vlastnost pro použití vektorizovaných řetězcových metod nad sloupcem Series:\n\nimport pandas as pd\ndf = pd.DataFrame({'jmena': ['Anna', 'Petr', 'Pavel']})\nmask = df['jmena'].________.startswith('P'):",
+    "options": [
+      "text",
+      "char",
+      "str",
+      "string"
+    ],
+    "answer": 2,
+    "explanation": "Akcesor .str zpřístupňuje vektorizované řetězcové metody (jako contains(), startswith(), lower()) nad všemi prvkami objektu Series.",
+    "expected": "str",
+    "code": "import pandas as pd\ndf = pd.DataFrame({'jmena': ['Anna', 'Petr', 'Pavel']})\nmask = df['jmena'].________.startswith('P')"
+  },
+  {
+    "id": "q7",
+    "type": "predict_output",
+    "question": "Co vrátí výraz df.iloc[0:2] zavolaný na DataFrame se 5 řádky?",
+    "options": [
+      "A) Jediný prvek z prvního řádku a druhého sloupce v původní tabulce df.",
+      "B) Objekt Series představující hodnoty z nultého sloupce pro první dva řádky.",
+      "C) Nový DataFrame obsahující první tři řádky (na pozicích 0, 1 a 2).",
+      "D) Nový DataFrame obsahující první dva řádky (na pozicích indexu 0 a 1)."
+    ],
+    "answer": 3,
+    "explanation": "Pseudometoda iloc[] používá celočíselné pozicové indexování dodržující konvence slicing [start:stop], kde stop pozice (2) není zahrnuta. Výsledkem pro 0:2 jsou tedy řádky 0 a 1.",
+    "code": null
+  },
+  {
+    "id": "q8",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl mezi metodami df.info() a df.head() v Pandas?",
+    "options": [
+      "A) info() vypisuje technické shrnutí sloupců, typů a paměti, zatímco head() vrací prvních několik řádků datových hodnot.",
+      "B) info() vrací nový DataFrame s popisnou statistikou, zatímco head() ukládá načtená data přímo na disk do souboru.",
+      "C) info() mění datové typy sloupců na optimálnější, zatímco head() seřadí hodnoty v tabulce podle prvního sloupce.",
+      "D) info() odstraňuje z tabulky neplatné řádky NaN, zatímco head() vybírá pouze sloupečky s číselnými hodnotami."
+    ],
+    "answer": 0,
+    "explanation": "df.info() vypíše na standardní výstup souhrn o počtu nepotvrzených (non-null) záznamů, datových typech dtype každého sloupce a využití paměti. df.head() vrací nový DataFrame obsahující počáteční řádky.",
+    "code": null
+  }
+]

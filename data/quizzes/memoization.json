@@ -1,0 +1,87 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl mezi přístupem shora dolů (memoizace) a zdola nahoru (dynamické programování)?",
+    "options": [
+      "A) Memoizace vyžaduje výhradně pole (seznamy), zatímco přístup zdola nahoru využívá výhradně slovníky.",
+      "B) Memoizace vychází z původního zadání ke kotvám rekurze, zatímco přístup zdola nahoru staví od kotev k cíli.",
+      "C) Memoizace počítá všechny mezistavy dopředu, zatímco přístup zdola nahoru počítá pouze vyžádané stavy.",
+      "D) Memoizace eliminuje paměťové nároky výpočtu, zatímco přístup zdola nahoru eliminuje časové nároky."
+    ],
+    "answer": 1,
+    "explanation": "Memoizace postupuje shora dolů (od požadovaného kotevního zadání rekurzivně větví k základním případům a kešíuje výsledky), zatímco přístup zdola nahoru iterativně skládá výpočet od základních případů (listů) nahoru k cíli.",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "predict_output",
+    "question": "Který vestavěný dekorátor z modulu functools poskytuje automatickou memoizaci výsledků funkce?",
+    "options": [
+      "A) @functools.remember",
+      "B) @functools.lru_store",
+      "C) @functools.cache",
+      "D) @functools.memoize"
+    ],
+    "answer": 2,
+    "explanation": "Dekorátor @functools.cache (přidaný v Pythonu 3.9 jako zkratka pro lru_cache(maxsize=None)) slouží k bezpracné memoizaci volání funkcí na základě jejich argumentů.",
+    "code": null
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jaký požadavek musí splňovat argumenty funkce, aby mohly být použity jako klíče memoizačního slovníku?",
+    "options": [
+      "A) Musí to být objekty implementující výhradně speciální metodu __len__() pro zjištění délky.",
+      "B) Musí to být výhradně celá kladná čísla typu int v rozsahu indexů souvislého paměťového pole.",
+      "C) Musí to být měnitelné (mutable) dynamické sekvence, například běžné seznamy nebo slovníky.",
+      "D) Musí to být hašovatelné (hashable) a neměnné (immutable) objekty, například n-tice nebo čísla."
+    ],
+    "answer": 3,
+    "explanation": "Slovník v Pythonu vyžaduje jako klíče hašovatelné objekty (hashable). Proto nelze přímo kešíovat argumenty typu list či dict, ale je třeba použít např. tuple nebo int.",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Na jakou časovou složitost se sníží výpočet Fibonacciho čísla při použití memoizace oproti čisté rekurzi?",
+    "options": [
+      "A) Sníží se na lineární složitost O(n), protože každý člen posloupnosti se počítá právě jednou.",
+      "B) Sníží se na konstantní složitost O(1), protože všechny výsledky jsou předpočítány při definici.",
+      "C) Zůstane na exponenciální složitosti O(2^n), protože režie rekurzivního volání zůstává stejná.",
+      "D) Sníží se na kvadratickou složitost O(n^2), protože vyhledávání ve slovníku trvá čas O(n)."
+    ],
+    "answer": 0,
+    "explanation": "Díky ukládání již spočtených hodnot do slovníku se vyhnete opakovanému exponenciálnímu rozvíjení stejných podstromů rekurze a složitost klesne z O(2^n) na O(n).",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "fill_blank_choice",
+    "question": "Doplňte typ výjimky, která vznikne při pokusu o čtení neexistujícího klíče ze slovníku a zachytává se při ruční implementaci memoizace.",
+    "options": [
+      "LookupError",
+      "KeyError",
+      "ValueError",
+      "IndexError"
+    ],
+    "answer": 1,
+    "explanation": "Při přístupu ke klíči, který se ve standardním slovníku `dict` nenachází, vyvolá Python výjimku `KeyError`.",
+    "code": "memo = {}\n\ndef compute_fibonacci(n):\n    try:\n        return memo[n]\n    except ________:\n        if n < 2:\n            memo[n] = n\n        else:\n            memo[n] = compute_fibonacci(n - 1) + compute_fibonacci(n - 2)\n        return memo[n]",
+    "expected": "KeyError"
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaký bude výsledek vykonání iterativního výpočtu Fibonacciho čísla pro n = 4 zdola nahoru?",
+    "options": [
+      "A) Vyvolá výjimku UnboundLocalError při paralelním přepsání n-tice n1 a n2.",
+      "B) Vrátí hodnotu 2, protože smyčka for se v algoritmu provede pouze dvakrát.",
+      "C) Vrátí hodnotu 3, protože posloupnost prvků postupuje jako 0, 1, 1, 2, 3.",
+      "D) Vrátí hodnotu 5, protože posloupnost prvků začíná počítat od 1, 2, 3, 5."
+    ],
+    "answer": 2,
+    "explanation": "Pro n=4 smyčka proběhne (4-1)=3krát: 1. krok: n1=1, n2=1; 2. krok: n1=2, n2=1; 3. krok: n1=3, n2=2. Funkce vrátí n1 = 3.",
+    "code": "def fib(n):\n    if n <= 1: return n\n    n2, n1 = 0, 1\n    for _ in range(n-1):\n        n1, n2 = n1 + n2, n1\n    return n1\n\nprint(fib(4))"
+  }
+]

@@ -1,0 +1,95 @@
+{
+  "slug": "materialy--python--sorting--advanced",
+  "total": 8,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <a href=\"overview.xml\">Již jsme si říkali</a>, jak se v Python'u třídí vestavěné typy. Také jsme si řekli, že je-li dostupná „magická metoda“ <code>__lt__()</code>, je ke třídění pomocí funkce <em>sorted()</em> použita právě ona.\r\n  </p>\r\n  <p>\r\n    Jelikož nyní již umíme pracovat s objekty a víme něco o jejich „magických metodách“, podíváme se, jak našim vlastním objektům naimplementovat možnost jejich řazení podle zvolených kritérií.\r\n  </p>\r\n\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Použité příklady upraveny podle dokumentace.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "__lt__()",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">__lt__()</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Za porovnávání instancí objektů pomocí funkce <em>sort()</em> je tedy zodpovědná „magická metoda“ <code>OBJEKT.__lt__(self, other)</code>. Parametr <em>self</em> odpovídá aktuální instanci objektu, druhý parametr <em>other</em> je pak vstupem pro druhou instanci, s níž dochází k porovnání.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    V Python'u 2.x tuto pozici zastávala standardní porovnávací funkce <em>cmp(a, b)</em>, resp. odpovídající magická metoda <em>__cmp__()</em>.\r\n  </div></div>\r\n  \r\n  <p>\r\n    Vlastní implementace musí vracet logickou hodnotu na základě porovnání nějakých odpovídajících si vlastností obou objektů, v nejjednodušším případě tedy např. dvou stejných atributů:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\ndef __lt__(self, other):\r\n    return self.ATRIBUT &lt; other.ATRIBUT\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Pro metodu <em>__lt__()</em>, tedy „menší než“ (<em>less than</em>), jde pochopitelně o odpovídající porovnání <code>&lt;</code> .\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Příklad I",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Příklad I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Definujme si vlastní třídu pro ukládání informací o žácích:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\nclass Student:\r\n    \r\n    def __init__(self, jméno, známka, věk):\r\n        self.jméno = jméno\r\n        self.známka = známka\r\n        self.věk = věk\r\n    \r\n    def __repr__(self):\r\n        return repr((self.jméno, self.známka, self.věk))\r\n  </pre>\r\n  \r\n  <p>\r\n    Pokud nyní zavedeme <em>seznam</em> několika žáků s příslušnými údaji..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\nstudenti = [\r\n    Student('John', 'A', 15),\r\n    Student('Jane', 'B', 12),\r\n    Student('Dave', 'B', 10),\r\n]\r\n  </pre>\r\n  <p>\r\n    ..přímo setřídit je nemůžeme, protože daná třída pro to neposkytuje žádnou podporu a její instance se tudíž hlásí jako <em>netříditelné</em>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; sorted(studenti)\r\nTraceback (most recent call last):\r\n  File \"&lt;pyshell#43&gt;\", line 1, in &lt;module&gt;\r\nsorted(studenti)\r\nTypeError: unorderable types: Student() &lt; Student()\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Příklad II",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Příklad II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Upravme nyní tuto třídu, tak aby třídění umožňovala:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\nclass Student:\r\n    \r\n    def __init__(self, jméno, známka, věk):\r\n        self.jméno = jméno\r\n        self.známka = známka\r\n        self.věk = věk\r\n    \r\n    def __repr__(self):\r\n        return repr((self.jméno, self.známka, self.věk))\r\n    \r\n    def __lt__(self, jiný_student):\r\n        return self.věk &lt; jiný_student.věk\r\n  </pre>\r\n  \r\n  <p>\r\n    Nyní při stejném <em>seznamu</em> žáků s příslušnými údaji..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\nstudenti = [\r\n    Student('John', 'A', 15),\r\n    Student('Jane', 'B', 12),\r\n    Student('Dave', 'B', 10),\r\n]\r\n  </pre>\r\n  <p>\r\n    ..už třídění provést můžeme – žáci se setřídí podle svého věku:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; studenti\r\n[('John', 'A', 15), ('Jane', 'B', 12), ('Dave', 'B', 10)]\r\n\r\n&gt;&gt;&gt; sorted(studenti)\r\n[('Dave', 'B', 10), ('Jane', 'B', 12), ('John', 'A', 15)]\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Porovnávání",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Porovnávání</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Zadefinování metody <em>__lt__()</em> umožňuje kromě třídění objektů pomocí vestavěné funkce <code>sorted()</code> též jejich porovnávání pomocí operátoru <code>&lt;</code> a jemu odpovídající funkce <em>operator.lt()</em> modulu <em>operator</em>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# a) porovnávání pomocí operátoru &lt;\r\n&gt;&gt;&gt; Student('John', 'A', 15) &lt; Student('Jane', 'B', 12)\r\nFalse\r\n&gt;&gt;&gt; Student('Jane', 'B', 12) &lt; Student('John', 'A', 15)\r\nTrue\r\n\r\n# b) porovnávání pomocí metody „operator.lt()“\r\n&gt;&gt;&gt; import operator\r\n&gt;&gt;&gt; operator.lt( Student('John', 'A', 15), Student('Jane', 'B', 12) )\r\nFalse\r\n&gt;&gt;&gt; operator.lt( Student('Jane', 'B', 12), Student('John', 'A', 15 ) )\r\nTrue\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Porovnávací metody",
+      "tags": [
+        "Core",
+        "Tricky"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Porovnávací metody</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Potřebujete-li své objekty nejen třídit, ale též uvedeným způsobem porovnávat, musíte dodefinovat i další porovnávací magické metody. Následující tabulka uvádí přehled jejich volání při příslušných operacích mezi objekty <code>x</code> a <code>y</code>:\r\n  </p>\r\n  <table class=\"center\">\r\n    <tr>\r\n        <th>operátor</th>\r\n        <td rowspan=\"7\" width=\"50\"></td>\r\n        <th>metoda</th>\r\n    </tr>\r\n    <tr>\r\n        <td> <code>x &lt; y</code> </td>\r\n        <td> <code>x.__lt__(y)</code> </td>\r\n    </tr>\r\n    <tr>\r\n        <td> <code>x &lt;= y</code> </td>\r\n        <td> <code>x.__le__(y)</code> </td>\r\n    </tr>\r\n    <tr>\r\n        <td> <code>x == y</code> </td>\r\n        <td> <code>x.__eq__(y)</code> </td>\r\n    </tr>\r\n    <tr>\r\n        <td> <code>x != y</code> </td>\r\n        <td> <code>x.__ne__(y)</code> </td>\r\n    </tr>\r\n    <tr>\r\n        <td> <code>x &gt; y</code> </td>\r\n        <td> <code>x.__gt__(y)</code> </td>\r\n    </tr>\r\n    <tr>\r\n        <td> <code>x &gt;= y</code> </td>\r\n        <td> <code>x.__ge__(y)</code> </td>\r\n    </tr>\r\n  </table>\r\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jména metod v modulu <em>operator</em> jsou nepřekvapivě obdobná.\r\n    </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Konvenčně vracejí porovnávací metody přímo booleovské hodnoty <code>True</code> nebo <code>False</code>, ale místo nich mohou vracet cokoliv, co bude dále jako pravdivostní hodnota vyhodnoceno.\r\n    </div></div></div>\r\n  <p>\r\n      PS: Striktně vzato, dvojce <code>__lt__()</code> vs <code>__gt__()</code> a <code>__le__()</code> vs <code>__ge__()</code> jsou si navzájem doplňkové, tzn. nadefinujete-li pouze jednu metodu z dvojce a pokusíte se pak porovnávat pomocí odpovídající druhé neexistující, Python prohodí pořadí argumentů a zavolá existující metodu na druhém z nich, takže dostanete logicky stejný výsledek.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Dekorátor „@functools.total_ordering“",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Dekorátor „@functools.total_ordering“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Třeba poznamenat, že implementujete-li metody z předchozího slajdu, Python naprosto nehlídá, zda jsou spolu logicky provázané – tudíž pravdivost operace <code>==</code> vůbec nemusí implikovat nepravdivost operace <code>!=</code>.\r\n    </p>\r\n    <p>\r\n        Na druhou stranu si od Python'u 3.2 můžete usnadnit práci – v modulu <a href=\"/materialy/python/functions/advanced-3.xml\"><em>functools</em></a> se totiž nachází i dekorátor <em>@functools.total_ordering</em>, kterému stačí v dekorované třídě nadefinovat metodu <code>__eq__()</code> a aspoň jednu z metod <code>__lt__()</code>, <code>__le__()</code>, <code>__gt__()</code> nebo <code>__ge__()</code>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Tyto automaticky odvozené metody se mohou v kritické situaci celkem pochopitelně ukázat pomalejšími než ručně napsané, ale jinak pekelně šetří práci i kód. Zároveň také není nezbytně nutné poskytnout implementaci metody <code>__eq__()</code>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Příklad",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Příklad</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pokud bychom pokračovali v našem příkladu o studentech, mohl by výsledek vypadat třeba takto:\r\n    </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\nfrom functools import total_ordering\r\n\r\n@total_ordering\r\nclass Student:\r\n    \r\n    def __init__(self, jméno, známka, věk):\r\n        self.jméno = jméno\r\n        self.známka = známka\r\n        self.věk = věk\r\n    \r\n    def __repr__(self):\r\n        return repr((self.jméno, self.známka, self.věk))\r\n    \r\n    def __eq__(self, jiný_student):\r\n        return self.věk == jiný_student.věk\r\n    \r\n    def __lt__(self, jiný_student):\r\n        return self.věk &lt; jiný_student.věk\r\n  </pre>\r\n  <p>\r\n      Instance této třídy je již možno porovnávat všemi šesti porovnávacími metodami.\r\n  </p>\r\n\r\n</div>"
+    }
+  ]
+}
