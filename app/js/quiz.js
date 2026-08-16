@@ -4,7 +4,7 @@
  */
 
 import { state, saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, getQuizFor } from "./state.js";
-import { clear, el, escapeHtml } from "./ui.js";
+import { clear, el, escapeHtml, escapeAttr } from "./ui.js";
 import { highlightCode, dedentCode } from "./highlight.js";
 import { formatInlineCode, isFlexibleCodeFillCorrect, parseQuestionContent } from "./format.js";
 
