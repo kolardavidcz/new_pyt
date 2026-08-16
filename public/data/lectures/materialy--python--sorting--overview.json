@@ -1,0 +1,183 @@
+{
+  "slug": "materialy--python--sorting--overview",
+  "total": 18,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Python má zabudovaný algoritmus pro třídění <em>TimSort</em>, který je poměrně univerzální, rychlý a hlavně <a href=\"?slajd=15\">stabilní</a>, takže se dá použít pro vícenásobné třídění objektů podle více kritérií (byť zrovna tohle není příliš potřeba).\r\n  </p>\r\n  <p>\r\n    PS: Dvojkový Python používal při řazení standardní porovnávací funkci <em>cmp(x1, x2)</em>, kterou znáte snad z většiny ostatních programovacích jazyků. Trojkový ji zaměnil za <a href=\"?slajd=10\">řazení pomocí klíče</a>, které je asi dosti nezvyklé, ale (nejen) podle mého velmi mocné.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Třídění vestavěných typů – „sorted()“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Třídění vestavěných typů – „sorted()“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Primárním způsobem třídění je použití globální funkce <code>sorted()</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    xs = sorted(iterable[, key][, reverse])\r\n  </pre>\r\n  <p>\r\n    Ta dokáže nějakým způsobem setřídit každý iterovatelný typ, který se nějak setřídit dá, přičemž vrací seznam:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = { 'b': 2, 'a': 1, 'c': 9, 'd': 7, }\r\n\r\n&gt;&gt;&gt; ys = sorted(xs)\r\n&gt;&gt;&gt; ys\r\n['a', 'b', 'c', 'd']\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Zde tedy metoda <code>sorted()</code> setřídila slovník a to tak, jak je pro slovník typické – po klíčích.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Poznámka k seznamům – metoda „[].sort()“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Poznámka k seznamům – metoda „[].sort()“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Pro řazení objektů typu <em>seznam</em> můžeme též použít metodu <code>sort()</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    xs.sort([key[, reverse]])\r\n  </pre>\r\n  <p>\r\n    Ta řadí seznam „v místě“, tzn. že nevytváří nový objekt, do kterého by nakopírovala výsledek řazení jako metoda <em>sorted()</em>, ale místo toho upraví pořadí prvků v tříděném seznamu (takže o seznam s původním pořadím prvků tímto přijdeme):\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = [5, 2, 6, 4, 1, 3, ]\r\n\r\n&gt;&gt;&gt; xs.sort()\r\n&gt;&gt;&gt; xs\r\n[1, 2, 3, 4, 5, 6]\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Aby dala ještě více najevo, že objekty jsou řazeny „v místě“, vrací metoda <code>xs.sort()</code> <em>None</em>.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Parametr „reverse“",
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Parametr „reverse“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Nepovinný boolean-parametr <em>reverse</em> u obou třídících metod nastavením na <em>True</em> způsobí změnu směru řazení (vlastně provádí všechna porovnávání opačně):\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = [5, 2, 6, 4, 1, 3, ]\r\n\r\n&gt;&gt;&gt; xs.sort( reverse=True )\r\n&gt;&gt;&gt; xs\r\n[6, 5, 4, 3, 2, 1]\r\n  </pre>\r\n  <p>\r\n    PS: V dalším textu ho, a stejně tak i metodu seznamu <code>sort()</code>, budeme ignorovat a probereme důkladně pouze druhý pojmenovaný parametr <em>key</em> a logiku schovanou za vlastním tříděním.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Třídění je lexikografické I",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Třídění je lexikografické I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Objekty v Python'u se třídí podle svého typu:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# třídění čísel podle velikosti\r\n&gt;&gt;&gt; sorted( [1, 5, 3, 2, 4, ] )\r\n[1, 2, 3, 4, 5]\r\n\r\n# třídění řetězců podle abecedy..\r\n&gt;&gt;&gt; sorted( ['ovce', 'kočka', 'pes', 'hroznýš', 'prase', ] )\r\n['hroznýš', 'kočka', 'ovce', 'pes', 'prase']\r\n\r\n# ..ovšem unicodové\r\n&gt;&gt;&gt; sorted( ['jedna', 'dvě', 'tři', 'čtyři', 'pět', 'šest', 'sedm', ] )\r\n['dvě', 'jedna', 'pět', 'sedm', 'tři', 'čtyři', 'šest']\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Třídění je lexikografické II",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Třídění je lexikografické II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Složitější objekty se pak třídí postupně po jednotlivých částech, přičemž každý „základní/jednoduchý“ typ se třídí stejně jako výše:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; sorted( [('two', 3), ('one', 4), ('one', 2), ('three', 5), ('two', 1), ] )\r\n[('one', 2), ('one', 4), ('three', 5), ('two', 1), ('two', 3)]\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Tzn. že n-tice v seznamu se nejdříve setřídily podle své první položky, tj. abecedně, a poté takto shodné ještě navíc i podle druhé, tj. podle velikosti.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Třídění je lexikografické III",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Třídění je lexikografické III</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <strong>Lexikografické třídění</strong> tedy znamená, že např. čísla se seřadí podle velikosti a řetězce podle abecedy plus to, že sekvence se porovnávají postupně „po složkách“ (pokud jsou ovšem typy příslušných složek navzájem porovnatelné). Přitom o výsledku řazení rozhodne první dvojce (libovolně hluboko zanořených) prvků, která není stejná, jak ukazuje následující příklad:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; [1, 2] &lt; [1, 2, 3]\r\nTrue\r\n\r\n&gt;&gt;&gt; [1, ['a', 'b']] &lt; [1, ['a', 'b'], 3]\r\nTrue\r\n\r\n&gt;&gt;&gt; [1, ['a', 'c']] &lt; [1, ['a', 'b'], 3]\r\nFalse\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Jelikož <code>'c' &gt; 'b'</code>, tak se Python skutečně nedívá na to, že druhá sekvence je delší – první sekvence zvítězila, protože řazení natrefilo na první dvojci porovnatelných prvků, která už rozhodla o výsledku.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Porovnávání různých typů",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Porovnávání různých typů</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Typy musejí být porovnatelné, jinak obdržíte výjimku <em>TypeError</em>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; 3.5 &lt; 4\r\n37: True\r\n\r\n&gt;&gt;&gt; 'a' &lt; 'c'\r\n37: True\r\n\r\n&gt;&gt;&gt; 'a' &lt; 5\r\nTraceback (most recent call last):\r\n  File \"&lt;pyshell#51&gt;\", line 1, in &lt;module&gt;\r\n'a' &lt; 5\r\nTypeError: unorderable types: str() &lt; int()\r\n  </pre>\r\n  <p>\r\n    A zdůrazňuji – <strong>ne nutně stejné, ale pouze porovnatelné</strong>! Pokud poskytují podporu pro porovnávání se i s jiným typem, tak se bez řečí porovnají.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Jak ukazují třebas výše celá a reálná čísla – to jsou také různé typy, ale má smysl je porovnávat.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Další příklady",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Další příklady</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Ještě několik příkladů z dokumentace pro zmatení nepřítele:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# protože 3 &lt; 4:\r\n&gt;&gt;&gt; (1, 2, 3, 4) &lt; (1, 2, 4)\r\nTrue\r\n\r\n# protože první sekvence je počáteční podsekvencí druhé:\r\n&gt;&gt;&gt; (1, 2) &lt; (1, 2, -1)\r\nTrue\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Magický parametr „key“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Magický parametr „key“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Třídění můžeme vnutit, aby se chovalo jinak, než by pro daný typ bylo běžné. To zajišťuje nepovinný pojmenovaný parametr <em>key</em>, který specifikuje funkci, která bude před vlastním porovnáváním zavolána na každý prvek vstupního iterovatelného typu.\r\n  </p>\r\n  \r\n  <p>\r\n    Nejsnažší je využití již známé funkce, jako např. <em>len()</em>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; names = [ \"John\", \"Wendy\", \"Pete\", \"Jane\", \"David\", \"Amanda\", \"Ix\"]\r\n&gt;&gt;&gt; sorted( names, key=len )\r\n['Ix', 'John', 'Pete', 'Jane', 'Wendy', 'David', 'Amanda']\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Zde je každý prvek vstupního seznamu, tedy řetězec, převeden na svou délku (ve znacích) a teprve podle ní je porovnán.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "„key“ a lambda-funkce I",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">„key“ a lambda-funkce I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Nestačí-li nám předdefinované funkce, můžeme s výhodou pro třídění použít vlastní <em>funkce řádkové</em>, tzv. <strong>lambda-funkce</strong>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = [('two', 3), ('one', 4), ('one', 2), ('three', 5), ('two', 1), ]\r\n&gt;&gt;&gt; sorted( xs, key=lambda x: x[1] )\r\n[('two', 1), ('one', 2), ('two', 3), ('one', 4), ('three', 5)]\r\n  </pre>\r\n  <p>\r\n    Zde jsme místo výchozího lexikografického porovnání vnutili třídění podle druhé části (<code>x[1]</code>) každého prvku vstupního seznamu.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    <a href=\"/materialy/python/functions/advanced-1.xml?slajd=5\"><em>Lambda-funkce</em></a> je prostě funkce beze jména, zavedená v rámci jednoho výrazu. Použití nachází mimo jiné všude tam, kde je potřeba funkci, ale je zbytečné kvůli tomu „zaneřáďovat“ globální jmenný prostor. V Python'u se nejčastěji vyskytují právě zde, u řazení.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "„key“ a lambda-funkce II",
+      "tags": [],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">„key“ a lambda-funkce II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Složitější příklad:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; names = [ \"John\", \"Wendy\", \"Pete\", \"Jane\", \"David\", \"Amanda\", \"Ix\"]\r\n\r\n# A) setřídění pouze podle délky slov\r\n&gt;&gt;&gt; sorted(names, key=len)\r\n['Ix', 'John', 'Pete', 'Jane', 'Wendy', 'David', 'Amanda']\r\n\r\n# B) setřídění navíc i podle abecedy\r\n&gt;&gt;&gt; sorted(names, key=lambda x: (len(x), x))\r\n['Ix', 'Jane', 'John', 'Pete', 'David', 'Wendy', 'Amanda']\r\n  </pre>\r\n  <p>\r\n    Zde parametr <em>key</em> v podstatě vyrobil z původního seznamu řetězců seznam n-tic <code>[(4, 'John'), (5, 'Wendy'), (4, 'Pete'), (4, 'Jane'), (5, 'David'), (6, 'Amanda'), (2, 'Ix'), ]</code>, který následně lexikograficky setřídil a zpětně z něj vyextrahoval prvky původního seznamu.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Ve starších verzích Python'u byste si tento upravený „meziseznam“ i extrakci setříděných prvků museli zařídit sami (viz tzv. metoda DSO, „decorate-sort-undecorate“).\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Poznámka",
+      "tags": [],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Jelikož pro řazení můžeme použít odkaz na libovolnou funkci, přepišme si poslední příklad tak, aby bylo lépe vidět, co se při řazení uvnitř děje:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; names = [ \"John\", \"Wendy\", \"Pete\", \"Jane\", \"David\", \"Amanda\", \"Ix\"]\r\n\r\n# Nejdřív to samé pomocí voastní funkce:\r\n&gt;&gt;&gt; def porovnej(x):\r\n...   return len(x), x\r\n... \r\n&gt;&gt;&gt; sorted(names, key=porovnej)\r\n['Ix', 'Jane', 'John', 'Pete', 'David', 'Wendy', 'Amanda']\r\n\r\n# Nyní si přidáme výpis parametrů:\r\n&gt;&gt;&gt; def porovnej(x):\r\n...   print(x)\r\n...   return len(x), x\r\n... \r\n&gt;&gt;&gt; sorted(names, key=porovnej)\r\nJohn\r\nWendy\r\nPete\r\nJane\r\nDavid\r\nAmanda\r\nIx\r\n['Ix', 'Jane', 'John', 'Pete', 'David', 'Wendy', 'Amanda']\r\n  </pre>\r\n  <p>\r\n    Python tedy za pomoci funkce <em>porovnej()</em> převedl každý prvek vstupní sekvence na dvojci <em>(len(x), x)</em>, kterou použil pro lexikografické setřídění původních dat.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Modul „operator“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Modul „operator“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Třídění podle vybrané části složitějšího objektu je natolik častý obrat, že Python poskytuje v rámci modulu <em>operator</em> několik pomocných funkcí, které nám ušetří psaní výběrových lambda-funkcí:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; xs = [('two', 3), ('one', 4), ('one', 2), ('three', 5), ('two', 1), ]\r\n\r\n# A) výchozí lexikografické třídění\r\n&gt;&gt;&gt; sorted(xs)\r\n[('one', 2), ('one', 4), ('three', 5), ('two', 1), ('two', 3)]\r\n\r\n# B1) třídění za pomoci výběrové lambda-funkce\r\n&gt;&gt;&gt; sorted(xs, key=lambda x: x[1])\r\n[('two', 1), ('one', 2), ('two', 3), ('one', 4), ('three', 5)]\r\n\r\n# B2) totéž, ale za pomoci metody itemgetter()\r\n&gt;&gt;&gt; from operator import itemgetter\r\n&gt;&gt;&gt; sorted(xs, key=itemgetter(1))\r\n[('two', 1), ('one', 2), ('two', 3), ('one', 4), ('three', 5)]\r\n  </pre>\r\n  \r\n  <p>\r\n    Modul <em>operator</em> poskytuje i další metody, které se uplatní zvláště u třídění instancí objektů: <code>operator.attrgetter()</code>, <code>operator.methodcaller()</code>\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Stabilita třídění I",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Stabilita třídění I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Všimněme si ještě jednou příkladu:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; names = [ \"John\", \"Wendy\", \"Pete\", \"Jane\", \"David\", \"Amanda\", \"Ix\"]\r\n&gt;&gt;&gt; sorted( names, key=len )\r\n['Ix', 'John', 'Pete', 'Jane', 'Wendy', 'David', 'Amanda']\r\n  </pre>\r\n  <p>\r\n    Jelikož porovnávací funkcí je <code>len()</code>, tedy délka řetězce, provede Python na vstupním objektu jen tolik změn, kolik je nezbytně nutné. Ve výsledku si čtyřpísmenná ('John', 'Pete', 'Jane') i pětipísmenná ('Wendy', 'David') slova zachovají stejné pořadí jako na vstupu.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Nezapomeňte – provedli jsme srovnání podle délky, nikoli abecedy!\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Stabilita třídění II",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Stabilita třídění II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Stability se dá využít pro <em>třídění podle více kritérií</em> – postupně provedeme třídění od posledního požadavku po první.\r\n  </p>\r\n  <p>\r\n    Například studenty podle známky a poté podle věku setřídíme následovně..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# ('jméno', 'známka', věk)\r\n&gt;&gt;&gt; xs = [ ('Petr', 'A', 23), ('Bořek', 'A', 21), ('Pavel', 'B', 21), ]\r\n\r\n# a) nejdříve provedeme třídění podle věku..\r\n&gt;&gt;&gt; s = sorted(xs, key=lambda x: x[2])\r\n&gt;&gt;&gt; s\r\n[('Bořek', 'A', 21), ('Pavel', 'B', 21), ('Petr', 'A', 23)]\r\n\r\n# b) ..a poté podle známky\r\n&gt;&gt;&gt; sorted(s, key=lambda x: x[1])\r\n[('Bořek', 'A', 21), ('Petr', 'A', 23), ('Pavel', 'B', 21)]\r\n  </pre>\r\n  <p>\r\n    ..ale asi je mnohem pochopitelnější a přímočařejší zavolat rovnou:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n    sorted( xs, key=lambda x: (x[1], x[2]) )\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Poznámky",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Poznámky</h2></div><div class=\"section-body\">\r\n\r\n  <ul>\r\n    <li>\r\n        Výchozí porovnávání objektů využívá jejich metodu <code>__lt__()</code>, je-li k dispozici. Jejím definováním tudíž můžeme předepsat, jak se naše objekty budou mezi sebou porovnávat (viz <a href=\"advanced.xml\">samostatná přednáška</a>).\r\n    </li>\r\n    <li>\r\n        Pokud všechny prvky určené pro třídění podporují požadované třídicí kritérium, nemusí pochopitelně vůbec být stejného typu:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; sorted(\r\n                ['Ahoj!', [1, 2, 3, 'Baf!'], {'já', 'množina', '∞'}, ('xxx', 666)],\r\n                key=len\r\n            )\r\n            [('xxx', 666), {'já', '∞', 'množina'}, [1, 2, 3, 'Baf!'], 'Ahoj!']\r\n        </pre>\r\n    </li>\r\n    <li>\r\n        Funkce vstupující do parametru <em>key</em> vůbec nemusí operovat na porovnávaných objektech. Má-li to smysl, může hodnoty pro třídění brát úplně odjinud.\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Poznámky k národním zvyklostem",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Poznámky k národním zvyklostem</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Třídění můžeme vnutit ohled na národní zvyklosti pomocí metody <code>key=locale.strxfrm</code> z modulu <code>locale</code>. Což podle aktuálního nastavení systému sice může zafungovat rovnou, ale chcete-li přenositelný kód, musíte použité pravidlo nejdříve nastavit pomocí <em>locale.setlocale()</em>. V posledních verzích Python'u se mi <strong>pro češtinu</strong> osvědčilo nastavení:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; locale.setlocale(locale.LC_ALL, ('czech', 'UTF-8'))\r\n        'cs_CZ.UTF-8'\r\n&gt;&gt;&gt; sorted('koníček', key=locale.strxfrm)\r\n        ['č', 'e', 'í', 'k', 'k', 'n', 'o']\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Byť má tedy své mouchy – takové <code>ň</code> se s ním moc dobře neřadí. Ale pořád lépe než bez něj.\r\n    </div></div>\r\n    <p>\r\n        Použití globálního <code>LC_ALL</code> zařídí, že se pravidla třídění uvedeného jazyka použijí úplně pro všechno, tedy nejen slova, ale třeba i čísla, datumy, měnu a podobně.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Použít proto pouze <code>locale.setlocale(locale.LC_ALL, '')</code>, který přebere nastavení jednotlivých položek ze systému, není nejlepší nápad – jste si jisti, že pro všechno máte nastavený stejný jazyk? ^_~\r\n    </div></div>\r\n    <p>\r\n        PS 1: Pravidlo pro řazení se dá nastavit kromě výše uvedené plné verze i pomocí zkratky, jejich seznam je k dispozici v <code>locale.locale_alias</code>. Nicméně to kupodivu není příliš přenositelné.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Například <code>locale.setlocale(locale.LC_ALL, 'czech')</code> zabere na Windows, ale pod Linuxem už ne, ačkoli příslušný alias existuje i tam. (Ale možná mám jen všechny linuxy stejně divně nastavené?)\r\n    </div></div>\r\n    <p>\r\n        PS 2: <em>locale.strxfrm()</em> můžete použít také jako funkci obalující řetězec, který požadujete setřídit národním způsobem. Výhodné obzvláště u složených třídicích výrazů (= návratových n-tic), kde pouze jejich část jsou řetězce.\r\n    </p>\r\n\r\n</div>"
+    }
+  ]
+}

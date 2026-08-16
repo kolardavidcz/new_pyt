@@ -1,0 +1,153 @@
+{
+  "slug": "materialy--regexp--overview",
+  "total": 15,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Z formálního hlediska jsou <strong>regulární výrazy</strong> (<em>regular expressions</em>) v původním smyslu tohoto slovního spojení jedním ze způsobů, jak popsat <em>regulární jazyky</em> v <em>teorii formálních jazyků</em>.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Na dalších slajdech se velmi volně seznámíme se základními pojmy a principy <em>teorie (regulárních) jazyků</em>. Struktura výkladu se drží klasické reference v oboru – <a href=\"http://DragonBook.stanford.edu\" class=\"external\">„Dragon Book“</a>, kapitola 3.3.\r\n  </div></div>\r\n  <p>\r\n    Z praktického hlediska se však – zvláště v programovacích jazycích – termín <em>regulární výrazy</em> používá pro mnohem specifičtější „nadmnožinu“ regulárních výrazů, totiž pro speciální programové prostředky sloužící k popisu a práci s <strong>vyhledáváním vzorů</strong> (<em>pattern matching</em>).\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Intermezzo",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Intermezzo</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Stručně řečeno je <strong>(formální) jazyk</strong> množina <em>slov</em>, tedy <em>konečných řetězců symbolů</em>, které vyhovují <strong>syntaxi</strong> daného jazyka. Syntaxi přitom určuje <strong>(formální) gramatika</strong>, aneb sada pravidel pro skládání symbolů dané <strong>abecedy</strong> (tj. množiny symbolů) do konečných řetězců.\r\n  </p>\r\n  <p>\r\n    <strong>Regulární jazyky</strong> jsou pak podmnožina jazyků formálních určená jistými omezujícími podmínkami. (Regulární jazyky tak popisují  menší skupinu jazyků než jazyky formální.) Nejčastěji jsou regulární jazyky generovány příslušnou <strong>regulární gramatikou</strong> nad příslušnou <em>abecedou</em>, ale stejně tak dobře mohou být generovány odpovídajícími <strong>regulárními výrazy</strong> (v původním smyslu slova).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Ovšem způsobů, jak zavést či popsat regulární jazyk je ještě mnohem více.\r\n  </div></div>\r\n  <p>\r\n    <strong>Vzory</strong> (<em>regexp</em>, <em>pattern</em>), tedy regulární výrazy ve smyslu <em>pattern matching</em>, splňují velmi podobný úkol – popisují skupiny řetězců odpovídající jistým pravidlům. Zároveň jsou však podstatně obsažnější – často umožňují například zapamatování si části zkoumaného řetězce a použití této zapamatované hodnoty v rámci stejného výrazu (tzv. <em>backreferences</em>), díky čemuž už nespadají do formální kategorie <em>regulárních jazyků</em>, ačkoli si z historických důvodů toto pojmenování podržely.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Abeceda",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Abeceda</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <strong>Abecedou</strong> se rozumí <em>konečná množina symbolů</em>. Tuto množinu značíme většinou <code>Σ</code>.\r\n  </p>\r\n  <p>\r\n    Klasickými příklady symbolů jsou písmena, čísla nebo interpunkce. Z nich pak můžeme vytvořit například následující abecedy:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      <em>binární abeceda</em> <code>{0, 1}</code> skládající se právě ze dvou symbolů – nuly a jedničky\r\n    </li>\r\n    <li>\r\n      znaky z <em>ASCII</em>-tabulky aneb prvních 128 znaků Unicodu\r\n    </li>\r\n    <li>\r\n      celý <em>Unicode</em> aneb kolem jednoho sta tisíce symbolů\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Řetězec",
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Řetězec</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Termín <strong>řetězec</strong> je vyhrazen pro <em>konečné sekvence symbolů z dané abecedy</em>. Značíme je většinou <code>s</code>.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Poměrně běžně se v tomto kontextu zaměnují termíny <em>řetězec</em>, <em>slovo</em> a <em>věta</em>.\r\n  </div></div>\r\n  <p>\r\n    Příklady řetězců nad abecedami z předchozího slajdu budiž například:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      libovolné binární číslo, tedy libovolná (konečná) sekvence nul a jedniček\r\n    </li>\r\n    <li>\r\n      libovolná <em>ceska</em> věta zapsaná bez nabodeníček jen pomocí ASCII\r\n    </li>\r\n    <li>\r\n      libovolná <em>česká</em> věta zapsaná pomocí znaků z Unicodu\r\n    </li>\r\n  </ul>\r\n  \r\n  <p class=\"enumerate\">\r\n    Každý řetězec má svoji <strong>délku</strong>, značenou většinou jako <code>|s|</code>, která udává, kolik symbolů dané abecedy je třeba poskládat za sebou k získání daného řetězce.\r\n  <p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Například řetězec „<em>abeceda</em>“, složený z pěti různých symbolů, má délku 7.\r\n  </div></div>\r\n  </p>\r\n    Přitom řetězec o délce nula, tzv. <strong>prázdný řetězec</strong>, se značí většinou jako <code>ε</code>.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Konečné řetězce se někdy značí též <code>Σ<sup>*</sup></code>, označení <code>Σ<sup>∞</sup></code> je pak vyhrazeno pro řetězce nekonečné.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Jazyk",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Jazyk</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Obecně se <strong>jazykem</strong> rozumí jakákoli <em>spočetná množina řetězců nad danou abecedou</em>.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Definice jazyka tedy neobsahuje přiřazení jakéhokoli <em>významu</em> těmto řetězcům.\r\n  </div></div>\r\n  \r\n  <p>\r\n    Tato definice je zcela úmyslně značně volná – vyhovují ji kupříkladu i tak abstraktní útvary jako..\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      prázdná množina <code>∅</code>\r\n    </li>\r\n    <li>\r\n      jednoprvková množina <code>{ε}</code> obsahující pouze prázdný řetězec\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    ..ale stejně tak jsou jazykem například i:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      všechny gramaticky správné české věty\r\n    </li>\r\n    <li>\r\n      všechny syntakticky správné pythonovské programy\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Syntaxe",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Syntaxe</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    V obecném případě popisuje <strong>syntaxe</strong> daného jazyka, které kombinace symbolů jsou v rámci příslušného jazyka přípustné.\r\n  </p>\r\n  <p>\r\n    Syntaxe tedy určuje, jaká slova můžeme v daném <em>jazyce</em> vytvořit z písmen příslušné <em>abecedy</em> a také jak je máme skládat za sebou, abychom vytvořili jejich přípustné kombinace.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Skládání řetězců",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Skládání řetězců</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Abychom mohli <em>syntaxi</em> zadat, musíme být nějak schopni popsat pravidla pro tvorbu řetězců vyhovujících danému jazyku. Prvním předpokladem k tomu je vědět, jak vůbec můžeme řetězce skládat. Platí následující:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n      Jsou-li <em>x</em> a <em>y</em> řetězce, pak <em>xy</em> značí jejich <strong>spojení</strong> (<em>concatenation</em>), tedy řetězec získaný prostým připojením řetězce <em>y</em> na konec řetězce <em>x</em>.<br>\r\n      Příkladem budiž řetězce <code>x = kočko</code> a <code>y = pes</code>, jejichž spojením získáme řetězec <code>kočkopes</code>.\r\n    </li>\r\n    <li>\r\n      Prázdný řetězec <code>ε</code> je zjevně pro skládání řetězců <strong>jednotkovým prvkem</strong>: <code>s = εs = sε</code>\r\n    </li>\r\n    <li>\r\n      Díky předchozímu můžeme operaci skládání řetězců chápat jako <em>násobení</em> a přirozeně zadefinovat jejich <strong>umocňování</strong>:\r\n      <ul>\r\n        <li>\r\n          <code>s<sup>0</sup> = ε</code>\r\n        </li>\r\n        <li>\r\n          <code>s<sup>i</sup> = s<sup>i-1</sup>s</code> pro každé <code>i &gt; 0</code>\r\n        </li>\r\n      </ul>\r\n      Odtud tedy například plyne, že <code>s<sup>3</sup> = s<sup>2</sup>s = s<sup>1</sup>ss = sss</code>\r\n    </li>\r\n  </ol>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Skládání jazyků",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Skládání jazyků</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Podobně jako umíme skládat řetězce konkrétního jazyka do řetězců delších, umíme též skládat řetězce dvou jazyků dohromady, čímž vytváříme řetězce jazyka nového.\r\n  </p>\r\n  <p>\r\n    Nejdůležitějšími operacemi (v rámci lexikální analýzy) nad jazyky jsou přitom následující tři:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n      <strong>sjednocení</strong> (<em>union</em>) jazyků <em>L</em> a <em>M</em>: <code> L ∪ M = {s | s ∈ L ∨ s ∈ M} </code>\r\n    </li>\r\n    <li>\r\n      <strong>spojení</strong> (<em>concatenation</em>) jazyků <em>L</em> a <em>M</em>: <code> LM = {st | s ∈ L ∧ t ∈ M} </code>\r\n    </li>\r\n    <li>\r\n      <strong>(Kleenův) uzávěr</strong> (<em>Kleen closure</em>) jazyka <em>L</em>: <code> L<sup>*</sup> = ∪L<sup>i</sup>, i ∈ &lt;0, ∞&gt; </code>\r\n    </li>\r\n  </ol>\r\n  <p>\r\n    PS: Vlastně jsme nyní zformalizovali a trochu rozšířili pravidla pro skládání řetězců.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Skládání jazyků – příklady",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Skládání jazyků – příklady</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Mějme zadány následující dvě množiny:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      množinu všech ASCII-písmen <code> L = {A, B, …, Z, a, b, …, z} </code>; obsahuje 52 znaků\r\n    </li>\r\n    <li>\r\n      množinu všech číslic <code> M = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9} </code>; obsahuje 10 znaků\r\n    </li>\r\n  </ul>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    O obou množinách bychom nejspíše přirozeně uvažovali jako o dvou různých abecedách. Ale stejně tak dobře je můžeme – a v tomto případě také budeme – uvažovat jako jazyky obsahující pouze uvedené jednoznakové řetězce.\r\n  </div></div>\r\n  <p>\r\n    Následuje několik příkladů nových jazyků, které můžeme z jazyků <em>L</em> a <em>M</em> vytvořit pomocí tří základních operací pro skládání jazyků:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      <code>L∪M</code> je jazyk o 62 řetězcích délky jedna (ASCII-písmena velká i malá a číslice)\r\n    </li>\r\n    <li>\r\n      <code>LM</code> je jazyk o 520 řetězcích délky dva (první znak každého řetězce je ASCII-písmeno, druhý je číslo)\r\n    </li>\r\n    <li>\r\n      <code>L<sup>5</sup></code> je jazyk všech možných pětiznakových řetězců ASCII-písmen\r\n    </li>\r\n    <li>\r\n      <code>L<sup>*</sup></code> je jazyk všech možných (tedy libovolně dlouhých) řetězců ASCII-písmen; zjevně (díky definici uzávěru) obsahuje i prázdný řetězec <code>ε</code>\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Příklad – identifikátory v Python'u",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Příklad – identifikátory v Python'u</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Vrátíme-li se na chvíli do Python'u 2.x, může jméno identifikátoru obsahovat ASCII-písmena malá i velká, znak podtržítko (tj. <em>_</em>) a číslice 0 až 9, které však nesmí být na prvním místě. Upravíme-li mírně (o ono podtržítko) množinu <em>L</em> z předchozího slajdu na <code> L = {A, B, …, Z, a, b, …, z, _} </code>, popíšeme identifikátory v Python'u 2.x jako jazyk:\r\n  </p>\r\n  <pre class=\"center\"> L(L∪D)<sup>*</sup> </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Identifikátor tedy začíná na písmeno nebo podtržítko, za nímž může následovat libovolně dlouhá kombinace písmen, podtržítek a číslic.\r\n  </div></div>\r\n  <p>\r\n    PS: Python 3.x se svojí podporou Unicodu nepřekvapivě rošířil množinu znaků, které se mohou v identifikátorech vyskytovat (každý si určitě všiml mé záliby v používání češtiny ^_~), takže množina <em>L</em> „trochu nabobtnala“.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Od skládání jazyků k regulárním výrazům",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Od skládání jazyků k regulárním výrazům</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    V předchozích příkladech jsme aplikací tří základních operací na pojmenované množiny řetězců (představujících jazyky) vytvářeli množiny řetězců (tedy jazyky) nové.\r\n  </p>\r\n  <p>\r\n    A právě tomuto postupu vytváření (všech možných) nových jazyků aplikací příslušných tří operací na symbolická označení množin znaků se říká <strong>regulární výrazy</strong>.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Poznámka: Tímto způsobem popíšeme nikoli obecný, ale „pouze“ <em>regulární</em> jazyk.\r\n  </div></div>\r\n  \r\n  <p>\r\n    Při zápisu regulárních výrazů se používá pro zachycení základních operací jiných symbolů, ale jinak jde o stejnou věc. Například povolené identifikátory jazyka Python z předchozího příkladu by se při označení <em>písmeno_</em> pro množinu <em>L</em> a <em>číslo</em> pro množinu <em>M</em> zapsaly jako:\r\n  </p>\r\n  <pre class=\"center\"> písmeno_ (písmeno_ | číslo)<sup>*</sup> </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Tedy závorky slouží ke grupování výrazů, <code>|</code> představuje operaci sjednocení, <code>*</code> znamená žádný nebo více výskytů předchozího výrazu a vzájemná poloha (<em>juxtaposition</em>) jednotlivých výrazů určuje operaci spojení.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Regulární výrazy a jazyky",
+      "tags": [],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Regulární výrazy a jazyky</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <em>Regulární výrazy</em> nad určitou <em>abecedou</em> určují příslušné <em>regulární jazyky</em> nad touto abecedou.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Budeme to značit takto: Regulární výraz <em>r</em> generuje regulární jazyk <em>L(r)</em>.\r\n  </div></div>\r\n  <p>\r\n    V základu regulárních výrazů stojí dvě věci:\r\n  </p>\r\n  <ul>\r\n    <li> symboly jisté abecedy </li>\r\n    <li> operace nad množinami těchto symbolů </li>\r\n  </ul>\r\n  <p>\r\n    Jednoduché regulární výrazy jsou přímo symboly abecedy, složitější pak tyto symboly poskládané pomocí uvedených operací do větších celků. Přitom každý takovýto větší celek můžeme nějak označit a použít ho v dalších, ještě složitějších regulárních výrazech.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Jinak řečeno: Složitější regulární výrazy/jazyky jsou rekurzivně generovány výrazy/jazyky jednoduššími.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Regulární výrazy – formalizace",
+      "tags": [],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Regulární výrazy – formalizace</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Prvním bodem formalizace je zavedení základních regulárních výrazů, z nichž pak můžeme stavět výrazy složitější. Platí:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n      Prázdný řetězec <code>ε</code> je regulární výraz. Jím generovaný jazyk jest <code>L(ε) = {ε}</code>, tj. jazyk skládající se pouze z prázdného řetězce.\r\n    </li>\r\n    <li>\r\n      Každý symbol <code>a∊Σ</code> je regulární výraz. Jím generovaný jazyk jest <code>L(a) = {a}</code>, tj. jazyk o jednom řetězci délky jedna.\r\n    </li>\r\n  </ol>\r\n  \r\n  <p class=\"enumerate\">\r\n    Máme-li základní stavební bloky, musíme je mít ještě čím „lepit“ dohromady. Druhým bodem zavedení regulárních výrazů jsou tudíž operace, které můžeme provádět. Za předpokladu, že <em>r</em> a <em>s</em> jsou regulární výrazy a <em>L(r)</em> a <em>L(s)</em> jim odpovídající regulární jazyky, platí následující:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n      <code>(r)|(s)</code> je regulární výraz generující jazyk <code>L(r)∪L(s)</code> (tedy sjednocení jazyků).\r\n    </li>\r\n    <li>\r\n      <code>(r)(s)</code> je regulární výraz generující jazyk <code>L(r)L(s)</code> (tedy spojení jazyků).\r\n    </li>\r\n    <li>\r\n      <code>(r)<sup>*</sup></code> je regulární výraz generující jazyk <code>(L(r))<sup>*</sup></code> (tedy uzávěr jazyka).\r\n    </li>\r\n    <li>\r\n      <code>(r)</code> je regulární výraz generující jazyk <code>L(r)</code> (tedy volnost v uzávorkovávání).\r\n    </li>\r\n  </ol>\r\n  <p>\r\n    Podle bodu 4 tedy můžeme výrazy uzávorkovávat, aniž bychom tím změnili jejich význam. Nadbytečného počtu závorek se pak zbavíme, přijmeme-li následující dvě konvence:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      Unární operátor <code>*</code> má nejvyšší prioritu a je zleva asociativní (tj. aplikuje se jako první a to na výraz po své levé straně).\r\n    </li>\r\n    <li>\r\n      Spojení jazyků má druhou nejvyšší prioritu a je zleva asociativní (tj. aplikuje se hned po uzávěru a skládá jazyky zleva doprava).\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Příklady",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Příklady</h2></div><div class=\"section-body\">\r\n\r\n  <table class=\"center\" border=\"1\" cellpadding=\"10\" cellspacing=\"0\">\r\n    <tr>\r\n      <th> regulární výraz </th>\r\n      <th> odpovídající jazyk </th>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>a|b</code>\r\n      </td>\r\n      <td>\r\n        <code>{a, b}</code>\r\n      </td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>(a|b)(a|b)</code>\r\n        <br>\r\n        <code>aa|ab|ba|bb</code>\r\n      </td>\r\n      <td>\r\n        <code>{aa, ab, ba, bb}</code>\r\n      </td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>a<sup>*</sup></code>\r\n      </td>\r\n      <td>\r\n        <code>{ε, a, aa, aaa, …}</code>\r\n      </td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>(a|b)*</code>\r\n        <br>\r\n        <code>(a*b*)*</code>\r\n      </td>\r\n      <td>\r\n        <code>{ε, a, b, aa, ab, ba, bb, aaa, …}</code>\r\n      </td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>a|a<sup>*</sup>b</code>\r\n      </td>\r\n      <td>\r\n        <code>{a, b, ab, aab, aaab, …}</code>\r\n      </td>\r\n    </tr>\r\n  </table>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    PS: Použitá abeceda je tedy právě dvouprvková množina <code>{a, b}</code>.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Práce s regulárními výrazy",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Práce s regulárními výrazy</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Ač to tak možná na první pohled nevypadá, stačí uvedené základní regulární výrazy a operace nad nimi, aby nad danou abecedou dokázaly popsat <em>všechny</em> regulární jazyky s danou syntaxí. Na druhou stranu vyjádření některých skutečností je v tomto podání nepřekvapivě zdlouhavé, takže se není moc co divit, že regulární výrazy byly brzo rozšířeny o pár užitečných zkratek. Mezi nejstarší a nejtypičtější patří:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      Operátor <code><sup>+</sup></code> značící <em>jeden nebo více výskytů</em>. Regulární výraz <code>(r)<sup>+</sup></code> generuje jazyk <code>(L(r))<sup>+</sup></code>. Zjevně mimo jiné platí <code>r<sup>*</sup> = r<sup>+</sup>|ε</code> a <code>r<sup>+</sup> = rr<sup>*</sup> = r<sup>*</sup>r</code>.\r\n    </li>\r\n    <li>\r\n      Operátor <code>?</code> značící <em>žádný nebo právě jeden výskyt</em>. Regulární výraz <code>r?</code> generuje jazyk <code>L(r?) = L(r)∪{ε}</code>.\r\n    </li>\r\n    <li>\r\n      Zkrácený zápis některých regulárních výrazů pomocí tzv. <em>tříd znaků</em> (<em>character classes</em>). Konkrétně regulární výrazy typu <code>a<sub>1</sub>|a<sub>2</sub>|…|a<sub>n</sub></code> můžeme nahradit zápisem <code>[a<sub>1</sub>a<sub>2</sub>…a<sub>n</sub>]</code> a logické sekvence znaků, např. všechna malá ASCII-písmena, dokonce pomocí pomlčky/spojovníku ještě větší zkratkou jako <code>[a-z]</code>.\r\n    </li>\r\n  </ul>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Operátory <code><sup>+</sup></code> a <code>?</code> mají stejnou prioritu a asociují stejným směrem jako operátor uzávěru <code><sup>*</sup></code>.\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Složitější pravidla se s výhodou zapisují rozložená do tzv. <em>regulárních definic</em>, kde začínáme s pojmenovanými pravidly složenými ze základních stavebních prvků a pokračujeme ke složitějším, která mohou používat všechny předchozí.\r\n  </p>\r\n  <p>\r\n    Přepišme takto pro ukázku náš starý známý příklad s identifikátory v Python'u 2.x (rovnou použijeme zkratky zavedené výše):\r\n  </p>\r\n  <pre>    písmeno_      → [A-Za-z_]\r\n    číslo         → [0-9]\r\n    identifikátor → písmeno_ (písmeno_ | číslo)<sup>*</sup>  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Nejdříve jsme tedy zadefinovali jména pro použitelné skupiny znaků (tedy jednoduché regulární výrazy <em>písmeno_</em> a <em>číslo</em>) a poté jsme z nich složili finální regulární výraz <em>identifikátor</em>.\r\n  </div></div>\r\n\r\n</div>"
+    }
+  ]
+}

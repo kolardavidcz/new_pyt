@@ -54,9 +54,9 @@ function findHtmlFiles(dir, fileList = []) {
 }
 
 const htmlSources = [
-  join(ROOT, ".old", "vyuka_downloaded"),
   join(ROOT, "public", "vyuka_downloaded"),
-  join(ROOT, "vyuka_downloaded")
+  join(ROOT, "vyuka_downloaded"),
+  join(ROOT, ".old", "vyuka_downloaded"),
 ];
 
 let htmlFiles = [];
@@ -64,12 +64,15 @@ for (const s of htmlSources) {
   findHtmlFiles(s, htmlFiles);
 }
 
-// Unique files by basename/slug
+// Map unique files by canonical relative path
 const fileMap = new Map();
 for (const f of htmlFiles) {
-  const name = f.split(/[/\\]/).pop().replace(/\.html?$/, "");
-  if (!fileMap.has(name)) {
-    fileMap.set(name, f);
+  const norm = f.replace(/\\/g, "/");
+  const relPath = norm.includes("vyuka_downloaded/")
+    ? norm.split("vyuka_downloaded/").pop()
+    : norm.split(/[/\\]/).pop();
+  if (!fileMap.has(relPath)) {
+    fileMap.set(relPath, f);
   }
 }
 
@@ -85,9 +88,12 @@ if (existsSync(slidesJsonPath)) {
 }
 
 let prebuiltCount = 0;
-for (const [slug, filePath] of fileMap.entries()) {
+for (const [relPath, filePath] of fileMap.entries()) {
   try {
     const htmlContent = readFileSync(filePath, "utf-8");
+    const cleanRel = relPath.replace(/\.html?$/, "");
+    const pathSlug = cleanRel.replace(/[\/\\]/g, "--");
+    const baseName = filePath.split(/[/\\]/).pop().replace(/\.html?$/, "");
     
     // Extract section chunks
     const slides = [];
@@ -103,8 +109,20 @@ for (const [slug, filePath] of fileMap.entries()) {
       const hMatch = sectionInner.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i);
       const title = hMatch ? hMatch[1].replace(/<[^>]+>/g, "").trim() : `Section ${idx + 1}`;
 
-      const skey = `${slug}#${sectionId}`;
-      const slideMeta = slidesMetadata[skey];
+      // Check metadata with multiple key variants
+      const candidateKeys = [
+        `${cleanRel}#${sectionId}`,
+        `${pathSlug}#${sectionId}`,
+        `${baseName}#${sectionId}`,
+      ];
+      let slideMeta = null;
+      for (const ck of candidateKeys) {
+        if (slidesMetadata[ck]) {
+          slideMeta = slidesMetadata[ck];
+          break;
+        }
+      }
+
       const tags = (slideMeta && Array.isArray(slideMeta.tags)) ? slideMeta.tags : [];
       const diff = (slideMeta && typeof slideMeta === "object") ? (slideMeta.diff || null) : (typeof slideMeta === "string" ? slideMeta : null);
 
@@ -120,8 +138,17 @@ for (const [slug, filePath] of fileMap.entries()) {
     }
 
     if (slides.length > 0) {
-      const outPath = join(LECTURES_OUT_DIR, `${slug}.json`);
-      writeFileSync(outPath, JSON.stringify({ slug, total: slides.length, slides }, null, 2), "utf-8");
+      const payload = JSON.stringify({ slug: pathSlug, total: slides.length, slides }, null, 2);
+      
+      // Primary: write pathSlug-based JSON (e.g. materialy--python--sorting--overview.json)
+      writeFileSync(join(LECTURES_OUT_DIR, `${pathSlug}.json`), payload, "utf-8");
+      
+      // Secondary: also write baseName if it's not a known duplicate/collision
+      const collisions = ["overview", "basics", "fp", "coroutines", "decorators", "example-1", "magic", "pnm", "procvicovani.2", "_comprehensions"];
+      if (!collisions.includes(baseName)) {
+        writeFileSync(join(LECTURES_OUT_DIR, `${baseName}.json`), payload, "utf-8");
+      }
+
       prebuiltCount++;
     }
   } catch { /* ignore */ }
