@@ -247,13 +247,14 @@ export async function loadQuestionImprovements() {
   return state.questionImprovements;
 }
 
-export async function updateQuestionImprovementStatus(id, newStatus, fixSummary = "") {
+export async function updateQuestionImprovement(id, updates = {}) {
   if (!Array.isArray(state.questionImprovements)) state.questionImprovements = [];
   const idx = state.questionImprovements.findIndex((item) => item.id === id);
   if (idx !== -1) {
-    state.questionImprovements[idx].status = newStatus;
-    state.questionImprovements[idx].resolvedAt = new Date().toISOString();
-    if (fixSummary) state.questionImprovements[idx].fixSummary = fixSummary;
+    if (updates.status === "resolved" && !updates.resolvedAt) {
+      updates.resolvedAt = new Date().toISOString();
+    }
+    state.questionImprovements[idx] = { ...state.questionImprovements[idx], ...updates };
   }
 
   // Sync to API and Upstash
@@ -261,7 +262,7 @@ export async function updateQuestionImprovementStatus(id, newStatus, fixSummary 
     const res = await fetch("/api/question-improvement", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "update", id, status: newStatus, fixSummary }),
+      body: JSON.stringify({ action: "update", id, ...updates }),
     });
     if (res.ok) {
       const data = await res.json();
@@ -281,7 +282,11 @@ export async function updateQuestionImprovementStatus(id, newStatus, fixSummary 
     } catch { /* ignore */ }
   }
 
-  notifyStateChange("questionImprovementUpdated", { id, newStatus });
+  notifyStateChange("questionImprovementUpdated", { id, updates });
+}
+
+export async function updateQuestionImprovementStatus(id, newStatus, fixSummary = "") {
+  return updateQuestionImprovement(id, { status: newStatus, fixSummary });
 }
 
 export async function deleteQuestionImprovement(id) {

@@ -67,15 +67,16 @@ export default async function handler(req, res) {
         return res.status(200).json({ status: "ok", action: "delete", id: body.id, result: updatedList, total: updatedList.length });
       }
 
-      // 2. Explicit Update Action (Status, fixSummary)
+      // 2. Explicit Update Action (Status, fixSummary, category, userNote, etc.)
       if (body.action === "update" && body.id) {
         const remoteItems = await fetchRemoteImprovements();
         const idx = remoteItems.findIndex((i) => i.id === body.id);
         if (idx !== -1) {
-          if (body.status) remoteItems[idx].status = body.status;
-          if (body.resolvedAt) remoteItems[idx].resolvedAt = body.resolvedAt;
-          else if (body.status === "resolved") remoteItems[idx].resolvedAt = new Date().toISOString();
-          if (body.fixSummary !== undefined) remoteItems[idx].fixSummary = body.fixSummary;
+          const { action, ...updates } = body;
+          if (updates.status === "resolved" && !updates.resolvedAt) {
+            updates.resolvedAt = new Date().toISOString();
+          }
+          remoteItems[idx] = { ...remoteItems[idx], ...updates };
           await saveRemoteImprovements(remoteItems);
         }
         return res.status(200).json({ status: "ok", action: "update", id: body.id, result: remoteItems, total: remoteItems.length });
