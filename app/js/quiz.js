@@ -333,13 +333,12 @@ export async function renderQuizSection(item) {
     }
 
     if (q.type === "code_fill" || q.type === "fill_blank_choice") {
-      let ansIdx = 0;
+      let ansIdx = typeof q.answer === "number" ? q.answer : 0;
       let rawCorrect = "";
 
       if (q.expected) {
         rawCorrect = String(q.expected);
       } else if (typeof q.answer === "number") {
-        ansIdx = q.answer;
         rawCorrect = (q.options && q.options[ansIdx]) ? q.options[ansIdx] : String(q.answer);
       } else if (typeof q.answer === "string" && q.answer) {
         rawCorrect = q.answer;
@@ -349,7 +348,7 @@ export async function renderQuizSection(item) {
           if (idx !== -1) ansIdx = idx;
         }
       } else if (q.options && q.options.length) {
-        rawCorrect = q.options[0];
+        rawCorrect = q.options[ansIdx] || q.options[0];
       }
 
       const expectedClean = rawCorrect.replace(/^[A-D]\)\s*/, "").trim();

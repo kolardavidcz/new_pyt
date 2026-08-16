@@ -5,8 +5,8 @@
     "question": "Odkud čte kód `fileinput.input()`, pokud skriptu nebyly při spuštění předány žádné argumenty souborů?",
     "options": [
       "A) Ze standardního vstupu (sys.stdin), takže může zpracovávat data předaná přes pipeline.",
-      "B) Vyvolá výjimku FileNotFoundError, protože nebyl zadán žádný název vstupního souboru.",
-      "C) Automaticky prohledá aktuální adresář a otevře první nalezený soubor s příponou .txt.",
+      "B) Automaticky prohledá aktuální adresář a otevře první nalezený soubor s příponou .txt.",
+      "C) Vyvolá výjimku FileNotFoundError, protože nebyl zadán žádný název vstupního souboru.",
       "D) Vrátí prázdný iterátor, který okamžitě ukončí cyklus for bez načtení jakéhokoliv řádku."
     ],
     "answer": 0,
@@ -17,12 +17,12 @@
     "type": "predict_output",
     "question": "Jaký účinek má nastavení parametru `inplace=True` při volání `fileinput.input()`?",
     "options": [
-      "A) Přesměruje standardní výstup (sys.stdout) do právě zpracovávaného souboru, čímž jej přepíše.",
-      "B) Otevře všechny soubory v režimu pro připsání na konec (append) bez modifikace stávajících řádků.",
-      "C) Načte celý obsah všech zadaných souborů do paměti RAM ještě před zahájením samotné iterace.",
-      "D) Uzamkne všechny právě zpracovávané soubory na disku proti zápisu ze strany ostatních procesů."
+      "A) Načte celý obsah všech zadaných souborů do paměti RAM ještě před zahájením samotné iterace.",
+      "B) Přesměruje standardní výstup (sys.stdout) do právě zpracovávaného souboru, čímž jej přepíše.",
+      "C) Uzamkne všechny právě zpracovávané soubory na disku proti zápisu ze strany ostatních procesů.",
+      "D) Otevře všechny soubory v režimu pro připsání na konec (append) bez modifikace stávajících řádků."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Parametr inplace=True přesměruje standardní výstup print() přímo do právě čteného souboru. Původní soubor je zálohován/přesunut a jeho obsah je nahrazen tištěným výstupem."
   },
   {
@@ -30,12 +30,12 @@
     "type": "fill_blank_choice",
     "question": "Doplňte funkci modulu `fileinput`, která vrací pořadové číslo řádku v rámci právě otevřeného souboru (resetované na 1 pro každý soubor).",
     "options": [
-      "filelineno",
       "lineno",
-      "fileno",
-      "line_number"
+      "line_number",
+      "filelineno",
+      "fileno"
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "`fileinput.filelineno()` vrací číslo řádku v aktuálním souboru (od 1), zatímco `fileinput.lineno()` vrací kumulativní celkový počet řádků přes všechny soubory.",
     "code": "import fileinput\n\n# Zpracování souborů mereni_1.log a mereni_2.log\nfor line in fileinput.input(files=(\"mereni_1.log\", \"mereni_2.log\")):\n    # Získání čísla řádku v rámci aktuálního souboru\n    current_line = fileinput.________()\n    print(f\"{fileinput.filename()}:{current_line} -> {line.strip()}\")",
     "expected": "filelineno"
@@ -45,12 +45,12 @@
     "type": "multiple_choice",
     "question": "Které komprimované formáty souborů dokáže automaticky otevírat předpřipravená hook funkce `fileinput.hook_compressed`?",
     "options": [
-      "A) Soubory s komprimovanými příponami .gz (gzip) a .bz2 (bzip2).",
+      "A) Pouze komprimované archivní soubory s jedinou příponou .zip.",
       "B) Komprimované archivní soubory s příponami .zip, .tar a .7z.",
-      "C) Pouze komprimované archivní soubory s jedinou příponou .zip.",
-      "D) Jakékoliv komprimované soubory s příponami jako .xz a .rar."
+      "C) Jakékoliv komprimované soubory s příponami jako .xz a .rar.",
+      "D) Soubory s komprimovanými příponami .gz (gzip) a .bz2 (bzip2)."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "fileinput.hook_compressed detekuje soubory podle přípony .gz nebo .bz2 a automaticky je otevře s využitím modulů gzip nebo bz2."
   }
 ]

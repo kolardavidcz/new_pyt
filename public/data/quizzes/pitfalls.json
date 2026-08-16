@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Co vypíše následující kód při druhém volání funkce pridat(2)?\n\ndef pridat(val, prpkn=[]):\n    prpkn.append(val)\n    return prpkn\n\npridat(1)\nres = pridat(2)\nprint(res)",
     "options": [
-      "A) Seznam [1, 2], protože výchozí objekt [] se vytvoří jen při definici funkce  .",
-      "B) Seznam [2], protože při každém volání bez argumentu se alokuje nový seznam   .",
+      "A) Seznam [2], protože při každém volání bez argumentu se alokuje nový seznam   .",
+      "B) Výjimku UnboundLocalError, protože proměnná prpkn nebyla označena jako global.",
       "C) N-tici (1, 2), protože výchozí argumenty se v paměti mění na imutabilní typ  .",
-      "D) Výjimku UnboundLocalError, protože proměnná prpkn nebyla označena jako global."
+      "D) Seznam [1, 2], protože výchozí objekt [] se vytvoří jen při definici funkce  ."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Výchozí hodnoty parametrů funkcí jsou v Pythonu vyhodnoceny pouze jednou při definici (překladu) funkce. Pokud je výchozí hodnotou mutabilní objekt (např. seznam []), všechna volání využívající výchozí parametr sdílejí přesně jednu a tu samou instanci v paměti."
   },
   {
@@ -30,12 +30,12 @@
     "type": "multiple_choice",
     "question": "Jaký bude obsah proměnné t po proběhnutí bloku try-except?\n\nt = ([1],)\ntry:\n    t[0] += [2]\nexcept TypeError:\n    pass\nprint(t)",
     "options": [
-      "A) N-tici ([1, 2],), protože operátor += upraví seznam v n-tici před výjimkou.",
-      "B) N-tici ([1],), protože vyvolaná výjimka TypeError ob obnoví původní n-tici.",
-      "C) N-tici ([1], [2]), protože nepřihlášený prvek se vloží až na konec n-tice .",
-      "D) Hodnotu None, protože selhání zapsání do n-tice vymaže celý datový objekt ."
+      "A) N-tici ([1], [2]), protože nepřihlášený prvek se vloží až na konec n-tice .",
+      "B) N-tici ([1, 2],), protože operátor += upraví seznam v n-tici před výjimkou.",
+      "C) Hodnotu None, protože selhání zapsání do n-tice vymaže celý datový objekt .",
+      "D) N-tici ([1],), protože vyvolaná výjimka TypeError ob obnoví původní n-tici."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Příkaz t[0] += [2] provede dvě věci: 1) Zavolá in-place rozšíření t[0].__iadd__([2]), což seznam úspěšně upraví na [1, 2]. 2) Pokusí se uložit výsledek zpět do t[0], což selže s TypeError, protože n-tice nepodporuje přiřazení prvku. Seznam uvnitř n-tice však již upraven zůstane."
   },
   {
@@ -43,12 +43,12 @@
     "type": "multiple_choice",
     "question": "Jak reaguje interpret Pythonu při zavolání funkce zmen()?\n\nval = 10\ndef zmen():\n    print(val)\n    val = 20\n\nzmen()",
     "options": [
-      "A) Vyvolá UnboundLocalError, protože přiřazení val=20 z ní dělá lokální proměnnou .",
+      "A) Vypíše 20, protože interpret Pythonu provede interní optimalizaci pořadí kódu  .",
       "B) Vypíše 10 a následně globální hodnotu val v paměti okamžitě přepíše na číslo 20.",
-      "C) Vypíše 10 a lokální proměnná val zastíní globální až na řádku za příkazem print.",
-      "D) Vypíše 20, protože interpret Pythonu provede interní optimalizaci pořadí kódu  ."
+      "C) Vyvolá UnboundLocalError, protože přiřazení val=20 z ní dělá lokální proměnnou .",
+      "D) Vypíše 10 a lokální proměnná val zastíní globální až na řádku za příkazem print."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Při analýze těla funkce Python v době překladu zjistí, že se do val v těle přiřazuje (val = 20), a označí val za lokální proměnnou pro celou funkci. Při spuštění pak řádek print(val) selže s UnboundLocalError, protože přistupuje k lokální proměnné dříve, než do ní byla uložena hodnota."
   },
   {
@@ -56,12 +56,12 @@
     "type": "multiple_choice",
     "question": "Co vypíše výraz print([f() for f in funcs])?\n\nfuncs = [lambda: i for i in range(3)]\nprint([f() for f in funcs])",
     "options": [
-      "A) Seznam [2, 2, 2], protože anonymní lambda funkce hledají i až při spuštění    .",
+      "A) Výjimku NameError, protože proměnná i po dokončení generování z paměti zmizí  .",
       "B) Seznam [0, 1, 2], protože proměnná i se při vytváření těla lambdy ihned sváže .",
       "C) Seznam [0, 0, 0], protože počáteční hodnota cyklu i=0 zůstane zachována v těle.",
-      "D) Výjimku NameError, protože proměnná i po dokončení generování z paměti zmizí  ."
+      "D) Seznam [2, 2, 2], protože anonymní lambda funkce hledají i až při spuštění    ."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "V Pythonu dochází v uzávěrech k tzv. late binding (zpožděnému vázání): proměnná i se v těle lambda funkce vyhodnocuje až ve chvíli zavolání f(), kdy už má po dokončení cyklu hodnotu 2. Všechny vytvořené lambda funkce tak vrátí 2. Opravou je použití výchozího parametru lambda i=i: i."
   },
   {
@@ -82,12 +82,12 @@
     "type": "fill_blank_choice",
     "question": "Doplňte výraz do f-stringu tak, aby byl výsledný řetězec obalen ve složených závorkách {VŠCHT}:",
     "options": [
-      "{{{jmeno}}}",
-      "{{jmeno}}",
       "\\{{jmeno\\}}",
-      "{\\{jmeno\\}}"
+      "{{{jmeno}}}",
+      "{\\{jmeno\\}}",
+      "{{jmeno}}"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "V f-stringu se složené závorky eskapují zdvojením {{ a }}. Trojité složené závorky {{{jmeno}}} vytvoří literální {, vyhodnotí proměnnou a uzavřou literální }.",
     "code": "jmeno = \"VŠCHT\"\n# Výsledkem má být text: \"{VŠCHT}\"\ntext = f\"________\"\n# Výstup: {VŠCHT}",
     "expected": "{{{jmeno}}}"
@@ -97,12 +97,12 @@
     "type": "multiple_choice",
     "question": "Ke kterému adresáři se vztahují relativní cesty při otevírání souborů pomocí open('data.txt')?",
     "options": [
-      "A) K aktuálnímu pracovnímu adresáři (CWD), odkud byl spuštěn interpret Pythonu    .",
-      "B) K adresáři, ve kterém se nachází samotný právě vykonávaný skript s příponou .py.",
-      "C) K kořenovému adresáři projektu určenému v proměnné prostředí zvané PYTHONPATH  .",
-      "D) K systémovému dočasnému adresáři určenému systémem pro běžného uživatele v OS  ."
+      "A) K systémovému dočasnému adresáři určenému systémem pro běžného uživatele v OS  .",
+      "B) K kořenovému adresáři projektu určenému v proměnné prostředí zvané PYTHONPATH  .",
+      "C) K aktuálnímu pracovnímu adresáři (CWD), odkud byl spuštěn interpret Pythonu    .",
+      "D) K adresáři, ve kterém se nachází samotný právě vykonávaný skript s příponou .py."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Relativní cesty v Pythonu se nevztahují k umístění zdrojového souboru .py, ale k aktuálnímu pracovnímu adresáři (Current Working Directory), ze kterého byl interpret spuštěn. Spuštění skriptu z jiného adresáře tak bez úpravy cest vyvolá FileNotFoundError."
   },
   {
@@ -110,12 +110,12 @@
     "type": "multiple_choice",
     "question": "Co bude výstupem příkazu print(cisla) po odebrání prvků během iterace?\n\ncisla = [1, 2, 3, 4]\nfor x in cisla:\n    if x % 2 != 0:\n        cisla.remove(x)\nprint(cisla)",
     "options": [
-      "A) Seznam [2, 3, 4], protože odebráním prvku 1 se posunou vnitřní indexy prvků .",
+      "A) Seznam [], protože odebrání prvku vymaže všechny zbývající prvky ze seznamu .",
       "B) Seznam [2, 4], protože metoda remove bezpečně aktualizuje ukazatel cyklu for.",
-      "C) Seznam [], protože odebrání prvku vymaže všechny zbývající prvky ze seznamu .",
-      "D) Výjimka RuntimeError, protože Python zakazuje modifikaci iterovaného pole   ."
+      "C) Výjimka RuntimeError, protože Python zakazuje modifikaci iterovaného pole   .",
+      "D) Seznam [2, 3, 4], protože odebráním prvku 1 se posunou vnitřní indexy prvků ."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Při modifikaci seznamu během iterace se interní index posouvá v původním seznamu. Odebráním prvku 1 na indexu 0 se prvek 2 posune na index 0 a prvek 3 na index 1. Smyčka v následujícím kroku přejde na index 1 (kde je nyní 3), čímž prvek 2 úplně přeskočí! Ve výsledku zůstane [2, 3, 4]."
   }
 ]

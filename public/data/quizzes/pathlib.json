@@ -4,12 +4,12 @@
     "type": "predict_output",
     "question": "Jaký bude výstup z následujícího spojování cest v modulu pathlib?\n\nfrom pathlib import PurePath\np = PurePath('/tmp') / '/pokus' / 'data.txt'\nprint(p)",
     "options": [
-      "A) /pokus/data.txt",
-      "B) /tmp/pokus/data.txt",
-      "C) /tmp//pokus/data.txt",
+      "A) /tmp//pokus/data.txt",
+      "B) /pokus/data.txt",
+      "C) /tmp/pokus/data.txt",
       "D) /tmp/data.txt"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Při spojování cest operátorem / způsobení absolutní cesty (začínající /) resetuje předchozí nahromaděnou cestu. Proto se '/tmp' ignoruje a vznikne '/pokus/data.txt'."
   },
   {
@@ -17,12 +17,12 @@
     "type": "multiple_choice",
     "question": "Co vrátí atribut p.stem pro cestu p = Path('/var/log/app.tar.gz')?",
     "options": [
-      "A) app.tar",
+      "A) .tar.gz",
       "B) app",
-      "C) app.tar.gz",
-      "D) .tar.gz"
+      "C) app.tar",
+      "D) app.tar.gz"
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Atribut .stem odsekne pouze poslední příponu (.gz), takže vrátí 'app.tar'. Celé jméno je 'app.tar.gz' (.name) a seznam všech přípon je ['.tar', '.gz'] (.suffixes)."
   },
   {
@@ -30,12 +30,12 @@
     "type": "multiple_choice",
     "question": "Jaký datový typ mají prvky vrácené generátorem p.iterdir()?",
     "options": [
-      "A) Objekty typu Path (PosixPath nebo WindowsPath) reprezentující příslušné položky.",
-      "B) Prosté řetězce (str) obsahující relativní cesty k jednotlivým souborům a složkám.",
-      "C) N-tice (tuple) obsahující název souboru a jeho metadata vrácená ze systémového stat.",
-      "D) Souborové popisovače (file descriptors) otevřené pro čtení obsahu adresáře."
+      "A) Souborové popisovače (file descriptors) otevřené pro čtení obsahu adresáře.",
+      "B) N-tice (tuple) obsahující název souboru a jeho metadata vrácená ze systémového stat.",
+      "C) Prosté řetězce (str) obsahující relativní cesty k jednotlivým souborům a složkám.",
+      "D) Objekty typu Path (PosixPath nebo WindowsPath) reprezentující příslušné položky."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Generátor iterdir() vrací objekty Path (resp. PosixPath/WindowsPath), nikoli prosté řetězce str. To umožňuje přímo volat metody jako .is_file() nebo .stat() na navrácených prvcích."
   },
   {
@@ -44,8 +44,8 @@
     "question": "Jaký je hlavní rozdíl mezi třídami PurePath a Path v modulu pathlib?",
     "options": [
       "A) PurePath provádí pouze řetězcové operace bez přístupu k souborovému systému.",
-      "B) PurePath podporuje výhradně operační systém Linux, zatímco Path funguje i na Windows.",
-      "C) PurePath slouží k načítání textových souborů, zatímco Path spravuje binární soubory.",
+      "B) PurePath slouží k načítání textových souborů, zatímco Path spravuje binární soubory.",
+      "C) PurePath podporuje výhradně operační systém Linux, zatímco Path funguje i na Windows.",
       "D) PurePath je starší zastaralá třída určená pro zpětnou kompatibilitu s Pythonem 2."
     ],
     "answer": 0,
@@ -57,12 +57,12 @@
     "question": "Doplňte metodu objektu Path pro rekurzivní vyhledání souborů odpovídajících vzoru ve všech podsložkách:",
     "code_snippet": "from pathlib import Path\np = Path('/projekty')\npy_files = list(p.________('*.py'))",
     "options": [
-      "rglob",
       "glob_all",
-      "iterdir",
-      "find"
+      "rglob",
+      "find",
+      "iterdir"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Metoda Path.rglob(pattern) rekurzivně prochází adresář i všechny jeho podsložky a vyhledává shody s daným vzorem.",
     "code": "from pathlib import Path\n\nproject_root = Path(\".\")\n# Rekurzivní vyhledání všech Python skriptů v podadresářích:\npy_files = list(project_root.________(\"*.py\"))",
     "expected": "rglob"
@@ -72,12 +72,12 @@
     "type": "multiple_choice",
     "question": "Co provede metoda p.resolve() na objektu Path?",
     "options": [
-      "A) Převede cestu na kanonickou, odstraní symbolické odkazy a eliminujeme sekvence ..",
-      "B) Pouze připojí aktuální pracovní adresář před relativní cestu bez řešení symlinků.",
-      "C) Vytvoří nový soubor na zadané cestě, pokud daný soubor na disku dosud neexistuje.",
-      "D) Změní přístupová práva souboru tak, aby odpovídala absolutním právům vlastníka."
+      "A) Změní přístupová práva souboru tak, aby odpovídala absolutním právům vlastníka.",
+      "B) Vytvoří nový soubor na zadané cestě, pokud daný soubor na disku dosud neexistuje.",
+      "C) Převede cestu na kanonickou, odstraní symbolické odkazy a eliminujeme sekvence ..",
+      "D) Pouze připojí aktuální pracovní adresář před relativní cestu bez řešení symlinků."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Metoda resolve() vytvoří absolutní kanonickou cestu – nahradí symbolické odkazy jejich cílem a odstraní relativní složky jako '.' a '..'. Metoda absolute() pouze připojí cwd bez řešení symlinků."
   },
   {
@@ -85,10 +85,10 @@
     "type": "true_false_tricky",
     "question": "Rozhodněte o pravdivosti tvrzení: Třída pathlib.Path obsahuje vestavěnou metodu p.copy(), která slouží k přímému kopírování souborů.",
     "options": [
-      "A) Tvrzení je nepravdivé. Path metodu pro kopírování nemá; je nutné použít modul shutil.",
-      "B) Tvrzení je pravdivé. Metoda p.copy() je standardní součástí Path od Pythonu 3.4."
+      "A) Tvrzení je pravdivé. Metoda p.copy() je standardní součástí Path od Pythonu 3.4.",
+      "B) Tvrzení je nepravdivé. Path metodu pro kopírování nemá; je nutné použít modul shutil."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Třída Path v modulu pathlib kupodivu neposkytuje metodu pro kopírování. Pro kopírování souborů je nutné importovat modul shutil a použít např. shutil.copy2(src, dst)."
   }
 ]

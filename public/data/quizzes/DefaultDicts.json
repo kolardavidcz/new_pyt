@@ -4,12 +4,12 @@
     "type": "predict_output",
     "question": "Co bude výstupem po spuštění následujícího kódu?\n\nfrom collections import defaultdict\nd = defaultdict(list)\nx = d['a']\nprint(len(d))",
     "options": [
-      "A) 1",
-      "B) 0",
+      "A) 0",
+      "B) None",
       "C) KeyError",
-      "D) None"
+      "D) 1"
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Pouhé čtení neexistujícího klíče d['a'] u defaultdict způsobí automatické zavolání default_factory (zde list()), vložení klíče s touto hodnotou do slovníku a zvětšení jeho délky na 1."
   },
   {
@@ -18,8 +18,8 @@
     "question": "Jak se zachová defaultdict(None) při přístupu k neexistujícímu klíči?",
     "options": [
       "A) Vyvolá výjimku KeyError, neboť chybí platná tovární funkce.",
-      "B) Vrátí hodnotu None a nový klíč v pořádku uloží do slovníku.",
-      "C) Vyvolá výjimku TypeError, neboť hodnota None není callable.",
+      "B) Vyvolá výjimku TypeError, neboť hodnota None není callable.",
+      "C) Vrátí hodnotu None a nový klíč v pořádku uloží do slovníku.",
       "D) Vytvoří prázdný slovník a vypíše varování o absenci továrny."
     ],
     "answer": 0,
@@ -30,12 +30,12 @@
     "type": "fill_blank_choice",
     "question": "Doplňte tovární funkci do `defaultdict`, která zajistí výchozí číselnou hodnotu 0 pro dosud neevidované prvky.",
     "options": [
+      "int()",
       "int",
-      "float",
       "0",
-      "int()"
+      "float"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Předáním konstruktoru `int` jako tovární funkce (default_factory) vrací `defaultdict` při přístupu k novému klíči hodnotu `int()`, tedy `0`.",
     "code": "from collections import defaultdict\n\n# Počítadlo výskytů atomů v molekule\natom_counts = defaultdict(________)\n\nfor atom in [\"C\", \"H\", \"C\", \"H\", \"O\", \"H\"]:\n    atom_counts[atom] += 1\n\nprint(atom_counts[\"C\"])  # 2\nprint(atom_counts[\"N\"])  # 0 (automaticky inicializováno)",
     "expected": "int"
@@ -45,12 +45,12 @@
     "type": "multiple_choice",
     "question": "Jaký je zásadní rozdíl mezi defaultdict(list) a metodou dict.setdefault(k, [])?",
     "options": [
-      "A) defaultdict volá tovární funkci líně pouze pro chybějící klíč, zatímco setdefault vyhodnocuje argument vždy.",
-      "B) defaultdict vyhodnocuje argument vždy při volání přístupu, zatímco setdefault volá tovární funkci zcela líně.",
-      "C) defaultdict umožní měnit výchozí hodnotu pro každý klíč zvlášť, zatímco setdefault používá globální továrnu.",
-      "D) defaultdict nevkládá chybějící klíč automaticky do slovníku, zatímco setdefault nový klíč okamžitě zaregistruje."
+      "A) defaultdict umožní měnit výchozí hodnotu pro každý klíč zvlášť, zatímco setdefault používá globální továrnu.",
+      "B) defaultdict nevkládá chybějící klíč automaticky do slovníku, zatímco setdefault nový klíč okamžitě zaregistruje.",
+      "C) defaultdict volá tovární funkci líně pouze pro chybějící klíč, zatímco setdefault vyhodnocuje argument vždy.",
+      "D) defaultdict vyhodnocuje argument vždy při volání přístupu, zatímco setdefault volá tovární funkci zcela líně."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "U d.setdefault(k, []) se výraz [] (vytvoření seznamu) vyhodnotí při každém volání metody, i když klíč již existuje. U defaultdict se tovární funkce volá líně až při absenci klíče."
   },
   {
@@ -58,10 +58,10 @@
     "type": "true_false_tricky",
     "question": "Tovární funkce předaná do defaultdict dostává při volání hledaný klíč jako svojí vstupní hodnotu.",
     "options": [
-      "A) Nepravda – tovární funkce se volá bez jakýchkoliv parametrů.",
-      "B) Pravda – tovární funkce přebírá klíč jako svůj první parametr."
+      "A) Pravda – tovární funkce přebírá klíč jako svůj první parametr.",
+      "B) Nepravda – tovární funkce se volá bez jakýchkoliv parametrů."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Interní metoda __missing__(key) u defaultdict volá self.default_factory() bez parametrů. Hledaný klíč se předané funkci nepředává."
   }
 ]

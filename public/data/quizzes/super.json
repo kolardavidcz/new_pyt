@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Co vypíše následující kód při zavolání metody `c.test()`?\n\nclass A:\n    def test(self):\n        return \"A\"\n\nclass B:\n    def test(self):\n        return \"B\"\n\nclass C(A, B):\n    def test(self):\n        return super(A, self).test()\n\nc = C()\nprint(c.test())",
     "options": [
-      "A) Vypíše řetězec 'B', protože hledání v MRO třídy C pokračuje po třídě A dalším rodičem B.",
+      "A) Vyvolá TypeError, protože prvním argumentem funkce super() musí být instance objektu.",
       "B) Vypíše řetězec 'A', protože super(A, self) odkazuje přímo na rodičovskou třídu A.",
       "C) Vyvolá AttributeError, protože třída A nedědí z třídy B a nemá přístup k jejím metodám.",
-      "D) Vyvolá TypeError, protože prvním argumentem funkce super() musí být instance objektu."
+      "D) Vypíše řetězec 'B', protože hledání v MRO třídy C pokračuje po třídě A dalším rodičem B."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "První parametr `type` ve `super(A, self)` určuje třídu v MRO rodokmenu instance `c` (`C -> A -> B -> object`), od jejíhož NÁSLEDUJÍCÍHO prvku se začne metoda vyhledávat. Za třídou `A` v MRO třídy `C` následuje třída `B`, proto se zavolá `B.test()`."
   },
   {
@@ -18,9 +18,9 @@
     "question": "Jaký bude výsledek vykonání kódu při volání `b.greet()` s vnořenou funkcí?\n\nclass A:\n    def greet(self):\n        return \"Hello\"\n\nclass B(A):\n    def greet(self):\n        def inner():\n            return super().greet() + \" World\"\n        return inner()\n\nb = B()\nprint(b.greet())",
     "options": [
       "A) Vyvolá RuntimeError, protože bezargumentový super() nefunguje uvnitř vnořené funkce bez self.",
-      "B) Vypíše řetězec 'Hello World', protože super() automaticky vyhledá instanci v nadřazeném rozsahu.",
-      "C) Vyvolá AttributeError, protože vnořená funkce inner nemá přístup k metodám rodičovské třídy.",
-      "D) Vypíše hodnotu None, protože vnořená funkce inner nepředává argumenty do nadřazené metody."
+      "B) Vypíše hodnotu None, protože vnořená funkce inner nepředává argumenty do nadřazené metody.",
+      "C) Vypíše řetězec 'Hello World', protože super() automaticky vyhledá instanci v nadřazeném rozsahu.",
+      "D) Vyvolá AttributeError, protože vnořená funkce inner nemá přístup k metodám rodičovské třídy."
     ],
     "answer": 0,
     "explanation": "Bezargumentové volání `super()` spoléhá na kompilátorem vkládanou proměnnou `__class__` a první argument metody (`self`). Uvnitř vnořené funkce `inner()`, která nemá parametr `self`, toto automatické doplnění selže a vyvolá `RuntimeError: super(): __class__ cell not found` (případně `TypeError`)."
@@ -30,12 +30,12 @@
     "type": "multiple_choice",
     "question": "Jaké bude pořadí výpisů při vytvoření instance `c = C()` v diamantové dědičnosti?\n\nclass Base:\n    def __init__(self):\n        print(\"Base\")\n\nclass A(Base):\n    def __init__(self):\n        print(\"A\")\n        super().__init__()\n\nclass B(Base):\n    def __init__(self):\n        print(\"B\")\n        super().__init__()\n\nclass C(A, B):\n    def __init__(self):\n        print(\"C\")\n        super().__init__()\n\nc = C()",
     "options": [
-      "A) Vypíše postupně C, A, B, Base díky kooperativnímu řetězení v MRO pořadí.",
-      "B) Vypíše postupně C, A, Base, B, Base kvůli dvojímu volání rodiče Base.",
-      "C) Vypíše postupně C, A, Base, protože třída A zavolá přímo konstruktor Base.",
+      "A) Vypíše postupně C, A, Base, protože třída A zavolá přímo konstruktor Base.",
+      "B) Vypíše postupně C, A, B, Base díky kooperativnímu řetězení v MRO pořadí.",
+      "C) Vypíše postupně C, A, Base, B, Base kvůli dvojímu volání rodiče Base.",
       "D) Vyvolá TypeError, protože třídy A a B dědí ze stejné základní třídy Base."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "MRO pro třídu `C` je `[C, A, B, Base, object]`. Volání `super().__init__()` uvnitř `A.__init__` nevyvolá přímo `Base.__init__`, ale předá řízení dalšímu prvku v MRO rodokmenu třídy `C`, což je `B.__init__`. Až `B.__init__` zavolá `Base.__init__`, takže každý konstruktor se zavolá právě jednou."
   },
   {
@@ -43,12 +43,12 @@
     "type": "fill_blank_choice",
     "question": "Doplňte název atributu třídy obsahujícího n-tici s pořadím prohledávání metod (MRO):",
     "options": [
-      "__mro__",
-      "__order__",
+      "__bases__",
       "__hierarchy__",
-      "__bases__"
+      "__mro__",
+      "__order__"
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Speciální atribut __mro__ (Method Resolution Order) obsahuje n-tici tříd určující prioritu vyhledávání metod a atributů.",
     "code": "class Base: pass\nclass Derived(Base): pass\n\nresolution_order = Derived.________\n# Výstup: (<class '__main__.Derived'>, <class '__main__.Base'>, <class 'object'>)",
     "expected": "__mro__"
@@ -58,12 +58,12 @@
     "type": "multiple_choice",
     "question": "Co přesně specifikuje prvotní argument `type` ve volání `super(type, object)`?",
     "options": [
-      "A) Třídu v MRO řetězci, od jejíž následující pozice se započne vyhledávání požadované metody.",
-      "B) Cílovou rodičovskou třídu, jejíž metoda se má přímo spustit s vynecháním ostatních předků.",
-      "C) Typ objektu, na kterém se má vyhledávání zastavit při dosažení vrchní úrovně dědičnosti.",
-      "D) Výchozí třídu, která se použije jako záložní řešení v případě nenalezení metody v potomcích."
+      "A) Výchozí třídu, která se použije jako záložní řešení v případě nenalezení metody v potomcích.",
+      "B) Typ objektu, na kterém se má vyhledávání zastavit při dosažení vrchní úrovně dědičnosti.",
+      "C) Cílovou rodičovskou třídu, jejíž metoda se má přímo spustit s vynecháním ostatních předků.",
+      "D) Třídu v MRO řetězci, od jejíž následující pozice se započne vyhledávání požadované metody."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "První parametr `type` nenařizuje spuštění metody přímo z dané třídy; určuje bod v MRO rodokmenu druhého argumentu, od jehož následujícího souseda se začne hledat."
   },
   {

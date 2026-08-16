@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Jakým způsobem ukládá Git historii změn v projektu uvnitř adresáře .git?",
     "options": [
-      "A) Ukládá kompletní snímky (snapshoty) stavu projektu označené SHA-1 hešem.",
-      "B) Ukládá postupné řádkové rozdíly (delty) mezi jednotlivými verzemi souborů.",
-      "C) Ukládá komprimované ZIP archivy celého adresáře pro každý jednotlivý commit.",
-      "D) Ukládá pouze změněné řádky textu bez vazby na celkovou strukturu adresářů."
+      "A) Ukládá postupné řádkové rozdíly (delty) mezi jednotlivými verzemi souborů.",
+      "B) Ukládá komprimované ZIP archivy celého adresáře pro každý jednotlivý commit.",
+      "C) Ukládá pouze změněné řádky textu bez vazby na celkovou strukturu adresářů.",
+      "D) Ukládá kompletní snímky (snapshoty) stavu projektu označené SHA-1 hešem."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Git na rozdíl od tradičních delta-based verzovacích systémů nepoužívá ukládání přírůstkových rozdílů, ale v databázi .git uchovává historii jako sérii snímků (snapshotů) celého projektu, kde každý objekt je jednoznačně identifikován SHA-1 hešem."
   },
   {
@@ -18,9 +18,9 @@
     "question": "Co se stane, pokud upravíte soubor app.py, zavoláte git add app.py a poté v něm provedete další změny před spuštěním git commit?",
     "options": [
       "A) Do komitu se uloží stav souboru z okamžiku spuštění příkazu git add app.py.",
-      "B) Do komitu se automaticky zahrnou i novější změny provedené po zavolání git add.",
+      "B) Změny v souboru se automaticky zahodí a soubor se vrátí do stavu z indexu Gitu.",
       "C) Příkaz git commit selže s chybou, protože soubor má nekonzistentní časové razítko.",
-      "D) Změny v souboru se automaticky zahodí a soubor se vrátí do stavu z indexu Gitu."
+      "D) Do komitu se automaticky zahrnou i novější změny provedené po zavolání git add."
     ],
     "answer": 0,
     "explanation": "Příkaz `git add` zkopíruje aktuální stav souboru do indexu (staging area). Pokud soubor po přidání do indexu znovu upravíte v pracovní složce, `git commit` nakomituje pouze verzi zmrazenou v indexu. Novější úpravy zůstanou v pracovní složce jako nepřidané změny."
@@ -42,12 +42,12 @@
     "question": "Kterým příkazem odeberete soubor ze staging area (unstage) bez ztráty rozpracovaných úprav v pracovním adresáři?",
     "code": "# Vyřazení souboru ze staging area před vytvořením commitu\ngit ________ HEAD titration_data.py",
     "options": [
+      "checkout",
       "reset",
       "remove",
-      "checkout",
       "revert"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Příkaz git reset HEAD soubor vyjme soubor z indexu (staging area), ale ponechá veškeré změny v souboru na disku nedotčené.",
     "expected": "reset"
   },
@@ -56,12 +56,12 @@
     "type": "multiple_choice",
     "question": "Který příkaz zobrazí rozdíl mezi změnami připravenými v indexu (staging area) a posledním komitem v HEAD?",
     "options": [
-      "A) git diff --cached pro porovnání stavu indexu s aktuálním komitem v repozitáři.",
-      "B) git diff bez přepínačů pro porovnání pracovní složky se stavem v indexu.",
-      "C) git diff HEAD pro porovnání neuvolněných změn na disku přímo s repozitářem.",
-      "D) git log -p pro zobrazení kompletní historie všech commitů v celém projektu."
+      "A) git log -p pro zobrazení kompletní historie všech commitů v celém projektu.",
+      "B) git diff HEAD pro porovnání neuvolněných změn na disku přímo s repozitářem.",
+      "C) git diff --cached pro porovnání stavu indexu s aktuálním komitem v repozitáři.",
+      "D) git diff bez přepínačů pro porovnání pracovní složky se stavem v indexu."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "`git diff` bez parametrů porovnává pracovní složku vůči indexu. Pro porovnání změn zanesených do indexu vůči posledním nakomitovaným změnám v repozitáři slouží přepínač `git diff --cached` (případně `--staged`). Příkaz `git diff HEAD` porovnává nekomitovanou pracovní složku přímo s HEAD."
   },
   {
@@ -69,12 +69,12 @@
     "type": "multiple_choice",
     "question": "Jaký je hlavní rozdíl mezi příkazy git reset HEAD~1 a git reset --soft HEAD~1?",
     "options": [
-      "A) reset HEAD~1 vrátí komit a zruší staging změn, zatímco --soft ponechá změny v indexu.",
-      "B) reset HEAD~1 smaže úpravy na disku, zatímco --soft zachová soubory v pracovní složce.",
-      "C) reset HEAD~1 vytvoří nový komit v historii, zatímco --soft komit vymaže z reflogu.",
-      "D) reset HEAD~1 funguje na vzdáleném serveru, zatímco --soft funguje pouze lokálně."
+      "A) reset HEAD~1 funguje na vzdáleném serveru, zatímco --soft funguje pouze lokálně.",
+      "B) reset HEAD~1 vytvoří nový komit v historii, zatímco --soft komit vymaže z reflogu.",
+      "C) reset HEAD~1 smaže úpravy na disku, zatímco --soft zachová soubory v pracovní složce.",
+      "D) reset HEAD~1 vrátí komit a zruší staging změn, zatímco --soft ponechá změny v indexu."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Příkaz `git reset HEAD~1` (výchozí `--mixed`) posune ukazatel větvě o jeden commit zpět a vymaže index, přičemž úpravy ponechá v pracovní složce nezařazené. S přepínačem `--soft HEAD~1` se ukazatel vrátí, ale index zůstane zachován, takže změny z vráceného komitu zůstanou rovnou připraveny v indexu pro další commit."
   },
   {
@@ -83,9 +83,9 @@
     "question": "Který nástroj zprostředkuje nalezení SHA-1 heše smazaného komitu po nechtěném spuštění git reset --hard?",
     "options": [
       "A) git reflog pro výpis kompletní historie pohybů ukazatele HEAD v lokálním repozitáři.",
-      "B) git status pro zobrazení pracovního stromu a seznamu nezarovnaných souborů na disku.",
-      "C) git fsck pro vyčištění nepoužívaných datových objektů z vnitřní databáze repozitáře.",
-      "D) git remote pro ověření stavu vzdáleného serveru a stažení chybějících komitů."
+      "B) git fsck pro vyčištění nepoužívaných datových objektů z vnitřní databáze repozitáře.",
+      "C) git remote pro ověření stavu vzdáleného serveru a stažení chybějících komitů.",
+      "D) git status pro zobrazení pracovního stromu a seznamu nezarovnaných souborů na disku."
     ],
     "answer": 0,
     "explanation": "`git reflog` udržuje protokol všech změn referencí a pohybů HEAD v lokálním repozitáři. I když po `git reset --hard` komit zmizí z viditelného stromu větví, jeho SHA-1 hash lze dohledat v reflogu a následně zotavit např. pomocí `git checkout -b nova_vetev <SHA>`."
@@ -95,12 +95,12 @@
     "type": "multiple_choice",
     "question": "Jaký dopad má spuštění příkazu git rm --cached data.txt na soubor data.txt?",
     "options": [
-      "A) Soubor se přestane verzovat v indexu Gitu, ale zůstane zachován na lokálním disku.",
-      "B) Soubor se okamžitě vymaže z lokálního disku i ze všech předchozích komitů v historii.",
+      "A) Příkaz vyvolá chybu selhání, protože ze staging area nelze odebrat existující soubor.",
+      "B) Soubor se přestane verzovat v indexu Gitu, ale zůstane zachován na lokálním disku.",
       "C) Soubor se přesune do adresáře .git a označí se jako dočasná záloha pracovního stromu.",
-      "D) Příkaz vyvolá chybu selhání, protože ze staging area nelze odebrat existující soubor."
+      "D) Soubor se okamžitě vymaže z lokálního disku i ze všech předchozích komitů v historii."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Přepínač `--cached` dá příkazu `git rm` pokyn odebrat soubor ze staging area a přestat jej sledovat v Gitu, ale neprovádí fyzické smazání souboru ze souborového systému na disku."
   },
   {
@@ -108,10 +108,10 @@
     "type": "true_false_tricky",
     "question": "Lze pomocí git push úspěšně odeslat lokální komity do vzdáleného repozitáře s aktivní pracovní složkou (nebazarového)?",
     "options": [
-      "A) Nepravda – Git standardně odmítá push do nebazarového repozitáře s aktivní pracovní složkou.",
-      "B) Pravda – Git automaticky sloučí příchozí změny s pracovní složkou vzdáleného repozitáře."
+      "A) Pravda – Git automaticky sloučí příchozí změny s pracovní složkou vzdáleného repozitáře.",
+      "B) Nepravda – Git standardně odmítá push do nebazarového repozitáře s aktivní pracovní složkou."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Git standardně brání spuštění `git push` do repozitářů, které nejsou typu `bare` (tj. obsahují vlastní pracovní složku a checkoutnutou větev), aby nedošlo k přepsání nekomitovaných změn vzdáleného vývojáře."
   },
   {
@@ -120,12 +120,12 @@
     "question": "Kterým příkazem stáhnete nové commity ze vzdáleného repozitáře do lokální databáze bez automatického sloučení do pracovní větve?",
     "code": "# Stažení nových commitů ze vzdáleného serveru bez úpravy pracovních souborů\ngit ________ origin\ngit log HEAD..origin/main",
     "options": [
-      "fetch",
+      "commit",
       "clone",
-      "checkout",
-      "commit"
+      "fetch",
+      "checkout"
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Příkaz git fetch stáhne historii a objekty ze vzdáleného repozitáře do lokální kopie bez zásahu do aktuální pracovní větve.",
     "expected": "fetch"
   }
