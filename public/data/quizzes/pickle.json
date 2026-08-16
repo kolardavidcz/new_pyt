@@ -4,13 +4,14 @@
     "type": "multiple_choice",
     "question": "Který mód otevření souboru je vyžadován při zápisu zapiklených dat metodou pickle.dump()?",
     "options": [
-      "A) 'r+' — modul pickle potřebuje režim pro čtení i zápis z důvodu kontroly zapsaných dat.",
-      "B) 'a+' — modul pickle vyžaduje režim připsání na konec souboru pro správnou serializaci.",
+      "A) 'a+' — modul pickle vyžaduje režim připsání na konec souboru pro správnou serializaci.",
+      "B) 'r+' — modul pickle potřebuje režim pro čtení i zápis z důvodu kontroly zapsaných dat.",
       "C) 'wt' — modul pickle generuje textový výstup kódovaný automaticky v systémech UTF-8.",
       "D) 'wb' — modul pickle vytváří binární bajtový tok, který vyžaduje přímý binární zápis."
     ],
     "answer": 3,
-    "explanation": "Metoda pickle.dump() zapisuje serializovaná data v binárním formátu (objekt typu bytes), proto musí být výstupní soubor otevřen v binárním režimu zápisu ('wb'). V textovém režimu by pokus o zápis bajtů vyvolal výjimku TypeError."
+    "explanation": "Metoda pickle.dump() zapisuje serializovaná data v binárním formátu (objekt typu bytes), proto musí být výstupní soubor otevřen v binárním režimu zápisu ('wb'). V textovém režimu by pokus o zápis bajtů vyvolal výjimku TypeError.",
+    "code": null
   },
   {
     "id": "q2",
@@ -19,9 +20,9 @@
     "code": "import pickle\n\nserialized_sample = b\"\\x80\\x04\\x95\\x19\\x00\\x00\\x00\\x00\\x00\\x00\\x00}\\x94\\x8c\\x06sample\\x94\\x8c\\x07ethanol\\x94s.\"\nmeasurement = pickle.________(serialized_sample)\n# Vystup: {'sample': 'ethanol'}",
     "options": [
       "loads",
+      "dumps",
       "load",
-      "dump",
-      "dumps"
+      "dump"
     ],
     "answer": 0,
     "explanation": "Funkce pickle.loads() načítá a deserializuje objekt z předaného bajtového řetězce v paměti, zatímco pickle.load() čte ze souborového proudu.",
@@ -38,7 +39,8 @@
       "D) Funkce se automaticky převede na anonymní lambda výraz a uloží jako spustitelný bajtkód."
     ],
     "answer": 1,
-    "explanation": "Modul pickle neukládá bytecode ani zdrojový kód funkcí a tříd. Zapisuje pouze referenci v podobě jejich plného jména a mateřského modulu, takže při unpicklování musí daná funkce v cílovém prostředí existovat pod stejným jménem."
+    "explanation": "Modul pickle neukládá bytecode ani zdrojový kód funkcí a tříd. Zapisuje pouze referenci v podobě jejich plného jména a mateřského modulu, takže při unpicklování musí daná funkce v cílovém prostředí existovat pod stejným jménem.",
+    "code": null
   },
   {
     "id": "q4",
@@ -49,7 +51,8 @@
       "B) Deserializace pomocí pickle.load() představuje kritické bezpečnostní riziko, protože proces rozbalení může automaticky spustit libovolný kód."
     ],
     "answer": 1,
-    "explanation": "Při rozbalování zapiklených dat dochází k instanciaci objektů a volání konstruktorů či speciálních metod, což umožňuje útočníkovi podvrhnout bajtkód vykonávající libovolné příkazy v operačním systému. Pro nedůvěryhodná data je nutné se pickle vyhnout."
+    "explanation": "Při rozbalování zapiklených dat dochází k instanciaci objektů a volání konstruktorů či speciálních metod, což umožňuje útočníkovi podvrhnout bajtkód vykonávající libovolné příkazy v operačním systému. Pro nedůvěryhodná data je nutné se pickle vyhnout.",
+    "code": null
   },
   {
     "id": "q5",
@@ -57,10 +60,10 @@
     "question": "Jaká výjimka nastane při pokusu o zapiklení generátorového výrazu pomocí pickle.dumps()?",
     "code": "import pickle\ngen = (x**2 for x in range(10))\npickle.dumps(gen)",
     "options": [
-      "A) TypeError — operace dumps() přijímá pouze sekvenční typy jako seznamy nebo n-tice v paměti.",
-      "B) ValueError — generátorový výraz vyžaduje explicitní konverzi na seznam před serializací dat.",
+      "A) ValueError — generátorový výraz vyžaduje explicitní konverzi na seznam před serializací dat.",
+      "B) AttributeError — objekt generátoru nemá vytvořen atribut __dict__ pro uložení vnitřního stavu.",
       "C) PicklingError — generátory udržují vnitřní stav iterátoru a nepatří mezi piklitelné objekty.",
-      "D) AttributeError — objekt generátoru nemá vytvořen atribut __dict__ pro uložení vnitřního stavu."
+      "D) TypeError — operace dumps() přijímá pouze sekvenční typy jako seznamy nebo n-tice v paměti."
     ],
     "answer": 2,
     "explanation": "Generátory, otevřené soubory, síťová spojení nebo databázová připojení nelze serializovat. Pokus o zapiklení nepiklitelného objektu vyvolá výjimku pickle.PicklingError."
@@ -70,13 +73,14 @@
     "type": "multiple_choice",
     "question": "K čemu primárně slouží modul pickletools ve standardní knihovně Pythonu?",
     "options": [
-      "A) Zrychluje vykonávání metod pickle.dump() a pickle.load() pomocí C-rozšíření interpretru.",
-      "B) Automaticky převádí binární struktury modulu pickle do lidsky čitelného formátu JSON či XML.",
+      "A) Automaticky převádí binární struktury modulu pickle do lidsky čitelného formátu JSON či XML.",
+      "B) Zrychluje vykonávání metod pickle.dump() a pickle.load() pomocí C-rozšíření interpretru.",
       "C) Šifruje zapiklená data pomocí symetrického šifrovacího klíče před uložením na lokální disk.",
       "D) Umožňuje inspekci a disasemblaci instrukcí piklicího protokolu bez spuštění nebezpečného kódu."
     ],
     "answer": 3,
-    "explanation": "Modul pickletools poskytuje funkci dis(), která disasembruje bajtový tok piklicího protokolu na jednotlivé operační kódy. To umožňuje offline analýzu struktury uložených dat bez rizika vykonání škodlivého kódu z neznámého souboru."
+    "explanation": "Modul pickletools poskytuje funkci dis(), která disasembruje bajtový tok piklicího protokolu na jednotlivé operační kódy. To umožňuje offline analýzu struktury uložených dat bez rizika vykonání škodlivého kódu z neznámého souboru.",
+    "code": null
   },
   {
     "id": "q7",
@@ -89,6 +93,7 @@
       "D) Uloží se kompletní definice všech metod třídy včetně veškerého zdrojového kódu."
     ],
     "answer": 0,
-    "explanation": "pickle neukládá metody třídy ani její kód, ale pouze členské proměnné (typicky ze slovníku __dict__) a odkaz na název třídy a modulu. Při unpicklování se znovu načte třída z modulu a naplní se uloženými atributy."
+    "explanation": "pickle neukládá metody třídy ani její kód, ale pouze členské proměnné (typicky ze slovníku __dict__) a odkaz na název třídy a modulu. Při unpicklování se znovu načte třída z modulu a naplní se uloženými atributy.",
+    "code": null
   }
 ]

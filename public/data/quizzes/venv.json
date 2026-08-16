@@ -4,13 +4,14 @@
     "type": "multiple_choice",
     "question": "Který příkaz vytvoří nové virtuální prostředí ve složce .venv v aktuálním adresáři?",
     "options": [
-      "A) python create venv .venv",
+      "A) pip install venv .venv",
       "B) pyvenv create --dir .venv",
-      "C) pip install venv .venv",
+      "C) python create venv .venv",
       "D) python -m venv .venv"
     ],
     "answer": 3,
-    "explanation": "Standardní způsob od Pythonu 3.8 je spuštění modulu `venv` pomocí příkazu `python -m venv <cesta>`."
+    "explanation": "Standardní způsob od Pythonu 3.8 je spuštění modulu `venv` pomocí příkazu `python -m venv <cesta>`.",
+    "code": null
   },
   {
     "id": "q2",
@@ -23,20 +24,22 @@
       "D) Odstraní z nově vytvářeného virtuálního prostředí správce pip a zakáže instalaci lokálních balíčků."
     ],
     "answer": 0,
-    "explanation": "Přepínač nastavení klíč `include-system-site-packages = True` v `pyvenv.cfg`. Globální balíčky budou dostupné, ale pokud nainstalujete lokální balíček stejného jména, použije se lokální."
+    "explanation": "Přepínač nastavení klíč `include-system-site-packages = True` v `pyvenv.cfg`. Globální balíčky budou dostupné, ale pokud nainstalujete lokální balíček stejného jména, použije se lokální.",
+    "code": null
   },
   {
     "id": "q3",
     "type": "multiple_choice",
     "question": "Co se stane s proměnnou prostředí PATH v příkazové řádce při aktivaci virtuálního prostředí?",
     "options": [
-      "A) Původní obsah proměnné PATH se kompletně smaže a nahradí pouze absolutní cestou k souboru python.exe.",
+      "A) Do proměnné PATH se uloží cesta k repozitáři PyPI pro prioritní stahování nových balíčků z internetu.",
       "B) Na její začátek se přidá cesta k podadresáři bin (resp. Scripts ve Windows) daného virtuálního prostředí.",
-      "C) Do proměnné PATH se uloží cesta k repozitáři PyPI pro prioritní stahování nových balíčků z internetu.",
-      "D) Aktivace proměnnou PATH vůbec nemění, pouze vytváří dočasný zástupce na ploše operačního systému."
+      "C) Aktivace proměnnou PATH vůbec nemění, pouze vytváří dočasný zástupce na ploše operačního systému.",
+      "D) Původní obsah proměnné PATH se kompletně smaže a nahradí pouze absolutní cestou k souboru python.exe."
     ],
     "answer": 1,
-    "explanation": "Aktivace prostředí (např. přes `source activate` nebo `activate.bat`) předřadí složku binárek venvu na samý začátek systémové proměnné PATH."
+    "explanation": "Aktivace prostředí (např. přes `source activate` nebo `activate.bat`) předřadí složku binárek venvu na samý začátek systémové proměnné PATH.",
+    "code": null
   },
   {
     "id": "q4",
@@ -45,9 +48,9 @@
     "code": "import sys\nprint(sys.base_prefix == sys.prefix)",
     "options": [
       "A) Vyvolá AttributeError, protože atribut sys.base_prefix existuje pouze mimo virtuální prostředí.",
-      "B) True, protože obě proměnné vždy ukazují na hlavní systémovou instalaci Pythonu bez ohledu na venv.",
+      "B) True, protože obě proměnné se po aktivaci virtuálního prostředí automaticky přenastaví na cestu k .venv.",
       "C) False, protože sys.prefix ukazuje na složku prostředí .venv, zatímco sys.base_prefix na základní Python.",
-      "D) True, protože obě proměnné se po aktivaci virtuálního prostředí automaticky přenastaví na cestu k .venv."
+      "D) True, protože obě proměnné vždy ukazují na hlavní systémovou instalaci Pythonu bez ohledu na venv."
     ],
     "answer": 2,
     "explanation": "`sys.base_prefix` uchovává cestu k původní hlavní instalaci Pythonu (nemění se), zatímco `sys.prefix` ukazuje na kořenový adresář spuštěného virtuálního prostředí (mění se)."
@@ -59,8 +62,8 @@
     "code": "# Aktivace virtuálního prostředí pro bioinformatický projekt\n________ .venv/bin/activate",
     "options": [
       "import",
-      "python",
       "execute",
+      "python",
       "source"
     ],
     "answer": 3,
@@ -73,12 +76,13 @@
     "question": "Proč se nedoporučuje verzovat složku virtuálního prostředí .venv v systému Git?",
     "options": [
       "A) Prostředí obsahuje stovky megabajtů závislostí a binárek, které lze snadno zregenerovat z requirements.txt.",
-      "B) Operační systém vyžaduje pro verzování složky .venv speciální komerční licenci systému správy verzí.",
-      "C) Git neumí zpracovat symbolické odkazy a při nahrávání na vzdálený repozitář poškodí soubor pyvenv.cfg.",
-      "D) Soubor .gitignore zapsaný v adresáři .venv znemožňuje odeslání jakéhokoliv kódu projektu na GitHub."
+      "B) Soubor .gitignore zapsaný v adresáři .venv znemožňuje odeslání jakéhokoliv kódu projektu na GitHub.",
+      "C) Operační systém vyžaduje pro verzování složky .venv speciální komerční licenci systému správy verzí.",
+      "D) Git neumí zpracovat symbolické odkazy a při nahrávání na vzdálený repozitář poškodí soubor pyvenv.cfg."
     ],
     "answer": 0,
-    "explanation": "Složka `.venv` je velká a obsahuje platformně závislé binárky a symlinky. Projekt má verzovat pouze `requirements.txt`, ze kterého lze prostředí kdekoliv znova postavit."
+    "explanation": "Složka `.venv` je velká a obsahuje platformně závislé binárky a symlinky. Projekt má verzovat pouze `requirements.txt`, ze kterého lze prostředí kdekoliv znova postavit.",
+    "code": null
   },
   {
     "id": "q7",
@@ -89,6 +93,7 @@
       "B) Nepravda – při použití binárky z `<venv>/bin/python` se kód spustí v prostředí venv i bez aktivace shellu."
     ],
     "answer": 1,
-    "explanation": "Aktivace pouze upravuje PATH v shellu. Pokud spustíte kód přímo spouštěčem `<venv>/bin/python` (nebo `<venv>\\Scripts\\python.exe`), Python automaticky detekuje soubor `pyvenv.cfg` a použije venv."
+    "explanation": "Aktivace pouze upravuje PATH v shellu. Pokud spustíte kód přímo spouštěčem `<venv>/bin/python` (nebo `<venv>\\Scripts\\python.exe`), Python automaticky detekuje soubor `pyvenv.cfg` a použije venv.",
+    "code": null
   }
 ]

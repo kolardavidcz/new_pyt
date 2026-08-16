@@ -10,21 +10,23 @@
       "D) Zdrojový kód PyPy se kompiluje přímo do systémového assembleru procesoru přes LLVM bez mezikroku v C."
     ],
     "answer": 2,
-    "explanation": "Vývoj PyPy probíhá tak, že je napsán v omezené podmnožině Pythonu zvané RPython (Restricted Python). RPython je přeložen do C a následně zkompilován běžným C kompilátorem."
+    "explanation": "Vývoj PyPy probíhá tak, že je napsán v omezené podmnožině Pythonu zvané RPython (Restricted Python). RPython je přeložen do C a následně zkompilován běžným C kompilátorem.",
+    "code": null
   },
   {
     "id": "q2",
     "type": "fill_blank_choice",
-    "question": "Doplňte parametr dekorátoru @jit, který zaručí vyhození výjimky při neschopnosti zkompilovat kód bez Python C-API:\n\n```python\nfrom numba import jit\n\n@jit(________=True)\ndef vypocet(x):\n    return x.sum()\n```",
+    "question": "Doplňte parametr dekorátoru @jit, který zaručí vyhození výjimky při neschopnosti zkompilovat kód bez Python C-API:",
     "options": [
-      "fastmath",
-      "strict",
       "pure_c",
+      "strict",
+      "fastmath",
       "nopython"
     ],
     "answer": 3,
     "explanation": "Parametr nopython=True (nebo samostatný dekorátor @njit) zakáže fallback do pomalého object mode. Pokud Numba nemůže kód přeložit do čistého nativního kódu bez Python C-API, vyvolá výjimku.",
-    "expected": "nopython"
+    "expected": "nopython",
+    "code": "from numba import jit\n\n@jit(________=True)\ndef vypocet(x):\n    return x.sum()"
   },
   {
     "id": "q3",
@@ -33,24 +35,26 @@
     "options": [
       "A) Vytvoří ze skalární funkce univerzální funkce (ufunc) schopnou pracovat nad vícerozměrnými poli.",
       "B) Uvolní Globální zámek interpretu (GIL) a automaticky rozloží výpočet mezi více samostatných OS procesů.",
-      "C) Přeloží Python kód dopředu (AOT) do samostatného dynamického knihovního souboru .so nebo .dll na disku.",
-      "D) Zabezpečí automatickou konverzi Python objektů na C-struktury bez nutnosti instalace knihovny LLVM."
+      "C) Zabezpečí automatickou konverzi Python objektů na C-struktury bez nutnosti instalace knihovny LLVM.",
+      "D) Přeloží Python kód dopředu (AOT) do samostatného dynamického knihovního souboru .so nebo .dll na disku."
     ],
     "answer": 0,
-    "explanation": "Dekorátor @vectorize umožňuje napsat funkci pro skalární hodnoty a automaticky z ní vygeneruje NumPy ufunc, která podporuje broadcasting a operace nad vícerozměrnými n-dimenzionálními poli."
+    "explanation": "Dekorátor @vectorize umožňuje napsat funkci pro skalární hodnoty a automaticky z ní vygeneruje NumPy ufunc, která podporuje broadcasting a operace nad vícerozměrnými n-dimenzionálními poli.",
+    "code": null
   },
   {
     "id": "q4",
     "type": "predict_output",
     "question": "Co umožní nastavení parametru nogil=True u dekorátoru @jit v Numbě během provádění zkompilované funkce?",
     "options": [
-      "A) Přesune provádění výpočtu z procesoru CPU přímo na grafický akcelerátor GPU s využitím rozhraní CUDA.",
+      "A) Zaručí, že funkce bude moci přistupovat k dynamickým objektům typu dict a list bez použití zámku.",
       "B) Uvolní Globální zámek interpretu (GIL), takže zkompilovaná funkce může běžet souběžně ve více vláknech.",
-      "C) Zaručí, že funkce bude moci přistupovat k dynamickým objektům typu dict a list bez použití zámku.",
+      "C) Přesune provádění výpočtu z procesoru CPU přímo na grafický akcelerátor GPU s využitím rozhraní CUDA.",
       "D) Vypne kontrolu přetečení paměti u polí NumPy a zrychlí indexaci prvků vynecháním platnostních testů."
     ],
     "answer": 1,
-    "explanation": "Parametr nogil=True instruuje Numbu, aby během vykonávání zkompilovaného nativního kódu uvolnila GIL (Global Interpreter Lock). Díky tomu mohou jiná Python vlákna běžet současně na jiných CPU jádrech."
+    "explanation": "Parametr nogil=True instruuje Numbu, aby během vykonávání zkompilovaného nativního kódu uvolnila GIL (Global Interpreter Lock). Díky tomu mohou jiná Python vlákna běžet současně na jiných CPU jádrech.",
+    "code": null
   },
   {
     "id": "q5",
@@ -61,6 +65,7 @@
       "B) Pravda – Cython vyžaduje předpřeklad C souboru a vytvoření rozšíření (setup.py), zatímco Numba kompiluje kód při spuštění."
     ],
     "answer": 1,
-    "explanation": "Cython překládá .pyx soubory do C/C++ předem (AOT) a kompiluje je do sdílené knihovny. Numba analyzuje Python kód za běhu a při prvním spuštění generuje strojový kód pomocí JIT (LLVM)."
+    "explanation": "Cython překládá .pyx soubory do C/C++ předem (AOT) a kompiluje je do sdílené knihovny. Numba analyzuje Python kód za běhu a při prvním spuštění generuje strojový kód pomocí JIT (LLVM).",
+    "code": null
   }
 ]

@@ -4,26 +4,28 @@
     "type": "multiple_choice",
     "question": "Jak se změní hodnoty atributů u instancí po in-place modifikaci seznamu definovaného v těle třídy?",
     "options": [
-      "A) AttributeError (protože k items nelze přistupovat přes instanci a2)",
-      "B) [] (protože každá instance automaticky dostává vlastní kopii seznamu)",
+      "A) [] (protože každá instance automaticky dostává vlastní kopii seznamu)",
+      "B) None (protože metoda append nevrací žádnou hodnotu při modifikaci)",
       "C) [1] (protože items je sdílený třídní atribut modifikovaný v místě)",
-      "D) None (protože metoda append nevrací žádnou hodnotu při modifikaci)"
+      "D) AttributeError (protože k items nelze přistupovat přes instanci a2)"
     ],
     "answer": 2,
-    "explanation": "Atribut items definovaný v těle třídy je třídní proměnná sdílená všemi instancemi. Volání a1.items.append(1) modifikuje tento sdílený seznam přímo v paměti, takže změna je viditelná i přes ostatní instance (a2.items vrátí [1])."
+    "explanation": "Atribut items definovaný v těle třídy je třídní proměnná sdílená všemi instancemi. Volání a1.items.append(1) modifikuje tento sdílený seznam přímo v paměti, takže změna je viditelná i přes ostatní instance (a2.items vrátí [1]).",
+    "code": null
   },
   {
     "id": "basics_q2",
     "type": "multiple_choice",
     "question": "Jaký bude výstup při přístupu ke třídnímu a instančnímu atributu po přiřazení w.color = 'blue'?",
     "options": [
-      "A) red red (přiřazení je ignorováno, protože třídní atribut color je konstantní)",
-      "B) blue blue (přiřazení na instanci změní hodnotu přímo v samotné třídě Widget)",
-      "C) TypeError (protože atribut color nelze takto přepsat bez metody __setattr__)",
+      "A) blue blue (přiřazení na instanci změní hodnotu přímo v samotné třídě Widget)",
+      "B) TypeError (protože atribut color nelze takto přepsat bez metody __setattr__)",
+      "C) red red (přiřazení je ignorováno, protože třídní atribut color je konstantní)",
       "D) red blue (na instanci w vznikne nový atribut shadowující třídní atribut)"
     ],
     "answer": 3,
-    "explanation": "Přiřazení do w.color zápisem nevytváří ani nemění atribut na třídě Widget, ale vytvoří nový instanční atribut na objektu w, který překryje (shadowuje) původní třídní atribut. Widget.color zůstává 'red'."
+    "explanation": "Přiřazení do w.color zápisem nevytváří ani nemění atribut na třídě Widget, ale vytvoří nový instanční atribut na objektu w, který překryje (shadowuje) původní třídní atribut. Widget.color zůstává 'red'.",
+    "code": null
   },
   {
     "id": "basics_q3",
@@ -31,39 +33,42 @@
     "question": "Jaký bude výstup při volání funkce nadefinované v těle třídy C bez dekorátoru přímo přes jmenný prostor třídy C.info(5)?",
     "options": [
       "A) 5 (při volání přímo na třídě se předá přesně jeden argument bez automatického self)",
-      "B) TypeError (protože funkce v těle třídy musí mít vždy definovaný parametr self)",
-      "C) <bound method C.info> (vrátí se svázaná metoda místo vyhodnocení výsledku)",
-      "D) None (protože funkce v třídě bez dekorátoru nevracejí žádnou konkrétní hodnotu)"
+      "B) None (protože funkce v třídě bez dekorátoru nevracejí žádnou konkrétní hodnotu)",
+      "C) TypeError (protože funkce v těle třídy musí mít vždy definovaný parametr self)",
+      "D) <bound method C.info> (vrátí se svázaná metoda místo vyhodnocení výsledku)"
     ],
     "answer": 0,
-    "explanation": "Při volání nedekorované funkce přímo přes třídu (C.info(5)) funguje objekt jako obyčejný jmenný prostor. Funkce nedostává žádný implicitní parametr self a argument 5 se naváže na parametr x."
+    "explanation": "Při volání nedekorované funkce přímo přes třídu (C.info(5)) funguje objekt jako obyčejný jmenný prostor. Funkce nedostává žádný implicitní parametr self a argument 5 se naváže na parametr x.",
+    "code": null
   },
   {
     "id": "basics_q4",
     "type": "predict_output",
     "question": "Jaká chyba nastane při volání nedekorované jednoplánové funkce def info(x): z instance třídy c.info(5)?",
     "options": [
-      "A) AttributeError: 'C' object has no attribute 'info' v rámci instance",
+      "A) <C object> (metoda vrací referenci na instanci c uloženou v parametru x)",
       "B) TypeError: C.info() takes 1 positional argument but 2 were given",
-      "C) <C object> (metoda vrací referenci na instanci c uloženou v parametru x)",
-      "D) 5 (metoda úspěšně vrátí předanou hodnotu 5 bez ohledu na instanci c)"
+      "C) 5 (metoda úspěšně vrátí předanou hodnotu 5 bez ohledu na instanci c)",
+      "D) AttributeError: 'C' object has no attribute 'info' v rámci instance"
     ],
     "answer": 1,
-    "explanation": "Volání na instanci (c.info(5)) automaticky vkládá instanci c jako prvotní poziční argument (self). Jelikož definice info(x) přijímá pouze 1 argument, předání instance c i čísla 5 vyvolá TypeError o předání 2 argumentů."
+    "explanation": "Volání na instanci (c.info(5)) automaticky vkládá instanci c jako prvotní poziční argument (self). Jelikož definice info(x) přijímá pouze 1 argument, předání instance c i čísla 5 vyvolá TypeError o předání 2 argumentů.",
+    "code": null
   },
   {
     "id": "basics_q5",
     "type": "fill_blank_choice",
-    "question": "Doplňte správný dekorátor ________ před def increment(cls): pro metodu třídy s prvním implicitním argumentem cls.\n\n```python\n# Doplňte správný dekorátor ________ před def increment(cls): pro metodu třídy s prvním implicitním argumentem cls.\nvysledek = ________\n```",
+    "question": "Doplňte správný dekorátor ________ před def increment(cls): pro metodu třídy s prvním implicitním argumentem cls.",
     "options": [
+      "@staticmethod",
       "@classproperty",
-      "@instancemethod",
       "@classmethod",
-      "@staticmethod"
+      "@instancemethod"
     ],
     "answer": 2,
     "explanation": "Dekorátor @classmethod způsobí, že dekorovaná metoda dostane při volání na třídě i na instanci jako první implicitní parametr referenci na objekt třídy (konvenčně pojmenovaný cls).",
-    "expected": "@classmethod"
+    "expected": "@classmethod",
+    "code": "vysledek = ________"
   },
   {
     "id": "basics_q6",
@@ -76,21 +81,23 @@
       "D) Přejmenuje atribut v interním slovníku na tvar _NázevTřídy__b."
     ],
     "answer": 3,
-    "explanation": "Atributy začínající dvěma podtržítky (bez zakončení 2 podtržítky) jsou Pythonem transformovány na tvar _JménoTřídy__atribut (přičemž začáteční podtržítka názvu třídy se odstraňují). Jde o ochranu proti přepsání atributů v potomcích, nikoliv o neprolomitelnou privátnost."
+    "explanation": "Atributy začínající dvěma podtržítky (bez zakončení 2 podtržítky) jsou Pythonem transformovány na tvar _JménoTřídy__atribut (přičemž začáteční podtržítka názvu třídy se odstraňují). Jde o ochranu proti přepsání atributů v potomcích, nikoliv o neprolomitelnou privátnost.",
+    "code": null
   },
   {
     "id": "basics_q7",
     "type": "fill_blank_choice",
-    "question": "Doplňte správný výraz ________.__init__(name) pro volání konstruktoru rodičovské třídy v Python 3.\n\n```python\n# Doplňte správný výraz ________.__init__(name) pro volání konstruktoru rodičovské třídy v Python 3.\nvysledek = ________\n```",
+    "question": "Doplňte správný výraz ________.__init__(name) pro volání konstruktoru rodičovské třídy v Python 3.",
     "options": [
       "super()",
-      "base()",
+      "parent()",
       "self()",
-      "parent()"
+      "base()"
     ],
     "answer": 0,
     "explanation": "V Pythonu 3 nahrazuje volání super().__init__(...) starší bezargumentový i explicitní zápis super(AktuálníTřída, self).__init__(...). Zjišťuje rodičovské třídy automaticky z MRO.",
-    "expected": "super()"
+    "expected": "super()",
+    "code": "vysledek = ________"
   },
   {
     "id": "basics_q8",
@@ -103,6 +110,7 @@
       "D) None (protože statické metody slouží pouze k úpravě třídních proměnných bez návratu)"
     ],
     "answer": 1,
-    "explanation": "Metoda označená @staticmethod nedostává žádné implicitní prvotní parametry (ani self, ani cls). Při volání m.add(3, 4) se předají přesně 2 argumenty a výsledek je 3 + 4 = 7."
+    "explanation": "Metoda označená @staticmethod nedostává žádné implicitní prvotní parametry (ani self, ani cls). Při volání m.add(3, 4) se předají přesně 2 argumenty a výsledek je 3 + 4 = 7.",
+    "code": null
   }
 ]

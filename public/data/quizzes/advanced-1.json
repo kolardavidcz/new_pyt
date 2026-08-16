@@ -4,26 +4,28 @@
     "type": "multiple_choice",
     "question": "Co přesně v Pythonu označuje pojem uzávěr (closure)?",
     "options": [
-      "A) Anonymní jednorázovou lambda-funkci, která nemá vlastní název v tabulce globálních symbolů programu.",
+      "A) Speciální třídu, jejíž metody mohou přistupovat k privátním atributům jiných instancí téže třídy.",
       "B) Způsob uzavření souboru nebo síťového rozhraní v kontextovém manažeru za použití příkazu with.",
-      "C) Speciální třídu, jejíž metody mohou přistupovat k privátním atributům jiných instancí téže třídy.",
+      "C) Anonymní jednorázovou lambda-funkci, která nemá vlastní název v tabulce globálních symbolů programu.",
       "D) Funkci vrácenou z vnitřního rozsahu viditelnosti, která si uchovává přístup k proměnným vnější funkce."
     ],
     "answer": 3,
-    "explanation": "Uzávěr je funkce definovaná uvnitř vnější funkce, která si po svém vrácení nese odkaz na proměnné z rozsahu viditelnosti vnější funkce (enclosing scope)."
+    "explanation": "Uzávěr je funkce definovaná uvnitř vnější funkce, která si po svém vrácení nese odkaz na proměnné z rozsahu viditelnosti vnější funkce (enclosing scope).",
+    "code": null
   },
   {
     "id": "q2",
     "type": "multiple_choice",
-    "question": "Jaký výsledek vrátí zřetězené volání vnější a vnitřní funkce vytvor_nasobic(3)(4)?\n\ndef vytvor_nasobic(kategorie):\n    def nasob(cislo):\n        return kategorie * cislo\n    return nasob",
+    "question": "Jaký výsledek vrátí zřetězené volání vnější a vnitřní funkce vytvor_nasobic(3)(4)?",
     "options": [
       "A) Vrátí hodnotu 12, protože první volání vrátí vnitřní funkci uzávěru a druhé ji aplikuje na číslo 4.",
-      "B) Vrátí odkaz na funkci nasob bez provedení výpočtu násobení pro zadaná vstupní čísla v závorkách.",
-      "C) Vrátí n-tici (3, 4), protože interpret zřetězená volání automaticky spojí do seznamu argumentů.",
-      "D) Vyvolá výjimku TypeError, protože funkce vytvor_nasobic přijímá pouze jeden vstupní argument."
+      "B) Vyvolá výjimku TypeError, protože funkce vytvor_nasobic přijímá pouze jeden vstupní argument.",
+      "C) Vrátí odkaz na funkci nasob bez provedení výpočtu násobení pro zadaná vstupní čísla v závorkách.",
+      "D) Vrátí n-tici (3, 4), protože interpret zřetězená volání automaticky spojí do seznamu argumentů."
     ],
     "answer": 0,
-    "explanation": "Zavolání vytvor_nasobic(3) vrátí uzávěr funkce nasob s navázaným argumentem kategorie=3. Druhá část (4) tento uzávěr okamžitě zavolá a vrátí 3 * 4 = 12."
+    "explanation": "Zavolání vytvor_nasobic(3) vrátí uzávěr funkce nasob s navázaným argumentem kategorie=3. Druhá část (4) tento uzávěr okamžitě zavolá a vrátí 3 * 4 = 12.",
+    "code": "def vytvor_nasobic(kategorie):\n    def nasob(cislo):\n        return kategorie * cislo\n    return nasob"
   },
   {
     "id": "q3",
@@ -36,17 +38,18 @@
       "D) Vrátí hodnotu None, protože v těle lambda-funkce nebylo použito klíčové slovo return."
     ],
     "answer": 1,
-    "explanation": "Lambda-funkce v Pythonu se skládají z jediného výrazu, jehož hodnota se vyhodnotí a automaticky vrátí bez potřeby klíčového slova return."
+    "explanation": "Lambda-funkce v Pythonu se skládají z jediného výrazu, jehož hodnota se vyhodnotí a automaticky vrátí bez potřeby klíčového slova return.",
+    "code": null
   },
   {
     "id": "q4",
     "type": "fill_blank_choice",
     "question": "Doplňte lambda funkci do parametru `key`, která zajistí seřazení chemických prvků podle jejich protonového čísla (druhé položky n-tice).",
     "options": [
+      "x[1]",
       "def(x): return x[1]",
-      "lambda x[1]",
       "lambda x: x[1]",
-      "x[1]"
+      "lambda x[1]"
     ],
     "answer": 2,
     "explanation": "Výraz `lambda x: x[1]` definuje anonymní funkci přijímající n-tici `x` a vracející její druhý prvek na indexu 1 jako klíč pro řazení.",
@@ -56,15 +59,16 @@
   {
     "id": "q5",
     "type": "multiple_choice",
-    "question": "Co vrátí přístup k dosud neexistujícímu klíči v defaultdict, definovaném pomocí lambda-funkce?\n\nfrom collections import defaultdict\nd = defaultdict(lambda: [0, 'novy'])\nprint(d['test'])",
+    "question": "Co vrátí přístup k dosud neexistujícímu klíči v defaultdict, definovaném pomocí lambda-funkce?",
     "options": [
-      "A) Vyvolá výjimku KeyError, protože lambda-funkce neumí dynamicky generovat výchozí klíče.",
-      "B) Vrátí samotný objekt <function <lambda>> bez jeho automatického spuštění a vyhodnocení.",
+      "A) Vrátí samotný objekt <function <lambda>> bez jeho automatického spuštění a vyhodnocení.",
+      "B) Vyvolá výjimku KeyError, protože lambda-funkce neumí dynamicky generovat výchozí klíče.",
       "C) Vrátí hodnotu None a klíč 'test' do slovníku uopště neuloží ani nevytvoří v paměti.",
       "D) Vrátí nový seznam [0, 'novy'] a současně jej uloží do slovníku pod klíčem 'test'."
     ],
     "answer": 3,
-    "explanation": "Při dotazu na chybějící klíč zavolá defaultdict svou tovární funkci (zde anonymní lambda-funkci) bez argumentů, získá její návratovou hodnotu [0, 'novy'], uloží ji k danému klíči a vrátí."
+    "explanation": "Při dotazu na chybějící klíč zavolá defaultdict svou tovární funkci (zde anonymní lambda-funkci) bez argumentů, získá její návratovou hodnotu [0, 'novy'], uloží ji k danému klíči a vrátí.",
+    "code": "from collections import defaultdict\nd = defaultdict(lambda: [0, 'novy'])\nprint(d['test'])"
   },
   {
     "id": "q6",
@@ -72,11 +76,12 @@
     "question": "Posuďte pravdivost tvrzení: Tělo lambda-funkce v Pythonu může obsahovat více samostatných příkazů.",
     "options": [
       "A) Nepravda – lambda-funkce v Pythonu je syntakticky omezena pouze na jediný vyhodnotitelný výraz.",
-      "B) Nepravda – lambda-funkce nesmí obsahovat žádné matematické výrazy ani volání jiných funkcí.",
+      "B) Pravda – lambda-funkce v Pythonu podporuje více příkazů spojených středníkem stejně jako běžné funkce.",
       "C) Pravda – více příkazů je povoleno, pokud jsou všechny uzavřeny v bloku složených závorek {}.",
-      "D) Pravda – lambda-funkce v Pythonu podporuje více příkazů spojených středníkem stejně jako běžné funkce."
+      "D) Nepravda – lambda-funkce nesmí obsahovat žádné matematické výrazy ani volání jiných funkcí."
     ],
     "answer": 0,
-    "explanation": "V Pythonu jsou lambda-funkce zjednodušeny a syntakticky omezeny výhradně na jediný výraz. Nemohou obsahovat více příkazů ani příkazy jako return, pass či assert."
+    "explanation": "V Pythonu jsou lambda-funkce zjednodušeny a syntakticky omezeny výhradně na jediný výraz. Nemohou obsahovat více příkazů ani příkazy jako return, pass či assert.",
+    "code": null
   }
 ]

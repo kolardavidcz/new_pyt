@@ -6,37 +6,40 @@
     "options": [
       "A) Až při prvním zavolání vestavěné funkce next() nad vytvořenou instancí generátoru.",
       "B) Až po úplném proiterování celého generátoru nebo při jeho prvním explicitním uzavření.",
-      "C) Ihned při zavolání funkce generátoru, kdy se vytvoří a inicializuje jeho pracovní kontext.",
-      "D) Při použití deklarativního klíčového slova yield během definice a kompilace dané funkce."
+      "C) Při použití deklarativního klíčového slova yield během definice a kompilace dané funkce.",
+      "D) Ihned při zavolání funkce generátoru, kdy se vytvoří a inicializuje jeho pracovní kontext."
     ],
     "answer": 0,
-    "explanation": "Zavolání generátorové funkce (konstruktoru) pouze vytvoří objekt generátoru, ale nespustí žádný kód v jeho těle. Kód až po první yield se vykoná teprve při prvním volání next()."
+    "explanation": "Zavolání generátorové funkce (konstruktoru) pouze vytvoří objekt generátoru, ale nespustí žádný kód v jeho těle. Kód až po první yield se vykoná teprve při prvním volání next().",
+    "code": null
   },
   {
     "id": "q2",
     "type": "multiple_choice",
-    "question": "Co vypíše následující kód při protnutí manuální a automatické iterace?\n\ndef gen():\n    yield 1\n    yield 2\n    yield 3\n\ng = gen()\nprint(next(g))\nfor x in g:\n    print(x)",
+    "question": "Co vypíše následující kód při protnutí manuální a automatické iterace?",
     "options": [
       "A) Vyvolá výjimku TypeError, protože rozpracovaný generátor již nelze předat do smyčky for.",
       "B) Vypíše postupně čísla 1, 2 a 3, protože cyklus for naváže na aktuální vnitřní stav generátoru g.",
-      "C) Vypíše postupně čísla 1, 1, 2 a 3, protože cyklus for automaticky restartuje iteraci od začátku.",
-      "D) Vypíše pouze číslo 1 a následně vyvolá výjimku StopIteration při pokusu o vstup do cyklu for."
+      "C) Vypíše pouze číslo 1 a následně vyvolá výjimku StopIteration při pokusu o vstup do cyklu for.",
+      "D) Vypíše postupně čísla 1, 1, 2 a 3, protože cyklus for automaticky restartuje iteraci od začátku."
     ],
     "answer": 1,
-    "explanation": "Generátor si udržuje svůj interní stav. Volání next(g) spotřebuje první hodnotu (1), a následný cyklus for pokračuje v iteraci od druhého prvku (2 a 3)."
+    "explanation": "Generátor si udržuje svůj interní stav. Volání next(g) spotřebuje první hodnotu (1), a následný cyklus for pokračuje v iteraci od druhého prvku (2 a 3).",
+    "code": "def gen():\n    yield 1\n    yield 2\n    yield 3\n\ng = gen()\nprint(next(g))\nfor x in g:\n    print(x)"
   },
   {
     "id": "q3",
     "type": "multiple_choice",
-    "question": "Jaký výstup vytvoří dvojí zavolání next(gen()) bez uložení instance generátoru do proměnné?\n\ndef gen():\n    yield 'A'\n    yield 'B'\n\nprint(next(gen()))\nprint(next(gen()))",
+    "question": "Jaký výstup vytvoří dvojí zavolání next(gen()) bez uložení instance generátoru do proměnné?",
     "options": [
-      "A) Vypíše postupně řetězce 'A' a 'B', protože Python si udržuje globální odkaz na funkci gen().",
-      "B) Vypíše řetězec 'A' a při druhém volání vyvolá výjimku StopIteration kvůli vyčerpání generátoru.",
+      "A) Vypíše řetězec 'A' a při druhém volání vyvolá výjimku StopIteration kvůli vyčerpání generátoru.",
+      "B) Vyvolá výjimku RuntimeError, protože nelze volat next() přímo nad konstruktorem bez přiřazení.",
       "C) Vypíše dvakrát řetězec 'A', protože každé volání gen() vytvoří zcela novou nezávislou instanci.",
-      "D) Vyvolá výjimku RuntimeError, protože nelze volat next() přímo nad konstruktorem bez přiřazení."
+      "D) Vypíše postupně řetězce 'A' a 'B', protože Python si udržuje globální odkaz na funkci gen()."
     ],
     "answer": 2,
-    "explanation": "Zavoláním gen() vznikne pokaždé nový generátorový objekt na začátku svého běhu, takže první next() nad ním vrátí vždy první prvek ('A')."
+    "explanation": "Zavoláním gen() vznikne pokaždé nový generátorový objekt na začátku svého běhu, takže první next() nad ním vrátí vždy první prvek ('A').",
+    "code": "def gen():\n    yield 'A'\n    yield 'B'\n\nprint(next(gen()))\nprint(next(gen()))"
   },
   {
     "id": "q4",
@@ -56,28 +59,30 @@
   {
     "id": "q5",
     "type": "multiple_choice",
-    "question": "Kam se uloží hodnota vrácená příkazem return v těle generátorové funkce při vyvolání StopIteration?\n\ndef gen():\n    yield 1\n    return 'konec'\n\ng = gen()\nnext(g)\ntry:\n    next(g)\nexcept StopIteration as e:\n    print(e.value)",
+    "question": "Kam se uloží hodnota vrácená příkazem return v těle generátorové funkce při vyvolání StopIteration?",
     "options": [
       "A) Uloží se do atributu value vyvolané instance výjimky StopIteration.",
-      "B) Uloží se do globální proměnné __return__ propojené s příslušným objektem.",
-      "C) Ztratí se bez náhrady, protože generátory nesmí obsahovat příkaz return.",
+      "B) Ztratí se bez náhrady, protože generátory nesmí obsahovat příkaz return.",
+      "C) Uloží se do globální proměnné __return__ propojené s příslušným objektem.",
       "D) Vrátí se běžným způsobem jako standardní návratová hodnota volání next()."
     ],
     "answer": 0,
-    "explanation": "Příkaz return HODNOTA v generátoru ukončí jeho vykonávání a předanou hodnotu přibalí do atributu value výjimky StopIteration."
+    "explanation": "Příkaz return HODNOTA v generátoru ukončí jeho vykonávání a předanou hodnotu přibalí do atributu value výjimky StopIteration.",
+    "code": "def gen():\n    yield 1\n    return 'konec'\n\ng = gen()\nnext(g)\ntry:\n    next(g)\nexcept StopIteration as e:\n    print(e.value)"
   },
   {
     "id": "q6",
     "type": "multiple_choice",
     "question": "Jak se zachová generátor g po zavolání metody g.close() při dalším pokusu o zavolání next(g)?",
     "options": [
-      "A) Vyvolá výjimku RuntimeError s oznámením, že s uzavřeným generátorem nelze dále pracovat.",
+      "A) Ignoruje požadavek na zavření a vrátí následující hodnotu předepsanou v pořadí prvků yield.",
       "B) Ihned vyvolá výjimku StopIteration, protože generátor je explicitně převeden do ukončeného stavu.",
-      "C) Ignoruje požadavek na zavření a vrátí následující hodnotu předepsanou v pořadí prvků yield.",
-      "D) Vrátí zadanou hodnotu None a pokračuje v iteraci od prvního příkazu yield v definici funkce."
+      "C) Vrátí zadanou hodnotu None a pokračuje v iteraci od prvního příkazu yield v definici funkce.",
+      "D) Vyvolá výjimku RuntimeError s oznámením, že s uzavřeným generátorem nelze dále pracovat."
     ],
     "answer": 1,
-    "explanation": "Metoda close() okamžitě ukončí generátor. Jakékoli další zavolání next() nad tímto generátorem vyvolá výjimku StopIteration."
+    "explanation": "Metoda close() okamžitě ukončí generátor. Jakékoli další zavolání next() nad tímto generátorem vyvolá výjimku StopIteration.",
+    "code": null
   },
   {
     "id": "q7",
@@ -85,9 +90,9 @@
     "question": "Doplňte klíčová slova pro delegování generování hodnot na vnořený generátor naměřených dat ze subroutiny.",
     "options": [
       "yield for",
-      "yield in",
+      "delegate yield",
       "yield from",
-      "delegate yield"
+      "yield in"
     ],
     "answer": 2,
     "explanation": "Konstrukce `yield from` deleguje generování hodnot na jiný iterovatelný objekt nebo generátor a zároveň zprostředkovává obousměrnou komunikaci.",

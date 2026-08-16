@@ -4,13 +4,14 @@
     "type": "multiple_choice",
     "question": "Který datový typ je v modulu shelve vyžadován pro klíče perzistentního slovníku?",
     "options": [
-      "A) Pouze celá čísla int a str.",
+      "A) Jakýkoliv piklitelný objekt.",
       "B) Výhradně textové řetězce str.",
       "C) Libovolný immutable typ s hash().",
-      "D) Jakýkoliv piklitelný objekt."
+      "D) Pouze celá čísla int a str."
     ],
     "answer": 1,
-    "explanation": "Backend dbm pod modulem shelve vyžaduje striktně řetězcové klíče (str). Hodnotami v perzistentním slovníku mohou být libovolné serializovatelné pythoní objekty."
+    "explanation": "Backend dbm pod modulem shelve vyžaduje striktně řetězcové klíče (str). Hodnotami v perzistentním slovníku mohou být libovolné serializovatelné pythoní objekty.",
+    "code": null
   },
   {
     "id": "q2",
@@ -23,7 +24,8 @@
       "D) Kód selže a vyvolá výjimku PermissionError kvůli zápisu do neotevřené vyrovnávací paměti."
     ],
     "answer": 2,
-    "explanation": "Při výchozím writeback=False vrací db['seznam'] odpicklovaný dočasný objekt. Příkaz .append(99) modifikuje tuto kopii. Pro uložení na disk je nutné znovupřiřazení db['seznam'] = temp."
+    "explanation": "Při výchozím writeback=False vrací db['seznam'] odpicklovaný dočasný objekt. Příkaz .append(99) modifikuje tuto kopii. Pro uložení na disk je nutné znovupřiřazení db['seznam'] = temp.",
+    "code": null
   },
   {
     "id": "q3",
@@ -34,16 +36,17 @@
       "B) Pravda: Umožňuje přímé modifikace mutable objektů, ale udržuje v paměti cache všech načtených položek."
     ],
     "answer": 1,
-    "explanation": "Nastavení writeback=True uchovává všechny načtené i upravené položky v paměťovém cache slovníku. To umožňuje in-place úpravy, ale dramaticky zvyšuje spotřebu paměti a zpomaluje sync/close."
+    "explanation": "Nastavení writeback=True uchovává všechny načtené i upravené položky v paměťovém cache slovníku. To umožňuje in-place úpravy, ale dramaticky zvyšuje spotřebu paměti a zpomaluje sync/close.",
+    "code": null
   },
   {
     "id": "q4",
     "type": "fill_blank_choice",
     "question": "Která hodnota parametru flag ve funkci shelve.open() vynutí vytvoření nové prázdné databáze s přepsáním existujícího souboru?",
     "options": [
-      "'c'",
       "'r'",
       "'w'",
+      "'c'",
       "'n'"
     ],
     "answer": 3,
@@ -57,12 +60,13 @@
     "question": "Jaká omezení platí pro přístup více procesů či skriptů k téže databázi modulu shelve?",
     "options": [
       "A) Pro zápis může mít databázi otevřenou současně pouze jediný proces; pro čtení více procesů.",
-      "B) Databázi může mít současně otevřenou právě jeden proces bez ohledu na čtení či zápis.",
-      "C) Konkurentní čtení i zápis jsou podporovány výhradně v případě použití backendu dbm.dumb.",
-      "D) Databáze plně podporuje paralelní zápis z více procesů díky zámkům na úrovni backendu."
+      "B) Konkurentní čtení i zápis jsou podporovány výhradně v případě použití backendu dbm.dumb.",
+      "C) Databáze plně podporuje paralelní zápis z více procesů díky zámkům na úrovni backendu.",
+      "D) Databázi může mít současně otevřenou právě jeden proces bez ohledu na čtení či zápis."
     ],
     "answer": 0,
-    "explanation": "Modul shelve nezajišťuje zamykání pro paratelní zápis. Zápis z více procesů naráz může poškodit databázi. Paralelní čtení z více procesů je bezpečné."
+    "explanation": "Modul shelve nezajišťuje zamykání pro paratelní zápis. Zápis z více procesů naráz může poškodit databázi. Paralelní čtení z více procesů je bezpečné.",
+    "code": null
   },
   {
     "id": "q6",
@@ -71,10 +75,11 @@
     "options": [
       "A) Dvojici souborů mojedata.sqlite a mojedata.log pro podporu transakčního logování.",
       "B) Soubory mojedata.dat a mojedata.dir (případně mojedata.bak při spuštěném provozu).",
-      "C) Pouze jediný binární soubor s příponou mojedata.db vytvořený ve složce projektu.",
-      "D) Trojici souborů mojedata.txt, mojedata.json a mojedata.bin v cache adresáři."
+      "C) Trojici souborů mojedata.txt, mojedata.json a mojedata.bin v cache adresáři.",
+      "D) Pouze jediný binární soubor s příponou mojedata.db vytvořený ve složce projektu."
     ],
     "answer": 1,
-    "explanation": "Čistě pythoní backend dbm.dumb vytváří dvojici souborů .dat a .dir (plus .bak během manipulace), které uchovávají indexy klíčů a samotná bajtová data."
+    "explanation": "Čistě pythoní backend dbm.dumb vytváří dvojici souborů .dat a .dir (plus .bak během manipulace), které uchovávají indexy klíčů a samotná bajtová data.",
+    "code": null
   }
 ]
