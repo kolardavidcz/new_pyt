@@ -78,7 +78,17 @@ def save_question_improvement(entry: dict) -> list:
         if isinstance(item, dict) and item.get("id"):
             by_id[item["id"]] = item
 
-    if isinstance(entry, dict) and entry.get("id"):
+    if isinstance(entry, dict) and entry.get("action") == "delete" and entry.get("id"):
+        by_id.pop(entry["id"], None)
+    elif isinstance(entry, dict) and entry.get("action") == "update" and entry.get("id"):
+        item_id = entry["id"]
+        if item_id in by_id:
+            updates = {k: v for k, v in entry.items() if k != "action"}
+            if updates.get("status") == "resolved" and not updates.get("resolvedAt"):
+                from datetime import datetime, timezone
+                updates["resolvedAt"] = datetime.now(timezone.utc).isoformat()
+            by_id[item_id] = {**by_id[item_id], **updates}
+    elif isinstance(entry, dict) and entry.get("id"):
         existing = by_id.get(entry["id"], {})
         by_id[entry["id"]] = {**existing, **entry}
 

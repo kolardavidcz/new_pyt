@@ -12,6 +12,7 @@ import {
   getUsersDb,
   resetUserPassword,
   loadQuestionImprovements,
+  updateQuestionImprovement,
   updateQuestionImprovementStatus,
   deleteQuestionImprovement,
   saveRelevanceOverride,
@@ -231,6 +232,8 @@ function renderImprovementsTab() {
       else if (status === "dismissed") statusLabel = "Zamítnuto";
 
       const isSlide = item.questionType === "presentation" || item.questionId === "presentation-content";
+      const isFactual = item.category === "factual_or_unclear" || (item.categoryLabel && item.categoryLabel.toLowerCase().includes("faktick"));
+      const hasZnamenacek = isSlide && isFactual;
 
       return `
         <div class="admin-item-card" data-id="${item.id}" style="border-radius:2px;">
@@ -239,6 +242,9 @@ function renderImprovementsTab() {
               <span style="font-size:11px; font-weight:600; padding:2px 6px; border-radius:2px; background:${isSlide ? "rgba(56,189,248,0.15)" : "rgba(168,85,247,0.15)"}; color:${isSlide ? "#38bdf8" : "#c084fc"};">
                 ${isSlide ? "Prezentace" : "Kvíz"}
               </span>
+              ${hasZnamenacek ? `
+                <span class="admin-badge-znamenacek" style="font-size:11px; font-weight:700; padding:2px 8px; border-radius:2px; background:rgba(234,179,8,0.2); color:#facc15; border:1px solid rgba(234,179,8,0.5); display:inline-flex; align-items:center; gap:4px;" title="Znamenáček: student nahlásil faktickou chybu v prezentaci">★ Znamenáček</span>
+              ` : ""}
               <strong style="color:var(--fg); font-size:13px;">${escapeHtml(item.deckKey)}</strong>
               ${!isSlide ? `<span style="color:var(--fg-muted); font-size:12px;">· Otázka: <code>${escapeHtml(item.questionId)}</code></span>` : ""}
             </div>
@@ -250,12 +256,50 @@ function renderImprovementsTab() {
           </div>
           ${item.questionText ? `<div style="font-size:11.5px; font-style:italic; color:var(--fg-subtle); background:var(--editor); padding:6px 10px; border-radius:2px; margin-top:6px;">"${escapeHtml(item.questionText)}"...</div>` : ""}
           ${item.userNote ? `<div style="font-size:12px; color:var(--fg); margin-top:6px;"><strong>Poznámka:</strong> ${escapeHtml(item.userNote)}</div>` : ""}
+          ${item.fixSummary ? `<div style="font-size:12px; color:#89d185; margin-top:4px;"><strong>Úprava správce:</strong> ${escapeHtml(item.fixSummary)}</div>` : ""}
           <div style="font-size:10.5px; color:var(--fg-subtle); margin-top:6px;">${new Date(item.timestamp).toLocaleString("cs-CZ")}</div>
+          
           <div class="admin-item-actions" style="margin-top:8px;">
             ${status !== "resolved" ? `<button type="button" class="admin-btn-sm success btn-act-resolve" data-id="${item.id}">Vyřešit</button>` : ""}
             ${status !== "dismissed" ? `<button type="button" class="admin-btn-sm btn-act-dismiss" data-id="${item.id}">Zamítnout</button>` : ""}
             ${status !== "open" ? `<button type="button" class="admin-btn-sm btn-act-reopen" data-id="${item.id}">Znovu otevřít</button>` : ""}
+            <button type="button" class="admin-btn-sm btn-act-edit" data-id="${item.id}">Upravit</button>
             <button type="button" class="admin-btn-sm danger btn-act-delete" data-id="${item.id}">Smazat</button>
+          </div>
+
+          <!-- Inline Edit Drawer -->
+          <div class="admin-edit-panel hidden" id="editPanel-${item.id}" style="margin-top:10px; padding:12px; background:var(--editor, #1e1e1e); border:1px solid var(--border-subtle, #444); border-radius:2px;">
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
+              <div style="flex:1; min-width:200px;">
+                <label style="font-size:11px; color:var(--fg-muted); display:block; margin-bottom:4px;">Kategorie:</label>
+                <select class="admin-search-input edit-category" style="width:100%;">
+                  <option value="factual_or_unclear" ${item.category === "factual_or_unclear" ? "selected" : ""}>Faktická chyba / nejasná formulace</option>
+                  <option value="style_or_typo" ${item.category === "style_or_typo" ? "selected" : ""}>Stylistická chyba / překlep / kód</option>
+                  <option value="off_topic" ${item.category === "off_topic" ? "selected" : ""}>Mimo téma / chybí kontext</option>
+                  <option value="suggestion_idea" ${item.category === "suggestion_idea" ? "selected" : ""}>Námět na zlepšení / doplnění</option>
+                </select>
+              </div>
+              <div style="min-width:140px;">
+                <label style="font-size:11px; color:var(--fg-muted); display:block; margin-bottom:4px;">Stav:</label>
+                <select class="admin-search-input edit-status" style="width:100%;">
+                  <option value="open" ${status === "open" ? "selected" : ""}>Otevřeno</option>
+                  <option value="resolved" ${status === "resolved" ? "selected" : ""}>Vyřešeno</option>
+                  <option value="dismissed" ${status === "dismissed" ? "selected" : ""}>Zamítnuto</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-bottom:8px;">
+              <label style="font-size:11px; color:var(--fg-muted); display:block; margin-bottom:4px;">Poznámka uživatele:</label>
+              <textarea class="admin-search-input edit-user-note" rows="2" style="width:100%; font-family:inherit;">${escapeHtml(item.userNote || "")}</textarea>
+            </div>
+            <div style="margin-bottom:8px;">
+              <label style="font-size:11px; color:var(--fg-muted); display:block; margin-bottom:4px;">Poznámka správce k vyřešení (fixSummary):</label>
+              <input type="text" class="admin-search-input edit-fix-summary" placeholder="Např. Opraveno v prezentaci, upraveno zadání otázky..." value="${escapeHtml(item.fixSummary || "")}" style="width:100%; font-family:inherit;" />
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+              <button type="button" class="admin-btn-sm btn-cancel-inline-edit" data-id="${item.id}">Zrušit</button>
+              <button type="button" class="admin-btn-sm success btn-save-inline-edit" data-id="${item.id}">Uložit změny</button>
+            </div>
           </div>
         </div>
       `;
@@ -286,6 +330,58 @@ function renderImprovementsTab() {
           await deleteQuestionImprovement(b.getAttribute("data-id"));
           renderImprovementsTab();
         }
+      });
+    });
+
+    container.querySelectorAll(".btn-act-edit").forEach((b) => {
+      b.addEventListener("click", () => {
+        const id = b.getAttribute("data-id");
+        const panel = container.querySelector(`#editPanel-${id}`);
+        if (panel) {
+          panel.classList.toggle("hidden");
+        }
+      });
+    });
+
+    container.querySelectorAll(".btn-cancel-inline-edit").forEach((b) => {
+      b.addEventListener("click", () => {
+        const id = b.getAttribute("data-id");
+        const panel = container.querySelector(`#editPanel-${id}`);
+        if (panel) panel.classList.add("hidden");
+      });
+    });
+
+    container.querySelectorAll(".btn-save-inline-edit").forEach((b) => {
+      b.addEventListener("click", async () => {
+        const id = b.getAttribute("data-id");
+        const card = b.closest(".admin-item-card");
+        const catSelect = card?.querySelector(".edit-category");
+        const statusSelect = card?.querySelector(".edit-status");
+        const noteInput = card?.querySelector(".edit-user-note");
+        const fixInput = card?.querySelector(".edit-fix-summary");
+
+        const category = catSelect?.value || "factual_or_unclear";
+        const newStatus = statusSelect?.value || "open";
+        const userNote = noteInput?.value.trim() || "";
+        const fixSummary = fixInput?.value.trim() || "";
+
+        let categoryLabel = "Faktická chyba / nejasná formulace";
+        if (category === "style_or_typo") categoryLabel = "Stylistická chyba / překlep / kód";
+        else if (category === "off_topic") categoryLabel = "Mimo téma / chybí kontext";
+        else if (category === "suggestion_idea") categoryLabel = "Námět na zlepšení / doplnění";
+
+        b.disabled = true;
+        b.textContent = "Ukládám…";
+
+        await updateQuestionImprovement(id, {
+          category,
+          categoryLabel,
+          status: newStatus,
+          userNote,
+          fixSummary,
+        });
+
+        renderImprovementsTab();
       });
     });
   }
