@@ -4,12 +4,12 @@
     "type": "predict_output",
     "question": "Jaká hodnota se uloží do args.v při volání bez argumentů?\n\nimport argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-v', nargs='?', const='VERBOSE', default='SILENT')\nargs = parser.parse_args([])\nprint(args.v)",
     "options": [
-      "A) SILENT",
-      "B) VERBOSE",
-      "C) None",
-      "D) True"
+      "A) None",
+      "B) SILENT",
+      "C) True",
+      "D) VERBOSE"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "U přepínače s nargs='?' se hodnota const použije v případě, že je přepínač -v na příkazové řádce přítomen bez hodnoty. Pokud přepínač není zadán vůbec, použije se hodnota default ('SILENT')."
   },
   {
@@ -17,12 +17,12 @@
     "type": "predict_output",
     "question": "Jakou výchozí hodnotu má přepínač s nastavením action='store_true'?\n\nimport argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-f', '--force', action='store_true')\nargs = parser.parse_args([])\nprint(args.force)",
     "options": [
-      "A) False",
+      "A) True",
       "B) None",
-      "C) True",
+      "C) False",
       "D) AttributeError"
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Akce store_true automaticky nastavuje výchozí hodnotu na boolovské False. Pokud uživatel přepínač na příkazové řádce použije, hodnota v atributu force se změní na True."
   },
   {
@@ -30,12 +30,12 @@
     "type": "predict_output",
     "question": "Jaký bude výstup parseru při opakovaném použití přepínače s action='append'?\n\nimport argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-i', '--include', action='append')\nargs = parser.parse_args(['-i', 'a.py', '-i', 'b.py'])\nprint(args.include)",
     "options": [
-      "A) ['a.py', 'b.py']",
-      "B) 'b.py'",
-      "C) ['b.py']",
-      "D) ('a.py', 'b.py')"
+      "A) ['b.py']",
+      "B) ('a.py', 'b.py')",
+      "C) 'b.py'",
+      "D) ['a.py', 'b.py']"
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Akce action='append' nezapříčiní přepsání hodnoty poslední zadanou, ale každou novou hodnotu postupně přidá jako nový prvek do jednoho kumulativního seznamu."
   },
   {
@@ -57,12 +57,12 @@
     "question": "Doplňte speciální výjimku modulu argparse pro signalizaci neplatné hodnoty z vlastní konverzní funkce:",
     "code_snippet": "from argparse import ArgumentParser, ________\n\ndef positive_int(val):\n    n = int(val)\n    if n <= 0:\n        raise ________('Číslo musí být kladné!')\n    return n",
     "options": [
+      "InvalidOptionError",
       "ArgumentTypeError",
-      "ArgumentValueError",
       "ParseError",
-      "InvalidOptionError"
+      "ArgumentValueError"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Vlastní validační funkce v type= modulu argparse vyhazují argparse.ArgumentTypeError, kterou parser zpracuje a zobrazí chybovou hlášku CLI.",
     "code": "import argparse\n\ndef positive_int(val):\n    num = int(val)\n    if num <= 0:\n        raise argparse.________(\"Číslo musí být kladné\")\n    return num",
     "expected": "ArgumentTypeError"
@@ -72,12 +72,12 @@
     "type": "multiple_choice",
     "question": "Jaké chování zajistí kód group = parser.add_mutually_exclusive_group(required=True)?",
     "options": [
-      "A) Uživatel musí zadat právě jeden argument z dané skupiny, jinak parser selže.",
-      "B) Uživatel může zadat všechny přepínače ze zadané skupiny naráz v libovolném pořadí.",
-      "C) Přepínače ze skupiny se stanou povinné všechny současně při spuštění skriptu.",
-      "D) Skupina automaticky skryje nápovědu pro všechny obsažené přepínače z výpisu -h."
+      "A) Skupina automaticky skryje nápovědu pro všechny obsažené přepínače z výpisu -h.",
+      "B) Přepínače ze skupiny se stanou povinné všechny současně při spuštění skriptu.",
+      "C) Uživatel musí zadat právě jeden argument z dané skupiny, jinak parser selže.",
+      "D) Uživatel může zadat všechny přepínače ze zadané skupiny naráz v libovolném pořadí."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "add_mutually_exclusive_group() vynucuje, že lze vybrat nejvýše jeden argument ze skupiny. Parametr required=True navíc zaručuje, že alespoň jeden z nich musí být povinně zadán."
   },
   {
@@ -85,12 +85,12 @@
     "type": "predict_output",
     "question": "Jaká hodnota převáží při spuštění skriptu bez argumentů?\n\nimport argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-x', default='alpha')\nparser.set_defaults(x='beta')\nargs = parser.parse_args([])\nprint(args.x)",
     "options": [
-      "A) beta",
+      "A) ['alpha', 'beta']",
       "B) alpha",
       "C) None",
-      "D) ['alpha', 'beta']"
+      "D) beta"
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Metoda parser.set_defaults(...) má vyšší prioritu než parametr default= v add_argument(), takže přepíše původní výchozí hodnotu 'alpha' na 'beta'."
   },
   {
@@ -99,9 +99,9 @@
     "question": "Co se stane při spuštění skriptu s nargs='+' bez předání jakéhokoliv argumentu?\n\nimport argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('files', nargs='+')\nargs = parser.parse_args([])",
     "options": [
       "A) Skript ukončí běh se zprávou o chybě z důvodu nedostatečného počtu argumentů.",
-      "B) Skript vrátí objekt Namespace s prázdným seznamem uloženým v atributu files.",
-      "C) Skript vytvoří objekt Namespace, kde má atribut files uloženou hodnotu None.",
-      "D) Skript se pozastaví a bude čekat na zadání názvů souborů ze standardního vstupu."
+      "B) Skript se pozastaví a bude čekat na zadání názvů souborů ze standardního vstupu.",
+      "C) Skript vrátí objekt Namespace s prázdným seznamem uloženým v atributu files.",
+      "D) Skript vytvoří objekt Namespace, kde má atribut files uloženou hodnotu None."
     ],
     "answer": 0,
     "explanation": "Násobnost nargs='+' vyžaduje alespoň 1 zadanou hodnotu. Nezadá-li uživatel žádnou, parse_args() vypíše usage, zobrazí chybu 'too few arguments' a okamžitě skript ukončí."

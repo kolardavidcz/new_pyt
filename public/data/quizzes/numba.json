@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Co se stane, pokud kód uvnitř funkce odekorované @jit(nopython=True) obsahuje konstrukci nepodporovanou Numbou?",
     "options": [
-      "A) Numba vyvolá výjimku a zastaví kompilaci, místo aby přešla do pomalejšího režimu kompatibility object mode.",
-      "B) Numba se automaticky přepne do režimu C-API (object mode) a funkci zkompiluje s pomalejším během v Pythonu.",
+      "A) Numba vygeneruje varování do sys.stderr a přenese vykonávání celého kódu na grafickou kartu přes modul CUDA.",
+      "B) Numba vyvolá výjimku a zastaví kompilaci, místo aby přešla do pomalejšího režimu kompatibility object mode.",
       "C) Numba ignoruje nepodporovanou část kódu a nahradí ji prázdnou instrukcí pass bez upozornění vývojáře aplikace.",
-      "D) Numba vygeneruje varování do sys.stderr a přenese vykonávání celého kódu na grafickou kartu přes modul CUDA."
+      "D) Numba se automaticky přepne do režimu C-API (object mode) a funkci zkompiluje s pomalejším během v Pythonu."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Při nastavení `nopython=True` Numba zakáže automatický záložní přechod do pomalejšího `object mode` (který je závislý na C-Python API). Pokud objeví nekombilovatelnou konstrukci, vyvolá kompilátor výjimku a ukončí zpracování."
   },
   {
@@ -17,12 +17,12 @@
     "type": "multiple_choice",
     "question": "Jaký je výsledek volání fn(2**15, 0) při použití následující typové anotace v Numbě?\n\nfrom numba import jit, int16\n\n@jit(int16(int16, int16))\ndef fn(x, y):\n    return x + y",
     "options": [
-      "A) -32768 — dojde k přetečení 16bitového celého čísla se znaménkem v C-reprezentaci typu.",
-      "B) 32768 — Python automaticky rozšíří typ na 32bitové celé číslo bez ztráty samotné hodnoty.",
-      "C) OverflowError — Python zachytí přetečení typu a vyvolá standardní výjimku interpretu.",
-      "D) TypeError — Numba odmítne předanou hodnotu 32768, protože překračuje definovaný rozsah."
+      "A) OverflowError — Python zachytí přetečení typu a vyvolá standardní výjimku interpretu.",
+      "B) TypeError — Numba odmítne předanou hodnotu 32768, protože překračuje definovaný rozsah.",
+      "C) -32768 — dojde k přetečení 16bitového celého čísla se znaménkem v C-reprezentaci typu.",
+      "D) 32768 — Python automaticky rozšíří typ na 32bitové celé číslo bez ztráty samotné hodnoty."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Anotací `int16(int16, int16)` vynutíme kompilaci funkce pro 16bitová celá čísla se znaménkem (rozsah -32768 až 32767). Předaná hodnota 2**15 (32768) při operaci v C-kompilovaném kódu přeteče na záporné číslo -32768."
   },
   {
@@ -30,12 +30,12 @@
     "type": "multiple_choice",
     "question": "Kterému parametru dekorátoru @jit v Numbě předáme hodnotu True pro uvolnění globálního zámku interpretu (GIL)?",
     "options": [
-      "A) nogil — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech.",
-      "B) free_gil — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech.",
-      "C) parallel — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech.",
-      "D) no_lock — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech."
+      "A) parallel — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech.",
+      "B) no_lock — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech.",
+      "C) free_gil — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech.",
+      "D) nogil — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Parametr `nogil=True` v dekorátoru `@numba.jit` instructs kompilátor k uvolnění Globálního zámku interpretu (GIL) během provádění nativního kódu zkompilovaného Numbou, což dovoluje využít plný paralelismus více vláken Pythonu."
   },
   {
@@ -44,9 +44,9 @@
     "question": "Kam Numba ukládá zkompilované binární verze funkcí při zapnutí parametru cache=True u dekorátoru @jit?",
     "options": [
       "A) Do standardního adresáře __pycache__ nacházejícího se vedle zdrojového souboru s kódovými moduly.",
-      "B) Do dočasného systémového adresáře /tmp nebo C:\\Temp určeného pro mezipaměť operačního systému.",
-      "C) Přímým zápisem do systémové operační paměti RAM bez možnosti uložení zkompilovaného kódu na disk.",
-      "D) Do skrytého globálního adresáře .numba_cache v domovské složce pro právě přihlášeného uživatele."
+      "B) Do skrytého globálního adresáře .numba_cache v domovské složce pro právě přihlášeného uživatele.",
+      "C) Do dočasného systémového adresáře /tmp nebo C:\\Temp určeného pro mezipaměť operačního systému.",
+      "D) Přímým zápisem do systémové operační paměti RAM bez možnosti uložení zkompilovaného kódu na disk."
     ],
     "answer": 0,
     "explanation": "Pokud je u dekorátoru `@jit` nastaven parametr `cache=True`, Numba uloží zkompilovaný binární kód do standardního adresáře `__pycache__` nacházejícího se ve stejné složce jako zdrojový `.py` soubor."

@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Proč je při opakovaném překreslování grafu v animaci výhodnější použít metodu line.set_data(x, y) místo volání pyplot.plot()?",
     "options": [
-      "A) Upravuje data v již vytvořeném objektu čáry místo opakovaného alokování nových objektů grafu.",
-      "B) Převede souřadnice grafu přímo na rasterizovaný maticový obrázek v paměti grafické karty.",
+      "A) Převede souřadnice grafu přímo na rasterizovaný maticový obrázek v paměti grafické karty.",
+      "B) Upravuje data v již vytvořeném objektu čáry místo opakovaného alokování nových objektů grafu.",
       "C) Zamezuje blikání obrazovky tím, že zakáže překreslování os a popisků v každém snímku animace.",
       "D) Automaticky přepíná vykreslování dat do samostatného výpočetního vlákna operačního systému."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Volání pyplot.plot() při každém kroku vytváří a přidává nové Line2D objekty do os grafu, což vede k rychlému zpomalení (přetížení paměti i vykreslovací smyčky). Metoda set_data() pouze aktualizuje vnitřní pole existující čáry."
   },
   {
@@ -18,12 +18,12 @@
     "question": "Která metoda objektu Line2D v knihovně Matplotlib aktualizuje souřadnice bodů vykreslené čáry během animace?",
     "code": "import matplotlib.pyplot as plt\nimport numpy as np\n\nfig, ax = plt.subplots()\nline, = ax.plot([], [], \"r-\")\n\ndef update(frame):\n    x = np.linspace(0, 2 * np.pi, 100)\n    y = np.sin(x + frame / 10.0)\n    line.________(x, y)\n    return line,",
     "options": [
-      "set_data",
       "update_data",
       "set_points",
+      "set_data",
       "set_values"
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Metoda Line2D.set_data(x, y) přiřadí existujícímu objektu čáry nové pole souřadnic bez nutnosti překreslovat celý graf.",
     "expected": "set_data"
   },
@@ -32,12 +32,12 @@
     "type": "multiple_choice",
     "question": "K čemu slouží funkce pyplot.pause(interval) při vytváření jednoduchých animací v knihovně Matplotlib?",
     "options": [
-      "A) Pozastaví běh skriptu na zadaný čas v sekundách a vynutí aktualizaci vykreslovaného okna grafu.",
-      "B) Zastaví nahrávání animace do MP4 souboru a vytvoří v daném místě kontrolní snímek pro pauzu.",
+      "A) Zastaví nahrávání animace do MP4 souboru a vytvoří v daném místě kontrolní snímek pro pauzu.",
+      "B) Přepne grafický okenní subsystém z interaktivního režimu do statického zobrazení okna.",
       "C) Uloží aktuální stav grafu do paměťového vyrovnávacího zásobníku pro kešování snímků.",
-      "D) Přepne grafický okenní subsystém z interaktivního režimu do statického zobrazení okna."
+      "D) Pozastaví běh skriptu na zadaný čas v sekundách a vynutí aktualizaci vykreslovaného okna grafu."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "plt.pause(interval) zavolá interně přikreslení celého okna (plt.draw()) a přeruší vykonávání skriptu na stanovený interval. To umožňuje sledovat vývoj grafu v reálném čase bez nutnosti stavět komplexní objekt FuncAnimation."
   },
   {
@@ -70,12 +70,12 @@
     "question": "Jaký výsledek vyprodukuje následující kód vytvářející animaci pomocí ArtistAnimation?",
     "code": "fig, ax = plt.subplots()\nframes = []\nfor i in range(5):\n    line, = ax.plot([0, 1], [0, i], 'r-')\n    frames.append([line])\nanim = animation.ArtistAnimation(fig, frames, interval=200)",
     "options": [
-      "A) Vytvoří se animace zobrazující v každém kroku čáru spojující bod (0,0) s bodem (1,i).",
-      "B) Nastane chyba TypeError, protože ArtistAnimation přijímá pouze funkce, nikoli seznamy prvků.",
-      "C) Graf zobrazí pouze poslední červenou čáru a předchozí snímky budou automaticky smazány.",
+      "A) Graf zobrazí pouze poslední červenou čáru a předchozí snímky budou automaticky smazány.",
+      "B) Vytvoří se animace zobrazující v každém kroku čáru spojující bod (0,0) s bodem (1,i).",
+      "C) Nastane chyba TypeError, protože ArtistAnimation přijímá pouze funkce, nikoli seznamy prvků.",
       "D) Všechny čáry se vykreslí najednou přes sebe v jediném statickém snímku zcela bez animace."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "ArtistAnimation projde seznam frames a v zadaném časovém intervalu (zde 200 ms) zobrazuje pouze artisty přiřazené k danému snímku (v tomto případě příslušnou čáru line)."
   }
 ]

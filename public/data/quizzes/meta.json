@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Co se stane při instanciaci objektu, pokud přepsaná metoda __new__() ve třídě nevrátí instanci dané třídy?\n\n```python\nclass Creator:\n    def __new__(cls):\n        print(\"NEW\")\n        return None\n    def __init__(self):\n        print(\"INIT\")\n\nc = Creator()\n```",
     "options": [
-      "A) Vypíše pouze NEW a proměnná c bude obsahovat None, protože metoda __init__() se zavolá pouze při vrácení správné instance.",
-      "B) Vypíše NEW i INIT, protože Python volá metodu __init__() vždy bezpodmínečně po dokončení metody __new__().",
-      "C) Vyvolá výjimku TypeError, neboť metoda __new__() má striktně předepsáno vracet platný paměťový ukazatel na instanci.",
-      "D) Vypíše pouze INIT, protože vrácením hodnoty None metoda __new__() deleguje vytvoření objektu na konstruktor __init__()."
+      "A) Vypíše pouze INIT, protože vrácením hodnoty None metoda __new__() deleguje vytvoření objektu na konstruktor __init__().",
+      "B) Vyvolá výjimku TypeError, neboť metoda __new__() má striktně předepsáno vracet platný paměťový ukazatel na instanci.",
+      "C) Vypíše NEW i INIT, protože Python volá metodu __init__() vždy bezpodmínečně po dokončení metody __new__().",
+      "D) Vypíše pouze NEW a proměnná c bude obsahovat None, protože metoda __init__() se zavolá pouze při vrácení správné instance."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Python zavolá __init__(self, ...) pouze tehdy, pokud __new__(cls, ...) vrátí instanci třídy cls (nebo její podtřídy). Pokud __new__ vrátí None (nebo objekt jiného typu), __init__ se nezavolá."
   },
   {
@@ -30,12 +30,12 @@
     "type": "fill_blank_choice",
     "question": "Doplňte první argument pro dynamické vytvoření třídy pomocí metatřídy type():",
     "options": [
+      "{\"x\": 10}",
       "\"DynamicClass\"",
       "DynamicClass",
-      "object",
-      "{\"x\": 10}"
+      "object"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Tříargumentové volání type(name, bases, dict) přebírá jako první parametr název třídy jako řetězec (str).",
     "code": "# Dynamické vytvoření třídy s atributem x=10:\nDynamicClass = type(________, (object,), {\"x\": 10})\nprint(DynamicClass.__name__)  # Výstup: DynamicClass",
     "expected": "\"DynamicClass\""
@@ -45,12 +45,12 @@
     "type": "multiple_choice",
     "question": "K čemu slouží magická metoda __prepare__(metacls, name, bases, **kwargs) při procesu vytváření třídy metatřídou?",
     "options": [
-      "A) Vytváří a vrací mapovací objekt (slovník), který se použije jako jmenný prostor třídy během vykonávání jejího těla.",
-      "B) Slouží k automatickému promazání nepoužívaných metod v rodičovských třídách před zahájením kompilace těla.",
-      "C) Kontroluje datové typy všech definovaných atributů a vyvolá výjimku TypeError při nalezení neznámé vlastnosti.",
+      "A) Slouží k automatickému promazání nepoužívaných metod v rodičovských třídách před zahájením kompilace těla.",
+      "B) Kontroluje datové typy všech definovaných atributů a vyvolá výjimku TypeError při nalezení neznámé vlastnosti.",
+      "C) Vytváří a vrací mapovací objekt (slovník), který se použije jako jmenný prostor třídy během vykonávání jejího těla.",
       "D) Spouští se až po dokončení metody __init__ metatřídy pro závěrečnou registraci třídy do globálního jmenného prostoru."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Metoda __prepare__ se volá jako první krok při definici třídy. Vrací slovník (např. OrderedDict nebo custom dict), který slouží k zachycení atributů definovaných v těle třídy v pořadí, v jakém byly zapsány."
   },
   {
@@ -58,12 +58,12 @@
     "type": "multiple_choice",
     "question": "Jaký bude výstup při opakované instanciaci třídy spravované metatřídou implementující vzor Singleton pomocí __call__?\n\n```python\nclass Singleton(type):\n    _instances = {}\n    def __call__(cls, *args, **kwargs):\n        if cls not in cls._instances:\n            cls._instances[cls] = super().__call__(*args, **kwargs)\n        return cls._instances[cls]\n\nclass Logger(metaclass=Singleton):\n    def __init__(self, name):\n        self.name = name\n\na = Logger(\"First\")\nb = Logger(\"Second\")\nprint(a is b, b.name)\n```",
     "options": [
-      "A) Vypíše True First, protože druhá instanciace vrátí již existující objekt a bez opětovného přepsání atributu.",
+      "A) Vyvolá výjimku KeyError, protože slovník _instances nepodporuje ukládání objektů tříd jako klíčů vyhledávání.",
       "B) Vypíše True Second, protože metoda __init__ třídy Logger se zavolá znovu a přepíše atribut name na Second.",
       "C) Vypíše False Second, protože metoda __call__ vytvoří dvě odlišné instance třídy Logger se stejnými atributy.",
-      "D) Vyvolá výjimku KeyError, protože slovník _instances nepodporuje ukládání objektů tříd jako klíčů vyhledávání."
+      "D) Vypíše True First, protože druhá instanciace vrátí již existující objekt a bez opětovného přepsání atributu."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Při prvním volání Logger(\"First\") vrátí Singleton.__call__ novou instanci a uloží ji do _instances. Při druhém volání Logger(\"Second\") podmínka cls not in cls._instances selže, super().__call__ (a tedy i Logger.__init__) se už podruhé nezavolá a vrátí se původní instance a. Proto a is b je True a b.name zůstává \"First\"."
   },
   {
@@ -72,8 +72,8 @@
     "question": "Doplňte klíčový parametr v hlavičce třídy pro určení vlastní metatřídy:",
     "options": [
       "metaclass",
-      "meta",
       "type",
+      "meta",
       "base"
     ],
     "answer": 0,

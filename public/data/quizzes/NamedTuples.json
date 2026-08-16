@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Co se stane při pokusu o zavedení pojmenované n-tice `namedtuple('Point', 'x class y')`?",
     "options": [
-      "A) Vytvoří se typ `Point`, kde se nepovolené jméno automaticky nahradí za `_1`.",
-      "B) Vyvolá se `ValueError`, protože `'class'` je vyhrazené klíčové slovo Pythonu.",
+      "A) Vyvolá se `ValueError`, protože `'class'` je vyhrazené klíčové slovo Pythonu.",
+      "B) Vytvoří se typ `Point`, ale k atributu `'class'` lze přistupovat jen indexem.",
       "C) Vyvolá se `SyntaxError`, protože jména prvků musí být zadána v seznamu.",
-      "D) Vytvoří se typ `Point`, ale k atributu `'class'` lze přistupovat jen indexem."
+      "D) Vytvoří se typ `Point`, kde se nepovolené jméno automaticky nahradí za `_1`."
     ],
-    "answer": 1,
+    "answer": 0,
     "explanation": "Výchozí nastavení rename=False vyvolá ValueError, pokud název pole obsahuje vyhrazené klíčové slovo."
   },
   {
@@ -17,12 +17,12 @@
     "type": "fill_blank_choice",
     "question": "Doplňte metodu pojmenované n-tice (namedtuple) pro vytvoření nové kopie s upravenou hodnotou vybraného atributu:",
     "options": [
+      "_update",
       "_replace",
-      "replace",
       "_make",
-      "_update"
+      "replace"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Metoda _replace(**kwargs) vytvoří novou instanci namedtuple se změněnými hodnotami zadaných polí, protože pojmenované n-tice jsou neměnné (immutable).",
     "code": "from collections import namedtuple\n\nPoint = namedtuple(\"Point\", [\"x\", \"y\"])\np = Point(1, 2)\n\n# Vytvoření nové instance se změněnou souřadnicí x:\nnew_p = p.________(x=10)\n# Výstup: Point(x=10, y=2)",
     "expected": "_replace"
@@ -32,10 +32,10 @@
     "type": "predict_output",
     "question": "Jaké pole bude vytvořeno na čtvrtém místě při spuštění příkazu `namedtuple('Item', 'name price qty price', rename=True)`?",
     "options": [
-      "A) Název `_4` vzniklý nahrazením duplikátu podtržítkem s pořadím prvku.",
-      "B) Název `price_1` vzniklý automatickým přidáním pořadového čísla.",
+      "A) Název `price_1` vzniklý automatickým přidáním pořadového čísla.",
+      "B) Název `_price` vzniklý přidáním úvodního podtržítka před název.",
       "C) Název `_3` vzniklý nahrazením duplikátu podtržítkem s indexem pole.",
-      "D) Název `_price` vzniklý přidáním úvodního podtržítka před název."
+      "D) Název `_4` vzniklý nahrazením duplikátu podtržítkem s pořadím prvku."
     ],
     "answer": 2,
     "explanation": "Při zapnutí rename=True se duplicitní jméno nahradí podtržítkem a jeho číselným indexem pole (index 3), tedy _3."
@@ -46,11 +46,11 @@
     "question": "Jaký bude výstup příkazu `p = Person._make(['Alice', 30]); print(p.name, p[1])` pro `Person = namedtuple('Person', 'name age')`?",
     "options": [
       "A) Textový výstup `Alice Alice` způsobený načtením stejného prvku v obou případech.",
-      "B) Textový výstup `Alice 30` získaný kombinačním přístupem přes jméno i index.",
+      "B) Chybová výjimka `TypeError` vyvolaná předáním seznamu místo n-tice do `_make()`.",
       "C) Textový výstup `30 30` způsobený přečtením druhé hodnoty ze vstupního seznamu.",
-      "D) Chybová výjimka `TypeError` vyvolaná předáním seznamu místo n-tice do `_make()`."
+      "D) Textový výstup `Alice 30` získaný kombinačním přístupem přes jméno i index."
     ],
-    "answer": 1,
+    "answer": 3,
     "explanation": "Metoda _make() vytvoří instanci z iterovatelného objektu. Prvky jsou přístupné přes atribut p.name ('Alice') i index p[1] (30)."
   },
   {
@@ -58,12 +58,12 @@
     "type": "multiple_choice",
     "question": "Proč pomocné metody třídy `namedtuple` (například `_fields`, `_make`, `_replace`) začínají podtržítkem?",
     "options": [
-      "A) Aby se uživateli zabránilo v jejich volání z důvodu interní privatizace.",
-      "B) Aby se vyhovělo striktnímu pravidlu PEP 8 pro označování metod třídy.",
-      "C) Aby se předešlo konfliktu jmen s uživatelsky definovanými poli n-tice.",
-      "D) Aby se odlišily od metod jazyka C, které jsou v knihovně implementovány."
+      "A) Aby se předešlo konfliktu jmen s uživatelsky definovanými poli n-tice.",
+      "B) Aby se uživateli zabránilo v jejich volání z důvodu interní privatizace.",
+      "C) Aby se odlišily od metod jazyka C, které jsou v knihovně implementovány.",
+      "D) Aby se vyhovělo striktnímu pravidlu PEP 8 pro označování metod třídy."
     ],
-    "answer": 2,
+    "answer": 0,
     "explanation": "Úvodní podtržítko u metod namedtuple předchází konfliktům s názvy uživatelských atributů."
   },
   {

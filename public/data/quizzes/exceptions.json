@@ -4,12 +4,12 @@
     "type": "predict_output",
     "question": "Jaké výstupy a v jakém pořadí vytiskne následující kód?\n\ntry:\n    x = 1 / 1\nexcept ZeroDivisionError:\n    print('E')\nelse:\n    print('L')\nfinally:\n    print('F')",
     "options": [
-      "A) Vytiskne L a potom F.",
-      "B) Vytiskne E a potom F.",
-      "C) Vytiskne pouze text L.",
+      "A) Vytiskne E a potom F.",
+      "B) Vytiskne pouze text L.",
+      "C) Vytiskne L a potom F.",
       "D) Vytiskne F a potom L."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Větev else se provede pouze v případě, že v bloku try nedošlo k žádné výjimce. Větev finally se provede vždy."
   },
   {
@@ -17,12 +17,12 @@
     "type": "multiple_choice",
     "question": "Proč je chyba uvést except Exception: před except ValueError:?",
     "options": [
-      "A) ValueError dědí z Exception, takže první větev zachytí vše a druhá se nikdy nespustí.",
-      "B) Exception dědí z ValueError, takže druhá větev vyvolá při kompilaci chybu SyntaxError.",
-      "C) ValueError se automaticky převádí na Exception a způsobí nečekaný pád celého programu.",
-      "D) Druhý blok except alokuje paměťové zdroje, které rodičovská třída automaticky uvolní."
+      "A) ValueError se automaticky převádí na Exception a způsobí nečekaný pád celého programu.",
+      "B) Druhý blok except alokuje paměťové zdroje, které rodičovská třída automaticky uvolní.",
+      "C) Exception dědí z ValueError, takže druhá větev vyvolá při kompilaci chybu SyntaxError.",
+      "D) ValueError dědí z Exception, takže první větev zachytí vše a druhá se nikdy nespustí."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Python vyhodnocuje except bloky shora dolů. Jelikož ValueError dědí z Exception, obecný except Exception: zachytí i ValueError a ke specifičtějšímu bloku se řízení nedostane."
   },
   {
@@ -31,9 +31,9 @@
     "question": "Doplňte hlavičku bloku `except` pro současné odchycení výjimek `ValueError` a `TypeError`.",
     "options": [
       "except (ValueError, TypeError)",
-      "except [ValueError, TypeError]",
+      "except ValueError, TypeError",
       "except {ValueError, TypeError}",
-      "except ValueError, TypeError"
+      "except [ValueError, TypeError]"
     ],
     "answer": 0,
     "explanation": "Pro zachycení více typů výjimek v jedné větvi `except` musí být třídy výjimek sdruženy do n-tice (tuple) v kulatých závorkách.",
@@ -45,12 +45,12 @@
     "type": "fill_blank_choice",
     "question": "Doplňte klíčové slovo pro opětovné přeposlání (re-raise) zachycené výjimky výše v zásobníku volání po zalogování chyby.",
     "options": [
-      "raise",
       "throw",
-      "rethrow",
-      "pass"
+      "raise",
+      "pass",
+      "rethrow"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Příkaz `raise` bez argumentů uvnitř bloku `except` znovu vyvolá aktuálně zpracovávanou výjimku včetně jejího původního trasování (traceback).",
     "code": "def log_and_rethrow(func, *args):\n    try:\n        return func(*args)\n    except Exception as err:\n        print(f\"Chyba při běhu: {err}\")\n        ________  # Znovu vyvolá původní zachycenou výjimku",
     "expected": "raise"
@@ -60,12 +60,12 @@
     "type": "predict_output",
     "question": "Co vytiskne příkaz print(ex.args) po zachycení výjimky vyvolané jako raise ValueError('a', 'b')?",
     "options": [
-      "A) N-tici prvků ('a', 'b').",
-      "B) Seznam prvků ['a', 'b'].",
-      "C) Množinu prvků {'a', 'b'}.",
+      "A) Seznam prvků ['a', 'b'].",
+      "B) Množinu prvků {'a', 'b'}.",
+      "C) N-tici prvků ('a', 'b').",
       "D) Spojený text ('a' + 'b')."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Všechny positional argumenty předané konstruktoru výjimky se ukládají do atributu .args jako n-tice (tuple)."
   },
   {
@@ -73,12 +73,12 @@
     "type": "multiple_choice",
     "question": "Jaká je doporučená minimální definice vlastní uživatelské třídy výjimky v Pythonu?",
     "options": [
-      "A) Třída dědící z Exception: class AppError(Exception): pass",
-      "B) Třída dědící z BaseException: class AppErr(BaseException): pass",
-      "C) Třída dědící z obecného object: class AppError(object): pass",
-      "D) Třída dědící ze SystemExit: class AppError(SystemExit): pass"
+      "A) Třída dědící ze SystemExit: class AppError(SystemExit): pass",
+      "B) Třída dědící z obecného object: class AppError(object): pass",
+      "C) Třída dědící z BaseException: class AppErr(BaseException): pass",
+      "D) Třída dědící z Exception: class AppError(Exception): pass"
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Uživatelské výjimky by měly dědit z třídy Exception (nikoliv přímo z BaseException, ze které dědí i systémové výjimky jako KeyboardInterrupt nebo SystemExit)."
   },
   {
@@ -88,8 +88,8 @@
     "options": [
       "A) Příkazy assert jsou z kódu zcela odstraněny a vůbec se nevykonají.",
       "B) Příkazy assert vyvolají výjimku AssertionError při každém selhání.",
-      "C) Příkazy assert pouze vypíší varování do konsole a program běží dál.",
-      "D) Příkazy assert se automaticky převedou na klasickou podmínku if not."
+      "C) Příkazy assert se automaticky převedou na klasickou podmínku if not.",
+      "D) Příkazy assert pouze vypíší varování do konsole a program běží dál."
     ],
     "answer": 0,
     "explanation": "Při spuštění Pythonu s příznakem optimalizace -O je proměnná __debug__ nastavena na False a všechny příkazy assert jsou bytecode kompilátorem zcela odstraněny."

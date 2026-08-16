@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Proč se změny v databázi SQLite (INSERT, UPDATE) neprojeví v souboru ihned po zavolání cursor.execute()?",
     "options": [
-      "A) Změny jsou drženy v transakci a pro jejich uložení je nutné zavolat connection.commit().",
+      "A) Změny se zapíší až v okamžiku, kdy velikost vyrovnávací paměti přesáhne velikost RAM.",
       "B) SQLite vyžaduje ruční uvolnění databázového zámku zavoláním sqlite3.flush_buffers().",
       "C) Všechny zápisové operace probíhají ve vedlejším vlákně až po uzavření objektu kurzoru.",
-      "D) Změny se zapíší až v okamžiku, kdy velikost vyrovnávací paměti přesáhne velikost RAM."
+      "D) Změny jsou drženy v transakci a pro jejich uložení je nutné zavolat connection.commit()."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "V ovladači sqlite3 probíhají úpravy v transakci. Bez zavolání connection.commit() na objektu připojení se provedené změny při ukončení zruší."
   },
   {
@@ -19,8 +19,8 @@
     "options": [
       "A) Použitím symbolů ? a předáním hodnot jako n-tice v druhém argumentu cursor.execute().",
       "B) Formátováním řetězců pomocí f-stringů přímo v textu SQL příkazu před jeho odesláním.",
-      "C) Spojením řetězců operátorem + a ošetřením uvozovek metodou str.replace(\"'\", \"''\").",
-      "D) Převodem všech vstupních proměnných na bajtový typ bytes před jejich vložením do SQL."
+      "C) Převodem všech vstupních proměnných na bajtový typ bytes před jejich vložením do SQL.",
+      "D) Spojením řetězců operátorem + a ošetřením uvozovek metodou str.replace(\"'\", \"''\")."
     ],
     "answer": 0,
     "explanation": "Použití zástupných symbolů ? (nebo pojmenovaných :name) zajišťuje, že databázový ovladač vstupy bezpečně escapuje a znemožní útoky SQL Injection. F-stringy či spájení řetězců jsou hrubá chyba."
@@ -30,12 +30,12 @@
     "type": "multiple_choice",
     "question": "Která metoda objektu Cursor je nejvhodnější pro efektivní vložení velkého množství řádků z kolekce parametrů?",
     "options": [
-      "A) cursor.executemany(sql, data)",
-      "B) cursor.execute_bulk(sql, data)",
+      "A) cursor.execute_bulk(sql, data)",
+      "B) cursor.executemany(sql, data)",
       "C) cursor.executescript(sql, data)",
       "D) cursor.fetchmany(sql, data)"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Metoda executemany() přijímá SQL šablonu se zástupnými symboly a sekvenci parametrů, které efektivně vykoná v rámci jednoho volání."
   },
   {
@@ -43,12 +43,12 @@
     "type": "multiple_choice",
     "question": "Jak se liší metoda cursor.executescript() od standardní metody cursor.execute()?",
     "options": [
-      "A) Umožňuje vykonat více SQL příkazů oddělených středníkem předaných v jediném řetězci.",
-      "B) Spouští SQL příkazy v externím procesu SQLite CLI místo vnitřní C knihovny Pythonu.",
-      "C) Automaticky volá commit() po každém řádku a ignoruje veškeré syntaktické chyby.",
+      "A) Spouští SQL příkazy v externím procesu SQLite CLI místo vnitřní C knihovny Pythonu.",
+      "B) Automaticky volá commit() po každém řádku a ignoruje veškeré syntaktické chyby.",
+      "C) Umožňuje vykonat více SQL příkazů oddělených středníkem předaných v jediném řetězci.",
       "D) Převádí SQL dotaz do Python bajtkódu pro zrychlení opakovaných databázových dotazů."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Metoda execute() vykoná pouze jeden SQL dotaz, zatímco executescript() dokáže zpracovat celý skript složený z více SQL příkazů oddělených středníky."
   },
   {
@@ -56,12 +56,12 @@
     "type": "fill_blank_choice",
     "question": "Doplňte metodu kurzoru z rozhraní Python DB-API 2.0 (např. sqlite3), která načte z výsledku SQL dotazu právě jeden následující řádek.",
     "options": [
-      "fetchone",
-      "fetchrow",
+      "readline",
       "get_one",
-      "readline"
+      "fetchrow",
+      "fetchone"
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Metoda cursor.fetchone() vrátí jeden následující řádek z výsledku SQL dotazu jako n-tici (tuple), nebo None, pokud již žádný další záznam neexistuje.",
     "code": "import sqlite3\n\nconn = sqlite3.connect(\"laborator.db\")\ncursor = conn.cursor()\n\ncursor.execute(\"SELECT vzorek_id, koncentrace FROM mereni WHERE id = ?\", (42,))\n# Načtení jediného nalezeného záznamu jako tuple\nrow = cursor.________()\n# Výstup: ('VZ-42', 0.015) nebo None",
     "expected": "fetchone"
@@ -72,9 +72,9 @@
     "question": "Jaké zkratky (shortcuts) nabízejí objekty připojení Connection podle standardu DB API 2 v sqlite3?",
     "options": [
       "A) Metody execute(), executemany() a executescript() lze volat přímo na objektu Connection.",
-      "B) Připojení k databázi se automaticky uzavře po 60 sekundách bez volání connection.close().",
-      "C) Tabulky vytvořené v SQLite se v Pythonu automaticky namapují na datové třídy dataclass.",
-      "D) Při výskytu chyb v SQL dotazu se automaticky spouští opravný skript v prostředí SQLite."
+      "B) Při výskytu chyb v SQL dotazu se automaticky spouští opravný skript v prostředí SQLite.",
+      "C) Připojení k databázi se automaticky uzavře po 60 sekundách bez volání connection.close().",
+      "D) Tabulky vytvořené v SQLite se v Pythonu automaticky namapují na datové třídy dataclass."
     ],
     "answer": 0,
     "explanation": "Objekty Connection v modulu sqlite3 nabízejí zkratky connection.execute(...) apod., které si samy interně vytvoří dočasný kurzor a zavolají požadovanou operaci."

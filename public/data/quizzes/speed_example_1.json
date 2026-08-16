@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Proč dosáhl prvotní pokus o cythonizaci s výrazem (vyrez * maska).sum() horšího času (3,1 s) než čistý Python (1,8 s)?",
     "options": [
-      "A) Načítání výřezů alokovalo v každém kroku smyčky nové objekty a volalo pomalé C-API (žluté řádky v cython -a).",
+      "A) Knihovna Pillow zablokovala přístup k paměťovému bufferu obrázku, takže Cython musel kopírovat celou matici.",
       "B) Cython zkompiloval maticové násobení do jednovláknového C kódu bez využití vektorových instrukcí SSE a AVX.",
-      "C) Knihovna Pillow zablokovala přístup k paměťovému bufferu obrázku, takže Cython musel kopírovat celou matici.",
+      "C) Načítání výřezů alokovalo v každém kroku smyčky nové objekty a volalo pomalé C-API (žluté řádky v cython -a).",
       "D) Výraz vyvolal vnitřní přetečení paměti typu float, což přinutilo CPython přejít do záložního režimu interpretace."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "V prvotním Cython kódu vytvářel výraz np.array(vyrez) v každé iteraci zanořené smyčky nový Python objekt. Nástroj cython -a označil řádek sytě žlutou barvou, což signalizuje intenzivní volání C-API CPythonu uvnitř smyčky."
   },
   {
@@ -17,12 +17,12 @@
     "type": "predict_output",
     "question": "Jaká úprava kódu v Cythonu snížila čas vykonání filtru obrázku z 3,1 s na špičkových 0,14 s?",
     "options": [
-      "A) Nahrazení jednořádkového maticového násobení (vyrez * maska).sum() zanořenou C smyčkou přes jednotlivé prvky.",
-      "B) Použití dekorátoru @jit(nopython=True) nad původní cythoní funkcí a vypnutí kontroly mezí indexace polí.",
-      "C) Převod celého 3D pole RGB obrázku na jednorozměrný Python seznam objektů typu float před voláním filtru.",
-      "D) Zvýšení počtu vláken v modulu threading a rozdělení jednotlivých barevných kanálů obrázku do skriptů."
+      "A) Použití dekorátoru @jit(nopython=True) nad původní cythoní funkcí a vypnutí kontroly mezí indexace polí.",
+      "B) Převod celého 3D pole RGB obrázku na jednorozměrný Python seznam objektů typu float před voláním filtru.",
+      "C) Zvýšení počtu vláken v modulu threading a rozdělení jednotlivých barevných kanálů obrázku do skriptů.",
+      "D) Nahrazení jednořádkového maticového násobení (vyrez * maska).sum() zanořenou C smyčkou přes jednotlivé prvky."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Odstraněním NumPy operací nad výřezy a přepsáním násobení matice na přímou zanořenou C smyčku se kód zcela zbavil volání Python C-API uvnitř smyček, což snížilo čas na 0,14 s."
   },
   {
@@ -31,9 +31,9 @@
     "question": "Na čem je založen princip vektorizace konvolučního filtru v čistém NumPy bez použití smyček for?",
     "options": [
       "A) Na součtu 9 posunutých 2D výřezů (views) původní matice s odpovídajícími koeficienty v jediném výrazu.",
-      "B) Na automatickém převodu 2D matice obrázku do frekvenční domény pomocí rychlé Fourierovy transformace (FFT).",
-      "C) Na použití funkce np.vectorize() nad původní nevektorizovanou pythonní funkcí se zanořenou smyčkou.",
-      "D) Na paralelním zpracování jednotlivých bajtů obrázku pomocí grafické karty přes externí modul CUDA."
+      "B) Na použití funkce np.vectorize() nad původní nevektorizovanou pythonní funkcí se zanořenou smyčkou.",
+      "C) Na paralelním zpracování jednotlivých bajtů obrázku pomocí grafické karty přes externí modul CUDA.",
+      "D) Na automatickém převodu 2D matice obrázku do frekvenční domény pomocí rychlé Fourierovy transformace (FFT)."
     ],
     "answer": 0,
     "explanation": "Vektorizace nahradila smyčku tím, že vytvořila 9 stejně velkých posunutých výřezů matice (např. M[0:-2, 0:-2], M[1:-1, 1:-1]), vynásobila je koeficienty masky a sečetla je najednou kompilovanou C operací NumPy."
@@ -43,12 +43,12 @@
     "type": "predict_output",
     "question": "Která dvojice metod dosáhla v ukázkovém srovnání filtru obrázku nejvyššího zrychlení (kolem 11x až 13x)?",
     "options": [
-      "A) Optimalizovaný Cython s C smyčkami a vektorizované řešení v čistém NumPy.",
-      "B) Naivní nevektorizovaný Python s NumPy a Numba bez použití mezipaměti.",
-      "C) Numba s nastavením nopython=False a Cython s použitím volání np.array().",
-      "D) Naivní Python smyčka a funkce np.vectorize() aplikovaná na skalární funkci."
+      "A) Naivní Python smyčka a funkce np.vectorize() aplikovaná na skalární funkci.",
+      "B) Optimalizovaný Cython s C smyčkami a vektorizované řešení v čistém NumPy.",
+      "C) Naivní nevektorizovaný Python s NumPy a Numba bez použití mezipaměti.",
+      "D) Numba s nastavením nopython=False a Cython s použitím volání np.array()."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Optimalizovaný Cython (s manuální C smyčkou) dosáhl času 0,14 s (13x zrychlení) a vektorizovaný NumPy dosáhl 0,16 s (11x zrychlení). Naivní smyčka trvala 1,8 s."
   },
   {

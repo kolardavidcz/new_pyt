@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Jaká hodnota vrácená z metody __exit__() způsobí potlačení výjimky vzniklé uvnitř bloku with?",
     "options": [
-      "A) Pravdivá hodnota True (nebo jakýkoliv pravdivý objekt), která interpretu sdělí, že byla výjimka zpracována.",
-      "B) Nepravdivá hodnota False (nebo None), která interpretu sdělí, že byla výjimka úspěšně zpracována.",
-      "C) Objekt výjimky typu BaseException, který nahradí původně vyvolanou výjimku v aktuálním kontextu.",
-      "D) Řetězec s názvem zachycené výjimky, který se předá nadřazenému bloku try-except k logování."
+      "A) Objekt výjimky typu BaseException, který nahradí původně vyvolanou výjimku v aktuálním kontextu.",
+      "B) Řetězec s názvem zachycené výjimky, který se předá nadřazenému bloku try-except k logování.",
+      "C) Pravdivá hodnota True (nebo jakýkoliv pravdivý objekt), která interpretu sdělí, že byla výjimka zpracována.",
+      "D) Nepravdivá hodnota False (nebo None), která interpretu sdělí, že byla výjimka úspěšně zpracována."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Pokud __exit__() vrátí True (pravdivou hodnotu), Python výjimku potlačí a kód pokračuje za blokem with. Pokud vrátí False nebo None, výjimka se propaguje výše."
   },
   {
@@ -17,12 +17,12 @@
     "type": "multiple_choice",
     "question": "Jaký bude výstup následujícího kódu využívajícího generátorový kontextový manažer?\n\n```python\nfrom contextlib import contextmanager\n\n@contextmanager\ndef my_ctx():\n    print(\"START\")\n    yield \"DATA\"\n    print(\"END\")\n\ncm = my_ctx()\nwith cm as val:\n    print(val)\nwith cm as val:\n    print(val)\n```",
     "options": [
-      "A) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku RuntimeError: generator didn't yield.",
+      "A) Vypíše START, DATA, END a při druhém vstupu neprovede nic, protože proměnná val již obsahuje řetězec DATA.",
       "B) Vypíše START, DATA, END dvakrát za sebou, protože generátor se při dalším vstupu automaticky restartuje.",
       "C) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku StopIteration kvůli vyčerpání generátoru.",
-      "D) Vypíše START, DATA, END a při druhém vstupu neprovede nic, protože proměnná val již obsahuje řetězec DATA."
+      "D) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku RuntimeError: generator didn't yield."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Generátor vytvořený pomocí @contextmanager je jednorázový. Jednou vyčerpaný generátorový objekt uložený do proměnné cm nelze znovu použít v dalším bloku with; pokus o to vyvolá RuntimeError: generator didn't yield."
   },
   {
@@ -31,8 +31,8 @@
     "question": "Doplňte klíčové slovo pro předání spravovaného prostředku z kontextového manažeru @contextmanager:",
     "options": [
       "yield",
-      "return",
       "send",
+      "return",
       "pass"
     ],
     "answer": 0,
@@ -45,12 +45,12 @@
     "type": "multiple_choice",
     "question": "Jaké argumenty obdrží metoda __exit__(self, exc_type, exc_val, exc_tb) při normálním ukončení bloku with bez výjimky?",
     "options": [
-      "A) Všechny tři argumenty exc_type, exc_val a exc_tb budou mít hodnotu None.",
-      "B) Argumenty obdrží instanci třídy SuccessState s informací o bezchybném průběhu.",
-      "C) Argument exc_type bude StopIteration, zatímco zbývající dva budou None.",
+      "A) Argument exc_type bude StopIteration, zatímco zbývající dva budou None.",
+      "B) Všechny tři argumenty exc_type, exc_val a exc_tb budou mít hodnotu None.",
+      "C) Argumenty obdrží instanci třídy SuccessState s informací o bezchybném průběhu.",
       "D) Metoda __exit__() se při bezchybném doběhu bloku with vůbec nevolá."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Dokončí-li se blok with bez vyvolání výjimky, Python zavolá __exit__ s argumenty (None, None, None)."
   },
   {
@@ -58,12 +58,12 @@
     "type": "multiple_choice",
     "question": "Co bude vytištěno při spuštění následujícího kódu s vlastní třídou kontextového manažeru?\n\n```python\nclass Manager:\n    def __enter__(self):\n        return \"RESOURCE\"\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        return False\n\nm = Manager()\nwith m as res:\n    print(res is m, res)\n```",
     "options": [
-      "A) Vypíše False RESOURCE, protože res dostane návratovou hodnotu z __enter__(), nikoliv objekt m.",
-      "B) Vypíše True RESOURCE, protože proměnná res v příkazu as vždy odkazuje přímo na kontextový manažer m.",
-      "C) Vypíše False None, protože výstup z __enter__() se zahodí a proměnná res se inicializuje na None.",
-      "D) Vyvolá výjimku AttributeError, protože metoda __enter__() musí vracet výhradně samotný objekt self."
+      "A) Vypíše True RESOURCE, protože proměnná res v příkazu as vždy odkazuje přímo na kontextový manažer m.",
+      "B) Vyvolá výjimku AttributeError, protože metoda __enter__() musí vracet výhradně samotný objekt self.",
+      "C) Vypíše False RESOURCE, protože res dostane návratovou hodnotu z __enter__(), nikoliv objekt m.",
+      "D) Vypíše False None, protože výstup z __enter__() se zahodí a proměnná res se inicializuje na None."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Proměnná za klíčovým slovem as přebírá návratovou hodnotu metody __enter__(). Jelikož ta vrátila řetězec \"RESOURCE\", proměnná res drží tento řetězec a nikoliv objekt m (res is m je tedy False)."
   },
   {
@@ -71,12 +71,12 @@
     "type": "fill_blank_choice",
     "question": "Doplňte návratovou hodnotu metody __exit__, která potlačí vzniklou výjimku a zabrání jejímu dalšímu šíření:",
     "options": [
-      "True",
+      "self",
       "False",
       "None",
-      "self"
+      "True"
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Pokud metoda __exit__() vrátí pravdivou hodnotu (True), Python výjimku potlačí a nepokračuje v jejím šíření.",
     "code": "class SuppressErrors:\n    def __enter__(self):\n        return self\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        if exc_type is not None:\n            print(f\"Zachycena výjimka: {exc_val}\")\n            return ________",
     "expected": "True"
@@ -86,10 +86,10 @@
     "type": "true_false_tricky",
     "question": "Zápis with A() as a, B() as b: v Pythonu 3.10+ odpovídá zanořenému with A() as a: with B() as b: a volání metod __enter__ a __exit__ probíhá ve stejném lexikálním pořadí (nejprve A, potom B u obou kroků).",
     "options": [
-      "A) Tvrzení je nepravdivé; metody __enter__ probíhají v pořadí A a pak B, ale čistící metody __exit__ probíhají v opačném pořadí (nejprve B a až poté A).",
-      "B) Tvrzení je pravdivé; oba kontexty se otevírají i zavírají ve stejném lexikálním pořadí shora dolů (nejprve A a potom B u vstupů i ukončení)."
+      "A) Tvrzení je pravdivé; oba kontexty se otevírají i zavírají ve stejném lexikálním pořadí shora dolů (nejprve A a potom B u vstupů i ukončení).",
+      "B) Tvrzení je nepravdivé; metody __enter__ probíhají v pořadí A a pak B, ale čistící metody __exit__ probíhají v opačném pořadí (nejprve B a až poté A)."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Kontextové manažery při vícenásobném zápisu fungují jako zanořené bloky: vstupní metody __enter__ se volají v pořadí zápisu (zleva doprava: A, pak B), ale čistící metody __exit__ se volají v opačném pořadí (nejprve vnitřní B, potom vnější A)."
   }
 ]

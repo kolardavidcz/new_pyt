@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Co se stane při pokusu použít instanci `MojIter` v cyklu `for` v níže uvedeném kódu?\n\nclass MojIter:\n    def __next__(self):\n        return 1\n\nfor x in MojIter():\n    print(x)\n    break",
     "options": [
-      "A) Vyvolá TypeError, protože cyklus for vyžaduje implementaci metody __iter__() pro vytvoření iterátoru.",
-      "B) Vypíše hodnotu 1 a skončí, protože metoda __next__() je plně postačující pro provádění cyklu for.",
-      "C) Vyvolá AttributeError, protože metoda __next__() musí být vždy zadekorována dekorátorem @iterator.",
-      "D) Vypíše hodnotu None, protože chybějící metoda __iter__() automaticky inicializuje prázdný iterátor."
+      "A) Vyvolá AttributeError, protože metoda __next__() musí být vždy zadekorována dekorátorem @iterator.",
+      "B) Vypíše hodnotu None, protože chybějící metoda __iter__() automaticky inicializuje prázdný iterátor.",
+      "C) Vyvolá TypeError, protože cyklus for vyžaduje implementaci metody __iter__() pro vytvoření iterátoru.",
+      "D) Vypíše hodnotu 1 a skončí, protože metoda __next__() je plně postačující pro provádění cyklu for."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Cyklus `for` na začátku volá funkci `iter(obj)`, která vyžaduje přítomnost metody `__iter__()`. Pouhá existence metody `__next__()` bez `__iter__()` nestačí a vyvolá `TypeError: 'MojIter' object is not iterable`."
   },
   {
@@ -17,12 +17,12 @@
     "type": "multiple_choice",
     "question": "Jaký bude výstup po vyčerpání prvků z instance `Odpocet`?\n\nclass Odpocet:\n    def __init__(self, start):\n        self.val = start\n    def __iter__(self):\n        return self\n    def __next__(self):\n        if self.val <= 0:\n            raise StopIteration\n        self.val -= 1\n        return self.val + 1\n\nit = Odpocet(2)\nprint(next(it), next(it))\ntry:\n    print(next(it))\nexcept StopIteration:\n    print(\"Konec\")",
     "options": [
-      "A) Vypíše '2 1' a následně 'Konec', protože po dosažení nulové hodnoty vyvolá metoda __next__ StopIteration.",
+      "A) Vypíše '2 1 None', protože po vyčerpání hodnot vrací funkce next() implicitní prázdnou hodnotu None.",
       "B) Vypíše '2 1 0' bez vyhození výjimky, protože hodnota 0 se vyhodnotí jako platný poslední prvek sekvence.",
       "C) Vyvolá IndexError, protože ruční volání funkce next() na vyčerpaném iterátoru vyvolá chybový stav pole.",
-      "D) Vypíše '2 1 None', protože po vyčerpání hodnot vrací funkce next() implicitní prázdnou hodnotu None."
+      "D) Vypíše '2 1' a následně 'Konec', protože po dosažení nulové hodnoty vyvolá metoda __next__ StopIteration."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "První dvě volání `next(it)` vrátí hodnoty `2` a `1`. Třetí volání narazí na `self.val <= 0`, což vyvolá výjimku `StopIteration`, kterou blok `except` zachytí a vypíše `'Konec'`."
   },
   {
@@ -31,9 +31,9 @@
     "question": "Doplňte návratovou hodnotu metody __iter__() pro splnění iterátorového protokolu:",
     "options": [
       "self",
+      "self.__next__()",
       "next(self)",
-      "iter(self)",
-      "self.__next__()"
+      "iter(self)"
     ],
     "answer": 0,
     "explanation": "Objekt implementující __next__() musí ve své metodě __iter__() vracet sám sebe (self), aby vyhověl iterátorovému protokolu.",
@@ -45,12 +45,12 @@
     "type": "multiple_choice",
     "question": "Jaké podmínky musí objekt splňovat, aby mohl být předán do vestavěné funkce `reversed()`?",
     "options": [
-      "A) Musí definovat metodu __reversed__(), nebo implementovat metody __len__() a __getitem__() sekvenčního protokolu.",
-      "B) Musí definovat výhradně metodu __reversed__(), protože jiné záložní protokoly Python při reverzování nepodporuje.",
-      "C) Musí definovat metody __iter__() a __next__() běžného dopředného iterátoru s příznakem reverse=True v hlavičce.",
-      "D) Musí dědit ze třídy ReversibleIterator a přetěžovat metodu __backward__() určenou pro zpětnou iteraci prvků."
+      "A) Musí definovat výhradně metodu __reversed__(), protože jiné záložní protokoly Python při reverzování nepodporuje.",
+      "B) Musí definovat metodu __reversed__(), nebo implementovat metody __len__() a __getitem__() sekvenčního protokolu.",
+      "C) Musí dědit ze třídy ReversibleIterator a přetěžovat metodu __backward__() určenou pro zpětnou iteraci prvků.",
+      "D) Musí definovat metody __iter__() a __next__() běžného dopředného iterátoru s příznakem reverse=True v hlavičce."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Funkce `reversed()` nejprve hledá metodu `__reversed__()`. Pokud chybí, pokusí se použít sekvenční protokol vyžadující metody `__len__()` a `__getitem__()` pro přístup přes celočíselné indexy od konce."
   },
   {

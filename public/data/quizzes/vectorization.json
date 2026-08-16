@@ -4,12 +4,12 @@
     "type": "multiple_choice",
     "question": "Jaký je primární důvod pro vyhýbání se klasickým zanořeným smyčkám typu for přes prvky pole v NumPy?",
     "options": [
-      "A) Smyčky v čistoautorském Pythonu přinášejí velkou režii interpretu, zatímco vektorizované operace běží v C.",
-      "B) Zanořené smyčky v Pythonu mají omezenou hloubku zanoření, takže na 3D a vyšší pole je vůbec nelze použít.",
-      "C) NumPy při použití smyčky for automaticky převádí všechna celá čísla na plovoucí čárku bez vědomí vývojáře.",
-      "D) Pythonní smyčky zamknou paměťový buffer pole ndarray, takže z nich nelze zapisovat do jiných objektů NumPy."
+      "A) Zanořené smyčky v Pythonu mají omezenou hloubku zanoření, takže na 3D a vyšší pole je vůbec nelze použít.",
+      "B) Smyčky v čistoautorském Pythonu přinášejí velkou režii interpretu, zatímco vektorizované operace běží v C.",
+      "C) Pythonní smyčky zamknou paměťový buffer pole ndarray, takže z nich nelze zapisovat do jiných objektů NumPy.",
+      "D) NumPy při použití smyčky for automaticky převádí všechna celá čísla na plovoucí čárku bez vědomí vývojáře."
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Vektorizace nahrazuje pomalé smyčky v čistém Pythonu kompilovaným kódem v C. Pythonní smyčky nesou obrovskou režii dynamického typování, správy referencí a interpretu v každé iteraci, zatímco NumPy provede operaci nad souvislým blokem paměti v kompilovaném C rozhraní."
   },
   {
@@ -17,12 +17,12 @@
     "type": "fill_blank_choice",
     "question": "Kterou funkci modulu numpy použijete jako dekorátor pro převod skalární Python funkce na funkci pracující s NumPy poli prvek po prvku?",
     "options": [
-      "vectorize",
-      "elementwise",
+      "array_func",
       "ufunc",
-      "array_func"
+      "vectorize",
+      "elementwise"
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Dekorátor np.vectorize převede běžnou skalární Python funkci na univerzální funkci aplikovatelnou na celá NumPy pole prvek po prvku.",
     "code": "import numpy as np\n\n@np.________\ndef classify_ph(val: float) -> str:\n    if val < 7.0:\n        return \"acidic\"\n    elif val > 7.0:\n        return \"basic\"\n    return \"neutral\"\n\nph_array = np.array([2.5, 7.0, 11.2])\n# classify_ph(ph_array) -> array(['acidic', 'neutral', 'basic'], dtype='<U7')",
     "expected": "vectorize"
@@ -32,12 +32,12 @@
     "type": "multiple_choice",
     "question": "Jaký bude výsledek vykonání následujícího kódu pro 2D NumPy pole?\n\nimport numpy as np\n\n@np.vectorize\ndef f(x):\n    return 1 if x > 0 else 0\n\nprint(f(np.array([[-1, 2], [0, 5]])))",
     "options": [
-      "A) array([[0, 1], [0, 1]]) — funkce aplikuje podmínku prvek po prvku a zachová dvoudimenzionální tvar pole.",
-      "B) array([0, 1, 0, 1]) — dekorátor automaticky zploští vstupní pole do jednodimenzionálního vektoru výsledků.",
-      "C) 1 — funkce vyhodnotí matici jako jeden celistvý objekt a vrátí skalární pravdivostní hodnotu pro celé pole.",
-      "D) TypeError — dekorovaná funkce nedokáže zpracovat dvoudimenzionální matici bez určení osy parametrů axis."
+      "A) TypeError — dekorovaná funkce nedokáže zpracovat dvoudimenzionální matici bez určení osy parametrů axis.",
+      "B) 1 — funkce vyhodnotí matici jako jeden celistvý objekt a vrátí skalární pravdivostní hodnotu pro celé pole.",
+      "C) array([0, 1, 0, 1]) — dekorátor automaticky zploští vstupní pole do jednodimenzionálního vektoru výsledků.",
+      "D) array([[0, 1], [0, 1]]) — funkce aplikuje podmínku prvek po prvku a zachová dvoudimenzionální tvar pole."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "Funkce odekorovaná pomocí `@np.vectorize` aplikuje vnitřní logiku na každý prvek vstupního pole bez ohledu na jeho dimenzionalitu a vrátí nové `ndarray` přesně stejného tvaru (shape), v tomto případě 2D matici `[[0, 1], [0, 1]]`."
   },
   {
@@ -46,9 +46,9 @@
     "question": "Jak se chová vestavěná funkce np.sign() při předání n-dimenzionálního pole ndarray?",
     "options": [
       "A) Aplikuje matematickou funkci signum na každý jednotlivý prvek pole bez ohledu na jeho dimenzionalitu a tvar.",
-      "B) Vypočítá znaménko determinantu pro 2D matice a pro 1D vektory vrátí znaménko součtu všech obsažených prvků.",
+      "B) Vrátí skalární hodnotu 1, pokud jsou všechny prvky pole kladné, a -1, pokud je v poli alespoň jedno záporné.",
       "C) Vyžaduje 1D vektor a pro vícerozměrná pole vždy vyvolá výjimku ValueError z důvodu neplatné dimenzionality.",
-      "D) Vrátí skalární hodnotu 1, pokud jsou všechny prvky pole kladné, a -1, pokud je v poli alespoň jedno záporné."
+      "D) Vypočítá znaménko determinantu pro 2D matice a pro 1D vektory vrátí znaménko součtu všech obsažených prvků."
     ],
     "answer": 0,
     "explanation": "Univerzální funkce (ufunc) v NumPy, jako je `np.sign()`, jsou navrženy tak, aby přijímaly skaláry i vícerozměrná pole libovolných rozměrů (0D, 1D, 2D atd.) a prováděly požadovanou operaci prvek po prvku s zachováním tvaru pole."
@@ -58,12 +58,12 @@
     "type": "fill_blank_choice",
     "question": "Který operátor provede v Pythonu a NumPy maticové násobení či skalární součin dvou 1D vektorů?",
     "options": [
-      "@",
       "*",
-      "**",
-      "^"
+      "@",
+      "^",
+      "**"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Infixový operátor @ provádí v NumPy maticové a vektorové násobení (skalární součin u 1D vektorů), zatímco operátor * násobí prvky po složkách.",
     "code": "import numpy as np\n\nv = np.array([1.0, 2.0, 3.0])\n# Skalární součin vektoru v se sebou samým: 1*1 + 2*2 + 3*3\ndot_product = v ________ v\n# Vystup: 14.0",
     "expected": "@"

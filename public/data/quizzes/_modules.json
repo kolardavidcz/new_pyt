@@ -17,12 +17,12 @@
     "type": "fill_blank_choice",
     "question": "Doplňte název speciální proměnné modulu, která definuje veřejný export symbolů při importu pomocí hvězdičky (`from module import *`).",
     "options": [
+      "__public__",
       "__all__",
       "__export__",
-      "__public__",
       "__exports__"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Proměnná `__all__` obsahuje seznam řetězců se jmény identifikátorů, které budou importovány při volání `from modul import *`.",
     "code": "# Modul chem_tools.py\n________ = [\"calculate_molarity\", \"dilute_solution\"]\n\ndef calculate_molarity(moles, volume):\n    return moles / volume\n\ndef dilute_solution(c1, v1, c2):\n    return (c1 * v1) / c2\n\ndef _internal_helper():\n    pass",
     "expected": "__all__"
@@ -32,12 +32,12 @@
     "type": "multiple_choice",
     "question": "Jaký je důsledek provedení příkazu `del modul` po předchozím `import modul`?",
     "options": [
-      "A) Odstraní pouze odkaz ze jmenného prostoru skriptu, ale modul zůstane načtený v sys.modules.",
-      "B) Způsobí kompletní uvolnění paměti a při příštím importu se zdrojový kód z disku znovu vykoná.",
-      "C) Způsobí zneplatnění všech objektů, které byly z tohoto modulu dříve importovány do paměti.",
-      "D) Vyvolá výjimku ImportError, protože naimportovaný modul nelze z běžícího interpretu odstranit."
+      "A) Způsobí zneplatnění všech objektů, které byly z tohoto modulu dříve importovány do paměti.",
+      "B) Vyvolá výjimku ImportError, protože naimportovaný modul nelze z běžícího interpretu odstranit.",
+      "C) Odstraní pouze odkaz ze jmenného prostoru skriptu, ale modul zůstane načtený v sys.modules.",
+      "D) Způsobí kompletní uvolnění paměti a při příštím importu se zdrojový kód z disku znovu vykoná."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Příkaz del modul smaže pouze lokální proměnnou v namespace. Modul zůstává načtený v registru sys.modules, takže další import kód znovu nevykoná; k novému načtení slouží importlib.reload()."
   },
   {
@@ -45,12 +45,12 @@
     "type": "predict_output",
     "question": "Který z následujících zápisů relativního importu v rámci balíčku je v Pythonu platný?",
     "options": [
-      "A) from . import utils (relativní importy vyžadují syntaktickou formu from ... import).",
-      "B) import .utils (relativní tečka bez klíčového slova from není v syntaxi povolená).",
-      "C) import ..tools (zpětný posun o dvě úrovně tečkami u příkazu import nelze použít).",
-      "D) from . import .utils (kombinace teček v modulu i u příkazu import je syntaktická chyba)."
+      "A) import ..tools (zpětný posun o dvě úrovně tečkami u příkazu import nelze použít).",
+      "B) from . import .utils (kombinace teček v modulu i u příkazu import je syntaktická chyba).",
+      "C) import .utils (relativní tečka bez klíčového slova from není v syntaxi povolená).",
+      "D) from . import utils (relativní importy vyžadují syntaktickou formu from ... import)."
     ],
-    "answer": 0,
+    "answer": 3,
     "explanation": "V Pythonu je relativní import povolen pouze ve formě `from .[module] import [name]`. Příkaz `import .module` vyvolá syntaktickou chybu SyntaxError."
   },
   {
@@ -60,8 +60,8 @@
     "options": [
       "A) Běžný balíček vyžaduje soubor __init__.py, zatímco jmenný balíček jej neobsahuje a může být rozprostřen v sys.path.",
       "B) Jmenný balíček vyžaduje soubor __init__.py, zatímco běžný balíček může existovat pouze jako adresář bez souborů.",
-      "C) Běžný balíček podporuje relativní importy, zatímco jmenný balíček umožňuje pouze absolutní importy podmodulů.",
-      "D) Jmenný balíček má při importu vždy vyšší prioritu než běžný balíček se stejným názvem v prohledávané cestě."
+      "C) Jmenný balíček má při importu vždy vyšší prioritu než běžný balíček se stejným názvem v prohledávané cestě.",
+      "D) Běžný balíček podporuje relativní importy, zatímco jmenný balíček umožňuje pouze absolutní importy podmodulů."
     ],
     "answer": 0,
     "explanation": "Jmenný balíček (namespace package) od Pythonu 3.3 nezahrnuje __init__.py, což umožňuje jeho složkám sídlit v různých adresářích v sys.path. Běžný balíček s __init__.py má při vyhledávání vždy prioritu."
@@ -71,12 +71,12 @@
     "type": "predict_output",
     "question": "Co vypíše kód v souboru `calc.py`, pokud jej spustíte přímo z terminálu příkazem `python calc.py`?\n\n```python\ndef add(a, b):\n    return a + b\n\nprint(__name__)\n```",
     "options": [
-      "A) __main__",
-      "B) calc",
+      "A) calc",
+      "B) __main__",
       "C) calc.py",
       "D) __calc__"
     ],
-    "answer": 0,
+    "answer": 1,
     "explanation": "Při přímém spuštění souboru jako hlavního skriptu nastaví Python magickou proměnnou __name__ na řetězec \"__main__\". Pokud by byl soubor importován jako modul, obsahoval by řetězec \"calc\"."
   },
   {
@@ -84,12 +84,12 @@
     "type": "multiple_choice",
     "question": "Co se stane při spuštění adresáře nebo `.zip` archivu příkazem `python mojebiblioteka`?",
     "options": [
-      "A) Python vyhledá v kořeni daného adresáře či archivu soubor __main__.py a spustí jeho kód.",
-      "B) Python automaticky načte a vykoná soubor __init__.py z kořene balíčku jako hlavní skript.",
-      "C) Příkaz selže s chybou IsADirectoryError, protože Python neumí spouštět celé adresáře.",
-      "D) Python zkompiluje všechny soubory .py do .pyc a uloží je do nového adresáře __pycache__."
+      "A) Python automaticky načte a vykoná soubor __init__.py z kořene balíčku jako hlavní skript.",
+      "B) Python zkompiluje všechny soubory .py do .pyc a uloží je do nového adresáře __pycache__.",
+      "C) Python vyhledá v kořeni daného adresáře či archivu soubor __main__.py a spustí jeho kód.",
+      "D) Příkaz selže s chybou IsADirectoryError, protože Python neumí spouštět celé adresáře."
     ],
-    "answer": 0,
+    "answer": 2,
     "explanation": "Adresář nebo ZIP archiv obsahující soubor __main__.py lze přímo předat interpretu Pythonu k vykonání jako samostatný spustitelný balíček."
   },
   {
