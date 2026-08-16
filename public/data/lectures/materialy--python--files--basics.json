@@ -1,0 +1,136 @@
+{
+  "slug": "materialy--python--files--basics",
+  "total": 13,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Se soubory v Python'u se na první pohled pracuje velmi podobně, jako kdekoliv jinde – soubor z daného umístění otevřeme, pracujeme s jeho obsahem a na konci ho zase spořádaně uzavřeme:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\nf = open('cesta/k/souboru', mode='r', encoding='utf-8')\r\n...\r\nf.close()\r\n  </pre>\r\n  <p>\r\n    Výchozí mód je <code>r</code> (tedy textový soubor otevřený pro čtení) a protože je pozičně na druhém místě, zdánlivě by pro textové soubory tedy stačilo psát <code>open('CESTA', 'r')</code> nebo rovnou <code>open('CESTA')</code>. Problém je v tom, že <em>encoding</em> je až <strong>třetí</strong> pojmenovaný parametr (druhým je nastavení mezipaměti <em>buffering</em>) a výchozí kódování je závislé na systému, takže <strong><code>open()</code> bez parametru <em>encoding</em> je v podstatě nepoužitelný (rozhodně nepřenosný)</strong>.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Operační kontext „with“",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Operační kontext „with“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Protože cestou se může stát mnoho nepředvídaného, je dobré se pojistit a soubor pro případ takových nenadálých událostí stejně pěkně zavřít.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Soubor se snažíme <em>čistě uzavřít</em> nejen proto, aby nezůstal „viset“ v nějakém nedefinovaném stavu, ale hlavně proto, že veškerá práce s ním je „bafrovaná“ (<em>buffered</em>), takže se snadno stane, že při nekorektním uzavření se část dat třeba vůbec nezapíše, protože zůstala viset připravená v mezipaměti (<em>buffer</em>).\r\n  </div></div>\r\n  <p>\r\n    Po staru to člověk dělal soustavou bloků <code>try-finally</code>, ale v Python'u 3 je mnohem lepší použít příkaz <code>with</code> pro vytvoření příslušného operačního kontextu (<em>runtime context</em>):\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\nwith open('cesta/k/souboru', encoding='utf-8') as f:\r\n    BLOK\r\n  </pre>\r\n  <p>\r\n    Uvnitř bloku máme pod identifikátorem <code>f</code> k dispozici otevřený <em>stream</em> (aneb „proud dat“) a můžeme s ním úplně normálně pracovat. Jakmile kód v bloku proběhne, ať už úspěšně nebo neúspěšně, tak je stream automaticky uzavřen (a nemusíme se o to tudíž starat sami).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Technicky vzato objekt typu stream zde funguje jako „správce kontextu“ (<em>context manager</em>) – při vstupu do bloku je zavolána jeho „magická“ metoda <code>__enter__()</code>, při opuštění bloku pak <code>__exit__()</code>. Blíže viz <a class=\"external\" href=\"http://diveintopython3.net/special-method-names.html#context-managers\">B.11</a>.\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Vlastnosti proudu",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Vlastnosti proudu</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    Otevřený soubor (tedy <em>stream</em>, resp. „proud dat“; zde pro případ <strong>textového souboru</strong>) má mnoho zajímavých vlastností:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; f = open('cestina.txt', encoding='utf-8')\r\n\r\n&gt;&gt;&gt; f\r\n&lt;_io.TextIOWrapper name='cestina.txt' encoding='utf-8'&gt;\r\n\r\n&gt;&gt;&gt; dir(f)\r\n['_CHUNK_SIZE', '__class__', '__delattr__', '__doc__', '__enter__', '__eq__', \r\n '__exit__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', \r\n '__init__', '__iter__', '__le__', '__lt__', '__ne__', '__new__', '__next__', \r\n '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', \r\n '__str__', '__subclasshook__', '_checkClosed', '_checkReadable', \r\n '_checkSeekable', '_checkWritable', 'buffer', 'close', 'closed', 'detach', \r\n 'encoding', 'errors', 'fileno', 'flush', 'isatty', 'line_buffering', 'name', \r\n 'newlines', 'read', 'readable', 'readline', 'readlines', 'seek', 'seekable', \r\n 'tell', 'truncate', 'writable', 'write', 'writelines']\r\n  </pre>\r\n  <p>\r\n    Na mnohé o souboru se můžeme ptát:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; f.name       # jméno souboru\r\n'cestina.txt'\r\n&gt;&gt;&gt; f.encoding   # kódování souboru\r\n'utf-8'\r\n&gt;&gt;&gt; f.mode       # způsob přístupu k souboru (zde r = „pouze pro čtení“)\r\n'r'\r\n\r\n&gt;&gt;&gt; f.readable()   # Je proud možno číst?\r\nTrue\r\n&gt;&gt;&gt; f.writable()   # Je do souboru možno zapisovat?\r\nFalse\r\n\r\n# Podporuje proud náhodný přístup? Aneb..\r\n# ..Je možno použít metody seek(), tell() a truncate()?\r\n&gt;&gt;&gt; f.seekable()\r\nTrue\r\n  </pre>\r\n\r\n  <p>\r\n    Všimněte si, že (dosud) otevřený soubor se patřičně hlásí jako nezavřený a naopak:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; f.closed\r\nFalse\r\n&gt;&gt;&gt; f.close()\r\n&gt;&gt;&gt; f.closed\r\nTrue\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Konstruktor „open()“",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Konstruktor „open()“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Plný konstruktor pro otevření souboru je nepřekvapivě dosti komplikovaný:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n      open(\r\n          SOUBOR\r\n          [, mode='r']\r\n          [, buffering=-1]\r\n          [, encoding=None]\r\n          [, errors=None]\r\n          [, newline=None]\r\n          [, closefd=True]\r\n          [, opener=None]\r\n      )\r\n  </pre>\r\n  <p>\r\n    Teoreticky jediným povinným parametrem je sice pouze cesta k souboru (která možná trošku překvapivě <a href=\"https://docs.python.org/3/glossary.html#term-path-like-object\" class=\"external\">nemusí být pouze řetězcem</a>), se kterým chceme pracovat, ale jelikož výchozím módem je textový pro čtení, máme problém s přenositelností kódování<sup>*</sup>.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    <sup>*</sup> Ne, UTF-8 stále není automatickým výchozím kódováním na všech operačních systémech :-(\r\n  </div></div>\r\n  <p>\r\n    Další parametry pak jsou:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      <em>mode</em> – <a href=\"?slajd=5\">způsob otevření souboru</a> pro práci s ním;\r\n    </li>\r\n    <li>\r\n      <em>buffering</em> – <a href=\"?slajd=13\">nastavení práce s mezipamětí</a>;\r\n    </li>\r\n    <li>\r\n      <em>encoding</em> – algoritmus kódování <strong>textového souboru</strong>;\r\n      <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Není-li zadáno, zjistí se aktuální automaticky pomocí <code>locale.getpreferredencoding(False)</code>.\r\n      </div></div>\r\n    </li>\r\n    <li>\r\n      <em>errors</em> – varianta <a href=\"texts.xml?slajd=11\">řešení chyb při dekódování</a> <strong>textových souborů</strong>;\r\n    </li>\r\n    <li>\r\n      <em>newline</em> – velmi zajímavý parametr umožňující <a href=\"texts.xml?slajd=12\">změnu chování vůči koncům řádek</a> v <strong>textových souborech</strong>.\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    Parametr <em>closefd</em> se může uplatnit v situaci, kdy cesta k souboru není zadána řetězcem, a parametr <em>opener</em> pak umožňuje i použít vlastní volatelný objekt pro otevření požadovaného cíle. Pro obé konzultujte prosím přímo <a href=\"https://docs.python.org/3/library/functions.html#open\" class=\"external\">oficiální dokumentaci</a>.\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Módy otevření souboru I",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Módy otevření souboru I</h2></div><div class=\"section-body\">\r\n  \r\n  <p class=\"enumerate\">\r\n    <strong>Textový soubor</strong> (volitelně identifikovaný příznakem <code>t</code>) můžeme otevřít v několika módech:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        <strong>r</strong> – soubor je otevřen pouze pro čtení\r\n    </li>\r\n    <li>\r\n        <strong>w</strong> – soubor je otevřen pro zápis (již existující neprázdný soubor bude smazán)\r\n    </li>\r\n    <li>\r\n        <strong>x</strong> – soubor je exkluzivně vytvořen (tzn. že přístup selže s výjimkou <code>FileExistsError</code>, pokud soubor již existuje) a otevřen pro zápis\r\n    </li>\r\n    <li>\r\n        <strong>a</strong> – soubor je otevřen pro přidávání (<strong>zapsaná data budou přidána na konec</strong>)\r\n    </li>\r\n    <li>\r\n        <strong>r+</strong> – soubor je otevřen pro čtení i zápis (čili musí již existovat a popisovač je nastaven na jeho začátek)\r\n    </li>\r\n    <li>\r\n        <strong>w+</strong> – soubor je otevřen pro čtení i zápis (již existující neprázdný soubor bude smazán)\r\n    </li>\r\n    <li>\r\n        <strong>a+</strong> – soubor je otevřen pro čtení i přidávání (přitom čtecí a zapisovací ukazatel jsou na sobě nezávislé; sice na začátku míří oba na konec souboru, ale čtecí můžete např. pomocí <code>seek()</code> přesunout, zatímco <strong>zápis probíhá vždy na konci</strong>)\r\n    </li>\r\n  </ul>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Nezadáme-li mód otevření souboru, je výchozí hodnotou <code>tr</code>, to jest <em>textový soubor, pouze čtení</em>.\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Pro případ <strong>binárního souboru</strong> kombinujeme výše uvedené módy s příznakem <code>b</code> (tedy např. <code>br</code> otevře binární soubor pro čtení).\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Módy otevření souboru II",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Módy otevření souboru II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nejen mně přijdou módy otevření souboru poněkud zmatené. <a href=\"https://stackoverflow.com/a/30566011\" class=\"external\">Andrzej Pronobis / Renato Byrro</a> vytvořili rozhodovací diagram, který – pokud jsem se úplně neztratil v testování, což by mě ani trochu nepřekvapilo ^_^ – odpovídá realitě a je docela přehledný:\r\n    </p>\r\n    \r\n    <img src=\"_files/ExWNT-white-bg.png\" width=\"800\" alt=\"módy otevření souboru\">\r\n    <p>\r\n        PS: Mód <em>x</em> patří do větve <em>writing</em> – je to tak trochu „nafintěné“ <em>w</em>. Mód <em>x+</em> můžete také použít, ale vzhledem k povaze věci se chová úplně stejně jako <em>x</em>.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Čtení z proudu",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Čtení z proudu</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Z otevřeného proudu (<em>stream</em>u) je možno číst data několika různými způsoby. Základní představuje metoda <code>read()</code>:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        načtení celého proudu najednou:<br>\r\n        <code>content = stream.read()</code>\r\n        <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n          Pro binární stream je volání <code>read()</code> bez parametrů (resp. s <code>-1</code>) v podstatě ekvivalentní zavolání metody <code>readall()</code>.\r\n        </div></div>\r\n    </li>\r\n    <li>\r\n        načtení daného počtu <strong>znaků</strong> (pro případ <em>textového souboru</em>) nebo <strong>bajtů</strong> (pro případ <em>binárního souboru</em>):<br>\r\n        <code>part = stream.read(ZNAKŮ|BAJTŮ)</code>\r\n    </li>\r\n  </ul>\r\n  <div class=\"example-block example-horizontal\"><div class=\"example-col\"><div class=\"example-label\">→ Input: <a href=\"_files/cestina.txt\"><em>cestina.txt</em></a></div><example src=\"_files/cestina.txt\" lang=\"text\"></example></div><div class=\"example-col\"><div class=\"example-label\">📄 Program: <a href=\"_files/cestina.py\"><em>cestina.py</em></a></div><example src=\"_files/cestina.py\" lang=\"python\"></example></div><div class=\"example-col\"><div class=\"example-label\">▶ Output</div><example src=\"_files/cestina.out\" lang=\"text\"></example></div></div>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Shodou okolností má tato oblíbená česká testovací věta právě 39 znaků :-)\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Zápis do proudu",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Zápis do proudu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Podobně jako u čtení z proudu máme pro zápis k dispozici především základní metodu:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <code>stream.write(ŘETĚZEC|BAJTY)</code>\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Tato metoda provede zapsání daných <strong>znaků</strong> (pro případ <em>textového souboru</em>) nebo <strong>bajtů</strong> (pro případ <em>binárního souboru</em>):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # otevřme soubor v textovém módu a kódování UTF-8 pro zápis (vlastně „přepis“)\r\n&gt;&gt;&gt; f = open('test', 'w', encoding='utf-8')\r\n        # metoda write() vrací počet zapsaných znaků (jsme v módu 't')\r\n&gt;&gt;&gt; f.write('Ahoj, světe!')\r\n        12\r\n&gt;&gt;&gt; f.write('Jak se máš?')\r\n        11\r\n&gt;&gt;&gt; f.close()\r\n\r\n        # podívejme se, co jsme zapsali\r\n&gt;&gt;&gt; f = open('test', 'r', encoding='utf-8')\r\n&gt;&gt;&gt; f.read()\r\n        'Ahoj, světe!Jak se máš?'\r\n&gt;&gt;&gt; f.close()\r\n</pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Znaky vs bajty I",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Znaky vs bajty I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Základní třídou pro vstup a výstup je třída <code>IOBase</code>. Z ní dědí jak třída <code>TextIOBase</code> pro práci s textovými soubory, tak třída <code>RawIOBase</code> pro práci se soubory binárními. \r\n    </p>\r\n    <p>\r\n        Přitom mezi textovými a binárními soubory jsou dva, a to zcela zásadní, rozdíly:\r\n    </p>\r\n    <ol>\r\n        <li>\r\n            <em>Binární</em> soubory jsou čteny (a zapisovány) <strong>po bajtech</strong>, <em>textové</em> jsou zpracovávány <strong>po znacích</strong> (přičemž jeden znak zabírá podle použitého kódování místo jednoho či několika bajtů).\r\n        </li>\r\n        <li>\r\n            V <em>textových souborech</em> je automaticky prováděna <strong>konverze konců řádků</strong> různých platforem (<code>\\n</code> na Unixu a MacOS X+, <code>\\r\\n</code> na Windows, <code>\\r</code> na MacOS 9-) na jednotné pracovní <code>\\n</code> (konverze je samozřejmě obousměrná), v <em>binárních</em> pochopitelně nikoli.\r\n        </li>\r\n    </ol>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Znaky vs bajty II",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Znaky vs bajty II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Pamatovat na rozdíl mezi <em>bajty</em> a <em>znaky</em> je přitom skutečně důležité:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n# otevřme textový soubor v kódování UTF-8 \r\n&gt;&gt;&gt; f = open('japonstina.txt', encoding='utf-8')\r\n\r\n&gt;&gt;&gt; f.tell()   # s čertvě otevřeným souborem stojíme na začátku proudu\r\n0\r\n&gt;&gt;&gt; f.read()   # načtěmež celý proud\r\n'狼.cz'\r\n&gt;&gt;&gt; f.tell()   # jsme na jeho konci – v bajtech je delší, než ve znacích!\r\n6\r\n\r\n&gt;&gt;&gt; f.seek(0)   # vraťme se na začátek\r\n0\r\n&gt;&gt;&gt; f.tell()\r\n0\r\n\r\n&gt;&gt;&gt; f.read(1)   # přečtěmež jeden znak..\r\n'狼'\r\n&gt;&gt;&gt; f.tell()    # ..ale posunuli jsme se o tři bajty dále!\r\n3\r\n\r\n&gt;&gt;&gt; f.read(1)   # '.' je ve spodní polovině ASCII-tabulky, takže načtení\r\n                #   jednoho znaku..\r\n'.'\r\n&gt;&gt;&gt; f.tell()    # ..nás posune pouze o jeden bajt dále\r\n4\r\n\r\n&gt;&gt;&gt; f.close()\r\n  </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Znaky vs bajty III",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Znaky vs bajty III</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Asi už tušíte, do jakých nesnází se dostanete, pokud se pokusíte na <em>textovém</em> proudu posouvat začátky čtení dalšího znaku do nesmyslných míst:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; f = open('japonstina.txt', encoding='utf-8')\r\n&gt;&gt;&gt; f.tell()\r\n0\r\n\r\n&gt;&gt;&gt; f.seek(1)   # posuňme se o jeden bajt po streamu dopředu..\r\n1\r\n&gt;&gt;&gt; f.tell()\r\n1\r\n&gt;&gt;&gt; f.read(1)   # ..a pokusme se nyní načíst jeden znak\r\nTraceback (most recent call last):\r\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\r\n  File \"/usr/lib/python3.1/codecs.py\", line 300, in decode\r\n(result, consumed) = self._buffer_decode(data, self.errors, final)\r\nUnicodeDecodeError: 'utf8' codec can't decode byte 0x8b in position 0: \r\n        unexpected code byte\r\n  </pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Chybové hlášení zalomeno pro potřeby zobrazení. Proč k němu vůbec došlo, viz <a href=\"/materialy/text/encoding.xml?slajd=9\">algoritmus UTF-8</a>.\r\n  </div></div>\r\n  \r\n  <p>\r\n    Kdybyste si neměli pamatovat nic jiného: <strong>Nikdy nemíchejte binární a textové proudy dohromady!</strong> ^_^\r\n  </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Mezipaměť („buffer“) I",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Mezipaměť („buffer“) I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Zakončeme náš úvod do práce se soubory jednou velmi důležitou poznámkou:\r\n  </p>\r\n  <blockquote>\r\n    Z důvodů vnitřní implementace a optimalizace práce s proudy (<em>stream</em>) probíhá veškerá komunikace přes tzv. <strong>mezipaměť</strong> (<em>buffer</em>), odkud jsou data přesouvána až podle požadavků systému, není-li programem vynuceno jinak.\r\n  </blockquote>\r\n  <p>\r\n    V praxi to například v případě zápisu znamená, že data nemusí být před vyžádaným uzavřením proudu vůbec skutečně zapsána!\r\n  </p>\r\n  <p>\r\n    Někdy (podle způsobu práce i často) se nám může hodit vnutit systému zápis připravených dat dříve, než to zařídí uzavření proudu zavoláním jeho metody <em>close()</em> nebo ukončením práce v bloku <em>with</em>. A právě tuto činnost má na starosti metoda proudu <strong>flush()</strong>.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Uvedené se mimochodem týká třeba i výpisu znaků na konzoli při použití zdánlivě obyčejné a bezproblémové funkce <em>print()</em>! Pokud byste na to někdy narazili, tak funkce <em>print()</em> ve výchozím nastavení tiskne na zařízení <code>sys.stdout</code>, což je – také ve výchozím nastavení – právě konzole. Vynucení výpisu dosud nabafrovaných dat pak zařídí podle verze Python'u buď nastavení stejnojmenného parametru přímo na funkci <em>print()</em> (Python 3.3+)..\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n      print(…, flush=True)\r\n    </pre>\r\n    ..nebo zavolání metody <em>flush()</em> (pro Python 3.2-):\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n      import sys\r\n      print(…)\r\n      sys.stdout.flush()\r\n    </pre>\r\n  </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Mezipaměť („buffer“) II",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Mezipaměť („buffer“) II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jak jsme zmiňovali už <a href=\"?slajd=1\">na prvním slajdu</a>, historická pozice kódování textového souboru až jako třetího pojmenovaného parametru plus neexistující konsenzus pro výchozí kódování nám ztěžují práci se soubory. A tím parametrem, kvůli kterému musíme vždy vypisovat <em>encoding=</em> je právě parametr řídící způsob práce s mezipamětí: <strong><code>buffering</code></strong>\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Jeho možná nastavení jsou následující:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong>0</strong> – v binárním módu vypíná bafrování\r\n        </li>\r\n        <li>\r\n            <strong>1</strong> – v textovém módu přepíná bafr na řádkový\r\n        </li>\r\n        <li>\r\n            <strong>&gt;1</strong> – nastavuje příslušnou velikost bafru\r\n        </li>\r\n    </ul>\r\n    \r\n    <p class=\"enumerate\">\r\n        Není-li atribut <em>buffering=</em> uveden (a má tak výchozí hodnotu -1), nastoupí heuristika:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            u <em>„interaktivních“ textových souborů</em> (tedy těch, pro něž metoda <em>stream</em>u <code>isatty()</code> vrací <code>True</code>) je bafrování nastaveno na řádkové;\r\n        </li>\r\n        <li>\r\n            u <em>binárních</em> a ostatních <em>textových</em> souborů se Python pokusí zjistit velikost systémových bloků (typicky skončí s číslem 4096 nebo 8192).\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+  "slug": "materialy--python--fp",
+  "total": 17,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Citát",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Citát</h2></div><div class=\"section-body\">\r\n\r\n    <blockquote>\r\n        I would never call Python “functional” but whenever I program in Python the code invariably ends up being almost purely functional. (Admittedly, that's mainly due to the extremely nice list comprehension.)\r\n    </blockquote>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <a href=\"http://stackoverflow.com/a/1017986\" class=\"external\">Konrad Rudolph</a>\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Úvod",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jak vždycky upozorňuju na <a href=\"/materialy/python/types/boolean.xml?slajd=1\">„podivné“ chování</a> pravdivostních operátorů <code>and</code> a <code>or</code>, které má Python společné s jinými podobně starými jazyky, je pro něj jeden velmi dobrý důvod (byť to podle všeho nebyl záměr), který ale asi nikdy nevyužijete:\r\n    </p>\r\n    <blockquote>\r\n        Vracení operandu z pravdivostního výrazu umožňuje psát v Python'u vyloženě funkcionální konstrukce bez vedlejších efektů.\r\n    </blockquote>\r\n    <p>\r\n        Dohnáno do extrému je totiž pomocí funkcí a pravdivostních operátorů možno v Python'u nahradit prakticky všechny řídicí konstrukce <strong>výrazy</strong>, což v konečném důsledku umožňuje napsat program jako volání funkcí bez vedlejších efektů (samozřejmě s trochou disciplíny).\r\n    </p>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Jelikož ale <strong>Python samozřejmě není funkcionální jazyk</strong>, je často výsledkem slušně obfuskovaný kód. Nicméně je to zajímavá odbočka od hlavního směru, o které se vyplatí vědět – třeba se vám myšlenky za ní zalíbí a zkusíte příště nějaký opravdový funkcionální jazyk (jako třeba Haskell, SML či Lisp).\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Příklady a nápady jsem čerpal z úžasného povídání o <a href=\"http://gnosis.cx/publish/tech_index_cp.html\" class=\"external\">„Charming Python“</a> od Davida Mertze.\r\n        </div></div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "„if-elif-else“ I",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">„if-elif-else“ I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nahradíme-li kusy kódu voláním funkcí (což lze s trochou práce vždy zařídit), dá se pythoní řídící konstrukce <em>if-elif-else</em> světe div se nahradit následujícím kódem:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # konstrukcí (aneb příkazem)\r\n        if Podmínka1:\r\n            funkce1()\r\n        elif Podmínka2:\r\n            funkce2()\r\n        else:\r\n            funkce3()\r\n        \r\n        # výrazem\r\n        (Podmínka1 and funkce1()) or (Podmínka2 and funkce2()) or (funkce3())\r\n    </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "„if-elif-else“ II",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„if-elif-else“ II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Komu se to nezdá (na první pohled asi nikomu), mírně si to upravme:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # konstrukcí (aneb příkazem)\r\n        if Podmínka1: funkce1()\r\n        elif Podmínka2: funkce2()\r\n        else: funkce3()\r\n        \r\n        # výrazem\r\n        (Podmínka1 and funkce1()) or \\\r\n        (Podmínka2 and funkce2()) or \\\r\n        (funkce3())\r\n    </pre>\r\n    <p>\r\n        Vzhledem k tomu, <a href=\"/materialy/python/types/boolean.xml?slajd=1\">jak se chovají pravdivostní operátory</a>, je to už nyní asi jasnější: Je-li <em>Podmínka1</em> pravdivá, nutně se vyhodnotí i <em>funkce1()</em> a na další části výrazu <code>or</code> se již nedostane<sup>*</sup>. Není-li <em>Podmínka1</em> splněna, použije se stejná logika na druhý řádek s <em>Podmínkou2</em> a <em>funkcí2()</em>. A konečně selže-li i tento, je vykonána <em>funkce3()</em>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <sup>*</sup> Vrací-li funkce hodnotu, která se vyhodnotí jako pravdivá, což je snadné zařídit, protože mimo jiné existuje – a teď už asi nikoho nepřekvapí proč – <a href=\"/materialy/python/types/boolean.xml?slajd=2\">rozumně nadefinovaná množina objektů, které se vyhodnocují jako nepravdivé</a>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "„if-elif-else“ III",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">„if-elif-else“ III</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Celé to nejspíš vypadá jako hračka. Ale jen do té chvíle, než si uvědomíte, že pythoní konstrukce <em>if-elif-else</em> je <strong>příkaz</strong>, zatímco tahle šílená konstrukce je <strong>výraz</strong>!\r\n    </p>\r\n    <p>\r\n        Prakticky to znamená, že zatímco v pythoním <em>if-elif-else</em> provádíte přiřazení do objektů v rámci příslušných větví, zde je výsledek vrácen jakožto výstupní hodnota daného výrazu a co s ním provedete, je na vás.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        V malém podobnou funkci zastává pythoní <a href=\"/materialy/python/overview.0.xml?slajd=36\"><em>ternární výraz</em></a>, ale to je samozřejmě jen obdoba <em>if-else</em>. Navíc byl přidán do Python'u poměrně nedávno (ve verzi 2.5), zatímco tohle chování pravdivostních výrazů je tam celou dobu. A ještě ke všemu se dá snadno řetězit.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "„if-elif-else“ jako funkce",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">„if-elif-else“ jako funkce</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož výše uvedený pravdivostní výraz vrací hodnotu, nic nám nebrání chovat se k němu jako k funkci. To nám dokonce umožní poslat mu nějaké parametry. Navíc – jelikož je to právě jeden výraz – není důvod nepoužít na jeho zavedení omezenou pythoní lambda-funkci..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        if_blok = lambda PARAMETRY: (Podmínka1 and funkce1()) \\\r\n                                 or (Podmínka2 and funkce2()) \\\r\n                                 or (funkce3())\r\n    </pre>\r\n    <p>\r\n        ..která automaticky vrátí příslušnou spočítanou hodnotu. Příklad:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; parita = lambda x: (x % 2 == 0 and 'sudé') or ('liché')\r\n        \r\n&gt;&gt;&gt; parita(3)\r\n        0: 'liché'\r\n&gt;&gt;&gt; parita(4)\r\n        1: 'sudé'\r\n</pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "„if-elif-else“ – rozbor",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">„if-elif-else“ – rozbor</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Samozřejmě jelikož Python není na uvedené záležitosti přímo zařízen, čitelnosti jsme zrovna v tomhle případě moc neprospěli. Nicméně několik věcí jsme cestou získali – kdybychom totiž funkci se stejným chováním napsali klasicky, musela by:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            buď mít <code>return</code> na více místech;\r\n        </li>\r\n        <li>\r\n            nebo přiřazovat návratovou hodnotu do nějaké proměnné.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Nic z toho naše kapku šílené funkcionální řešení nepotřebuje – proměnná je v něm jediná (vstupní parametr) a <strong>nic se do ní nepřiřazuje</strong> a hodnotu vrátí vždy také právě jen jednu.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Intermezzo – omezení „vedlejších efektů“",
+      "tags": [
+        "WOW"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Intermezzo – omezení „vedlejších efektů“</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Zvýrazněná vlastnost z předchozího slajdu je jedním z hlavních plusů funkcionálních programovacích jazyků:\r\n    </p>\r\n    <blockquote>\r\n        Funkcionální jazyky žádné proměnné neobsahují a tudíž v nich nedochází k chybám typu „pod tímhle jménem jsem čekal něco, ale ono je tam něco úplně jiného a já ani nevím proč“.\r\n    </blockquote>\r\n    <p>\r\n        Přesněji – funkcionální jazyky samozřejmě umožňují přiřadit jména výrazům, ale toto přiřazení je „jednou provždy“.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Popravdě v Python'u také můžete vyrobit variantu <strong>singletonu</strong> pro atributy, takže jednou vytvořený atribut nebude možné měnit (např. hlídáním obsahu třídního slovníku <code>__dict__</code> úpravou metody <code>__setattr__()</code>), ale pro toto použití je to trochu škrábání se levou rukou za pravým uchem.\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Dalším velkým plusem funkcionálních jazyků je, že:\r\n    </p>\r\n    <blockquote>\r\n        Funkce ve funkcionálních programovacích jazycích jsou tzv. <em>referenčně transparentní</em>, což znamená, že jejich výstupní hodnota zcela závisí jen a pouze na vstupních parametrech.\r\n    </blockquote>\r\n    <p>\r\n        Tohle za vás Python samozřejmě nehlídá a když chcete, tak se uvnitř funkcí můžete hrabat naprosto v čemkoli a odvolávat se také naprosto na cokoliv. Kdyby nic jiného, tak omezení se na výrazy lambda-funkcí vám dosti ztíží něco takového provádět.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "„for-in“",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">„for-in“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Přidržíme-li se nahrazení bloků kódu voláním funkcí a vypůjčíme-li si zábavnou funkci <a href=\"/materialy/python/functions/functional.xml?slajd=6&amp;par=1\"><code>map()</code></a>, bez problémů nahradíme vhodným funkcionálním konstruktem i takovou věc, jako je smyčka <em>for-in</em>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # konstrukcí (aneb příkazem)\r\n        for x in ITERÁTOR: funkce(x)\r\n        \r\n        # výrazem\r\n        map(funkce, ITERÁTOR)\r\n    </pre>\r\n    <p>\r\n        Abych byl přesnější, tak tento trik fungoval ve dvojkovém Python'u, kde funkce <em>map()</em> vrátila seznam. V Python'u trojkovém vrací iterátor, takže ji musíte předat někomu dalšímu, kdo z ní jednotlivé hodnoty vytahá. A nebo použijete rovnou <a href=\"/materialy/python/types/_comprehensions.xml\">generátorovou notaci</a> (a její výstup podle potřeby buď použijete a nebo ne):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        [funkce(x) for x in ITERÁTOR]\r\n    </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "„for-in“ – eliminace nepotřebných proměnných",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">„for-in“ – eliminace nepotřebných proměnných</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pythoní smyčky <em>for-in</em> mají jednu nepříjemnou vlastnost – proměnná cyklu není lokální smyčce a po jejím ukončení si drží poslední nabytou hodnotu. Někdy se to řeší jejím (či jejich) explicitním smazáním po ukončení smyčky:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        for x in \"ahoj\":\r\n            print(x)\r\n        del x\r\n    </pre>\r\n    <p>\r\n        V Python'u 3.x ale můžeme využít trik z předchozího slajdu, protože proměnné generátorové notace jsou v něm naopak už lokální právě jen jí:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        [print(x) for x in \"ahoj\"]\r\n    </pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        V Python'u 2.x to ovšem ještě není pravda a generátorová notace se tam tak v mnohém podobá spíše normální smyčce <em>for-in</em>.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "„for-in“ – sekvence příkazů",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">„for-in“ – sekvence příkazů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Stejný trik se dá použít i na sekvenční zavolání několika kusů kódu (<em>blokN</em> jsou reference na funkce s příslušnými částmi kódu):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        zavolej = lambda f: f()\r\n        \r\n        # Python 2.x\r\n        map(zavolej, [blok1, blok2, blok2, …])\r\n        # Python 3.x\r\n        [zavolej(f) for f in [blok1, blok2, blok2, …])\r\n    </pre>\r\n\r\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "„while“",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">„while“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Dalším kandidátem na eliminaci je smyčka <em>while</em>, kterou můžeme nahradit rekurzí:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n            n = 1\r\n            while n &lt; 5:\r\n                n += 1\r\n            print(n)\r\n        </pre></div><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n            def get_n(n=1):\r\n                n += 1\r\n                return n if n &gt;= 5 else get_n(n)\r\n            print(get_n())\r\n        </pre></div></div>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Upraveno podle: <a href=\"http://pythonic.eu/fjfi/posts/funkcionalni-programovani-v-pythonu.html\" class=\"external\">Vědecké programování v Pythonu</a>\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Kontinuace I",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Kontinuace I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Princip kontinuací je (zdánlivě :) jednoduchý – funkce místo vracení hodnot zavolají další funkci v pořadí (které napočítané hodnoty přepošlou):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # funkce\r\n        def fn1(PARAMETR):\r\n            …\r\n            return HODNOTA\r\n        \r\n        fn2(fn1(P))\r\n        \r\n        \r\n        # kontinuace\r\n        def fn1(PARAMETR, f):\r\n            …\r\n            f(HODNOTA)\r\n        \r\n        fn1(P, fn2)\r\n        \r\n    </pre>\r\n    <p>\r\n        Kdyby v Python'u nebylo možné chovat se k funkcím jako k proměnným, uvedený kód byste takto napsat nemohli.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Čistě teoreticky by první funkce samozřejmě nemusela výsledek svého provedení další funkci posílat, ale pak by to znamenalo, že jak první, tak druhá funkce mají s největší pravděpodobností vedlejší efekty – první proto, že něco asi dělá, i když nic nevrací, druhá proto, že nemá žádný vstup, ale evidentně asi taky něco dělat má.\r\n    </div></div>\r\n\r\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Kontinuace II",
+      "tags": [
+        "Tricky"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Kontinuace II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nic není bohužel tak růžové, jak se na první pohled může zdát:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Python nikdy nedořešil chování v případě <em>tail call recursion</em>. Tohle sice není rekurze, ale do „nadřazené“ funkce se už nikdy nevrátíte a Python to nepozná a bude na ni (a všechny další v řetězci volání) držet reference, než příslušný řetězec kontinuací skončí (načež se postupně probublá k první funkci a všechny reference se odstraní ze zásobníku).\r\n        </li>\r\n        <li>\r\n            V souvislosti s předchozím bodem je místo na zásobníku pro uvedené řetězení funkcí v Python'u „natvrdo“ omezeno (kolem tisíce zanoření), takže v reálu (zvláště u rekurzivních algoritmů samozřejmě) snadno narazíte na hranici.\r\n        </li>\r\n        <li>\r\n            Po vzoru <a href=\"/materialy/python/functions/advanced-1.xml\">uzávěrů</a> by člověk čekal, že volané funkce budou mít přístup do kontextu svého zavolání (tedy „nadřazené“ funkce). Bohužel to je asi přesně ta jediná věc, kterou pythoní uzávěry postrádají, aby se chovaly jako skutečné uzávěry.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Implementace úplných uzávěrů (Xoltar-toolkit)",
+      "tags": [
+        "Skip"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Implementace úplných uzávěrů (Xoltar-toolkit)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Aby kontinuace fungovaly, jak mají, musíme doplnit pythoní uzávěry na úplné, což udělal už v roce 2001 <a href=\"http://www.xoltar.org/old_site/languages/python.html\" class=\"external\">Xoltar-toolkit</a> (zde mírně upraveno pro Python 3.x):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n        # pomocná metoda pro získání aktuálního „stack frame“\r\n        #   (není-li „sys._getframe“ přímo k dispozici)\r\n        import sys\r\n        if hasattr(sys, '_getframe'):\r\n            getStackFrame = sys._getframe\r\n        else:\r\n            def getStackFrame():\r\n                try:\r\n                    raise RuntimeError\r\n                except:\r\n                    return sys.exc_info()[2].tb_frame.f_back\r\n        # zavedení skutečného uzávěru\r\n        from types import FunctionType\r\n        def closure(func, locs = {}):\r\n            frame = getStackFrame().f_back\r\n            if not locs:\r\n                locs = frame.f_locals\r\n            globs = {}\r\n            globs.update(func.__globals__)\r\n            globs.update(locs)\r\n            newfunc = FunctionType(func.__code__, globs)\r\n            globs[func.__name__] = newfunc\r\n            return newfunc\r\n    </pre>\r\n    <p>\r\n        PS: Je evidentní, že kontinuace jsou tak trochu „uzávěry naruby“ kombinované navíc s rekurzí. Takže je to další poměrně exotický programovací prvek, který jde sice v Python'u napsat (byť tedy ne přímo), ale nemusí se to s ním přehánět ^_~\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Variace na monády",
+      "tags": [
+        "Legendary"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Variace na monády</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jako třešničku na dortu si k závěru ukažme funkci <em>echo()</em>, která opisuje uživatelův vstup, dokud nezadá písmeno <code>q</code>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n&gt;&gt;&gt; def monadic_print(x):\r\n...     print(x)\r\n...     return x\r\n&gt;&gt;&gt; echo = lambda: monadic_print(input('echo: ')) == 'q' or echo()\r\n        \r\n&gt;&gt;&gt; echo()\r\n        echo: ahoj\r\n        ahoj\r\n        echo: q\r\n        q\r\n        7: True\r\n</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Dokonce můžete býti i tak „zlí“, že první funkci napíšete na jednu řádku:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">\r\n            def monadic_print(x): print(x); return x\r\n        </pre>\r\n        Také to bude fungovat.\r\n    </div></div>\r\n    <p>\r\n        Důležitým bodem je zde funkce <em>monadic_print()</em>, která vrací svůj argument (takže nebýt vedlejšího efektu tisku, tak se vlastně tváří, jako kdyby tam vůbec nebyla) a „jen tak náhodou“ ho ještě cestou vytiskne na výstup<sup>*</sup>. Výsledná funkce pak v rámci jednoho výrazu zvládá vstup, výstup, podmínku a ještě pomocí rekurze dokonce i cyklus 0_o\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <sup>*</sup> Odtud také její název, který <a href=\"http://gnosis.cx/publish/programming/charming_python_13.txt\" class=\"external\">David Mertz</a> vybral jako narážku na řešení operací, které mají vedlejší efekty, v jazyce Haskell.\r\n    </div></div>\r\n    <p>\r\n        Ostatně je to právě bravurně zvládnutá <strong>rekurze</strong> (čímž tedy myslím i vhodné řešení <em>tail call</em>, tedy vykonání kusu kódu za rekurzivním voláním), která stojí v pozadí mnohé magie funkcionálních programovacích jazyků.\r\n    </p>\r\n\r\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Závěr",
+      "tags": [
+        "Core"
+      ],
+      "diff": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Závěr</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Snad jste z předchozího povídání získali ten správný dojem, totiž že <strong>funkcionální programování má svá velká plus</strong> ^_^ A nebudete se už příště (tolik) divit některým „podivným“ funkcím z pythoní standardní knihovny a jiným překvapivým místům a chováním jazyka. Zároveň je ale doufám i jasné, že <strong>Python není ani náhodou funkcionální programovací jazyk</strong> a že když budete chtít kód „prasit“, tak vám v tom nikdo bránit nebude.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Asi jako v OOP – chcete-li, můžete v Python'u psát krásné třídní programy, ale musíte se hlídat.\r\n    </div></div>\r\n    <p>\r\n        Nicméně vypustíme-li z našeho arzenálu programovacích zbraní ty nejšílenější pythoní funkcionální konstrukty, na které by jazyk musel být přímo zařízen, aby jejich použití dávalo smysl a nezpůsobovalo spíš bolení hlavy, zbyde nám i tak slušná armáda prostředků, s jejichž pomocí se mohou naše kódy státi podstatně elegantnějšími, kratšími, čitelnějšími a především pochopitelnějšími<sup>*</sup>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <sup>*</sup> Dosažení kteréžto úrovně jak ze strany autora kódu, tak jeho čtenáře, vyžaduje přirozený talent nebo spoustu let tvrdé dřiny ^_~\r\n    </div></div>\r\n\r\n</div>"
+    }
+  ]
+}

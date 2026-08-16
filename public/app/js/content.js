@@ -82,8 +82,10 @@ export function showWeek(weekId) {
   clear(main);
 
   const items = weekVisibleItems(week);
+  const isGray = week.week === 99 || week.isRemovedSection;
+  const weekLabel = isGray ? "Gray Section" : `Week ${week.week}`;
   const header = el("div", { className: "catalog-header" },
-    el("h1", {}, `Week ${week.week}: ${week.title}`),
+    el("h1", {}, `${weekLabel}: ${week.title}`),
     week.description ? el("p", { className: "desc" }, week.description) : null,
     el("div", { className: "catalog-stats" },
       el("span", {}, `${items.length} items visible`),
@@ -103,6 +105,8 @@ function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = false }
   const wrap = el("div", { className: "week-block", dataset: { weekId: week.id } });
 
   if (!hideTitle) {
+    const isGray = week.week === 99 || week.isRemovedSection;
+    const badgeText = isGray ? "Gray" : `W${week.week}`;
     const titleRow = el("div", { className: "week-block-header" });
     if (showWeekLink) {
       const btn = el("button", {
@@ -110,10 +114,10 @@ function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = false }
         className: "week-block-title",
         onClick: () => window.__pcsNavigate?.({ kind: "week", id: week.id }),
       });
-      btn.innerHTML = `<span class="week-num">W${week.week}</span> ${escapeHtml(week.title)}`;
+      btn.innerHTML = `<span class="week-num">${badgeText}</span> ${escapeHtml(week.title)}`;
       titleRow.appendChild(btn);
     } else {
-      titleRow.innerHTML = `<h2 class="week-block-title static"><span class="week-num">W${week.week}</span> ${escapeHtml(week.title)}</h2>`;
+      titleRow.innerHTML = `<h2 class="week-block-title static"><span class="week-num">${badgeText}</span> ${escapeHtml(week.title)}</h2>`;
     }
     if (week.description) {
       titleRow.appendChild(el("p", { className: "week-block-desc" }, week.description));
@@ -265,12 +269,14 @@ function lectureToolbar(item, mode) {
 
 function lectureHero(item, { compact = false } = {}) {
   const hero = el("div", { className: "item-hero" });
+  const isGray = item.weekNum === 99 || item.week === 99;
+  const weekBadge = isGray ? "Gray" : `W${item.weekNum}`;
   hero.innerHTML = `
     <h1${compact ? ' style="font-size:var(--fs-xl)"' : ""}>${escapeHtml(item.title)}</h1>
     <div class="meta-row">
       ${badgesHtml(item.tags)}
       ${flavorHtml(item.diff)}
-      <span style="color:var(--text-faint);font-size:11px;margin-left:4px">${escapeHtml(item.kind)} · W${item.weekNum}</span>
+      <span style="color:var(--text-faint);font-size:11px;margin-left:4px">${escapeHtml(item.kind)} · ${weekBadge}</span>
     </div>
     ${starsHtml(item, 10, compact ? "bar" : "full")}
     ${!compact && item.desc ? `<p class="desc">${escapeHtml(item.desc)}</p>` : ""}
@@ -291,13 +297,14 @@ function buildBottomNavBar(item) {
 
   // 1. Previous button
   if (prevItem) {
+    const prevBadge = (prevItem.weekNum === 99 || prevItem.week === 99) ? "Gray" : `W${prevItem.weekNum}`;
     const prevBtn = el("button", {
       type: "button",
       className: "btn bottom-nav-btn prev",
       title: `Previous: ${prevItem.title}`,
       onClick: () => window.__pcsNavigate?.({ kind: prevItem.kind, id: prevItem.id }),
     });
-    prevBtn.innerHTML = `<span class="nav-arrow">←</span> <span class="nav-label"><strong>W${prevItem.weekNum}</strong> ${escapeHtml(prevItem.title)}</span>`;
+    prevBtn.innerHTML = `<span class="nav-arrow">←</span> <span class="nav-label"><strong>${prevBadge}</strong> ${escapeHtml(prevItem.title)}</span>`;
     bar.appendChild(prevBtn);
   } else {
     const disabledPrev = el("button", { type: "button", className: "btn bottom-nav-btn prev disabled", disabled: true });
@@ -322,13 +329,14 @@ function buildBottomNavBar(item) {
 
   // 3. Next button
   if (nextItem) {
+    const nextBadge = (nextItem.weekNum === 99 || nextItem.week === 99) ? "Gray" : `W${nextItem.weekNum}`;
     const nextBtn = el("button", {
       type: "button",
       className: "btn bottom-nav-btn next",
       title: `Next: ${nextItem.title}`,
       onClick: () => window.__pcsNavigate?.({ kind: nextItem.kind, id: nextItem.id }),
     });
-    nextBtn.innerHTML = `<span class="nav-label"><strong>W${nextItem.weekNum}</strong> ${escapeHtml(nextItem.title)}</span> <span class="nav-arrow">→</span>`;
+    nextBtn.innerHTML = `<span class="nav-label"><strong>${nextBadge}</strong> ${escapeHtml(nextItem.title)}</span> <span class="nav-arrow">→</span>`;
     bar.appendChild(nextBtn);
   } else {
     const disabledNext = el("button", { type: "button", className: "btn bottom-nav-btn next disabled", disabled: true });
@@ -823,12 +831,15 @@ export async function fetchAndExtract(path) {
     if (Array.isArray(cached) && cached.length > 0) return cached;
   }
 
-  const slug = path.split("/").pop().replace(/\.html?$/, "");
+  const cleanRel = path.replace(/\\/g, "/").replace(/^.*?vyuka_downloaded\//, "").replace(/^\//, "").replace(/\.html?$/, "");
+  const pathSlug = cleanRel.replace(/[\/\\]/g, "--");
+  const baseName = path.split("/").pop().replace(/\.html?$/, "");
 
-  // 1. Try static pre-rendered JSON slide tree (Static Shell + Dynamic Dojo)
-  if (slug) {
+  // 1. Try static pre-rendered JSON slide tree (canonical pathSlug, then fallback to baseName)
+  const candidates = [pathSlug, baseName].filter(Boolean);
+  for (const s of candidates) {
     try {
-      const res = await fetch(`data/lectures/${slug}.json`);
+      const res = await fetch(`data/lectures/${s}.json`);
       if (res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.slides) && data.slides.length > 0) {
