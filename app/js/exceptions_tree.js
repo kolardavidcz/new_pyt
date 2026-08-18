@@ -4,78 +4,78 @@
  */
 
 export const EXCEPTION_TAGS = {
-  flow: { label: "⚙️ Řízení toku (Očekávané)", class: "pill-flow", desc: "Očekávané ukončení cyklu nebo iterátoru — není to chyba" },
-  bug: { label: "🐛 Chyba v kódu (Opravit kód)", class: "pill-bug", desc: "Chybná logika, překlep nebo chybějící podmínka" },
-  guard: { label: "🛡️ Potřeba robustnosti (Guard / Try-except)", class: "pill-guard", desc: "Závisí na vnějším vstupu, souboru či síti — nutno ošetřit" },
-  sys: { label: "⚡ Vnější zásah / OS", class: "pill-sys", desc: "Zásah uživatele (Ctrl+C), ukončení procesu nebo systémová chyba" },
-  warn: { label: "⚠️ Varování (Nekritické)", class: "pill-warn", desc: "Informativní varování, nezpůsobí pád programu" },
-  base: { label: " Kořenová / Bázová třída", class: "pill-base", desc: "Společný předek pro hierarchické zachytávání" }
+  flow: { label: "[Řízení toku]", class: "pill-flow", desc: "Očekávané ukončení cyklu nebo iterátoru" },
+  bug: { label: "[Chyba v kódu]", class: "pill-bug", desc: "Chybná logika, překlep nebo chybějící podmínka" },
+  guard: { label: "[Robustnost]", class: "pill-guard", desc: "Závisí na vnějším vstupu, souboru či síti — nutno ošetřit" },
+  sys: { label: "[Systém]", class: "pill-sys", desc: "Zásah uživatele, ukončení procesu nebo systémová chyba" },
+  warn: { label: "[Varování]", class: "pill-warn", desc: "Informativní varování, nezpůsobí pád programu" },
+  base: { label: "[Kořen]", class: "pill-base", desc: "Společný předek pro hierarchické zachytávání" }
 };
 
 export const EXCEPTION_TREE_DATA = {
   name: "BaseException",
   tag: "sys",
-  tagLabel: "⚡ Systémový kořen",
+  tagLabel: "[Systém]",
   meaning: "Nejvyšší kořenová třída všech výjimek v Pythonu.",
   children: [
     {
       name: "BaseExceptionGroup",
       tag: "sys",
-      tagLabel: "⚡ Skupina výjimek (Python 3.11+)",
+      tagLabel: "[Systém 3.11+]",
       meaning: "Skupina současně vzniklých výjimek dědících z BaseException (pro task groups v asyncio).",
       children: []
     },
     {
       name: "GeneratorExit",
       tag: "flow",
-      tagLabel: "⚙️ Řízení toku (Očekávané)",
+      tagLabel: "[Řízení toku]",
       meaning: "Vyvolána uvnitř generátoru při volání jeho metody close() pro uvolnění prostředků.",
       children: []
     },
     {
       name: "KeyboardInterrupt",
       tag: "sys",
-      tagLabel: "⚡ Vnější zásah (Neopravitelné kódem)",
+      tagLabel: "[Vnější zásah]",
       meaning: "Vyvolána, když uživatel stiskne klávesovou zkratku přerušení programu (obvykle Ctrl+C).",
       children: []
     },
     {
       name: "SystemExit",
       tag: "sys",
-      tagLabel: "⚡ Ukončení procesu (Očekávané)",
+      tagLabel: "[Ukončení]",
       meaning: "Vyvolána funkcí sys.exit() při požadavku na standardní ukončení procesu.",
       children: []
     },
     {
       name: "Exception",
       tag: "base",
-      tagLabel: " Kořen běžných výjimek",
+      tagLabel: "[Kořen chyb]",
       meaning: "Bázová třída pro všechny nefatální chyby; doporučený předek pro vlastní výjimky i obecné try-except.",
       children: [
         {
           name: "ArithmeticError",
           tag: "base",
-          tagLabel: " Aritmetika",
+          tagLabel: "[Aritmetika]",
           meaning: "Společná nadtřída pro numerické a matematické chyby výpočtu.",
           children: [
             {
               name: "FloatingPointError",
               tag: "bug",
-              tagLabel: "🐛 Chyba v kódu / HW",
+              tagLabel: "[Chyba v kódu]",
               meaning: "Chyba operace v plovoucí řádové čárce (pokud je hardwarem/OS hlášena).",
               children: []
             },
             {
               name: "OverflowError",
               tag: "guard",
-              tagLabel: "🛡️ Přetečení limitu",
+              tagLabel: "[Robustnost]",
               meaning: "Výsledek matematické operace překročil maximální rozsah číselné reprezentace (např. u float).",
               children: []
             },
             {
               name: "ZeroDivisionError",
               tag: "bug",
-              tagLabel: "🐛 Dělení nulou (Chyba v kódu)",
+              tagLabel: "[Chyba v kódu]",
               meaning: "Dělení nebo modulo nulou (1 / 0 nebo 10 % 0). Řešení: ošetřit vstupní jmenovatel.",
               children: []
             }
@@ -84,48 +84,48 @@ export const EXCEPTION_TREE_DATA = {
         {
           name: "AssertionError",
           tag: "bug",
-          tagLabel: "🐛 Neplatný předpoklad (Assert)",
+          tagLabel: "[Chyba v kódu]",
           meaning: "Příkaz assert vyhodnotil podmínku jako False (neplatný vnitřní předpoklad programu).",
           children: []
         },
         {
           name: "AttributeError",
           tag: "bug",
-          tagLabel: "🐛 Neexistující atribut / metoda",
+          tagLabel: "[Chyba v kódu]",
           meaning: "Objekt nemá požadovaný atribut nebo metodu (např. 'str' object has no attribute 'append').",
           children: []
         },
         {
           name: "BufferError",
           tag: "sys",
-          tagLabel: "⚡ Nízká úroveň / Paměť",
+          tagLabel: "[Systém]",
           meaning: "Nízkoúrovňová operace s vyrovnávací pamětí (buffer protocol) selhala.",
           children: []
         },
         {
           name: "EOFError",
           tag: "guard",
-          tagLabel: "🛡️ Konec vstupu",
+          tagLabel: "[Robustnost]",
           meaning: "Funkce input() narazila na konec vstupního streamu (End-Of-File) bez přečtení dat.",
           children: []
         },
         {
           name: "ExceptionGroup",
           tag: "base",
-          tagLabel: " Skupina výjimek (Python 3.11+)",
+          tagLabel: "[Systém 3.11+]",
           meaning: "Skupina výjimek dědících z Exception; obsluhuje se pomocí syntaxe except*.",
           children: []
         },
         {
           name: "ImportError",
           tag: "bug",
-          tagLabel: "🐛 Chyba při importu",
+          tagLabel: "[Chyba v kódu]",
           meaning: "Příkaz import nebo from ... import selhal při načítání modulu nebo objektu.",
           children: [
             {
               name: "ModuleNotFoundError",
               tag: "bug",
-              tagLabel: "🐛 Modul nenalezen (Chybí instalace)",
+              tagLabel: "[Chyba v kódu]",
               meaning: "Hledaný modul nebyl nalezen v sys.path (např. chybí 'pip install <balíček>').",
               children: []
             }
@@ -134,20 +134,20 @@ export const EXCEPTION_TREE_DATA = {
         {
           name: "LookupError",
           tag: "base",
-          tagLabel: " Chyba vyhledání v kolekci",
+          tagLabel: "[Vyhledání]",
           meaning: "Společný předek pro chyby při vyhledávání klíče či indexu v sekvenci nebo mapování.",
           children: [
             {
               name: "IndexError",
               tag: "bug",
-              tagLabel: "🐛 Index mimo rozsah",
+              tagLabel: "[Chyba v kódu]",
               meaning: "Index v sekvenci (list, tuple, str) je mimo platný rozsah (např. xs[10] pro 3prvkový seznam).",
               children: []
             },
             {
               name: "KeyError",
               tag: "guard",
-              tagLabel: "🛡️ Neexistující klíč (Použít .get())",
+              tagLabel: "[Robustnost]",
               meaning: "Zadaný klíč nebyl ve slovníku nalezen. Řešení: použít d.get(key, default) nebo 'if key in d:'.",
               children: []
             }
@@ -156,20 +156,20 @@ export const EXCEPTION_TREE_DATA = {
         {
           name: "MemoryError",
           tag: "sys",
-          tagLabel: "⚡ Vyčerpána RAM (Neopravitelné)",
+          tagLabel: "[Systém]",
           meaning: "Operační paměť je vyčerpána a interpret Pythonu nemůže alokovat další objekt.",
           children: []
         },
         {
           name: "NameError",
           tag: "bug",
-          tagLabel: "🐛 Neznámá proměnná / funkce",
+          tagLabel: "[Chyba v kódu]",
           meaning: "Pokus o přístup k neexistující lokální nebo globální proměnné (překlep ve jménu, chybějící definice).",
           children: [
             {
               name: "UnboundLocalError",
               tag: "bug",
-              tagLabel: "🐛 Proměnná před přiřazením",
+              tagLabel: "[Chyba v kódu]",
               meaning: "Čtení lokální proměnné uvnitř funkce dříve, než do ní byla v této funkci přiřazena hodnota.",
               children: []
             }
@@ -178,54 +178,54 @@ export const EXCEPTION_TREE_DATA = {
         {
           name: "OSError",
           tag: "guard",
-          tagLabel: "🛡️ Systémová / Souborová chyba",
+          tagLabel: "[Systém / I/O]",
           meaning: "Společná nadtřída pro chyby operačního systému, souborů a síťové komunikace.",
           children: [
             {
               name: "BlockingIOError",
               tag: "guard",
-              tagLabel: "🛡️ Neblokující I/O",
+              tagLabel: "[Robustnost]",
               meaning: "Operace na neblokujícím socketu nebo streamu by způsobila zablokování běhu.",
               children: []
             },
             {
               name: "ChildProcessError",
               tag: "sys",
-              tagLabel: "⚡ Chyba podprocesu",
+              tagLabel: "[Systém]",
               meaning: "Operace s dceřiným podprocesem (child process) selhala.",
               children: []
             },
             {
               name: "ConnectionError",
               tag: "guard",
-              tagLabel: "🛡️ Chyba síťového spojení",
+              tagLabel: "[Robustnost]",
               meaning: "Společná nadtřída pro výpadky a problémy síťového připojení.",
               children: [
                 {
                   name: "BrokenPipeError",
                   tag: "guard",
-                  tagLabel: "🛡️ Uzavřená roura / Socket",
+                  tagLabel: "[Robustnost]",
                   meaning: "Zápis do síťového socketu nebo roury, jejíž protější konec byl už uzavřen.",
                   children: []
                 },
                 {
                   name: "ConnectionAbortedError",
                   tag: "guard",
-                  tagLabel: "🛡️ Přerušené spojení",
+                  tagLabel: "[Robustnost]",
                   meaning: "Navázané síťové spojení bylo přerušeno lokálním síťovým stackem.",
                   children: []
                 },
                 {
                   name: "ConnectionRefusedError",
                   tag: "guard",
-                  tagLabel: "🛡️ Odmítnuté spojení (Server neběží)",
+                  tagLabel: "[Robustnost]",
                   meaning: "Cílový server odmítl navázat spojení (na daném portu žádná služba neposlouchá).",
                   children: []
                 },
                 {
                   name: "ConnectionResetError",
                   tag: "guard",
-                  tagLabel: "🛡️ Reset spojení protistranou",
+                  tagLabel: "[Robustnost]",
                   meaning: "Existující spojení bylo vzdálenou protistranou násilně ukončeno (TCP RST).",
                   children: []
                 }
@@ -234,56 +234,56 @@ export const EXCEPTION_TREE_DATA = {
             {
               name: "FileExistsError",
               tag: "guard",
-              tagLabel: "🛡️ Soubor již existuje",
+              tagLabel: "[Robustnost]",
               meaning: "Pokus o vytvoření souboru nebo adresáře s názvem, který již existuje (např. os.mkdir).",
               children: []
             },
             {
               name: "FileNotFoundError",
               tag: "guard",
-              tagLabel: "🛡️ Soubor nenalezen",
+              tagLabel: "[Robustnost]",
               meaning: "Požadovaný soubor nebo složka nebyla nalezena. Doporučeno ověřit cestu před otevřením.",
               children: []
             },
             {
               name: "InterruptedError",
               tag: "sys",
-              tagLabel: "⚡ Přerušeno signálem OS",
+              tagLabel: "[Signál OS]",
               meaning: "Systémové volání operačního systému bylo přerušeno příchozím signálem (EINTR).",
               children: []
             },
             {
               name: "IsADirectoryError",
               tag: "bug",
-              tagLabel: "🐛 Záměna složky za soubor",
+              tagLabel: "[Chyba v kódu]",
               meaning: "Byla požadována souborová operace (např. open() pro zápis) nad adresářem.",
               children: []
             },
             {
               name: "NotADirectoryError",
               tag: "bug",
-              tagLabel: "🐛 Záměna souboru za složku",
+              tagLabel: "[Chyba v kódu]",
               meaning: "Byla požadována adresářová operace (např. os.listdir) nad běžným souborem.",
               children: []
             },
             {
               name: "PermissionError",
               tag: "guard",
-              tagLabel: "🛡️ Odepřen přístup (Práva OS)",
+              tagLabel: "[Robustnost]",
               meaning: "Nedostatečná přístupová oprávnění k souboru, složce nebo systémovému prostředku.",
               children: []
             },
             {
               name: "ProcessLookupError",
               tag: "guard",
-              tagLabel: "🛡️ Proces podle PID nenalezen",
+              tagLabel: "[Robustnost]",
               meaning: "Požadovaný systémový proces podle zadaného PID neexistuje.",
               children: []
             },
             {
               name: "TimeoutError",
               tag: "guard",
-              tagLabel: "🛡️ Vypršel časový limit (Timeout)",
+              tagLabel: "[Robustnost]",
               meaning: "Systémová či síťová operace překročila nastavený časový limit.",
               children: []
             }
@@ -292,34 +292,34 @@ export const EXCEPTION_TREE_DATA = {
         {
           name: "ReferenceError",
           tag: "sys",
-          tagLabel: "⚡ Slabá reference GC",
+          tagLabel: "[Systém]",
           meaning: "Pokus o přístup k objektu přes slabý odkaz (weakref), který již byl uklizen garbage collectorem.",
           children: []
         },
         {
           name: "RuntimeError",
           tag: "bug",
-          tagLabel: "🐛 Běhová chyba",
+          tagLabel: "[Běhová chyba]",
           meaning: "Obecná běhová chyba, která nespadá do žádné konkrétnější kategorie výjimek.",
           children: [
             {
               name: "NotImplementedError",
               tag: "bug",
-              tagLabel: "🐛 Neimplementováno (TODO)",
+              tagLabel: "[Chyba v kódu]",
               meaning: "Abstraktní metoda nebo rozhraní nebylo v odvozené třídě doimplementováno.",
               children: []
             },
             {
               name: "PythonFinalizationError",
               tag: "sys",
-              tagLabel: "⚡ Chyba při ukončování",
+              tagLabel: "[Systém]",
               meaning: "Chyba nastala během závěrečné fáze ukončování (shutdown) interpretu Pythonu.",
               children: []
             },
             {
               name: "RecursionError",
               tag: "bug",
-              tagLabel: "🐛 Nekonečná rekurze",
+              tagLabel: "[Chyba v kódu]",
               meaning: "Překročení maximální povolené hloubky rekurzivních volání (chybí bázová podmínka).",
               children: []
             }
@@ -328,33 +328,33 @@ export const EXCEPTION_TREE_DATA = {
         {
           name: "StopAsyncIteration",
           tag: "flow",
-          tagLabel: "⚙️ Řízení toku (Konec asynchronní smyčky)",
+          tagLabel: "[Řízení toku]",
           meaning: "Signalizuje ukončení asynchronního iterátoru metodou __anext__().",
           children: []
         },
         {
           name: "StopIteration",
           tag: "flow",
-          tagLabel: "⚙️ Řízení toku (Konec smyčky for)",
+          tagLabel: "[Řízení toku]",
           meaning: "Signalizuje vyčerpání prvků v synchronním iterátoru voláním next(). Řídí běh cyklu for.",
           children: []
         },
         {
           name: "SyntaxError",
           tag: "bug",
-          tagLabel: "🐛 Syntaktická chyba (Chyba v kódu)",
+          tagLabel: "[Chyba v kódu]",
           meaning: "Chyba syntaxe zjištěná parserem ještě před samotným spuštěním kódu.",
           children: [
             {
               name: "IndentationError",
               tag: "bug",
-              tagLabel: "🐛 Chyba v odsazení",
+              tagLabel: "[Chyba v kódu]",
               meaning: "Chybné odsazení bloku kódu (např. po dvojtečce chybí 4 mezery).",
               children: [
                 {
                   name: "TabError",
                   tag: "bug",
-                  tagLabel: "🐛 Mix mezer a tabulátorů",
+                  tagLabel: "[Chyba v kódu]",
                   meaning: "Nekonzistentní míchání tabulátorů a mezer v odsazení řádků.",
                   children: []
                 }
@@ -365,47 +365,47 @@ export const EXCEPTION_TREE_DATA = {
         {
           name: "SystemError",
           tag: "sys",
-          tagLabel: "⚡ Interní chyba interpretu",
+          tagLabel: "[Systém]",
           meaning: "Vnitřní systémová chyba interpretu CPythonu nebo chyba v C-rozšíření.",
           children: []
         },
         {
           name: "TypeError",
           tag: "bug",
-          tagLabel: "🐛 Nekompatibilní datový typ",
+          tagLabel: "[Chyba v kódu]",
           meaning: "Operace nebo funkce byla zavolána s objektem nevhodného typu (např. 'a' + 5 nebo len(123)).",
           children: []
         },
         {
           name: "ValueError",
           tag: "guard",
-          tagLabel: "🛡️ Neplatná hodnota argumentu",
+          tagLabel: "[Robustnost]",
           meaning: "Argument má správný datový typ, ale neplatnou hodnotu (např. int('necislo') nebo math.sqrt(-1)).",
           children: [
             {
               name: "UnicodeError",
               tag: "guard",
-              tagLabel: "🛡️ Chyba kódování textu",
+              tagLabel: "[Robustnost]",
               meaning: "Bázová třída pro chyby při kódování nebo dekódování Unicode řetězců.",
               children: [
                 {
                   name: "UnicodeDecodeError",
                   tag: "guard",
-                  tagLabel: "🛡️ Chyba dekódování bajtů",
+                  tagLabel: "[Robustnost]",
                   meaning: "Bajtovou sekvenci nelze dekódovat na text (např. čtení Windows-1250 souboru jako UTF-8).",
                   children: []
                 },
                 {
                   name: "UnicodeEncodeError",
                   tag: "guard",
-                  tagLabel: "🛡️ Chyba kódování do bajtů",
+                  tagLabel: "[Robustnost]",
                   meaning: "Znak nelze převést do cílového formátu bajtů (např. český znak v ASCII kódování).",
                   children: []
                 },
                 {
                   name: "UnicodeTranslateError",
                   tag: "guard",
-                  tagLabel: "🛡️ Chyba překladu znaku",
+                  tagLabel: "[Robustnost]",
                   meaning: "Znak nelze přeložit v tabulce znakových translací.",
                   children: []
                 }
@@ -416,83 +416,83 @@ export const EXCEPTION_TREE_DATA = {
         {
           name: "Warning",
           tag: "warn",
-          tagLabel: "⚠️ Varování",
+          tagLabel: "[Varování]",
           meaning: "Základní třída pro varovná hlášení (nekritická, standardně nezpůsobí pád programu).",
           children: [
             {
               name: "BytesWarning",
               tag: "warn",
-              tagLabel: "⚠️ Varování: Bytes vs Str",
+              tagLabel: "[Varování]",
               meaning: "Varování při pochybném míchání binárních bajtů bytes a textových řetězců str.",
               children: []
             },
             {
               name: "DeprecationWarning",
               tag: "warn",
-              tagLabel: "⚠️ Varování: Zastaralá funkce",
+              tagLabel: "[Varování]",
               meaning: "Varování před použitím zastaralé funkčnosti určené k budoucímu odstranění z Pythonu.",
               children: []
             },
             {
               name: "EncodingWarning",
               tag: "warn",
-              tagLabel: "⚠️ Varování: Chybí encoding",
+              tagLabel: "[Varování]",
               meaning: "Varování před spoléháním se na implicitní kódování platformy (Python 3.10+).",
               children: []
             },
             {
               name: "FutureWarning",
               tag: "warn",
-              tagLabel: "⚠️ Varování: Budoucí změna",
+              tagLabel: "[Varování]",
               meaning: "Varování pro koncové uživatele před plánovanou změnou chování funkce v budoucích verzích.",
               children: []
             },
             {
               name: "ImportWarning",
               tag: "warn",
-              tagLabel: "⚠️ Varování: Import",
+              tagLabel: "[Varování]",
               meaning: "Varování při potenciálních potížích při vyhledávání nebo importování modulu.",
               children: []
             },
             {
               name: "PendingDeprecationWarning",
               tag: "warn",
-              tagLabel: "⚠️ Varování: Budoucí zastarání",
+              tagLabel: "[Varování]",
               meaning: "Varování před konstrukcí, která bude v budoucích verzích prohlášena za deprecated.",
               children: []
             },
             {
               name: "ResourceWarning",
               tag: "warn",
-              tagLabel: "⚠️ Varování: Neuvolněný prostředek",
+              tagLabel: "[Varování]",
               meaning: "Varování před neuzavřeným souborem, socketem nebo neuvolněným systémovým deskriptorem.",
               children: []
             },
             {
               name: "RuntimeWarning",
               tag: "warn",
-              tagLabel: "⚠️ Varování: Běhové chování",
+              tagLabel: "[Varování]",
               meaning: "Varování před podezřelým chováním za běhu programu.",
               children: []
             },
             {
               name: "SyntaxWarning",
               tag: "warn",
-              tagLabel: "⚠️ Varování: Podezřelá syntaxe",
+              tagLabel: "[Varování]",
               meaning: "Varování před podezřelou syntaktickou konstrukcí (např. použití 'is' s číselným literálem).",
               children: []
             },
             {
               name: "UnicodeWarning",
               tag: "warn",
-              tagLabel: "⚠️ Varování: Unicode",
+              tagLabel: "[Varování]",
               meaning: "Varování týkající se manipulace s Unicode textem a kódováním.",
               children: []
             },
             {
               name: "UserWarning",
               tag: "warn",
-              tagLabel: "⚠️ Uživatelské varování",
+              tagLabel: "[Uživatelské varování]",
               meaning: "Obecné varování vyvolané uživatelským kódem pomocí modulu warnings.warn().",
               children: []
             }
@@ -550,14 +550,30 @@ export function renderExceptionTreeHtml() {
 }
 
 /**
- * Generate clean, static, continuous Exception Hierarchy Tree HTML
+ * Generate clean, static, continuous ASCII Exception Hierarchy Tree HTML (+-- / |    +--)
  */
 export function renderStaticExceptionTreeHtml() {
   function renderNode(node, depth = 0, isLast = true, prefix = "") {
     const hasChildren = node.children && node.children.length > 0;
-    const connector = depth === 0 ? "" : (isLast ? "└── " : "├── ");
+    
+    let connector = "";
+    if (depth === 1) {
+      connector = " +-- ";
+    } else if (depth > 1) {
+      connector = "+-- ";
+    }
+
     const currentPrefix = depth === 0 ? "" : (prefix + connector);
-    const childPrefix = depth === 0 ? "" : (prefix + (isLast ? "    " : "│   "));
+    
+    let nextPrefix = "";
+    if (depth === 0) {
+      nextPrefix = "";
+    } else if (depth === 1) {
+      nextPrefix = isLast ? "      " : " |   ";
+    } else {
+      nextPrefix = prefix + (isLast ? "     " : "|    ");
+    }
+
     const tagClass = `pill-${node.tag || "base"}`;
 
     let html = `
@@ -565,14 +581,14 @@ export function renderStaticExceptionTreeHtml() {
         <span class="exc-tree-branch" aria-hidden="true">${escapeHtml(currentPrefix)}</span>
         <code class="exc-name tok-type">${escapeHtml(node.name)}</code>
         <span class="exc-tag-badge ${tagClass}">${escapeHtml(node.tagLabel)}</span>
-        <span class="exc-meaning-sep">•</span>
+        <span class="exc-meaning-sep">—</span>
         <span class="exc-meaning-text">${escapeHtml(node.meaning)}</span>
       </div>`;
 
     if (hasChildren) {
       node.children.forEach((child, idx) => {
         const childIsLast = idx === node.children.length - 1;
-        html += renderNode(child, depth + 1, childIsLast, childPrefix);
+        html += renderNode(child, depth + 1, childIsLast, nextPrefix);
       });
     }
 
@@ -591,4 +607,5 @@ export function renderStaticExceptionTreeHtml() {
 
 export const renderStaticExceptionCheatSheetHtml = renderStaticExceptionTreeHtml;
 export const renderStaticA4ExceptionTreeHtml = renderStaticExceptionTreeHtml;
+
 
