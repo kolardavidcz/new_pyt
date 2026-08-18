@@ -80,6 +80,31 @@ export function detectCodeLang(code, declaredLang = "") {
   return "python";
 }
 
+export function isCodeBlockquote(html, rawText) {
+  const t = (rawText || "").trim();
+  if (!t) return false;
+  // Quotes or Czech quotes are prose
+  if (t.startsWith("„") || t.startsWith('"') || t.startsWith("»") || t.startsWith("'") || t.startsWith("«")) return false;
+  // Explicit <code> or <pre> inside blockquote
+  if (/^<code>[\s\S]*<\/code>$/i.test((html || "").trim()) || /<pre[\s\S]*<\/pre>/i.test(html || "")) return true;
+  
+  // Czech sentence words and sentence structures that indicate prose, NOT code
+  if (/\b(je|jsou|není|nejsou|obsahuje|představuje|může|musí|bude|bylo|mají|slouží|sloužit|pokud|jestliže|protože|však|používá|volá|vrací|určuje|znamená|respektive|nalezen|vytvořen|označit|při vstupu|vynechané|chcete-li|napišeme)\b/i.test(t)) return false;
+  if (t.endsWith(".") && !t.includes("(") && !t.includes("=")) return false;
+
+  // Single-line or multi-line python code/signatures:
+  // 1. Assignment with call: xd = collections.defaultdict(...) or nt = collections.namedtuple(...)
+  if (/^[a-zA-Z0-9_.]+\s*=\s*[a-zA-Z0-9_.]+\s*\(/.test(t) && t.endsWith(")")) return true;
+  // 2. Function/method signature: fileinput.input(...) or datetime.replace(...) or os.system(...)
+  if (/^[a-zA-Z0-9_.]+\s*\(/.test(t) && t.endsWith(")")) return true;
+  // 3. Stride / arithmetic expr: m.strides[0] * i + m.strides[1] * j
+  if (/^[a-zA-Z0-9_.]+(\[[^\]]+\]|\.[a-zA-Z0-9_]+)\s*[\*+\-\/]\s*[a-zA-Z0-9_.]+/i.test(t)) return true;
+  // 4. CLI commands: conda remove -n ...
+  if (/^(\$|>|conda\s+[a-z\-]+|pip\s+[a-z\-]+|python\s+[a-z0-9_\-\.]+)\s+/i.test(t)) return true;
+
+  return false;
+}
+
 function esc(s) {
   return s
     .replace(/&/g, "&amp;")
@@ -506,6 +531,22 @@ function getCodeText(pre) {
  */
 export function highlightRoot(root) {
   if (!root) return;
+
+  // Convert code blockquotes into standard code-block pre elements
+  root.querySelectorAll("blockquote").forEach((bq) => {
+    if (bq.dataset.hl === "1") return;
+    const text = (bq.textContent || "").trim();
+    if (!text) return;
+    if (isCodeBlockquote(bq.innerHTML, text)) {
+      const codeText = dedentCode(text);
+      const lang = detectCodeLang(codeText, "python");
+      const pre = document.createElement("pre");
+      pre.className = `code-block lang-${lang}`;
+      pre.innerHTML = `<code>${highlightCode(codeText, lang)}</code>`;
+      pre.dataset.hl = "1";
+      bq.replaceWith(pre);
+    }
+  });
 
   // Convert SyntaxHighlighter-ish pre.brush to plain pre
   root.querySelectorAll("pre").forEach((pre) => {
