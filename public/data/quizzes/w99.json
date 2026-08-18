@@ -1321,102 +1321,59 @@
       "code": null
     }
   ],
-  "pickle": [
+  "serialization_overview": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Který mód otevření souboru je vyžadován při zápisu zapiklených dat metodou pickle.dump()?",
+      "question": "Proč je nebezpečné načítat neznámá data pomocí modulu pickle (pickle.load)?",
       "options": [
-        "A) 'a+' — modul pickle vyžaduje režim připsání na konec souboru pro správnou serializaci.",
-        "B) 'r+' — modul pickle potřebuje režim pro čtení i zápis z důvodu kontroly zapsaných dat.",
-        "C) 'wt' — modul pickle generuje textový výstup kódovaný automaticky v systémech UTF-8.",
-        "D) 'wb' — modul pickle vytváří binární bajtový tok, který vyžaduje přímý binární zápis."
+        "A) pickle dokáže při deserializaci spustit libovolný kód zabudovaný v datovém toku.",
+        "B) pickle trvale smaže otevřený soubor, pokud narazí na neznámou datovou třídu.",
+        "C) pickle automaticky přepisuje systémové proměnné prostředí daného uživatele OS.",
+        "D) pickle nepodporuje znakové kódování UTF-8 a způsobí přetečení v paměti RAM."
       ],
-      "answer": 3,
-      "explanation": "Metoda pickle.dump() zapisuje serializovaná data v binárním formátu (objekt typu bytes), proto musí být výstupní soubor otevřen v binárním režimu zápisu ('wb'). V textovém režimu by pokus o zápis bajtů vyvolal výjimku TypeError.",
+      "answer": 0,
+      "explanation": "Formát pickle není bezpečný vůči neznámým datům. Proces deserializace dokáže zkonstruovat objekty a zavolat jejich metody/konstruktory, což umožňuje útočníkovi spustit v systému libovolný kód (Arbitrary Code Execution).",
       "code": null
     },
     {
       "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Která funkce modulu pickle deserializuje objekt přímo z bajtového řetězce (bytes) v paměti?",
-      "code": "import pickle\n\nserialized_sample = b\"\\x80\\x04\\x95\\x19\\x00\\x00\\x00\\x00\\x00\\x00\\x00}\\x94\\x8c\\x06sample\\x94\\x8c\\x07ethanol\\x94s.\"\nmeasurement = pickle.________(serialized_sample)\n# Vystup: {'sample': 'ethanol'}",
+      "type": "multiple_choice",
+      "question": "K čemu slouží standardní modul shelve v Pythonu?",
       "options": [
-        "loads",
-        "dumps",
-        "load",
-        "dump"
+        "A) Umožňuje šifrování datových struktur za pomoci symetrického tajného klíče.",
+        "B) Poskytuje perzistentní slovník uložený na disku s využitím modulu pickle.",
+        "C) Zajišťuje kompresi binárních dat před jejich odesláním po síťovém spojení.",
+        "D) Slouží k rychlému generování bajtkódu .pyc pro moduly spouštěné v paměti."
       ],
-      "answer": 0,
-      "explanation": "Funkce pickle.loads() načítá a deserializuje objekt z předaného bajtového řetězce v paměti, zatímco pickle.load() čte ze souborového proudu.",
-      "expected": "loads"
+      "answer": 1,
+      "explanation": "Modul shelve funguje jako perzistentní slovník na disku. Klíče jsou řetězce a hodnoty jsou libovolné pythoní objekty serializované pomocí modulu pickle.",
+      "code": null
     },
     {
       "id": "q3",
       "type": "multiple_choice",
-      "question": "Co se stane při pokusu o zapiklení uživatelsky definované funkce v Pythonu?",
+      "question": "Jaké je hlavní určení modulu marshal ve standardní knihovně Pythonu?",
       "options": [
-        "A) Uloží se kompletní zdrojový kód funkce i se všemi lokálními proměnnými v těle funkce.",
-        "B) Uloží se pouze plně kvalifikované jméno funkce a název modulu, nikoli její zdrojový kód.",
-        "C) Vyvolá se okamžitě výjimka PicklingError, protože funkce nelze v Pythonu piklit.",
-        "D) Funkce se automaticky převede na anonymní lambda výraz a uloží jako spustitelný bajtkód."
+        "A) Bezpečná serializace datových struktur pro přenos mezi různými verzemi jazyka.",
+        "B) Serializace běžných datových struktur do lidsky čitelného formátu JSON a XML.",
+        "C) Čtení a zápis internalizovaného pseudozkompilovaného bajtkódu souborů .pyc.",
+        "D) Ukládání kompletních grafických objektů a uživatelského rozhraní aplikací."
       ],
-      "answer": 1,
-      "explanation": "Modul pickle neukládá bytecode ani zdrojový kód funkcí a tříd. Zapisuje pouze referenci v podobě jejich plného jména a mateřského modulu, takže při unpicklování musí daná funkce v cílovém prostředí existovat pod stejným jménem.",
+      "answer": 2,
+      "explanation": "Modul marshal slouží především interním potřebám Pythonu pro čtení a zápis .pyc souborů (zkompilovaný bajtkód). Není určen pro obecnou serializaci.",
       "code": null
     },
     {
       "id": "q4",
       "type": "true_false_tricky",
-      "question": "Posouzení bezpečnosti deserializace neověřených zapiklených dat z neznámých zdrojů:",
+      "question": "Data uložená pomocí modulu pickle jsou standardně v lidsky čitelném textovém formátu.",
       "options": [
-        "A) Deserializace pomocí pickle.load() je zcela bezpečná, protože modul pickle provádí sanitaci vstupních bajtů a nepovoluje spouštění funkcí.",
-        "B) Deserializace pomocí pickle.load() představuje kritické bezpečnostní riziko, protože proces rozbalení může automaticky spustit libovolný kód."
+        "A) Pravda – pickle vytváří přenosný textový soubor ve formátu JSON.",
+        "B) Nepravda – pickle používá binární formát určený pouze pro Python."
       ],
       "answer": 1,
-      "explanation": "Při rozbalování zapiklených dat dochází k instanciaci objektů a volání konstruktorů či speciálních metod, což umožňuje útočníkovi podvrhnout bajtkód vykonávající libovolné příkazy v operačním systému. Pro nedůvěryhodná data je nutné se pickle vyhnout.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Jaká výjimka nastane při pokusu o zapiklení generátorového výrazu pomocí pickle.dumps()?",
-      "code": "import pickle\ngen = (x**2 for x in range(10))\npickle.dumps(gen)",
-      "options": [
-        "A) ValueError — generátorový výraz vyžaduje explicitní konverzi na seznam před serializací dat.",
-        "B) AttributeError — objekt generátoru nemá vytvořen atribut __dict__ pro uložení vnitřního stavu.",
-        "C) PicklingError — generátory udržují vnitřní stav iterátoru a nepatří mezi piklitelné objekty.",
-        "D) TypeError — operace dumps() přijímá pouze sekvenční typy jako seznamy nebo n-tice v paměti."
-      ],
-      "answer": 2,
-      "explanation": "Generátory, otevřené soubory, síťová spojení nebo databázová připojení nelze serializovat. Pokus o zapiklení nepiklitelného objektu vyvolá výjimku pickle.PicklingError."
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "K čemu primárně slouží modul pickletools ve standardní knihovně Pythonu?",
-      "options": [
-        "A) Automaticky převádí binární struktury modulu pickle do lidsky čitelného formátu JSON či XML.",
-        "B) Zrychluje vykonávání metod pickle.dump() a pickle.load() pomocí C-rozšíření interpretru.",
-        "C) Šifruje zapiklená data pomocí symetrického šifrovacího klíče před uložením na lokální disk.",
-        "D) Umožňuje inspekci a disasemblaci instrukcí piklicího protokolu bez spuštění nebezpečného kódu."
-      ],
-      "answer": 3,
-      "explanation": "Modul pickletools poskytuje funkci dis(), která disasembruje bajtový tok piklicího protokolu na jednotlivé operační kódy. To umožňuje offline analýzu struktury uložených dat bez rizika vykonání škodlivého kódu z neznámého souboru.",
-      "code": null
-    },
-    {
-      "id": "q7",
-      "type": "multiple_choice",
-      "question": "Co přesně se uloží při serializaci instance uživatelské třídy pomocí modulu pickle?",
-      "options": [
-        "A) Uloží se pouze atributy instance z __dict__ a odkaz na příslušnou třídu a modul.",
-        "B) Uloží se pouze binární adresa paměťového ukazatele na objekt v běžícím procesu.",
-        "C) Uloží se celá třída se všemi statickými metodami a nadřazenou dědičnou hierarchií.",
-        "D) Uloží se kompletní definice všech metod třídy včetně veškerého zdrojového kódu."
-      ],
-      "answer": 0,
-      "explanation": "pickle neukládá metody třídy ani její kód, ale pouze členské proměnné (typicky ze slovníku __dict__) a odkaz na název třídy a modulu. Při unpicklování se znovu načte třída z modulu a naplní se uloženými atributy.",
+      "explanation": "Modul pickle ukládá objekty v binárním formátu specifickém pro Python. Není lidsky čitelný ani přímo kompatibilní s jinými jazyky.",
       "code": null
     }
   ],
