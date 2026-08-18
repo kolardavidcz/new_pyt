@@ -810,19 +810,119 @@ function resolveAlreadyStudied(slide, slug, pageId) {
   return null;
 }
 
+function initExceptionTree(container) {
+  if (!container || container.__excInit) return;
+  container.__excInit = true;
+
+  const searchInput = container.querySelector("#excSearchInput");
+  const clearBtn = container.querySelector("#excClearBtn");
+  const filterPills = container.querySelectorAll(".exc-pill");
+  const expandAllBtn = container.querySelector("#excExpandAllBtn");
+  const collapseAllBtn = container.querySelector("#excCollapseAllBtn");
+  const nodes = container.querySelectorAll(".exc-node");
+
+  let currentTag = "all";
+  let currentQuery = "";
+
+  function applyFilters() {
+    const q = currentQuery.trim().toLowerCase();
+
+    nodes.forEach((node) => {
+      const name = node.dataset.name || "";
+      const tag = node.dataset.tag || "";
+      const meaning = node.dataset.meaning || "";
+
+      const selfMatchesTag = currentTag === "all" || tag === currentTag;
+      const selfMatchesQuery = !q || name.includes(q) || meaning.includes(q);
+
+      if (selfMatchesTag && selfMatchesQuery) {
+        node.classList.remove("is-hidden");
+        if (q) {
+          let parent = node.parentElement?.closest(".exc-node");
+          while (parent) {
+            parent.classList.remove("is-hidden");
+            parent.classList.remove("is-collapsed");
+            parent = parent.parentElement?.closest(".exc-node");
+          }
+        }
+      } else {
+        const matchingDescendant = node.querySelector(".exc-node:not(.is-hidden)");
+        if (matchingDescendant && (!currentTag || currentTag === "all" || matchingDescendant.dataset.tag === currentTag)) {
+          node.classList.remove("is-hidden");
+        } else {
+          node.classList.add("is-hidden");
+        }
+      }
+    });
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      currentQuery = e.target.value;
+      if (clearBtn) clearBtn.style.display = currentQuery ? "inline-flex" : "none";
+      applyFilters();
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (searchInput) searchInput.value = "";
+      currentQuery = "";
+      clearBtn.style.display = "none";
+      applyFilters();
+      searchInput?.focus();
+    });
+  }
+
+  filterPills.forEach((pill) => {
+    pill.addEventListener("click", () => {
+      filterPills.forEach((p) => p.classList.remove("active"));
+      pill.classList.add("active");
+      currentTag = pill.dataset.tag || "all";
+      applyFilters();
+    });
+  });
+
+  if (expandAllBtn) {
+    expandAllBtn.addEventListener("click", () => {
+      nodes.forEach((n) => n.classList.remove("is-collapsed"));
+    });
+  }
+
+  if (collapseAllBtn) {
+    collapseAllBtn.addEventListener("click", () => {
+      nodes.forEach((n) => {
+        if (!n.classList.contains("depth-0") && n.classList.contains("has-children")) {
+          n.classList.add("is-collapsed");
+        }
+      });
+    });
+  }
+
+  container.addEventListener("click", (e) => {
+    const toggleBtn = e.target.closest(".exc-toggle-btn");
+    if (!toggleBtn) return;
+    const node = toggleBtn.closest(".exc-node");
+    if (node) {
+      node.classList.toggle("is-collapsed");
+    }
+  });
+}
+
 function renderSlide(page, item, num) {
   const diff = resolveSlideDiff(page, item.slug, page.id);
   const tags = resolveSlideTags(page, item.slug, page.id);
   const alreadyStudied = resolveAlreadyStudied(page, item.slug, page.id);
 
   const slide = el("article", {
-    className: "slide",
+    className: "slide" + (page.is_intersection ? " is-intersection" : ""),
     id: page.id,
   });
   const header = el("div", { className: "slide-header" });
   header.innerHTML = `
     <span class="slide-num">${String(num).padStart(2, "0")}</span>
     <h2 class="slide-title">${escapeHtml(page.title)}</h2>
+    ${page.is_intersection ? '<span class="slide-intersection-badge">✦ Extra Přehled</span>' : ""}
     ${badgesHtml(tags)}
     ${diff ? flavorHtml(diff) : ""}
   `;
@@ -852,6 +952,12 @@ function renderSlide(page, item, num) {
   const body = el("div", { className: "slide-body" });
   body.innerHTML = rewriteContentUrls(page.html || "", item.path);
   slide.appendChild(body);
+
+  const excTree = body.querySelector("#excTreeApp");
+  if (excTree) {
+    initExceptionTree(excTree);
+  }
+
   return slide;
 }
 
@@ -874,7 +980,7 @@ export async function fetchAndExtract(path) {
   const candidates = [pathSlug, baseName].filter(Boolean);
   for (const s of candidates) {
     try {
-      const res = await fetch(`data/lectures/${s}.json`);
+      const res = await fetch(`/data/lectures/${s}.json`);
       if (res.ok) {
         const data = await res.json();
         if (data && Array.isArray(data.slides) && data.slides.length > 0) {

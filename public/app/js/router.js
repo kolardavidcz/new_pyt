@@ -204,7 +204,11 @@ function parseHash(hash) {
     return { kind: a === "content" || a === "item" ? "lecture" : a, id: itemId };
   }
   if (a === "presentation" && b) return { kind: "presentation", id: dec(parts.slice(1).join("/")) };
-  if (a === "page" && b && c) return { kind: "page", id: dec(b), pageId: dec(c) };
+  if (a === "page" && parts.length >= 3) {
+    const pageId = dec(parts[parts.length - 1]);
+    const itemId = dec(parts.slice(1, -1).join("/"));
+    return { kind: "page", id: itemId, pageId };
+  }
   if (a === "search") return { kind: "search" };
   if (a === "progress") return { kind: "progress" };
   if (a === "login") return { kind: "login" };

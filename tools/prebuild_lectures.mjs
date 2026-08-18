@@ -8,6 +8,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { renderExceptionTreeHtml } from "../app/js/exceptions_tree.js";
 
 const ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "data");
@@ -25,6 +26,17 @@ console.log("⚡ Pre-building Quiz Chunks and Static Lectures...");
 // 1. SPLIT QUIZZES.JSON INTO PER-DECK AND PER-WEEK JSON CHUNKS
 const quizFile = join(ROOT, "data", "quizzes.json");
 const courseFile = join(ROOT, "data", "course.json");
+
+// Load intersection slides
+let intersectionSlides = [];
+const intersectionSlidesPath = join(ROOT, "data", "intersection_slides.json");
+if (existsSync(intersectionSlidesPath)) {
+  try {
+    intersectionSlides = JSON.parse(readFileSync(intersectionSlidesPath, "utf-8"));
+  } catch (err) {
+    console.error("  ❌ Error reading intersection_slides.json:", err);
+  }
+}
 
 if (existsSync(quizFile)) {
   try {
@@ -475,6 +487,37 @@ function transformPreBlocks(html) {
   });
 }
 
+const excTreeSnippet = `<div class="exc-tree-app" id="excTreeApp">
+  <div class="exc-toolbar">
+    <div class="exc-search-box">
+      <span class="exc-search-icon">🔍</span>
+      <input type="text" class="exc-search-input" id="excSearchInput" placeholder="Filtrovat výjimku (např. KeyError, ZeroDivision, soubor)..." aria-label="Filtrovat výjimky" />
+      <button type="button" class="btn exc-clear-btn" id="excClearBtn" style="display:none;">✕</button>
+    </div>
+    <div class="exc-filter-pills" id="excFilterPills">
+      <button type="button" class="exc-pill active" data-tag="all">Vše (55)</button>
+      <button type="button" class="exc-pill pill-flow" data-tag="flow">⚙️ Řízení toku</button>
+      <button type="button" class="exc-pill pill-bug" data-tag="bug">🐛 Chyba v kódu</button>
+      <button type="button" class="exc-pill pill-guard" data-tag="guard">🛡️ Potřeba robustnosti</button>
+      <button type="button" class="exc-pill pill-sys" data-tag="sys">⚡ Vnější zásah / OS</button>
+      <button type="button" class="exc-pill pill-warn" data-tag="warn">⚠️ Varování</button>
+    </div>
+    <div class="exc-actions">
+      <button type="button" class="btn" id="excExpandAllBtn">Rozbalit vše</button>
+      <button type="button" class="btn" id="excCollapseAllBtn">Sbalit vše</button>
+    </div>
+  </div>
+  <div class="exc-tree-view" id="excTreeView">
+${renderExceptionTreeHtml()}
+  </div>
+</div>`;
+
+function transformExampleTags(html) {
+  if (!html) return "";
+  let res = html.replace(/<example[^>]*src=["']_history\/Python310["'][^>]*>[\s\S]*?<\/example>/gi, excTreeSnippet);
+  return res;
+}
+
 function transformCodeBlockquotes(html) {
   return html.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (match, inner) => {
     const rawText = inner.replace(/<[^>]+>/g, "").trim();
@@ -487,6 +530,7 @@ function transformCodeBlockquotes(html) {
 }
 
 let prebuiltCount = 0;
+const pagesIndexMap = {};
 for (const [relPath, filePath] of fileMap.entries()) {
   try {
     const htmlContent = readFileSync(filePath, "utf-8");
@@ -502,7 +546,7 @@ for (const [relPath, filePath] of fileMap.entries()) {
 
     while ((match = sectionRegex.exec(htmlContent)) !== null) {
       const sectionId = match[1];
-      const sectionInner = transformPreBlocks(transformCodeBlockquotes(match[2]));
+      const sectionInner = transformExampleTags(transformPreBlocks(transformCodeBlockquotes(match[2])));
       
       // Extract title header if present
       const hMatch = sectionInner.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i);
@@ -538,6 +582,54 @@ for (const [relPath, filePath] of fileMap.entries()) {
       idx++;
     }
 
+    // Splice matching intersection slides for this lecture
+    const matchingIntersections = intersectionSlides.filter((isl) => {
+      if (!isl.lecture) return false;
+      const normLec = isl.lecture.replace(/\\/g, "/").replace(/^\/+/, "");
+      return (
+        cleanRel === normLec.replace(/\.html?$/, "") ||
+        pathSlug === normLec.replace(/[\/\\]/g, "--").replace(/\.html?$/, "") ||
+        baseName === isl.lecture.split(/[/\\]/).pop().replace(/\.html?$/, "")
+      );
+    });
+
+    for (const isl of matchingIntersections) {
+      let insertIdx = slides.length;
+      if (isl.insert_after) {
+        const afterPos = slides.findIndex((s) => s.id === isl.insert_after);
+        if (afterPos !== -1) insertIdx = afterPos + 1;
+      } else if (isl.insert_before) {
+        const beforePos = slides.findIndex((s) => s.id === isl.insert_before);
+        if (beforePos !== -1) insertIdx = beforePos;
+      } else if (typeof isl.insert_index === "number") {
+        insertIdx = Math.min(isl.insert_index, slides.length);
+      }
+
+      let islHtml = isl.html || "";
+      if (islHtml.includes('id="excTreeView"') && !islHtml.includes('exc-node')) {
+        islHtml = islHtml.replace(
+          /<div class="exc-tree-view" id="excTreeView">[\s\S]*?<\/div>/i,
+          `<div class="exc-tree-view" id="excTreeView">\n${renderExceptionTreeHtml()}\n</div>`
+        );
+      }
+
+      slides.splice(insertIdx, 0, {
+        id: isl.id || `intersection_${insertIdx}`,
+        idx: insertIdx,
+        title: isl.title || "Intersection Slide",
+        tags: isl.tags || ["Core"],
+        diff: isl.diff || null,
+        is_intersection: true,
+        already_studied_in: null,
+        html: islHtml,
+      });
+    }
+
+    // Re-index idx sequentially
+    slides.forEach((s, i) => {
+      s.idx = i;
+    });
+
     if (slides.length > 0) {
       const payload = JSON.stringify({ slug: pathSlug, total: slides.length, slides }, null, 2);
       
@@ -553,8 +645,33 @@ for (const [relPath, filePath] of fileMap.entries()) {
       }
 
       prebuiltCount++;
+      
+      const pageEntries = slides.map((s) => ({
+        id: s.id,
+        title: s.title,
+        tags: s.tags,
+        diff: s.diff,
+        is_intersection: s.is_intersection || false,
+      }));
+      pagesIndexMap[relPath] = pageEntries;
+      pagesIndexMap[`vyuka_downloaded/${relPath}`] = pageEntries;
+      pagesIndexMap[`public/vyuka_downloaded/${relPath}`] = pageEntries;
     }
   } catch { /* ignore */ }
+}
+
+const pagesIndexPath = join(DATA_DIR, "pages-index.json");
+if (existsSync(pagesIndexPath)) {
+  try {
+    const existingIndex = JSON.parse(readFileSync(pagesIndexPath, "utf-8"));
+    const mergedIndex = { ...existingIndex, ...pagesIndexMap };
+    const payload = JSON.stringify(mergedIndex, null, 2);
+    writeFileSync(pagesIndexPath, payload, "utf-8");
+    writeFileSync(join(PUB_DIR, "data", "pages-index.json"), payload, "utf-8");
+    console.log(`  ✓ Updated pages-index.json with static slides & intersection slides`);
+  } catch (err) {
+    console.error("  ❌ Error updating pages-index.json:", err);
+  }
 }
 
 console.log(`  ✓ Pre-rendered ${prebuiltCount} static lecture slide trees into data/lectures/ and public/data/lectures/`);
