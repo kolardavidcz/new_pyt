@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { renderCompactAsciiExceptionTreeHtml } from "../app/js/exceptions_tree.js";
+import { renderCompactAsciiExceptionTreeHtml, renderSplitExceptionTreeHtml } from "../app/js/exceptions_tree.js";
 
 const ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "data");
@@ -611,6 +611,51 @@ for (const [relPath, filePath] of fileMap.entries()) {
       const diff = (slideMeta && typeof slideMeta === "object") ? (slideMeta.diff || null) : (typeof slideMeta === "string" ? slideMeta : null);
       const alreadyStudiedIn = (slideMeta && typeof slideMeta === "object") ? (slideMeta.already_studied_in || null) : null;
 
+      if ((cleanRel === "materialy/python/exceptions/exceptions" || baseName === "exceptions") && sectionId === "id8") {
+        slides.push(
+          {
+            id: "id8",
+            idx: idx++,
+            title: "Hierarchie standardních výjimek I",
+            tags: ["Core", "CheatSheet"],
+            diff: "overview",
+            already_studied_in: null,
+            html: `<div class="section-header"><span class="section-num">8</span><h2 class="section-title">Hierarchie standardních výjimek I — Kořen a řízení toku</h2></div><div class="section-body">
+  <div class="note-item"><span class="note-icon">📝</span><div class="note-content">
+    Viz <a href="http://docs.python.org/py3k/library/exceptions.html" target="_blank" rel="noopener">dokumentace standardních výjimek Pythonu</a>
+  </div></div>
+  ${renderSplitExceptionTreeHtml(1)}
+</div>`,
+          },
+          {
+            id: "id8_2",
+            idx: idx++,
+            title: "Hierarchie standardních výjimek II",
+            tags: ["Core", "CheatSheet"],
+            diff: "overview",
+            already_studied_in: null,
+            html: `<div class="section-header"><span class="section-num">8.2</span><h2 class="section-title">Hierarchie standardních výjimek II — Soubory a síť (OSError)</h2></div><div class="section-body">
+  ${renderSplitExceptionTreeHtml(2)}
+</div>`,
+          },
+          {
+            id: "id8_3",
+            idx: idx++,
+            title: "Hierarchie standardních výjimek III",
+            tags: ["Core", "CheatSheet"],
+            diff: "overview",
+            already_studied_in: null,
+            html: `<div class="section-header"><span class="section-num">8.3</span><h2 class="section-title">Hierarchie standardních výjimek III — Typy, syntaktické chyby a varování</h2></div><div class="section-body">
+  ${renderSplitExceptionTreeHtml(3)}
+  <p>
+    PS: Struktura standardních výjimek se čas od času mění (např. Python 3.2 postrádal celou větev <em>OSError</em> a měl místo ní <em>EnvironmentError</em>).
+  </p>
+</div>`,
+          }
+        );
+        continue;
+      }
+
       slides.push({
         id: sectionId,
         idx,
@@ -704,7 +749,9 @@ for (const [relPath, filePath] of fileMap.entries()) {
       pagesIndexMap[`vyuka_downloaded/${relPath}`] = pageEntries;
       pagesIndexMap[`public/vyuka_downloaded/${relPath}`] = pageEntries;
     }
-  } catch { /* ignore */ }
+  } catch (err) {
+    console.error("Error processing lecture:", filePath, err);
+  }
 }
 
 const pagesIndexPath = join(DATA_DIR, "pages-index.json");
