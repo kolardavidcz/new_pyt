@@ -47,13 +47,37 @@ function detectLang(node) {
   return "plain";
 }
 
-function normalizeLang(raw) {
-  const l = raw.toLowerCase();
-  if (l === "py" || l === "python3") return "python";
-  if (l === "sh" || l === "shell" || l === "zsh" || l === "cmd" || l === "powershell" || l === "ps1") return "bash";
-  if (l === "jscript" || l === "javascript" || l === "ts" || l === "typescript") return "js";
-  if (l === "html" || l === "htm") return "xml";
+export function normalizeLang(raw) {
+  if (!raw) return "python";
+  const l = String(raw).toLowerCase().trim();
+  if (l === "py" || l === "python3" || l === "python") return "python";
+  if (l === "sh" || l === "shell" || l === "zsh" || l === "cmd" || l === "powershell" || l === "ps1" || l === "bash" || l === "bat") return "bash";
+  if (l === "jscript" || l === "javascript" || l === "js" || l === "ts" || l === "typescript") return "js";
+  if (l === "html" || l === "htm" || l === "xml" || l === "svg") return "xml";
+  if (l === "css") return "css";
+  if (l === "sql") return "sql";
+  if (l === "c" || l === "cpp" || l === "c++") return "c";
+  if (l === "java") return "java";
+  if (l === "json" || l === "yaml" || l === "yml" || l === "text" || l === "plain" || l === "output") return "plain";
   return l;
+}
+
+export function detectCodeLang(code, declaredLang = "") {
+  if (declaredLang) {
+    return normalizeLang(declaredLang);
+  }
+  if (!code) return "python";
+  const trimmed = String(code).trim();
+  if (/^(\$|>|#!\/bin\/)/m.test(trimmed) || /^(python3?|pip3?|conda|venv|git|cd|ls|mkdir|chmod|curl|source)\s/m.test(trimmed)) {
+    return "bash";
+  }
+  if (/^(SELECT|INSERT|UPDATE|DELETE|CREATE\s+TABLE|FROM|WHERE)\b/im.test(trimmed)) {
+    return "sql";
+  }
+  if (/^<(!DOCTYPE|[a-z0-9_-]+)/i.test(trimmed)) {
+    return "xml";
+  }
+  return "python";
 }
 
 function esc(s) {
