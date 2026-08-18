@@ -204,6 +204,147 @@ function dedentLines(lines) {
   return lines.map((l) => l.trimEnd());
 }
 
+function standardizePythonCode(text) {
+  if (!text) return "";
+
+  let code = String(text).replace(/\t/g, "    ").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  code = code.replace(/\n{3,}/g, "\n\n");
+  code = trimBlankLines(code);
+
+  const rawLines = code.split("\n");
+  if (rawLines.length === 0) return "";
+
+  const lines = dedentLines(rawLines);
+
+  const hasClassOrDef = lines.some((l) => /^\s*(?:class|def|async\s+def|@\w+)\b/.test(l));
+  if (!hasClassOrDef) {
+    return lines.join("\n");
+  }
+
+  const result = [];
+  let inClass = false;
+  let inFunc = false;
+  let subBlockIndent = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i];
+    const trimmed = rawLine.trim();
+    const curRawIndent = (rawLine.match(/^[ ]*/) || [""])[0].length;
+
+    if (trimmed.length === 0) {
+      result.push("");
+      continue;
+    }
+
+    if (/^class\s+\w+/i.test(trimmed) || (/^class\s+/i.test(trimmed) && trimmed.endsWith(":"))) {
+      inClass = true;
+      inFunc = false;
+      subBlockIndent = -1;
+      result.push(trimmed);
+      continue;
+    }
+
+    if (/^@\w+/.test(trimmed)) {
+      inFunc = false;
+      subBlockIndent = -1;
+      if (inClass) {
+        result.push(`    ${trimmed}`);
+      } else {
+        result.push(trimmed);
+      }
+      continue;
+    }
+
+    if (/^(?:def|async\s+def)\s+\w+/i.test(trimmed)) {
+      subBlockIndent = -1;
+      if (inClass) {
+        inFunc = true;
+        result.push(`    ${trimmed}`);
+      } else {
+        inClass = false;
+        inFunc = true;
+        result.push(trimmed);
+      }
+      continue;
+    }
+
+    if (/^(?:for|while|if|elif|else|try|except|finally|with)\b/i.test(trimmed)) {
+      subBlockIndent = curRawIndent;
+      if (inClass && inFunc) {
+        result.push(`        ${trimmed}`);
+      } else if (inFunc || inClass) {
+        result.push(`    ${trimmed}`);
+      } else {
+        result.push(trimmed);
+      }
+      continue;
+    }
+
+    if (subBlockIndent >= 0 && curRawIndent <= subBlockIndent) {
+      subBlockIndent = -1;
+    }
+
+    if (/^(?:return|yield|raise|break|continue|pass)\b/i.test(trimmed)) {
+      const isNested = subBlockIndent >= 0 && curRawIndent > subBlockIndent;
+      if (inClass && inFunc) {
+        result.push(isNested ? `            ${trimmed}` : `        ${trimmed}`);
+      } else if (inFunc || inClass) {
+        result.push(isNested ? `        ${trimmed}` : `    ${trimmed}`);
+      } else {
+        result.push(trimmed);
+      }
+      if (!isNested) subBlockIndent = -1;
+      continue;
+    }
+
+    if (trimmed === "..." || trimmed === "…") {
+      const isNested = subBlockIndent >= 0;
+      if (inClass && inFunc) {
+        result.push(isNested ? `            ...` : `        ...`);
+      } else if (inFunc || inClass) {
+        result.push(isNested ? `        ...` : `    ...`);
+      } else {
+        result.push(`...`);
+      }
+      continue;
+    }
+
+    if (inClass && !inFunc) {
+      result.push(`    ${trimmed}`);
+      continue;
+    }
+
+    if (inFunc) {
+      const isPostBlockCall = /^[a-zA-Z_]\w*\s*(?:=|\(|\.|\[)/.test(trimmed) &&
+        !/^(?:self|cls)\b/.test(trimmed) &&
+        !trimmed.startsWith("self.") &&
+        !trimmed.startsWith("cls.") &&
+        (rawLine.match(/^[ ]*/)[0].length === 0 || /^[a-z_]\w*\s*=\s*(?:[A-Z]\w*\(|Člověk|Potomek|Školák)/.test(trimmed));
+
+      if (isPostBlockCall && (rawLine.match(/^[ ]*/)[0].length === 0 || /^[a-z]\s*=/.test(trimmed))) {
+        inClass = false;
+        inFunc = false;
+        subBlockIndent = -1;
+        result.push(trimmed);
+        continue;
+      }
+
+      const isNested = subBlockIndent >= 0 && curRawIndent > subBlockIndent;
+      if (inClass) {
+        result.push(isNested ? `            ${trimmed}` : `        ${trimmed}`);
+      } else {
+        result.push(isNested ? `        ${trimmed}` : `    ${trimmed}`);
+      }
+      if (!isNested) subBlockIndent = -1;
+      continue;
+    }
+
+    result.push(trimmed);
+  }
+
+  return trimBlankLines(result.join("\n"));
+}
+
 function normalizeCodeShowcase(text, lang = "python") {
   if (!text) return "";
   let code = String(text).replace(/\t/g, "    ").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
@@ -213,14 +354,17 @@ function normalizeCodeShowcase(text, lang = "python") {
   const lines = code.split("\n");
   if (lines.length === 0) return "";
 
-  const hasReplPrompt = lines.some((l) => /^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(l));
+  const hasReplPrompt = lines.some((l) => /^\s*>{2,3}(?:\s|$)/.test(l));
   if (!hasReplPrompt) {
+    if (lang === "python") {
+      return standardizePythonCode(code);
+    }
     return dedentLines(lines).join("\n");
   }
 
   let firstPromptIdx = -1;
   for (let i = 0; i < lines.length; i++) {
-    if (/^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(lines[i])) {
+    if (/^\s*>{2,3}(?:\s|$)/.test(lines[i])) {
       firstPromptIdx = i;
       break;
     }
@@ -238,7 +382,7 @@ function normalizeCodeShowcase(text, lang = "python") {
     const codePrefix = rawPrefix.slice(0, splitIdx);
     const commentPrefix = rawPrefix.slice(splitIdx);
 
-    const dedentedCode = dedentLines(codePrefix);
+    const dedentedCode = standardizePythonCode(codePrefix.join("\n")).split("\n");
     const normalizedComments = commentPrefix.map((l) => l.trimStart());
     prefixLines = [...dedentedCode, ...normalizedComments];
     replLines = lines.slice(firstPromptIdx);
