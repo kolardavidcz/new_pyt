@@ -577,102 +577,18 @@ export const EXCEPTION_ENTRIES = [
   { branch: "           +-- ", name: "UserWarning", typ: "Varování", cls: "typ-warn", desc: "Běžná uživatelská a knihovní varování z kódu aplikace." }
 ];
 
-export const EXCEPTION_PART_1 = [
-  { branch: "", name: "BaseException", typ: "Systém", cls: "typ-sys", desc: "Nejvyšší kořenová třída všech výjimek v Pythonu." },
-  { branch: " +-- ", name: "BaseExceptionGroup", typ: "Systém", cls: "typ-sys", desc: "Skupina současně vzniklých výjimek (asyncio TaskGroup)." },
-  { branch: " +-- ", name: "SystemExit", typ: "Ukončení", cls: "typ-sys", desc: "Standardní ukončení procesu funkcí sys.exit()." },
-  { branch: " +-- ", name: "KeyboardInterrupt", typ: "Vnější zásah", cls: "typ-sys", desc: "Přerušení běhu uživatelem stiskem Ctrl+C." },
-  { branch: " +-- ", name: "GeneratorExit", typ: "Řízení toku", cls: "typ-flow", desc: "Ukončení generátoru voláním generator.close()." },
-  { branch: " +-- ", name: "Exception", typ: "Kořen chyb", cls: "typ-base", desc: "Bázová třída pro běžné chyby a obecný try-except." },
-  { branch: "      +-- ", name: "StopIteration", typ: "Řízení toku", cls: "typ-flow", desc: "Konec synchronního iterátoru v next(); řídí cyklus for." },
-  { branch: "      +-- ", name: "StopAsyncIteration", typ: "Řízení toku", cls: "typ-flow", desc: "Konec asynchronního iterátoru v async for." },
-  { branch: "      +-- ", name: "ArithmeticError", typ: "Aritmetika", cls: "typ-base", desc: "Společná nadtřída pro numerické a matematické chyby." },
-  { branch: "      |    +-- ", name: "FloatingPointError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Chyba operace v plovoucí řádové čárce." },
-  { branch: "      |    +-- ", name: "OverflowError", typ: "Přetečení", cls: "typ-guard", desc: "Překročení maximálního rozsahu číselné reprezentace." },
-  { branch: "      |    +-- ", name: "ZeroDivisionError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Dělení nebo modulo nulou (1 / 0 nebo 10 % 0)." },
-  { branch: "      +-- ", name: "AssertionError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Příkaz assert vyhodnotil podmínku jako False." },
-  { branch: "      +-- ", name: "AttributeError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Objekt nemá volaný atribut nebo metodu." },
-  { branch: "      +-- ", name: "BufferError", typ: "Paměť", cls: "typ-sys", desc: "Nízkoúrovňová operace s vyrovnávací pamětí selhala." },
-  { branch: "      +-- ", name: "EOFError", typ: "Vstup", cls: "typ-guard", desc: "input() narazil na konec vstupního streamu bez dat." },
-  { branch: "      +-- ", name: "ExceptionGroup", typ: "Skupina chyb", cls: "typ-base", desc: "Skupina výjimek dědících z Exception (syntaxe except*)." },
-  { branch: "      +-- ", name: "ImportError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Příkaz import selhal při načítání modulu nebo objektu." },
-  { branch: "      |    +-- ", name: "ModuleNotFoundError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Modul nebyl nalezen v sys.path (chybí pip install)." },
-  { branch: "      +-- ", name: "LookupError", typ: "Kolekce", cls: "typ-base", desc: "Společný předek pro chyby vyhledávání klíče či indexu." },
-  { branch: "      |    +-- ", name: "IndexError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Index v sekvenci (list, tuple, str) je mimo meze." },
-  { branch: "      |    +-- ", name: "KeyError", typ: "Robustnost", cls: "typ-guard", desc: "Klíč nebyl ve slovníku nalezen (použít .get() / try-except)." },
-  { branch: "      +-- ", name: "MemoryError", typ: "Paměť", cls: "typ-sys", desc: "Vyčerpána paměť RAM; interpret nemůže alokovat objekt." },
-  { branch: "      +-- ", name: "NameError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Přístup k nedefinované proměnné nebo funkci (překlep)." },
-  { branch: "      |    +-- ", name: "UnboundLocalError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Čtení lokální proměnné před jejím přiřazením." }
-];
-
-export const EXCEPTION_PART_2 = [
-  { branch: "", name: "Exception", typ: "Kořen chyb", cls: "typ-base", desc: "(pokračování hierarchie Exception)" },
-  { branch: " +-- ", name: "OSError", typ: "Systém", cls: "typ-guard", desc: "Společný předek pro chyby OS, souborů a síťové komunikace." },
-  { branch: "      +-- ", name: "BlockingIOError", typ: "Robustnost", cls: "typ-guard", desc: "Operace na neblokujícím socketu by zablokovala běh." },
-  { branch: "      +-- ", name: "ChildProcessError", typ: "Systém", cls: "typ-sys", desc: "Operace s dceřiným podprocesem selhala." },
-  { branch: "      +-- ", name: "ConnectionError", typ: "Síť", cls: "typ-guard", desc: "Společná nadtřída pro výpadky a problémy síťového spojení." },
-  { branch: "      |    +-- ", name: "BrokenPipeError", typ: "Síť", cls: "typ-guard", desc: "Zápis do socketu/roury s již uzavřeným protějším koncem." },
-  { branch: "      |    +-- ", name: "ConnectionAbortedError", typ: "Síť", cls: "typ-guard", desc: "Spojení přerušeno lokálním síťovým stackem." },
-  { branch: "      |    +-- ", name: "ConnectionRefusedError", typ: "Síť", cls: "typ-guard", desc: "Cílový server odmítl spojení na daném portu." },
-  { branch: "      |    +-- ", name: "ConnectionResetError", typ: "Síť", cls: "typ-guard", desc: "Spojení protistranou násilně ukončeno (RST)." },
-  { branch: "      +-- ", name: "FileExistsError", typ: "Soubory", cls: "typ-guard", desc: "Pokus o vytvoření souboru/složky, která již existuje." },
-  { branch: "      +-- ", name: "FileNotFoundError", typ: "Soubory", cls: "typ-guard", desc: "Soubor či složka na zadané cestě neexistuje." },
-  { branch: "      +-- ", name: "InterruptedError", typ: "Systém", cls: "typ-sys", desc: "Systémové volání OS bylo přerušeno signálem (EINTR)." },
-  { branch: "      +-- ", name: "IsADirectoryError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Souborová operace požadována nad složkou." },
-  { branch: "      +-- ", name: "NotADirectoryError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Adresářová operace požadována nad souborem." },
-  { branch: "      +-- ", name: "PermissionError", typ: "Oprávnění", cls: "typ-guard", desc: "Odepřen přístup k souboru/složce kvůli právům OS." },
-  { branch: "      +-- ", name: "ProcessLookupError", typ: "Systém", cls: "typ-guard", desc: "Proces podle zadaného PID neexistuje." },
-  { branch: "      +-- ", name: "TimeoutError", typ: "Časový limit", cls: "typ-guard", desc: "Síťová či I/O operace překročila nastavený časový limit." },
-  { branch: " +-- ", name: "ReferenceError", typ: "Paměť", cls: "typ-sys", desc: "Přístup přes slabý odkaz (weakref) na již uklizený objekt." }
-];
-
-export const EXCEPTION_PART_3 = [
-  { branch: "", name: "Exception", typ: "Kořen chyb", cls: "typ-base", desc: "(pokračování hierarchie Exception)" },
-  { branch: " +-- ", name: "RuntimeError", typ: "Běhová chyba", cls: "typ-bug", desc: "Obecná běhová chyba nespadající do konkrétnější kategorie." },
-  { branch: " |    +-- ", name: "NotImplementedError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Abstraktní metoda nebyla v odvozené třídě implementována." },
-  { branch: " |    +-- ", name: "PythonFinalizationError", typ: "Systém", cls: "typ-sys", desc: "Chyba nastala při ukončování interpretu Pythonu." },
-  { branch: " |    +-- ", name: "RecursionError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Překročena max. hloubka rekurze (chybí bázový případ)." },
-  { branch: " +-- ", name: "SyntaxError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Chyba syntaxe zjištěná parserem před spuštěním kódu." },
-  { branch: " |    +-- ", name: "IndentationError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Chybné odsazení bloku kódu (např. chybí 4 mezery)." },
-  { branch: " |         +-- ", name: "TabError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Nekonzistentní míchání tabulátorů a mezer v odsazení." },
-  { branch: " +-- ", name: "SystemError", typ: "Systém", cls: "typ-sys", desc: "Interní chyba v interpretu nebo C rozšíření Pythonu." },
-  { branch: " +-- ", name: "TypeError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Operace aplikována na nevhodný datový typ (např. 'str' + 5)." },
-  { branch: " +-- ", name: "ValueError", typ: "Robustnost", cls: "typ-guard", desc: "Správný datový typ, ale neplatná hodnota (např. int('abc'))." },
-  { branch: " |    +-- ", name: "UnicodeError", typ: "Kódování", cls: "typ-guard", desc: "Společná nadtřída pro chyby kódování a dekódování textu." },
-  { branch: " |         +-- ", name: "UnicodeDecodeError", typ: "Kódování", cls: "typ-guard", desc: "Selhání převodu bajtů na text (nesprávný encoding)." },
-  { branch: " |         +-- ", name: "UnicodeEncodeError", typ: "Kódování", cls: "typ-guard", desc: "Znak nelze zakódovat do cílové znakové sady." },
-  { branch: " |         +-- ", name: "UnicodeTranslateError", typ: "Kódování", cls: "typ-guard", desc: "Selhání při překladu znaku metodou translate()." },
-  { branch: " +-- ", name: "Warning", typ: "Varování", cls: "typ-warn", desc: "Společná bázová třída pro všechna nefatální varování." },
-  { branch: "      +-- ", name: "BytesWarning", typ: "Varování", cls: "typ-warn", desc: "Varování při podezřelém míchání typů bytes a str." },
-  { branch: "      +-- ", name: "DeprecationWarning", typ: "Varování", cls: "typ-warn", desc: "Varování před použitím zastaralých funkcí či syntaxe." },
-  { branch: "      +-- ", name: "EncodingWarning", typ: "Varování", cls: "typ-warn", desc: "Varování při neuvedení parametru encoding v open()." },
-  { branch: "      +-- ", name: "FutureWarning", typ: "Varování", cls: "typ-warn", desc: "Varování před konstrukcí, která změní význam v budoucnu." },
-  { branch: "      +-- ", name: "ImportWarning", typ: "Varování", cls: "typ-warn", desc: "Varování při podezřelých chybách během importování modulu." },
-  { branch: "      +-- ", name: "PendingDeprecationWarning", typ: "Varování", cls: "typ-warn", desc: "Plánované budoucí zastarání funkce či API." },
-  { branch: "      +-- ", name: "ResourceWarning", typ: "Varování", cls: "typ-warn", desc: "Varování před neuvolněným systémovým prostředkem." },
-  { branch: "      +-- ", name: "RuntimeWarning", typ: "Varování", cls: "typ-warn", desc: "Varování před podezřelým chováním kódu za běhu." },
-  { branch: "      +-- ", name: "SyntaxWarning", typ: "Varování", cls: "typ-warn", desc: "Varování před syntakticky pochybnou konstrukcí." },
-  { branch: "      +-- ", name: "UnicodeWarning", typ: "Varování", cls: "typ-warn", desc: "Varování při podezřelé operaci nad Unicode řetězcem." },
-  { branch: "      +-- ", name: "UserWarning", typ: "Varování", cls: "typ-warn", desc: "Běžná uživatelská a knihovní varování z kódu aplikace." }
-];
-
 /**
- * Generate compact ASCII + CZ exception tree HTML (full or by part)
+ * Generate compact ASCII + CZ exception tree HTML
  */
-export function renderCompactAsciiExceptionTreeHtml(entries = EXCEPTION_ENTRIES) {
+export function renderCompactAsciiExceptionTreeHtml() {
   function escapeHtml(str) {
     return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
-  const linesHtml = entries.map((e) => {
+  const linesHtml = EXCEPTION_ENTRIES.map((e) => {
     const branchPart = e.branch ? `<span class="exc-branch">${escapeHtml(e.branch)}</span>` : "";
     return `<div class="exc-line">${branchPart}<span class="exc-lead"><span class="exc-name ${e.cls}">${escapeHtml(e.name)}</span> <span class="exc-typ ${e.cls}">[${escapeHtml(e.typ)}]</span></span><span class="exc-sep"> – </span><span class="exc-desc">${escapeHtml(e.desc)}</span></div>`;
   }).join("\n");
 
   return `<div class="exc-ascii-tree">${linesHtml}</div>`;
-}
-
-export function renderSplitExceptionTreeHtml(part = 1) {
-  const entries = part === 2 ? EXCEPTION_PART_2 : part === 3 ? EXCEPTION_PART_3 : EXCEPTION_PART_1;
-  return renderCompactAsciiExceptionTreeHtml(entries);
 }
