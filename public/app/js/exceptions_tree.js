@@ -504,73 +504,78 @@ export const EXCEPTION_TREE_DATA = {
 };
 
 /**
- * Complete standard Python Exception Hierarchy formatted as compact ASCII + CZ text
+ * Complete standard Python Exception Hierarchy formatted with color-coded category types and concise Czech meanings.
  */
-export const COMPACT_ASCII_EXCEPTIONS_TREE = `BaseException [Systém] - Nejvyšší kořenová třída všech výjimek v Pythonu.
- +-- SystemExit [Ukončení] - Vyvolána funkcí sys.exit() při požadavku na standardní ukončení procesu.
- +-- KeyboardInterrupt [Vnější zásah] - Vyvolána, když uživatel stiskne klávesovou zkratku přerušení programu (obvykle Ctrl+C).
- +-- GeneratorExit [Řízení toku] - Vyvolána uvnitř generátoru při volání jeho metody close() pro uvolnění prostředků.
- +-- Exception [Kořen chyb] - Bázová třída pro všechny nefatální chyby; doporučený předek pro vlastní výjimky i obecné try-except.
-      +-- StopIteration [Řízení toku] - Signalizuje vyčerpání prvků v synchronním iterátoru voláním next(). Řídí běh cyklu for.
-      +-- StopAsyncIteration [Řízení toku] - Signalizuje ukončení asynchronního iterátoru metodou __anext__().
-      +-- ArithmeticError [Aritmetika] - Společná nadtřída pro numerické a matematické chyby výpočtu.
-      |    +-- FloatingPointError [Chyba v kódu] - Chyba operace v plovoucí řádové čárce (pokud je hardwarem/OS hlášena).
-      |    +-- OverflowError [Přetečení] - Výsledek matematické operace překročil maximální rozsah číselné reprezentace (např. u float).
-      |    +-- ZeroDivisionError [Chyba v kódu] - Dělení nebo modulo nulou (1 / 0 nebo 10 % 0). Řešení: ošetřit vstupní jmenovatel.
-      +-- AssertionError [Chyba v kódu] - Příkaz assert vyhodnotil podmínku jako False (neplatný vnitřní předpoklad programu).
-      +-- AttributeError [Chyba v kódu] - Objekt nemá požadovaný atribut nebo metodu (např. 'str' object has no attribute 'append').
-      +-- BufferError [Systém] - Nízkoúrovňová operace s vyrovnávací pamětí (buffer protocol) selhala.
-      +-- EOFError [Robustnost] - Funkce input() narazila na konec vstupního streamu (End-Of-File) bez přečtení dat.
-      +-- ImportError [Chyba v kódu] - Příkaz import nebo from ... import selhal při načítání modulu nebo objektu.
-      |    +-- ModuleNotFoundError [Chyba v kódu] - Hledaný modul nebyl nalezen v sys.path (např. chybí 'pip install <balíček>').
-      +-- LookupError [Kolekce] - Společný předek pro chyby při vyhledávání klíče či indexu v sekvenci nebo mapování.
-      |    +-- IndexError [Chyba v kódu] - Index v sekvenci (list, tuple, str) je mimo platný rozsah (např. xs[10] pro 3prvkový seznam).
-      |    +-- KeyError [Robustnost] - Zadaný klíč nebyl ve slovníku nalezen. Řešení: použít d.get(key, default) nebo 'if key in d:'.
-      +-- MemoryError [Systém] - Operační paměť je vyčerpána a interpret Pythonu nemůže alokovat další objekt.
-      +-- NameError [Chyba v kódu] - Pokus o přístup k neexistující lokální nebo globální proměnné (překlep ve jménu, chybějící definice).
-      |    +-- UnboundLocalError [Chyba v kódu] - Čtení lokální proměnné uvnitř funkce dříve, než do ní byla v této funkci přiřazena hodnota.
-      +-- OSError [Robustnost] - Společná nadtřída pro chyby operačního systému, souborů a síťové komunikace.
-      |    +-- BlockingIOError [Robustnost] - Operace na neblokujícím socketu nebo streamu by způsobila zablokování běhu.
-      |    +-- ChildProcessError [Systém] - Operace s dceřiným podprocesem (child process) selhala.
-      |    +-- ConnectionError [Robustnost] - Společná nadtřída pro výpadky a problémy síťového připojení.
-      |    |    +-- BrokenPipeError [Robustnost] - Zápis do síťového socketu nebo roury, jejíž protější konec byl už uzavřen.
-      |    |    +-- ConnectionAbortedError [Robustnost] - Navázané síťové spojení bylo přerušeno lokálním síťovým stackem.
-      |    |    +-- ConnectionRefusedError [Robustnost] - Cílový server odmítl navázat spojení (na daném portu žádná služba neposlouchá).
-      |    |    +-- ConnectionResetError [Robustnost] - Existující spojení bylo vzdálenou protistranou násilně ukončeno (TCP RST).
-      |    +-- FileExistsError [Robustnost] - Pokus o vytvoření souboru nebo adresáře s názvem, který již existuje (např. os.mkdir).
-      |    +-- FileNotFoundError [Robustnost] - Požadovaný soubor nebo složka nebyla nalezena. Doporučeno ověřit cestu před otevřením.
-      |    +-- InterruptedError [Systém] - Systémové volání operačního systému bylo přerušeno příchozím signálem (EINTR).
-      |    +-- IsADirectoryError [Chyba v kódu] - Byla požadována souborová operace (např. open() pro zápis) nad adresářem.
-      |    +-- NotADirectoryError [Chyba v kódu] - Byla požadována adresářová operace (např. os.listdir) nad běžným souborem.
-      |    +-- PermissionError [Robustnost] - Nedostatečná přístupová oprávnění k souboru, složce nebo systémovému prostředku.
-      |    +-- ProcessLookupError [Robustnost] - Požadovaný systémový proces podle zadaného PID neexistuje.
-      |    +-- TimeoutError [Robustnost] - Systémová či síťová operace překročila nastavený časový limit.
-      +-- ReferenceError [Systém] - Pokus o přístup k objektu přes slabý odkaz (weakref), který již byl uklizen garbage collectorem.
-      +-- RuntimeError [Chyba v kódu] - Obecná běhová chyba, která nespadá do žádné konkrétnější kategorie výjimek.
-      |    +-- NotImplementedError [Chyba v kódu] - Abstraktní metoda nebo rozhraní nebylo v odvozené třídě doimplementováno.
-      |    +-- RecursionError [Chyba v kódu] - Překročení maximální povolené hloubky rekurzivních volání (chybí bázová podmínka).
-      +-- SyntaxError [Chyba v kódu] - Chyba syntaxe zjištěná parserem ještě před samotným spuštěním kódu.
-      |    +-- IndentationError [Chyba v kódu] - Chybné odsazení bloku kódu (např. po dvojtečce chybí 4 mezery).
-      |         +-- TabError [Chyba v kódu] - Nekonzistentní míchání tabulátorů a mezer v odsazení řádků.
-      +-- SystemError [Systém] - Interní chyba interpretu Pythonu (např. chyba v C extension nebo bytecode interpretu).
-      +-- TypeError [Chyba v kódu] - Operace nebo funkce byla aplikována na objekt nevhodného datového typu (např. 'str' + 5).
-      +-- ValueError [Robustnost] - Operace obdržela argument správného datového typu, ale s nevhodnou hodnotou (např. int('abc')).
-      |    +-- UnicodeError [Robustnost] - Společná nadtřída pro chyby při kódování a dekódování řetězců.
-      |         +-- UnicodeDecodeError [Robustnost] - Chyba při převodu bajtů na řetězec (např. nesprávné kódování utf-8 vs cp1250).
-      |         +-- UnicodeEncodeError [Robustnost] - Chyba při převodu řetězce na bajty (znak nelze v cílovém kódování vyjádřit).
-      |         +-- UnicodeTranslateError [Robustnost] - Chyba při překladu znaků metodou translate().
-      +-- Warning [Varování] - Společná bázová třída pro všechna standardní varování (nezpůsobují pád programu).
-           +-- DeprecationWarning [Varování] - Varování před použitím zastaralých funkcí či syntaxe, které budou v budoucnu odstraněny.
-           +-- PendingDeprecationWarning [Varování] - Varování před funkcemi, jejichž zastarání je plánováno v delším horizontu.
-           +-- RuntimeWarning [Varování] - Varování před podezřelým nebo neobvyklým chováním kódu za běhu.
-           +-- SyntaxWarning [Varování] - Varování před syntakticky podezřelými konstrukcemi v kódu.
-           +-- UserWarning [Varování] - Výchozí kategorie pro uživatelská a knihovní varování generovaná aplikací.
-           +-- FutureWarning [Varování] - Varování před konstrukcemi, jejichž sémantika se v budoucí verzi jazyka změní.
-           +-- ImportWarning [Varování] - Varování vyvolaná při podezřelých chybách během importování modulů.
-           +-- UnicodeWarning [Varování] - Varování související s podezřelými operacemi nad Unicode řetězci.
-           +-- BytesWarning [Varování] - Varování při podezřelém míchání datových typů bytes a str.
-           +-- EncodingWarning [Varování] - Varování při neuvedení explicitního kódování při otevírání textových souborů (Python 3.10+).
-           +-- ResourceWarning [Varování] - Varování před neuzavřenými soubory, sokety či neuvolněnými systémovými prostředky.`;
+export const EXCEPTION_ENTRIES = [
+  { branch: "", name: "BaseException", typ: "Systém", cls: "typ-sys", desc: "Nejvyšší kořenová třída všech výjimek v Pythonu." },
+  { branch: " +-- ", name: "BaseExceptionGroup", typ: "Systém", cls: "typ-sys", desc: "Skupina současně vzniklých výjimek (asyncio TaskGroup)." },
+  { branch: " +-- ", name: "SystemExit", typ: "Ukončení", cls: "typ-sys", desc: "Standardní ukončení procesu funkcí sys.exit()." },
+  { branch: " +-- ", name: "KeyboardInterrupt", typ: "Vnější zásah", cls: "typ-sys", desc: "Přerušení běhu uživatelem stiskem Ctrl+C." },
+  { branch: " +-- ", name: "GeneratorExit", typ: "Řízení toku", cls: "typ-flow", desc: "Ukončení generátoru voláním generator.close()." },
+  { branch: " +-- ", name: "Exception", typ: "Kořen chyb", cls: "typ-base", desc: "Bázová třída pro běžné chyby a obecný try-except." },
+  { branch: "      +-- ", name: "StopIteration", typ: "Řízení toku", cls: "typ-flow", desc: "Konec synchronního iterátoru v next(); řídí cyklus for." },
+  { branch: "      +-- ", name: "StopAsyncIteration", typ: "Řízení toku", cls: "typ-flow", desc: "Konec asynchronního iterátoru v async for." },
+  { branch: "      +-- ", name: "ArithmeticError", typ: "Aritmetika", cls: "typ-base", desc: "Společná nadtřída pro numerické a matematické chyby." },
+  { branch: "      |    +-- ", name: "FloatingPointError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Chyba operace v plovoucí řádové čárce." },
+  { branch: "      |    +-- ", name: "OverflowError", typ: "Přetečení", cls: "typ-guard", desc: "Překročení maximálního rozsahu číselné reprezentace." },
+  { branch: "      |    +-- ", name: "ZeroDivisionError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Dělení nebo modulo nulou (1 / 0 nebo 10 % 0)." },
+  { branch: "      +-- ", name: "AssertionError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Příkaz assert vyhodnotil podmínku jako False." },
+  { branch: "      +-- ", name: "AttributeError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Objekt nemá volaný atribut nebo metodu." },
+  { branch: "      +-- ", name: "BufferError", typ: "Paměť", cls: "typ-sys", desc: "Nízkoúrovňová operace s vyrovnávací pamětí selhala." },
+  { branch: "      +-- ", name: "EOFError", typ: "Vstup", cls: "typ-guard", desc: "input() narazil na konec vstupního streamu bez dat." },
+  { branch: "      +-- ", name: "ExceptionGroup", typ: "Skupina chyb", cls: "typ-base", desc: "Skupina výjimek dědících z Exception (syntaxe except*)." },
+  { branch: "      +-- ", name: "ImportError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Příkaz import selhal při načítání modulu nebo objektu." },
+  { branch: "      |    +-- ", name: "ModuleNotFoundError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Modul nebyl nalezen v sys.path (chybí pip install)." },
+  { branch: "      +-- ", name: "LookupError", typ: "Kolekce", cls: "typ-base", desc: "Společný předek pro chyby vyhledávání klíče či indexu." },
+  { branch: "      |    +-- ", name: "IndexError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Index v sekvenci (list, tuple, str) je mimo meze." },
+  { branch: "      |    +-- ", name: "KeyError", typ: "Robustnost", cls: "typ-guard", desc: "Klíč nebyl ve slovníku nalezen (použít .get() / try-except)." },
+  { branch: "      +-- ", name: "MemoryError", typ: "Paměť", cls: "typ-sys", desc: "Vyčerpána paměť RAM; interpret nemůže alokovat objekt." },
+  { branch: "      +-- ", name: "NameError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Přístup k nedefinované proměnné nebo funkci (překlep)." },
+  { branch: "      |    +-- ", name: "UnboundLocalError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Čtení lokální proměnné před jejím přiřazením." },
+  { branch: "      +-- ", name: "OSError", typ: "Systém", cls: "typ-guard", desc: "Společný předek pro chyby OS, souborů a síťové komunikace." },
+  { branch: "      |    +-- ", name: "BlockingIOError", typ: "Robustnost", cls: "typ-guard", desc: "Operace na neblokujícím socketu by zablokovala běh." },
+  { branch: "      |    +-- ", name: "ChildProcessError", typ: "Systém", cls: "typ-sys", desc: "Operace s dceřiným podprocesem selhala." },
+  { branch: "      |    +-- ", name: "ConnectionError", typ: "Síť", cls: "typ-guard", desc: "Společná nadtřída pro výpadky a problémy síťového spojení." },
+  { branch: "      |    |    +-- ", name: "BrokenPipeError", typ: "Síť", cls: "typ-guard", desc: "Zápis do socketu/roury s již uzavřeným protějším koncem." },
+  { branch: "      |    |    +-- ", name: "ConnectionAbortedError", typ: "Síť", cls: "typ-guard", desc: "Spojení přerušeno lokálním síťovým stackem." },
+  { branch: "      |    |    +-- ", name: "ConnectionRefusedError", typ: "Síť", cls: "typ-guard", desc: "Cílový server odmítl spojení na daném portu." },
+  { branch: "      |    |    +-- ", name: "ConnectionResetError", typ: "Síť", cls: "typ-guard", desc: "Spojení protistranou násilně ukončeno (RST)." },
+  { branch: "      |    +-- ", name: "FileExistsError", typ: "Soubory", cls: "typ-guard", desc: "Pokus o vytvoření souboru/složky, která již existuje." },
+  { branch: "      |    +-- ", name: "FileNotFoundError", typ: "Soubory", cls: "typ-guard", desc: "Soubor či složka na zadané cestě neexistuje." },
+  { branch: "      |    +-- ", name: "InterruptedError", typ: "Systém", cls: "typ-sys", desc: "Systémové volání OS bylo přerušeno signálem (EINTR)." },
+  { branch: "      |    +-- ", name: "IsADirectoryError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Souborová operace požadována nad složkou." },
+  { branch: "      |    +-- ", name: "NotADirectoryError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Adresářová operace požadována nad souborem." },
+  { branch: "      |    +-- ", name: "PermissionError", typ: "Oprávnění", cls: "typ-guard", desc: "Odepřen přístup k souboru/složce kvůli právům OS." },
+  { branch: "      |    +-- ", name: "ProcessLookupError", typ: "Systém", cls: "typ-guard", desc: "Proces podle zadaného PID neexistuje." },
+  { branch: "      |    +-- ", name: "TimeoutError", typ: "Časový limit", cls: "typ-guard", desc: "Síťová či I/O operace překročila nastavený časový limit." },
+  { branch: "      +-- ", name: "ReferenceError", typ: "Paměť", cls: "typ-sys", desc: "Přístup přes slabý odkaz (weakref) na již uklizený objekt." },
+  { branch: "      +-- ", name: "RuntimeError", typ: "Běhová chyba", cls: "typ-bug", desc: "Obecná běhová chyba nespadající do konkrétnější kategorie." },
+  { branch: "      |    +-- ", name: "NotImplementedError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Abstraktní metoda nebyla v odvozené třídě implementována." },
+  { branch: "      |    +-- ", name: "PythonFinalizationError", typ: "Systém", cls: "typ-sys", desc: "Chyba nastala při ukončování interpretu Pythonu." },
+  { branch: "      |    +-- ", name: "RecursionError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Překročena max. hloubka rekurze (chybí bázový případ)." },
+  { branch: "      +-- ", name: "SyntaxError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Chyba syntaxe zjištěná parserem před spuštěním kódu." },
+  { branch: "      |    +-- ", name: "IndentationError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Chybné odsazení bloku kódu (např. chybí 4 mezery)." },
+  { branch: "      |         +-- ", name: "TabError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Nekonzistentní míchání tabulátorů a mezer v odsazení." },
+  { branch: "      +-- ", name: "SystemError", typ: "Systém", cls: "typ-sys", desc: "Interní chyba v interpretu nebo C rozšíření Pythonu." },
+  { branch: "      +-- ", name: "TypeError", typ: "Chyba v kódu", cls: "typ-bug", desc: "Operace aplikována na nevhodný datový typ (např. 'str' + 5)." },
+  { branch: "      +-- ", name: "ValueError", typ: "Robustnost", cls: "typ-guard", desc: "Správný datový typ, ale neplatná hodnota (např. int('abc'))." },
+  { branch: "      |    +-- ", name: "UnicodeError", typ: "Kódování", cls: "typ-guard", desc: "Společná nadtřída pro chyby kódování a dekódování textu." },
+  { branch: "      |         +-- ", name: "UnicodeDecodeError", typ: "Kódování", cls: "typ-guard", desc: "Selhání převodu bajtů na text (nesprávný encoding)." },
+  { branch: "      |         +-- ", name: "UnicodeEncodeError", typ: "Kódování", cls: "typ-guard", desc: "Znak nelze zakódovat do cílové znakové sady." },
+  { branch: "      |         +-- ", name: "UnicodeTranslateError", typ: "Kódování", cls: "typ-guard", desc: "Selhání při překladu znaku metodou translate()." },
+  { branch: "      +-- ", name: "Warning", typ: "Varování", cls: "typ-warn", desc: "Společná bázová třída pro všechna nefatální varování." },
+  { branch: "           +-- ", name: "BytesWarning", typ: "Varování", cls: "typ-warn", desc: "Varování při podezřelém míchání typů bytes a str." },
+  { branch: "           +-- ", name: "DeprecationWarning", typ: "Varování", cls: "typ-warn", desc: "Varování před použitím zastaralých funkcí či syntaxe." },
+  { branch: "           +-- ", name: "EncodingWarning", typ: "Varování", cls: "typ-warn", desc: "Varování při neuvedení parametru encoding v open()." },
+  { branch: "           +-- ", name: "FutureWarning", typ: "Varování", cls: "typ-warn", desc: "Varování před konstrukcí, která změní význam v budoucnu." },
+  { branch: "           +-- ", name: "ImportWarning", typ: "Varování", cls: "typ-warn", desc: "Varování při podezřelých chybách během importování modulu." },
+  { branch: "           +-- ", name: "PendingDeprecationWarning", typ: "Varování", cls: "typ-warn", desc: "Plánované budoucí zastarání funkce či API." },
+  { branch: "           +-- ", name: "ResourceWarning", typ: "Varování", cls: "typ-warn", desc: "Varování před neuvolněným systémovým prostředkem." },
+  { branch: "           +-- ", name: "RuntimeWarning", typ: "Varování", cls: "typ-warn", desc: "Varování před podezřelým chováním kódu za běhu." },
+  { branch: "           +-- ", name: "SyntaxWarning", typ: "Varování", cls: "typ-warn", desc: "Varování před syntakticky pochybnou konstrukcí." },
+  { branch: "           +-- ", name: "UnicodeWarning", typ: "Varování", cls: "typ-warn", desc: "Varování při podezřelé operaci nad Unicode řetězcem." },
+  { branch: "           +-- ", name: "UserWarning", typ: "Varování", cls: "typ-warn", desc: "Běžná uživatelská a knihovní varování z kódu aplikace." }
+];
 
 /**
  * Generate compact ASCII + CZ exception tree HTML
@@ -580,5 +585,10 @@ export function renderCompactAsciiExceptionTreeHtml() {
     return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
-  return `<pre class="brush: plain; gutter: false; toolbar: false; exc-ascii-tree">${escapeHtml(COMPACT_ASCII_EXCEPTIONS_TREE)}</pre>`;
+  const linesHtml = EXCEPTION_ENTRIES.map((e) => {
+    const branchPart = e.branch ? `<span class="exc-branch">${escapeHtml(e.branch)}</span>` : "";
+    return `<div class="exc-line">${branchPart}<span class="exc-lead"><span class="exc-name ${e.cls}">${escapeHtml(e.name)}</span> <span class="exc-typ ${e.cls}">[${escapeHtml(e.typ)}]</span></span><span class="exc-sep"> – </span><span class="exc-desc">${escapeHtml(e.desc)}</span></div>`;
+  }).join("\n");
+
+  return `<div class="exc-ascii-tree">${linesHtml}</div>`;
 }
