@@ -127,24 +127,67 @@ if (existsSync(slidesJsonPath)) {
 function isCodeBlockquote(html, rawText) {
   const t = (rawText || "").trim();
   if (!t) return false;
-  if (t.startsWith("„") || t.startsWith('"') || t.startsWith("»") || t.startsWith("'") || t.startsWith("«")) return false;
-  if (/^<code>[\s\S]*<\/code>$/i.test((html || "").trim()) || /<pre[\s\S]*<\/pre>/i.test(html || "")) return true;
-  if (/\b(je|jsou|není|nejsou|obsahuje|představuje|může|musí|bude|bylo|mají|slouží|sloužit|pokud|jestliže|protože|však|používá|volá|vrací|určuje|znamená|respektive|nalezen|vytvořen|označit|při vstupu|vynechané|chcete-li|napišeme)\b/i.test(t)) return false;
-  if (t.endsWith(".") && !t.includes("(") && !t.includes("=")) return false;
+  
+  // Explicit code or pre tags
+  if (/^<code>[\s\S]*<\/code>$/is.test((html || "").trim()) || /<pre[\s\S]*<\/pre>/i.test(html || "")) return true;
 
-  if (/^[a-zA-Z0-9_.]+\s*=\s*[a-zA-Z0-9_.]+\s*\(.*?\)$/s.test(t)) return true;
-  if (/^[a-zA-Z0-9_.]+\s*\([a-zA-Z0-9_=*,\s'"\(\)\[\]\.\/\:\-\+\<\>\&]*\)$/s.test(t)) return true;
+  // Real prose quotes
+  if (t.startsWith("„") && !t.includes("Funkce") && !t.includes("SEKVENCE")) return false;
+  if (t.startsWith("»") || t.startsWith("«")) return false;
+  if (/^"[A-Z][a-z\s]+"/i.test(t) && !t.includes("\\") && !t.includes(".exe")) return false;
+
+  // Czech sentence words indicating prose, NOT code
+  if (/\b(je|jsou|není|nejsou|obsahuje|představuje|může|musí|bude|bylo|mají|slouží|sloužit|pokud|jestliže|protože|však|používá|volá|vrací|určuje|znamená|respektive|nalezen|vytvořen|označit|při vstupu|vynechané|chcete-li|napišeme|potomci|představují|patří|úkolem|každou|máte-li|jsou-li|načtete-li)\b/i.test(t)) return false;
+  if (t.endsWith(".") && !t.includes("(") && !t.includes("=") && !t.includes("->")) return false;
+
+  // 1. Assignment or instantiation (Python / XPath / XML)
+  if (/^[a-zA-Z0-9_.]+\s*=\s*.+$/s.test(t)) return true;
+  if (/^xmlns:[a-zA-Z0-9_]+=/i.test(t)) return true;
+
+  // 2. Function / Method signature / Call
+  if (/^[a-zA-Z0-9_.]+\s*\(.*?\)/s.test(t)) return true;
+
+  // 3. Keyword syntax templates
+  if (/^(assert|for\s+\$|some\s+\$|every\s+\$|if\s+\(|while\s+|def\s+|class\s+|with\s+|return\s+|yield\s+|import\s+|from\s+)/i.test(t)) return true;
+  if (/^„?\[“?\s*Funkce\(I\)\s+for\s+I\s+in\s+SEKVENCE/i.test(t)) return true;
+
+  // 4. Data structures & expressions
+  if (/^\[\s*['"][a-zA-Z0-9_]+['"]/i.test(t)) return true;
+  if (/^\{[a-zA-Z0-9_:]+\}$/i.test(t)) return true;
+  if (/^\(:\s*.*\s*:\)$/i.test(t)) return true;
+  if (/^[a-zA-Z0-9_-]+\s+to\s+[a-zA-Z0-9_-]+$/i.test(t)) return true;
+  if (/^(eq|ne|lt|le|gt|ge|\=|\!\=|\<|\<\=|\>|\>\=|\+|\-|\*|\band\b|\bor\b)(\s+(eq|ne|lt|le|gt|ge|\=|\!\=|\<|\<\=|\>|\>\=|\+|\-|\*|\band\b|\bor\b))*$/i.test(t)) return true;
   if (/^[a-zA-Z0-9_.]+(\[[^\]]+\]|\.[a-zA-Z0-9_]+)\s*[\*+\-\/]\s*[a-zA-Z0-9_.]+/i.test(t)) return true;
+
+  // 5. CLI commands / HTTP headers / executable paths
   if (/^(\$|>|conda\s+[a-z\-]+|pip\s+[a-z\-]+|python\s+[a-z0-9_\-\.]+)\s+/i.test(t)) return true;
+  if (/^"[A-Z]:\\.*\.exe"/i.test(t)) return true;
+  if (/^(metoda\s+lokální|verze-protokolu\s+kód|jméno-hlavičky:)/i.test(t)) return true;
 
   return false;
+}
+
+function detectCodeLang(code) {
+  if (!code) return "python";
+  const trimmed = String(code).trim();
+  if (/^(\$|>|#!\/bin\/)/m.test(trimmed) || /^(python3?|pip3?|conda|venv|git|cd|ls|mkdir|chmod|curl|source)\s/m.test(trimmed) || /^"[A-Z]:\\.*\.exe"/i.test(trimmed)) {
+    return "bash";
+  }
+  if (/^(SELECT|INSERT|UPDATE|DELETE|CREATE\s+TABLE|FROM|WHERE)\b/im.test(trimmed)) {
+    return "sql";
+  }
+  if (/^<(!DOCTYPE|[a-z0-9_-]+)/i.test(trimmed) || /^xmlns:[a-z0-9_-]+=/i.test(trimmed)) {
+    return "xml";
+  }
+  return "python";
 }
 
 function transformCodeBlockquotes(html) {
   return html.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (match, inner) => {
     const rawText = inner.replace(/<[^>]+>/g, "").trim();
     if (isCodeBlockquote(inner, rawText)) {
-      return `<pre class="brush: python; gutter: false; toolbar: false;">${inner.trim()}</pre>`;
+      const lang = detectCodeLang(rawText);
+      return `<pre class="brush: ${lang}; gutter: false; toolbar: false;">${inner.trim()}</pre>`;
     }
     return match;
   });
