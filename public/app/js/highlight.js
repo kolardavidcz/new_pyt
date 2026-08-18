@@ -560,6 +560,15 @@ export function dedentCode(text) {
  * - Properly indents ellipsis (...) placeholders inside classes, functions, and loops
  * - Resets top-level classes, functions, and post-class calls to column 0
  */
+/**
+ * Normalizes and standardizes indentation for pure Python code blocks:
+ * - Expands tabs to 4 spaces
+ * - Collapses \n{3,} to \n\n
+ * - Dedents common outer container margin
+ * - Normalizes 2-space indentation to 4-space tab stops
+ * - Preserves nested functions, closures, decorators, and multi-level returns
+ * - Indents ellipsis (...) placeholders contextually
+ */
 export function standardizePythonCode(text) {
   if (!text) return "";
 
@@ -573,78 +582,82 @@ export function standardizePythonCode(text) {
 
   const lines = dedentLines(rawLines);
 
-  const hasCompound = lines.some((l) =>
-    /^\s*(?:class|def|async\s+def|@\w+|for|while|if|elif|else|try|except|finally|with)\b/.test(l)
-  );
-  if (!hasCompound) {
-    return lines.join("\n");
+  // Collect non-zero indentation values
+  const nonZeroIndents = [];
+  for (const l of lines) {
+    if (l.trim().length === 0) continue;
+    const ind = (l.match(/^[ ]*/) || [""])[0].length;
+    if (ind > 0) nonZeroIndents.push(ind);
   }
 
+  // Detect 2-space indentation: has lines with indent % 4 !== 0 and indent % 2 === 0
+  const isTwoSpace = nonZeroIndents.length > 0 &&
+    nonZeroIndents.every((n) => n % 2 === 0) &&
+    nonZeroIndents.some((n) => n % 4 !== 0);
+
   const result = [];
-  // Stack of active blocks: array of { type, indent }
-  const stack = [];
+  let lastNonEmptyIndent = 0;
+  let lastNonEmptyEndedWithColon = false;
 
   for (let i = 0; i < lines.length; i++) {
-    const rawLine = lines[i];
-    const trimmed = rawLine.trim();
+    const line = lines[i];
+    const trimmed = line.trim();
 
     if (trimmed.length === 0) {
       result.push("");
       continue;
     }
 
-    // Comment line
-    if (trimmed.startsWith("#")) {
-      const curIndent = stack.length > 0 ? stack[stack.length - 1].indent + 4 : 0;
-      result.push(`${" ".repeat(curIndent)}${trimmed}`);
+    const rawIndent = (line.match(/^[ ]*/) || [""])[0].length;
+
+    // Handle ellipsis placeholder with 0 raw indent inside an opened block
+    if ((trimmed === "..." || trimmed === "…") && rawIndent === 0 && lastNonEmptyEndedWithColon) {
+      const targetIndent = lastNonEmptyIndent + 4;
+      result.push(`${" ".repeat(targetIndent)}...`);
+      lastNonEmptyIndent = targetIndent;
+      lastNonEmptyEndedWithColon = false;
       continue;
     }
 
-    // Check for post-class/func top-level call closing everything (e.g. p = Potomek(), p.mtd())
-    const isPostBlockCall =
-      /^[a-zA-Z_]\w*\s*(?:=|\(|\.|\[)/.test(trimmed) &&
-      !/^(?:self|cls)\b/.test(trimmed) &&
-      !trimmed.startsWith("self.") &&
-      !trimmed.startsWith("cls.") &&
-      !/^(?:def|class|return|yield|raise|if|elif|else|for|while|try|except|finally|with)\b/.test(trimmed) &&
-      (rawLine.match(/^[ ]*/)[0].length === 0 || /^[a-z_]\w*\s*=\s*(?:[A-Z]\w*\(|Člověk|Potomek|Školák)/.test(trimmed));
-
-    if (isPostBlockCall && stack.length > 0 && (rawLine.match(/^[ ]*/)[0].length === 0 || /^[a-z]\s*=/.test(trimmed))) {
-      stack.length = 0;
-      result.push(trimmed);
-      continue;
-    }
-
-    // Top-level class definition
-    if (/^class\s+\w+/i.test(trimmed) || (/^class\s+/i.test(trimmed) && trimmed.endsWith(":"))) {
-      stack.length = 0;
-      result.push(trimmed);
-      stack.push({ type: "class", indent: 0 });
-      continue;
-    }
-
-    // Decorator (@classmethod, @staticmethod, etc.)
-    if (/^@\w+/.test(trimmed)) {
-      const topClass = stack.find((b) => b.type === "class");
-      const indent = topClass ? 4 : 0;
-      result.push(`${" ".repeat(indent)}${trimmed}`);
-      continue;
-    }
-
-    // Function or method definition
-    if (/^(?:def|async\s+def)\s+\w+/i.test(trimmed)) {
-      const inClass = stack.some((b) => b.type === "class");
-      if (inClass) {
-        while (stack.length > 0 && stack[stack.length - 1].type !== "class") {
-          stack.pop();
-        }
-        result.push(`    ${trimmed}`);
-        stack.push({ type: "def", indent: 4 });
+    let targetIndent = rawIndent;
+    if (rawIndent > 0) {
+      if (isTwoSpace) {
+        targetIndent = Math.round(rawIndent / 2) * 4;
       } else {
-        stack.length = 0;
-        result.push(trimmed);
-        stack.push({ type: "def", indent: 0 });
+        targetIndent = Math.round(rawIndent / 4) * 4;
       }
+    }
+
+    result.push(`${" ".repeat(targetIndent)}${trimmed}`);
+    lastNonEmptyIndent = targetIndent;
+    lastNonEmptyEndedWithColon = trimmed.endsWith(":") && !trimmed.startsWith("#");
+  }
+
+  return trimBlankLines(result.join("\n"));
+}
+
+/**
+ * Reconstructs compound indentation specifically for flat/unindented REPL continuation lines
+ */
+export function reconstructFlatReplLines(headerLine, contLines) {
+  const result = [headerLine.trim()];
+  const stack = [];
+
+  // Determine if header ends with colon
+  if (headerLine.trim().endsWith(":")) {
+    stack.push({ type: headerLine.trim().split(/\s|:/)[0], indent: 0 });
+  }
+
+  for (const cLine of contLines) {
+    const trimmed = cLine.trim();
+    if (trimmed.length === 0) {
+      result.push("");
+      continue;
+    }
+
+    if (trimmed.startsWith("#")) {
+      const curIndent = stack.length > 0 ? stack[stack.length - 1].indent + 4 : 4;
+      result.push(`${" ".repeat(curIndent)}${trimmed}`);
       continue;
     }
 
@@ -663,33 +676,20 @@ export function standardizePythonCode(text) {
       continue;
     }
 
-    // Compound headers: for, while, if, try, with
-    if (/^(?:for|while|if|try|with)\b/i.test(trimmed) && trimmed.endsWith(":")) {
-      const curIndent = stack.length > 0 ? stack[stack.length - 1].indent + 4 : 0;
+    // Compound headers inside loop/block (e.g. if x in xd:)
+    if (/^(?:for|while|if|try|with|def)\b/i.test(trimmed) && trimmed.endsWith(":")) {
+      const curIndent = stack.length > 0 ? stack[stack.length - 1].indent + 4 : 4;
       result.push(`${" ".repeat(curIndent)}${trimmed}`);
       stack.push({ type: trimmed.split(/\s|:/)[0], indent: curIndent });
       continue;
     }
 
     // Normal statement inside block
-    const curIndent = stack.length > 0 ? stack[stack.length - 1].indent + 4 : 0;
-
-    // Check if statement ends a loop/func (e.g. return, pass, break, continue)
-    if (/^(?:return|yield|raise|break|continue|pass)\b/i.test(trimmed)) {
-      result.push(`${" ".repeat(curIndent)}${trimmed}`);
-      continue;
-    }
-
-    // Ellipsis placeholder (...)
-    if (trimmed === "..." || trimmed === "…") {
-      result.push(`${" ".repeat(curIndent)}...`);
-      continue;
-    }
-
+    const curIndent = stack.length > 0 ? stack[stack.length - 1].indent + 4 : 4;
     result.push(`${" ".repeat(curIndent)}${trimmed}`);
   }
 
-  return trimBlankLines(result.join("\n"));
+  return result;
 }
 
 /**
@@ -789,16 +789,21 @@ export function normalizeCodeShowcase(text, lang = "python") {
         const hasTrailingEmptyPrompt = continuationLines[continuationLines.length - 1].replace(/^\s*\.{3}/, "").trim().length === 0;
         const codeContLines = hasTrailingEmptyPrompt ? continuationLines.slice(0, -1) : continuationLines;
 
-        const strippedLines = [headerRest];
-        for (const cLine of codeContLines) {
-          const stripped = cLine.replace(/^\s*\.{3}\s?/, "");
-          strippedLines.push(stripped);
+        // Check if continuation lines have relative indentation or are flat
+        const strippedContLines = codeContLines.map((cLine) => cLine.replace(/^\s*\.{3}\s?/, ""));
+        const contIndents = strippedContLines.filter((l) => l.trim().length > 0).map((l) => (l.match(/^[ ]*/) || [""])[0].length);
+        const hasRelativeIndents = contIndents.some((ind) => ind > 0) && new Set(contIndents).size > 1;
+
+        let standardizedLines;
+        if (hasRelativeIndents) {
+          standardizedLines = standardizePythonCode([headerRest, ...strippedContLines].join("\n")).split("\n");
+        } else {
+          standardizedLines = reconstructFlatReplLines(headerRest, strippedContLines);
         }
 
-        const standardized = standardizePythonCode(strippedLines.join("\n")).split("\n");
-        processedReplLines.push(`>>> ${standardized[0]}`);
-        for (let s = 1; s < standardized.length; s++) {
-          processedReplLines.push(`... ${standardized[s]}`);
+        processedReplLines.push(`>>> ${standardizedLines[0]}`);
+        for (let s = 1; s < standardizedLines.length; s++) {
+          processedReplLines.push(`... ${standardizedLines[s]}`);
         }
         if (hasTrailingEmptyPrompt) {
           processedReplLines.push("...");
