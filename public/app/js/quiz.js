@@ -321,14 +321,14 @@ export async function renderQuizSection(item) {
 
     function updateLiveFill(val, isCorrect) {
       const cleanVal = val.replace(/^[A-D]\)\s*/, "").trim();
-      const targetNode = codeWrapEl ? codeWrapEl.querySelector("code") : qText;
+      const targetNode = (codeWrapEl ? codeWrapEl.querySelector("code") : null) || qText.querySelector("pre code") || qText;
       if (targetNode) {
         if (!targetNode.dataset.originalCode) {
           targetNode.dataset.originalCode = targetNode.innerHTML;
         }
         const orig = targetNode.dataset.originalCode;
         const fillHtml = `<span class="filled-blank ${isCorrect ? "correct" : "incorrect"}">${escapeHtml(cleanVal)}</span>`;
-        targetNode.innerHTML = orig.replace(/________|___/g, fillHtml);
+        targetNode.innerHTML = orig.replace(/________|___|___BLANK___/g, fillHtml);
       }
     }
 
@@ -367,6 +367,16 @@ export async function renderQuizSection(item) {
         if (codeNode && (codeNode.innerHTML.includes("________") || codeNode.innerHTML.includes("___") || codeNode.innerHTML.includes("___BLANK___"))) {
           codeNode.innerHTML = codeNode.innerHTML.replace(/________|___|___BLANK___/g, inlineInputHtml);
           inserted = true;
+        }
+      }
+      if (!inserted) {
+        const codeNodes = qText.querySelectorAll("pre code, .code-block code, .inline-code, code");
+        for (const codeNode of codeNodes) {
+          if (codeNode.innerHTML.includes("________") || codeNode.innerHTML.includes("___") || codeNode.innerHTML.includes("___BLANK___")) {
+            codeNode.innerHTML = codeNode.innerHTML.replace(/________|___|___BLANK___/g, inlineInputHtml);
+            inserted = true;
+            break;
+          }
         }
       }
       if (!inserted && (qText.innerHTML.includes("________") || qText.innerHTML.includes("___") || qText.innerHTML.includes("___BLANK___"))) {

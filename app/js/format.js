@@ -2,7 +2,7 @@
  * Code formatting, syntax pill inlining, and quiz fill evaluation utilities.
  */
 
-import { highlightCode, dedentCode } from "./highlight.js";
+import { highlightCode, dedentCode, detectCodeLang, normalizeLang } from "./highlight.js";
 import { DYNAMIC_PY_BUILTINS } from "./syntax_tokens.js";
 
 const DYNAMIC_PY_FUNC_REGEX = new RegExp(
@@ -21,15 +21,43 @@ function escapeHtml(s) {
 export function formatInlineCode(str) {
   if (!str) return "";
 
+  // Handle multiline markdown codeblocks (```lang ... ```) if present
+  if (String(str).includes("```")) {
+    const blocks = String(str).split("```");
+    const outBlocks = [];
+    for (let b = 0; b < blocks.length; b++) {
+      if (b % 2 === 1) {
+        const rawBlock = blocks[b];
+        const firstLineBreak = rawBlock.indexOf("\n");
+        let langDeclared = "";
+        let codeBody = rawBlock;
+        if (firstLineBreak !== -1) {
+          const possibleLang = rawBlock.slice(0, firstLineBreak).trim();
+          if (/^[a-zA-Z0-9_#+-]+$/.test(possibleLang)) {
+            langDeclared = possibleLang;
+            codeBody = rawBlock.slice(firstLineBreak + 1);
+          }
+        }
+        const dedented = dedentCode(codeBody);
+        const lang = detectCodeLang(dedented, langDeclared);
+        outBlocks.push(`<pre class="code-block lang-${lang}"><code>${highlightCode(dedented, lang)}</code></pre>`);
+      } else {
+        outBlocks.push(formatInlineCode(blocks[b]));
+      }
+    }
+    return outBlocks.join("");
+  }
+
   // Split by backticks: even indices are text, odd indices are code snippets
   const parts = String(str).split(/`([^`]+)`/g);
   const out = [];
 
   for (let i = 0; i < parts.length; i++) {
     if (i % 2 === 1) {
-      // Code snippet: highlight raw code directly (single clean escape in highlighter)
+      // Code snippet: highlight raw code directly
       const rawCode = parts[i];
-      const highlighted = highlightCode(rawCode, "python");
+      const lang = detectCodeLang(rawCode);
+      const highlighted = highlightCode(rawCode, lang);
       out.push(`<code class="inline-code">${highlighted}</code>`);
     } else {
       // Text fragment: escape HTML safely for text nodes (preserve existing HTML tags if any)
@@ -140,28 +168,41 @@ export function parseQuestionContent(rawQuestion, rawCode) {
   let stemText = rawQuestion || "";
   let codeSnippetHtml = "";
 
+  // If question contains markdown code blocks, render them inline in their natural reading order
   if (stemText.includes("```")) {
     const parts = stemText.split("```");
-    let promptParts = [];
+    const formattedParts = [];
     for (let pIdx = 0; pIdx < parts.length; pIdx++) {
       if (pIdx % 2 === 1) {
-        let codeText = parts[pIdx].replace(/^(python|bash|c|java)\n?/i, "");
-        const dedented = dedentCode(codeText);
-        const lang = parts[pIdx].match(/^(python|bash|c|java)/i)?.[1] || "python";
-        codeSnippetHtml += `<pre class="code-block lang-${lang}"><code>${highlightCode(dedented, lang)}</code></pre>`;
+        const rawBlock = parts[pIdx];
+        const firstLineBreak = rawBlock.indexOf("\n");
+        let langDeclared = "";
+        let codeBody = rawBlock;
+        if (firstLineBreak !== -1) {
+          const possibleLang = rawBlock.slice(0, firstLineBreak).trim();
+          if (/^[a-zA-Z0-9_#+-]+$/.test(possibleLang)) {
+            langDeclared = possibleLang;
+            codeBody = rawBlock.slice(firstLineBreak + 1);
+          }
+        }
+        const dedented = dedentCode(codeBody);
+        const lang = detectCodeLang(dedented, langDeclared);
+        formattedParts.push(`<div class="quiz-code-wrap"><pre class="code-block lang-${lang}"><code>${highlightCode(dedented, lang)}</code></pre></div>`);
       } else {
-        promptParts.push(parts[pIdx]);
+        formattedParts.push(formatInlineCode(parts[pIdx]));
       }
     }
-    stemText = promptParts.join("").trim();
+    stemText = formattedParts.join("");
+  } else {
+    stemText = formatInlineCode(stemText);
   }
 
-  if (!codeSnippetHtml && rawCode) {
+  // If question has a standalone q.code not already embedded in q.question
+  if (rawCode && (!rawQuestion || !rawQuestion.includes("```"))) {
     const dedented = dedentCode(rawCode);
-    const lang = "python";
+    const lang = detectCodeLang(dedented);
     codeSnippetHtml = `<pre class="code-block lang-${lang}"><code>${highlightCode(dedented, lang)}</code></pre>`;
   }
 
-  const stemHtml = formatInlineCode(stemText);
-  return { stemHtml, codeSnippetHtml };
+  return { stemHtml: stemText, codeSnippetHtml };
 }

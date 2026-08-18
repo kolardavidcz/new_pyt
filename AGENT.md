@@ -101,18 +101,56 @@ const targetIdx = hash % cleanOpts.length;
 
 ---
 
-## 🎨 UI Design Tokens & CSS Guidelines (`app/css/shell.css`)
+## 🎨 Theme System, Code Block Settings & Print Architecture
 
-### 1. Color Palette (VS Code Terminal Aesthetic)
-- **Editor Background**: `#1e1e1e` (Dark mode) / `#ffffff` (Light mode)
-- **Sidebar Background**: `#252526`
-- **Status Bar**: `#007acc`
-- **Primary Accent / Buttons**: `#0284c7` (Hover: `#0369a1`)
-- **Secondary & Action Buttons**: `rgba(255, 255, 255, 0.08)` (Border: `rgba(255, 255, 255, 0.16)`, Text: `#e2e8f0`, Hover: `rgba(255, 255, 255, 0.16)`)
+The application implements a multi-layer theme engine combining global page themes, user-configurable code block themes, and print stylesheet rules.
 
-### 2. Utility Classes & DOM Toggling
-- **CRITICAL CSS OVERRIDE**: `.hidden { display: none !important; }` in `shell.css`.
-- When showing an element programmatically, **ALWAYS call `element.classList.remove("hidden")`** in addition to setting inline styles (e.g. `style.display = "flex"`), otherwise `.hidden` will force `display: none !important`.
+```
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                               THEME COMBINATION MATRIX                                 │
+├───────────────────┬──────────────────────┬────────────────────────┬────────────────────┤
+│ Global Theme      │ Code Block Setting   │ Slide Code Blocks      │ Quiz Code Blocks   │
+├───────────────────┼──────────────────────┼────────────────────────┼────────────────────┤
+│ Dark (Default)    │ dark                 │ #1e1e1e (Dark+)        │ #1e1e1e (Dark+)    │
+│ Dark              │ light                │ #1e1e1e (Dark+)        │ #1e1e1e (Dark+)    │
+│ Light             │ dark (Default)       │ #1e1e1e (Dark+)        │ #1e1e1e (Dark+)    │
+│ Light             │ light                │ #f8f9fa (Light Tokens) │ #f8f9fa (Light Tk) │
+│ @media print      │ dark                 │ #1e1e1e (High Contrast)│ #1e1e1e (High Cont)│
+│ @media print      │ light                │ #f8f9fa (Ink Saver)    │ #f8f9fa (Ink Saver)│
+└───────────────────┴──────────────────────┴────────────────────────┴────────────────────┘
+```
+
+### 1. Global Page Themes (`data-theme="dark"` vs `data-theme="light"`)
+- **Dark Page Theme (`html[data-theme="dark"]` - Default)**:
+  - Dark editor surface: `--editor: #1e1e1e`, `--bg: #161616`, `--sidebar: #252526`.
+  - Monospace VS Code Dark+ aesthetics across modals, control centers, and cards.
+- **Light Page Theme (`html[data-theme="light"]`)**:
+  - Clean white page background: `--bg: #ffffff`, `--editor: #ffffff`, `--border: #cbd5e1`.
+  - Text: `#0f172a` / `#1e293b`.
+
+### 2. Code Block Theme Setting (`data-code-block-color="dark"` vs `"light"`)
+In User Profile / Settings (`app/js/content.js`), users can independently configure **Kódové bloky**: `Tmavé` (`dark`) vs `Světlé` (`light`):
+- `data-code-block-color="dark"`: Renders `#1e1e1e` background with VS Code Dark+ token colors across all code blocks, even when viewing in Light page theme.
+- `data-code-block-color="light"`: Renders `#f8f9fa` background with light syntax tokens (`#0000ff` keywords, `#a31515` strings, `#008000` comments).
+- **Mandatory Uniformity**: This setting applies to:
+  1. Presentation slides (`.slide-body pre`, `.code-block`)
+  2. Interactive quiz questions (`.quiz-code-wrap pre`, `.quiz-q-card pre`)
+  3. Interactive code fill inputs (`.inline-code-fill-input`)
+  4. Structured exercise cards (`.task-card pre`)
+
+### 3. Print Layout Standards (`app/css/print.css` / `@media print`)
+- **Default Light Paper**: Print layout ALWAYS forces `#ffffff` background with `#111827` high-contrast body text for clean A4 printing.
+- **Print Code Block Control**:
+  - `data-code-block-color="dark"`: Renders `#1e1e1e` dark codeboxes for high-contrast presentation slides.
+  - `data-code-block-color="light"`: Renders `#f8f9fa` light codeboxes to save printer toner.
+- **Print Quizzes Toggle**: `data-print-quizzes="true"` toggles quiz questions at the end of the printed document.
+
+### 4. Code Block Formatting Standard (Slides & Quizzes)
+All code blocks across slides and quizzes must adhere to the exact same standard:
+1. **Markup Structure**: `<pre class="code-block lang-{lang}"><code>{highlightCode(dedented, lang)}</code></pre>`.
+2. **Automatic Indentation Dedenting**: Always run `dedentCode(text)` before highlighting.
+3. **Language Normalization & Detection**: Use `detectCodeLang(code, declaredLang)` to detect Python REPL (`>>>`), shell commands (`$`, `>`), SQL, XML, or Python.
+4. **Natural Reading Flow**: In questions with markdown code blocks ```` ``` ````, code blocks must remain in their natural flow within the question stem rather than being displaced to the bottom of the card.
 
 ---
 
@@ -124,21 +162,24 @@ Agents MUST execute verification tools before concluding any task:
 ```bash
 node tools/check_contrast.mjs
 ```
-- **Requirement**: Must pass **43 / 43 test cases** (0 failures).
+- **Requirement**: Must pass **43 / 43 test cases** across all 6 theme & code block combinations (0 failures).
 
-### 2. Vercel Static Export Preparation
+### 2. Static Asset Pre-Rendering & Vercel Build
 ```bash
-node tools/prepare_vercel.mjs
+node tools/prebuild_lectures.mjs && node tools/prepare_vercel.mjs
 ```
-- Synchronizes `app/`, `data/`, and static resources to `public/` (**1,704 static files**).
+- Pre-parses static lecture slide trees into `public/data/lectures/{slug}.json` and splits per-deck quizzes into `public/data/quizzes/{slug}.json`.
 
-### 3. Chrome DevTools MCP Visual QA
-- Use DevTools MCP tools (`navigate_page`, `evaluate_script`, `take_screenshot`) to capture inline PNG screenshots and empirically verify UI layout changes on `http://localhost:8780/#/login` and `http://localhost:8780/#/lecture/*`.
+### 3. JavaScript Syntax Verification
+```bash
+node --check app/js/highlight.js && node --check app/js/format.js && node --check app/js/quiz.js && node --check app/js/content.js
+```
 
 ---
 
 ## ⚠️ Mandatory Rules for AI Agents
 
-1. **No Superficial Symptom Patches**: Never comment out failing assertions, swallow errors, or return dummy fallbacks. Trace root causes empirical log evidence.
-2. **Never Declare Success Without Verification**: Always execute `node tools/check_contrast.mjs`, `node tools/prepare_vercel.mjs`, and DevTools screenshot verification.
+1. **No Superficial Symptom Patches**: Never comment out failing assertions, swallow errors, or return dummy fallbacks. Trace root causes with empirical evidence.
+2. **Never Declare Success Without Verification**: Always execute `node tools/check_contrast.mjs`, `node tools/prepare_vercel.mjs`, and syntax audits.
 3. **Preserve User Customization**: Always adhere to user rules and high engineering standards (WCAG 2.1 AA, linting, test reliability).
+
