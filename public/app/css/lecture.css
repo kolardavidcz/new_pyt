@@ -615,8 +615,8 @@ html[data-theme="light"] .slide-recap-banner .recap-link-btn:hover {
   margin-left: 8px;
 }
 
-/* ── STATIC FULL-TREE EXCEPTION CHEAT SHEET (PRINTABLE ON MAX 1 A4) ── */
-.exc-static-print-sheet {
+/* ── UNIFIED EXCEPTION HIERARCHY TREE ─────────────────────── */
+.exc-tree-container {
   margin: 16px 0 24px;
   background: var(--editor);
   border: 1px solid var(--border);
@@ -624,97 +624,36 @@ html[data-theme="light"] .slide-recap-banner .recap-link-btn:hover {
   padding: 14px 18px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   font-family: inherit;
-  font-size: 11px;
-  line-height: 1.35;
-}
-
-.exc-print-header {
-  margin-bottom: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
-}
-
-.exc-print-title-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 6px;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.exc-print-title {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text-bright);
-}
-
-.exc-print-badge {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-  border: 1px solid rgba(56, 189, 248, 0.3);
-}
-
-.exc-print-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 12px;
-  align-items: center;
-  font-size: 11px;
-}
-
-.exc-legend-item {
-  font-weight: 600;
-  padding: 1px 6px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  user-select: text;
-}
-
-.exc-print-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-@media (max-width: 900px) {
-  .exc-print-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.exc-row {
-  padding: 1.5px 0;
+.exc-tree-row {
+  padding: 2.5px 0;
   display: flex;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: 6px;
-  white-space: nowrap;
-  overflow: hidden;
-  font-size: 11px;
-  line-height: 1.35;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
-html[data-theme="light"] .exc-row {
+html[data-theme="light"] .exc-tree-row {
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-.exc-row-branch {
+.exc-tree-branch {
   font-family: var(--font-mono);
   color: var(--text-faint);
-  font-size: 11px;
+  font-size: 11.5px;
   white-space: pre;
   user-select: text;
   flex-shrink: 0;
 }
 
-.exc-row-code {
+.exc-name {
   font-family: var(--font-mono);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 700;
   color: #4ec9b0 !important;
   background: none !important;
@@ -723,10 +662,10 @@ html[data-theme="light"] .exc-row {
   flex-shrink: 0;
 }
 
-.exc-row-tag {
-  font-size: 9px;
+.exc-tag-badge {
+  font-size: 9.5px;
   font-weight: 600;
-  padding: 0 4px;
+  padding: 0.5px 5px;
   border-radius: 3px;
   border: 1px solid var(--border);
   white-space: nowrap;
@@ -734,21 +673,19 @@ html[data-theme="light"] .exc-row {
   flex-shrink: 0;
 }
 
-.exc-row-sep {
+.exc-meaning-sep {
   color: var(--text-faint);
   font-size: 8px;
   flex-shrink: 0;
 }
 
-.exc-row-meaning {
-  font-size: 10.5px;
-  line-height: 1.25;
+.exc-meaning-text {
+  font-size: 11.5px;
+  line-height: 1.35;
   color: var(--text-muted);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   user-select: text;
   flex: 1;
+  min-width: 200px;
 }
 
 /* Tag Color Variants */
@@ -789,15 +726,15 @@ html[data-theme="light"] .exc-row {
 }
 
 /* Light Theme */
-html[data-theme="light"] .exc-static-print-sheet {
+html[data-theme="light"] .exc-tree-container {
   background: #ffffff;
 }
 
-html[data-theme="light"] .exc-row-code {
+html[data-theme="light"] .exc-name {
   color: #0369a1 !important;
 }
 
-html[data-theme="light"] .exc-row-meaning {
+html[data-theme="light"] .exc-meaning-text {
   color: #475569;
 }
 
@@ -837,83 +774,41 @@ html[data-theme="light"] .pill-base {
   border-color: rgba(56, 189, 248, 0.4);
 }
 
-/* ── PRINT RULES (GUARANTEED MAX 1 A4 SHEET) ──────────────── */
+/* ── PRINT RULES ──────────────────────────────────────────── */
 @media print {
-  @page {
-    size: A4 portrait;
-    margin: 8mm 10mm;
-  }
-
-  .exc-static-print-sheet {
+  .exc-tree-container {
     box-shadow: none !important;
     border: 1px solid #94a3b8 !important;
     background: #ffffff !important;
     padding: 3mm 4mm !important;
     margin: 0 !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
   }
 
-  .exc-print-header {
-    margin-bottom: 1.5mm !important;
-    padding-bottom: 1.5mm !important;
-  }
-
-  .exc-print-title {
-    font-size: 9.5pt !important;
-    color: #0f172a !important;
-  }
-
-  .exc-print-badge {
-    font-size: 7.5pt !important;
-    padding: 0.5mm 1.5mm !important;
-  }
-
-  .exc-print-legend {
-    gap: 1.5mm 3mm !important;
-    font-size: 7pt !important;
-  }
-
-  .exc-legend-item {
-    padding: 0.2mm 1.5mm !important;
-  }
-
-  .exc-print-grid {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 3mm !important;
-  }
-
-  .exc-print-col {
-    gap: 0.8mm !important;
-  }
-
-  .exc-row {
-    padding: 0.4mm 0 !important;
+  .exc-tree-row {
+    padding: 0.6mm 0 !important;
     border-bottom: 0.5px solid #e2e8f0 !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
 
-  .exc-row-branch {
-    font-size: 6.8pt !important;
+  .exc-tree-branch {
+    font-size: 7.5pt !important;
   }
 
-  .exc-row-code {
-    font-size: 7.2pt !important;
+  .exc-name {
+    font-size: 8pt !important;
     color: #0369a1 !important;
   }
 
-  .exc-row-tag {
-    font-size: 6pt !important;
+  .exc-tag-badge {
+    font-size: 6.5pt !important;
     padding: 0.2mm 1mm !important;
   }
 
-  .exc-row-meaning {
-    font-size: 6.8pt !important;
-    line-height: 1.15 !important;
+  .exc-meaning-text {
+    font-size: 7.5pt !important;
+    line-height: 1.25 !important;
     color: #334155 !important;
-    padding-left: 3mm !important;
   }
 }
 
