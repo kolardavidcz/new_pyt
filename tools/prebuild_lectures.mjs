@@ -182,6 +182,145 @@ function detectCodeLang(code) {
   return "python";
 }
 
+function trimBlankLines(text) {
+  if (!text) return "";
+  const lines = text.split("\n");
+  while (lines.length > 0 && lines[0].trim().length === 0) lines.shift();
+  while (lines.length > 0 && lines[lines.length - 1].trim().length === 0) lines.pop();
+  return lines.join("\n");
+}
+
+function dedentLines(lines) {
+  let minIndent = Infinity;
+  for (const line of lines) {
+    if (line.trim().length === 0) continue;
+    const match = line.match(/^[ ]*/);
+    const indent = match ? match[0].length : 0;
+    if (indent < minIndent) minIndent = indent;
+  }
+  if (minIndent > 0 && minIndent !== Infinity) {
+    return lines.map((line) => (line.length >= minIndent ? line.slice(minIndent) : line.trimEnd()));
+  }
+  return lines.map((l) => l.trimEnd());
+}
+
+function normalizeCodeShowcase(text, lang = "python") {
+  if (!text) return "";
+  let code = String(text).replace(/\t/g, "    ").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  code = code.replace(/\n{3,}/g, "\n\n");
+  code = trimBlankLines(code);
+
+  const lines = code.split("\n");
+  if (lines.length === 0) return "";
+
+  const hasReplPrompt = lines.some((l) => /^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(l));
+  if (!hasReplPrompt) {
+    return dedentLines(lines).join("\n");
+  }
+
+  let firstPromptIdx = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (/^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(lines[i])) {
+      firstPromptIdx = i;
+      break;
+    }
+  }
+
+  let prefixLines = [];
+  let replLines = [];
+
+  if (firstPromptIdx > 0) {
+    const rawPrefix = lines.slice(0, firstPromptIdx);
+    let splitIdx = rawPrefix.length;
+    while (splitIdx > 0 && /^\s*#/.test(rawPrefix[splitIdx - 1])) {
+      splitIdx--;
+    }
+    const codePrefix = rawPrefix.slice(0, splitIdx);
+    const commentPrefix = rawPrefix.slice(splitIdx);
+
+    const dedentedCode = dedentLines(codePrefix);
+    const normalizedComments = commentPrefix.map((l) => l.trimStart());
+    prefixLines = [...dedentedCode, ...normalizedComments];
+    replLines = lines.slice(firstPromptIdx);
+  } else {
+    replLines = lines;
+  }
+
+  // Process REPL lines in chunks (group consecutive output lines to dedent them together)
+  const processedReplLines = [];
+  let i = 0;
+  while (i < replLines.length) {
+    const line = replLines[i];
+
+    if (line.trim().length === 0) {
+      processedReplLines.push("");
+      i++;
+      continue;
+    }
+
+    if (/^\s*#/.test(line)) {
+      processedReplLines.push(line.trimStart());
+      i++;
+      continue;
+    }
+
+    const mPrompt = line.match(/^(\s*)(>{2,3}|\.{3})(.*)$/);
+    if (mPrompt) {
+      const sym = mPrompt[2];
+      const rest = mPrompt[3];
+
+      if (sym === ">>>" || sym === ">>") {
+        const trimmedRest = rest.trimStart();
+        processedReplLines.push(`>>> ${trimmedRest}`);
+        i++;
+        continue;
+      } else if (sym === "...") {
+        if (rest.trim().length === 0) {
+          processedReplLines.push("...");
+        } else {
+          const leadingSpaces = (rest.match(/^[ ]*/) || [""])[0].length;
+          const trimmedRest = rest.trimStart();
+          const indentLevels = Math.max(1, Math.round((leadingSpaces - 1) / 4) || 1);
+          const indentSpaces = indentLevels * 4;
+          processedReplLines.push(`... ${" ".repeat(indentSpaces)}${trimmedRest}`);
+        }
+        i++;
+        continue;
+      }
+    }
+
+    // Accumulate consecutive output lines
+    const outputChunk = [];
+    while (i < replLines.length) {
+      const cur = replLines[i];
+      if (cur.trim().length === 0 || /^\s*#/.test(cur) || /^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(cur)) {
+        break;
+      }
+      // Strip artifact line numbers
+      const cleanLine = cur.replace(/^\d+:\s*(\{\}|\[\]|\(\)|True|False|None|\d+)/, "$1");
+      outputChunk.push(cleanLine);
+      i++;
+    }
+
+    if (outputChunk.length > 0) {
+      const dedentedOutput = dedentLines(outputChunk);
+      processedReplLines.push(...dedentedOutput);
+    }
+  }
+
+  const combined = [...prefixLines, ...processedReplLines];
+  return trimBlankLines(combined.join("\n"));
+}
+
+function transformPreBlocks(html) {
+  return html.replace(/<pre([^>]*)>([\s\S]*?)<\/pre>/gi, (match, attrs, inner) => {
+    const rawText = inner.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+    const normalized = normalizeCodeShowcase(rawText);
+    const escaped = normalized.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return `<pre${attrs}>${escaped}</pre>`;
+  });
+}
+
 function transformCodeBlockquotes(html) {
   return html.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (match, inner) => {
     const rawText = inner.replace(/<[^>]+>/g, "").trim();
@@ -209,7 +348,7 @@ for (const [relPath, filePath] of fileMap.entries()) {
 
     while ((match = sectionRegex.exec(htmlContent)) !== null) {
       const sectionId = match[1];
-      const sectionInner = transformCodeBlockquotes(match[2]);
+      const sectionInner = transformPreBlocks(transformCodeBlockquotes(match[2]));
       
       // Extract title header if present
       const hMatch = sectionInner.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i);

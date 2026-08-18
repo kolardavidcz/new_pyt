@@ -133,11 +133,16 @@ In User Profile / Settings (`app/js/content.js`), users configure **Barevné sch
 - `data-code-block-color="light"`: Renders `#f8f9fa` light codeboxes to save printer toner.
 - **Print Quizzes Toggle**: `data-print-quizzes="true"` toggles quiz questions at the end of the printed document.
 
-### 3. Code Block Formatting Standard (Slides & Quizzes)
+### 3. Code Block & Console Showcase Formatting Standard (Slides & Quizzes)
 All code blocks across slides and quizzes adhere to the exact same standard:
-1. **Markup Structure**: `<pre class="code-block lang-{lang}"><code>{highlightCode(dedented, lang)}</code></pre>`.
-2. **Automatic Indentation Dedenting**: Always run `dedentCode(text)` before highlighting.
-3. **Language Normalization & Detection**: Use `detectCodeLang(code, declaredLang)` to detect Python REPL (`>>>`), shell commands (`$`, `>`), SQL, XML, or Python.
+1. **Markup Structure**: `<pre class="code-block lang-{lang}"><code>{highlightCode(code, lang)}</code></pre>`.
+2. **Universal Showcase Normalization (`normalizeCodeShowcase`)**:
+   - **Vertical Whitespace**: Collapse runaway blank lines (`\n{3,}` $\rightarrow$ `\n\n`) to preserve readable spacing between blocks without vertical gaps.
+   - **Prefix Code Blocks**: Dedicated dedenting so top-level function/class definitions start at column 0 while preserving standard 4-space internal indentation.
+   - **Narrative Comments**: Top-level `#` comments introducing REPL sessions start flush at column 0.
+   - **Prompt Standardization**: Normalizes `>>>`, `>>`, and `...` prompts. Multi-line continuation prompts (`...`) apply standard 4-space indent levels for nested blocks.
+   - **Zero-Offset Output**: Console outputs and object reprs start flush at column 0 without accidental container padding, while preserving relative structured sub-indentation (e.g. tracebacks).
+3. **Language Normalization & Detection**: Use `detectCodeLang(code, declaredLang)` to detect Python REPL (`>>>`, `>>`), shell commands (`$`, `>`), SQL, XML, or Python.
 4. **Natural Reading Flow**: In questions with markdown code blocks ```` ``` ````, code blocks remain in their natural flow within the question stem rather than being displaced to the bottom of the card.
 
 ---
@@ -150,7 +155,7 @@ Agents MUST execute verification tools before concluding any task:
 ```bash
 node tools/check_contrast.mjs
 ```
-- **Requirement**: Must pass **43 / 43 test cases** across all 6 theme & code block combinations (0 failures).
+- **Requirement**: Must pass **49 / 49 test cases** across all 6 theme & code block combinations (0 failures).
 
 ### 2. Static Asset Pre-Rendering & Vercel Build
 ```bash

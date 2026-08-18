@@ -388,50 +388,52 @@ function isPythonReprOutput(line) {
 function highlightPythonRepl(code, opts) {
   const lines = code.split("\n");
   let inContinuation = false;
-  let lastPromptWasSingleLine = false;
 
   const highlightedLines = lines.map((line) => {
+    // Empty line
+    if (line.trim().length === 0) {
+      inContinuation = false;
+      return "";
+    }
+
     // Comment line inside REPL block (e.g. "# a) Zaveďme seznam...")
     if (/^\s*#/.test(line)) {
       return highlightGeneric(line, opts);
     }
 
-    // Match >>> prompt or ... prompt
-    const mPrompt = line.match(/^(\s*)(>{3}|\.{3})(\s*)(.*)$/);
+    // Match >>>, >>, or ... prompt
+    const mPrompt = line.match(/^(\s*)(>{2,3}|\.{3})(\s*)(.*)$/);
     if (mPrompt) {
-      inContinuation = mPrompt[2] === "...";
-      lastPromptWasSingleLine = mPrompt[2] === ">>>";
-      const leadingSpace = esc(mPrompt[1]);
-      const promptSymbol = span("prompt", mPrompt[2]);
-      const spacing = esc(mPrompt[3]);
-      const codePart = highlightGeneric(mPrompt[4], opts);
-      return `${leadingSpace}${promptSymbol}${spacing}${codePart}`;
+      const sym = mPrompt[2];
+      const rest = mPrompt[4];
+      inContinuation = sym === "...";
+
+      const promptDisplay = sym === ">>" ? "&gt;&gt;&gt;" : esc(sym);
+      const promptSymbol = `<span class="tok-prompt">${promptDisplay}</span>`;
+      const spacing = esc(mPrompt[3] || " ");
+      const codePart = highlightGeneric(rest, opts);
+      return `${esc(mPrompt[1])}${promptSymbol}${spacing}${codePart}`;
     }
 
     // Check if line is indented continuation of a multiline statement following ...
-    if (inContinuation && /^\s{4,}/.test(line) && line.trim().length > 0) {
+    if (inContinuation && /^\s{4,}/.test(line)) {
       return highlightGeneric(line, opts);
     }
 
-    // Dedent indented REPL output lines following prompts (e.g. "    15" -> "15" or "    !,?AJaee..." -> "!,?AJaee...")
-    let activeLine = line;
-    if (/^\s+\S/.test(activeLine)) {
-      activeLine = activeLine.trimStart();
+    // Check if line is Python definition code before/inside REPL (e.g. "def funkce(...):" or "    for arg in args:")
+    if (/^\s*(?:def|class|for|while|if|elif|else|try|except|finally|with|return|yield|import|from|async|await)\b/.test(line)) {
+      return highlightGeneric(line, opts);
     }
-    // Strip line number prefix artifacts like "6: {}" -> "{}" or "7: {}" -> "{}"
-    activeLine = activeLine.replace(/^\d+:\s*(\{\}|\[\]|\(\))/, "$1");
 
     // Check if line is a Python REPL object return representation (repr)
-    if (isPythonReprOutput(activeLine)) {
+    if (isPythonReprOutput(line)) {
       inContinuation = false;
-      lastPromptWasSingleLine = false;
-      return highlightGeneric(activeLine, opts);
+      return highlightGeneric(line, opts);
     }
 
     // Otherwise, this is a raw stdout/stderr print output line!
     inContinuation = false;
-    lastPromptWasSingleLine = false;
-    return span("term-output", activeLine);
+    return span("term-output", line);
   });
 
   return highlightedLines.join("\n");
@@ -446,10 +448,11 @@ export function highlightCode(code, lang) {
         builtins: PY_BUILTINS,
         stringChars: ['"', "'"],
       };
-      if (code.includes(">>>") || code.includes("...")) {
-        return highlightPythonRepl(code, opts);
+      const normalized = normalizeCodeShowcase(code, "python");
+      if (normalized.includes(">>>") || normalized.includes(">>") || normalized.includes("...")) {
+        return highlightPythonRepl(normalized, opts);
       }
-      return highlightGeneric(code, opts);
+      return highlightGeneric(normalized, opts);
     }
     case "text":
     case "plain": {
@@ -459,7 +462,8 @@ export function highlightCode(code, lang) {
         builtins: PY_BUILTINS,
         stringChars: ['"', "'"],
       };
-      const lines = code.split("\n");
+      const normalized = normalizeCodeShowcase(code, "plain");
+      const lines = normalized.split("\n");
       return lines.map((line) => {
         if (/^\s*#/.test(line) || isPythonReprOutput(line)) {
           return highlightGeneric(line, opts);
@@ -467,42 +471,50 @@ export function highlightCode(code, lang) {
         return span("term-output", line);
       }).join("\n");
     }
-    case "bash":
-      return highlightGeneric(code, {
+    case "bash": {
+      const normalized = normalizeCodeShowcase(code, "bash");
+      return highlightGeneric(normalized, {
         lineComment: "#",
         keywords: BASH_KEYWORDS,
         builtins: new Set(["python", "python3", "pip", "pip3", "conda", "venv", "git", "ls", "cat", "grep", "mkdir", "rm", "cp", "mv", "chmod", "sudo", "apt", "brew"]),
         stringChars: ['"', "'", "`"],
       });
-    case "js":
-      return highlightGeneric(code, {
+    }
+    case "js": {
+      const normalized = normalizeCodeShowcase(code, "js");
+      return highlightGeneric(normalized, {
         lineComment: "//",
         blockComment: ["/*", "*/"],
         keywords: JS_KEYWORDS,
         builtins: new Set(["console", "window", "document", "Array", "Object", "String", "Number", "Math", "JSON", "Promise", "Map", "Set"]),
         stringChars: ['"', "'", "`"],
       });
-    case "css":
-      return highlightGeneric(code, {
+    }
+    case "css": {
+      const normalized = normalizeCodeShowcase(code, "css");
+      return highlightGeneric(normalized, {
         lineComment: null,
         blockComment: ["/*", "*/"],
         keywords: new Set(["important", "from", "to"]),
         builtins: new Set(),
         stringChars: ['"', "'"],
       });
-    case "sql":
-      return highlightGeneric(code, {
+    }
+    case "sql": {
+      const normalized = normalizeCodeShowcase(code, "sql");
+      return highlightGeneric(normalized, {
         lineComment: "--",
         blockComment: ["/*", "*/"],
         keywords: new Set(["SELECT", "FROM", "WHERE", "INSERT", "UPDATE", "DELETE", "CREATE", "TABLE", "INTO", "VALUES", "AND", "OR", "NOT", "NULL", "JOIN", "LEFT", "RIGHT", "INNER", "ON", "AS", "ORDER", "BY", "GROUP", "LIMIT", "INDEX", "PRIMARY", "KEY", "FOREIGN", "REFERENCES", "select", "from", "where", "insert", "update", "delete", "create", "table", "into", "values", "and", "or", "not", "null", "join", "left", "right", "inner", "on", "as", "order", "by", "group", "limit"]),
         builtins: new Set(),
         stringChars: ['"', "'"],
       });
+    }
     case "xml":
     case "html":
-      return highlightXmlRaw(code);
+      return highlightXmlRaw(normalizeCodeShowcase(code, "xml"));
     default:
-      return esc(code);
+      return esc(normalizeCodeShowcase(code, "plain"));
   }
 }
 
@@ -518,30 +530,158 @@ export function trimBlankLines(text) {
   return lines.join("\n");
 }
 
-export function dedentCode(text) {
-  if (!text) return "";
-  text = trimBlankLines(text);
-  const lines = text.split("\n");
+export function dedentLines(lines) {
   let minIndent = Infinity;
   for (const line of lines) {
     if (line.trim().length === 0) continue;
-    const match = line.match(/^[ \t]*/);
+    const match = line.match(/^[ ]*/);
     const indent = match ? match[0].length : 0;
     if (indent < minIndent) minIndent = indent;
   }
   if (minIndent > 0 && minIndent !== Infinity) {
-    return lines
-      .map((line) => (line.length >= minIndent ? line.slice(minIndent) : line))
-      .join("\n");
+    return lines.map((line) => (line.length >= minIndent ? line.slice(minIndent) : line.trimEnd()));
   }
-  return text;
+  return lines.map((l) => l.trimEnd());
+}
+
+export function dedentCode(text) {
+  if (!text) return "";
+  text = trimBlankLines(text.replace(/\t/g, "    "));
+  const lines = text.split("\n");
+  return dedentLines(lines).join("\n");
+}
+
+/**
+ * Normalizes code showcases:
+ * - Expands tabs to 4 spaces
+ * - Collapses excessive blank lines (\n{3,} -> \n\n)
+ * - Dedents prefix function/class definitions independently
+ * - Strips excess leading spaces on top-level comments
+ * - Standardizes >>>, >>, and ... continuation indentation
+ * - Cleans up output lines to column 0
+ */
+export function normalizeCodeShowcase(text, lang = "python") {
+  if (!text) return "";
+
+  // 1. Expand tabs and normalize line endings
+  let code = String(text).replace(/\t/g, "    ").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+  // 2. Collapse excessive blank lines (max 1 empty line between blocks) and trim ends
+  code = code.replace(/\n{3,}/g, "\n\n");
+  code = trimBlankLines(code);
+
+  const lines = code.split("\n");
+  if (lines.length === 0) return "";
+
+  // Check if snippet contains REPL prompts (>>>, >>, ...)
+  const hasReplPrompt = lines.some((l) => /^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(l));
+
+  if (!hasReplPrompt) {
+    return dedentLines(lines).join("\n");
+  }
+
+  // Find index of first prompt
+  let firstPromptIdx = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (/^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(lines[i])) {
+      firstPromptIdx = i;
+      break;
+    }
+  }
+
+  let prefixLines = [];
+  let replLines = [];
+
+  if (firstPromptIdx > 0) {
+    const rawPrefix = lines.slice(0, firstPromptIdx);
+    
+    // Check if trailing lines of prefix are comments introducing the REPL
+    let splitIdx = rawPrefix.length;
+    while (splitIdx > 0 && /^\s*#/.test(rawPrefix[splitIdx - 1])) {
+      splitIdx--;
+    }
+    const codePrefix = rawPrefix.slice(0, splitIdx);
+    const commentPrefix = rawPrefix.slice(splitIdx);
+
+    const dedentedCode = dedentLines(codePrefix);
+    const normalizedComments = commentPrefix.map((l) => l.trimStart());
+    prefixLines = [...dedentedCode, ...normalizedComments];
+    replLines = lines.slice(firstPromptIdx);
+  } else {
+    replLines = lines;
+  }
+
+  // Process REPL lines in chunks (group consecutive output lines to dedent them together)
+  const processedReplLines = [];
+  let i = 0;
+  while (i < replLines.length) {
+    const line = replLines[i];
+
+    if (line.trim().length === 0) {
+      processedReplLines.push("");
+      i++;
+      continue;
+    }
+
+    if (/^\s*#/.test(line)) {
+      processedReplLines.push(line.trimStart());
+      i++;
+      continue;
+    }
+
+    const mPrompt = line.match(/^(\s*)(>{2,3}|\.{3})(.*)$/);
+    if (mPrompt) {
+      const sym = mPrompt[2];
+      const rest = mPrompt[3];
+
+      if (sym === ">>>" || sym === ">>") {
+        const trimmedRest = rest.trimStart();
+        processedReplLines.push(`>>> ${trimmedRest}`);
+        i++;
+        continue;
+      } else if (sym === "...") {
+        if (rest.trim().length === 0) {
+          processedReplLines.push("...");
+        } else {
+          const leadingSpaces = (rest.match(/^[ ]*/) || [""])[0].length;
+          const trimmedRest = rest.trimStart();
+          const indentLevels = Math.max(1, Math.round((leadingSpaces - 1) / 4) || 1);
+          const indentSpaces = indentLevels * 4;
+          processedReplLines.push(`... ${" ".repeat(indentSpaces)}${trimmedRest}`);
+        }
+        i++;
+        continue;
+      }
+    }
+
+    // Accumulate consecutive output lines
+    const outputChunk = [];
+    while (i < replLines.length) {
+      const cur = replLines[i];
+      if (cur.trim().length === 0 || /^\s*#/.test(cur) || /^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(cur)) {
+        break;
+      }
+      // Strip artifact line numbers
+      const cleanLine = cur.replace(/^\d+:\s*(\{\}|\[\]|\(\)|True|False|None|\d+)/, "$1");
+      outputChunk.push(cleanLine);
+      i++;
+    }
+
+    if (outputChunk.length > 0) {
+      const dedentedOutput = dedentLines(outputChunk);
+      processedReplLines.push(...dedentedOutput);
+    }
+  }
+
+  const combined = [...prefixLines, ...processedReplLines];
+  return trimBlankLines(combined.join("\n"));
 }
 
 function getCodeText(pre) {
   // Prefer raw text; strip syntaxhighlighter leftovers if any
   const code = pre.querySelector("code");
   let text = code ? code.textContent : pre.textContent;
-  return dedentCode(text);
+  return normalizeCodeShowcase(text, detectLang(pre));
 }
 
 /**
