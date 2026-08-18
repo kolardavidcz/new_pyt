@@ -198,8 +198,8 @@ export function updatePageStudyButtons(now) {
   const isStudiedNow = now !== undefined ? now : (currentTab?.itemId ? isStudied(currentTab.itemId) : false);
   document.querySelectorAll(".study-btn, .bottom-nav-study-btn").forEach((b) => {
     b.classList.toggle("is-studied", isStudiedNow);
-    b.innerHTML = isStudiedNow ? "Prostudováno ✓" : "Označit jako prostudované";
-    b.title = isStudiedNow ? "Kliknutím zrušíte označení prostudováno" : "Kliknutím označíte lekci jako prostudovanou";
+    b.innerHTML = isStudiedNow ? "✓ Studied" : "☐ Mark studied";
+    b.title = isStudiedNow ? "Click to unmark as studied" : "Click to mark as studied for progress";
   });
 }
 
@@ -213,30 +213,30 @@ function lectureToolbar(item, mode) {
       bar.appendChild(el("button", {
         type: "button",
         className: "btn primary",
-        title: "Spustit prezentaci na celou obrazovku",
+        title: "Start full screen presentation",
         onClick: () => {
           window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[0].id });
           toggleFullscreen(true);
         },
-      }, "Prezentace ⛶"));
+      }, "See as presentation ⛶"));
     }
   } else {
     bar.appendChild(el("button", {
       type: "button",
       className: "btn",
-      title: "Zpět na celou lekci",
+      title: "Scrollable full lecture",
       onClick: () => {
         toggleFullscreen(false);
         window.__pcsNavigate?.({ kind: item.kind, id: item.id });
       },
-    }, "Celá lekce"));
+    }, "Open full lecture"));
   }
 
   if (mode === "full") {
     bar.appendChild(el("button", {
       type: "button",
       className: "btn btn-print",
-      title: "Vytisknout nebo exportovat do PDF",
+      title: "Print or export to PDF",
       onClick: () => window.print(),
     }, "Tisk 🖨"));
   }
@@ -246,14 +246,14 @@ function lectureToolbar(item, mode) {
   const studyBtn = el("button", {
     type: "button",
     className: "btn study-btn" + (studied ? " is-studied" : ""),
-    title: studied ? "Kliknutím zrušíte označení prostudováno" : "Kliknutím označíte lekci jako prostudovanou",
+    title: studied ? "Click to unmark as studied" : "Click to mark as studied for progress",
     onClick: () => {
       const now = toggleStudied(item.id);
       updatePageStudyButtons(now);
       try { renderTree(); } catch { /* */ }
       window.__pcsUpdateStatus?.();
     },
-  }, studied ? "Prostudováno ✓" : "Označit jako prostudované");
+  }, studied ? "✓ Studied" : "☐ Mark studied");
   bar.appendChild(studyBtn);
 
   // Navrhnout úpravu button
@@ -316,7 +316,7 @@ function buildBottomNavBar(item) {
   const studyBtn = el("button", {
     type: "button",
     className: "btn bottom-nav-study-btn" + (studied ? " is-studied" : ""),
-    title: studied ? "Kliknutím zrušíte označení prostudováno" : "Kliknutím označíte lekci jako prostudovanou",
+    title: studied ? "Click to unmark as studied" : "Click to mark as studied for progress",
     onClick: () => {
       const now = toggleStudied(item.id);
       updatePageStudyButtons(now);
@@ -324,7 +324,7 @@ function buildBottomNavBar(item) {
       window.__pcsUpdateStatus?.();
     },
   });
-  studyBtn.innerHTML = studied ? "Prostudováno ✓" : "Označit jako prostudované";
+  studyBtn.innerHTML = studied ? "✓ Studied" : "☐ Mark studied";
   bar.appendChild(studyBtn);
 
   // 3. Next button
@@ -459,35 +459,35 @@ export async function showPage(itemId, pageId) {
     const nav = el("div", { className: "item-actions lecture-toolbar presentation-floating-nav" });
     nav.appendChild(el("button", {
       type: "button", className: "btn primary",
-      title: "Zpět na celou lekci",
+      title: "Open full lecture",
       onClick: () => {
         toggleFullscreen(false);
         window.__pcsNavigate?.({ kind: item.kind, id: item.id });
       },
-    }, "Celá lekce"));
+    }, "Open full lecture"));
     nav.appendChild(el("button", {
       type: "button", className: "btn",
-      title: "Zobrazit přehled všech slajdů",
+      title: "View all slides",
       onClick: () => window.__pcsNavigate?.({ kind: "presentation", id: item.id }),
-    }, "Všechny slajdy"));
+    }, "All slides"));
     if (idx > 0) {
       nav.appendChild(el("button", {
         type: "button", className: "btn",
-        title: "Předchozí slajd (←)",
+        title: "Previous slide (←)",
         onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[idx - 1].id }),
-      }, "← Předchozí"));
+      }, "← Prev"));
     }
     if (idx >= 0 && idx < pages.length - 1) {
       nav.appendChild(el("button", {
         type: "button", className: "btn",
-        title: "Další slajd (→)",
+        title: "Next slide (→)",
         onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[idx + 1].id }),
-      }, "Další →"));
+      }, "Next →"));
     }
 
     nav.appendChild(el("button", {
       type: "button", className: "btn btn-suggest-update",
-      title: "Navrhnout úpravu obsahu prezentace nebo nahlásit chybu",
+      title: "Suggest an edit to the presentation content or report an issue",
       onClick: () => openPresentationImprovementModal(item),
     }, "Navrhnout úpravu"));
 
