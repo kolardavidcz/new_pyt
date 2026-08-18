@@ -217,129 +217,119 @@ function standardizePythonCode(text) {
   const lines = dedentLines(rawLines);
 
   const hasClassOrDef = lines.some((l) => /^\s*(?:class|def|async\s+def|@\w+)\b/.test(l));
-  if (!hasClassOrDef) {
+  const hasCompound = lines.some((l) =>
+    /^\s*(?:class|def|async\s+def|@\w+|for|while|if|elif|else|try|except|finally|with)\b/.test(l)
+  );
+  if (!hasCompound) {
     return lines.join("\n");
   }
 
   const result = [];
-  let inClass = false;
-  let inFunc = false;
-  let subBlockIndent = -1;
+  const stack = [];
 
   for (let i = 0; i < lines.length; i++) {
     const rawLine = lines[i];
     const trimmed = rawLine.trim();
-    const curRawIndent = (rawLine.match(/^[ ]*/) || [""])[0].length;
 
     if (trimmed.length === 0) {
       result.push("");
       continue;
     }
 
-    if (/^class\s+\w+/i.test(trimmed) || (/^class\s+/i.test(trimmed) && trimmed.endsWith(":"))) {
-      inClass = true;
-      inFunc = false;
-      subBlockIndent = -1;
+    // Comment line
+    if (trimmed.startsWith("#")) {
+      const curIndent = stack.length > 0 ? stack[stack.length - 1].indent + 4 : 0;
+      result.push(`${" ".repeat(curIndent)}${trimmed}`);
+      continue;
+    }
+
+    // Post-class/func top-level call closing everything (e.g. p = Potomek(), p.mtd())
+    const isPostBlockCall =
+      /^[a-zA-Z_]\w*\s*(?:=|\(|\.|\[)/.test(trimmed) &&
+      !/^(?:self|cls)\b/.test(trimmed) &&
+      !trimmed.startsWith("self.") &&
+      !trimmed.startsWith("cls.") &&
+      !/^(?:def|class|return|yield|raise|if|elif|else|for|while|try|except|finally|with)\b/.test(trimmed) &&
+      (rawLine.match(/^[ ]*/)[0].length === 0 || /^[a-z_]\w*\s*=\s*(?:[A-Z]\w*\(|Člověk|Potomek|Školák)/.test(trimmed));
+
+    if (isPostBlockCall && stack.length > 0 && (rawLine.match(/^[ ]*/)[0].length === 0 || /^[a-z]\s*=/.test(trimmed))) {
+      stack.length = 0;
       result.push(trimmed);
       continue;
     }
 
+    // Top-level class definition
+    if (/^class\s+\w+/i.test(trimmed) || (/^class\s+/i.test(trimmed) && trimmed.endsWith(":"))) {
+      stack.length = 0;
+      result.push(trimmed);
+      stack.push({ type: "class", indent: 0 });
+      continue;
+    }
+
+    // Decorator (@classmethod, @staticmethod, etc.)
     if (/^@\w+/.test(trimmed)) {
-      inFunc = false;
-      subBlockIndent = -1;
-      if (inClass) {
-        result.push(`    ${trimmed}`);
-      } else {
-        result.push(trimmed);
-      }
+      const topClass = stack.find((b) => b.type === "class");
+      const indent = topClass ? 4 : 0;
+      result.push(`${" ".repeat(indent)}${trimmed}`);
       continue;
     }
 
+    // Function or method definition
     if (/^(?:def|async\s+def)\s+\w+/i.test(trimmed)) {
-      subBlockIndent = -1;
+      const inClass = stack.some((b) => b.type === "class");
       if (inClass) {
-        inFunc = true;
+        while (stack.length > 0 && stack[stack.length - 1].type !== "class") {
+          stack.pop();
+        }
         result.push(`    ${trimmed}`);
+        stack.push({ type: "def", indent: 4 });
       } else {
-        inClass = false;
-        inFunc = true;
+        stack.length = 0;
         result.push(trimmed);
+        stack.push({ type: "def", indent: 0 });
       }
       continue;
     }
 
-    if (/^(?:for|while|if|elif|else|try|except|finally|with)\b/i.test(trimmed)) {
-      subBlockIndent = curRawIndent;
-      if (inClass && inFunc) {
-        result.push(`        ${trimmed}`);
-      } else if (inFunc || inClass) {
-        result.push(`    ${trimmed}`);
-      } else {
-        result.push(trimmed);
+    // Branch keywords: elif, else, except, finally
+    if (/^(?:elif|else|except|finally)\b/i.test(trimmed)) {
+      while (
+        stack.length > 0 &&
+        !["if", "elif", "try", "except", "for", "while"].includes(stack[stack.length - 1].type)
+      ) {
+        stack.pop();
       }
+      const parent = stack.length > 0 ? stack.pop() : { indent: 0 };
+      const indent = parent.indent;
+      result.push(`${" ".repeat(indent)}${trimmed}`);
+      stack.push({ type: trimmed.split(/\s|:/)[0], indent });
       continue;
     }
 
-    if (subBlockIndent >= 0 && curRawIndent <= subBlockIndent) {
-      subBlockIndent = -1;
+    // Compound headers: for, while, if, try, with
+    if (/^(?:for|while|if|try|with)\b/i.test(trimmed) && trimmed.endsWith(":")) {
+      const curIndent = stack.length > 0 ? stack[stack.length - 1].indent + 4 : 0;
+      result.push(`${" ".repeat(curIndent)}${trimmed}`);
+      stack.push({ type: trimmed.split(/\s|:/)[0], indent: curIndent });
+      continue;
     }
 
+    // Normal statement inside block
+    const curIndent = stack.length > 0 ? stack[stack.length - 1].indent + 4 : 0;
+
+    // Check if statement ends a loop/func (e.g. return, pass, break, continue)
     if (/^(?:return|yield|raise|break|continue|pass)\b/i.test(trimmed)) {
-      const isNested = subBlockIndent >= 0 && curRawIndent > subBlockIndent;
-      if (inClass && inFunc) {
-        result.push(isNested ? `            ${trimmed}` : `        ${trimmed}`);
-      } else if (inFunc || inClass) {
-        result.push(isNested ? `        ${trimmed}` : `    ${trimmed}`);
-      } else {
-        result.push(trimmed);
-      }
-      if (!isNested) subBlockIndent = -1;
+      result.push(`${" ".repeat(curIndent)}${trimmed}`);
       continue;
     }
 
+    // Ellipsis placeholder (...)
     if (trimmed === "..." || trimmed === "…") {
-      const isNested = subBlockIndent >= 0;
-      if (inClass && inFunc) {
-        result.push(isNested ? `            ...` : `        ...`);
-      } else if (inFunc || inClass) {
-        result.push(isNested ? `        ...` : `    ...`);
-      } else {
-        result.push(`...`);
-      }
+      result.push(`${" ".repeat(curIndent)}...`);
       continue;
     }
 
-    if (inClass && !inFunc) {
-      result.push(`    ${trimmed}`);
-      continue;
-    }
-
-    if (inFunc) {
-      const isPostBlockCall = /^[a-zA-Z_]\w*\s*(?:=|\(|\.|\[)/.test(trimmed) &&
-        !/^(?:self|cls)\b/.test(trimmed) &&
-        !trimmed.startsWith("self.") &&
-        !trimmed.startsWith("cls.") &&
-        (rawLine.match(/^[ ]*/)[0].length === 0 || /^[a-z_]\w*\s*=\s*(?:[A-Z]\w*\(|Člověk|Potomek|Školák)/.test(trimmed));
-
-      if (isPostBlockCall && (rawLine.match(/^[ ]*/)[0].length === 0 || /^[a-z]\s*=/.test(trimmed))) {
-        inClass = false;
-        inFunc = false;
-        subBlockIndent = -1;
-        result.push(trimmed);
-        continue;
-      }
-
-      const isNested = subBlockIndent >= 0 && curRawIndent > subBlockIndent;
-      if (inClass) {
-        result.push(isNested ? `            ${trimmed}` : `        ${trimmed}`);
-      } else {
-        result.push(isNested ? `        ${trimmed}` : `    ${trimmed}`);
-      }
-      if (!isNested) subBlockIndent = -1;
-      continue;
-    }
-
-    result.push(trimmed);
+    result.push(`${" ".repeat(curIndent)}${trimmed}`);
   }
 
   return trimBlankLines(result.join("\n"));
@@ -390,7 +380,6 @@ function normalizeCodeShowcase(text, lang = "python") {
     replLines = lines;
   }
 
-  // Process REPL lines in chunks (group consecutive output lines to dedent them together)
   const processedReplLines = [];
   let i = 0;
   while (i < replLines.length) {
@@ -408,39 +397,64 @@ function normalizeCodeShowcase(text, lang = "python") {
       continue;
     }
 
-    const mPrompt = line.match(/^(\s*)(>{2,3}|\.{3})(.*)$/);
+    const mPrompt = line.match(/^(\s*)(>{2,3})(.*)$/);
     if (mPrompt) {
       const sym = mPrompt[2];
-      const rest = mPrompt[3];
+      const headerRest = mPrompt[3].trimStart();
 
-      if (sym === ">>>" || sym === ">>") {
-        const trimmedRest = rest.trimStart();
-        processedReplLines.push(`>>> ${trimmedRest}`);
-        i++;
-        continue;
-      } else if (sym === "...") {
-        if (rest.trim().length === 0) {
-          processedReplLines.push("...");
-        } else {
-          const leadingSpaces = (rest.match(/^[ ]*/) || [""])[0].length;
-          const trimmedRest = rest.trimStart();
-          const indentLevels = Math.max(1, Math.round((leadingSpaces - 1) / 4) || 1);
-          const indentSpaces = indentLevels * 4;
-          processedReplLines.push(`... ${" ".repeat(indentSpaces)}${trimmedRest}`);
+      // Check if this prompt line starts a compound block with subsequent continuation lines (...)
+      const continuationLines = [];
+      let nextIdx = i + 1;
+      while (nextIdx < replLines.length && /^\s*\.{3}(?:\s|$)/.test(replLines[nextIdx])) {
+        continuationLines.push(replLines[nextIdx]);
+        nextIdx++;
+      }
+
+      if (continuationLines.length > 0) {
+        const hasTrailingEmptyPrompt = continuationLines[continuationLines.length - 1].replace(/^\s*\.{3}/, "").trim().length === 0;
+        const codeContLines = hasTrailingEmptyPrompt ? continuationLines.slice(0, -1) : continuationLines;
+
+        const strippedLines = [headerRest];
+        for (const cLine of codeContLines) {
+          const stripped = cLine.replace(/^\s*\.{3}\s?/, "");
+          strippedLines.push(stripped);
         }
+
+        const standardized = standardizePythonCode(strippedLines.join("\n")).split("\n");
+        processedReplLines.push(`>>> ${standardized[0]}`);
+        for (let s = 1; s < standardized.length; s++) {
+          processedReplLines.push(`... ${standardized[s]}`);
+        }
+        if (hasTrailingEmptyPrompt) {
+          processedReplLines.push("...");
+        }
+
+        i = nextIdx;
+        continue;
+      } else {
+        processedReplLines.push(`>>> ${headerRest}`);
         i++;
         continue;
       }
     }
 
-    // Accumulate consecutive output lines
+    if (/^\s*\.{3}(.*)$/.test(line)) {
+      const rest = line.replace(/^\s*\.{3}/, "");
+      if (rest.trim().length === 0) {
+        processedReplLines.push("...");
+      } else {
+        processedReplLines.push(`... ${rest.trimStart()}`);
+      }
+      i++;
+      continue;
+    }
+
     const outputChunk = [];
     while (i < replLines.length) {
       const cur = replLines[i];
       if (cur.trim().length === 0 || /^\s*#/.test(cur) || /^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(cur)) {
         break;
       }
-      // Strip artifact line numbers
       const cleanLine = cur.replace(/^\d+:\s*(\{\}|\[\]|\(\)|True|False|None|\d+)/, "$1");
       outputChunk.push(cleanLine);
       i++;
