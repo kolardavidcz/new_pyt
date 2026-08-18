@@ -532,14 +532,13 @@ export async function renderQuizSection(item) {
 
     } else if (q.options && q.options.length) {
       const isTF = q.type === "true_false_tricky" || q.options.length === 2;
-      const isPredict = q.type === "predict_output";
-      const optsWrap = el("div", { className: isTF ? "quiz-options-list tf-options" : (isPredict ? "quiz-options-list term-options" : "quiz-options-list") });
+      const optsWrap = el("div", { className: isTF ? "quiz-options-list tf-options" : "quiz-options-list" });
       
       q.options.forEach((optText, optIdx) => {
         const isCorrectOpt = optIdx === q.answer;
         const btn = el("button", {
           type: "button",
-          className: "quiz-opt-btn" + (isTF ? " tf-btn" : "") + (isPredict ? " term-opt-btn" : ""),
+          className: "quiz-opt-btn" + (isTF ? " tf-btn" : ""),
           onClick: () => {
             optsWrap.querySelectorAll(".quiz-opt-btn").forEach((b, i) => {
               b.disabled = true;
@@ -560,12 +559,7 @@ export async function renderQuizSection(item) {
         });
 
         const cleanOptText = optText.replace(/^[A-D]\)\s*/, "");
-        if (isPredict) {
-          const formattedContent = formatInlineCode(cleanOptText);
-          btn.innerHTML = `<code class="term-opt-code"><span class="term-prompt">&gt;&gt;&gt;</span> ${formattedContent}</code>`;
-        } else {
-          btn.innerHTML = formatInlineCode(cleanOptText);
-        }
+        btn.innerHTML = formatInlineCode(cleanOptText);
 
         if (savedState) {
           btn.disabled = true;
