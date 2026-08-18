@@ -39,6 +39,7 @@ const TESTS = [
   { category: "Variant 1: Dark Web + Dark Code", label: "Dark Code Function (#DCDCAA on #1E1E1E)", fg: "#dcdcaa", bg: "#1e1e1e", target: 4.5 },
   { category: "Variant 1: Dark Web + Dark Code", label: "Dark Code Number (#B5CEA8 on #1E1E1E)", fg: "#b5cea8", bg: "#1e1e1e", target: 4.5 },
   { category: "Variant 1: Dark Web + Dark Code", label: "Dark Code Builtin (#4EC9B0 on #1E1E1E)", fg: "#4ec9b0", bg: "#1e1e1e", target: 4.5 },
+  { category: "Variant 1: Dark Web + Dark Code", label: "Dark Code Prompt (#38BDF8 on #1E1E1E)", fg: "#38bdf8", bg: "#1e1e1e", target: 4.5 },
   { category: "Variant 1: Dark Web + Dark Code", label: "Dark Code Base Text (#D4D4D4 on #1E1E1E)", fg: "#d4d4d4", bg: "#1e1e1e", target: 7.0 },
 
   // ── VARIANT 2: Dark Web Theme + Light Code Block ────────────────────────
@@ -46,6 +47,7 @@ const TESTS = [
   { category: "Variant 2: Dark Web + Light Code", label: "Light Code String (#A31515 on #F8F9FA)", fg: "#a31515", bg: "#f8f9fa", target: 4.5 },
   { category: "Variant 2: Dark Web + Light Code", label: "Light Code Keyword (#0000FF on #F8F9FA)", fg: "#0000ff", bg: "#f8f9fa", target: 4.5 },
   { category: "Variant 2: Dark Web + Light Code", label: "Light Code Function (#795E26 on #F8F9FA)", fg: "#795e26", bg: "#f8f9fa", target: 4.5 },
+  { category: "Variant 2: Dark Web + Light Code", label: "Light Code Prompt (#0369A1 on #F8F9FA)", fg: "#0369a1", bg: "#f8f9fa", target: 4.5 },
   { category: "Variant 2: Dark Web + Light Code", label: "Light Code Base Text (#1F2937 on #F8F9FA)", fg: "#1f2937", bg: "#f8f9fa", target: 7.0 },
 
   // ── VARIANT 3: Light Web Theme + Dark Code Block ────────────────────────
@@ -53,6 +55,7 @@ const TESTS = [
   { category: "Variant 3: Light Web + Dark Code", label: "Dark Code String (#CE9178 on #1E1E1E)", fg: "#ce9178", bg: "#1e1e1e", target: 4.5 },
   { category: "Variant 3: Light Web + Dark Code", label: "Dark Code Keyword (#569CD6 on #1E1E1E)", fg: "#569cd6", bg: "#1e1e1e", target: 4.5 },
   { category: "Variant 3: Light Web + Dark Code", label: "Dark Code Function (#DCDCAA on #1E1E1E)", fg: "#dcdcaa", bg: "#1e1e1e", target: 4.5 },
+  { category: "Variant 3: Light Web + Dark Code", label: "Dark Code Prompt (#38BDF8 on #1E1E1E)", fg: "#38bdf8", bg: "#1e1e1e", target: 4.5 },
   { category: "Variant 3: Light Web + Dark Code", label: "Dark Code Base Text (#D4D4D4 on #1E1E1E)", fg: "#d4d4d4", bg: "#1e1e1e", target: 7.0 },
 
   // ── VARIANT 4: Light Web Theme + Light Code Block ───────────────────────
@@ -60,6 +63,7 @@ const TESTS = [
   { category: "Variant 4: Light Web + Light Code", label: "Light Code String (#A31515 on #F8F9FA)", fg: "#a31515", bg: "#f8f9fa", target: 4.5 },
   { category: "Variant 4: Light Web + Light Code", label: "Light Code Keyword (#0000FF on #F8F9FA)", fg: "#0000ff", bg: "#f8f9fa", target: 4.5 },
   { category: "Variant 4: Light Web + Light Code", label: "Light Code Function (#795E26 on #F8F9FA)", fg: "#795e26", bg: "#f8f9fa", target: 4.5 },
+  { category: "Variant 4: Light Web + Light Code", label: "Light Code Prompt (#0369A1 on #F8F9FA)", fg: "#0369a1", bg: "#f8f9fa", target: 4.5 },
   { category: "Variant 4: Light Web + Light Code", label: "Light Code Base Text (#1F2937 on #F8F9FA)", fg: "#1f2937", bg: "#f8f9fa", target: 7.0 },
 
   // ── VARIANT 5: Print View + Dark Code Block ─────────────────────────────
@@ -67,6 +71,7 @@ const TESTS = [
   { category: "Variant 5: Print View + Dark Code", label: "Print Dark Code String (#CE9178 on #1E1E1E)", fg: "#ce9178", bg: "#1e1e1e", target: 4.5 },
   { category: "Variant 5: Print View + Dark Code", label: "Print Dark Code Keyword (#569CD6 on #1E1E1E)", fg: "#569cd6", bg: "#1e1e1e", target: 4.5 },
   { category: "Variant 5: Print View + Dark Code", label: "Print Dark Code Function (#DCDCAA on #1E1E1E)", fg: "#dcdcaa", bg: "#1e1e1e", target: 4.5 },
+  { category: "Variant 5: Print View + Dark Code", label: "Print Dark Code Prompt (#38BDF8 on #1E1E1E)", fg: "#38bdf8", bg: "#1e1e1e", target: 4.5 },
   { category: "Variant 5: Print View + Dark Code", label: "Print Dark Code Base Text (#D4D4D4 on #1E1E1E)", fg: "#d4d4d4", bg: "#1e1e1e", target: 7.0 },
 
   // ── VARIANT 6: Print View + Light Code Block ────────────────────────────
@@ -74,6 +79,7 @@ const TESTS = [
   { category: "Variant 6: Print View + Light Code", label: "Print Light Code String (#B45309 on #F8F9FA)", fg: "#b45309", bg: "#f8f9fa", target: 4.5 },
   { category: "Variant 6: Print View + Light Code", label: "Print Light Code Keyword (#0000FF on #F8F9FA)", fg: "#0000ff", bg: "#f8f9fa", target: 4.5 },
   { category: "Variant 6: Print View + Light Code", label: "Print Light Code Function (#795E26 on #F8F9FA)", fg: "#795e26", bg: "#f8f9fa", target: 4.5 },
+  { category: "Variant 6: Print View + Light Code", label: "Print Light Code Prompt (#0369A1 on #F8F9FA)", fg: "#0369a1", bg: "#f8f9fa", target: 4.5 },
   { category: "Variant 6: Print View + Light Code", label: "Print Light Code Base Text (#1F2937 on #F8F9FA)", fg: "#1f2937", bg: "#f8f9fa", target: 7.0 },
 
   // ── General Document & UI Elements ──────────────────────────────────────
