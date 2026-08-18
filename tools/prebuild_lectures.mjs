@@ -124,6 +124,32 @@ if (existsSync(slidesJsonPath)) {
   }
 }
 
+function isCodeBlockquote(html, rawText) {
+  const t = (rawText || "").trim();
+  if (!t) return false;
+  if (t.startsWith("„") || t.startsWith('"') || t.startsWith("»") || t.startsWith("'") || t.startsWith("«")) return false;
+  if (/^<code>[\s\S]*<\/code>$/i.test((html || "").trim()) || /<pre[\s\S]*<\/pre>/i.test(html || "")) return true;
+  if (/\b(je|jsou|není|nejsou|obsahuje|představuje|může|musí|bude|bylo|mají|slouží|sloužit|pokud|jestliže|protože|však|používá|volá|vrací|určuje|znamená|respektive|nalezen|vytvořen|označit|při vstupu|vynechané|chcete-li|napišeme)\b/i.test(t)) return false;
+  if (t.endsWith(".") && !t.includes("(") && !t.includes("=")) return false;
+
+  if (/^[a-zA-Z0-9_.]+\s*=\s*[a-zA-Z0-9_.]+\s*\(.*?\)$/s.test(t)) return true;
+  if (/^[a-zA-Z0-9_.]+\s*\([a-zA-Z0-9_=*,\s'"\(\)\[\]\.\/\:\-\+\<\>\&]*\)$/s.test(t)) return true;
+  if (/^[a-zA-Z0-9_.]+(\[[^\]]+\]|\.[a-zA-Z0-9_]+)\s*[\*+\-\/]\s*[a-zA-Z0-9_.]+/i.test(t)) return true;
+  if (/^(\$|>|conda\s+[a-z\-]+|pip\s+[a-z\-]+|python\s+[a-z0-9_\-\.]+)\s+/i.test(t)) return true;
+
+  return false;
+}
+
+function transformCodeBlockquotes(html) {
+  return html.replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, (match, inner) => {
+    const rawText = inner.replace(/<[^>]+>/g, "").trim();
+    if (isCodeBlockquote(inner, rawText)) {
+      return `<pre class="brush: python; gutter: false; toolbar: false;">${inner.trim()}</pre>`;
+    }
+    return match;
+  });
+}
+
 let prebuiltCount = 0;
 for (const [relPath, filePath] of fileMap.entries()) {
   try {
@@ -140,7 +166,7 @@ for (const [relPath, filePath] of fileMap.entries()) {
 
     while ((match = sectionRegex.exec(htmlContent)) !== null) {
       const sectionId = match[1];
-      const sectionInner = match[2];
+      const sectionInner = transformCodeBlockquotes(match[2]);
       
       // Extract title header if present
       const hMatch = sectionInner.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i);
