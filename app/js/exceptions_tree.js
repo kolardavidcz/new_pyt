@@ -548,3 +548,129 @@ export function renderExceptionTreeHtml() {
 
   return renderNode(EXCEPTION_TREE_DATA, 0, true, "");
 }
+
+/**
+ * Generate static, complete 55-node 2-column Exception Hierarchy Cheat Sheet (Guaranteed Max 1 A4)
+ */
+export function renderStaticA4ExceptionTreeHtml() {
+  const col1 = [
+    { prefix: "", name: "BaseException", tag: "sys", tagLabel: "⚡ Systém", meaning: "Nejvyšší kořenová třída všech výjimek v Pythonu." },
+    { prefix: "├── ", name: "BaseExceptionGroup", tag: "sys", tagLabel: "⚡ Systém (3.11+)", meaning: "Skupina souběžných výjimek v asyncio task groups." },
+    { prefix: "├── ", name: "KeyboardInterrupt", tag: "sys", tagLabel: "⚡ Vnější zásah", meaning: "Přerušení programu uživatelem (Ctrl+C). Neopravitelné kódem." },
+    { prefix: "├── ", name: "SystemExit", tag: "sys", tagLabel: "⚡ Ukončení procesu", meaning: "Požadavek na ukončení procesu funkcí sys.exit()." },
+    { prefix: "├── ", name: "GeneratorExit", tag: "flow", tagLabel: "⚙️ Řízení toku", meaning: "Vyvolána při ukončení generátoru voláním close()." },
+    { prefix: "└── ", name: "Exception", tag: "base", tagLabel: " Kořen běžných chyb", meaning: "Bázová třída pro všechny nefatální chyby; cíl obecného try-except." },
+    { prefix: "     ├── ", name: "StopIteration", tag: "flow", tagLabel: "⚙️ Řízení toku", meaning: "Konec synchronního iterátoru v next(); řídí konec for smyčky." },
+    { prefix: "     ├── ", name: "StopAsyncIteration", tag: "flow", tagLabel: "⚙️ Řízení toku", meaning: "Konec asynchronního iterátoru v __anext__() pro async for." },
+    { prefix: "     ├── ", name: "ArithmeticError", tag: "base", tagLabel: " Aritmetika", meaning: "Společný předek pro numerické a matematické chyby výpočtu." },
+    { prefix: "     │    ├── ", name: "FloatingPointError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Chyba operace v plovoucí řádové čárce na úrovni HW/OS." },
+    { prefix: "     │    ├── ", name: "OverflowError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Přetečení maximálního rozsahu čísla (např. u float)." },
+    { prefix: "     │    └── ", name: "ZeroDivisionError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Dělení nebo modulo nulou (1 / 0 nebo 10 % 0). Nutno ošetřit." },
+    { prefix: "     ├── ", name: "AssertionError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Příkaz assert vyhodnotil podmínku jako False." },
+    { prefix: "     ├── ", name: "AttributeError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Objekt nemá volanou metodu či atribut (např. str.append())." },
+    { prefix: "     ├── ", name: "BufferError", tag: "sys", tagLabel: "⚡ Nízká úroveň", meaning: "Nízkoúrovňová operace s buffer protokolem paměti selhala." },
+    { prefix: "     ├── ", name: "EOFError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Funkce input() narazila na konec streamu (Ctrl+D / EOF)." },
+    { prefix: "     ├── ", name: "ImportError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Příkaz import selhal při načítání modulu nebo objektu." },
+    { prefix: "     │    └── ", name: "ModuleNotFoundError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Modul nebyl nalezen v sys.path (chybí pip install)." },
+    { prefix: "     ├── ", name: "LookupError", tag: "base", tagLabel: " Vyhledání", meaning: "Společný předek pro chyby indexace a klíčů v kolekcích." },
+    { prefix: "     │    ├── ", name: "IndexError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Index v sekvenci (list, tuple, str) je mimo platný rozsah." },
+    { prefix: "     │    └── ", name: "KeyError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Klíč nebyl ve slovníku nalezen. Použít d.get() / try-except." },
+    { prefix: "     ├── ", name: "MemoryError", tag: "sys", tagLabel: "⚡ Vyčerpána RAM", meaning: "Operační paměť je vyčerpána; interpret nemůže alokovat objekt." },
+    { prefix: "     ├── ", name: "NameError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Přístup k neexistující proměnné/funkci (překlep, chybí definice)." },
+    { prefix: "     │    └── ", name: "UnboundLocalError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Čtení lokální proměnné před přiřazením hodnoty ve funkci." },
+    { prefix: "     ├── ", name: "TypeError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Nekompatibilní datový typ (např. 'str' + 5 nebo volání ne-funkce)." },
+    { prefix: "     ├── ", name: "ValueError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Správný typ, ale neplatná hodnota argumentu (např. int('abc'))." },
+    { prefix: "     │    └── ", name: "UnicodeError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Společná třída pro chyby kódování/překladu Unicode." },
+    { prefix: "     │         ├── ", name: "UnicodeDecodeError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Chyba při dekódování bajtů do textu (chybí encoding)." },
+    { prefix: "     │         ├── ", name: "UnicodeEncodeError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Chyba při kódování textu do specifické znakové sady." },
+    { prefix: "     │         └── ", name: "UnicodeTranslateError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Chyba při překladu znaku v translate()." },
+    { prefix: "     ├── ", name: "SyntaxError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Syntaktická chyba v kódu zjištěná parserem před spuštěním." },
+    { prefix: "     │    └── ", name: "IndentationError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Chybné odsazení bloku kódu (např. chybí 4 mezery)." },
+    { prefix: "     │         └── ", name: "TabError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Nekonzistentní míchání tabulátorů a mezer v odsazení." },
+    { prefix: "     └── ", name: "RuntimeError", tag: "bug", tagLabel: "🐛 Běhová chyba", meaning: "Obecná běhová chyba nespadající do konkrétnější kategorie." },
+    { prefix: "          ├── ", name: "RecursionError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Překročena maximální hloubka rekurze (chybí ukončení)." },
+    { prefix: "          └── ", name: "NotImplementedError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Abstraktní metoda nebo rozhraní nebylo v potomkovi přepsáno." }
+  ];
+
+  const col2 = [
+    { prefix: "     ├── ", name: "OSError", tag: "guard", tagLabel: "🛡️ Systém / I/O", meaning: "Společná nadtřída pro chyby operačního systému, disků a sítě." },
+    { prefix: "     │    ├── ", name: "BlockingIOError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Operace na neblokujícím streamu/socketu by způsobila blokování." },
+    { prefix: "     │    ├── ", name: "ChildProcessError", tag: "sys", tagLabel: "⚡ Systém", meaning: "Operace s dceřiným podprocesem systému selhala." },
+    { prefix: "     │    ├── ", name: "ConnectionError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Společný předek pro všechny výpadky síťového spojení." },
+    { prefix: "     │    │    ├── ", name: "BrokenPipeError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Zápis do socketu nebo roury, jejíž protější konec je uzavřen." },
+    { prefix: "     │    │    ├── ", name: "ConnectionAbortedError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Navázané síťové spojení bylo přerušeno lokálním stackem." },
+    { prefix: "     │    │    ├── ", name: "ConnectionRefusedError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Server odmítl navázat spojení (na portu nic neposlouchá)." },
+    { prefix: "     │    │    └── ", name: "ConnectionResetError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Existující spojení bylo vzdálenou protistranou násilně resetováno." },
+    { prefix: "     │    ├── ", name: "FileExistsError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Pokus o vytvoření souboru, který již na disku existuje." },
+    { prefix: "     │    ├── ", name: "FileNotFoundError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Požadovaný soubor nebo složka nebyla nalezena na zadané cestě." },
+    { prefix: "     │    ├── ", name: "InterruptedError", tag: "sys", tagLabel: "⚡ Signál OS", meaning: "Systémové volání OS bylo přerušeno příchozím signálem." },
+    { prefix: "     │    ├── ", name: "IsADirectoryError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Požadována souborová operace (např. open pro zápis) nad složkou." },
+    { prefix: "     │    ├── ", name: "NotADirectoryError", tag: "bug", tagLabel: "🐛 Chyba v kódu", meaning: "Požadována adresářová operace (např. listdir) nad běžným souborem." },
+    { prefix: "     │    ├── ", name: "PermissionError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Nedostatečná přístupová oprávnění k souboru nebo složce." },
+    { prefix: "     │    ├── ", name: "ProcessLookupError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Požadovaný systémový proces podle zadaného PID neexistuje." },
+    { prefix: "     │    └── ", name: "TimeoutError", tag: "guard", tagLabel: "🛡️ Robustnost", meaning: "Systémová či síťová operace překročila nastavený časový limit." },
+    { prefix: "     ├── ", name: "ReferenceError", tag: "sys", tagLabel: "⚡ Slabý odkaz", meaning: "Pokus o přístup přes slabý odkaz (weakref) po úklidu objektem GC." },
+    { prefix: "     ├── ", name: "SystemError", tag: "sys", tagLabel: "⚡ Interpret", meaning: "Interní chyba interpretu Pythonu (anomálie v CPython jádru)." },
+    { prefix: "     ├── ", name: "PythonFinalizationError", tag: "sys", tagLabel: "⚡ Ukončení", meaning: "Chyba nastala během závěrečné fáze shutdownu interpretu." },
+    { prefix: "     ├── ", name: "ExceptionGroup", tag: "base", tagLabel: " Skupina (3.11+)", meaning: "Skupina výjimek dědících z Exception; obsluha pomocí except*." },
+    { prefix: "     └── ", name: "Warning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Společný bázový předek pro všechna nefatální systémová varování." },
+    { prefix: "          ├── ", name: "DeprecationWarning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Varování: Zastaralá funkce, v budoucích verzích bude smazána." },
+    { prefix: "          ├── ", name: "PendingDeprecationWarning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Varování: Předběžné upozornění na budoucí zastarání funkce." },
+    { prefix: "          ├── ", name: "FutureWarning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Varování: Změna chování funkce v budoucích verzích Pythonu." },
+    { prefix: "          ├── ", name: "ResourceWarning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Varování: Neuvolněný prostředek (např. neuzavřený soubor bez with)." },
+    { prefix: "          ├── ", name: "RuntimeWarning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Varování: Podezřelé běhové chování kódu během výpočtu." },
+    { prefix: "          ├── ", name: "SyntaxWarning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Varování: Podezřelá či nejednoznačná syntaxe kódu." },
+    { prefix: "          ├── ", name: "UserWarning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Varování: Běžná uživatelská či knihovní varování z kódu." },
+    { prefix: "          ├── ", name: "ImportWarning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Varování: Možné problémy při importu specifického balíčku." },
+    { prefix: "          ├── ", name: "UnicodeWarning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Varování: Podezřelé zacházení s Unicode řetězci." },
+    { prefix: "          ├── ", name: "BytesWarning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Varování: Podezřelé porovnávání nebo míchání bytes a str." },
+    { prefix: "          └── ", name: "EncodingWarning", tag: "warn", tagLabel: "⚠️ Varování", meaning: "Varování: Chybějící explicitní encoding při otevírání souboru." }
+  ];
+
+  function renderRows(items) {
+    return items.map(it => {
+      const tagClass = `pill-${it.tag}`;
+      return `
+        <div class="exc-row">
+          <span class="exc-row-branch" aria-hidden="true">${escapeHtml(it.prefix)}</span>
+          <code class="exc-row-code">${escapeHtml(it.name)}</code>
+          <span class="exc-row-tag ${tagClass}">${escapeHtml(it.tagLabel)}</span>
+          <span class="exc-row-sep">•</span>
+          <span class="exc-row-meaning" title="${escapeHtml(it.meaning)}">${escapeHtml(it.meaning)}</span>
+        </div>`;
+    }).join("");
+  }
+
+  function escapeHtml(str) {
+    return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  return `
+<div class="exc-static-print-sheet">
+  <div class="exc-print-header">
+    <div class="exc-print-title-row">
+      <h3 class="exc-print-title">Hierarchie standardních výjimek v Pythonu (Kompletní přehled)</h3>
+      <span class="exc-print-badge">A4 Cheat Sheet • Python 3.10+</span>
+    </div>
+    <div class="exc-print-legend">
+      <span class="exc-legend-item pill-flow">⚙️ Řízení toku</span>
+      <span class="exc-legend-item pill-bug">🐛 Chyba v kódu (Opravit)</span>
+      <span class="exc-legend-item pill-guard">🛡️ Potřeba robustnosti (Try-except / Guard)</span>
+      <span class="exc-legend-item pill-sys">⚡ Vnější zásah / OS</span>
+      <span class="exc-legend-item pill-warn">⚠️ Varování</span>
+    </div>
+  </div>
+
+  <div class="exc-print-grid">
+    <div class="exc-print-col">
+      ${renderRows(col1)}
+    </div>
+    <div class="exc-print-col">
+      ${renderRows(col2)}
+    </div>
+  </div>
+</div>`;
+}
+
+export const renderStaticExceptionCheatSheetHtml = renderStaticA4ExceptionTreeHtml;
+
