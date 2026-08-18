@@ -360,7 +360,7 @@ export async function renderQuizSection(item) {
         if (cn) cn.dataset.hl = "1";
       }
 
-      const inlineInputHtml = `<input type="text" class="inline-code-fill-input" size="${blankLen}" style="--blank-len:${blankLen};" data-len="${blankLen}" autocomplete="off" spellcheck="false" placeholder="doplňte kód..." aria-label="Napište chybějící kód" />`;
+      const inlineInputHtml = `<input type="text" class="inline-code-fill-input" size="${blankLen}" style="--blank-len:${blankLen};" data-len="${blankLen}" autocomplete="off" spellcheck="false" aria-label="Napište chybějící kód" />`;
       let inserted = false;
       if (codeWrapEl) {
         const codeNode = codeWrapEl.querySelector("code");
