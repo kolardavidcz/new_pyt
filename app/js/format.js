@@ -162,6 +162,19 @@ export function isFlexibleCodeFillCorrect(userVal, expectedVal, options = [], an
   return false;
 }
 
+function isLikelyCodeSection(text) {
+  const lines = text.split("\n").map((l) => l.trim()).filter(Boolean);
+  if (lines.length === 0) return false;
+  return lines.some((t) =>
+    /^(?:def|class|for|while|if|elif|else|try|except|finally|with|import|from|return|yield|raise|assert|pass)\b/.test(t) ||
+    /^(?:print|len|range|type|isinstance|sorted|dict|list|set|tuple)\(/.test(t) ||
+    /^\w+\s*=\s*[\{\[\(\'\"0-9a-zA-Z]/.test(t) ||
+    /['"]\w+['"]\s*:\s*lambda\b/.test(t) ||
+    /^>>>/.test(t) ||
+    /^[a-zA-Z_]\w*\[.*\]\s*(?:=|\+=|-=|\*=|\/=|append|extend|pop)/.test(t)
+  );
+}
+
 export function parseQuestionContent(rawQuestion, rawCode) {
   if (!rawQuestion && !rawCode) return { stemHtml: "", codeSnippetHtml: "" };
 
@@ -193,6 +206,34 @@ export function parseQuestionContent(rawQuestion, rawCode) {
       }
     }
     stemText = formattedParts.join("");
+  } else if (!rawCode && stemText.includes("\n\n")) {
+    // If no explicit rawCode and question has multiline paragraphs where trailing paragraph is code
+    const paragraphs = stemText.split(/\n\s*\n/);
+    const stemParts = [];
+    const codeParts = [];
+    let inCode = false;
+
+    for (const p of paragraphs) {
+      if (inCode || isLikelyCodeSection(p)) {
+        inCode = true;
+        codeParts.push(p);
+      } else {
+        stemParts.push(p);
+      }
+    }
+
+    if (codeParts.length > 0) {
+      stemText = formatInlineCode(stemParts.join("\n\n"));
+      let extractedCode = codeParts.join("\n\n");
+      if (extractedCode.endsWith(":") && !/(?:def|class|for|while|if|elif|else|try|except|finally|with)\s.*:$/.test(extractedCode)) {
+        extractedCode = extractedCode.slice(0, -1).trim();
+      }
+      const dedented = dedentCode(extractedCode);
+      const lang = detectCodeLang(dedented);
+      codeSnippetHtml = `<pre class="code-block lang-${lang}"><code>${highlightCode(dedented, lang)}</code></pre>`;
+    } else {
+      stemText = formatInlineCode(stemText);
+    }
   } else {
     stemText = formatInlineCode(stemText);
   }
