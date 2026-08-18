@@ -552,13 +552,176 @@ export function dedentCode(text) {
 }
 
 /**
+ * Normalizes and standardizes indentation for pure Python code blocks:
+ * - Expands tabs to 4 spaces
+ * - Collapses \n{3,} to \n\n
+ * - Detects 2-space indentation and normalizes to standard 4-space tabs
+ * - Correctly nests methods (4 spaces), method bodies (8 spaces), sub-blocks (12 spaces)
+ * - Properly indents ellipsis (...) placeholders inside classes and functions
+ * - Resets top-level classes, functions, and post-class calls to column 0
+ */
+export function standardizePythonCode(text) {
+  if (!text) return "";
+
+  // 1. Expand tabs and normalize newlines
+  let code = String(text).replace(/\t/g, "    ").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  code = code.replace(/\n{3,}/g, "\n\n");
+  code = trimBlankLines(code);
+
+  const rawLines = code.split("\n");
+  if (rawLines.length === 0) return "";
+
+  // Dedent base lines first
+  const lines = dedentLines(rawLines);
+
+  // Check if snippet contains class / function definitions with nesting
+  const hasClassOrDef = lines.some((l) => /^\s*(?:class|def|async\s+def|@\w+)\b/.test(l));
+  if (!hasClassOrDef) {
+    return lines.join("\n");
+  }
+
+  const result = [];
+  let inClass = false;
+  let inFunc = false;
+  let subBlockIndent = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i];
+    const trimmed = rawLine.trim();
+    const curRawIndent = (rawLine.match(/^[ ]*/) || [""])[0].length;
+
+    // Empty line
+    if (trimmed.length === 0) {
+      result.push("");
+      continue;
+    }
+
+    // Top-level class definition
+    if (/^class\s+\w+/i.test(trimmed) || (/^class\s+/i.test(trimmed) && trimmed.endsWith(":"))) {
+      inClass = true;
+      inFunc = false;
+      subBlockIndent = -1;
+      result.push(trimmed);
+      continue;
+    }
+
+    // Decorator (@classmethod, @staticmethod, @property, @decorator)
+    if (/^@\w+/.test(trimmed)) {
+      inFunc = false;
+      subBlockIndent = -1;
+      if (inClass) {
+        result.push(`    ${trimmed}`);
+      } else {
+        result.push(trimmed);
+      }
+      continue;
+    }
+
+    // Method / Function definition (def ...:)
+    if (/^(?:def|async\s+def)\s+\w+/i.test(trimmed)) {
+      subBlockIndent = -1;
+      if (inClass) {
+        inFunc = true;
+        result.push(`    ${trimmed}`);
+      } else {
+        inClass = false;
+        inFunc = true;
+        result.push(trimmed);
+      }
+      continue;
+    }
+
+    // Compound control statements (for, while, if, elif, else, try, except, finally, with)
+    if (/^(?:for|while|if|elif|else|try|except|finally|with)\b/i.test(trimmed)) {
+      subBlockIndent = curRawIndent;
+      if (inClass && inFunc) {
+        result.push(`        ${trimmed}`);
+      } else if (inFunc || inClass) {
+        result.push(`    ${trimmed}`);
+      } else {
+        result.push(trimmed);
+      }
+      continue;
+    }
+
+    // Check if sub-block ended because current line's raw indent is <= subBlockIndent
+    if (subBlockIndent >= 0 && curRawIndent <= subBlockIndent) {
+      subBlockIndent = -1;
+    }
+
+    // Return, yield, raise, or break/continue
+    if (/^(?:return|yield|raise|break|continue|pass)\b/i.test(trimmed)) {
+      const isNested = subBlockIndent >= 0 && curRawIndent > subBlockIndent;
+      if (inClass && inFunc) {
+        result.push(isNested ? `            ${trimmed}` : `        ${trimmed}`);
+      } else if (inFunc || inClass) {
+        result.push(isNested ? `        ${trimmed}` : `    ${trimmed}`);
+      } else {
+        result.push(trimmed);
+      }
+      if (!isNested) subBlockIndent = -1;
+      continue;
+    }
+
+    // Ellipsis placeholder (...)
+    if (trimmed === "..." || trimmed === "…") {
+      const isNested = subBlockIndent >= 0;
+      if (inClass && inFunc) {
+        result.push(isNested ? `            ...` : `        ...`);
+      } else if (inFunc || inClass) {
+        result.push(isNested ? `        ...` : `    ...`);
+      } else {
+        result.push(`...`);
+      }
+      continue;
+    }
+
+    // Class attributes / docstrings inside class without method
+    if (inClass && !inFunc) {
+      result.push(`    ${trimmed}`);
+      continue;
+    }
+
+    // Inside function or method
+    if (inFunc) {
+      // Check if line is a top-level statement closing the class/func (e.g. p = Potomek(), p.mtd())
+      const isPostBlockCall = /^[a-zA-Z_]\w*\s*(?:=|\(|\.|\[)/.test(trimmed) &&
+        !/^(?:self|cls)\b/.test(trimmed) &&
+        !trimmed.startsWith("self.") &&
+        !trimmed.startsWith("cls.") &&
+        (rawLine.match(/^[ ]*/)[0].length === 0 || /^[a-z_]\w*\s*=\s*(?:[A-Z]\w*\(|Člověk|Potomek|Školák)/.test(trimmed));
+
+      if (isPostBlockCall && (rawLine.match(/^[ ]*/)[0].length === 0 || /^[a-z]\s*=/.test(trimmed))) {
+        inClass = false;
+        inFunc = false;
+        subBlockIndent = -1;
+        result.push(trimmed);
+        continue;
+      }
+
+      const isNested = subBlockIndent >= 0 && curRawIndent > subBlockIndent;
+      if (inClass) {
+        result.push(isNested ? `            ${trimmed}` : `        ${trimmed}`);
+      } else {
+        result.push(isNested ? `        ${trimmed}` : `    ${trimmed}`);
+      }
+      if (!isNested) subBlockIndent = -1;
+      continue;
+    }
+
+    // Top-level line
+    result.push(trimmed);
+  }
+
+  return trimBlankLines(result.join("\n"));
+}
+
+/**
  * Normalizes code showcases:
  * - Expands tabs to 4 spaces
  * - Collapses excessive blank lines (\n{3,} -> \n\n)
- * - Dedents prefix function/class definitions independently
- * - Strips excess leading spaces on top-level comments
- * - Standardizes >>>, >>, and ... continuation indentation
- * - Cleans up output lines to column 0
+ * - Pure Python blocks: applies standardizePythonCode()
+ * - REPL sessions: dedents prefix definitions, normalizes >>>, >>, ... prompts and zero-offset outputs
  */
 export function normalizeCodeShowcase(text, lang = "python") {
   if (!text) return "";
@@ -573,17 +736,20 @@ export function normalizeCodeShowcase(text, lang = "python") {
   const lines = code.split("\n");
   if (lines.length === 0) return "";
 
-  // Check if snippet contains REPL prompts (>>>, >>, ...)
-  const hasReplPrompt = lines.some((l) => /^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(l));
+  // Check if snippet contains REPL prompts (>>> or >>)
+  const hasReplPrompt = lines.some((l) => /^\s*>{2,3}(?:\s|$)/.test(l));
 
   if (!hasReplPrompt) {
+    if (lang === "python") {
+      return standardizePythonCode(code);
+    }
     return dedentLines(lines).join("\n");
   }
 
   // Find index of first prompt
   let firstPromptIdx = -1;
   for (let i = 0; i < lines.length; i++) {
-    if (/^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(lines[i])) {
+    if (/^\s*>{2,3}(?:\s|$)/.test(lines[i])) {
       firstPromptIdx = i;
       break;
     }
@@ -603,7 +769,7 @@ export function normalizeCodeShowcase(text, lang = "python") {
     const codePrefix = rawPrefix.slice(0, splitIdx);
     const commentPrefix = rawPrefix.slice(splitIdx);
 
-    const dedentedCode = dedentLines(codePrefix);
+    const dedentedCode = standardizePythonCode(codePrefix.join("\n")).split("\n");
     const normalizedComments = commentPrefix.map((l) => l.trimStart());
     prefixLines = [...dedentedCode, ...normalizedComments];
     replLines = lines.slice(firstPromptIdx);
