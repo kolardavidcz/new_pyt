@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { renderExceptionTreeHtml } from "../app/js/exceptions_tree.js";
+import { renderStaticExceptionCheatSheetHtml } from "../app/js/exceptions_tree.js";
 
 const ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "data");
@@ -487,34 +487,75 @@ function transformPreBlocks(html) {
   });
 }
 
-const excTreeSnippet = `<div class="exc-tree-app" id="excTreeApp">
-  <div class="exc-toolbar">
-    <div class="exc-search-box">
-      <span class="exc-search-icon">🔍</span>
-      <input type="text" class="exc-search-input" id="excSearchInput" placeholder="Filtrovat výjimku (např. KeyError, ZeroDivision, soubor)..." aria-label="Filtrovat výjimky" />
-      <button type="button" class="btn exc-clear-btn" id="excClearBtn" style="display:none;">✕</button>
-    </div>
-    <div class="exc-filter-pills" id="excFilterPills">
-      <button type="button" class="exc-pill active" data-tag="all">Vše (55)</button>
-      <button type="button" class="exc-pill pill-flow" data-tag="flow">⚙️ Řízení toku</button>
-      <button type="button" class="exc-pill pill-bug" data-tag="bug">🐛 Chyba v kódu</button>
-      <button type="button" class="exc-pill pill-guard" data-tag="guard">🛡️ Potřeba robustnosti</button>
-      <button type="button" class="exc-pill pill-sys" data-tag="sys">⚡ Vnější zásah / OS</button>
-      <button type="button" class="exc-pill pill-warn" data-tag="warn">⚠️ Varování</button>
-    </div>
-    <div class="exc-actions">
-      <button type="button" class="btn" id="excExpandAllBtn">Rozbalit vše</button>
-      <button type="button" class="btn" id="excCollapseAllBtn">Sbalit vše</button>
-    </div>
-  </div>
-  <div class="exc-tree-view" id="excTreeView">
-${renderExceptionTreeHtml()}
-  </div>
-</div>`;
+const python310AsciiTree = `BaseException
+ +-- SystemExit
+ +-- KeyboardInterrupt
+ +-- GeneratorExit
+ +-- Exception
+      +-- StopIteration
+      +-- StopAsyncIteration
+      +-- ArithmeticError
+      |    +-- FloatingPointError
+      |    +-- OverflowError
+      |    +-- ZeroDivisionError
+      +-- AssertionError
+      +-- AttributeError
+      +-- BufferError
+      +-- EOFError
+      +-- ImportError
+      |    +-- ModuleNotFoundError
+      +-- LookupError
+      |    +-- IndexError
+      |    +-- KeyError
+      +-- MemoryError
+      +-- NameError
+      |    +-- UnboundLocalError
+      +-- OSError
+      |    +-- BlockingIOError
+      |    +-- ChildProcessError
+      |    +-- ConnectionError
+      |    |    +-- BrokenPipeError
+      |    |    +-- ConnectionAbortedError
+      |    |    +-- ConnectionRefusedError
+      |    |    +-- ConnectionResetError
+      |    +-- FileExistsError
+      |    +-- FileNotFoundError
+      |    +-- InterruptedError
+      |    +-- IsADirectoryError
+      |    +-- NotADirectoryError
+      |    +-- PermissionError
+      |    +-- ProcessLookupError
+      |    +-- TimeoutError
+      +-- ReferenceError
+      +-- RuntimeError
+      |    +-- NotImplementedError
+      |    +-- RecursionError
+      +-- SyntaxError
+      |    +-- IndentationError
+      |         +-- TabError
+      +-- SystemError
+      +-- TypeError
+      +-- ValueError
+      |    +-- UnicodeError
+      |         +-- UnicodeDecodeError
+      |         +-- UnicodeEncodeError
+      |         +-- UnicodeTranslateError
+      +-- Warning
+           +-- DeprecationWarning
+           +-- PendingDeprecationWarning
+           +-- RuntimeWarning
+           +-- SyntaxWarning
+           +-- UserWarning
+           +-- FutureWarning
+           +-- ImportWarning
+           +-- UnicodeWarning
+           +-- BytesWarning
+           +-- EncodingWarning
+           +-- ResourceWarning`;
 
 function transformExampleTags(html) {
   if (!html) return "";
-  let res = html.replace(/<example[^>]*src=["']_history\/Python310["'][^>]*>[\s\S]*?<\/example>/gi, excTreeSnippet);
+  let res = html.replace(/<example[^>]*src=["']_history\/Python310["'][^>]*>[\s\S]*?<\/example>/gi, `<pre class="brush: plain; gutter: false; toolbar: false;">${python310AsciiTree}</pre>`);
   return res;
 }
 
@@ -606,10 +647,10 @@ for (const [relPath, filePath] of fileMap.entries()) {
       }
 
       let islHtml = isl.html || "";
-      if (islHtml.includes('id="excTreeView"') && !islHtml.includes('exc-node')) {
+      if (islHtml.includes('<!-- INJECT_STATIC_EXC_CHEATSHEET -->') || islHtml.includes('id="excTreeView"') || islHtml.includes('exc-tree-app')) {
         islHtml = islHtml.replace(
-          /<div class="exc-tree-view" id="excTreeView">[\s\S]*?<\/div>/i,
-          `<div class="exc-tree-view" id="excTreeView">\n${renderExceptionTreeHtml()}\n</div>`
+          /<!-- INJECT_STATIC_EXC_CHEATSHEET -->|<div class="exc-tree-app"[\s\S]*?<\/div>\s*<\/div>/gi,
+          renderStaticExceptionCheatSheetHtml()
         );
       }
 
