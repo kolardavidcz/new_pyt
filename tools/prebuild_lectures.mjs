@@ -8,7 +8,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { renderStaticExceptionTreeHtml } from "../app/js/exceptions_tree.js";
+import { renderCompactAsciiExceptionTreeHtml } from "../app/js/exceptions_tree.js";
 
 const ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "data");
@@ -647,10 +647,16 @@ for (const [relPath, filePath] of fileMap.entries()) {
       }
 
       let islHtml = isl.html || "";
-      if (islHtml.includes('<!-- INJECT_STATIC_EXC_TREE -->') || islHtml.includes('<!-- INJECT_STATIC_EXC_CHEATSHEET -->') || islHtml.includes('id="excTreeView"') || islHtml.includes('exc-tree-app') || islHtml.includes('exc-tree-container')) {
+      if (
+        islHtml.includes('<!-- INJECT_COMPACT_ASCII_EXCEPTIONS_TREE -->') ||
+        islHtml.includes('<!-- INJECT_STATIC_EXC_CHEATSHEET -->') ||
+        islHtml.includes('id="excTreeView"') ||
+        islHtml.includes('exc-tree-app') ||
+        islHtml.includes('exc-static-sheet')
+      ) {
         islHtml = islHtml.replace(
-          /<!-- INJECT_STATIC_EXC_TREE -->|<!-- INJECT_STATIC_EXC_CHEATSHEET -->|<div class="exc-tree-app"[\s\S]*?<\/div>\s*<\/div>|<div class="exc-tree-container"[\s\S]*?<\/div>/gi,
-          renderStaticExceptionTreeHtml()
+          /<!-- INJECT_COMPACT_ASCII_EXCEPTIONS_TREE -->|<!-- INJECT_STATIC_EXC_CHEATSHEET -->|<div class="exc-tree-app"[\s\S]*?<\/div>\s*<\/div>|<div class="exc-static-sheet"[\s\S]*?<\/div>\s*<\/div>/gi,
+          renderCompactAsciiExceptionTreeHtml()
         );
       }
 
