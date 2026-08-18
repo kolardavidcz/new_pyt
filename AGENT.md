@@ -103,54 +103,42 @@ const targetIdx = hash % cleanOpts.length;
 
 ## 🎨 Theme System, Code Block Settings & Print Architecture
 
-The application implements a multi-layer theme engine combining global page themes, user-configurable code block themes, and print stylesheet rules.
+The application implements a multi-layer theme engine cleanly separating global interactive web themes from user-configurable PDF/Print export rules.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
 │                               THEME COMBINATION MATRIX                                 │
 ├───────────────────┬──────────────────────┬────────────────────────┬────────────────────┤
-│ Global Theme      │ Code Block Setting   │ Slide Code Blocks      │ Quiz Code Blocks   │
+│ Environment/Theme │ Print Code Setting   │ Slide Code Blocks      │ Quiz Code Blocks   │
 ├───────────────────┼──────────────────────┼────────────────────────┼────────────────────┤
-│ Dark (Default)    │ dark                 │ #1e1e1e (Dark+)        │ #1e1e1e (Dark+)    │
-│ Dark              │ light                │ #1e1e1e (Dark+)        │ #1e1e1e (Dark+)    │
-│ Light             │ dark (Default)       │ #1e1e1e (Dark+)        │ #1e1e1e (Dark+)    │
-│ Light             │ light                │ #f8f9fa (Light Tokens) │ #f8f9fa (Light Tk) │
-│ @media print      │ dark                 │ #1e1e1e (High Contrast)│ #1e1e1e (High Cont)│
-│ @media print      │ light                │ #f8f9fa (Ink Saver)    │ #f8f9fa (Ink Saver)│
+│ Web Dark (Default)│ (any)                │ #1e1e1e (Dark+)        │ #1e1e1e (Dark+)    │
+│ Web Light         │ (any)                │ #f8f9fa (Light Tokens) │ #f8f9fa (Light Tk) │
+│ @media print (PDF)│ dark (Default)       │ #1e1e1e (High Contrast)│ #1e1e1e (High Cont)│
+│ @media print (PDF)│ light                │ #f8f9fa (Ink Saver)    │ #f8f9fa (Ink Saver)│
 └───────────────────┴──────────────────────┴────────────────────────┴────────────────────┘
 ```
 
-### 1. Global Page Themes (`data-theme="dark"` vs `data-theme="light"`)
-- **Dark Page Theme (`html[data-theme="dark"]` - Default)**:
+### 1. Web Page Themes (`html[data-theme="dark"]` vs `html[data-theme="light"]`)
+- **Web Dark Page Theme (`html[data-theme="dark"]` - Default)**:
   - Dark editor surface: `--editor: #1e1e1e`, `--bg: #161616`, `--sidebar: #252526`.
-  - Monospace VS Code Dark+ aesthetics across modals, control centers, and cards.
-- **Light Page Theme (`html[data-theme="light"]`)**:
-  - Clean white page background: `--bg: #ffffff`, `--editor: #ffffff`, `--border: #cbd5e1`.
-  - Text: `#0f172a` / `#1e293b`.
+  - Code blocks in slides, quizzes, and exercises automatically render with `#1e1e1e` background and VS Code Dark+ token colors.
+- **Web Light Page Theme (`html[data-theme="light"]`)**:
+  - Clean white page background: `--bg: #ffffff`, `--editor: #ffffff`, `--border: #cbd5e1`, text: `#0f172a`.
+  - Code blocks in slides, quizzes, and exercises automatically render with `#f8f9fa` light surface and light syntax tokens (`#0000ff` keywords, `#a31515` strings, `#008000` comments), completely independent of print settings.
 
-### 2. Code Block Theme Setting (`data-code-block-color="dark"` vs `"light"`)
-In User Profile / Settings (`app/js/content.js`), users can independently configure **Kódové bloky**: `Tmavé` (`dark`) vs `Světlé` (`light`):
-- `data-code-block-color="dark"`: Renders `#1e1e1e` background with VS Code Dark+ token colors across all code blocks, even when viewing in Light page theme.
-- `data-code-block-color="light"`: Renders `#f8f9fa` background with light syntax tokens (`#0000ff` keywords, `#a31515` strings, `#008000` comments).
-- **Mandatory Uniformity**: This setting applies to:
-  1. Presentation slides (`.slide-body pre`, `.code-block`)
-  2. Interactive quiz questions (`.quiz-code-wrap pre`, `.quiz-q-card pre`)
-  3. Interactive code fill inputs (`.inline-code-fill-input`)
-  4. Structured exercise cards (`.task-card pre`)
-
-### 3. Print Layout Standards (`app/css/print.css` / `@media print`)
-- **Default Light Paper**: Print layout ALWAYS forces `#ffffff` background with `#111827` high-contrast body text for clean A4 printing.
-- **Print Code Block Control**:
-  - `data-code-block-color="dark"`: Renders `#1e1e1e` dark codeboxes for high-contrast presentation slides.
-  - `data-code-block-color="light"`: Renders `#f8f9fa` light codeboxes to save printer toner.
+### 2. Print / PDF Export Settings (`data-code-block-color="dark"` vs `"light"`)
+In User Profile / Settings (`app/js/content.js`), users configure **Barevné schéma pro tisk** (`state.codeBlockColor`):
+- **Applies Exclusively to Print/PDF**: This setting affects `@media print` in `print.css` only.
+- `data-code-block-color="dark"`: Renders `#1e1e1e` dark codeboxes for high-contrast presentation slides when exporting to PDF.
+- `data-code-block-color="light"`: Renders `#f8f9fa` light codeboxes to save printer toner.
 - **Print Quizzes Toggle**: `data-print-quizzes="true"` toggles quiz questions at the end of the printed document.
 
-### 4. Code Block Formatting Standard (Slides & Quizzes)
-All code blocks across slides and quizzes must adhere to the exact same standard:
+### 3. Code Block Formatting Standard (Slides & Quizzes)
+All code blocks across slides and quizzes adhere to the exact same standard:
 1. **Markup Structure**: `<pre class="code-block lang-{lang}"><code>{highlightCode(dedented, lang)}</code></pre>`.
 2. **Automatic Indentation Dedenting**: Always run `dedentCode(text)` before highlighting.
 3. **Language Normalization & Detection**: Use `detectCodeLang(code, declaredLang)` to detect Python REPL (`>>>`), shell commands (`$`, `>`), SQL, XML, or Python.
-4. **Natural Reading Flow**: In questions with markdown code blocks ```` ``` ````, code blocks must remain in their natural flow within the question stem rather than being displaced to the bottom of the card.
+4. **Natural Reading Flow**: In questions with markdown code blocks ```` ``` ````, code blocks remain in their natural flow within the question stem rather than being displaced to the bottom of the card.
 
 ---
 

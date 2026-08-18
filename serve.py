@@ -19,11 +19,12 @@ import json
 import mimetypes
 import os
 import sys
+import urllib
 import urllib.parse
 import urllib.request
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 ROOT = Path(__file__).resolve().parent
 OLD = ROOT / ".old"
@@ -232,7 +233,6 @@ class Handler(SimpleHTTPRequestHandler):
             return
 
         if parsed.path.startswith("/api/sync"):
-            from urllib.parse import parse_qs
             qs = parse_qs(parsed.query)
             key = (qs.get("key") or qs.get("k") or [""])[0]
             if not key:
@@ -241,7 +241,6 @@ class Handler(SimpleHTTPRequestHandler):
             kv_url = "https://tough-husky-101028.upstash.io"
             kv_token = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA"
             try:
-                import urllib.request
                 req = urllib.request.Request(
                     f"{kv_url}/get/{urllib.parse.quote(key)}",
                     headers={"Authorization": f"Bearer {kv_token}"}
@@ -303,7 +302,6 @@ class Handler(SimpleHTTPRequestHandler):
             kv_url = "https://tough-husky-101028.upstash.io"
             kv_token = "gQAAAAAAAYqkAAIgcDFiZjJmZTQ3MWE4OTg0MWJjOWUwYmY5ZjU3MGEzOTg3NA"
             try:
-                import urllib.request
                 payload = json.loads(raw_body.decode("utf-8"))
                 if isinstance(payload, list):
                     # Batched operations
@@ -325,7 +323,6 @@ class Handler(SimpleHTTPRequestHandler):
                     k = payload.get("key") if isinstance(payload, dict) else None
                     v = payload.get("val") if isinstance(payload, dict) else payload
                     if not k:
-                        from urllib.parse import parse_qs
                         qs = parse_qs(parsed.query)
                         k = (qs.get("key") or qs.get("k") or [""])[0]
 
