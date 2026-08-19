@@ -134,7 +134,7 @@ function renderAdminModalContent(activeTab = "improvements") {
 
         <div class="admin-toolbar" style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:12px; color:var(--text-muted);">Registrovaní uživatelé a správci</span>
-          <input type="search" class="admin-search-input" id="admSearchUsers" name="admin_users_search_filter" autocomplete="off" placeholder="Filtrovat uživatele..." style="min-width:200px;" />
+          <input type="search" class="admin-search-input" id="admSearchUsers" name="admin_users_search_filter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" placeholder="Filtrovat uživatele..." style="min-width:200px;" />
         </div>
         <div class="admin-card-list" id="admUsersList" style="margin-top:10px;"></div>
       </div>
@@ -144,7 +144,7 @@ function renderAdminModalContent(activeTab = "improvements") {
       <div class="admin-tab-content active" id="tab-relevance">
         <div class="admin-toolbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
           <span style="font-size:12px; color:var(--text-muted);">Hodnocení relevance (1–10) pro studenty a vyučující</span>
-          <input type="search" class="admin-search-input" id="admSearchRel" name="admin_relevance_search_filter" autocomplete="off" placeholder="Hledat téma podle názvu nebo klíče..." style="min-width:260px;" />
+          <input type="search" class="admin-search-input" id="admSearchRel" name="admin_relevance_search_filter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" placeholder="Hledat téma podle názvu nebo klíče..." style="min-width:260px;" />
         </div>
         <div class="admin-card-list" id="admRelList"></div>
       </div>
@@ -448,6 +448,10 @@ function renderUsersTab() {
     };
   }
 
+  if (searchInput) {
+    searchInput.value = "";
+  }
+
   function updateList() {
     if (!container) return;
     const q = (searchInput?.value || "").toLowerCase();
@@ -494,15 +498,15 @@ function renderUsersTab() {
           <div style="font-size:11.5px; color:var(--fg-muted); margin-top:2px;">
             Fakulta: ${escapeHtml(rec.faculty || "VSČHT")} · Osobní číslo: ${escapeHtml(rec.studentId || "—")}
           </div>
-          <div class="admin-item-actions" style="align-items:center; margin-top:8px;">
-            <input type="password" class="admin-search-input adm-pass-input" placeholder="Nové heslo..." style="min-width:140px; font-size:11.5px;" data-user="${escapeHtml(u)}" />
+          <form autocomplete="off" onsubmit="return false;" class="admin-item-actions" style="align-items:center; margin-top:8px; display:flex; gap:8px;">
+            <input type="password" class="admin-search-input adm-pass-input" name="admin_user_reset_pwd_${escapeHtml(u)}" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" placeholder="Nové heslo..." style="min-width:140px; font-size:11.5px;" data-user="${escapeHtml(u)}" />
             <button type="button" class="admin-btn-sm success btn-act-reset-pass" data-user="${escapeHtml(u)}">Změnit heslo</button>
             ${u !== "kolard" && u !== "kolard@vscht.cz" ? (
               isAdmin
                 ? `<button type="button" class="admin-btn-sm btn-act-revoke-admin" data-user="${escapeHtml(u)}">Odebrat správce</button>`
                 : `<button type="button" class="admin-btn-sm btn-act-grant-admin" data-user="${escapeHtml(u)}">Udělit správce</button>`
             ) : `<span style="font-size:11px; color:var(--accent); font-weight:600;">Hlavní administrátor</span>`}
-          </div>
+          </form>
         </div>
       `;
     }).join("");
@@ -553,6 +557,10 @@ function renderRelevanceTab() {
   const container = adminModalEl?.querySelector("#admRelList");
   const searchInput = adminModalEl?.querySelector("#admSearchRel");
   if (!container) return;
+
+  if (searchInput) {
+    searchInput.value = "";
+  }
 
   function updateList() {
     const q = (searchInput?.value || "").toLowerCase();
