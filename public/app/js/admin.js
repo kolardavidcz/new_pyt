@@ -92,6 +92,65 @@ function renderAdminModalContent(activeTab = "improvements") {
   const improvements = state.questionImprovements || [];
   const openCount = improvements.filter((i) => (i.status || "open") === "open").length;
 
+  let tabBodyHtml = "";
+
+  if (activeTab === "improvements") {
+    tabBodyHtml = `
+      <div class="admin-tab-content active" id="tab-improvements">
+        <!-- Diagnostics Summary Strip -->
+        <div class="v2-status-line" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:10px 14px; background:var(--editor, #1e1e1e); border:1px solid var(--border-subtle, #333); border-radius:2px;">
+          <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:12px;">
+            <div>Témat v kurzu: <strong class="num">${state.items ? state.items.length : 0}</strong></div>
+            <div>Otevřených připomínek: <strong class="num" style="color:#f59e0b;">${openCount}</strong></div>
+            <div>Celkem hlášení: <strong class="num">${improvements.length}</strong></div>
+            <div>Chyby v odkazech: <strong class="num" style="color:${(state.errorLinkLog && state.errorLinkLog.length > 0) ? '#ef4444' : '#10b981'};">${state.errorLinkLog ? state.errorLinkLog.length : 0}</strong></div>
+          </div>
+          ${state.errorLinkLog && state.errorLinkLog.length > 0 ? `
+            <button type="button" class="admin-btn-sm btn-clear-link-errors" style="font-size:11px;">Vyčistit chyby odkazů</button>
+          ` : ""}
+        </div>
+
+        <div class="admin-toolbar" style="display:flex; gap:10px; margin-bottom:12px; align-items:center;">
+          <input type="search" class="admin-search-input" id="admSearchImp" name="admin_tickets_search_filter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" data-1p-ignore="true" data-bwignore="true" placeholder="Hledat podle otázky, tématu nebo poznámky..." style="flex:1;" />
+          <select class="admin-search-input" id="admFilterStatus" style="min-width:150px;">
+            <option value="all">Všechny stavy</option>
+            <option value="open" selected>Pouze otevřené (${openCount})</option>
+            <option value="resolved">Vyřešené</option>
+            <option value="dismissed">Zamítnuté</option>
+          </select>
+        </div>
+        <div class="admin-card-list" id="admImpList"></div>
+      </div>
+    `;
+  } else if (activeTab === "users") {
+    tabBodyHtml = `
+      <div class="admin-tab-content active" id="tab-users">
+        <form autocomplete="off" onsubmit="return false;" style="background:var(--editor, #1e1e1e); border:1px solid var(--border-subtle, #333); border-radius:2px; padding:12px 14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
+          <input type="email" id="admNewAdminUsername" name="admin_new_user_email" class="admin-search-input" autocomplete="off" placeholder="E-mail správce (@vscht.cz)" style="flex:1;" />
+          <input type="password" id="admNewAdminPass" name="admin_new_user_password" class="admin-search-input" autocomplete="new-password" placeholder="Heslo" style="flex:1;" />
+          <button type="button" class="btn primary sm v2-submit" id="btnAdmCreateAdmin" style="width:auto;">Udělit práva správce</button>
+          <div id="admUserCreateMsg" style="font-size:11.5px; color:#89d185; width:100%;"></div>
+        </form>
+
+        <div class="admin-toolbar" style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:12px; color:var(--text-muted);">Registrovaní uživatelé a správci</span>
+          <input type="search" class="admin-search-input" id="admSearchUsers" name="admin_users_search_filter" autocomplete="off" placeholder="Filtrovat uživatele..." style="min-width:200px;" />
+        </div>
+        <div class="admin-card-list" id="admUsersList" style="margin-top:10px;"></div>
+      </div>
+    `;
+  } else if (activeTab === "relevance") {
+    tabBodyHtml = `
+      <div class="admin-tab-content active" id="tab-relevance">
+        <div class="admin-toolbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <span style="font-size:12px; color:var(--text-muted);">Hodnocení relevance (1–10) pro studenty a vyučující</span>
+          <input type="search" class="admin-search-input" id="admSearchRel" name="admin_relevance_search_filter" autocomplete="off" placeholder="Hledat téma podle názvu nebo klíče..." style="min-width:260px;" />
+        </div>
+        <div class="admin-card-list" id="admRelList"></div>
+      </div>
+    `;
+  }
+
   adminModalEl.innerHTML = `
     <div class="modal-card admin-modal-card">
       <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center;">
@@ -117,57 +176,7 @@ function renderAdminModalContent(activeTab = "improvements") {
       </div>
 
       <div class="modal-body" style="padding:16px 20px;">
-        <!-- TAB 1: QUESTION IMPROVEMENTS & DIAGNOSTICS -->
-        <div class="admin-tab-content ${activeTab === "improvements" ? "active" : ""}" id="tab-improvements">
-          <!-- Diagnostics Summary Strip -->
-          <div class="v2-status-line" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding:10px 14px; background:var(--editor, #1e1e1e); border:1px solid var(--border-subtle, #333); border-radius:2px;">
-            <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:12px;">
-              <div>Témat v kurzu: <strong class="num">${state.items ? state.items.length : 0}</strong></div>
-              <div>Otevřených připomínek: <strong class="num" style="color:#f59e0b;">${openCount}</strong></div>
-              <div>Celkem hlášení: <strong class="num">${improvements.length}</strong></div>
-              <div>Chyby v odkazech: <strong class="num" style="color:${(state.errorLinkLog && state.errorLinkLog.length > 0) ? '#ef4444' : '#10b981'};">${state.errorLinkLog ? state.errorLinkLog.length : 0}</strong></div>
-            </div>
-            ${state.errorLinkLog && state.errorLinkLog.length > 0 ? `
-              <button type="button" class="admin-btn-sm btn-clear-link-errors" style="font-size:11px;">Vyčistit chyby odkazů</button>
-            ` : ""}
-          </div>
-
-          <div class="admin-toolbar" style="display:flex; gap:10px; margin-bottom:12px; align-items:center;">
-            <input type="text" class="admin-search-input" id="admSearchImp" name="search_admin_improvements_filter" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" data-1p-ignore placeholder="Hledat podle otázky, tématu nebo poznámky..." style="flex:1;" />
-            <select class="admin-search-input" id="admFilterStatus" style="min-width:150px;">
-              <option value="all">Všechny stavy</option>
-              <option value="open" selected>Pouze otevřené (${openCount})</option>
-              <option value="resolved">Vyřešené</option>
-              <option value="dismissed">Zamítnuté</option>
-            </select>
-          </div>
-          <div class="admin-card-list" id="admImpList"></div>
-        </div>
-
-        <!-- TAB 2: USER & ADMIN MANAGEMENT -->
-        <div class="admin-tab-content ${activeTab === "users" ? "active" : ""}" id="tab-users">
-          <div style="background:var(--editor, #1e1e1e); border:1px solid var(--border-subtle, #333); border-radius:2px; padding:12px 14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
-            <input type="text" id="admNewAdminUsername" class="admin-search-input" placeholder="E-mail správce (@vscht.cz)" style="flex:1;" />
-            <input type="password" id="admNewAdminPass" class="admin-search-input" placeholder="Heslo" style="flex:1;" />
-            <button type="button" class="btn primary sm v2-submit" id="btnAdmCreateAdmin" style="width:auto;">Udělit práva správce</button>
-            <div id="admUserCreateMsg" style="font-size:11.5px; color:#89d185; width:100%;"></div>
-          </div>
-
-          <div class="admin-toolbar" style="margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:12px; color:var(--text-muted);">Registrovaní uživatelé a správci</span>
-            <input type="text" class="admin-search-input" id="admSearchUsers" placeholder="Filtrovat uživatele..." style="min-width:200px;" />
-          </div>
-          <div class="admin-card-list" id="admUsersList" style="margin-top:10px;"></div>
-        </div>
-
-        <!-- TAB 3: PRESENTATION RELEVANCE MANAGER -->
-        <div class="admin-tab-content ${activeTab === "relevance" ? "active" : ""}" id="tab-relevance">
-          <div class="admin-toolbar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <span style="font-size:12px; color:var(--text-muted);">Hodnocení relevance (1–10) pro studenty a vyučující</span>
-            <input type="text" class="admin-search-input" id="admSearchRel" placeholder="Hledat téma podle názvu nebo klíče..." style="min-width:260px;" />
-          </div>
-          <div class="admin-card-list" id="admRelList"></div>
-        </div>
+        ${tabBodyHtml}
       </div>
     </div>
   `;
@@ -203,6 +212,10 @@ function renderImprovementsTab() {
   const searchInput = adminModalEl?.querySelector("#admSearchImp");
   const statusSelect = adminModalEl?.querySelector("#admFilterStatus");
   if (!container) return;
+
+  if (searchInput) {
+    searchInput.value = "";
+  }
 
   function updateList() {
     const q = (searchInput?.value || "").toLowerCase();
