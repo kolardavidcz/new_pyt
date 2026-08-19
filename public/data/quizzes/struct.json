@@ -4,10 +4,10 @@
     "type": "predict_output",
     "question": "Jaký datový typ navrací funkce struct.unpack() po rozbalení jediného čtyřbajtového celého čísla?",
     "options": [
-      "A) Slovník (dict) s klíčem odpovídajícím použitému formátovacímu znaku a vyhodnocenou hodnotou.",
-      "B) Objekt bajtů (bytes) s vyčištěným bajtovým pořadím přeloženým na danou architekturu procesoru.",
+      "A) Objekt bajtů (bytes) s vyčištěným bajtovým pořadím přeloženým na danou architekturu procesoru.",
+      "B) Samotné celé číslo (int) reprezentující dekódovanou hodnotu z načteného bajtového řetězce.",
       "C) N-tici (tuple) obsahující rozbalenou hodnotu jako svůj jediný prvek pro zachování konzistence.",
-      "D) Samotné celé číslo (int) reprezentující dekódovanou hodnotu z načteného bajtového řetězce."
+      "D) Slovník (dict) s klíčem odpovídajícím použitému formátovacímu znaku a vyhodnocenou hodnotou."
     ],
     "answer": 2,
     "explanation": "Funkce `struct.unpack()` vždy navrací n-tici (tuple), a to i v případě, že se rozbaluje pouze jediná hodnota (např. `(333,)`). Toto sjednocené chování zajišťuje konzistentní rozhraní bez ohledu na počet rozbalovaných prvků.",
@@ -18,9 +18,9 @@
     "type": "multiple_choice",
     "question": "Co vrátí volání struct.unpack('>I', b'\\x00\\x00\\x01\\x00')?",
     "options": [
-      "A) 256 — rozbalí skalární celé číslo bez n-tice, protože byl v řetězci použit jediný formátovací znak.",
-      "B) struct.error — vyvolá výjimku, protože daný bajtový řetězec b'\\x00\\x00\\x01\\x00' nemá platný prefix.",
-      "C) (1,) — rozbalí 4bajtové celé číslo v řazení little-endian, kde se bajty načítají zprava do leva.",
+      "A) struct.error — vyvolá výjimku, protože daný bajtový řetězec b'\\x00\\x00\\x01\\x00' nemá platný prefix.",
+      "B) (1,) — rozbalí 4bajtové celé číslo v řazení little-endian, kde se bajty načítají zprava do leva.",
+      "C) 256 — rozbalí skalární celé číslo bez n-tice, protože byl v řetězci použit jediný formátovací znak.",
       "D) (256,) — rozbalí 4bajtové celé číslo v řazení big-endian, kde hodnota 0x0100 odpovídá číslu 256."
     ],
     "answer": 3,
@@ -33,9 +33,9 @@
     "question": "Jaký je rozdíl mezi formátovacími znaky 10s a 10c v modulu struct?",
     "options": [
       "A) 10s reprezentuje jeden 10bajtový objekt bytes, zatímco 10c znamená 10 samostatných 1bajtových hodnot.",
-      "B) 10s funguje pouze s big-endian pořadím bajtů, zatímco 10c vyžaduje little-endian pořadí bajtů paměti.",
-      "C) 10s reprezentuje řetězec typu str v kódování UTF-8, zatímco 10c představuje pole C-style znaků char.",
-      "D) 10s vyžaduje ukončovací nulový bajt \\x00, zatímco 10c načítá přesně 10 bajtů bez jakéhokoliv ukončení."
+      "B) 10s vyžaduje ukončovací nulový bajt \\x00, zatímco 10c načítá přesně 10 bajtů bez jakéhokoliv ukončení.",
+      "C) 10s funguje pouze s big-endian pořadím bajtů, zatímco 10c vyžaduje little-endian pořadí bajtů paměti.",
+      "D) 10s reprezentuje řetězec typu str v kódování UTF-8, zatímco 10c představuje pole C-style znaků char."
     ],
     "answer": 0,
     "explanation": "V modulu `struct` označuje zápis `10s` jeden souvislý 10bajtový objekt typu `bytes`. Naproti tomu `10c` označuje opakovací činitel pro 10 samostatných jednobajtových hodnot `bytes` (v rozbalené n-tici tedy vznikne 10 samostatných prvků).",
@@ -46,10 +46,10 @@
     "type": "fill_blank_choice",
     "question": "Která třída z modulu struct slouží k předkompilování binárního formátovacího řetězce pro efektivní opakované balení a rozbalování dat?",
     "options": [
-      "Packer",
+      "Format",
       "Struct",
       "Pattern",
-      "Format"
+      "Packer"
     ],
     "answer": 1,
     "explanation": "Třída struct.Struct(fmt) vytvoří předkompilovaný objekt formátu, jehož metody pack() a unpack() jsou výrazně rychlejší při opakovaném volání.",
@@ -61,8 +61,8 @@
     "type": "multiple_choice",
     "question": "Který znak na začátku formátovacího řetězce v modulu struct nastavuje síťové (network) pořadí bajtů?",
     "options": [
-      "A) = — určuje přirozené pořadí bajtů v platformě se standardní velikostí datových typů a bez zarovnání.",
-      "B) < — určuje little-endian pořadí bajtů v paměti se standardní velikostí datových typů a bez zarovnání.",
+      "A) < — určuje little-endian pořadí bajtů v paměti se standardní velikostí datových typů a bez zarovnání.",
+      "B) = — určuje přirozené pořadí bajtů v platformě se standardní velikostí datových typů a bez zarovnání.",
       "C) ! — určuje síťové pořadí bajtů (big-endian) se standardní velikostí datových typů a bez zarovnání.",
       "D) @ — určuje přirozené pořadí bajtů z platformy s přirozenou velikostí datových typů a zarovnáním."
     ],
@@ -75,9 +75,9 @@
     "type": "multiple_choice",
     "question": "Jak se liší výstup metody calcsize() u formátů '@' a '<' na 64bitovém systému pro řetězec 'cl' (char, long)?",
     "options": [
-      "A) Oba formáty vyvolají výjimku struct.error, protože kombinace znakového a dlouhého typu je v Pythonu neplatná.",
-      "B) @ vrátí 9 bajtů bez zarovnání, zatímco < automaticky doplní nulové bajty na nejbližší násobek osmi (16 B).",
-      "C) @ i < vrátí shodně 9 bajtů, protože zarovnávání bajtů se u standardních typů C vyžaduje výhradně pro float.",
+      "A) @ vrátí 9 bajtů bez zarovnání, zatímco < automaticky doplní nulové bajty na nejbližší násobek osmi (16 B).",
+      "B) @ i < vrátí shodně 9 bajtů, protože zarovnávání bajtů se u standardních typů C vyžaduje výhradně pro float.",
+      "C) Oba formáty vyvolají výjimku struct.error, protože kombinace znakového a dlouhého typu je v Pythonu neplatná.",
       "D) @ použije přirozené zarovnání C-struktur (16 B), zatímco < vypne zarovnávání a vrátí součet velikostí (9 B)."
     ],
     "answer": 3,

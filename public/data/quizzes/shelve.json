@@ -18,10 +18,10 @@
     "type": "multiple_choice",
     "question": "Jaký účinek má příkaz db['seznam'].append(99) v databázi shelve při výchozím nastavení writeback=False?",
     "options": [
-      "A) Změna se okamžitě zapíše na disk do souboru databáze bez nutnosti jakéhokoliv dalšího zásahu.",
+      "A) Kód selže a vyvolá výjimku PermissionError kvůli zápisu do neotevřené vyrovnávací paměti.",
       "B) Změna se uloží do paměťové cache a provede se její zapsání až při volání metody db.close().",
       "C) Seznam v databázi zůstane nezměněn, protože modifikace mutable objektu se bez přiřazení nezapsala.",
-      "D) Kód selže a vyvolá výjimku PermissionError kvůli zápisu do neotevřené vyrovnávací paměti."
+      "D) Změna se okamžitě zapíše na disk do souboru databáze bez nutnosti jakéhokoliv dalšího zásahu."
     ],
     "answer": 2,
     "explanation": "Při výchozím writeback=False vrací db['seznam'] odpicklovaný dočasný objekt. Příkaz .append(99) modifikuje tuto kopii. Pro uložení na disk je nutné znovupřiřazení db['seznam'] = temp.",
@@ -44,9 +44,9 @@
     "type": "fill_blank_choice",
     "question": "Která hodnota parametru flag ve funkci shelve.open() vynutí vytvoření nové prázdné databáze s přepsáním existujícího souboru?",
     "options": [
-      "'r'",
-      "'w'",
       "'c'",
+      "'w'",
+      "'r'",
       "'n'"
     ],
     "answer": 3,
@@ -61,8 +61,8 @@
     "options": [
       "A) Pro zápis může mít databázi otevřenou současně pouze jediný proces; pro čtení více procesů.",
       "B) Konkurentní čtení i zápis jsou podporovány výhradně v případě použití backendu dbm.dumb.",
-      "C) Databáze plně podporuje paralelní zápis z více procesů díky zámkům na úrovni backendu.",
-      "D) Databázi může mít současně otevřenou právě jeden proces bez ohledu na čtení či zápis."
+      "C) Databázi může mít současně otevřenou právě jeden proces bez ohledu na čtení či zápis.",
+      "D) Databáze plně podporuje paralelní zápis z více procesů díky zámkům na úrovni backendu."
     ],
     "answer": 0,
     "explanation": "Modul shelve nezajišťuje zamykání pro paratelní zápis. Zápis z více procesů naráz může poškodit databázi. Paralelní čtení z více procesů je bezpečné.",
@@ -73,10 +73,10 @@
     "type": "predict_output",
     "question": "Které soubory vytvoří záložní backend dbm.dumb na disku při práci s databází pojmenovanou mojedata?",
     "options": [
-      "A) Dvojici souborů mojedata.sqlite a mojedata.log pro podporu transakčního logování.",
+      "A) Pouze jediný binární soubor s příponou mojedata.db vytvořený ve složce projektu.",
       "B) Soubory mojedata.dat a mojedata.dir (případně mojedata.bak při spuštěném provozu).",
-      "C) Trojici souborů mojedata.txt, mojedata.json a mojedata.bin v cache adresáři.",
-      "D) Pouze jediný binární soubor s příponou mojedata.db vytvořený ve složce projektu."
+      "C) Dvojici souborů mojedata.sqlite a mojedata.log pro podporu transakčního logování.",
+      "D) Trojici souborů mojedata.txt, mojedata.json a mojedata.bin v cache adresáři."
     ],
     "answer": 1,
     "explanation": "Čistě pythoní backend dbm.dumb vytváří dvojici souborů .dat a .dir (plus .bak během manipulace), které uchovávají indexy klíčů a samotná bajtová data.",

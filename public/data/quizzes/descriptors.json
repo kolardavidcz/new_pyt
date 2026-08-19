@@ -5,9 +5,9 @@
     "question": "Jaký je hlavní rozdíl mezi datovým deskriptorem (data descriptor) a nedatovým deskriptorem (non-data descriptor) při vyhledávání atributů na instanci?",
     "options": [
       "A) Datový definuje metodu __set__ nebo __delete__ a má přednost před __dict__ instance, nedatový definuje jen __get__.",
-      "B) Datový deskriptor se ukládá přímo do __dict__ instance, zatímco nedatový deskriptor se ukládá do __dict__ třídy.",
-      "C) Nedatový deskriptor nelze na instanci vůbec přepsat novou hodnotou, kdežto datový deskriptor lze snadno nahradit.",
-      "D) Nedatový definuje metodu __set__ a má přednost před __dict__ instance, zatímco datový definuje výhradně __get__."
+      "B) Nedatový definuje metodu __set__ a má přednost před __dict__ instance, zatímco datový definuje výhradně __get__.",
+      "C) Datový deskriptor se ukládá přímo do __dict__ instance, zatímco nedatový deskriptor se ukládá do __dict__ třídy.",
+      "D) Nedatový deskriptor nelze na instanci vůbec přepsat novou hodnotou, kdežto datový deskriptor lze snadno nahradit."
     ],
     "answer": 0,
     "explanation": "Datový deskriptor implementuje __set__ (nebo __delete__), což způsobuje, že přístup i zápis k tomuto atributu má vždy přednost před slovníkem __dict__ instance. Nedatový deskriptor implementuje pouze __get__ (např. metody), takže uložení atributu do __dict__ instance nedatový deskriptor překryje.",
@@ -18,10 +18,10 @@
     "type": "multiple_choice",
     "question": "Jak se liší chování metod __getattr__ a __getattribute__ při přístupu k atributu instance?",
     "options": [
-      "A) Vypíše ALWAYS FALLBACK, protože Python při neexistenci atributu postupně zavolá obě obslužné metody v definovaném pořadí.",
+      "A) Vyvolá RecursionError, protože implementace __getattribute__ bez použití super() vyvolá nekonečnou rekurzi přístupu.",
       "B) Vypíše ALWAYS, protože __getattribute__ se volá bezpodmínečně při každém přístupu k atributu a __getattr__ se nezavolá.",
       "C) Vypíše FALLBACK, protože atribut anything není v __dict__ definován a __getattr__ má při vyhledávání vyšší prioritu.",
-      "D) Vyvolá RecursionError, protože implementace __getattribute__ bez použití super() vyvolá nekonečnou rekurzi přístupu."
+      "D) Vypíše ALWAYS FALLBACK, protože Python při neexistenci atributu postupně zavolá obě obslužné metody v definovaném pořadí."
     ],
     "answer": 1,
     "explanation": "Metoda __getattribute__ se volá vždy při jakémkoliv přístupu k atributu. Protože v kódu vrátil návratovou hodnotu ihned bez AttributeError, k volání __getattr__ (které se spouští až po selhání běžného hledání) vůbec nedojde.",
@@ -32,10 +32,10 @@
     "type": "fill_blank_choice",
     "question": "Doplňte metodu protokolu deskriptorů volanou při čtení hodnoty atributu z instance:",
     "options": [
-      "__getattr__",
       "__getitem__",
+      "__getattribute__",
       "__get__",
-      "__getattribute__"
+      "__getattr__"
     ],
     "answer": 2,
     "explanation": "Deskriptorový protokol definuje metodu __get__(self, instance, owner) pro čtení hodnoty spravovaného atributu.",
@@ -47,8 +47,8 @@
     "type": "multiple_choice",
     "question": "Jak Python vnitřně přeloží zápis p.barva = \"zelená\", je-li barva datovým deskriptorem definovaným na třídě Plocha?",
     "options": [
-      "A) Plocha.__setattr__(p, 'barva', \"zelená\")",
-      "B) p.__dict__['barva'].__set__(type(p), \"zelená\")",
+      "A) p.__dict__['barva'].__set__(type(p), \"zelená\")",
+      "B) Plocha.__setattr__(p, 'barva', \"zelená\")",
       "C) p.__set__(type(p).__dict__['barva'], \"zelená\")",
       "D) type(p).__dict__['barva'].__set__(p, \"zelená\")"
     ],
@@ -62,9 +62,9 @@
     "question": "Co se stane při pokusu o spuštění následujícího kódu vytvářejícího vlastnost s dekorátory?",
     "options": [
       "A) Vyvolá výjimku ValueError, protože přiřazení do s.size spustí metodu označenou dekorátorem @size.setter.",
-      "B) Vyvolá výjimku AttributeError, protože metody pro getter a setter musí mít odlišné názvy (např. get_size).",
+      "B) Atribut s.size se změní na -5, protože dekorátor @size.setter se uplatní pouze u instancí třídy object.",
       "C) Kód selže již při definici třídy s výjimkou NameError, neboť dekorátor @size.setter neodkazuje na existující proměnnou.",
-      "D) Atribut s.size se změní na -5, protože dekorátor @size.setter se uplatní pouze u instancí třídy object."
+      "D) Vyvolá výjimku AttributeError, protože metody pro getter a setter musí mít odlišné názvy (např. get_size)."
     ],
     "answer": 0,
     "explanation": "Zápis @size.setter navazuje na dříve definovanou property size. Při uložení s.size = -5 se zavolá setter metoda, která ověří podmínku a vyvolá ValueError(\"Velikost musí být nezáporná\").",

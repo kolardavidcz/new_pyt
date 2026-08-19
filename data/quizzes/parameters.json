@@ -5,9 +5,9 @@
     "question": "Jaký datový typ mají proměnné args a kwargs uvnitř těla následující funkce?",
     "options": [
       "A) args je typu tuple (n-tice) a kwargs je typu dict (slovník).",
-      "B) args je typu list (seznam) a kwargs je typu dict (slovník).",
-      "C) args je typu tuple (n-tice) a kwargs je typu list (seznam).",
-      "D) args je typu list (seznam) a kwargs je typu set (množina)."
+      "B) args je typu list (seznam) a kwargs je typu set (množina).",
+      "C) args je typu list (seznam) a kwargs je typu dict (slovník).",
+      "D) args je typu tuple (n-tice) a kwargs je typu list (seznam)."
     ],
     "answer": 0,
     "explanation": "Operátor * zabalí přebytečné poziční argumenty do n-tice (tuple), zatímco operátor ** zabalí přebytečné pojmenované argumenty do slovníku (dict).",
@@ -18,10 +18,10 @@
     "type": "multiple_choice",
     "question": "Jaký výstup vytvoří volání následující funkce s variabilním počtem argumentů?",
     "options": [
-      "A) Vypíše číslo 10, protože hodnota b=5 přepíše poslední prvek n-tice args a sečte pouze předané hodnoty.",
+      "A) Vyvolá výjimku TypeError, protože argument b se pokusí odebrat hodnotu 4 z n-tice pozičních argumentů.",
       "B) Vypíše číslo 15, protože a=1, args=(2, 3, 4) a b je předáno jako povinný keyword-only argument b=5.",
-      "C) Vyvolá výjimku TypeError, protože argument b se pokusí odebrat hodnotu 4 z n-tice pozičních argumentů.",
-      "D) Vyvolá výjimku SyntaxError, protože parametr s hvězdičkou *args musí být až na úplném konci definice."
+      "C) Vyvolá výjimku SyntaxError, protože parametr s hvězdičkou *args musí být až na úplném konci definice.",
+      "D) Vypíše číslo 10, protože hodnota b=5 přepíše poslední prvek n-tice args a sečte pouze předané hodnoty."
     ],
     "answer": 1,
     "explanation": "Parametru a se přiřadí 1, n-tice *args zachytí zbývající poziční argumenty (2, 3, 4) a parametr b umístěný za *args vyžaduje volání jako pojmenovaný argument b=5. Součet 1 + 9 + 5 je 15.",
@@ -32,8 +32,8 @@
     "type": "fill_blank_choice",
     "question": "Doplňte oddělovač do hlavičky funkce pro kalibraci senzoru, aby parametr `tolerance` byl vyžadován výhradně jako pojmenovaný (keyword-only).",
     "options": [
-      "**",
       "*params",
+      "**",
       "*",
       "/"
     ],
@@ -47,9 +47,9 @@
     "type": "fill_blank_choice",
     "question": "Doplňte oddělovač do signatury funkce, který vynutí předání parametrů `x` a `y` výhradně pozičně (positional-only).",
     "options": [
+      "*",
       "!",
       "**",
-      "*",
       "/"
     ],
     "answer": 3,
@@ -63,9 +63,9 @@
     "question": "Jaký výstup vyprodukuje postupné dvojí zavolání funkce s výchozím proměnným argumentem?",
     "options": [
       "A) První volání vrátí [1] a druhé volání vrátí [1, 2], protože seznam target se vytvoří pouze jednou.",
-      "B) První volání vrátí [1] a druhé volání vrátí [2], protože seznam target se vytvoří při každém volání.",
-      "C) Obě volání vrátí hodnotu None, protože metoda append upravuje seznam na místě a nic nevrací.",
-      "D) První volání vrátí [1] a druhé volání vyvolá TypeError, protože seznam target nelze opakovaně měnit."
+      "B) První volání vrátí [1] a druhé volání vyvolá TypeError, protože seznam target nelze opakovaně měnit.",
+      "C) První volání vrátí [1] a druhé volání vrátí [2], protože seznam target se vytvoří při každém volání.",
+      "D) Obě volání vrátí hodnotu None, protože metoda append upravuje seznam na místě a nic nevrací."
     ],
     "answer": 0,
     "explanation": "Jelikož se výchozí hodnota target=[] vyhodnotí pouze jednou při definici funkce, všichni volající bez zadaného argumentu sdílejí stejný objekt seznamu v paměti. Metoda .append() ho mutuje, takže druhý dotaz obdrží kumulovaný seznam [1, 2].",
@@ -90,10 +90,10 @@
     "type": "multiple_choice",
     "question": "Jaký je idiomatický způsob řešení výchozí hodnoty pro mutable parametr (např. seznam) v Pythonu?",
     "options": [
-      "A) Využít dekorátor @classmethod pro automatické vytvoření nové instance seznamu při každém zavolání.",
-      "B) Použít jako výchozí hodnotu prázdnou n-tici () a v těle funkce ji předisponovat pomocí konverze na list(param).",
+      "A) Nastavit výchozí hodnotu na copy.deepcopy([]) přímo v hlavičce definice parametrů dané funkce.",
+      "B) Využít dekorátor @classmethod pro automatické vytvoření nové instance seznamu při každém zavolání.",
       "C) Nastavit výchozí hodnotu na None a uvnitř těla funkce vytvořit nový seznam pomocí podmínky if param is None.",
-      "D) Nastavit výchozí hodnotu na copy.deepcopy([]) přímo v hlavičce definice parametrů dané funkce."
+      "D) Použít jako výchozí hodnotu prázdnou n-tici () a v těle funkce ji předisponovat pomocí konverze na list(param)."
     ],
     "answer": 2,
     "explanation": "Standardním návrhovým vzorem v Pythonu je použít param=None v hlavičce a uvnitř funkce provést if param is None: param = []. Tím se zaručí, že při každém volání bez argumentu vznikne zcela nový samostatný objekt.",
@@ -104,9 +104,9 @@
     "type": "multiple_choice",
     "question": "Co se stane při spuštění následujícího kódu s pozičně-omezeným parametrem?",
     "options": [
-      "A) Vypíše číslo 5, pokud je zadaný parametr y pozičně a x pojmenovaně v libovolném pořadí argumentů.",
-      "B) Vypíše číslo 5, protože lomítko / je pouze orientační záložka a předávání jmen argumentů neomezuje.",
-      "C) Vyvolá SyntaxError, protože lomítko / v definici parametrů není platným syntaktickým prvkem Pythonu.",
+      "A) Vypíše číslo 5, protože lomítko / je pouze orientační záložka a předávání jmen argumentů neomezuje.",
+      "B) Vyvolá SyntaxError, protože lomítko / v definici parametrů není platným syntaktickým prvkem Pythonu.",
+      "C) Vypíše číslo 5, pokud je zadaný parametr y pozičně a x pojmenovaně v libovolném pořadí argumentů.",
       "D) Vyvolá TypeError, protože parametr x se nachází před lomítkem / a nesmí být předán jako pojmenovaný."
     ],
     "answer": 3,

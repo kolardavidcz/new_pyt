@@ -34,9 +34,9 @@
     "question": "Jaké pole bude vytvořeno na čtvrtém místě při spuštění příkazu `namedtuple('Item', 'name price qty price', rename=True)`?",
     "options": [
       "A) Název `_4` vzniklý nahrazením duplikátu podtržítkem s pořadím prvku.",
-      "B) Název `_price` vzniklý přidáním úvodního podtržítka před název.",
+      "B) Název `price_1` vzniklý automatickým přidáním pořadového čísla.",
       "C) Název `_3` vzniklý nahrazením duplikátu podtržítkem s indexem pole.",
-      "D) Název `price_1` vzniklý automatickým přidáním pořadového čísla."
+      "D) Název `_price` vzniklý přidáním úvodního podtržítka před název."
     ],
     "answer": 2,
     "explanation": "Při zapnutí rename=True se duplicitní jméno nahradí podtržítkem a jeho číselným indexem pole (index 3), tedy _3.",
@@ -47,9 +47,9 @@
     "type": "predict_output",
     "question": "Jaký bude výstup příkazu `p = Person._make(['Alice', 30]); print(p.name, p[1])` pro `Person = namedtuple('Person', 'name age')`?",
     "options": [
-      "A) Textový výstup `30 30` způsobený přečtením druhé hodnoty ze vstupního seznamu.",
+      "A) Chybová výjimka `TypeError` vyvolaná předáním seznamu místo n-tice do `_make()`.",
       "B) Textový výstup `Alice Alice` způsobený načtením stejného prvku v obou případech.",
-      "C) Chybová výjimka `TypeError` vyvolaná předáním seznamu místo n-tice do `_make()`.",
+      "C) Textový výstup `30 30` způsobený přečtením druhé hodnoty ze vstupního seznamu.",
       "D) Textový výstup `Alice 30` získaný kombinačním přístupem přes jméno i index."
     ],
     "answer": 3,
@@ -59,15 +59,15 @@
   {
     "id": "q5",
     "type": "multiple_choice",
-    "question": "Proč pomocné metody třídy `namedtuple` (například `_fields`, `_make`, `_replace`) začínají podtržítkem?",
+    "question": "Proč vestavěné pomocné metody a atributy třídy `namedtuple` (např. `_fields`, `_make`, `_asdict`, `_replace`) začínají podtržítkem?",
     "options": [
-      "A) Aby se předešlo konfliktu jmen s uživatelsky definovanými poli n-tice.",
-      "B) Aby se vyhovělo striktnímu pravidlu PEP 8 pro označování metod třídy.",
-      "C) Aby se uživateli zabránilo v jejich volání z důvodu interní privatizace.",
-      "D) Aby se odlišily od metod jazyka C, které jsou v knihovně implementovány."
+      "A) Aby se zabránilo kolizi s názvy uživatelských polí a atributů dané n-tice (např. pokud se pole jmenuje 'fields' nebo 'make').",
+      "B) Aby se odlišily instanční metody od statických metod rodičovské třídy tuple.",
+      "C) Podtržítko signalizuje kompilátoru Cythonu přímé volání nativní C funkce v CPythonu.",
+      "D) Jde o striktní interní privátní metody, které standardní uživatelský kód nesmí nikdy volat."
     ],
     "answer": 0,
-    "explanation": "Úvodní podtržítko u metod namedtuple předchází konfliktům s názvy uživatelských atributů.",
+    "explanation": "Tvůrci standardní knihovny použili úvodní podtržítko u metod pojmenované n-tice záměrně, aby umožnili pojmenovat uživatelská pole jakkoliv (např. 'make', 'fields', 'replace') bez rizika kolize s metodami n-tice.",
     "code": null
   },
   {

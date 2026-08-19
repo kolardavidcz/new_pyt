@@ -4,10 +4,10 @@
     "type": "multiple_choice",
     "question": "Jak se změní datový typ celočíselného sloupce v Pandas DataFrame, pokud obsahuje chybějící hodnoty načtené jako np.nan?",
     "options": [
-      "A) Vyvolá se runtime výjimka ValueError, protože standardní číselné pole v Pandas nedovoluje np.nan.",
-      "B) Sloupec se automaticky převede na textový řetězec str, přičemž všechny nuly se vymažou z dat.",
+      "A) Celý sloupec zůstane nezměněn jako np.int64 a np.nan se nahradí nulou bez upozornění vývojáře.",
+      "B) Vyvolá se runtime výjimka ValueError, protože standardní číselné pole v Pandas nedovoluje np.nan.",
       "C) Celý sloupec se automaticky přetypuje na plovoucí řádkovou čárku np.float64 nebo obecný typ object.",
-      "D) Celý sloupec zůstane nezměněn jako np.int64 a np.nan se nahradí nulou bez upozornění vývojáře."
+      "D) Sloupec se automaticky převede na textový řetězec str, přičemž všechny nuly se vymažou z dat."
     ],
     "answer": 2,
     "explanation": "Standardní NumPy typ np.int64 neumí reprezentovat chybějící hodnotu NaN. Přítomnost np.nan v celočíselném poli proto v Pandas vynutí přetypování celého sloupce na np.float64.",
@@ -33,9 +33,9 @@
     "question": "Kterou metodou nahradíte všechny chybějící hodnoty (NaN / <NA>) ve sloupci df['DOSPELCI'] hodnotou 0?",
     "options": [
       "df['DOSPELCI'].fillna(0)",
-      "df['DOSPELCI'].null_to_zero()",
+      "df['DOSPELCI'].dropna(value=0)",
       "df['DOSPELCI'].replace_na(0)",
-      "df['DOSPELCI'].dropna(value=0)"
+      "df['DOSPELCI'].null_to_zero()"
     ],
     "answer": 0,
     "explanation": "Metoda fillna(value) nahrazuje všechny chybějící hodnoty (np.nan, pd.NA) v Series nebo DataFrame zadanou náhradní hodnotou.",
@@ -61,10 +61,10 @@
     "type": "multiple_choice",
     "question": "Jaký účinek má kód out_df.loc[len(out_df)] = [druh, pocet_ptaku, pocet_rybniku] na existujícím DataFrame out_df s číselným indexem?",
     "options": [
-      "A) Vytvoří nový sloupec s názvem odpovídajícím hodnotě proměnné druh na konci tabulky DataFrame.",
-      "B) Přepíše první řádek v DataFrame pod indexem 0 a vymaže veškerá dříve uložená data v datatframu.",
+      "A) Přepíše první řádek v DataFrame pod indexem 0 a vymaže veškerá dříve uložená data v datatframu.",
+      "B) Vyvolá výjimku IndexError, protože index len(out_df) leží mimo rozsah existujících řádků v paměti.",
       "C) Přidá nový řádek s danými hodnotami na konec DataFrame pod index rovnající se aktuálnímu počtu řádků.",
-      "D) Vyvolá výjimku IndexError, protože index len(out_df) leží mimo rozsah existujících řádků v paměti."
+      "D) Vytvoří nový sloupec s názvem odpovídajícím hodnotě proměnné druh na konci tabulky DataFrame."
     ],
     "answer": 2,
     "explanation": "Jelikož v nula odvozeném indexu je len(out_df) přesně následující volný index, zápis do out_df.loc[len(out_df)] efektivně připojí nový řádek na konec tabulky.",

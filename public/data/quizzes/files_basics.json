@@ -6,8 +6,8 @@
     "options": [
       "A) Soubor se otevře v binárním režimu a čtení vrátí bajtový objekt místo řetězce.",
       "B) Výchozí kódování závisí na operačním systému a jeho lokálním nastavení prostředí.",
-      "C) Funkce vyžaduje parametr encoding povinně, jinak vyhodí výjimku TypeError.",
-      "D) Výchozí kódování je vždy ASCII a neumí automaticky dekódovat české znaky UTF-8."
+      "C) Výchozí kódování je vždy ASCII a neumí automaticky dekódovat české znaky UTF-8.",
+      "D) Funkce vyžaduje parametr encoding povinně, jinak vyhodí výjimku TypeError."
     ],
     "answer": 1,
     "explanation": "Bez parametru encoding použije Python locale.getpreferredencoding(False), což se liší mezi OS (např. Windows používá cp1250 a Linux UTF-8). Výchozí kódování není pevný ASCII (B) ani binární režim (D) a parametr není syntakticky povinný (C).",
@@ -34,8 +34,8 @@
     "code_snippet": "________ open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('test')",
     "options": [
       "try",
-      "using",
       "context",
+      "using",
       "with"
     ],
     "answer": 3,
@@ -49,9 +49,9 @@
     "question": "Jak se liší režim otevření souboru 'x' od režimu 'w'?",
     "options": [
       "A) Režim 'x' selže s výjimkou FileExistsError, pokud cíl již existuje.",
-      "B) Režim 'x' otevře soubor pro čtení i zápis bez smazání jeho obsahu.",
+      "B) Režim 'x' slouží výhradně k otvírání binárních souborů na systém Windows.",
       "C) Režim 'x' vytváří dočasný soubor, který se po zavření sám vymaže.",
-      "D) Režim 'x' slouží výhradně k otvírání binárních souborů na systém Windows."
+      "D) Režim 'x' otevře soubor pro čtení i zápis bez smazání jeho obsahu."
     ],
     "answer": 0,
     "explanation": "Režim 'x' (exkluzivní vytvoření) selže s FileExistsError, pokud soubor již existuje, což brání nechtěnému přepsání dat. Režim 'w' naopak existující soubor okamžitě smaže a přepíše.",
@@ -62,10 +62,10 @@
     "type": "multiple_choice",
     "question": "Co se stane při nastavení pozice ukazatele seek(1) na vícebajtový znak UTF-8?",
     "options": [
-      "A) Metoda seek(1) úspěšně přeskočí celý znak '狼' a metoda read(1) vrátí tečku '.'.",
+      "A) Kód vyhodí výjimku IndexError, protože pozice 1 neodpovídá hranici znaků.",
       "B) Kód vyhodí výjimku UnicodeDecodeError, protože pozice 1 je uprostřed znaku.",
       "C) Kód přečte druhý bajt znaku a vrátí odpovídající jednobajtový znak ASCII.",
-      "D) Kód vyhodí výjimku IndexError, protože pozice 1 neodpovídá hranici znaků."
+      "D) Metoda seek(1) úspěšně přeskočí celý znak '狼' a metoda read(1) vrátí tečku '.'."
     ],
     "answer": 1,
     "explanation": "Znak '狼' má v UTF-8 délku 3 bajty. Přesun na offset 1 skočí do středu bajtové sekvence tohoto znaku. Následné čtení read(1) selže s UnicodeDecodeError, protože dekodér narazí na neplatný počáteční bajt.",

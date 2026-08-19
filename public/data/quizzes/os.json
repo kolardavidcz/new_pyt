@@ -4,8 +4,8 @@
     "type": "multiple_choice",
     "question": "Co bude výsledkem následujícího spojení cest pomocí os.path.join v POSIX systému?",
     "options": [
-      "A) Vrátí 'data/projects//etc/config.txt', protože metoda zachová dvě lomítka vedle sebe bez jakékoli úpravy řetězce.",
-      "B) Vyvolá výjimku ValueError, protože absolutní cesty nelze podle specifikace předávat doprostřed seznamu argumentů.",
+      "A) Vyvolá výjimku ValueError, protože absolutní cesty nelze podle specifikace předávat doprostřed seznamu argumentů.",
+      "B) Vrátí 'data/projects//etc/config.txt', protože metoda zachová dvě lomítka vedle sebe bez jakékoli úpravy řetězce.",
       "C) Vrátí 'data/projects/etc/config.txt', protože funkce automaticky odstraní úvodní lomítka ze všech vnitřních částí.",
       "D) Vrátí '/etc/config.txt', protože výskyt absolutní cesty způsobený počátečním lomítkem zahodí všechny předchozí části."
     ],
@@ -32,10 +32,10 @@
     "type": "fill_blank_choice",
     "question": "Doplňte funkci modulu `os`, která rekurzivně vytvoří celou cestu k adresáři včetně všech chybějících mezilehlých složek.",
     "options": [
-      "mkdir",
+      "mkpath",
       "makedirs",
-      "create_dirs",
-      "mkpath"
+      "mkdir",
+      "create_dirs"
     ],
     "answer": 1,
     "explanation": "Funkce `os.makedirs(path, exist_ok=True)` vytvoří koncový adresář i všechny chybějící nadřazené adresáře podél cesty (obdoba příkazu `mkdir -p`).",
@@ -47,10 +47,10 @@
     "type": "multiple_choice",
     "question": "Který modul a funkce se v Pythonu používají pro zkopírování souboru včetně zachování jeho metadat?",
     "options": [
-      "A) Funkce os.copyfile(), protože nízkoúrovňový modul os jako jediný garantuje přímý nízkoúrovňový přenos metadat.",
-      "B) Funkce shutil.move(), protože při přesunu souboru dochází ke kaskádovému kopírování metadat bez ztráty dat.",
+      "A) Funkce shutil.move(), protože při přesunu souboru dochází ke kaskádovému kopírování metadat bez ztráty dat.",
+      "B) Funkce os.path.copy(), protože modul os.path přímo manipuluje s objektovými strukturami souborového systému.",
       "C) Funkce shutil.copy2(), protože na rozdíl od základního os či shutil.copy() uchovává i časová razítka a atributy.",
-      "D) Funkce os.path.copy(), protože modul os.path přímo manipuluje s objektovými strukturami souborového systému."
+      "D) Funkce os.copyfile(), protože nízkoúrovňový modul os jako jediný garantuje přímý nízkoúrovňový přenos metadat."
     ],
     "answer": 2,
     "explanation": "Základní modul `os` neobsahuje funkce pro kopírování souborů. K tomuto účelu slouží modul `shutil`. Zatímco `shutil.copy()` kopíruje pouze obsah a práva, `shutil.copy2()` navíc kopíruje i všechna ostatní dostupná metadata (např. čas posledního přístupu a modifikace).",
@@ -77,9 +77,9 @@
     "question": "Co se stane při volání funkce os.remove() na cestu, která ukazuje na neprázdný adresář?",
     "options": [
       "A) Python vyvolá výjimku (např. IsADirectoryError či OSError), protože os.remove() slouží výhradně k mazání souborů.",
-      "B) Adresář se bez varování smazá včetně veškerého obsahu, protože os.remove() funguje rekurzivně pro všechny cesty.",
+      "B) Python automaticky přesune adresář do dočasné systémové složky a vyvolá varování typu DeprecationWarning.",
       "C) Funkce smaže pouze prázdný adresář, ale pokud obsahuje soubory, ticho vrací hodnotu False bez vyvolání výjimky.",
-      "D) Python automaticky přesune adresář do dočasné systémové složky a vyvolá varování typu DeprecationWarning."
+      "D) Adresář se bez varování smazá včetně veškerého obsahu, protože os.remove() funguje rekurzivně pro všechny cesty."
     ],
     "answer": 0,
     "explanation": "`os.remove()` (rovněž přístupný jako `os.unlink()`) odstraňuje výhradně soubory. Pokud je předaná cesta adresářem, operační systém / Python vyvolá výjimku `IsADirectoryError` (na POSIXu) nebo `PermissionError`/`OSError` (na Windows). Pro odstranění adresáře je nutné použít `os.rmdir()` (pro prázdný) nebo `shutil.rmtree()` (pro celý strom).",
@@ -104,8 +104,8 @@
     "type": "multiple_choice",
     "question": "Proč je v Pythonu preferováno otevírat soubor v bloku try-except místo předchozí kontroly přes os.access()?",
     "options": [
-      "A) Volání funkce os.access() je v Pythonu zastaralé a vyvolá při použití v novějších verzích DeprecationWarning.",
-      "B) Metoda os.access() funguje pouze na operačním systému Windows a na Unixu způsobuje neplatné selhání přístupu.",
+      "A) Metoda os.access() funguje pouze na operačním systému Windows a na Unixu způsobuje neplatné selhání přístupu.",
+      "B) Volání funkce os.access() je v Pythonu zastaralé a vyvolá při použití v novějších verzích DeprecationWarning.",
       "C) Předchází se tím souběhu (TOCTOU) mezi kontrolou a otevřením a kód lépe odpovídá pythonímu principu EAFP.",
       "D) Blok try-except automaticky uzamkne soubor na úrovni operačního systému proti zápisu ostatními procesy."
     ],
@@ -133,9 +133,9 @@
     "question": "Čím se liší funkce os.renames() od základní funkce os.rename()?",
     "options": [
       "A) Vytvoří chybějící nadřazené adresáře pro novou cestu a po přesunu promaže i uvolněné prázdné staré adresáře.",
-      "B) Provádí přejmenování asynchronně na pozadí bez blokování hlavního vlákna běžícího Python interpreta.",
-      "C) Umožňuje přejmenovávat více souborů najednou pomocí zástupných znaků (wildcards) typu *.txt v jediném kroku.",
-      "D) Funguje výhradně pro přejmenovávání adresářů, zatímco os.rename() slouží pouze pro běžné datové soubory."
+      "B) Funguje výhradně pro přejmenovávání adresářů, zatímco os.rename() slouží pouze pro běžné datové soubory.",
+      "C) Provádí přejmenování asynchronně na pozadí bez blokování hlavního vlákna běžícího Python interpreta.",
+      "D) Umožňuje přejmenovávat více souborů najednou pomocí zástupných znaků (wildcards) typu *.txt v jediném kroku."
     ],
     "answer": 0,
     "explanation": "`os.renames(old, new)` před přejmenováním / přesunem vytvoří chybějící nadřazené adresáře v cílí (pomocí `os.makedirs`) a po dokončení se pokusí odstranit prázdné nadřazené adresáře ve zdroji (pomocí `os.removedirs`).",
