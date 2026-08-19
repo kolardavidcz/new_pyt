@@ -21,8 +21,8 @@
       "options": [
         "timegm",
         "mktime",
-        "gmtime",
-        "mktimes"
+        "mktimes",
+        "gmtime"
       ],
       "answer": 0,
       "explanation": "Funkce calendar.timegm() zpracovává struct_time v UTC a vrací počet sekund od unixové epochy (na rozdíl od time.mktime(), který předpokládá lokální čas).",
@@ -46,10 +46,10 @@
       "type": "multiple_choice",
       "question": "Jaký je hlavní rozdíl mezi metodami datetime.strptime() a datetime.strftime()?",
       "options": [
-        "A) strptime() zjišťuje aktuální systémový čas, zatímco strftime() nastavuje nový systémový čas operačního systému.",
+        "A) strptime() provádí konverzi času do UTC pásma, zatímco strftime() převede UTC čas na lokální časovou zónu systému.",
         "B) strptime() převádí textový řetězec na objekt datetime, zatímco strftime() formátuje datetime objekt na textový řetězec.",
         "C) strptime() vypisuje časový objekt na standardní výstup, zatímco strftime() načítá vstupní čas z konzole od uživatele.",
-        "D) strptime() provádí konverzi času do UTC pásma, zatímco strftime() převede UTC čas na lokální časovou zónu systému."
+        "D) strptime() zjišťuje aktuální systémový čas, zatímco strftime() nastavuje nový systémový čas operačního systému."
       ],
       "answer": 1,
       "explanation": "strptime (string parse time) parsuje text podle zadávaného formátu na objekt datetime. strftime (string format time) převádí objekt datetime na zformátovaný textový řetězec.",
@@ -60,10 +60,10 @@
       "type": "fill_blank_choice",
       "question": "Doplňte metodu, která přiřadí naivnímu objektu datetime časovou zónu UTC beze změny hodnot hodin a minut.",
       "options": [
-        "convert",
         "astimezone",
+        "set_tz",
         "replace",
-        "set_tz"
+        "convert"
       ],
       "answer": 2,
       "explanation": "Metoda datetime.replace(tzinfo=...) vytvoří novou instanci se zadanou časovou zónou bez časového posunu hodnot hodin a minut.",
@@ -76,8 +76,8 @@
       "question": "K čemu slouží parametr fold v metodě replace() u objektu datetime zavedený v Pythonu 3.6?",
       "options": [
         "A) K určení způsobu zaokrouhlování mikrosekund při převodu na celé sekundy (0 dolů, 1 nahoru k celému číslu).",
-        "B) K nastavení počtu nanosekund přidávaných k běžné sekundové přesnosti (0 pro sekundy, 1 pro nanosekundy).",
-        "C) K zapnutí automatické korekce přestupných sekund nahromaděných v éře UNIXového počítání (0 vypnuto, 1 zapnuto).",
+        "B) K zapnutí automatické korekce přestupných sekund nahromaděných v éře UNIXového počítání (0 vypnuto, 1 zapnuto).",
+        "C) K nastavení počtu nanosekund přidávaných k běžné sekundové přesnosti (0 pro sekundy, 1 pro nanosekundy).",
         "D) K rozlišení dvou stejných lokálních časů nastávajících při zimním posunu času (0 pro dřívější, 1 pro pozdější)."
       ],
       "answer": 3,
@@ -90,9 +90,9 @@
       "question": "Jaký bude účinek spuštění následujícího příkazu v Pythonu na platformě Linux?",
       "options": [
         "A) Nastaví čas posledního přístupu i čas poslední modifikace souboru data.txt na aktuální systémový čas.",
-        "B) Smaže veškerá časová razítka souboru data.txt a nastaví přístupová práva k souboru na hodnotu 000.",
+        "B) Vynuluje čas modifikace i čas přístupu souboru data.txt na začátek UNIXové epochy (1. ledna 1970).",
         "C) Vyvolá výjimku TypeError, protože funkce os.utime() striktně vyžaduje předání n-tice časových údajů.",
-        "D) Vynuluje čas modifikace i čas přístupu souboru data.txt na začátek UNIXové epochy (1. ledna 1970)."
+        "D) Smaže veškerá časová razítka souboru data.txt a nastaví přístupová práva k souboru na hodnotu 000."
       ],
       "answer": 0,
       "explanation": "Volání os.utime(path) bez dalších argumentů (nebo s times=None) nastaví čas přístupu (atime) i modifikace (mtime) zadané cesty na aktuální systémový čas.",
@@ -105,8 +105,8 @@
       "options": [
         "A) localtime() provádí konverzi času pouze pro systém Windows, zatímco gmtime() funguje výhradně na systémech typu POSIX/Linux.",
         "B) localtime() vrací struct_time v lokální časové zóně, zatímco gmtime() vrací struct_time v koordinovaném světovém čase UTC.",
-        "C) localtime() vrací čas jako číslo typu float, zatímco gmtime() vrací objekt reprezentující zónu v podobě textového řetězce.",
-        "D) localtime() bere v úvahu pouze přestupné sekundy, zatímco gmtime() započítává pouze posuny letního a zimního času na Zemi."
+        "C) localtime() bere v úvahu pouze přestupné sekundy, zatímco gmtime() započítává pouze posuny letního a zimního času na Zemi.",
+        "D) localtime() vrací čas jako číslo typu float, zatímco gmtime() vrací objekt reprezentující zónu v podobě textového řetězce."
       ],
       "answer": 1,
       "explanation": "Obě funkce převádějí sekundy od epochy na n-tici struct_time. localtime() zohledňuje nastavené lokální časové pásmo a DST, zatímco gmtime() vrací čas v nultém poledníku (UTC).",
@@ -119,10 +119,10 @@
       "type": "multiple_choice",
       "question": "Jak je v knihovně Pandas vnitřně koncepčně strukturován objekt DataFrame?",
       "options": [
-        "A) Jako jednorozměrný spojový seznam řádků, kde každý prvek obsahuje n-tici s libovolně proměnnými typy dat.",
-        "B) Jako trojrozměrný tenzor v NumPy, kde první dimenze drží datové typy a zbylé dvě drží hodnoty tabulky.",
+        "A) Jako trojrozměrný tenzor v NumPy, kde první dimenze drží datové typy a zbylé dvě drží hodnoty tabulky.",
+        "B) Jako statická pole C-struktur alokovaná v souvislém bloku paměti s pevně zafixovaným počtem řádků i sloupců.",
         "C) Jako slovník sloupců, kde klíče jsou názvy sloupců a hodnotami jsou objekty Series sdílející společný index.",
-        "D) Jako statická pole C-struktur alokovaná v souvislém bloku paměti s pevně zafixovaným počtem řádků i sloupců."
+        "D) Jako jednorozměrný spojový seznam řádků, kde každý prvek obsahuje n-tici s libovolně proměnnými typy dat."
       ],
       "answer": 2,
       "explanation": "DataFrame je v podstatě mapování (slovník) z názvů sloupců na jednorozměrná pole Series, přičemž všechny sloupce sdílejí stejný řádkový index. Přidání sloupce je proto levné, zatímco přidání řádku je náročné.",
@@ -145,8 +145,8 @@
       "type": "fill_blank_choice",
       "question": "Doplňte chybějící syntaxi závorek pro výběr pod-tabulky se sloupci A a B jako nového DataFrame:\n\nimport pandas as pd\ndf = pd.DataFrame({'A': [1, 2], 'B': [3, 4], 'C': [5, 6]})\nsub_df = df________'A', 'B'________:",
       "options": [
-        "([ a ])",
         "[ a ]",
+        "([ a ])",
         "{( a )}",
         "[[ a ]]"
       ],
@@ -161,9 +161,9 @@
       "question": "Jaký datový typ vrátí metoda df['kategorie'].unique() při zavolání na sloupec Pandas?",
       "options": [
         "A) NumPy pole ndarray obsahující pouze unikátní hodnoty z daného sloupce.",
-        "B) Vestavěnou pythonovskou množinu set bez zachování původního pořadí prvků.",
-        "C) Nový objekt typu Pandas Series indexovaný celými čísly od nuly nahoru.",
-        "D) Standardní pythonovský seznam list všech unikátních řetězců v datovém sloupci."
+        "B) Nový objekt typu Pandas Series indexovaný celými čísly od nuly nahoru.",
+        "C) Standardní pythonovský seznam list všech unikátních řetězců v datovém sloupci.",
+        "D) Vestavěnou pythonovskou množinu set bez zachování původního pořadí prvků."
       ],
       "answer": 0,
       "explanation": "Metoda .unique() na objektu Series nevrací Python list ani set, ale NumPy jednorozměrné pole ndarray unikátních hodnot v pořadí jejich prvního výskytu.",
@@ -174,10 +174,10 @@
       "type": "multiple_choice",
       "question": "Proč se při vyhodnocování složených podmínek ve fancy indexingu v Pandas musí používat operátory &, | a ~ místo and, or a not?",
       "options": [
-        "A) Operátory and a or pracují výhradně s celými čísly, zatímco bitové operátory & a | fungují i pro řetězce a desetinná čísla.",
+        "A) Slova and a or jsou v syntaxi Pandas vyrazena z důvodu zrychlení parsování výrazů při spuštění kódu v C-rozhraní.",
         "B) Bitové operátory jsou přetíženy pro prvek po prvku (element-wise), zatímco Python and/or vyhodnocují pravdivost celého objektu.",
-        "C) Slova and a or jsou v syntaxi Pandas vyrazena z důvodu zrychlení parsování výrazů při spuštění kódu v C-rozhraní.",
-        "D) Bitové operátory automaticky konvertují chybějící hodnoty NaN na False, což klíčová slova and a or nedokážou zaručit."
+        "C) Bitové operátory automaticky konvertují chybějící hodnoty NaN na False, což klíčová slova and a or nedokážou zaručit.",
+        "D) Operátory and a or pracují výhradně s celými čísly, zatímco bitové operátory & a | fungují i pro řetězce a desetinná čísla."
       ],
       "answer": 1,
       "explanation": "Klíčová slova and a or se snaží zkonvertovat celý objekt Series na jedinou logickou hodnotu (vyvolá ValueError: Truth value of a Series is ambiguous). Pro porovnání po prvcích se musí použít bitové operátory &, |, ~ a podmínky obalit v závorkách.",
@@ -188,10 +188,10 @@
       "type": "fill_blank_choice",
       "question": "Doplňte chybějící vlastnost pro použití vektorizovaných řetězcových metod nad sloupcem Series:\n\nimport pandas as pd\ndf = pd.DataFrame({'jmena': ['Anna', 'Petr', 'Pavel']})\nmask = df['jmena'].________.startswith('P'):",
       "options": [
-        "text",
         "char",
+        "string",
         "str",
-        "string"
+        "text"
       ],
       "answer": 2,
       "explanation": "Akcesor .str zpřístupňuje vektorizované řetězcové metody (jako contains(), startswith(), lower()) nad všemi prvkami objektu Series.",
@@ -203,9 +203,9 @@
       "type": "predict_output",
       "question": "Co vrátí výraz df.iloc[0:2] zavolaný na DataFrame se 5 řádky?",
       "options": [
-        "A) Jediný prvek z prvního řádku a druhého sloupce v původní tabulce df.",
-        "B) Objekt Series představující hodnoty z nultého sloupce pro první dva řádky.",
-        "C) Nový DataFrame obsahující první tři řádky (na pozicích 0, 1 a 2).",
+        "A) Objekt Series představující hodnoty z nultého sloupce pro první dva řádky.",
+        "B) Nový DataFrame obsahující první tři řádky (na pozicích 0, 1 a 2).",
+        "C) Jediný prvek z prvního řádku a druhého sloupce v původní tabulce df.",
         "D) Nový DataFrame obsahující první dva řádky (na pozicích indexu 0 a 1)."
       ],
       "answer": 3,
@@ -218,9 +218,9 @@
       "question": "Jaký je hlavní rozdíl mezi metodami df.info() a df.head() v Pandas?",
       "options": [
         "A) info() vypisuje technické shrnutí sloupců, typů a paměti, zatímco head() vrací prvních několik řádků datových hodnot.",
-        "B) info() vrací nový DataFrame s popisnou statistikou, zatímco head() ukládá načtená data přímo na disk do souboru.",
+        "B) info() odstraňuje z tabulky neplatné řádky NaN, zatímco head() vybírá pouze sloupečky s číselnými hodnotami.",
         "C) info() mění datové typy sloupců na optimálnější, zatímco head() seřadí hodnoty v tabulce podle prvního sloupce.",
-        "D) info() odstraňuje z tabulky neplatné řádky NaN, zatímco head() vybírá pouze sloupečky s číselnými hodnotami."
+        "D) info() vrací nový DataFrame s popisnou statistikou, zatímco head() ukládá načtená data přímo na disk do souboru."
       ],
       "answer": 0,
       "explanation": "df.info() vypíše na standardní výstup souhrn o počtu nepotvrzených (non-null) záznamů, datových typech dtype každého sloupce a využití paměti. df.head() vrací nový DataFrame obsahující počáteční řádky.",
@@ -233,10 +233,10 @@
       "type": "multiple_choice",
       "question": "Jakou externí knihovnu vyžaduje Pandas při prvním pokusu o načtení excelovského souboru .xlsx přes pd.read_excel()?",
       "options": [
-        "A) Knihovnu xlwt pro vytvoření zpětné kompatibility se starými binárními soubory.",
+        "A) Knihovnu xlsxwriter pro generování grafů a maker přímo uvnitř excelového sešitu.",
         "B) Knihovnu openpyxl pro čtení a zápis moderních souborů ve formátu XLSX.",
-        "C) Knihovnu pytz pro správnou interpretaci časových zón v buňkách s datem a časem.",
-        "D) Knihovnu xlsxwriter pro generování grafů a maker přímo uvnitř excelového sešitu."
+        "C) Knihovnu xlwt pro vytvoření zpětné kompatibility se starými binárními soubory.",
+        "D) Knihovnu pytz pro správnou interpretaci časových zón v buňkách s datem a časem."
       ],
       "answer": 1,
       "explanation": "Pandas samotný neobsahuje parser pro Excel formáty. Pro načítání moderních .xlsx souborů spoléhá na knihovnu openpyxl (případně xlrd pro staré .xls).",

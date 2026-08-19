@@ -4,9 +4,9 @@
     "type": "predict_output",
     "question": "Co bude výstupem po spuštění následujícího kódu?",
     "options": [
-      "A) 0",
-      "B) None",
-      "C) KeyError",
+      "A) KeyError",
+      "B) 0",
+      "C) None",
       "D) 1"
     ],
     "answer": 3,
@@ -19,8 +19,8 @@
     "question": "Jak se zachová defaultdict(None) při přístupu k neexistujícímu klíči?",
     "options": [
       "A) Vyvolá výjimku KeyError, neboť chybí platná tovární funkce.",
-      "B) Vytvoří prázdný slovník a vypíše varování o absenci továrny.",
-      "C) Vrátí hodnotu None a nový klíč v pořádku uloží do slovníku.",
+      "B) Vrátí hodnotu None a nový klíč v pořádku uloží do slovníku.",
+      "C) Vytvoří prázdný slovník a vypíše varování o absenci továrny.",
       "D) Vyvolá výjimku TypeError, neboť hodnota None není callable."
     ],
     "answer": 0,
@@ -32,10 +32,10 @@
     "type": "fill_blank_choice",
     "question": "Doplňte tovární funkci do `defaultdict`, která zajistí výchozí číselnou hodnotu 0 pro dosud neevidované prvky.",
     "options": [
-      "float",
+      "0",
       "int",
       "int()",
-      "0"
+      "float"
     ],
     "answer": 1,
     "explanation": "Předáním konstruktoru `int` jako tovární funkce (default_factory) vrací `defaultdict` při přístupu k novému klíči hodnotu `int()`, tedy `0`.",
@@ -45,15 +45,15 @@
   {
     "id": "q4",
     "type": "multiple_choice",
-    "question": "Jaký je zásadní rozdíl mezi defaultdict(list) a metodou dict.setdefault(k, [])?",
+    "question": "Jaký je zásadní rozdíl v chování a výkonu mezi `defaultdict(list)` a voláním běžné metody `d.setdefault(k, [])`?",
     "options": [
-      "A) defaultdict nevkládá chybějící klíč automaticky do slovníku, zatímco setdefault nový klíč okamžitě zaregistruje.",
-      "B) defaultdict vyhodnocuje argument vždy při volání přístupu, zatímco setdefault volá tovární funkci zcela líně.",
-      "C) defaultdict volá tovární funkci líně pouze pro chybějící klíč, zatímco setdefault vyhodnocuje argument vždy.",
-      "D) defaultdict umožní měnit výchozí hodnotu pro každý klíč zvlášť, zatímco setdefault používá globální továrnu."
+      "A) setdefault funguje pouze s neměnnými typy (int, str), zatímco defaultdict akceptuje pouze měnitelné kontejnery.",
+      "B) Mezi oběma přístupy není žádný výkonnostní ani sémantický rozdíl, liší se pouze zápisem syntaxe.",
+      "C) defaultdict volá tovární funkci líně pouze při absenci klíče, zatímco u setdefault(k, []) se nový prázdný seznam vytvoří v paměti při každém volání.",
+      "D) defaultdict neumí do slovníku vložit nově vytvořený klíč, zatímco setdefault klíč vždy trvale zapíše."
     ],
     "answer": 2,
-    "explanation": "U d.setdefault(k, []) se výraz [] (vytvoření seznamu) vyhodnotí při každém volání metody, i když klíč již existuje. U defaultdict se tovární funkce volá líně až při absenci klíče.",
+    "explanation": "Při volání d.setdefault(k, []) se prázdný seznam [] v argumentu vytvoří v paměti vždy (eagerly), i když klíč ve slovníku již existuje. Naproti tomu defaultdict volá továrnu list líně (lazy) výhradně ve chvíli, kdy klíč skutečně chybí.",
     "code": null
   },
   {

@@ -7,8 +7,8 @@
       "options": [
         "A) Soubor se otevře v binárním režimu a čtení vrátí bajtový objekt místo řetězce.",
         "B) Výchozí kódování závisí na operačním systému a jeho lokálním nastavení prostředí.",
-        "C) Funkce vyžaduje parametr encoding povinně, jinak vyhodí výjimku TypeError.",
-        "D) Výchozí kódování je vždy ASCII a neumí automaticky dekódovat české znaky UTF-8."
+        "C) Výchozí kódování je vždy ASCII a neumí automaticky dekódovat české znaky UTF-8.",
+        "D) Funkce vyžaduje parametr encoding povinně, jinak vyhodí výjimku TypeError."
       ],
       "answer": 1,
       "explanation": "Bez parametru encoding použije Python locale.getpreferredencoding(False), což se liší mezi OS (např. Windows používá cp1250 a Linux UTF-8). Výchozí kódování není pevný ASCII (B) ani binární režim (D) a parametr není syntakticky povinný (C).",
@@ -35,8 +35,8 @@
       "code_snippet": "________ open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('test')",
       "options": [
         "try",
-        "using",
         "context",
+        "using",
         "with"
       ],
       "answer": 3,
@@ -50,9 +50,9 @@
       "question": "Jak se liší režim otevření souboru 'x' od režimu 'w'?",
       "options": [
         "A) Režim 'x' selže s výjimkou FileExistsError, pokud cíl již existuje.",
-        "B) Režim 'x' otevře soubor pro čtení i zápis bez smazání jeho obsahu.",
+        "B) Režim 'x' slouží výhradně k otvírání binárních souborů na systém Windows.",
         "C) Režim 'x' vytváří dočasný soubor, který se po zavření sám vymaže.",
-        "D) Režim 'x' slouží výhradně k otvírání binárních souborů na systém Windows."
+        "D) Režim 'x' otevře soubor pro čtení i zápis bez smazání jeho obsahu."
       ],
       "answer": 0,
       "explanation": "Režim 'x' (exkluzivní vytvoření) selže s FileExistsError, pokud soubor již existuje, což brání nechtěnému přepsání dat. Režim 'w' naopak existující soubor okamžitě smaže a přepíše.",
@@ -63,10 +63,10 @@
       "type": "multiple_choice",
       "question": "Co se stane při nastavení pozice ukazatele seek(1) na vícebajtový znak UTF-8?",
       "options": [
-        "A) Metoda seek(1) úspěšně přeskočí celý znak '狼' a metoda read(1) vrátí tečku '.'.",
+        "A) Kód vyhodí výjimku IndexError, protože pozice 1 neodpovídá hranici znaků.",
         "B) Kód vyhodí výjimku UnicodeDecodeError, protože pozice 1 je uprostřed znaku.",
         "C) Kód přečte druhý bajt znaku a vrátí odpovídající jednobajtový znak ASCII.",
-        "D) Kód vyhodí výjimku IndexError, protože pozice 1 neodpovídá hranici znaků."
+        "D) Metoda seek(1) úspěšně přeskočí celý znak '狼' a metoda read(1) vrátí tečku '.'."
       ],
       "answer": 1,
       "explanation": "Znak '狼' má v UTF-8 délku 3 bajty. Přesun na offset 1 skočí do středu bajtové sekvence tohoto znaku. Následné čtení read(1) selže s UnicodeDecodeError, protože dekodér narazí na neplatný počáteční bajt.",
@@ -106,9 +106,9 @@
       "question": "Co vrátí atribut p.stem pro cestu p = Path('/var/log/app.tar.gz')?",
       "options": [
         "A) app",
-        "B) app.tar.gz",
+        "B) .tar.gz",
         "C) app.tar",
-        "D) .tar.gz"
+        "D) app.tar.gz"
       ],
       "answer": 2,
       "explanation": "Atribut .stem odsekne pouze poslední příponu (.gz), takže vrátí 'app.tar'. Celé jméno je 'app.tar.gz' (.name) a seznam všech přípon je ['.tar', '.gz'] (.suffixes).",
@@ -119,9 +119,9 @@
       "type": "multiple_choice",
       "question": "Jaký datový typ mají prvky vrácené generátorem p.iterdir()?",
       "options": [
-        "A) Souborové popisovače (file descriptors) otevřené pro čtení obsahu adresáře.",
+        "A) Prosté řetězce (str) obsahující relativní cesty k jednotlivým souborům a složkám.",
         "B) N-tice (tuple) obsahující název souboru a jeho metadata vrácená ze systémového stat.",
-        "C) Prosté řetězce (str) obsahující relativní cesty k jednotlivým souborům a složkám.",
+        "C) Souborové popisovače (file descriptors) otevřené pro čtení obsahu adresáře.",
         "D) Objekty typu Path (PosixPath nebo WindowsPath) reprezentující příslušné položky."
       ],
       "answer": 3,
@@ -135,8 +135,8 @@
       "options": [
         "A) PurePath provádí pouze řetězcové operace bez přístupu k souborovému systému.",
         "B) PurePath slouží k načítání textových souborů, zatímco Path spravuje binární soubory.",
-        "C) PurePath podporuje výhradně operační systém Linux, zatímco Path funguje i na Windows.",
-        "D) PurePath je starší zastaralá třída určená pro zpětnou kompatibilitu s Pythonem 2."
+        "C) PurePath je starší zastaralá třída určená pro zpětnou kompatibilitu s Pythonem 2.",
+        "D) PurePath podporuje výhradně operační systém Linux, zatímco Path funguje i na Windows."
       ],
       "answer": 0,
       "explanation": "PurePath a její podtřídy provádí pouze syntaktické úpravy cest v paměti bez přímého I/O volání OS. Třída Path dědí z PurePath a přidává reálné operace se souborovým systémem.",
@@ -148,9 +148,9 @@
       "question": "Doplňte metodu objektu Path pro rekurzivní vyhledání souborů odpovídajících vzoru ve všech podsložkách:",
       "code_snippet": "from pathlib import Path\np = Path('/projekty')\npy_files = list(p.________('*.py'))",
       "options": [
-        "glob_all",
-        "rglob",
         "find",
+        "rglob",
+        "glob_all",
         "iterdir"
       ],
       "answer": 1,
@@ -163,10 +163,10 @@
       "type": "multiple_choice",
       "question": "Co provede metoda p.resolve() na objektu Path?",
       "options": [
-        "A) Vytvoří nový soubor na zadané cestě, pokud daný soubor na disku dosud neexistuje.",
-        "B) Změní přístupová práva souboru tak, aby odpovídala absolutním právům vlastníka.",
+        "A) Pouze připojí aktuální pracovní adresář před relativní cestu bez řešení symlinků.",
+        "B) Vytvoří nový soubor na zadané cestě, pokud daný soubor na disku dosud neexistuje.",
         "C) Převede cestu na kanonickou, odstraní symbolické odkazy a eliminujeme sekvence ..",
-        "D) Pouze připojí aktuální pracovní adresář před relativní cestu bez řešení symlinků."
+        "D) Změní přístupová práva souboru tak, aby odpovídala absolutním právům vlastníka."
       ],
       "answer": 2,
       "explanation": "Metoda resolve() vytvoří absolutní kanonickou cestu – nahradí symbolické odkazy jejich cílem a odstraní relativní složky jako '.' a '..'. Metoda absolute() pouze připojí cwd bez řešení symlinků.",
@@ -191,9 +191,9 @@
       "type": "predict_output",
       "question": "Jaký typ mají výstupy při přístupu k prvkům bajtového řetězce?",
       "options": [
-        "A) <class 'bytes'> <class 'bytes'>",
+        "A) <class 'int'> <class 'str'>",
         "B) <class 'str'> <class 'bytes'>",
-        "C) <class 'int'> <class 'str'>",
+        "C) <class 'bytes'> <class 'bytes'>",
         "D) <class 'int'> <class 'bytes'>"
       ],
       "answer": 3,
@@ -207,8 +207,8 @@
       "options": [
         "A) b'\\x00\\x00\\x00' b'\\x03'",
         "B) b'\\x00' b'\\x03\\x03\\x03'",
-        "C) b'\\x03' b'\\x03'",
-        "D) b'\\x03\\x03\\x03' b'\\x03'"
+        "C) b'\\x03\\x03\\x03' b'\\x03'",
+        "D) b'\\x03' b'\\x03'"
       ],
       "answer": 0,
       "explanation": "Volání bytes(N) s celým číslem alokuje N nulových bajtů (b'\\x00\\x00\\x00'). Konstruktor s iterovatelem bytes([3]) převede čísla v rozmezí 0-255 na odpovídající bajty (b'\\x03').",
@@ -219,10 +219,10 @@
       "type": "multiple_choice",
       "question": "Co se stane při pokusu o úpravu prvku v bajtovém řetězci bytes?",
       "options": [
-        "A) Hodnota prvního bajtu se v objektu úspěšně přepíše z 97 na novou hodnotu 65.",
+        "A) Vyhodí výjimku ValueError, protože zadaná hodnota 65 neodpovídá typu str.",
         "B) Vyhodí výjimku TypeError, protože objekt typu bytes je neměnný (immutable).",
         "C) Kód automaticky zkonvertuje objekt proměnné data na nový typ bytearray.",
-        "D) Vyhodí výjimku ValueError, protože zadaná hodnota 65 neodpovídá typu str."
+        "D) Hodnota prvního bajtu se v objektu úspěšně přepíše z 97 na novou hodnotu 65."
       ],
       "answer": 1,
       "explanation": "Typ bytes je neměnná sekvence (immutable). Při pokusu o úpravu b[0] vyhodí TypeError: 'bytes' object does not support item assignment. Pro modifikovatelné bajty je nutné použít bytearray.",
@@ -233,10 +233,10 @@
       "type": "multiple_choice",
       "question": "Který způsob formátování je podporován pro bajtové řetězce bytes v Pythonu 3?",
       "options": [
-        "A) Bajtové řetězce v Pythonu 3 neposkytují vůbec žádné formátovací mechanizmy.",
+        "A) Formátované řetězce s novým prefiksem fb (například zápis fb'{data}').",
         "B) Standardní metoda .format() (například zápis b'{}'.format(b'data')).",
         "C) Interpolace textu pomocí operátoru % (například zápis b'%b' % b'data').",
-        "D) Formátované řetězce s novým prefiksem fb (například zápis fb'{data}')."
+        "D) Bajtové řetězce v Pythonu 3 neposkytují vůbec žádné formátovací mechanizmy."
       ],
       "answer": 2,
       "explanation": "Pro bajtové řetězce byla v Pythonu 3.5 zpětně přidána interpolace pomocí operátoru %. Metoda .format() ani f-řetězce s prefiksem fb pro typ bytes neexistují.",
@@ -248,9 +248,9 @@
       "question": "Doplňte metodu pro dekódování bajtového řetězce bytes na textový řetězec str:",
       "code_snippet": "raw_bytes = b'\\xc5\\x99etezec'\ntext = raw_bytes.________('utf-8')",
       "options": [
+        "encode",
         "parse",
         "to_str",
-        "encode",
         "decode"
       ],
       "answer": 3,
@@ -264,9 +264,9 @@
       "question": "Jaké hodnoty vrací cyklus for při iteraci přes bajtový řetězec bytes?",
       "options": [
         "A) 65 66",
-        "B) b'A' b'B'",
+        "B) 0 1",
         "C) A B",
-        "D) 0 1"
+        "D) b'A' b'B'"
       ],
       "answer": 0,
       "explanation": "Iterace přes bytes vrací jednotlivé celočíselné hodnoty bajtů (int 0-255). ASCII hodnota 'A' je 65 a 'B' je 66. Znaky nebo podřetězce b'A' se při iteraci nevytváří.",
@@ -281,8 +281,8 @@
       "options": [
         "A) None",
         "B) SILENT",
-        "C) True",
-        "D) VERBOSE"
+        "C) VERBOSE",
+        "D) True"
       ],
       "answer": 1,
       "explanation": "U přepínače s nargs='?' se hodnota const použije v případě, že je přepínač -v na příkazové řádce přítomen bez hodnoty. Pokud přepínač není zadán vůbec, použije se hodnota default ('SILENT').",
@@ -293,10 +293,10 @@
       "type": "predict_output",
       "question": "Jakou výchozí hodnotu má přepínač s nastavením action='store_true'?",
       "options": [
-        "A) AttributeError",
+        "A) None",
         "B) True",
         "C) False",
-        "D) None"
+        "D) AttributeError"
       ],
       "answer": 2,
       "explanation": "Akce store_true automaticky nastavuje výchozí hodnotu na boolovské False. Pokud uživatel přepínač na příkazové řádce použije, hodnota v atributu force se změní na True.",
@@ -307,9 +307,9 @@
       "type": "predict_output",
       "question": "Jaký bude výstup parseru při opakovaném použití přepínače s action='append'?",
       "options": [
-        "A) 'b.py'",
-        "B) ('a.py', 'b.py')",
-        "C) ['b.py']",
+        "A) ('a.py', 'b.py')",
+        "B) ['b.py']",
+        "C) 'b.py'",
         "D) ['a.py', 'b.py']"
       ],
       "answer": 3,
@@ -322,9 +322,9 @@
       "question": "Co vrací metoda parse_known_args() modulu argparse?",
       "options": [
         "A) Dvojici (Namespace s rozpoznanými argumenty, seznam nerozpoznaných argumentů).",
-        "B) Objekt typu Namespace obsahující jak rozpoznané, tak neznámé argumenty dohromady.",
-        "C) Pouze slovník s rozpoznanými argumenty, přičemž neznámé argumenty zcela ignoruje.",
-        "D) Výjimku UnrecognizedArgumentError, pokud se v příkazu objeví neznámý přepínač."
+        "B) Pouze slovník s rozpoznanými argumenty, přičemž neznámé argumenty zcela ignoruje.",
+        "C) Výjimku UnrecognizedArgumentError, pokud se v příkazu objeví neznámý přepínač.",
+        "D) Objekt typu Namespace obsahující jak rozpoznané, tak neznámé argumenty dohromady."
       ],
       "answer": 0,
       "explanation": "Metoda parse_known_args() při výskytu neznámých argumentů neselže, ale vrátí n-tici: první prvek je Namespace s parsovanými argumenty a druhý je seznam zbylých nerozpoznaných řetězců.",
@@ -336,10 +336,10 @@
       "question": "Doplňte speciální výjimku modulu argparse pro signalizaci neplatné hodnoty z vlastní konverzní funkce:",
       "code_snippet": "from argparse import ArgumentParser, ________\n\ndef positive_int(val):\n    n = int(val)\n    if n <= 0:\n        raise ________('Číslo musí být kladné!')\n    return n",
       "options": [
-        "InvalidOptionError",
+        "ParseError",
         "ArgumentTypeError",
         "ArgumentValueError",
-        "ParseError"
+        "InvalidOptionError"
       ],
       "answer": 1,
       "explanation": "Vlastní validační funkce v type= modulu argparse vyhazují argparse.ArgumentTypeError, kterou parser zpracuje a zobrazí chybovou hlášku CLI.",
@@ -351,10 +351,10 @@
       "type": "multiple_choice",
       "question": "Jaké chování zajistí kód group = parser.add_mutually_exclusive_group(required=True)?",
       "options": [
-        "A) Uživatel může zadat všechny přepínače ze zadané skupiny naráz v libovolném pořadí.",
+        "A) Skupina automaticky skryje nápovědu pro všechny obsažené přepínače z výpisu -h.",
         "B) Přepínače ze skupiny se stanou povinné všechny současně při spuštění skriptu.",
         "C) Uživatel musí zadat právě jeden argument z dané skupiny, jinak parser selže.",
-        "D) Skupina automaticky skryje nápovědu pro všechny obsažené přepínače z výpisu -h."
+        "D) Uživatel může zadat všechny přepínače ze zadané skupiny naráz v libovolném pořadí."
       ],
       "answer": 2,
       "explanation": "add_mutually_exclusive_group() vynucuje, že lze vybrat nejvýše jeden argument ze skupiny. Parametr required=True navíc zaručuje, že alespoň jeden z nich musí být povinně zadán.",
@@ -365,9 +365,9 @@
       "type": "predict_output",
       "question": "Jaká hodnota převáží při spuštění skriptu bez argumentů?",
       "options": [
-        "A) alpha",
+        "A) ['alpha', 'beta']",
         "B) None",
-        "C) ['alpha', 'beta']",
+        "C) alpha",
         "D) beta"
       ],
       "answer": 3,
@@ -395,10 +395,10 @@
       "type": "multiple_choice",
       "question": "Jak se chová objekt vytvořený pomocí modulu mmap?",
       "options": [
-        "A) Automaticky šifruje a komprimuje souborová data zapsaná na pevný disk.",
+        "A) Funguje výhradně jako klasický textový řetězec str uložený v operační paměti.",
         "B) Kombinuje rozhraní souborového proudu (read/seek) a měnitelného bajtového pole.",
-        "C) Slouží jako databázový index pro rychlé vyhledávání v relacích na disku.",
-        "D) Funguje výhradně jako klasický textový řetězec str uložený v operační paměti."
+        "C) Automaticky šifruje a komprimuje souborová data zapsaná na pevný disk.",
+        "D) Slouží jako databázový index pro rychlé vyhledávání v relacích na disku."
       ],
       "answer": 1,
       "explanation": "Objekt mmap namapuje soubor přímo do paměti a poskytuje hybridní rozhraní – podporuje souborové metody (read, readline, seek) i přístup přes indexy a výřezy jako bytearray.",
@@ -423,8 +423,8 @@
       "type": "predict_output",
       "question": "Jaký typ a hodnotu vrátí metoda read_byte() nad objektem mmap?",
       "options": [
-        "A) 'A' <class 'str'>",
-        "B) b'A' <class 'bytes'>",
+        "A) b'A' <class 'bytes'>",
+        "B) 'A' <class 'str'>",
         "C) 0 <class 'int'>",
         "D) 65 <class 'int'>"
       ],
@@ -438,9 +438,9 @@
       "question": "Jakým způsobem je nutné předat regulární výraz při vyhledávání v objektu mmap?",
       "options": [
         "A) Vzor musí být definován jako bajtový řetězec s předponou rb (např. rb'pattern').",
-        "B) Vzor je nutné nejprve převést na celočíselné pole ASCII hodnot jednotlivých znaků.",
-        "C) Regulární výrazy nelze nad objektem mmap z důvodu paměťových omezení použít.",
-        "D) Vzor musí být předán jako běžný textový Unicode řetězec str v kódování UTF-8."
+        "B) Regulární výrazy nelze nad objektem mmap z důvodu paměťových omezení použít.",
+        "C) Vzor musí být předán jako běžný textový Unicode řetězec str v kódování UTF-8.",
+        "D) Vzor je nutné nejprve převést na celočíselné pole ASCII hodnot jednotlivých znaků."
       ],
       "answer": 0,
       "explanation": "Jelikož mmap reprezentuje neopracovaná bajtová data v paměti, operace a regexpy nad mmap vyžadují bajtový vzor (byte regex pattern) s předponou rb''.",
@@ -453,8 +453,8 @@
       "options": [
         "A) Soubor se otevře v neomezeném režimu paměti, kde jeho délka může dynamicky rost.",
         "B) Vytvoří se anonymní paměťový blok neprovázaný se žádným konkrétním souborem.",
-        "C) Otevře se v režimu pro čtení naposledy modifikovaný soubor z pevného disku.",
-        "D) Funkce vyhodí výjimku ValueError z důvodu neplatného souborového popisovače."
+        "C) Funkce vyhodí výjimku ValueError z důvodu neplatného souborového popisovače.",
+        "D) Otevře se v režimu pro čtení naposledy modifikovaný soubor z pevného disku."
       ],
       "answer": 1,
       "explanation": "Hodnota fileno = -1 slouží k vytvoření anonymního alokovaného paměťového bloku (anonymous memory mapping) v RAM, který není vázán na žádný fyzický soubor na disku.",
@@ -468,9 +468,9 @@
       "question": "Kdy přesně dochází k vyhodnocení a aplikaci dekorátoru třídy?",
       "options": [
         "A) Při prvním vytvoření instance dané třídy během běhu aplikace.",
-        "B) Při zavolání jakékoliv metody vytvořené instance dané třídy.",
+        "B) Až po ukončení vykonávání bloku if __name__ == '__main__':.",
         "C) Okamžitě po vyhodnocení těla třídy při definici (v čase importu).",
-        "D) Až po ukončení vykonávání bloku if __name__ == '__main__':."
+        "D) Při zavolání jakékoliv metody vytvořené instance dané třídy."
       ],
       "answer": 2,
       "explanation": "Dekorátor třídy se vykoná ihned po zpracování definice třídy interpretem. Výraz `@dec class A: pass` je ekvivalentní zápisu `A = dec(A)`. Aplikace dekorátoru je posledním krokem vytváření objektu třídy a nečeká na tvorbu konkrétních instancí.",
@@ -481,9 +481,9 @@
       "type": "fill_blank_choice",
       "question": "Doplňte dekorátor ze standardní knihovny pro automatické dopočítání porovnávacích metod:",
       "options": [
-        "order_derivation",
-        "auto_comparisons",
         "rich_comparisons",
+        "auto_comparisons",
+        "order_derivation",
         "total_ordering"
       ],
       "answer": 3,
@@ -522,10 +522,10 @@
       "type": "multiple_choice",
       "question": "Jaký bude výstup tohoto kódu při porovnání objektů dekorované třídy pomocí operátoru `>`?",
       "options": [
-        "A) Vrátí objekt typu NotImplemented, protože porovnávání dvou instancí vyžaduje definici metody __cmp__.",
+        "A) Způsobí chybovou výjimku TypeError, protože operátor > nebyl ve třídě explicitně nadefinován.",
         "B) Vrátí hodnotu False, protože @total_ordering automaticky odvodil metodu __gt__ z __eq__ a __lt__.",
-        "C) Vrátí hodnotu True, protože dekorátor @total_ordering při spuštění automaticky obrací pořadí operandů.",
-        "D) Způsobí chybovou výjimku TypeError, protože operátor > nebyl ve třídě explicitně nadefinován."
+        "C) Vrátí objekt typu NotImplemented, protože porovnávání dvou instancí vyžaduje definici metody __cmp__.",
+        "D) Vrátí hodnotu True, protože dekorátor @total_ordering při spuštění automaticky obrací pořadí operandů."
       ],
       "answer": 1,
       "explanation": "Třída definuje `__eq__` a `__lt__`. Dekorátor `@total_ordering` automaticky doplní `__gt__`. Výraz `p1 > p2` porovná ceny (10 > 20), což vyhodnotí jako `False`. Bez použití `@total_ordering` by kód vyvolal `TypeError`.",

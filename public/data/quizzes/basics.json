@@ -6,8 +6,8 @@
     "options": [
       "A) [1] (protože items je sdílený třídní atribut modifikovaný v místě)",
       "B) AttributeError (protože k items nelze přistupovat přes instanci a2)",
-      "C) None (protože metoda append nevrací žádnou hodnotu při modifikaci)",
-      "D) [] (protože každá instance automaticky dostává vlastní kopii seznamu)"
+      "C) [] (protože každá instance automaticky dostává vlastní kopii seznamu)",
+      "D) None (protože metoda append nevrací žádnou hodnotu při modifikaci)"
     ],
     "answer": 0,
     "explanation": "Atribut items definovaný v těle třídy je třídní proměnná sdílená všemi instancemi. Volání a1.items.append(1) modifikuje tento sdílený seznam přímo v paměti, takže změna je viditelná i přes ostatní instance (a2.items vrátí [1]).",
@@ -32,10 +32,10 @@
     "type": "multiple_choice",
     "question": "Jaký bude výstup při volání funkce nadefinované v těle třídy C bez dekorátoru přímo přes jmenný prostor třídy C.info(5)?",
     "options": [
-      "A) <bound method C.info> (vrátí se svázaná metoda místo vyhodnocení výsledku)",
-      "B) None (protože funkce v třídě bez dekorátoru nevracejí žádnou konkrétní hodnotu)",
+      "A) TypeError (protože funkce v těle třídy musí mít vždy definovaný parametr self)",
+      "B) <bound method C.info> (vrátí se svázaná metoda místo vyhodnocení výsledku)",
       "C) 5 (při volání přímo na třídě se předá přesně jeden argument bez automatického self)",
-      "D) TypeError (protože funkce v těle třídy musí mít vždy definovaný parametr self)"
+      "D) None (protože funkce v třídě bez dekorátoru nevracejí žádnou konkrétní hodnotu)"
     ],
     "answer": 2,
     "explanation": "Při volání nedekorované funkce přímo přes třídu (C.info(5)) funguje objekt jako obyčejný jmenný prostor. Funkce nedostává žádný implicitní parametr self a argument 5 se naváže na parametr x.",
@@ -46,9 +46,9 @@
     "type": "predict_output",
     "question": "Jaká chyba nastane při volání nedekorované jednoplánové funkce def info(x): z instance třídy c.info(5)?",
     "options": [
-      "A) AttributeError: 'C' object has no attribute 'info' v rámci instance",
+      "A) <C object> (metoda vrací referenci na instanci c uloženou v parametru x)",
       "B) 5 (metoda úspěšně vrátí předanou hodnotu 5 bez ohledu na instanci c)",
-      "C) <C object> (metoda vrací referenci na instanci c uloženou v parametru x)",
+      "C) AttributeError: 'C' object has no attribute 'info' v rámci instance",
       "D) TypeError: C.info() takes 1 positional argument but 2 were given"
     ],
     "answer": 3,
@@ -61,9 +61,9 @@
     "question": "Doplňte dekorátor pro vytvoření metody třídy, která jako první argument přijímá referenci na třídu (cls):",
     "options": [
       "@classmethod",
-      "@classproperty",
+      "@staticmethod",
       "@instancemethod",
-      "@staticmethod"
+      "@classproperty"
     ],
     "answer": 0,
     "explanation": "Dekorátor @classmethod předává metodě jako první argument samotnou třídu (cls) namísto instance (self).",
@@ -75,10 +75,10 @@
     "type": "multiple_choice",
     "question": "Jakým způsobem Python provádí tzv. name mangling u atributů začínajících dvěma podtržítky (např. __b)?",
     "options": [
-      "A) Odstraní atribut z objektu a uloží jej do soukromého modulu __private__.",
+      "A) Zablokuje zápis i čtení daného atributu na úrovni paměťového interpreteru.",
       "B) Přejmenuje atribut v interním slovníku na tvar _NázevTřídy__b.",
       "C) Přejmenuje atribut na __b_private a znemožní k němu jakýkoliv přístup.",
-      "D) Zablokuje zápis i čtení daného atributu na úrovni paměťového interpreteru."
+      "D) Odstraní atribut z objektu a uloží jej do soukromého modulu __private__."
     ],
     "answer": 1,
     "explanation": "Atributy začínající dvěma podtržítky (bez zakončení 2 podtržítky) jsou Pythonem transformovány na tvar _JménoTřídy__atribut (přičemž začáteční podtržítka názvu třídy se odstraňují). Jde o ochranu proti přepsání atributů v potomcích, nikoliv o neprolomitelnou privátnost.",

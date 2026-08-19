@@ -5,9 +5,9 @@
     "question": "Jak se změní hodnoty atributů u instancí po in-place modifikaci seznamu definovaného v těle třídy?",
     "options": [
       "A) [] (protože každá instance automaticky dostává vlastní kopii seznamu)",
-      "B) None (protože metoda append nevrací žádnou hodnotu při modifikaci)",
+      "B) AttributeError (protože k items nelze přistupovat přes instanci a2)",
       "C) [1] (protože items je sdílený třídní atribut modifikovaný v místě)",
-      "D) AttributeError (protože k items nelze přistupovat přes instanci a2)"
+      "D) None (protože metoda append nevrací žádnou hodnotu při modifikaci)"
     ],
     "answer": 2,
     "explanation": "Atribut items definovaný v těle třídy je třídní proměnná sdílená všemi instancemi. Volání a1.items.append(1) modifikuje tento sdílený seznam přímo v paměti, takže změna je viditelná i přes ostatní instance (a2.items vrátí [1]).",
@@ -19,8 +19,8 @@
     "question": "Jaký bude výstup při přístupu ke třídnímu a instančnímu atributu po přiřazení w.color = 'blue'?",
     "options": [
       "A) blue blue (přiřazení na instanci změní hodnotu přímo v samotné třídě Widget)",
-      "B) TypeError (protože atribut color nelze takto přepsat bez metody __setattr__)",
-      "C) red red (přiřazení je ignorováno, protože třídní atribut color je konstantní)",
+      "B) red red (přiřazení je ignorováno, protože třídní atribut color je konstantní)",
+      "C) TypeError (protože atribut color nelze takto přepsat bez metody __setattr__)",
       "D) red blue (na instanci w vznikne nový atribut shadowující třídní atribut)"
     ],
     "answer": 3,
@@ -33,9 +33,9 @@
     "question": "Jaký bude výstup při volání funkce nadefinované v těle třídy C bez dekorátoru přímo přes jmenný prostor třídy C.info(5)?",
     "options": [
       "A) 5 (při volání přímo na třídě se předá přesně jeden argument bez automatického self)",
-      "B) None (protože funkce v třídě bez dekorátoru nevracejí žádnou konkrétní hodnotu)",
-      "C) TypeError (protože funkce v těle třídy musí mít vždy definovaný parametr self)",
-      "D) <bound method C.info> (vrátí se svázaná metoda místo vyhodnocení výsledku)"
+      "B) TypeError (protože funkce v těle třídy musí mít vždy definovaný parametr self)",
+      "C) <bound method C.info> (vrátí se svázaná metoda místo vyhodnocení výsledku)",
+      "D) None (protože funkce v třídě bez dekorátoru nevracejí žádnou konkrétní hodnotu)"
     ],
     "answer": 0,
     "explanation": "Při volání nedekorované funkce přímo přes třídu (C.info(5)) funguje objekt jako obyčejný jmenný prostor. Funkce nedostává žádný implicitní parametr self a argument 5 se naváže na parametr x.",
@@ -46,10 +46,10 @@
     "type": "predict_output",
     "question": "Jaká chyba nastane při volání nedekorované jednoplánové funkce def info(x): z instance třídy c.info(5)?",
     "options": [
-      "A) <C object> (metoda vrací referenci na instanci c uloženou v parametru x)",
+      "A) AttributeError: 'C' object has no attribute 'info' v rámci instance",
       "B) TypeError: C.info() takes 1 positional argument but 2 were given",
-      "C) 5 (metoda úspěšně vrátí předanou hodnotu 5 bez ohledu na instanci c)",
-      "D) AttributeError: 'C' object has no attribute 'info' v rámci instance"
+      "C) <C object> (metoda vrací referenci na instanci c uloženou v parametru x)",
+      "D) 5 (metoda úspěšně vrátí předanou hodnotu 5 bez ohledu na instanci c)"
     ],
     "answer": 1,
     "explanation": "Volání na instanci (c.info(5)) automaticky vkládá instanci c jako prvotní poziční argument (self). Jelikož definice info(x) přijímá pouze 1 argument, předání instance c i čísla 5 vyvolá TypeError o předání 2 argumentů.",
@@ -61,9 +61,9 @@
     "question": "Doplňte správný dekorátor ________ před def increment(cls): pro metodu třídy s prvním implicitním argumentem cls.",
     "options": [
       "@staticmethod",
-      "@classproperty",
+      "@instancemethod",
       "@classmethod",
-      "@instancemethod"
+      "@classproperty"
     ],
     "answer": 2,
     "explanation": "Dekorátor @classmethod způsobí, že dekorovaná metoda dostane při volání na třídě i na instanci jako první implicitní parametr referenci na objekt třídy (konvenčně pojmenovaný cls).",
@@ -75,9 +75,9 @@
     "type": "multiple_choice",
     "question": "Jakým způsobem Python provádí tzv. name mangling u atributů začínajících dvěma podtržítky (např. __b)?",
     "options": [
-      "A) Přejmenuje atribut na __b_private a znemožní k němu jakýkoliv přístup.",
-      "B) Zablokuje zápis i čtení daného atributu na úrovni paměťového interpreteru.",
-      "C) Odstraní atribut z objektu a uloží jej do soukromého modulu __private__.",
+      "A) Zablokuje zápis i čtení daného atributu na úrovni paměťového interpreteru.",
+      "B) Odstraní atribut z objektu a uloží jej do soukromého modulu __private__.",
+      "C) Přejmenuje atribut na __b_private a znemožní k němu jakýkoliv přístup.",
       "D) Přejmenuje atribut v interním slovníku na tvar _NázevTřídy__b."
     ],
     "answer": 3,

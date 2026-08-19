@@ -7,8 +7,8 @@
     "options": [
       "A) <class 'list'> [1, 'a', [2, 3]] — návratová hodnota složená z více prvků vytvoří měnitelný seznam se všemi položkami.",
       "B) <class 'tuple'> (1, 'a', [2, 3]) — čárkami oddělené hodnoty za return jsou automaticky zabaleny do objektu typu n-tice.",
-      "C) <class 'dict'> {0: 1, 1: 'a', 2: [2, 3]} — Python převede vrácené hodnoty na slovník s číselnými klíči podle pořadí.",
-      "D) <class 'int'> 1 — návratové slovo return vrací v tomto zápisu pouze první zadanou hodnotu a ostatní ignoruje."
+      "C) <class 'int'> 1 — návratové slovo return vrací v tomto zápisu pouze první zadanou hodnotu a ostatní ignoruje.",
+      "D) <class 'dict'> {0: 1, 1: 'a', 2: [2, 3]} — Python převede vrácené hodnoty na slovník s číselnými klíči podle pořadí."
     ],
     "answer": 1,
     "explanation": "V Pythonu zápis return a, b, c nevytváří samostatné návratové hodnoty, ale konstruuje jediný objekt typu tuple (n-tice). Závorky jsou u n-tice volitelné, klíčovým prvkem pro její vytvoření je čárka.",
@@ -20,10 +20,10 @@
     "question": "Doplňte token do definice funkce pro výpočet pH, který vynutí zadání parametru `temperature` výhradně jako pojmenovaného argumentu.",
     "code_snippet": "def fn(a, b, ________, c=10):\n    return a + b + c",
     "options": [
-      "**",
       "/",
+      "*args",
       "*",
-      "*args"
+      "**"
     ],
     "answer": 2,
     "explanation": "Samostatná hvězdička `*` v hlavičce funkce označuje hranici keyword-only parametrů — všechny parametry uvedené za ní musí být volány s názvem argumentu.",
@@ -52,9 +52,9 @@
     "code_snippet": "def fn(x, y=[]):\n    y.append(x)\n    return y\n\nfn(1)\nres = fn(2)\nprint(res)",
     "options": [
       "A) [1, 2] — výchozí seznam se vytvoří pouze jednou při definici funkce a jeho modifikace přetrvávají mezi voláními.",
-      "B) [1] — funkce vrací předchozí stav seznamu před přidáním nového prvku z důvodu nesynchronizovaného zápisu.",
+      "B) [2] — při každém volání bez druhého argumentu se inicializuje nový prázdný seznam a starý je smazán z paměti.",
       "C) AttributeError — metoda append vyvolá výjimku, protože výchozí parametr je vyhodnocen jako neměnná n-tice.",
-      "D) [2] — při každém volání bez druhého argumentu se inicializuje nový prázdný seznam a starý je smazán z paměti."
+      "D) [1] — funkce vrací předchozí stav seznamu před přidáním nového prvku z důvodu nesynchronizovaného zápisu."
     ],
     "answer": 0,
     "explanation": "Seznam [] ve výchozím parametru je vytvořen pouze jednou při definici funkce def. Všechna volání fn() bez druhého argumentu sdílejí stejný objekt v paměti. Volání fn(1) do něj přidá 1 a volání fn(2) přidá 2, takže výsledek je [1, 2].",
@@ -65,10 +65,10 @@
     "type": "multiple_choice",
     "question": "Které z následujících volání funkce def fn(a, b, /, c): pass vyvolá chybu TypeError?",
     "options": [
-      "A) fn(a=1, 2, 3) — poziční argumenty nesmí předcházet pojmenovaným argumentům při jakémkoliv volání funkce.",
+      "A) fn(1, 2, c=3) — parametr c za lomítkem vyžaduje povinné předání jménem a nelze mu předat poziční hodnotu.",
       "B) fn(a=1, b=2, c=3) — parametry před lomítkem / jsou definovány jako výhradně poziční a nelze je volat jménem.",
       "C) fn(1, 2, 3) — hodnota pro parametr c nesmí být předána pozičně, pokud jsou předchozí parametry odděleny lomítkem.",
-      "D) fn(1, 2, c=3) — parametr c za lomítkem vyžaduje povinné předání jménem a nelze mu předat poziční hodnotu."
+      "D) fn(a=1, 2, 3) — poziční argumenty nesmí předcházet pojmenovaným argumentům při jakémkoliv volání funkce."
     ],
     "answer": 1,
     "explanation": "Lomítko / v definici parametrů označuje, že všechny parametry stojící před ním (a a b) jsou positional-only. Zkuste-li je předat pomocí jména (a=1, b=2), Python vyvolá TypeError. Parametr c za lomítkem lze předat jak pozičně (fn(1, 2, 3)), tak pojmenovaně (fn(1, 2, c=3)).",
@@ -107,9 +107,9 @@
     "question": "Co se stane při pokusu o spuštění následujícího kódu?",
     "code_snippet": "def fn(x, y=3):\n    return x ** y\n\nres = fn(x=2, 4)",
     "options": [
-      "A) Nastane TypeError, protože parametr x obdrží dvě různé hodnoty a parametr y zůstane bez zadané výchozí hodnoty.",
-      "B) Proběhne výpočet s výsledkem 16, protože Python automaticky přiřadí druhý argument 4 zbývajícímu parametru y.",
-      "C) Proběhne výpočet s výsledkem 8, protože první pojmenovaný argument vyruší platnost druhého zadaného argumentu.",
+      "A) Proběhne výpočet s výsledkem 16, protože Python automaticky přiřadí druhý argument 4 zbývajícímu parametru y.",
+      "B) Proběhne výpočet s výsledkem 8, protože první pojmenovaný argument vyruší platnost druhého zadaného argumentu.",
+      "C) Nastane TypeError, protože parametr x obdrží dvě různé hodnoty a parametr y zůstane bez zadané výchozí hodnoty.",
       "D) Nastane SyntaxError, protože v definici volání funkce nesmí žádný poziční argument následovat za pojmenovaným argumentem."
     ],
     "answer": 3,
