@@ -628,6 +628,10 @@ function triggerPrint() {
   if (window.printTier && (!activeTab || activeTab.kind === "progress" || activeTab.kind === "home")) {
     window.printTier(4);
   } else {
+    window.print();
+  }
+}
+
 boot();
 
 // Register high-performance Service Worker for instant offline & caching
