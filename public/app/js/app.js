@@ -15,23 +15,22 @@ import { initAdminPanel, openAdminModal, updateAdminUIElements } from "./admin.j
 import { escapeHtml } from "./ui.js";
 
 async function loadJson(url) {
-  const clean = url.replace(/^\//, "");
+  const clean = url.replace(/^\//, "").replace(/^data\//, "");
   const urlsToTry = [
-    "data/" + clean.replace(/^data\//, ""),
-    "./data/" + clean.replace(/^data\//, ""),
-    "../data/" + clean.replace(/^data\//, ""),
-    "/" + clean,
-    "./" + clean,
+    "/data/" + clean,
+    "/public/data/" + clean,
+    "data/" + clean,
+    "./data/" + clean,
   ];
   let lastErr = null;
   for (const u of urlsToTry) {
     try {
-      const res = await fetch(u, { cache: "no-store" });
+      const res = await fetch(u);
       if (res.ok) {
-        const contentType = res.headers.get("content-type") || "";
-        if (!contentType.includes("text/html")) {
+        const text = await res.text();
+        if (text && text.trim().length > 0) {
           try {
-            return await res.json();
+            return JSON.parse(text);
           } catch (e) {
             lastErr = e;
           }
