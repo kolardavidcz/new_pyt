@@ -734,6 +734,21 @@ async function loadFullContent(item, main) {
       }
       main.appendChild(quizEl);
     }
+
+    // Speculative hover prefetching for in-slide links
+    main.querySelectorAll("a.internal-pres-link").forEach((link) => {
+      link.addEventListener("pointerenter", () => {
+        const href = link.getAttribute("href");
+        if (href && href.startsWith("#/")) {
+          const targetId = href.replace(/^#\//, "").split("?")[0].split("#")[0];
+          const targetItem = state.itemsById?.get(targetId) || state.itemsById?.get("lecture:" + targetId);
+          if (targetItem) {
+            if (targetItem.path) fetchAndExtract(targetItem.path).catch(() => {});
+            if (targetItem.id) getQuizFor(targetItem).catch(() => {});
+          }
+        }
+      }, { once: true, passive: true });
+    });
   } catch (err) {
     main.appendChild(el("div", { className: "error-box" },
       "Failed to load: ",

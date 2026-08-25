@@ -1,10 +1,22 @@
-/** Explorer tree rendering */
-
-import { state, weekVisibleItems, pagesFor, slideDiff, itemMatchesFilters } from "./state.js";
+import { state, weekVisibleItems, pagesFor, slideDiff, itemMatchesFilters, getQuizFor } from "./state.js";
+import { fetchAndExtract } from "./content.js";
 import {
   clear, starsHtml, badgesHtml, flavorHtml,
   svgChevron, svgFolder, svgFile, svgExercise, svgPage,
+  escapeAttr, escapeHtml,
 } from "./ui.js";
+
+const prefetchedPaths = new Set();
+export function prefetchItem(item) {
+  if (!item) return;
+  if (item.path && !prefetchedPaths.has(item.path)) {
+    prefetchedPaths.add(item.path);
+    fetchAndExtract(item.path).catch(() => {});
+  }
+  if (item.id) {
+    getQuizFor(item).catch(() => {});
+  }
+}
 
 let onSelect = null;
 
@@ -166,6 +178,19 @@ function buildItemNode(item) {
     </span>
   `;
 
+  let prefetchTimer = null;
+  row.addEventListener("pointerenter", () => {
+    prefetchTimer = setTimeout(() => {
+      prefetchItem(item);
+    }, 35);
+  });
+  row.addEventListener("pointerleave", () => {
+    if (prefetchTimer) clearTimeout(prefetchTimer);
+  });
+  row.addEventListener("touchstart", () => {
+    prefetchItem(item);
+  }, { passive: true });
+
   row.addEventListener("click", (e) => {
     if (e.target.closest(".tree-twistie") && hasPages) {
       toggleExpand(key);
@@ -214,6 +239,19 @@ function buildPageNode(item, page) {
     <span class="tree-label" title="${escapeAttr(page.title)}">${escape(page.title)}</span>
     <span class="tree-meta">${diff ? flavorHtml(diff) : ""}</span>
   `;
+
+  let pagePrefetchTimer = null;
+  row.addEventListener("pointerenter", () => {
+    pagePrefetchTimer = setTimeout(() => {
+      prefetchItem(item);
+    }, 35);
+  });
+  row.addEventListener("pointerleave", () => {
+    if (pagePrefetchTimer) clearTimeout(pagePrefetchTimer);
+  });
+  row.addEventListener("touchstart", () => {
+    prefetchItem(item);
+  }, { passive: true });
 
   row.addEventListener("click", () => select("page", item.id, page.id));
   row.addEventListener("keydown", (e) => {

@@ -99,6 +99,13 @@ if (existsSync(fav)) {
   cpSync(fav, join(PUB, "favicon.ico"));
 }
 
+// Service Worker if present
+const swFile = join(ROOT, "sw.js");
+if (existsSync(swFile)) {
+  cpSync(swFile, join(PUB, "sw.js"));
+  console.log("  ✓ sw.js → public/sw.js");
+}
+
 // Lightweight deploy stamp (debug)
 writeFileSync(
   join(PUB, "deploy.json"),
