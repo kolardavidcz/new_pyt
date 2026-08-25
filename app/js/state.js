@@ -917,17 +917,25 @@ export async function getQuizFor(item) {
     // 1. Try per-deck chunk
     const targetKey = quiz_deck || slug || lastTwo || idClean || "";
     if (targetKey) {
-      try {
-        const res = await fetch(`data/quizzes/${targetKey}.json`);
-        if (res.ok) {
-          const qList = await res.json();
-          if (Array.isArray(qList)) {
-            state.quizzes[targetKey] = qList;
-            invalidateQuizNormCache();
-            found = qList;
+      const urls = [
+        `/data/quizzes/${targetKey}.json`,
+        `data/quizzes/${targetKey}.json`,
+        `./data/quizzes/${targetKey}.json`,
+      ];
+      for (const u of urls) {
+        try {
+          const res = await fetch(u);
+          if (res.ok) {
+            const qList = await res.json();
+            if (Array.isArray(qList)) {
+              state.quizzes[targetKey] = qList;
+              invalidateQuizNormCache();
+              found = qList;
+              break;
+            }
           }
-        }
-      } catch { /* ignore */ }
+        } catch { /* ignore */ }
+      }
     }
 
     // 2. Fallback: Lazy fetch per-week chunk if missing
@@ -935,10 +943,10 @@ export async function getQuizFor(item) {
       const weekNum = item.weekNum !== undefined ? item.weekNum : (item.week ? item.week : null);
       if (weekNum != null) {
         const urls = [
+          `/data/quizzes/w${weekNum}.json`,
           `data/quizzes/w${weekNum}.json`,
           `./data/quizzes/w${weekNum}.json`,
           `../data/quizzes/w${weekNum}.json`,
-          `/data/quizzes/w${weekNum}.json`
         ];
         for (const u of urls) {
           try {
