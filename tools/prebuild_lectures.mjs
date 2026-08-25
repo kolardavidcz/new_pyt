@@ -6,7 +6,7 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderCompactAsciiExceptionTreeHtml } from "../app/js/exceptions_tree.js";
 
@@ -553,9 +553,60 @@ const python310AsciiTree = `BaseException
            +-- EncodingWarning
            +-- ResourceWarning`;
 
-function transformExampleTags(html) {
+function transformExampleTags(html, fileDir = "") {
   if (!html) return "";
   let res = html.replace(/<example[^>]*src=["']_history\/Python310["'][^>]*>[\s\S]*?<\/example>/gi, renderCompactAsciiExceptionTreeHtml());
+
+  // Inline external example files directly into static pre blocks at build time
+  res = res.replace(/<example\b([^>]*?)>([\s\S]*?)<\/example>|<example\b([^>]*?)\/>/gi, (match, attrs1, inner, attrs2) => {
+    const attrs = attrs1 || attrs2 || "";
+    const srcMatch = attrs.match(/src=["']([^"']+)["']/i);
+    const langMatch = attrs.match(/lang=["']([^"']+)["']/i);
+    
+    if (!srcMatch) return match;
+    const src = srcMatch[1].trim();
+    if (src === "_history/Python310") return renderCompactAsciiExceptionTreeHtml();
+    
+    let lang = langMatch ? langMatch[1].trim() : "python";
+    if (src.endsWith(".out") || src.endsWith(".txt") || src.endsWith(".log")) lang = "plain";
+    if (src.endsWith(".pbm") || src.endsWith(".pgm") || src.endsWith(".ppm")) lang = "plain";
+    if (src.endsWith(".b")) lang = "plain";
+    if (src.endsWith(".xml") || src.endsWith(".html")) lang = "xml";
+    if (src.endsWith(".css")) lang = "css";
+    if (src.endsWith(".js")) lang = "js";
+
+    const cleanSrc = src.replace(/^\.\//, "");
+    const candidatePaths = [
+      fileDir ? join(fileDir, cleanSrc) : null,
+      join(ROOT, "public", "vyuka_downloaded", "materialy", cleanSrc),
+      join(ROOT, "vyuka_downloaded", "materialy", cleanSrc),
+      join(ROOT, "public", "vyuka_downloaded", cleanSrc),
+      join(ROOT, "vyuka_downloaded", cleanSrc),
+      join(ROOT, "public", cleanSrc),
+      join(ROOT, cleanSrc),
+    ].filter(Boolean);
+
+    let content = null;
+    for (const p of candidatePaths) {
+      if (existsSync(p)) {
+        try {
+          content = readFileSync(p, "utf-8");
+          break;
+        } catch { /* ignore */ }
+      }
+    }
+
+    if (content !== null) {
+      const escaped = content
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      return `<pre class="brush: ${lang}; gutter: false; toolbar: false;">${escaped}</pre>`;
+    }
+
+    return match;
+  });
+
   return res;
 }
 
@@ -587,7 +638,7 @@ for (const [relPath, filePath] of fileMap.entries()) {
 
     while ((match = sectionRegex.exec(htmlContent)) !== null) {
       const sectionId = match[1];
-      const sectionInner = transformExampleTags(transformPreBlocks(transformCodeBlockquotes(match[2])));
+      const sectionInner = transformPreBlocks(transformCodeBlockquotes(transformExampleTags(match[2], dirname(filePath))));
       
       // Extract title header if present
       const hMatch = sectionInner.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i);
