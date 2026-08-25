@@ -3,7 +3,7 @@ import { fetchAndExtract } from "./content.js";
 import {
   clear, starsHtml, badgesHtml, flavorHtml,
   svgChevron, svgFolder, svgFile, svgExercise, svgPage,
-  escapeAttr, escapeHtml,
+  escapeAttr, escapeHtml as escape,
 } from "./ui.js";
 
 const prefetchedPaths = new Set();
@@ -349,15 +349,6 @@ export function revealItem(itemId, pageId) {
   });
 }
 
-function escape(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
-function escapeAttr(s) {
-  return escape(s).replace(/"/g, "&quot;");
-}
 function cssEscape(s) {
   if (window.CSS && CSS.escape) return CSS.escape(s);
   return String(s).replace(/"/g, '\\"');
