@@ -10,7 +10,7 @@
         "Core",
         "WOW"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <strong>Dekorátory</strong> obecně jsou funkce, které berou jako parametr funkci (a případně nějaké další doplňující parametry) a vrací tuto funkci zadaným způsobem upravenou, „odekorovanou“.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Čistě teoreticky může dekorátor funkci redukovat na libovolnou návratovou hodnotu, ale to by bylo velmi specifické použití.\r\n  </div></div>\r\n\r\n  <p>\r\n    Většinou se pro jejich zápis používá konstrukce <code>@DEKORÁTOR</code>. Jinými slovy konstrukce..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">@dekorátor\ndef moje_funkce():\n    BLOK</pre>\r\n  <p>\r\n    ..je vlastně přehlednější náhrada za..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">def moje_funkce():\n    BLOK\n\nmoje_funkce = dekorátor(moje_funkce)</pre>\r\n\r\n</div>"
     },
@@ -20,9 +20,9 @@
       "title": "Poznámka",
       "tags": [
         "Core",
-        "WOW"
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Funkce dekorátoru se v praxi snad nejčastěji projevuje tak, že návratové hodnoty z dekorované funkce jsou nějakým způsobem omezeny či změněny, proto by člověk mohl být v pokušení napsat dekorovací funkci jako operátor vracející tyto nějak upravené hodnoty. Jenže ve skutečnosti dekorátor dekorovanou funkci vlastně zcela nahrazuje, a proto musí být pochopitelně sám volatelným objektem! Jinak řečeno:\r\n    </p>\r\n    <blockquote>\r\n        Vstupem dekorátoru je objekt dekorované funkce a výstupem objekt nějaké jiné funkce.\r\n    </blockquote>\r\n    <p>\r\n        Kvůli tomu je konstrukce dekorátorů kapku složitější, než by člověk na první pohled mohl očekávat.\r\n    </p>\r\n\r\n</div>"
     },
@@ -31,9 +31,10 @@
       "idx": 2,
       "title": "Konstrukce dekorátoru I",
       "tags": [
-        "Skip"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Konstrukce dekorátoru I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zavedeme-li dekorátor..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">def dekorátor(funkce):\n    def _dekorátor():\n        print('START')\n        return funkce()\n    return _dekorátor</pre>\r\n    <p>\r\n        ..pak volání následujícím způsobem odekorované funkce..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">@dekorátor\ndef moje_funkce():\n    print('moje funkce')</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Tedy rozepsaně:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">moje_funkce = dekorátor(moje_funkce)</pre>\r\n    </div></div>\r\n    <p>\r\n        ..vrátí:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; moje_funkce()\nSTART\nmoje funkce</pre>\r\n    <p>\r\n        Celé toto funguje právě proto, že funkce uvnitř funkcí si s sebou nesou celý aktuální (dynamický) kontext, jak jsme viděli už dříve na případě <a href=\"advanced.xml?slajd=4\">uzávěrů</a> (<em>closures</em>).\r\n    </p>\r\n\r\n</div>"
     },
@@ -42,9 +43,10 @@
       "idx": 3,
       "title": "Poznámka",
       "tags": [
-        "Legendary"
+        "Core",
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\r\n    \r\n    <p>\r\n        Odekorovaná funkce se sice jmenuje stejně, ale pochopitelně je to už úplně jiná funkce:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; def dekorátor(funkce):\n...     def _dekorátor():\n...         print('START')\n...         return funkce()\n...     return _dekorátor\n\n&gt;&gt;&gt; def moje_funkce():\n...     print('moje funkce')\n&gt;&gt;&gt; moje_funkce\n&lt;function moje_funkce at 0x000001E6B32DB0A0&gt;\n\n&gt;&gt;&gt; @dekorátor\n... def moje_funkce():\n...     print('moje funkce')\n&gt;&gt;&gt; moje_funkce\n&lt;function dekorátor.&lt;locals&gt;._dekorátor at 0x000001E6B32DB1C0&gt;</pre>\r\n    \r\n</div>"
     },
@@ -53,9 +55,9 @@
       "idx": 4,
       "title": "Konstrukce dekorátoru II",
       "tags": [
-        "Legendary"
+        "Core"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Konstrukce dekorátoru II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zpracování návratové hodnoty funkce dekorátorem nebo prostě nějaká další dodatečná činnost ještě po zavolání funkce vyžaduje následující úpravu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">def _dekorátor():\n    print('START')\n    ret = funkce()\n    print('END')\n    return ret</pre>\r\n    <p>\r\n        Dekorovanou funkci je tedy třeba nejdříve vykonat (zavolat), návratovou hodnotu – ať už je jí cokoli – si uschovat pro pozdější použití, vykonat zbývající práci dekorátoru (což tedy může být a často právě bývá úprava návratové hodnoty) a teprve poté vrátit (případně upravenou) spočítanou hodnotu původní funkce.\r\n    </p>\r\n\r\n</div>"
     },
@@ -64,9 +66,10 @@
       "idx": 5,
       "title": "Příklad",
       "tags": [
-        "Legendary"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Příklad</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Následující dekorátor při volání funkce vypíše její jméno a spočítá dobu jejího běhu. Všimněte si však především, že <strong>jeden dekorátor použijeme na vícero různých funkcí, aniž bychom změnili jejich výchozí chování</strong>, a přitom se dozvíme něco navíc:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/decorators.2.py\"><em>decorators.2.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\ndef dekorátor(funkce):\n    from time import time\n    def _dekorátor():\n        print('\\nSTART:', funkce.__name__)\n        t, ret = time(), funkce()\n        print('KONEC:', time() - t)\n        return ret\n    return _dekorátor\n\n@dekorátor\ndef moje_funkce():\n    print('moje funkce')\n\n@dekorátor\ndef moje_dlouhá_funkce():\n    from time import sleep\n    print('moje dlouhá funkce')\n    sleep(3)\n\nmoje_funkce()\nmoje_dlouhá_funkce()</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">START: moje_funkce\nmoje funkce\nKONEC: 1.9073486328125e-06\n\nSTART: moje_dlouhá_funkce\nmoje dlouhá funkce\nKONEC: 3.0002083778381348</pre></div></div>\r\n\r\n</div>"
     },
@@ -75,9 +78,9 @@
       "idx": 6,
       "title": "PS: Atributy funkcí",
       "tags": [
-        "Legendary"
+        "Skip"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">PS: Atributy funkcí</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jak jsme viděli u atributu <code>__name__</code> na předchozím slajdu, funkce je interně také „jenom“ nějaký objekt se složitější strukturou. A jako takovému jí můžeme třeba i nastavovat vlastní atributy:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">def dekorátor(funkce):\n    def _dekorátor():\n        return funkce()\n    _dekorátor.atribut = \"Ahoj!\"\n    return _dekorátor\n\n@dekorátor\ndef moje_funkce():\n    print( 'moje funkce' )\n&gt;&gt;&gt; moje_funkce()\nmoje funkce\n&gt;&gt;&gt; moje_funkce.atribut\n'Ahoj!'\n&gt;&gt;&gt; moje_funkce.__dict__\n{'atribut': 'Ahoj!'}</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        A to pochopitelně nejen v rámci dekorátorů jako zde.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -86,9 +89,9 @@
       "idx": 7,
       "title": "Předávání parametrů funkci",
       "tags": [
-        "Legendary"
+        "Core"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Předávání parametrů funkci</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Bude-li dekorovaná funkce očekávat nějaké vstupní parametry, syntaxe se nepatrně změní o vnitřní parametr:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; def dekorátor(funkce):\n...     def _dekorátor(x):\n...         print('START')\n...         ret = funkce(x)\n...         return ret\n...     return _dekorátor\n... \n... @dekorátor\n... def moje_funkce(s):\n...     print( 'Ahoj, ', s, '!', sep='' )\n\n&gt;&gt;&gt; moje_funkce('Láďo')\nSTART\nAhoj, Láďo!</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Zatím se nic nezměnilo, vracíme stále stejnou funkci, která prostě jen navíc očekává vstupní parametr:\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">moje_funkce = dekorátor(moje_funkce)</pre>\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -97,9 +100,10 @@
       "idx": 8,
       "title": "Příklad",
       "tags": [
-        "Legendary"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Příklad</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Ukažme si rozumnější příklad – dekorátor, který při volání funkce vypíše všechny její parametry a navíc jeden (<em>debug</em>) nastaví, čímž i změní její chování:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; def decorator(target):\n... \n...     def wrapper(*args, **kwargs):\n...         # Edit the keyword arguments\n...         #   -- here, enable debug mode no matter what\n...         kwargs.update({'debug': True})\n...         print(\n...             'Calling function \"%s\" with arguments %s and keyword arguments %s'\n...             % (target.__name__, args, kwargs)\n...         )\n...         return target(*args, **kwargs)\n... \n...     wrapper.attribute = 1\n...     return wrapper\n\n&gt;&gt;&gt; @decorator\n... def target(a, b, debug=False):\n...     if debug: print('[Debug] I am the target function')\n...     return a + b\n\n# volání funkce je nyní odekorované, tzn. 'debug' je nastaven na True..\n&gt;&gt;&gt; target(1,2)\nCalling function \"target\" with arguments (1, 2)\n                and keyword arguments {'debug': True}\n[Debug] I am the target function\n3\n\n# ..a funkci přibyl nový atribut 'attribute'\n&gt;&gt;&gt; target.attribute\n1</pre>\r\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Podle <a href=\"http://www.siafoo.net/article/68\" class=\"external\">http://www.siafoo.net/article/68</a> .\r\n      </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        (Zalámáno pro lepší čitelnost.)\r\n      </div></div></div>\r\n\r\n</div>"
     },
@@ -108,9 +112,10 @@
       "idx": 9,
       "title": "Předávání parametrů dekorátoru I",
       "tags": [
-        "Legendary"
+        "Core",
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Předávání parametrů dekorátoru I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Začněme příkladem. Při zavedení následujícího dekorátoru..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">def omez_hodnoty(maximum):        # funkce přebírající parametry dekorátoru\n    def _omez_hodnoty(funkce):    # funkce přebírající dekorovanou funkci\n        def __omez_hodnoty(xs):   # konečná návratová funkce\n            ret = funkce( [x for x in xs if x &lt;= maximum] )\n            return ret\n        return __omez_hodnoty\n    return _omez_hodnoty</pre>\r\n  <p>\r\n    ..můžeme provést odekorování např. takto:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">@omez_hodnoty(9)\ndef zpracuj_hodnoty(xs):\n    return [x**2 for x in xs]</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Tohle už je zajímavější:\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">zpracuj_hodnoty = omez_hodnoty(9)(zpracuj_hodnoty)</pre>\r\n    Tedy kód <code>omez_hodnoty(9)</code> vrací vlastně funkci <code>_omez_hodnoty</code>, které jako parametr předhodíme původní funkci, to jest <code>_omez_hodnoty(zpracuj_hodnoty)</code>, čímž dostaneme odkaz na funkci <code>__omez_hodnoty</code>, která očekává vstupní parametr <code>xs</code>. A ta pak už volá úplně původní funkci s parametry omezenými podle vstupu dekorátoru.\r\n  </div></div>\r\n  <p>\r\n    Volání funkce <em>zpracuj_hodnoty()</em> pak vrátí:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; test = zpracuj_hodnoty( [1, 3, 11, 4, 7, 14, 5] )\n&gt;&gt;&gt; print(test)\n[1, 9, 16, 49, 25]</pre>\r\n\r\n</div>"
     },
@@ -119,9 +124,9 @@
       "idx": 10,
       "title": "Předávání parametrů dekorátoru II",
       "tags": [
-        "Legendary"
+        "Skip"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Předávání parametrů dekorátoru II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Potřebujeme-li předat parametry nikoli dekorované funkci, ale dekorátoru samotnému, konstrukce se zesložitila o další mezifunkci, která tyto parametry přebírá a posílá dál. Sice už to vypadá kapku nepřehledně, ale v podstatě by se dalo říci, že v tomto případě prostě:\r\n  </p>\r\n  <blockquote>\r\n    Musíme vyrobit funkci, která z jí zadaných parametrů vyrobí příslušný dekorátor.\r\n  </blockquote>\r\n  <p>\r\n    Dekorátor sám je tedy stále <em>funkce vrácená z funkce</em>, ale tentokrát je sám navíc vyroben (a tedy vrácen) další funkcí. Která prostě jenom přebírá příslušné parametry, které použije k jeho tvorbě:\r\n  </p>\r\n  <table>\r\n    <tr>\r\n      <th>původní dekorátor</th>\r\n      <th>→</th>\r\n      <th>funkce vyrábějící dekorátor</th>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <pre>&lt;div class=\"color\"&gt;def _omez_hodnoty(funkce):\n    def __omez_hodnoty(xs):\n        ret = funkce(x for x in xs if x &lt;= mx)\n        return ret\n    return __omez_hodnoty&lt;/div&gt;</pre>\r\n      </td>\r\n      <td></td>\r\n      <td>\r\n        <pre>def omez_hodnoty(mx):\n&lt;div class=\"color\"&gt;    def _omez_hodnoty(funkce):\n        def __omez_hodnoty(xs):\n            ret = funkce(x for x in xs if x &lt;= mx)\n            return ret\n        return __omez_hodnoty&lt;/div&gt;    return _omez_hodnoty</pre>\r\n      </td>\r\n    </tr>\r\n  </table>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n      Hodnotu <em>mx</em> pro omezení vstupů musí dekorátor nalevo odněkud získat. A obalení další funkcí (která tento dekorátor tedy vlastně vyrobí) je právě ten kontext, odkud se tato hodnota objeví.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -130,9 +135,10 @@
       "idx": 11,
       "title": "Řetězení dekorátorů I",
       "tags": [
-        "Legendary"
+        "Core",
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Řetězení dekorátorů I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Stejně jako funkce můžeme zanořovat do sebe, <code>@</code>dekorátory můžeme přidávat před definici funkce. Aplikují se pak v uvedeném pořadí:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/decorators.1.py\"><em>decorators.1.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">def sečti(fn):\n    def wrapper(*args, **kwargs):\n        return [sum( fn(*args, **kwargs) )]\n    return wrapper\n\ndef umocni(fn):\n    def wrapper(*args, **kwargs):\n        return [x**2 for x in fn(*args, **kwargs)]\n    return wrapper\n\n# výstup 1: filtruj\ndef filtruj(xs, n):\n    return [x for x in xs if x &lt; n]\nprint( filtruj([5, 14, 7, 3, 23, 4, 17, 6, 11], 10) )\n\nprint()\n\n# výstup 2a: sečti(filtruj)\n@sečti\ndef filtruj(xs, n):\n    return [x for x in xs if x &lt; n]\nprint( filtruj([5, 14, 7, 3, 23, 4, 17, 6, 11], 10) )\n\nprint()\n\n# výstup 2b: umocni(filtruj)\n@umocni\ndef filtruj(xs, n):\n    return [x for x in xs if x &lt; n]\nprint( filtruj([5, 14, 7, 3, 23, 4, 17, 6, 11], 10) )\n\nprint()\n\n# výstup 3a: umocni(sečti(filtruj))\n@umocni\n@sečti\ndef filtruj(xs, n):\n    return [x for x in xs if x &lt; n]\nprint( filtruj([5, 14, 7, 3, 23, 4, 17, 6, 11], 10) )\n\nprint()\n\n# výstup 3b: sečti(umocni(filtruj))\n@sečti\n@umocni\ndef filtruj(xs, n):\n    return [x for x in xs if x &lt; n]\nprint( filtruj([5, 14, 7, 3, 23, 4, 17, 6, 11], 10) )\n\nprint()</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">[5, 7, 3, 4, 6]\n\n[25]\n\n[25, 49, 9, 16, 36]\n\n[625]\n\n[135]</pre></div></div>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Dává-li to smysl, můžete samozřejmě za sebou řetězit stejný dekorátor ^_~\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -141,9 +147,9 @@
       "idx": 12,
       "title": "Řetězení dekorátorů II",
       "tags": [
-        "Legendary"
+        "Skip"
       ],
-      "diff": null,
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Řetězení dekorátorů II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pro komplikovanější řetězení dekorátorů pak volání vypadá tak, jak jsme už viděli u <a href=\"?slajd=8\">předávání parametrů dekorátoru</a>. Například (bez invence přímo podle dokumentace)..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">@f1(arg)\n@f2\ndef func():\n    pass</pre>\r\n    <p>\r\n        je ekvivalentní tomutu kódu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">func():\n    pass\nfunc = f1(arg)(f2(func))</pre>\r\n    <p>\r\n        Volání komplikovanějších případů je snad z této ukázky a hlavně předchozího příkladu již celkem zřejmé: Parametrem dekorátoru je vždy funkce, tudíž čeká-li sám dekorátor nějaké řídicí parametry, musí vrátit funkci, jejímž parametrem teprve bude funkce následující.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        V tomto příkladu tedy volání <code>f1(arg)</code> vrátí funkci, která teprve slouží jako vlastní dekorátor funkce <code>f2</code> (která je zase vlastním dekorátorem původní funkce <code>func</code>).\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -152,9 +158,9 @@
       "idx": 13,
       "title": "Použití",
       "tags": [
-        "Legendary"
+        "Core"
       ],
-      "diff": null,
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Použití</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Python sám nabízí několik připravených dekorátorů. Asi nejviditelnější jsou dekorátory <code>@classmethod</code> a <code>@staticmethod</code> u tříd, které zajišťují, že příslušné metody třídy se nechovají jako instanční, ale jako třídní nebo statické.\r\n  </p>\r\n  \r\n\r\n  <p class=\"enumerate\">\r\n    Z předchozích příkladů je vidět, že častého použití by se mohly dekorátory dočkat např. u logovacích nebo debugovacích funkcí:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        dekorátor pro výpis informací o volaných funkcích;\r\n    </li>\r\n    <li>\r\n        dekorátor pro ukládání informací o volaných funkcích;\r\n    </li>\r\n    <li>\r\n        ...\r\n    </li>\r\n  </ul>\r\n\r\n  <p class=\"enumerate\">\r\n    Zcela typicky se s dekorátory setkáte v různých webových frameworcích, kde slouží k zajištění vybraných podmínek pro vstupní nebo návratové hodnoty funkcí. Typické příklady:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        funkci je možné vykonat pouze tehdy, je-li daný uživatel přihlášen do systému;\r\n    </li>\r\n    <li>\r\n        funkce musí v daném kontextu vracet řetězce bez formátovacích prvků;\r\n    </li>\r\n    <li>\r\n        ...\r\n    </li>\r\n  </ul>\r\n\r\n  <p class=\"enumerate\">\r\n    Kupříkladu v kontextu <a href=\"annotations.xml\">anotací funkcí</a> je možno dekorátory použít pro tak nepythoní věc jako je <a href=\"annotations.xml?slajd=7\">ověřování vstupních a výstupních typů</a>.\r\n  </p>\r\n\r\n</div>"
     },
@@ -163,9 +169,9 @@
       "idx": 14,
       "title": "Knihovna dekorátorů",
       "tags": [
-        "Legendary"
+        "Skip"
       ],
-      "diff": null,
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Knihovna dekorátorů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Když se podíváte na seznam vestavěných funkcí Python'u (třeba přes <code>dir(__builtins__)</code>), zjistíte kupříkladu, že známé třídní dekorátory <code>@classmethod</code> a <code>@staticmethod</code> jsou prostě jenom funkce v globálním jmenném prostoru. Další dekorátory se schovávají v různých modulech, např. <code>@contextlib.contextmanager</code>. Vzhledem k tomu, že dekorátory jsou vlastně „jenom“ funkce, není se moc čemu divit.\r\n    </p>\r\n    <p>\r\n        Pokud by vás ale zajímal nějaký ultimativnější přehled dekorátorů (převážně externích), podívejte se na oficiální <a href=\"https://wiki.python.org/moin/PythonDecoratorLibrary\" class=\"external\">Python Decorator Library</a>. Najdete tam spoustu zajímavého, mimo jiné i podstatně rozumnější dekorátory pro deskriptory, než je <a href=\"/materialy/python/objects/descriptors.xml?slajd=4\">oficiální verze</a>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -174,9 +180,11 @@
       "idx": 15,
       "title": "Poznámka k otisku funkce &amp; „@functools.wraps“",
       "tags": [
-        "Legendary"
+        "Core",
+        "WOW",
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Poznámka k otisku funkce &amp; „@functools.wraps“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Při použití dekorátorů je třeba pamatovat na to, že „obalovací“ mezifunkce <em>zcela nahradí</em> dekorovanou funkci. Což mimo jiné znamená, že pokud budeme dekorované funkci pomocí introspekce klást nějaké otázky o její identitě, dostaneme úplně jiné odpovědi – budou se totiž týkat identity dekorátoru!\r\n  </p>\r\n  \r\n  <p>\r\n    Jinými slovy – pokud se nebudete (hodně) snažit, použití dekorátoru zcela změní tzv. <strong>otisk funkce</strong> (<em>call signature</em>), tj. přibližně jméno funkce a seznam jejích argumentů.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Přepsat úplně celý otisk je dosti komplikované (pro jeho definici viz <a href=\"http://www.python.org/dev/peps/pep-0362/\" class=\"external\">PEP 362</a>). Ale pro začátek se můžete podívat třeba na kopírování dokumentačního řetězce <em>__doc__</em> nebo jména funkce <em>__name__</em>. A možná postačí dekorátor (sic :-) <a href=\"https://docs.python.org/3/library/functools.html?highlight=wraps#functools.wraps\" class=\"external\"><code>functools.wraps</code></a>:\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">            from functools import wraps\n\n            def dekorátor(funkce):\n                    @wraps(funkce)\n                    def _dekorátor(*args, **kwargs):\n                        ...\n                    return _dekorátor</pre>\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -185,9 +193,9 @@
       "idx": 16,
       "title": "Poznámka",
       "tags": [
-        "Legendary"
+        "Skip"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kromě běžného zápisu, který jsme celou dobu používali..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">            def dekorátor(funkce):\n                    def _dekorátor(*args, **kwargs):\n                        ...\n                    return _dekorátor</pre>\r\n    <p>\r\n        ..můžete tu vnitřní funkci klidně zapsat i bokem..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">            def _dekorátor(*args, **kwargs):\n                ...\n\n            def dekorátor(funkce):\n                    return _dekorátor</pre>\r\n    <p>\r\n        ..ale je vidět, že to je spíš pro zmatení nepřítele než k běžnému užitku.\r\n    </p>\r\n\r\n</div>"
     },
@@ -196,9 +204,9 @@
       "idx": 17,
       "title": "Poznámka k dekorování generátorů",
       "tags": [
-        "Legendary"
+        "Skip"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Poznámka k dekorování generátorů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož <a href=\"/materialy/python/generators/generators.xml\">generátory</a> se v Python'u zavádějí pomocí funkcí, dají se také odekorovat. Mezi generátory a funkcemi je však několik významných rozdílů, především:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Funkce se při každém svém volání provede celá od začátku do konce, vrátí návratovou hodnotu a ukončí se tím.\r\n        </li>\r\n        <li>\r\n            Generátor se provádí po částech, volá se opakovaně, pamatuje si stav předchozího „zamražení“ a ukončí se vyhozením výjimky <em>StopIteration</em>.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Z toho vyplývá, že ne všechno, co jsme si ukázali na předchozích slajdech půjde aplikovat úplně přímočaře i pro generátory – <strong>zatímco dekorátor funkce je sám funkcí, dekorátor generátoru musí být sám generátorem</strong>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Především tedy jedno konkrétní volání dekorované funkce se musí nahradit nějakou složitější konstrukcí, která generátor projde <em>yield</em> po <em>yield</em>u, až ho celý vyčerpá.\r\n    </div></div>\r\n\r\n</div>"
     }

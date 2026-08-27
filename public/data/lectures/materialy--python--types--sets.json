@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\n\n  <p>\n    Množina je neuspořádaná kolekce jedinečných a neměnných (<em>immutable</em>) hodnot. Tak trochu se o nich dá uvažovat jako o „slovnících bez hodnot“ – klíče ve slovníku jsou také jedinečné, musí být neměnné a jejich pořadí není určené<sup>*</sup>.\n  </p>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    <sup>*</sup> Respektive nebylo určené až do Python'u 3.7, od té doby tohle srovnání trochu pokulhává.\n  </div></div>\n  \n  <p>\n    Množiny v Python'u jsou jinak množinami v matematickém smyslu slova, takže na nich můžeme provádět standardní množinové operace, jako je například sjednocení, průnik nebo rozdíl.\n  </p>\n\n</div>"
     },
@@ -18,9 +18,10 @@
       "idx": 1,
       "title": "Zavedení – „set()“",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Zavedení – „set()“</h2></div><div class=\"section-body\">\n\n  <p class=\"enumerate\">\n    Množina je neuspořádaná kolekce jedinečných a neměnných (<em>immutable</em>) hodnot. K jejímu vytvoření slouží konstruktor <code>set()</code> nebo přímá notace za pomoci složených závorek:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = { 1, 2, 'ahoj', 3, 'b', }\n\n&gt;&gt;&gt; xs\n{3, 1, 2, 'b', 'ahoj'}\n\n&gt;&gt;&gt; type(xs)\n&lt;class 'set'&gt;</pre>\n  \n  <p class=\"enumerate\">\n    Stejně tak je možné vytvořit množinu z jiných datových typů, např. seznamu (který obsahuje pouze neměnné datové typy):\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = [ 1, 2, 'ahoj', 3, 'b', ]\n&gt;&gt;&gt; set(xs)\n{1, 2, 3, 'ahoj', 'b'}</pre>\n  \n</div>"
     },
@@ -29,9 +30,10 @@
       "idx": 2,
       "title": "Prázná množina (Pozor!)",
       "tags": [
+        "Core",
         "Tricky"
       ],
-      "diff": null,
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Prázná množina (Pozor!)</h2></div><div class=\"section-body\">\n  \n  <p>\n    Při pokusu o vytvoření <strong>prázdné množiny</strong> narazíme na historický pozůstatek (množiny se v Python'u objevily mnohem později než slovníky), který měl být podle mého vyřešen s příchodem Python'u 3.x, leč bohužel nebyl:\n  <p>\n  <blockquote>\n    Jelikož sekvence symbolů <code>{}</code> se z historických důvodů používá pro vytvoření prázdného slovníku (místo logičtějšího <code>{:}</code>), na množinu nám jaksi nic nezbylo (T_T)\n  </blockquote>\n  </p>\n    Musíme tedy chtě nechtě použít jen a pouze variantu s pomocí vytvořujicí funkce <code>set()</code>:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = set()\n&gt;&gt;&gt; xs\nset()\n\n&gt;&gt;&gt; type(xs)\n&lt;class 'set'&gt;</pre>\n\n</div>"
     },
@@ -40,18 +42,11 @@
       "idx": 3,
       "title": "Základní vlastnosti",
       "tags": [
-        "Already Studied"
+        "Core",
+        "WOW"
       ],
-      "diff": "basics",
-      "already_studied_in": {
-        "lecture_id": "lecture:materialy/python/types/frozensets.html",
-        "lecture_title": "„zmražené“ množiny",
-        "lecture_path": "vyuka_downloaded/materialy/python/types/frozensets.html",
-        "slide_id": "id4",
-        "slide_title": "Základní vlastnosti",
-        "week": 2,
-        "reason": "97% text similarity (67 shared concept words)"
-      },
+      "diff": "pythonic",
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Základní vlastnosti</h2></div><div class=\"section-body\">\n\n  <p class=\"enumerate\">\n    Ačkoli množiny nepatří mezi sekvence, některé z vlastností mají – díky své struktuře „balíků na hodnoty“ – společné:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = { 1, 2, 'ahoj', 3, 'b', }\n\n# dotaz na počet prvků\n&gt;&gt;&gt; len(xs)\n5\n\n# dotaz na výskyt prvku\n&gt;&gt;&gt; 'b' in xs\nTrue\n&gt;&gt;&gt; 5 in xs\nFalse</pre>\n  \n  <p class=\"enumerate\">\n    Podoba se vztahuje dokonce i na procházení prvků množiny smyčkou <em>for-in</em>, jen je příslušné procházení – podobně jako u slovníků – „náhodné“:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = { 1, 2, 'ahoj', 3, 'b', }\n\n&gt;&gt;&gt; for x in xs:\n...     print(x)\n...\n1\n2\n3\nahoj\nb</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Varianta s <em>enumerate()</em> funguje také, ale jelikož pořadí výpisu prvků je v podstatě „náhodné“, tak má poněkud omezenější použití, než u sekvenčních typů. Stejně tak samotný cyklus <em>for-in</em> najde využití spíše pro „množinové“ operace, kde nás zajímají vlastnosti či funkce prvků a nikoli jejich pořadí.\n  </div></div>\n\n</div>"
     },
     {
@@ -61,7 +56,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Přidávání prvků – „add()“, „update()“</h2></div><div class=\"section-body\">\n\n  <p>\n    Přidat prvky do množiny se dá dvěma způsoby:\n  </p>\n\n  <p class=\"enumerate\">\n    Metoda <code>add(PRVEK)</code> přebírá jeden prvek (libovolného typu) a pokud ještě v množině není, přidá ho tam:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = {1, 2.0, 'tři', }\n\n# přidání nového prvku\n&gt;&gt;&gt; xs.add('four')\n&gt;&gt;&gt; xs\n{'four', 1, 2.0, 'tři'}\n\n# pokus o přidání již existujícího prvku\n&gt;&gt;&gt; xs.add(1)\n&gt;&gt;&gt; xs\n{'four', 1, 2.0, 'tři'}</pre>\n\n  <p class=\"enumerate\">\n    Metoda <code>update(*others)</code> přebírá na vstupu jednu (nebo více) množin a postupně je prvek po prvku zanese do hlavní množiny:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = {'four', 1, 2.0, 'tři'}\n\n# přidání prvků z jedné množiny\n&gt;&gt;&gt; xs.update( {5, 'šest'} )\n&gt;&gt;&gt; xs\n{'four', 1, 2.0, 'šest', 'tři', 5}\n\n# přidání prvků ze dvou množin\n&gt;&gt;&gt; xs.update( {'sedm', 8.0,}, {9,} )\n&gt;&gt;&gt; xs\n{'four', 1, 2.0, 'šest', 'tři', 9, 8.0, 'sedm', 5}</pre>\n  <p>\n    Kromě toho dokáže zpracovat na vstupu i typy, které je možno na množiny převést, a s jejich prvky provede stejnou operaci. Například pro seznam:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = {1, 2.0, 'tři', }\n\n&gt;&gt;&gt; xs.update( ['four', 5, 1, 'tři',] )\n&gt;&gt;&gt; xs\n{'four', 1, 2.0, 'tři', 5}</pre>\n\n</div>"
     },
@@ -70,9 +65,10 @@
       "idx": 5,
       "title": "Odebírání prvků – „discard()“, „remove()“, „pop()“, „clear()“",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Odebírání prvků – „discard()“, „remove()“, „pop()“, „clear()“</h2></div><div class=\"section-body\">\n\n  <p>\n    Odebrat prvky z množiny je možné třemi rozdílnými způsoby:\n  </p>\n\n  <p class=\"enumerate\">\n    Metoda <code>discard(PRVEK)</code> se pokusí daný prvek odstranit z množiny. Pokud tam není, nic se nestane:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = {1, 2.0, 'tři', }\n\n# odstranění prvku\n&gt;&gt;&gt; xs.discard(2.0)\n&gt;&gt;&gt; xs\n{1, 'tři'}\n\n# pokus o odstranění neexistujícího prvku\n&gt;&gt;&gt; xs.discard(2.0)\n&gt;&gt;&gt; xs\n{1, 'tři'}</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Tudíž není-li pro vás případná neexistence odstraňovaného prvku v množině důležitá, použijete <em>discard()</em>.\n  </div></div>\n\n  <p class=\"enumerate\">\n    Metoda <code>remove(PRVEK)</code> dělá úplně to samé jako metoda <em>discard()</em>, ale zavoláte-li ji pro neexistující prvek, bude se na vás „zlobit“:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = {1, 2.0, 'tři', }\n\n# odstranění prvku\n&gt;&gt;&gt; xs.remove(2.0)\n&gt;&gt;&gt; xs\n{1, 'tři'}\n\n# pokus o odstranění neexistujícího prvku\n&gt;&gt;&gt; xs.remove(2.0)\nTraceback (most recent call last):\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\nKeyError: 2.0</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Tudíž potřebujete-li se při odstraňování prvku z množinu při jeho případné neexistenci zachovat jinak, použijete metodu <em>remove()</em>. Nebo se nejdřív pomocí operátoru <code>in</code>, resp. <code>not in</code>, zeptáte, zda daný prvek v množině je, resp. není.\n  </div></div>\n\n  <p class=\"enumerate\">\n    Metoda <code>x = xs.pop()</code> odstraňuje a zároveň vrací náhodný prvek z množiny. Pokus o odstranění prvku z prázdné množiny selže:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = {'tři', 1, 2.0, }\n&gt;&gt;&gt; xs\n{1, 2.0, 'tři'}\n\n# postupné odstraňování (a vracení) náhodných prvků množiny\n&gt;&gt;&gt; xs.pop()\n1\n&gt;&gt;&gt; xs.pop()\n2.0\n&gt;&gt;&gt; \n&gt;&gt;&gt; xs.pop()\n'tři'\n\n# pokus o odstranění (a vrácení) prvku z prázdné množiny\n&gt;&gt;&gt; xs.pop()\nTraceback (most recent call last):\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\nKeyError: 'pop from an empty set'</pre>\n  \n  <p class=\"enumerate\">\n    Celou množinu můžeme smazat pomocí její metody <code>clear()</code>:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs.clear()\n&gt;&gt;&gt; xs\nset()</pre>\n  \n  <hr>\n  \n  <p>\n    Kontrolní otázka: Pročpak nejde u množiny použít univerzální příkaz <code>del</code>?\n    \n  </p>\n\n</div>"
     },
@@ -81,9 +77,10 @@
       "idx": 6,
       "title": "Množinové operace – operátorově",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Množinové operace – operátorově</h2></div><div class=\"section-body\">\n\n  <p class=\"enumerate\">\n    Množiny podporují tradiční sadu množinových operací, a to hned ve dvou různých podobách. Více bližší jazyku matematiky (a tak nejspíš průhlednější) jsou množinové operace pomocí binárních operátorů:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># zaveďme dvě množiny jako uskupení jedinečných písmen ze dvou řetězců\n&gt;&gt;&gt; xs = set('abracadabra')\n&gt;&gt;&gt; ys = set('alabama')\n&gt;&gt;&gt; xs\n{'a', 'r', 'b', 'c', 'd'}\n&gt;&gt;&gt; ys\n{'a', 'b', 'm', 'l'}\n\n# PRŮNIK: písmena, která jsou zároveň v xs i ys\n&gt;&gt;&gt; xs &amp; ys\n{'a', 'b'}\n\n# SJEDNOCENÍ: písmena, která jsou v xs a v ys\n&gt;&gt;&gt; xs | ys\n{'a', 'c', 'b', 'd', 'm', 'l', 'r'}\n\n# ROZDÍL: písmena z xs, která nejsou v ys\n&gt;&gt;&gt; xs - ys\n{'c', 'r', 'd'}\n\n# SYMETRICKÝ ROZDÍL: písmena, která jsou buď pouze v xs nebo pouze v ys\n&gt;&gt;&gt; xs ^ ys\n{'c', 'd', 'm', 'l', 'r'}</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    (Upraveno podle množinového příkladu z dokumentace.)\n  </div></div>\n  \n  <p class=\"enumerate\">\n    Máme také k dispozici standardní dotazy na množiny:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = {'tři', 1, 2.0, }\n&gt;&gt;&gt; ys = {'tři', }\n\n# Je/není (vlastní) podmnožinou?\n&gt;&gt;&gt; ys &lt;= xs\nTrue\n&gt;&gt;&gt; ys &lt; xs\nTrue\n\n&gt;&gt;&gt; ys &lt;= ys\nTrue\n&gt;&gt;&gt; ys &lt; ys\nFalse\n\n# Je/není (vlastní) nadmnožinou?\n&gt;&gt;&gt; xs &gt;= ys\nTrue\n&gt;&gt;&gt; xs &gt; ys\nTrue\n\n# Je/není prvkem?\n&gt;&gt;&gt; 2.0 in xs\nTrue\n&gt;&gt;&gt; 2.0 not in xs\nFalse</pre>\n\n</div>"
     },
@@ -94,7 +91,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Množinové operace – metodami</h2></div><div class=\"section-body\">\n\n  <p>\n    Druhou variantu množinových operací představují metody objektů typu <em>množina</em>. Největším rozdílem oproti operátorovým verzím je, že jako své argumenty akceptují libovolné typy, ze kterých je možno „vyrobit“ množiny.\n  </p>\n  \n  <p class=\"enumerate\">\n    Následují příklady odpovídající operátorovým verzím z předchozího slajdu:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = set('abracadabra')\n&gt;&gt;&gt; ys = set('alabama')\n\n# PRŮNIK: písmena, která jsou zároveň v xs i ys [odpovídá operátoru &amp;]\n&gt;&gt;&gt; xs.intersection(ys)\n{'a', 'b'}\n\n# SJEDNOCENÍ: písmena, která jsou v xs a v ys [odpovídá operátoru |]\n&gt;&gt;&gt; xs.union(ys)\n{'a', 'c', 'b', 'd', 'm', 'l', 'r'}\n\n# ROZDÍL: písmena z xs, která nejsou v ys [odpovídá operátoru -]\n&gt;&gt;&gt; xs.difference(ys)\n{'c', 'r', 'd'}\n\n# SYMETRICKÝ ROZDÍL: písmena, která jsou buď pouze v xs nebo pouze v ys\n#                    [odpovídá operátoru ^]\n&gt;&gt;&gt; xs.symmetric_difference(ys)\n{'c', 'd', 'm', 'l', 'r'}</pre>\n  \n  <p class=\"enumerate\">\n    Totéž pro dotazy po vlastnostech množin:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = {'tři', 1, 2.0, }\n&gt;&gt;&gt; ys = {'tři', }\n\n# Je ys podmnožina xs/ys? [odpovídá operátoru &lt;=]\n&gt;&gt;&gt; ys.issubset(xs)\nTrue\n&gt;&gt;&gt; ys.issubset(ys)\nTrue\n\n# Je xs nadmnožina ys? [odpovídá operátoru &gt;=]\n&gt;&gt;&gt; xs.issuperset(ys)\nTrue</pre>\n  \n  <p class=\"enumerate\">\n    Navíc je k dispozici operace <code>isdisjoint()</code>, která nemá operátorovou variantu, a vrací <em>True</em>, pokud množiny nemají žádné společné prvky:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; {'tři', 1, 2.0, }.isdisjoint( {'tři', } )\nFalse\n\n&gt;&gt;&gt; {'tři', 1, 2.0, }.isdisjoint( {'four', 5, } )\nTrue</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Neboli <code>isdisjoint()</code> vrátí <em>True</em>, pokud množiny mají prázdný průnik, tj. platí <code>{'tři', 1, 2.0, }.isdisjoint( {'four', 5, } ) == ( {'tři', 1, 2.0, }.intersection( {'four', 5, } ) == set() )</code>\n  </div></div>\n\n</div>"
     },
@@ -105,7 +102,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Poznámky k operacím a metodám</h2></div><div class=\"section-body\">\n\n  <p>\n    Operace za metodou <code>update()</code> je v podstatě <em>sjednocení</em> více množin. Dá se tudíž zapsat oběma následujícími způsoby – pomocí metody a pomocí operátorů:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># sjednocení metodou\n&gt;&gt;&gt; xs = {'tři', 1, 2.0, }\n&gt;&gt;&gt; xs.update( {'four', 5, 1, 'tři'} )\n&gt;&gt;&gt; xs\n{'four', 1, 2.0, 'tři', 5}\n\n# sjednocení operátorem\n&gt;&gt;&gt; xs = {'tři', 1, 2.0, }\n&gt;&gt;&gt; xs |= {'four', 5, 1, 'tři'}\n&gt;&gt;&gt; xs\n{'four', 1, 2.0, 'tři', 5}</pre>\n  \n  <p>\n    Obdobné metody i operátorové zkratky máme k dispozici i pro další množinové operace – <em>průnik</em>, <em>rozdíl</em> a <em>symetrický rozdíl</em>:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># A1) společný průnik množin; operátorově\n&gt;&gt;&gt; xs = {'tři', 1, 2.0, }\n&gt;&gt;&gt; xs &amp;= {'four', 5, 'tři', 1} &amp; {'tři'}\n&gt;&gt;&gt; xs\n{'tři'}\n# A2) společný průnik množin; metodou\n&gt;&gt;&gt; xs = {'tři', 1, 2.0, }\n&gt;&gt;&gt; xs.intersection_update( {'four', 5, 'tři', 1}, {'tři'} )\n&gt;&gt;&gt; xs\n{'tři'}\n\n# B1) rozdíl množin; operátorově\n&gt;&gt;&gt; xs = {'tři', 1, 2.0, 'four', 5, 6.0, 'sedm', }\n&gt;&gt;&gt; xs -= {'four', 5} | {2.0}\n&gt;&gt;&gt; xs\n{1, 6.0, 'sedm', 'tři'}\n# B2) rozdíl množin; metodou\n&gt;&gt;&gt; xs = {'tři', 1, 2.0, 'four', 5, 6.0, 'sedm', }\n&gt;&gt;&gt; xs.difference_update( {'four', 5}, {2.0} )\n&gt;&gt;&gt; xs\n{1, 6.0, 'sedm', 'tři'}\n\n# C1) symetrický rozdíl množin; operátorově\n&gt;&gt;&gt; xs = {1, 'dva', 3.0, 'four', }\n&gt;&gt;&gt; xs ^= {1, 2.0, 'tři', 'four'}\n&gt;&gt;&gt; xs\n{2.0, 3.0, 'tři', 'dva'}\n# C2) symetrický rozdíl množin; metodou\n&gt;&gt;&gt; xs = {1, 'dva', 3.0, 'four', }\n&gt;&gt;&gt; xs.symmetric_difference_update( {1, 2.0, 'tři', 'four'} )\n&gt;&gt;&gt; xs\n{2.0, 3.0, 'tři', 'dva'}</pre>\n\n</div>"
     },
@@ -114,18 +111,10 @@
       "idx": 9,
       "title": "Kopie množiny – „copy()“",
       "tags": [
-        "Already Studied"
+        "Core"
       ],
-      "diff": "basics",
-      "already_studied_in": {
-        "lecture_id": "lecture:materialy/python/types/frozensets.html",
-        "lecture_title": "„zmražené“ množiny",
-        "lecture_path": "vyuka_downloaded/materialy/python/types/frozensets.html",
-        "slide_id": "id7",
-        "slide_title": "Kopie množiny",
-        "week": 2,
-        "reason": "78% text similarity (32 shared concept words)"
-      },
+      "diff": "pythonic",
+      "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Kopie množiny – „copy()“</h2></div><div class=\"section-body\">\n\n  <p>\n    Jako jedna z mála datových struktur nabízí množina i vlastní metodu pro tvorbu kopie – <code>copy()</code>. Narozdíl od slovníku však prvky množiny mohou být pouze <a href=\"_remarks.xml?slajd=7\">hešovatelné</a>, tedy <em>neproměnné</em> (<em>immutable</em>) typy, takže při kopírování nenarazíme na problém s <em>mělkou vs hlubokou kopií</em>:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = { 1, 2, 'ahoj', 3, 'b', }\n\n&gt;&gt;&gt; xs\n{3, 1, 2, 'b', 'ahoj'}\n\n&gt;&gt;&gt; ys = xs.copy()\n&gt;&gt;&gt; ys\n{'ahoj', 1, 2, 3, 'b'}\n\n&gt;&gt;&gt; xs.clear()\n&gt;&gt;&gt; ys\n{'ahoj', 1, 2, 3, 'b'}</pre>\n\n</div>"
     },
     {
@@ -133,9 +122,10 @@
       "idx": 10,
       "title": "Generátorová notace",
       "tags": [
+        "Core",
         "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Generátorová notace</h2></div><div class=\"section-body\">\n\n  <p>\n    Python 3 rozšířil generátorovou notaci – dostupnou dříve pouze u seznamů – na další dva typy. A jedním z nich je právě množina. Obecný konstruktor vypadá velmi podobně jako u seznamu:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">{ HODNOTA for I in SEKVENCE [if PODMÍNKA] }</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Jako u seznamu vnitřní závorky zde označují nepovinnou část výrazu. Důležité jsou složené závorky vnější, které (spolu s identifikátorem <em>HODNOTA</em>) určují, že jde o generátor množiny. První část <em>HODNOTA</em> může (ale také nemusí) být funkcí prvků procházené sekvence.\n  </div></div>\n\n  <p>\n    Jeden příklad přímo z dokumentace:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = {x for x in 'abracadabra' if x not in 'abc'}\n&gt;&gt;&gt; xs\n{'r', 'd'}</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Tedy: Z uvedeného řetězce <em>'abracadabra'</em> vybereme zástupce písmen (tj. každé písmeno právě jednou), ale pouze takové, které se nevyskytují v řetězci <em>'abc'</em>.\n  </div></div>\n\n</div>"
     }

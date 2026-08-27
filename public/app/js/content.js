@@ -450,6 +450,9 @@ export async function showPage(itemId, pageId) {
     const subTitle = page.title || pageId;
     document.title = item.weekNum != null ? `W${item.weekNum} • ${subTitle}` : `newpyt • ${subTitle}`;
 
+    const returnBreadcrumb = renderRecapReturnBreadcrumb(item);
+    if (returnBreadcrumb) main.appendChild(returnBreadcrumb);
+
     const hero = lectureHero(item, { compact: true });
     main.appendChild(hero);
 
@@ -539,6 +542,9 @@ export async function showFullContent(itemId) {
       return;
     }
   }
+
+  const returnBreadcrumb = renderRecapReturnBreadcrumb(item);
+  if (returnBreadcrumb) main.appendChild(returnBreadcrumb);
 
   const hero = lectureHero(item);
   hero.appendChild(lectureToolbar(item, "full"));
@@ -818,6 +824,60 @@ function resolveSlideDiff(slide, slug, pageId) {
   return slideDiff(slug, pageId);
 }
 
+function getRecapReturn() {
+  if (state.recapReturn) return state.recapReturn;
+  try {
+    const raw = sessionStorage.getItem("pcs_recap_return");
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return null;
+}
+
+function setRecapReturn(data) {
+  state.recapReturn = data;
+  try {
+    if (data) sessionStorage.setItem("pcs_recap_return", JSON.stringify(data));
+    else sessionStorage.removeItem("pcs_recap_return");
+  } catch {}
+}
+
+function renderRecapReturnBreadcrumb(currentItem) {
+  const ret = getRecapReturn();
+  if (!ret) return null;
+  // If we navigated back to the origin, dismiss the breadcrumb
+  if (ret.fromId === currentItem?.id && (!ret.fromPageId || ret.fromPageId === currentItem?.pageId)) {
+    setRecapReturn(null);
+    return null;
+  }
+
+  const bar = el("div", { className: "recap-return-floating-banner" });
+  const fromWeekStr = typeof ret.fromWeek === "number" ? (ret.fromWeek === 99 ? "Gray" : `W${ret.fromWeek}`) : "";
+  bar.innerHTML = `
+    <span class="recap-return-icon">↶</span>
+    <span class="recap-return-text">Přešli jste z: <strong>${fromWeekStr ? fromWeekStr + " " : ""}${escapeHtml(ret.fromTitle || "předchozího výkladu")}</strong> (slajd #${escapeHtml(ret.fromPageId || "1")})</span>
+    <button type="button" class="recap-return-btn" title="Vrátit se zpět na předchozí přednášku">
+      ← Zpět na původní místo
+    </button>
+    <button type="button" class="recap-return-dismiss" title="Zavřít" aria-label="Zavřít">×</button>
+  `;
+  const btn = bar.querySelector(".recap-return-btn");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const target = { ...ret };
+      setRecapReturn(null);
+      window.__pcsNavigate?.({ kind: target.fromKind || "lecture", id: target.fromId, pageId: target.fromPageId });
+    });
+  }
+  const close = bar.querySelector(".recap-return-dismiss");
+  if (close) {
+    close.addEventListener("click", () => {
+      setRecapReturn(null);
+      bar.remove();
+    });
+  }
+  return bar;
+}
+
 function resolveAlreadyStudied(slide, slug, pageId) {
   if (slide?.already_studied_in) return slide.already_studied_in;
   const key = `${slug}#${pageId}`;
@@ -851,17 +911,17 @@ function renderSlide(page, item, num) {
     recapBanner.innerHTML = `
       <span class="recap-pill">[JIŽ PROBRÁNO]</span>
       <span class="recap-desc">Tento výklad / příklad byl původně probrán v:</span>
-      <button type="button" class="recap-link-btn" title="Přejít na původní výklad">
+      <button type="button" class="recap-link-btn"
+        data-lecture-id="${escapeHtml(alreadyStudied.lecture_id)}"
+        data-slide-id="${escapeHtml(alreadyStudied.slide_id)}"
+        data-from-id="${escapeHtml(item.id)}"
+        data-from-title="${escapeHtml(item.title)}"
+        data-from-week="${escapeHtml(item.week != null ? String(item.week) : "")}"
+        data-from-page-id="${escapeHtml(page.id)}"
+        title="Přejít na původní výklad">
         <strong>${primWeek} ${escapeHtml(primLec)}</strong> (slajd #${escapeHtml(alreadyStudied.slide_id)}) →
       </button>
     `;
-    const linkBtn = recapBanner.querySelector(".recap-link-btn");
-    if (linkBtn && alreadyStudied.lecture_id) {
-      linkBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        window.__pcsNavigate?.({ kind: "lecture", id: alreadyStudied.lecture_id, pageId: alreadyStudied.slide_id });
-      });
-    }
     slide.appendChild(recapBanner);
   }
 
@@ -2108,3 +2168,30 @@ function renderLoginForm() {
 
   return card;
 }
+
+// Global click delegation for cross-lecture recap buttons
+if (typeof document !== "undefined") {
+  document.addEventListener("click", (e) => {
+    const recapBtn = e.target.closest(".recap-link-btn");
+    if (!recapBtn) return;
+    e.preventDefault();
+    const lectureId = recapBtn.getAttribute("data-lecture-id");
+    const slideId = recapBtn.getAttribute("data-slide-id");
+    const fromId = recapBtn.getAttribute("data-from-id");
+    const fromTitle = recapBtn.getAttribute("data-from-title");
+    const fromWeek = recapBtn.getAttribute("data-from-week");
+    const fromPageId = recapBtn.getAttribute("data-from-page-id");
+
+    if (lectureId) {
+      setRecapReturn({
+        fromKind: "page",
+        fromId,
+        fromTitle,
+        fromWeek: fromWeek !== "" ? Number(fromWeek) : null,
+        fromPageId,
+      });
+      window.__pcsNavigate?.({ kind: "lecture", id: lectureId, pageId: slideId });
+    }
+  });
+}
+
