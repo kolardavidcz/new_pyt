@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Python ve velkém podporuje <strong>introspekci</strong> (též známo jako <em>reflexe</em>), tj. zjišťování, které atributy a metody jsou na objektu definované, zda je objekt potomkem nějakého rodiče (a kterého) apod. Přístup k podobným informacím je umožněn v zásadě dvěma způsoby – pomocí vestavěných funkcí a pomocí „navigace“ přes <em>magické atributy/metody</em> (to jsou ty se jménem z obou stran dvojpodtržítkovaným).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Ostatně vestavěné funkce často fungují právě tak, že volají některou z „magických“ metod nebo operují nad některými „magickými“ daty.\r\n  </div></div>\r\n  <p>\r\n    Obecně bychom introspekci objektu mohli charakterizovat jako hledání odpovědí na následující otázky:\r\n  </p>\r\n  <ul>\r\n    <li>Jak se jmenuješ?</li>\r\n    <li>Co jsi vlastně za objekt?</li>\r\n    <li>Co víš?</li>\r\n    <li>Co umíš?</li>\r\n    <li>Kdo jsou tví rodiče?</li>\r\n  </ul>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Zdroj: <a href=\"http://www.ibm.com/developerworks/library/l-pyint.html\" class=\"external\">http://www.ibm.com/developerworks/library/l-pyint.html</a>\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -18,10 +18,18 @@
       "idx": 1,
       "title": "Testovací struktura",
       "tags": [
-        "Skip"
+        "Already Studied"
       ],
-      "diff": null,
-      "already_studied_in": null,
+      "diff": "basics",
+      "already_studied_in": {
+        "lecture_id": "lecture:materialy/python/objects/oop.html",
+        "lecture_title": "Třídy a konstruktory (OOP)",
+        "lecture_path": "vyuka_downloaded/materialy/python/objects/oop.html",
+        "slide_id": "id2",
+        "slide_title": "Ukázková struktura",
+        "week": 6,
+        "reason": "Identický kód a příklad (Testovací struktura)"
+      },
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Testovací struktura</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Protože vestavěné objekty, na které bychom se mohli dívat, obsahují většinou <em>velmi mnoho</em> podobjektů, ukázkové příklady v této přednášce budou obsahovat starý známý testovací modul <em>skola</em>, jehož struktura je následující:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false;\">class Člověk():\n        \"\"\"Objektová reprezentace člověka.\"\"\"\n\n        def __init__(self, jméno, datum_narození, krevní_skupina):\n                self.jméno = jméno\n                self.datum_narození = datum_narození\n                self.krevní_skupina = krevní_skupina\n\nclass Školák(Člověk):\n        \"\"\"Objektová reprezentace školáka.\"\"\"\n\n        školáků = 0\n\n        def __init__(self, jméno, datum_narození, krevní_skupina, třída, předměty):\n            Člověk.__init__(self, jméno, datum_narození, krevní_skupina)\n            #super().__init__(jméno, datum_narození, krevní_skupina)\n            self.třída = třída\n            self.předměty = předměty\n            self.přidej_školáka()\n\n        @classmethod\n        def přidej_školáka(cls):\n            cls.školáků += 1\n\n        def průměrná_známka(self):\n            \"\"\"Vrací průměr všech známek studenta.\"\"\"\n            součet = 0\n            for předmět in self.předměty:\n                    součet += self.předměty[předmět]\n            return součet / len(self.předměty)\n\nclass Učitel(Člověk):\n        \"\"\"Objektová reprezentace učitele.\"\"\"\n\n        def __init__(self, jméno, datum_narození, krevní_skupina, třída, předměty, výplata):\n            Člověk.__init__(self, jméno, datum_narození, krevní_skupina)\n            #super().__init__(jméno, datum_narození, krevní_skupina)\n            self.třída = třída\n            self.předměty = předměty\n            self.výplata = výplata</pre>\r\n  <p>\r\n    Přitom zavedeme jednu instanci jménem <em>alisa</em> tímto způsobem:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">alisa = Školák(\n            'Алиса Селезнева',\n            '2065-11-17',\n            '0',\n            '3. A',\n            {'matematika': 1, 'zeměpis': 1, }\n        )</pre>\r\n\r\n</div>"
     },
     {
@@ -31,7 +39,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">[I] print() &amp; __str__()</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Jakousi základní introspekci poskytuje už samotný interpretr Python'u. Zadání jména objektu na příkazové řádce interpretru způsobí  vypsání jakési jeho základní hodnoty (často reprezentované jeho magickým atributem <code>__str__()</code>), která nám už sama o objektu mnohé napoví.\r\n  </p>\r\n  <p>\r\n    Při našem předchozím příkladu s Alisou bude např. platit:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">print(alisa)   --&gt;   &lt;__main__.Školák object at 0x00C72890&gt;</pre>\r\n  <p>\r\n    PS: Kromě funkce <em>print()</em> využívá tuto magickou metodu především také funkce <em>str()</em> a <em>format()</em>.\r\n  </p>\r\n\r\n</div>"
     },
@@ -43,7 +51,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">[I] __repr__()</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jak už to tak bývá, skutečnost je zamotanější – ve výchozím nastavení na objektech totiž metoda <em>__str__()</em> zavolá metodu <em>__repr__()</em> (kterou jinak volá vestavěná funkce <em>repr()</em>), takže jejich výstup je stejný.\r\n    </p>\r\n    <p>\r\n        Ale to je pravda jenom pro potomky základního objektu <code>object</code>, pro jiné typy je mezi nimi rozdíl – je-li to pro daný objekt/typ jen trochu možné, měla by metoda <em>___repr__()</em> vracet řetězcovou reprezentaci objektu v podobě pythoního výrazu, takže by jejím přímým použitím (v příslušném běhovém prostředí) mělo jít objekt přímo rekonstruovat.\r\n    </p>\r\n    <p>\r\n        Kde uvedená reprezentace není možná, obdržíme typickou hlášku v podobě <code>&lt; popis objektu &gt;</code> .\r\n    </p>\r\n\r\n</div>"
     },
@@ -52,9 +60,10 @@
       "idx": 4,
       "title": "[I] help()",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">[I] help()</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Za asi nejutajenějšího kandidáta na prvek jazyka, který <em>velmi</em> využívá vlastností a schopností introspekce u Python'u, však může být pravděpodobně pokládána funkce <code>help()</code>. Ta totiž dohledává většinu svých informací v rámci dokumentačních řetězců kódu, které jsou přístupné přes magický atribut <code>__doc__</code> jednotlivých objektů.\r\n  </p>\r\n  <p>\r\n    Při pokračování příkladu s Alisou bude např. platit:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># dokumentační řetězec vlastní třídy i instance 'alisa' je stejný\nŠkolák.__doc__             --&gt;   \"Objektová reprezentace školáka.\"\nalisa.__doc__              --&gt;   \"Objektová reprezentace školáka.\"\n\n# přitom atribut __class__ instance odkazuje právě na odpovídající třídu, takže:\nalisa.__class__.__doc__    --&gt;   \"Objektová reprezentace školáka.\"</pre>\r\n\r\n</div>"
     },
@@ -66,7 +75,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">[I] id()</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Mezi introspekční nástroje můžeme počítat též funkci <code>id(OBJEKT)</code>. Ta vrací identifikátor objektu, který je po dobu jeho života konstantní a jedinečný (typicky odpovídá jeho adrese v paměti). Například v rámci stejného běhu testovacího programu jako výše vrátila funkce <em>id()</em> toto:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">id(alisa)   --&gt;   13052048</pre>\r\n  <br>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Jinak ale dva různé objekty existující v různou dobu mohou dávat stejná <em>id()</em>:\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \"># ID je znovuvyužito (vytvořený seznam je zase hned zahozen)\n&gt;&gt;&gt; for i in range(3):\n...     print(id([]))\n1803625557440\n1803625557440\n1803625557440\n\n# ID se střídá ('x' bude existovat i po konci smyčky)\n&gt;&gt;&gt; for i in range(5):\n...     x = []\n...     print(id(x))\n1803624687488\n1803625557376\n1803624687488\n1803625557376\n1803624687488</pre>\r\n    PS: V kontrastu s tím <code>hash()</code> poskytuje pro každý objekt pochopitelně vždy jedinečné číslo.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -78,7 +87,7 @@
         "Core",
         "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">[II] dir() (a)</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Pravděpodobně zdaleka nejpoužívanějším introspekčním nástrojem (alespoň na příkazové řádce a při „od[brouk/mouch]ovávání“) bude funkce <em>dir()</em>. Ta vrací (jako řetězce) seznam všech (nedynamicky vytvořených) atributů přítomných na daném objektu.\r\n  </p>\r\n  <p>\r\n    V našem příkladu s Alisou obdržíme na dotaz <code>dir(alisa)</code> odpověď:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__',\n'__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__le__',\n'__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__',\n'__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__',\n'__weakref__', 'datum_narození', 'jméno', 'krevní_skupina', 'průměrná_známka',\n'předměty', 'přidej_školáka', 'třída', 'školáků']</pre>\r\n  <p>\r\n    Kromě námi vytvořených atributů se objekt <em>alisa</em> jen velmi málo liší od vlastností všech objektů, které zajišťuje jejich společný předek <em>object</em>, jak nám ukáže dotaz <code>dir(object)</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">['__class__', '__delattr__', '__doc__', '__eq__', '__format__', '__ge__',\n'__getattribute__', '__gt__', '__hash__', '__init__', '__le__', '__lt__',\n'__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__',\n'__sizeof__', '__str__', '__subclasshook__']</pre>\r\n\r\n</div>"
     },
@@ -89,7 +98,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">[II] dir() (b)</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Veškeré odlišnosti mezi obecným a konkrétním objektem přitom padají na vrub zavedení nového objektu s vlastními atributy:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      <code>__dict__</code> – slovník jmenného prostoru třídy; tj. atributy a jejich hodnoty;\r\n    </li>\r\n    <li>\r\n      <code>__module__</code> – jméno modulu, v němž byla třída definována;\r\n    </li>\r\n    <li>\r\n      <code>__weakref__</code> – signalizace přítomnosti podpory pro <em>weak references</em> u instance<sup>¨*</sup>.\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    Odpovídající hodnoty pro testovací příklad jsou:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">__dict__      --&gt;   {'jméno': 'Алиса Селезнева', 'třída': '3. A',\n                    'předměty': {'zeměpis': 1, 'matematika': 1},\n                    'datum_narození': '2065-11-17', 'krevní_skupina': '0'}\n__module__    --&gt;   __main__\n__weakref__   --&gt;   None</pre>\r\n  <br>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    <sup>*</sup> Python umožňuje odkazovat na (některé) objekty nejen klasicky „natvrdo“, ale též „slabě“ pomocí <em>weak references</em>. Objekt, na nějž odkazují už pouze <em>weak references</em>, může být při nejbližším běhu <em>garbage collector</em>u „zlikvidován“.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -100,7 +109,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">[II] callable()</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Funkce <code>dir()</code> vrací přehled atributů daného objektu jako obyčejný seznam řetězců bez jakéhokoliv bližšího rozlišení. Můžeme nějak snadno rozlišit mezi atributy datovými a metodami? Ano, pomocí funkce <code>callable()</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">callable(alisa.školáků)         --&gt;   False\ncallable(alisa.přidej_školáka)  --&gt;   True</pre>\r\n  <br>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Historickou shodou okolností se při přípravě Python'u 3.0 dospělo k závěru, že každý správný pythonista bude tuto informaci zjišťovat za pomoci vhodné <em>ABC</em> (tj. <em>abstract base class</em>), tedy konstrukcí <code>isinstance(x, collections.Callable)</code>. Překvapivě od Python'u 3.2 je vše zase zpátky při starém a znovu si vystačíme pouze s voláním funkce <code>callable(x)</code> ^_~\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -112,7 +121,7 @@
         "Core",
         "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">[II] getattr() &amp; hasattr()</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Použití <em>callable()</em> pro zjištění „volatelnosti“ atributu (nebo obecně jakéhokoliv objektu) je sice pěkné, ale jak nám pomůže, když <em>dir()</em> poskytuje odpovědi jako řetězce, ale <em>callable()</em> očekává referenci na objekt? Se záchranou přichází funkce <code>getattr(OBJEKT, \"atribut\")</code> (atribut je tedy zadáván jako <em>řetězec</em>). Volání této funkce je vlastně ekvivalentní zavolání <code>OBJEKT.atribut</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># Jelikož platí..\nalisa.školáků               --&gt;   1\ngetattr(alisa, 'školáků')   --&gt;   1\n\n# ..tak není divu, že:\nalisa.školáků == getattr(alisa, 'školáků')   --&gt;   True</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Plná možnost volání uvedené funkce je <code>getattr(OBJEKT, \"ATRIBUT\", default)</code>, přičemž <em>default</em> je vrácen místo hodnoty <code>OBJEKT.ATRIBUT</code>, není-li tato k dispozici. Pokud <em>default</em> neuvedete a atribut uvedeného jména na objektu neexistuje, obdržíte výjimku <code>AttributeError</code>.\r\n  </div></div>\r\n\r\n  <p class=\"enumerate\">\r\n    Funkce <em>getattr()</em> má sourozence – <code>hasattr(OBJEKT, \"atribut\")</code>. Ta slouží ke zjištění, zda daný objekt má atribut uvedeného jména (a tak je podstatně vhodnějším kandidátem na použití v programu, než procházení návratového seznamu funkce <em>dir()</em>):\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">hasattr(alisa, 'školáků')          --&gt;   True\nhasattr(alisa, 'přidej_školáky')   --&gt;   False</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Mimochodem funkce <em>hasattr()</em> je implementována pomocí funkce <em>getattr()</em> – prostě se pokusí daný atribut získat a zachová se podle toho, zda obdrží výjimku nebo ne.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -123,7 +132,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">[II] Poznámka – setattr()</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Funkce <em>hasattr()</em> a <em>getattr()</em> mají ještě třetího sourozence, který však už nemá moc společného s introspekcí. Je jím funkce <code>setattr(OBJEKT, \"atribut\", hodnota)</code> plnící funkci nastavení hodnoty atributu, jehož jméno je zadáno jako řetězec:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># výchozí hodnota\nalisa.krevní_skupina   --&gt;   0\n\n# „klasické“ nastavení hodnoty atributu\nalisa.krevní_skupina = 'A'\nalisa.krevní_skupina   --&gt;   A\n\n# použití funkce setattr()\nsetattr(alisa, 'krevní_skupina', 'B')\nalisa.krevní_skupina   --&gt;   B</pre>\r\n\r\n</div>"
     },
@@ -132,9 +141,10 @@
       "idx": 11,
       "title": "[II] Poznámka – __dict__ &amp; singletony",
       "tags": [
-        "Tricky"
+        "Tricky",
+        "Skip"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">[II] Poznámka – __dict__ &amp; singletony</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <strong>Slovník jmenného prostoru třídy</strong> <code>__dict__</code> můžeme použít k přímému (a tedy dosti neklasickému) přístupu na atributy objektu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">alisa.__dict__['jméno']      --&gt;   Алиса Селезнева\nalisa.__dict__['příjmení']   --&gt;   KeyError: 'příjmení'</pre>\r\n    <p>\r\n        Jako u mnoha jiných dvojpodtržítkovaných atributů tohle normálně <em>nebudete</em> chtít dělat, ale sakra se to hodí například při definici singletonových atributů na objektu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">def __setattr__(self, name, value):\n    if name in self.__dict__:\n        raise SingletonError\n    else:\n        self.__dict__[name] = value</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        To je samozřejmě pouze fragment kódu – chybí třída okolo i definice výjimky <em>SingletonError</em>.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -143,9 +153,10 @@
       "idx": 12,
       "title": "[II] Poznámka – __slots__",
       "tags": [
+        "Core",
         "Tricky"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">[II] Poznámka – __slots__</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož <code>__dict__</code> jako slovník je poměrně náročná paměťová struktura, existuje pro třídy s malým počtem vlastních atributů a naopak velkým počtem instancí (tisíce či milióny) obezlička pro interpret CPython<sup>*</sup> v podobě jednodušší datové struktury, a to tzv. <code>__slots__</code>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jiné interpretry, kupříkladu <a href=\"http://pypy.org\" class=\"external\">PyPy</a>, <a href=\"http://tech.oyster.com/save-ram-with-python-slots/\" class=\"external\">zjevně dělají podobnou optimalizaci automaticky</a>.\r\n    </div></div>\r\n    <p>\r\n        Zavedení <code>__slots__</code> na třídě způsobí, že na jejích instancích <strong>nebudou vůbec vytvářeny</strong> „magické“ atributy <code>__dict__</code> a <code>__weakref__</code>, což dokáže ušetřit spoustu místa. Kromě toho to ale také způsobí celou další armádu vedlejších efektů, které docela spolehlivě nabourají nejen introspekci a přístup k atributům (například slovník se dá rozšiřovat, ale sloty ne), proto je jejich použití pochopitelně velmi speciální a nemáte-li pro něj safra dobrý důvod, měli byste se mu vyhnout.\r\n    </p>\r\n    \r\n\r\n</div>"
     },
@@ -156,7 +167,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">[III] type()</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Mnoho dalších „klasických“ introspekčních vestavěných funkcí jsme už potkali. Zcela typickou je např. funkce <code>type(OBJEKT)</code>, která vrací typ daného objektu. Návratová hodnota je typový objekt a většinou odpovídá objektu v <code>OBJEKT.__class__</code>.\r\n  </p>\r\n  <p>\r\n    Při našem předchozím příkladu s Alisou bude např. platit:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># 'alisa' je instance třídy typu Školák a jako taková má i stejný typ\nalisa.__class__                  --&gt;   &lt;class '__main__.Školák'&gt;\ntype(alisa)                      --&gt;   &lt;class '__main__.Školák'&gt;\ntype(alisa) == alisa.__class__   --&gt;   True\n\n# jméno třídy, do které 'alisa' patří, je právě Školák\nalisa.__class__.__name__   --&gt;   \"Školák\"</pre>\r\n\r\n</div>"
     },
@@ -165,9 +176,10 @@
       "idx": 14,
       "title": "[III] isinstance()",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">[III] isinstance()</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Pro testování typu objektu se však nejčastěji používá funkce <code>isinstance(OBJEKT, TŘÍDA)</code>, protože bere v potaz celý řetězec dědičnosti, jak ukazují následující příklady:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># 'alisa' je instance třídy Školák a je to i její skutečná třída\nisinstance(alisa, Školák)   --&gt;   True\nalisa.__class__ == Školák   --&gt;   True\n\n# 'alisa' je též instancí předka Člověk, ale její skutečná třída je jiná\nisinstance(alisa, Člověk)   --&gt;   True\nalisa.__class__ == Člověk   --&gt;   False\n\n# 'alisa' pochopitelně není instancí třídy Učitel\nisinstance(alisa, Učitel)   --&gt;   False</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Druhým parametrem funkce <em>isinstance()</em> nemusí být nutně přímo třída, ale též například n-tice tříd. Koho zajímají podrobnosti, podívá se do dokumentace.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -178,7 +190,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">[III] issubclass()</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Pokud nás budou zajímat čistě „dědičné“ vlastnosti objektů, použijeme funkci <code>issubclass(OBJEKT, TŘÍDA)</code>. Například při pokračování v našem předchozím příkladu s Alisou bude pro vzájemné vztahy mezi třídami platit:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># Školák je potomkem Člověka, Učitel Školáka však nikoli (je to jeho „sourozenec“)\nissubclass(Školák, Člověk)   --&gt;   True\nissubclass(Učitel, Školák)   --&gt;   False\n\n# možná poněkud překvapivě jsou třídy pokládány za svoje vlastní podtřídy\nissubclass(Školák, Školák)   --&gt;   True</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Jako u <em>isinstance()</em> druhým parametrem funkce <em>issubclass()</em> nemusí být nutně přímo třída, ale též například n-tice tříd. Koho zajímají podrobnosti, podívá se do dokumentace.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -187,9 +199,10 @@
       "idx": 16,
       "title": "Příklad",
       "tags": [
-        "Skip"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Příklad</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Použijme (mírně upravený) příklad z <a href=\"http://www.ibm.com/developerworks/library/l-pyint.html\" class=\"external\">http://www.ibm.com/developerworks/library/l-pyint.html</a>. Funkce <em>interrogate()</em>..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false;\">def interrogate(item):\n    \"\"\"Print useful information about item.\"\"\"\n\n    if hasattr(item, '__name__'):\n        print(\"NAME:     \", item.__name__)\n\n    if hasattr(item, '__class__'):\n        print(\"CLASS:     \", item.__class__.__name__)\n\n    print(\"ID:     \", id(item) )\n\n    print(\"TYPE:    \", type(item) )\n\n    print(\"VALUE:   \", repr(item) )\n\n    print(\"CALLABLE: \", end='')\n    if callable(item):\n        print(\"Yes\")\n    else:\n        print(\"No\")\n\n    if hasattr(item, '__doc__') and getattr(item, '__doc__') != None:\n        doc = getattr(item, '__doc__')\n        doc = doc.strip()   # Remove leading/trailing whitespace.\n        firstline = doc.split('\\n')[0]\n        print(\"DOC:     \", firstline)</pre>\r\n  <p>\r\n    ..dává při následujícím volání..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false;\">from interrogate import interrogate\n\ninterrogate('řetězec')\nprint()\ninterrogate(42)\nprint()\ninterrogate(interrogate)</pre>\r\n  <p>\r\n    ..výstup:\r\n  </p>\r\n  <pre class=\"brush: plain; gutter: false; toolbar: false;\">CLASS:      str\nID:      134801966144592\nTYPE:     &lt;class 'str'&gt;\nVALUE:    'řetězec'\nCALLABLE: No\nDOC:      str(object='') -&gt; str\n\nCLASS:      int\nID:      11371344\nTYPE:     &lt;class 'int'&gt;\nVALUE:    42\nCALLABLE: No\nDOC:      int([x]) -&gt; integer\n\nNAME:      interrogate\nCLASS:      function\nID:      134801966687760\nTYPE:     &lt;class 'function'&gt;\nVALUE:    &lt;function interrogate at 0x7a9a0756e610&gt;\nCALLABLE: Yes\nDOC:      Print useful information about item.</pre>\r\n  \r\n  \r\n  <p>\r\n    Jak poznamenává uvedený zdroj: <em>„Můžeme vyslýchat dokonce sami sebe – lepší už to nebude.“</em> ^_^\r\n  </p>\r\n  \r\n\r\n</div>"
     }

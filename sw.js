@@ -3,7 +3,7 @@
  * Enables sub-10ms instant warm loading, offline support, and intelligent caching.
  */
 
-const CACHE_NAME = "pyt-v2-cache-v1";
+const CACHE_NAME = "pyt-v2-cache-v2";
 
 const CORE_SHELL_ASSETS = [
   "/",

@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Struktury, po kterých se dá iterovat, patří ke zcela základním stavebním kamenům jazyka Python. A iterovat se v Python'u dá opravdu skoro po všem, jak dokumentuje pár následujících příkladů:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">for znak in \"ahoj\":\n    ...\n\nfor prvek in [1, 2, 3, 4, 5]:\n    ...\n\nfor klíč in {'one': 1, 'two': 2, }:\n    ...\n\nfor řádka in open('soubor.txt'):\n    ...</pre>\r\n  <p>\r\n    V pozadí za touto pro jazyk zcela základní funkcionalitou stojí tzv. <em>iterátory</em>.\r\n  </p>\r\n\r\n</div>"
     },
@@ -20,7 +20,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Chování iterátorů I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Prozkoumejme, co činí iterátor iterátorem. Na příkladu řetězce je výsledné chování známé a následující:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; text = \"ahoj\"\n&gt;&gt;&gt; for znak in text:\n...     print(znak)\na\nh\no\nj</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Smyčka <em>for-in</em> se stará o „výrobu“ iterátorů tak říkajíc „za běhu“.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -29,9 +29,10 @@
       "idx": 2,
       "title": "Chování iterátorů II",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Chování iterátorů II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Ve skutečnosti se na pozadí smyčky <em>for-in</em> postupně provedou následující kroky:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># Vstupní objekt (zde řetězec), po kterém chceme iterovat:\n&gt;&gt;&gt; txt = \"ahoj\"\n\n# Řetězce mají k dispozici „magickou metodu“ __iter__()..\n&gt;&gt;&gt; txt.__iter__\n&lt;method-wrapper '__iter__' of str object at 0x00D682A0&gt;\n# ..která se používá pro konstrukci iterátoru:\n&gt;&gt;&gt; it = iter(txt)\n&gt;&gt;&gt; it\n&lt;str_iterator object at 0x00DAE030&gt;\n\n# Na iterátorech je pak definována „magická metoda“ __next__()..\n&gt;&gt;&gt; it.__next__\n&lt;method-wrapper '__next__' of str_iterator object at 0x00DAE030&gt;\n# ..která vrací následující prvek:\n&gt;&gt;&gt; next(it)\n'a'\n&gt;&gt;&gt; next(it)\n'h'\n&gt;&gt;&gt; next(it)\n'o'\n&gt;&gt;&gt; next(it)\n'j'\n\n# Je-li iterátor vyčerpán, obdržíme při pokusu o získání jeho dalšího prvku\n#    výjimku StopIteration:\n&gt;&gt;&gt; next(it)\nTraceback (most recent call last):\n  File \"&lt;pyshell#10&gt;\", line 1, in &lt;module&gt;\nnext(it)\nStopIteration</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Tedy funkce <code>iter()</code> zavolá metodu <code>__iter__()</code> daného objektu, zatímco funkce <code>next()</code> volá metodu <code>__next__()</code> vytvořeného iterátoru.\r\n  </div></div>\r\n  \r\n  <p>\r\n    Smyčka <em>for-in</em> tedy na pozadí pomocí funkce <code>iter()</code> vytvořila z „předhozeného“ objektu iterátor, po kterém následně pomocí volání <code>next()</code> postupně procházela prvek po prvku, dokud nenarazila na výjimku <code>StopIteration</code>, na které ukončila svoji činnost.\r\n  </p>\r\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n      Pozor – <em>for-in</em> opravdu <code>__iter__()</code> potřebuje, samotné <code>__next__()</code> nestačí! (Ručně pomocí <code>next()</code> si ale můžete iterovat i bez něho.)\r\n    </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n      PS: V Python'u 2.x se metoda iterátoru pro vrácení dalšího prvku jmenovala zcela nekonzistentně pouze <em>next()</em> (tedy bez podtržítek) a volala se přímo na příslušné instanci.\r\n    </div></div></div>\r\n\r\n</div>"
     },
@@ -40,9 +41,10 @@
       "idx": 3,
       "title": "Poznámky",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Poznámky</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Je zřejmé, že aby se objekt choval jako iterátor, musí definovat metodu <em>__next__()</em> pro vrácení dalšího prvku sekvence. Ve většině případů je tato metoda definována přímo na příslušném objektu, pak tudíž stačí, aby metoda <em>__iter__()</em> vracela přímo tento objekt.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Někdy se může hodit, aby iterování po objektu definoval objekt jiný.\r\n  </div></div>\r\n  <p class=\"enumerate\">\r\n    V případě konečného iterátoru se musí objekt postarat i o vrácení výjimky <em>StopIteration</em> ve správnou chvíli.\r\n  </p>\r\n  \r\n  <p>\r\n    <strong>Poznámka:</strong> Vytvořit iterátor na objektové úrovni tedy zahrnuje trochu víc práce. Pro mnoho aplikací si však vystačíme s použitím generátorů, které se o tvorbu iterátorů starají automaticky.\r\n  </p>\r\n\r\n</div>"
     },
@@ -51,11 +53,18 @@
       "idx": 4,
       "title": "Nekonečný generátor…",
       "tags": [
-        "Core",
-        "WOW"
+        "Already Studied"
       ],
-      "diff": null,
-      "already_studied_in": null,
+      "diff": "pythonic",
+      "already_studied_in": {
+        "lecture_id": "lecture:materialy/python/generators/generators.html",
+        "lecture_title": "Generátory (funkce s yield)",
+        "lecture_path": "vyuka_downloaded/materialy/python/generators/generators.html",
+        "slide_id": "id13",
+        "slide_title": "Nekonečné generátory",
+        "week": 5,
+        "reason": "Identický kód a příklad (Nekonečné generátory)"
+      },
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Nekonečný generátor…</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Pro srovnání se podívejme na příklad <em>nekonečného</em> generátoru a iterátoru pro generování sudých čísel. Začneme <strong>generátorem</strong>:\r\n  </p>\r\n  \r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; def sudá_čísla():\n...     číslo = 0\n...     while True:\n...         číslo += 2\n...         yield číslo\n\n&gt;&gt;&gt; g = sudá_čísla()\n&gt;&gt;&gt; next(g)\n2\n&gt;&gt;&gt; next(g)\n4\n&gt;&gt;&gt; next(g)\n6</pre>\r\n\r\n</div>"
     },
     {
@@ -65,7 +74,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">…a nekonečný iterátor</h2></div><div class=\"section-body\">\r\n\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class SudáČísla:\n...     \"Iterátor generující sudá čísla.\"\n... \n...     def __init__(self):\n...         self.číslo = 0\n... \n...     def __iter__(self):\n...         return self\n... \n...     def __next__(self):\n...         self.číslo += 2\n...         return self.číslo\n\n&gt;&gt;&gt; sc = SudáČísla()\n&gt;&gt;&gt; sc\n&lt;__main__.SudáČísla object at 0x00DC62B0&gt;\n\n&gt;&gt;&gt; it = iter(sc)\n&gt;&gt;&gt; it\n&lt;__main__.SudáČísla object at 0x00DC62B0&gt;\n\n&gt;&gt;&gt; next(it)\n2\n&gt;&gt;&gt; next(it)\n4\n&gt;&gt;&gt; next(it)\n6</pre>\r\n\r\n  <p>\r\n    V porovnání velmi jednoduchá generátorová notace v sobě zahrnuje celou mašinérii, kterou je jinak pro vytvoření obdobně se chovajícího objektu potřeba vytvořit. V případě nekonečného generátoru sice odpadá vyvolání výjimky <code>StopIteration</code> po vyčerpání dat pro iteraci, ale zavedení obslužných metod iterace (<code>__iter__()</code> a <code>__next__()</code>) a uložení lokálních proměnných a aktuálního stavu (pomocí atributu <code>self.číslo</code>) si musíme zařídit sami.\r\n  </p>\r\n\r\n</div>"
     },
@@ -74,9 +83,9 @@
       "idx": 6,
       "title": "Konečný generátor…",
       "tags": [
-        "Core"
+        "Already Studied"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Konečný generátor…</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Nyní ještě proveďme stejné srovnání pro <em>konečný</em> generátor a iterátor sloužící k výpisu sekvence v opačném pořadí. Začneme opět <strong>generátorem</strong>:\r\n  </p>\r\n\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; def reverse(data):\n...     for index in range(len(data)-1, -1, -1):\n...         yield data[index]\n...\n\n&gt;&gt;&gt; for char in reverse('Ahoj!'):\n...     print(char)\n!\nj\no\nh\nA</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Přímo podle dokumentace.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -84,8 +93,11 @@
       "id": "id8",
       "idx": 7,
       "title": "…a konečný iterátor",
-      "tags": [],
-      "diff": null,
+      "tags": [
+        "Core",
+        "Tricky"
+      ],
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">…a konečný iterátor</h2></div><div class=\"section-body\">\r\n\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class Reverse:\n...     \"Iterator for looping over a sequence backwards\"\n... \n...     def __init__(self, data):\n...         self.data = data\n...         self.index = len(data)\n... \n...     def __iter__(self):\n...         return self\n... \n...     def __next__(self):\n...         if self.index == 0:\n...             raise StopIteration\n...         self.index = self.index - 1\n...         return self.data[self.index]\n\n&gt;&gt;&gt; for char in Reverse('Ahoj!'):\n...     print(char)\n!\nj\no\nh\nA</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Oproti nekonečnému iterátoru zde tedy přibylo hlídání konce sekvence a vyhození výjimky pro tento případ.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -94,9 +106,9 @@
       "idx": 8,
       "title": "Poznámka – iterátory pozpátku",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Poznámka – iterátory pozpátku</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Dlužno poznamenat, že aby iterátor fungoval i uvnitř vestavěné funkce <em>reversed()</em>, musí splňovat jednu z následujích dvou podmínek:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            definovat metodu <em>__reversed__()</em>, která by pochopitelně měla pokud možno vracet iterátor nad prvky uvedeného objektu v opačném pořadí;\r\n        </li>\r\n        <li>\r\n            splňovat <em>protokol sekvencí</em>, to znamená definovat metody <em>__len__()</em> a <em>__getitem__()</em>.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">Což zajistí použití vestavěné implementace chování metody <em>reversed()</em>.</div></div>\r\n        </li>\r\n    </ul>\r\n    \r\n\r\n</div>"
     }

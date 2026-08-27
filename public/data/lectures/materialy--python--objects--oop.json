@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Rozhodně bych nechtěl tvrdit, že v Python'u se nedá programovat OOP-způsobem. Ostatně už pohled do standardní knihovny by mě usvědčil ze lži. A <a href=\"introspection.xml\">armáda introspekčních nástrojů</a> také. Co ale tvrdit chci:\r\n  </p>\r\n  <blockquote>\r\n    Python není primárně OOP-jazyk. A stejně jako u mnoha jiných oblastí v Python'u i programování podle principů OOP se řídí spíš konvencí než vynucovacími prostředky jazyka.\r\n  </blockquote>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Příklad pro uvedení do problematiky: V Python'u neexistuje koncept <em>privátních atributů</em>. Můžete sice některé atributy označit za „privátní“, ale to ostatním nezabrání se v nich hrabat, pokud budou chtít. Prostě se předpokládá, že když je takto označíte, budou je tak brát i ostatní.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -20,7 +20,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Ukázková struktura</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Pro potřeby této přednášky budeme předpokládat, že uživatelé znají nějaký čistě OOP-jazyk, a prostě se jen jednoduše podíváme, jak se běžné konstrukce řeší v Python'u. Použijeme k tomu starý známý testovací modul <em>skola</em>, jehož struktura je následující:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false;\">class Člověk():\n        \"\"\"Objektová reprezentace člověka.\"\"\"\n\n        def __init__(self, jméno, datum_narození, krevní_skupina):\n                self.jméno = jméno\n                self.datum_narození = datum_narození\n                self.krevní_skupina = krevní_skupina\n\nclass Školák(Člověk):\n        \"\"\"Objektová reprezentace školáka.\"\"\"\n\n        školáků = 0\n\n        def __init__(self, jméno, datum_narození, krevní_skupina, třída, předměty):\n            Člověk.__init__(self, jméno, datum_narození, krevní_skupina)\n            #super().__init__(jméno, datum_narození, krevní_skupina)\n            self.třída = třída\n            self.předměty = předměty\n            self.přidej_školáka()\n\n        @classmethod\n        def přidej_školáka(cls):\n            cls.školáků += 1\n\n        def průměrná_známka(self):\n            \"\"\"Vrací průměr všech známek studenta.\"\"\"\n            součet = 0\n            for předmět in self.předměty:\n                    součet += self.předměty[předmět]\n            return součet / len(self.předměty)\n\nclass Učitel(Člověk):\n        \"\"\"Objektová reprezentace učitele.\"\"\"\n\n        def __init__(self, jméno, datum_narození, krevní_skupina, třída, předměty, výplata):\n            Člověk.__init__(self, jméno, datum_narození, krevní_skupina)\n            #super().__init__(jméno, datum_narození, krevní_skupina)\n            self.třída = třída\n            self.předměty = předměty\n            self.výplata = výplata</pre>\r\n  <p>\r\n    Uvedený kód si v následujících slajdech postupně rozebereme.\r\n  </p>\r\n\r\n</div>"
     },
@@ -31,7 +31,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Instance třídy</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Instanci třídy <em>Školák</em> pod jménem <em>alisa</em> zavedeme tímto způsobem:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">alisa = Školák(\n            'Алиса Селезнева',\n            '2065-11-17',\n            '0',\n            '3. A',\n            {'matematika': 1, 'zeměpis': 1, }\n        )</pre>\r\n  \r\n  <p>\r\n    Porovnáme-li volání konstruktoru s jeho zdrojovým kódem z předchozího slajdu (ponechal jsem pouze relevantní části kódu)..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">class Školák(Člověk):\n\n        def __init__(self, jméno, datum_narození, krevní_skupina, třída, předměty):\n            Člověk.__init__(self, jméno, datum_narození, krevní_skupina)\n            self.třída = třída\n            self.předměty = předměty</pre>\r\n  <p>\r\n    ..vidíme, že konstruktoru posíláme o jeden parametr méně, než očekává. Onen „podivný“ první parametr <em>self</em> <strong>je automaticky předáván všem instančním metodám</strong> a je jím odkaz na právě zpracovávanou instanci (jak si ukážeme na dalším slajdu).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Asi ve většině OOP-jazyků se tento atribut jmenuje převážně <em>this</em> a je „automagicky“ přítomen v těle příslušných metod. Zda je přehlednější jeho implicitní přítomnost nebo explicitní předání jako prvního vstupního argumentu, ponechávám na vkusu každého uživatele.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -40,9 +40,10 @@
       "idx": 3,
       "title": "Argument „self“",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Argument „self“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Funkci explicitního argumentu <em>self</em> (který nahrazuje rozšířenější implicitní argument <em>this</em> z většiny OOP-jazyků) snadno osvětlí následující příklad nad již zavedenými objekty:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; Školák\n&lt;class '__main__.Školák'&gt;\n&gt;&gt;&gt; Školák.__init__\n&lt;function __init__ at 0x154f408&gt;\n\n&gt;&gt;&gt; alisa\n&lt;__main__.Školák object at 0x154c5d0&gt;\n&gt;&gt;&gt; alisa.__init__\n&lt;bound method Školák.__init__ of &lt;Školák object at 0x154c5d0&gt;&gt;</pre>\r\n  <p>\r\n    Nepřekvapivě tedy parametr <em>self</em> obdrží při volání příslušné metody právě onu <em>instanci</em>, na niž je daná metoda právě <strong>vázána</strong> (<em>bound</em>). Zde pro případ konstruktoru tedy volání..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">alisa = Školák( 'Алиса Селезнева', '2065-11-17', '0',\n                '3. A', {'matematika': 1, 'zeměpis': 1, } )</pre>\r\n  <p>\r\n    ..způsobí zavolání kódu:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">Školák.__init__( alisa, 'Алиса Селезнева', '2065-11-17', '0',\n                        '3. A', {'matematika': 1, 'zeměpis': 1, } )</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Tedy, tohle platí pro jakoukoliv jinou instační metodu, když už je objekt <code>alisa</code> k dispozici. Zrovna pro <em>__init__()</em> je třeba ho nejdříve (<a href=\"meta.xml?slajd=4\">kapku neprůhledně</a>) vyrobit:\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">alisa = Školák.__new__(Školák)</pre>\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -53,7 +54,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Konstruktor „__init__()“ I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Podívejme se nyní pořádně na vlastní <em>metodu konstruktoru</em> <code>__init__()</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">class Školák(Člověk):\n\n        def __init__(self, jméno, datum_narození, krevní_skupina, třída, předměty):\n            Člověk.__init__(self, jméno, datum_narození, krevní_skupina)\n            self.třída = třída\n            self.předměty = předměty</pre>\r\n  <p>\r\n    Vidíme, že poděděná třída (zde <em>Školák</em>) se musí sama postarat o zavolání konstruktoru nadřazené třídy (zde <em>Člověk</em>) se správnými parametry. Toto volání je v tomto případě v principu možno provést dvěma způsoby:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        Přímým odkazem na rodičovskou třídu:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">Člověk.__init__(self, jméno, datum_narození, krevní_skupina)</pre>\r\n        <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            To je sice zcela průhledné, leč je to další místo, které můžeme zapomenout upravit, rozhodneme-li se později provést přejmenování rodičovské třídy nebo komplexnější refaktorizaci.\r\n        </div></div>\r\n    </li>\r\n    <li>\r\n        Odkazem na příslušnou rodičovskou třídu pomocí vestavěné funkce <em>super()</em>, a to bez parametrů:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">super().__init__(jméno, datum_narození, krevní_skupina)</pre>\r\n        <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Toto je asi nejlepší možné řešení a pro případ jednoduché dědičnosti (tedy když má třída pouze jednoho rodiče) i nejpřehlednější.\r\n        </div></div>\r\n    </li>\r\n  </ul>\r\n  \r\n\r\n</div>"
     },
@@ -64,7 +65,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Konstruktor „__init__()“ II</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Pokud poděděná třída nemění způsob inicializace instance a <strong>vlastní metodu <em>__init__()</em> vůbec nezavede</strong>, nadřazený <em>__init__()</em> volat nemusíte, protože bude automaticky zavolán sám:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">class Rodič:\n    def __init__(self):\n        print('Rodič!')\n\nclass Potomek(Rodič):\n    pass\n\np = Potomek()   # Rodič!</pre>\r\n\r\n    <p class=\"enumerate\">\r\n        Naopak když ji zavedete, zavolá se pak pouze ona..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">class Rodič:\n    def __init__(self):\n        print('Rodič!')\n\nclass Potomek(Rodič):\n    def __init__(self):\n        print('Potomek!')\n\np = Potomek()   # Potomek!</pre>\r\n    <p>\r\n        ..pokud v rámci ní nevyvoláte rodičovskou variantu sami ručně:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">class Rodič:\n    def __init__(self):\n        print('Rodič!')\n\nclass Potomek(Rodič):\n    def __init__(self):\n        super().__init__()\n        print('Potomek!')\n\np = Potomek()   # Rodič! &amp; Potomek!</pre>\r\n\r\n</div>"
     },
@@ -73,9 +74,10 @@
       "idx": 6,
       "title": "Poznámka – „datové“ třídy I",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Poznámka – „datové“ třídy I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jistě jste si (a nejenom u Python'u) všimli, že volání metody <em>__init__()</em> v případech pouhého nastavení (instančních) atributů na nějakou vstupní hodnotu je ukázkový příklad ukecanosti a opakování kódu. Python 3.7 tak přinesl několik zkratek, jak se uvedenému opakování vyhnout.\r\n    </p>\r\n\r\n    <p class=\"enumerate\">\r\n        Pokud potřebujete rychle nastavit data nějaké třídě:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">from dataclasses import make_dataclass\n\nPoint = make_dataclass('Point', ['x', 'y', 'z'])\n\np = Point(1.5, 2.5, 3.0)\nprint(p)    # Point(x=1.5, y=2.5, z=3.0)</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: Součástí definice mohou být i anotace a složitější konstrukce, například:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">make_dataclass('C',\n    [('x', int), 'y', ('z', int, field(default=5))],\n    namespace={'add_one': lambda self: self.x + 1}\n)</pre>\r\n        Pak už je to ale spíš jen asi-ne-tak-úplně-přehledná zkratka za následující plnou formu.\r\n    </div></div>\r\n\r\n    <p class=\"enumerate\">\r\n        Pokud potřebujete s nastavovanými atributy dále i něco dělat:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">from dataclasses import dataclass\nfrom typing import Any\n\n@dataclass\nclass C:\n    x: int\n    y: Any\n    z: int = 5\n\n    def add_one(self):\n        return self.x + 1\n\nc = C(1, 'ahoj')\nprint(c)    # C(x=1, y='ahoj', z=5)</pre>\r\n\r\n</div>"
     },
@@ -84,9 +86,11 @@
       "idx": 7,
       "title": "Poznámka – „datové“ třídy II",
       "tags": [
-        "Core"
+        "Core",
+        "WOW",
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Poznámka – „datové“ třídy II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Popravdě možností jsou mraky:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Ve výchozím nastavení nagenerují oba způsoby kromě <em>__init__()</em> i <em>__repr__()</em> a <em>__eq__()</em>. Všechno můžete selektivně vypnout, ale stejně tak dobře (pomocí parametru dekorátoru <em>order=True</em>) můžete nechat přigenerovat i zbylé řadicí operátory <em>__lt__()</em>, <em>__le__()</em>, <em>__gt__()</em>, <em>__ge__()</em>.\r\n        </li>\r\n        <li>\r\n            Potřebujete-li něco provést po nastavení atributů, stačí připsat metodu <em>__post__init__()</em>.\r\n        </li>\r\n        <li>\r\n            Vyžadují-li atributy něco speciálního, je k dispozici funkce <em>field()</em>.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Typické je např. použití při nahrazování výchozích hodnot proměného typu. Zatímco..\r\n                <pre class=\"brush: python; gutter: false; toolbar: false; \">class X:\n    x = []</pre>\r\n                ..způsobí, že všechny instance uvidí v atributu <code>x</code> stejný seznam, následující kód už přiřadí každé instanci vlastní:\r\n                <pre class=\"brush: python; gutter: false; toolbar: false; \">@dataclass\nclass X:\n    x: list = field(default_factory=list)</pre>\r\n                PS: S anotacemi ten první kód ani nespustíte, takže vás to trkne.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            Jelikož <em>dataclasses</em> jsou často opravdu jen balíky hodnot, může se vám hodit převést je na slovník (funkce modulu <em>asdict()</em>) nebo n-tici (<em>astouple()</em>).\r\n        </li>\r\n        <li>\r\n            …\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Pro podrobnosti navštivte <a href=\"https://docs.python.org/3/library/dataclasses.html\" class=\"external\">originální dokumentaci</a>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -95,9 +99,9 @@
       "idx": 8,
       "title": "Vícenásobná dědičnost",
       "tags": [
-        "Tricky"
+        "Core"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Vícenásobná dědičnost</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Python umožňuje vyrobit třídu s více než jedním rodičem:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">            class Třída(Rodič1, Rodič2, ...):\n                ...</pre>\r\n    <p>\r\n        Aby se vyhnul „oblíbenému“ <a href=\"https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem\" class=\"external\">problému diamantu</a>, používá upravený perlovský algoritmus pro vyhledání zdroje vykonání příslušné zavolané metody (či vlastnosti). Ten se dá stručně shrnout tak, že <strong>dědičnost se řídí pořadím rodičovských tříd, a to postupně prohledáváním do hloubky</strong>. Koho zajímají podrobnosti, bude se chtít podívat na <a href=\"/materialy/python/modules/inspect.xml?slajd=8\"><em>MRO (Method Resolution Order)</em></a>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -105,8 +109,10 @@
       "id": "id10",
       "idx": 9,
       "title": "Vícenásobná dědičnost – příklad",
-      "tags": [],
-      "diff": null,
+      "tags": [
+        "Core"
+      ],
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Vícenásobná dědičnost – příklad</h2></div><div class=\"section-body\">\r\n\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/kockopes.py\"><em>kockopes.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">class Zvíře:\n    def promluv(self):\n        print(\"...\")\n\nclass Kočka(Zvíře):\n    def promluv(self):\n        print(\"mňau\")\n\nclass Pes(Zvíře):\n    def promluv(self):\n        print(\"haf\")\n\nclass Kočkopes(Kočka, Pes):\n    pass\n\nclass Psokočka(Pes, Kočka):\n    pass\n\n# ukázkové výstupy\nkp1 = Kočkopes()\nkp2 = Psokočka()\nkp1.promluv()\nkp2.promluv()\n\nprint()\n\nimport inspect\nprint( inspect.getmro(Kočkopes) )\nprint( inspect.getmro(Psokočka) )</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">mňau\nhaf\n\n(&lt;class '__main__.Kočkopes'&gt;, &lt;class '__main__.Kočka'&gt;, &lt;class '__main__.Pes'&gt;, &lt;class '__main__.Zvíře'&gt;, &lt;class 'object'&gt;)\n(&lt;class '__main__.Psokočka'&gt;, &lt;class '__main__.Pes'&gt;, &lt;class '__main__.Kočka'&gt;, &lt;class '__main__.Zvíře'&gt;, &lt;class 'object'&gt;)</pre></div></div>\r\n\r\n</div>"
     },
@@ -115,9 +121,10 @@
       "idx": 10,
       "title": "Funkce „super()“",
       "tags": [
+        "Core",
         "Tricky"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Funkce „super()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Funkce <code>super()</code> volaná bez parametrů vybere příslušného nadřazeného rodiče automaticky podle algoritmu z <a href=\"/materialy/python/modules/inspect.xml?slajd=8\"><em>MRO</em></a> (<em>Method Resolution Order</em>)..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">class A:\n    def mtd(self):\n        print('A')\n\nclass B:\n    def mtd(self):\n        print('B')\n\nclass Potomek(A, B):\n    def mtd(self):\n        super().mtd()\n\np = Potomek()\np.mtd() # A</pre>\r\n    <p>\r\n        ..ale pokud vám uvedené z nějakého důvodu zrovna nevyhovuje, dá se zavolat i s parametry <code>super(type, object_or_type=None)</code>, které vyhledávání příslušným způsobem upraví, například:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">class A:\n    def mtd(self):\n        print('A')\n\nclass B:\n    def mtd(self):\n        print('B')\n\nclass Potomek(A, B):\n    def mtd(self):\n        super(A, self).mtd()\n\np = Potomek()\np.mtd() # B</pre>\r\n    <p>\r\n        Jelikož možností je zjevně mnoho, je přehledu raději věnována <a href=\"super.xml\">samostatná přednáška</a>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -128,7 +135,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Instanční atributy</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Jakákoliv „obyčejná“ (tedy nijak „neoznačená“, viz následující slajdy) funkce na třídě se z hlediska volání chová jako <em>instanční metoda</em>. (V našem příkladě je takovou metodou funkce <code>průměrná_známka</code> na třídě <em>Školák</em>.)\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    <em>Instanční atributy</em> jsou tedy <em>vázány</em> (<em>bound</em>) na konkrétní instance tříd.\r\n  </div></div>\r\n  <p>\r\n    Ukázka použití:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">    class Školák(Člověk):\n\n        def __init__(self, ...):\n            ...\n                self.předměty = předměty\n\n        def průměrná_známka(self):\n            součet = 0\n            for předmět in self.předměty:\n                    součet += self.předměty[předmět]\n            return součet / len(self.předměty)</pre>\r\n  <p>\r\n    Jak už jsme viděli v případě funkce <em>__init__()</em>, instanční metody <strong>automaticky dostávají první parametr</strong>, kterým je právě daná konkrétní instance třídy. Konkrétní volání se pak překládá podle následujícího schématu:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># zavolání..\nalisa.průměrná_známka()\n# ..je ekvivalentní zavolání\nŠkolák.průměrná_známka(alisa)</pre>\r\n  <p>\r\n    To je ostatně důvod, proč se tomuto parametru <em>vřele</em> doporučuje říkat právě <em>self</em>, i když to není povinné.\r\n  </p>\r\n\r\n</div>"
     },
@@ -137,9 +144,10 @@
       "idx": 12,
       "title": "Třídní atributy",
       "tags": [
-        "Legendary"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Třídní atributy</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Někdy se nám ale může hodit operovat nikoli s atributy konkrétní instance třídy, nýbrž s atributy rodiče, tedy celé třídy. (V naší testovací struktuře je takovým atributem atribut <code>školáků</code> ve třídě <em>Školák</em>.)\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Síla <em>třídních atributů</em> tkví v tom, že jsou sdíleny všemi instancemi třídy mezi sebou navzájem, takže jakákoli změna v nich je viditelná ve všech jednotlivých instancích/objektech vytvořených z dané třídy.\r\n  </div></div>\r\n  <p>\r\n    Na třídních atributech operují komplementární <em>třídní metody</em> (<code>@classmethod</code>), jejichž použití je následující:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">    class Školák(Člověk):\n        ...\n        školáků = 0\n...\n\n        def __init__(self, ...):\n            ...\n                self.přidej_školáka()\n\n        @classmethod\n        def přidej_školáka(cls):\n                cls.školáků += 1</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    <em>@classmethod</em> je tzv. <a href=\"/materialy/python/functions/decorators.xml\">dekorátor</a> funkce. Prozatím ho berte jako část syntaxe jazyka, která slouží k označení třídnosti dané metody.\r\n  </div></div>\r\n  <p>\r\n    Podobně jako metody instanční, třídní metody také <strong>automaticky dostávají první parametr</strong>. Narozdíl od instačních metod ale tímto parametrem není příslušná instance, nýbrž původní třída! Konkrétní volání tedy vlastně vypadá takto:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># zavolání..\nalisa.přidej_školáka()\n# ..je ekvivalentní zavolání\nalisa.přidej_školáka(Školák)</pre>\r\n  <p>\r\n    Z úplně stejného důvodu jako u instančních metod se pro lepší čitelnost doporučuje tento parametr značit jako <em>cls</em> (což opět není povinné, ale asi už chápete, proč je to <em>velmi</em> doporučované).\r\n  </p>\r\n\r\n</div>"
     },
@@ -148,9 +156,9 @@
       "idx": 13,
       "title": "Statické atributy",
       "tags": [
-        "Legendary"
+        "Core"
       ],
-      "diff": null,
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Statické atributy</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    Kromě <em>instančních</em> a <em>třídních</em> metod v Python'u existují i metody <em>statické</em>, zaváděné pomocí dekorátoru <code>@staticmethod</code>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">    @staticmethod\n    def pomocná_metoda(par1, par2):\n        ...</pre>\r\n  <p>\r\n    Jak je vidět, narozdíl od běžných (instančních) metod a metod třídních neočekávají – a také nedostávají – žádný první implicitní parametr.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Můžete být v pokušení zavádět na třídách metody bez implicitního vstupního parametru a přitom je neoznačovat jako <em>statické</em>. Tyto funkce budou volatelné (přes tečkovou notaci) na příslušné třídě, ale už ne na její instanci – ta totiž při každém volání na začátek přidá samu sebe automaticky.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -159,9 +167,10 @@
       "idx": 14,
       "title": "„Privátní“ atributy",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">„Privátní“ atributy</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Python nemá koncepci skutečně soukromých, privátních atributů. Ale jakýkoliv atribut, jehož <strong>jméno začíná alespoň dvěma podtržítky a končí podtržítkem nejvýše jedním</strong> se bude jako privátní tvářit – nebude totiž na třídě (ani instanci) pod tímto jménem <strong>zvenku</strong><sup>*</sup> dostupný:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class MyClass:\n...     a = 1\n...     __b = 2\n\n# Na atribut 'a' se dostaneme normálně:\n&gt;&gt;&gt; MyClass.a\n1\n\n# S atributem '__b' už to nejde:\n&gt;&gt;&gt; MyClass.__b\nTraceback (most recent call last):\n  File \"&lt;pyshell#12&gt;\", line 1, in &lt;module&gt;\nMyClass.__b\nAttributeError: type object 'MyClass' has no attribute '__b'</pre>\r\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n          <sup>*</sup> Uvnitř třídy se na něj ale samozřejmě tímto dvojpodtržítkovým jménem normálně odkazuje.\r\n      </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: Technicky dojde k nahrazení jména atributu <code>__atribut</code> za <code>_classname__atribut</code>, kde <em>classname</em> je vytvořeno ze jména příslušné třídy (z něhož jsou nejdříve odstraněna případná začáteční podtržítka). V tomto příkladě bude tedy třída obsahovat atribut <code>MyClass._MyClass__b</code> (který se takto i bude vypisovat v rámci <code>dir(MyClass)</code>).\r\n      </div></div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Podobně atributy (data i metody) začínající na <em>jedno</em> podtržítko jsou konvencí brány za <em>neveřejnou část</em> API (rozhraní třídy). Narozdíl od dvojpodtržítkových jsou vidět a jsou normálně přístupné, ale všichni by se jim měli vyhýbat jako čert kříži ^_~\r\n  </p>\r\n\r\n</div>"
     },
@@ -170,9 +179,10 @@
       "idx": 15,
       "title": "Deskriptory (aka „properties“)",
       "tags": [
-        "Tricky"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Deskriptory (aka „properties“)</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Za implementací všech předchozích typů volání stojí tzv. <strong>protokol deskriptorů</strong>, po staru známý spíše pod anglickým jménem <em>properties</em> nebo pod jejich ekvivalentním označením ve spoustě jiných programovacích jazyků <em>getters &amp; setters</em>. Ukažme si rovnou příklad:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">class Plocha:\n\n    def __init__(self, barva=None):\n        self.__barva = barva\n\n    @property\n    def barva(self):\n        return self.__barva\n\n    @barva.setter\n    def barva(self, val):\n        self.__barva = val\n\n    @barva.deleter\n    def barva(self):\n        del self.__barva</pre>\r\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n          <a href=\"/materialy/python/functions/decorators.xml\">Dekorátor</a> <em>@property</em> učiní příslušný atribut (zde <em>barva</em>) přístupný pro získání hodnoty (tedy pro odpověď na dotaz <code>INSTANCE.barva</code>), dekorátor <em>@ATRIBUT.setter</em> pro přepis hodnoty (tedy reakci na výraz <code>INSTANCE.barva = HODNOTA</code>) a dekorátor <em>@ATRIBUT.deleter</em> pro zrušení atributu (tedy reakci na příkaz <code>del INSTANCE.barva</code>).\r\n      </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n          Pro tento konkrétní příklad pominu, že zavést atribut s příslušným chováním je asi lepší (a rozhodně čitelnější) radši pomocí k tomu určené (byť starší) <a href=\"descriptors.xml?slajd=3\">funkce <em>property()</em></a>.\r\n      </div></div></div>\r\n  <p>\r\n    K objektu s takto zavedenými metodami se pak můžeme chovat následujícím způsobem:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># zavedení instance Plochy červené barvy\n&gt;&gt;&gt; plocha = Plocha('červená')\n&gt;&gt;&gt; plocha.barva\n'červená'\n\n# změna barvy plochy na zelenou\n&gt;&gt;&gt; plocha.barva = 'zelená'\n&gt;&gt;&gt; plocha.barva\n'zelená'</pre>\r\n  \r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Podrobnější přehled deskriptorů v Python'u viz <a href=\"descriptors.xml\">samostatná přednáška</a>.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -183,7 +193,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Kritika OOP</h2></div><div class=\"section-body\">\r\n\r\n  <ul>\r\n    <li>\r\n      Joe Armstrong (Erlang): \"The problem with object-oriented languages is they've got all this implicit environment that they carry around with them. You wanted a banana but what you got was a gorilla holding the banana and the entire jungle.\"\r\n    </li>\r\n    <li>\r\n      Richard Mansfield (Compute! magazine): \"Entire generations of indoctrinated programmers continue to march out of the academy, committed to OOP and nothing but OOP for the rest of their lives.\" &amp; \"OOP is to writing a program, what going through airport security is to flying.\"\r\n    </li>\r\n    <li>\r\n      Paul Graham (Lisp): \"…the purpose of OOP is to act as a <em>herding mechanism</em> that keeps mediocre programmers in mediocre organizations from doing too much damage…\"\r\n    </li>\r\n  </ul>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Zdroj: <a class=\"external\" href=\"http://en.wikipedia.org/wiki/Object_oriented_programming\">OOP [Wikipedia]</a>\r\n  </div></div>\r\n  <p>\r\n    Poznámka: Nevím, jaký názor mají na čistě OOP-přístup autoři Python'u. Rozhodně OOP-prvky byly do Python'u postupně přidávány a v některých ohledech jsou velmi mocné (viz <a href=\"magic.xml\">magické metody</a>). Ale čistě OOP-přístup se v Python'u  nikdy nechytil. Spíš by se dalo říct, že Python je taková sbírka zajímavých myšlenek z mnoha různých míst – ostatně zkuste si napsat <code>import this</code> ^_^\r\n  </p>\r\n\r\n</div>"
     },
@@ -194,7 +204,7 @@
       "tags": [
         "Core"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Užití OOP</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kdy tedy OOP použít? Z hlediska samotného Python'u především v těchto případech:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Když potřebujete zapouzdřit nějaké hodnoty (a občas i funkce) do vlastního jmenného prostoru.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Python samotný totiž jinak dokáže vytvořit vlastní kontext už jen pouze pro celý modul a těla funkcí (čili i metod), jinde ne.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            Když chcete vyrobit objekty, které umí využívat nějaké vestavěné funkce nebo operátory.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Přímo přetížit vestavěný typ nemůžete, ale odvodit si vlastní ano – <em>magických metod</em> je v zásobě hromada. Nu a konečně je to skvělá příležitost pro využití operátoru <code>@</code>, který jinak nic v Python'u nepoužívá ^_~\r\n            </div></div>\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Druhá část odpovědi se týká použití tříd v běžné programátorské praxi – tam se vám budou asi nejvíc hodit:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Když potřebujete dědičnost – typicky kvůli polymorfismu nebo třeba váš tým při práci používá tzv. <em>dyzajnové vzory</em> (<em>design patterns</em>).\r\n        </li>\r\n        <li>\r\n            Při implementaci stavových automatů – třída stav drží a zároveň s ním umí i operovat.\r\n        </li>\r\n        <li>\r\n            …\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pro zajímavost: Kolegové z firmy, kde je Python s přehledem prvním programovacím jazykem, zjišťovali, kdo ve svých kódech používá třídy, a našli celého jednoho člověka. Z hlediska Python'u myslím typický výsledek – většinu jinde běžných použití OOP zde totiž skvěle nahradí moduly.\r\n    </div></div>\r\n\r\n</div>"
     }

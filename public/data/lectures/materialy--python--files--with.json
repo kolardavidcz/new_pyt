@@ -7,9 +7,9 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "WOW"
+        "Core"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ačkoli původní ideou za zavedením kontextu <em>with</em> byla snaha naučit generátory vstupní a čisticí operace kolem bloku kódu (podívejte se do <a href=\"https://www.python.org/dev/peps/pep-0343/\" class=\"external\">PEP'u 343</a>), my se na něj podíváme nejdříve přesně z opačné strany – jako na nástroj šetřící <em>try-finally</em> u bloků kódu, které potřebují nějaké výstupní „čisticí“ operace.\r\n    </p>\r\n\r\n</div>"
     },
@@ -18,9 +18,9 @@
       "idx": 1,
       "title": "Práce se soubory I",
       "tags": [
-        "WOW"
+        "Core"
       ],
-      "diff": null,
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Práce se soubory I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nebyl-li by kontext <em>with</em> k dispozici, vypadala by správná práce se soubory asi nějak takto:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">f = open(SOUBOR)\ntry:\n    BLOK\nfinally:\n    f.close()</pre>\r\n    <p>\r\n        Idea je taková, že dojde-li při práci se souborem k nějaké chybě, větev <em>finally</em> zajistí, že již otevřený soubor bude vždy řádně uzavřen.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: A koneckonců takto se soubory skutečně pracovalo, když ještě <em>with</em> nebylo k dispozici.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -29,9 +29,10 @@
       "idx": 2,
       "title": "Práce se soubory II",
       "tags": [
+        "Core",
         "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Práce se soubory II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        V podání kontextu <em>with</em> vypadá stejný kus kódu takto:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">with open(SOUBOR) as f:\n    BLOK</pre>\r\n    <p>\r\n        Za prvé je to podstatně kratší. A za druhé je to nakonec i stejně výmluvné – jakmile si zafixujete, že kontext <em>with</em> se stará o „čištění“ za vás.\r\n    </p>\r\n\r\n</div>"
     },
@@ -40,9 +41,9 @@
       "idx": 3,
       "title": "Princip",
       "tags": [
-        "WOW"
+        "Core"
       ],
-      "diff": null,
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Princip</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Samozřejmě automatické zavírání souborů je dosti omezená podmnožina toho, co kontext <em>with</em> umí – ostatně, jak už jsem říkal, byl navržen z poněkud jiných důvodů. Ve skutečnosti obstarává následující dvě funkce:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            vykonání definovaných operací <strong>před spuštěním kódu v BLOKu</strong>;\r\n        </li>\r\n        <li>\r\n            vykonání definovaných operací <strong>po opuštění kódu v BLOKu</strong>.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Mnoho objektů Python'u se uvedeným způsobem chová a je je tedy možno použít uvnitř kontextu <em>with</em>. Zároveň existuje několik způsobů, jak vyrobit vlastní objekty, které budou umožňovat to samé.\r\n    </p>\r\n\r\n</div>"
     },
@@ -51,10 +52,10 @@
       "idx": 4,
       "title": "Implementace pomocí třídy",
       "tags": [
-        "WOW",
-        "Legendary"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Implementace pomocí třídy</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nejnázornější je asi implementace pomocí třídy – objekt, který má podporovat spolupráci s kontextem <em>with</em>, musí definovat následující dvě metody:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong><code>__enter__()</code></strong> – operace, které se mají vykonat před spuštěním kódu v BLOKu;\r\n        </li>\r\n        <li>\r\n            <strong><code>__exit__()</code></strong> – operace, které se mají vykonat po opuštění kódu v BLOKu.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Přitom platí:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Použije-li kontext <em>with</em> přiřazení reference pomocí <code>as</code>, je tato reference návratovou hodnotou z metody <code>__enter__()</code>.\r\n        </li>\r\n        <li>\r\n            Dojde-li při vykonávání BLOKu k výjimce, je tato předána do metody <code>__exit__()</code> jako trojce <em>typ, hodnota, traceback</em>; v opačném případě metoda obdrží trojci <code>None, None, None</code>.\r\n        </li>\r\n        <li>\r\n            Byl-li BLOK opuštěn na výjimku a <code>__exit__()</code> vrátí <code>False</code>, je tato výjimka předána výše; pokud ovšem ve stejném případě <code>__exit__()</code> vrátí <code>True</code>, je výjimka potlačena.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -62,8 +63,11 @@
       "id": "id6",
       "idx": 5,
       "title": "Příklad",
-      "tags": [],
-      "diff": null,
+      "tags": [
+        "Core",
+        "Tricky"
+      ],
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Příklad</h2></div><div class=\"section-body\">\r\n\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><div class=\"example-label\">📄 Program: <a href=\"_files/with_class.py\"><em>with_class.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nclass MůjKontext:\n\n    def __enter__(self):\n        print('\\nSpouštím kontext…')\n\n    def __exit__(self, typ, hodnota, traceback):\n        print('Opouštím kontext…')\n        if typ is None:\n            print('…bez chyby.')\n        else:\n            print('…s chybou {} .'.format(hodnota))\n        return True\n\nwith MůjKontext():\n    print('1. kontext bez chyby')\n\nwith MůjKontext():\n    print('2. kontext s chybou')\n    raise TypeError('CHYBA')</pre></div><div class=\"example-col\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">Spouštím kontext…\n1. kontext bez chyby\nOpouštím kontext…\n…bez chyby.\n\nSpouštím kontext…\n2. kontext s chybou\nOpouštím kontext…\n…s chybou CHYBA .</pre></div></div>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Inspirace – Tarek Ziadé: „Expert Python Programming“\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -72,9 +76,9 @@
       "idx": 6,
       "title": "Příklad pro „as“",
       "tags": [
-        "WOW"
+        "Core"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Příklad pro „as“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Z metody <code>__enter__()</code> můžete vrátit skutečně cokoli, tak jen pro ukázku:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><div class=\"example-label\">📄 Program: <a href=\"_files/withas_class.py\"><em>withas_class.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nclass MůjKontext:\n\n    def __enter__(self):\n        print('\\nSpouštím kontext…')\n        return 'Haf!', 666\n\n    def __exit__(self, typ, hodnota, traceback):\n        print('Opouštím kontext…')\n        if typ is None:\n            print('…bez chyby.')\n        else:\n            print(f'…s chybou {hodnota} .')\n        return True\n\nwith MůjKontext() as kontext:\n    print('Kontext:', kontext)</pre></div><div class=\"example-col\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">Spouštím kontext…\nKontext: ('Haf!', 666)\nOpouštím kontext…\n…bez chyby.</pre></div></div>\r\n\r\n</div>"
     },
@@ -83,10 +87,10 @@
       "idx": 7,
       "title": "Implementace pomocí generátoru – „@contextmanager“",
       "tags": [
-        "WOW",
-        "Legendary"
+        "Core",
+        "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Implementace pomocí generátoru – „@contextmanager“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Vzhledem k tomu, že pro spolupráci s kontextem <em>with</em> jsou potřeba <em>dva oddělené kusy kódu</em>, nepřekvapí, že je možné proměnit generátor s jedním <em>yield</em>'em na odpovídající třídu – kód před <code>yield</code> je promítnut do části <code>__enter__()</code>, kód po něm pak do <code>__exit__()</code>.\r\n    </p>\r\n    <p>\r\n        Na uvedený překlad je pochopitelně k dispozici standardní dekorátor <strong><code>@contextmanager</code></strong>, jenž při nejjednodušším použití vypadá takto:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">from contextlib import contextmanager\n\n@contextmanager\ndef context():\n    ENTER\n    yield\n    EXIT</pre>\r\n\r\n</div>"
     },
@@ -95,9 +99,10 @@
       "idx": 8,
       "title": "Příklad",
       "tags": [
-        "WOW"
+        "Core",
+        "Tricky"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Příklad</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Poněkud komplikovanější použití kopírující chování předchozí třídní varianty:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/with_yield.py\"><em>with_yield.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nfrom contextlib import contextmanager\n\n@contextmanager\ndef můj_kontext():\n    print('\\nSpouštím kontext…')\n    try:\n        yield\n    except Exception as ex:\n        print('Opouštím kontext s chybou {} .'.format(ex))\n    else:\n        print('Opouštím kontext bez chyby.')\n\nwith můj_kontext():\n    print('1. kontext bez chyby')\n\nwith můj_kontext():\n    print('2. kontext s chybou')\n    raise TypeError('CHYBA')</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">Spouštím kontext…\n1. kontext bez chyby\nOpouštím kontext bez chyby.\n\nSpouštím kontext…\n2. kontext s chybou\nOpouštím kontext s chybou CHYBA .</pre></div></div>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Inspirace – Tarek Ziadé: „Expert Python Programming“\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -106,9 +111,9 @@
       "idx": 9,
       "title": "Poznámka – práce se soubory",
       "tags": [
-        "WOW"
+        "Skip"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Poznámka – práce se soubory</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Když nahlédneme do příslušného PEP'u, odpovídá práce se soubory v podstatě následujícímu kódu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">from contextlib import contextmanager\n\n@contextmanager\ndef opened(filename, mode=\"r\"):\n    f = open(filename, mode)\n    try:\n        yield f\n    finally:\n        f.close()\n\nwith opened(\"/etc/passwd\") as f:\n    for line in f:\n        print line.rstrip()</pre>\r\n    <p>\r\n        Tedy v rámci <em>__enter__()</em> je soubor otevřen a reference na něj je předána do kontextu a po skončení práce s ním je v rámci <em>__exit__()</em> soubor uzavřen.\r\n    </p>\r\n\r\n</div>"
     },
@@ -117,10 +122,9 @@
       "idx": 10,
       "title": "Třída vs generátor",
       "tags": [
-        "WOW",
-        "Tricky"
+        "Core"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Třída vs generátor</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Přestože pomocí generátoru i třídy lze kontext <em>with</em> připravit téměř úplně stejný, existují drobné rozdíly, které vám v konkrétním případě mohou upřednostnit jen jeden z nich:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            generátor je kratší na zápis, ale ne vždy tak průhledný na pochopení;\r\n        </li>\r\n        <li>\r\n            generátor automaticky drží kontext, což je ve třídě těžší napsat pro cokoliv kromě triviálních případů (kterých je na druhou stranu ale hodně);\r\n        </li>\r\n        <li>\r\n            práce s výjimkami v generátoru není tak průhledná jako ve třídě.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -129,9 +133,10 @@
       "idx": 11,
       "title": "Poznámka – modul „contextlib“",
       "tags": [
-        "WOW"
+        "Tricky",
+        "Skip"
       ],
-      "diff": null,
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Poznámka – modul „contextlib“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Knihovna <em>contextlib</em> obsahuje mnohem více zajímavých (a složitých) pomocných metod – mimo jiné i kontexty, které je možno navštívit vícekrát než jednou v rámci stejného běhu.\r\n    </p>\r\n    <p>\r\n        Spousta běžných kontextů je ale „jednoběhová“ – chcete-li je použít znovu, musíte je znovu zavést (proto se také kontexty zpravidla vytváří přímo uvnitř výrazu <code>with</code>). Příkladem jsou třebas soubory, které se po použití v kontextu uzavřou, což si můžeme nasimulovat třebas takto:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; from contextlib import contextmanager\n... \n... @contextmanager\n... def můj_kontext():\n...     print('Spouštím kontext…')\n...     yield\n...     print('Opouštím kontext…')\n... \n... mk = můj_kontext()\n\n&gt;&gt;&gt; with mk:\n...     print('1.')\nSpouštím kontext…\n1.\nOpouštím kontext…\n\n&gt;&gt;&gt; with mk:\n...     print('2.')\nTraceback (most recent call last):\n  File \"&lt;pyshell#2&gt;\", line 1, in &lt;module&gt;\n    with mk:\n  File \"c:\\PROGRAMS\\Python34\\lib\\contextlib.py\", line 61, in __enter__\n    raise RuntimeError(\"generator didn't yield\") from None\nRuntimeError: generator didn't yield</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Varianta s <code>with můj_kontext():</code> by samozřejmě fungovala při každém volání právě proto, že uvedený „jednoběhový“ kontext je pokaždé znovu vytvořen.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -140,9 +145,10 @@
       "idx": 12,
       "title": "Vícenásobný kontext „with“",
       "tags": [
+        "Core",
         "WOW"
       ],
-      "diff": null,
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Vícenásobný kontext „with“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Poznamenejme ještě, že kód..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">with A() as a, B() as b:\n    BLOK</pre>\r\n    <p>\r\n        ..je ekvivalentní kódu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">with A() as a:\n    with B() as b:\n        BLOK</pre>\r\n    <p>\r\n        A hlavně – od Python'u 3.10 konečně půjde uzávorkovat! Takže bude možné psát třebas:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">with (\n    A() as a,\n    B() as b\n):\n    BLOK</pre>\r\n\r\n</div>"
     }

@@ -6,8 +6,11 @@
       "id": "id1",
       "idx": 0,
       "title": "Úvod",
-      "tags": [],
-      "diff": null,
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\n\n  <p>\n    Modul <em>inspect</em> slouží k získávání (některých) informací o „živých“ objektech, jako jsou moduly, třídy, funkce a další. Mezi jeho základní funkce patří:\n  </p>\n  <ul>\n    <li>\n        zjišťování informací o typech a členství objektů\n    </li>\n    <li>\n        průzkum tříd a funkcí\n    </li>\n    <li>\n        přístup ke zdrojovému kódu\n    </li>\n    <li>\n        prohledávání <em>stack</em>u interpretru\n    </li>\n  </ul>\n  <p>\n    V dalším se v krátkosti seznámíme s prvními dvěma body.\n  </p>\n\n</div>"
     },
@@ -15,17 +18,30 @@
       "id": "id2",
       "idx": 1,
       "title": "Testovací struktura",
-      "tags": [],
-      "diff": null,
-      "already_studied_in": null,
+      "tags": [
+        "Already Studied"
+      ],
+      "diff": "basics",
+      "already_studied_in": {
+        "lecture_id": "lecture:materialy/python/objects/introspection.html",
+        "lecture_title": "introspekce",
+        "lecture_path": "vyuka_downloaded/materialy/python/objects/introspection.html",
+        "slide_id": "id2",
+        "slide_title": "Testovací struktura",
+        "week": 6,
+        "reason": "Identický kód a příklad (Testovací struktura)"
+      },
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Testovací struktura</h2></div><div class=\"section-body\">\n\n  <p>\n    Protože vestavěné objekty, na které bychom se mohli dívat, obsahují většinou <em>velmi mnoho</em> podobjektů, ukázkové příklady v této přednášce budou obsahovat starý známý testovací modul <em>skola</em>, jehož struktura je následující:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false;\">class Člověk():\n        \"\"\"Objektová reprezentace člověka.\"\"\"\n\n        def __init__(self, jméno, datum_narození, krevní_skupina):\n                self.jméno = jméno\n                self.datum_narození = datum_narození\n                self.krevní_skupina = krevní_skupina\n\nclass Školák(Člověk):\n        \"\"\"Objektová reprezentace školáka.\"\"\"\n\n        školáků = 0\n\n        def __init__(self, jméno, datum_narození, krevní_skupina, třída, předměty):\n            Člověk.__init__(self, jméno, datum_narození, krevní_skupina)\n            #super().__init__(jméno, datum_narození, krevní_skupina)\n            self.třída = třída\n            self.předměty = předměty\n            self.přidej_školáka()\n\n        @classmethod\n        def přidej_školáka(cls):\n            cls.školáků += 1\n\n        def průměrná_známka(self):\n            \"\"\"Vrací průměr všech známek studenta.\"\"\"\n            součet = 0\n            for předmět in self.předměty:\n                    součet += self.předměty[předmět]\n            return součet / len(self.předměty)\n\nclass Učitel(Člověk):\n        \"\"\"Objektová reprezentace učitele.\"\"\"\n\n        def __init__(self, jméno, datum_narození, krevní_skupina, třída, předměty, výplata):\n            Člověk.__init__(self, jméno, datum_narození, krevní_skupina)\n            #super().__init__(jméno, datum_narození, krevní_skupina)\n            self.třída = třída\n            self.předměty = předměty\n            self.výplata = výplata</pre>\n\n</div>"
     },
     {
       "id": "id3",
       "idx": 2,
       "title": "Typy a členství – „getmembers()“ I",
-      "tags": [],
-      "diff": null,
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Typy a členství – „getmembers()“ I</h2></div><div class=\"section-body\">\n\n  <p>\n    Nejzákladnější metodou pro získání členů nějakého objektu je <code>inspect.getmembers(objekt, predikat=None) \n</code>. Bez druhého parametru vrátí všechny dostupné podobjekty daného objektu <em>OBJEKT</em>:\n  </p>\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\n            📄 Program: <a href=\"_files/modul_inspect/inspect.getmembers.1.py\"><em>modul_inspect/inspect.getmembers.1.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import skola\nimport inspect\n\nalisa = skola.Školák(\n            'Алиса Селезнева',\n            '2065-11-17',\n            '0',\n            '3. A',\n            {'matematika': 1, 'zeměpis': 1, }\n        )\n\nfor name, value in inspect.getmembers(alisa):\n        print( name, ':', value )</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">__class__ : &lt;class '__main__.Školák'&gt;\n__delattr__ : &lt;method-wrapper '__delattr__' of Školák object at 0x193d350&gt;\n__dict__ : {'jméno': 'Алиса Селезнева', 'třída': '3. A', 'předměty': {'zeměpis': 1, 'matematika': 1}, 'datum_narození': '2065-11-17', 'krevní_skupina': '0'}\n__doc__ : Objektová reprezentace školáka.\n__eq__ : &lt;method-wrapper '__eq__' of Školák object at 0x193d350&gt;\n__format__ : &lt;built-in method __format__ of Školák object at 0x193d350&gt;\n__ge__ : &lt;method-wrapper '__ge__' of Školák object at 0x193d350&gt;\n__getattribute__ : &lt;method-wrapper '__getattribute__' of Školák object at 0x193d350&gt;\n__gt__ : &lt;method-wrapper '__gt__' of Školák object at 0x193d350&gt;\n__hash__ : &lt;method-wrapper '__hash__' of Školák object at 0x193d350&gt;\n__init__ : &lt;bound method Školák.__init__ of &lt;__main__.Školák object at 0x193d350&gt;&gt;\n__le__ : &lt;method-wrapper '__le__' of Školák object at 0x193d350&gt;\n__lt__ : &lt;method-wrapper '__lt__' of Školák object at 0x193d350&gt;\n__module__ : __main__\n__ne__ : &lt;method-wrapper '__ne__' of Školák object at 0x193d350&gt;\n__new__ : &lt;built-in method __new__ of type object at 0x84aea0&gt;\n__reduce__ : &lt;built-in method __reduce__ of Školák object at 0x193d350&gt;\n__reduce_ex__ : &lt;built-in method __reduce_ex__ of Školák object at 0x193d350&gt;\n__repr__ : &lt;method-wrapper '__repr__' of Školák object at 0x193d350&gt;\n__setattr__ : &lt;method-wrapper '__setattr__' of Školák object at 0x193d350&gt;\n__sizeof__ : &lt;built-in method __sizeof__ of Školák object at 0x193d350&gt;\n__str__ : &lt;method-wrapper '__str__' of Školák object at 0x193d350&gt;\n__subclasshook__ : &lt;built-in method __subclasshook__ of type object at 0x184aa60&gt;\n__weakref__ : None\ndatum_narození : 2065-11-17\njméno : Алиса Селезнева\nkrevní_skupina : 0\nprůměrná_známka : &lt;bound method Školák.průměrná_známka of &lt;__main__.Školák object at 0x193d350&gt;&gt;\npředměty : {'zeměpis': 1, 'matematika': 1}\npřidej_školáka : &lt;bound method type.přidej_školáka of &lt;class '__main__.Školák'&gt;&gt;\ntřída : 3. A\nškoláků : 1</pre></div></div>\n\n</div>"
     },
@@ -33,8 +49,11 @@
       "id": "id4",
       "idx": 3,
       "title": "Typy a členství – „getmembers()“ II",
-      "tags": [],
-      "diff": null,
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Typy a členství – „getmembers()“ II</h2></div><div class=\"section-body\">\n\n  <p>\n    Druhým parametrem metody <em>getmembers()</em> je omezující podmínka – ze všech členů objektu budou vráceny pouze ty, které vyhovují dané podmínce.\n  </p>\n  \n  <p class=\"enumerate\">\n    Sám modul <em>inspect</em> obsahuje několik <em>is</em>-metod, odkazy na něž se dají s výhodou právě jako tato podmínka použít:\n  </p>\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\n            📄 Program: <a href=\"_files/modul_inspect/inspect.getmembers.2.py\"><em>modul_inspect/inspect.getmembers.2.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import skola\nimport inspect\n\nalisa = skola.Školák(\n            'Алиса Селезнева',\n            '2065-11-17',\n            '0',\n            '3. A',\n            {'matematika': 1, 'zeměpis': 1, }\n        )\n\nprint('Třídy:')\nfor name, value in inspect.getmembers(alisa, inspect.isclass):\n        print( name, ':', value )\n\nprint()\n\nprint('Metody:')\nfor name, value in inspect.getmembers(alisa, inspect.ismethod):\n        print( name, ':', value )</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">Třídy:\n__class__ : &lt;class 'skola.Školák'&gt;\n\nMetody:\n__init__ : &lt;bound method Školák.__init__ of &lt;skola.Školák object at 0xf2c2d0&gt;&gt;\nprůměrná_známka : &lt;bound method Školák.průměrná_známka of &lt;skola.Školák object at 0xf2c2d0&gt;&gt;\npřidej_školáka : &lt;bound method type.přidej_školáka of &lt;class 'skola.Školák'&gt;&gt;</pre></div></div>\n  \n  <p class=\"enumerate\">\n    Podmínky si však samozřejmě můžete vymýšlet sami, např.:\n  </p>\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\n            📄 Program: <a href=\"_files/modul_inspect/inspect.getmembers.3.py\"><em>modul_inspect/inspect.getmembers.3.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import skola\nimport inspect\n\nalisa = skola.Školák(\n            'Алиса Селезнева',\n            '2065-11-17',\n            '0',\n            '3. A',\n            {'matematika': 1, 'zeměpis': 1, }\n        )\n\ndef objekt_je_řetězec(objekt):\n        return type(objekt) == str\n\nfor name, value in inspect.getmembers(alisa, objekt_je_řetězec):\n        print( name, ':', value )</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">__doc__ : Objektová reprezentace školáka.\n__module__ : skola\ndatum_narození : 2065-11-17\njméno : Алиса Селезнева\nkrevní_skupina : 0\ntřída : 3. A</pre></div></div>\n\n</div>"
     },
@@ -42,8 +61,10 @@
       "id": "id5",
       "idx": 4,
       "title": "Typy a členství – is-metody",
-      "tags": [],
-      "diff": null,
+      "tags": [
+        "Core"
+      ],
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Typy a členství – is-metody</h2></div><div class=\"section-body\">\n\n  <p>\n    <em>is</em>-metody z předchozího slajdu se dají použít i samostatně:\n  </p>\n  <div class=\"example-block example-horizontal\"><div class=\"example-col\"><div class=\"example-label\">📄 Program: <a href=\"_files/modul_inspect/inspect.is.py\"><em>modul_inspect/inspect.is.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import skola\nimport inspect\n\ndef gen():\n    yield 1\n\ninfo = inspect.ismodule( skola )\nprint(info)\n\ninfo = inspect.isclass( skola.Školák )\nprint(info)\n\ninfo = inspect.isfunction( lambda x: x )\nprint(info)\n\ninfo = inspect.isgeneratorfunction( gen )\nprint(info)</pre></div><div class=\"example-col\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">True\nTrue\nTrue\nTrue</pre></div></div>\n\n</div>"
     },
@@ -51,8 +72,10 @@
       "id": "id6",
       "idx": 5,
       "title": "Typy a členství – „getmoduleinfo()“",
-      "tags": [],
-      "diff": null,
+      "tags": [
+        "Skip"
+      ],
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Typy a členství – „getmoduleinfo()“</h2></div><div class=\"section-body\">\n\n  <p>\n    Další šikovnou metodou je <code>inspect.getmoduleinfo(CESTA)</code>, který vrací, jak bude Python interpretovat modul dostupný na dané cestě (nebo <em>None</em>, nejde-li o modul):\n  </p>\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\n            📄 Program: <a href=\"_files/modul_inspect/inspect.getmoduleinfo.py\"><em>modul_inspect/inspect.getmoduleinfo.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import skola\nimport inspect\n\ninfo = inspect.getmoduleinfo('skola.py')\nprint(info)\n\ninfo = inspect.getmoduleinfo('/usr/lib/python3.1/string.py')\nprint(info)\n\ninfo = inspect.getmoduleinfo('/usr/lib/python3.1/string.pyc')\nprint(info)\n\ninfo = inspect.getmoduleinfo('/usr/lib/python3.1/lib-dynload/termios.so')\nprint(info)</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">ModuleInfo(name='skola', suffix='.py', mode='U', module_type=1)\nModuleInfo(name='string', suffix='.py', mode='U', module_type=1)\nModuleInfo(name='string', suffix='.pyc', mode='rb', module_type=2)\nModuleInfo(name='termios', suffix='.so', mode='rb', module_type=3)</pre></div></div>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Čísla v <em>module_type</em> odpovídají příslušným konstantám z modulu <em>imp</em>, konkrétně zde 1 je <code>imp.PY_SOURCE</code>, 2 je <code>imp.PY_COMPILED</code> a 3 je <code>imp.C_EXTENSION</code>.\n  </div></div>\n\n</div>"
     },
@@ -60,8 +83,11 @@
       "id": "id7",
       "idx": 6,
       "title": "Třídy a funkce – „getclasstree()“",
-      "tags": [],
-      "diff": null,
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Třídy a funkce – „getclasstree()“</h2></div><div class=\"section-body\">\n\n  <p>\n    Prvním zástupcem metod sloužících ke zjišťování údajů o třídách a funkcích, se kterým se seznámíme, je metoda <em>getclasstree()</em>.\n  </p>\n  <p>\n    Metoda <code>inspect.getclasstree(classes, unique=False)</code> na vstupu přebírá seznam tříd, které na výstupu uspořádá podle rodičovských vztahů do hierarchicky uspořádaných zanořených seznamů:\n  </p>\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\n            📄 Program: <a href=\"_files/modul_inspect/inspect.getclasstree.py\"><em>modul_inspect/inspect.getclasstree.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import skola\nimport inspect\nimport pprint\n\ninfo = inspect.getclasstree([skola.Učitel, skola.Školák, skola.Člověk])\npprint.pprint(info)</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">[(&lt;class 'object'&gt;, ()),\n[(&lt;class 'skola.Člověk'&gt;, (&lt;class 'object'&gt;,)),\n    [(&lt;class 'skola.Učitel'&gt;, (&lt;class 'skola.Člověk'&gt;,)),\n    (&lt;class 'skola.Školák'&gt;, (&lt;class 'skola.Člověk'&gt;,))]]]</pre></div></div>\n\n</div>"
     },
@@ -69,8 +95,11 @@
       "id": "id8",
       "idx": 7,
       "title": "Třídy a funkce – „getmro()“ a algoritmus „MRO“",
-      "tags": [],
-      "diff": null,
+      "tags": [
+        "Core",
+        "WOW"
+      ],
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Třídy a funkce – „getmro()“ a algoritmus „MRO“</h2></div><div class=\"section-body\">\n\n  <p>\n    Na obdobném pískovišti si hraje metoda <code>inspect.getmro(TŘÍDA)</code> – v podstatě vrátí n-tici s „rodokmenem“ dané třídy:\n  </p>\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\n            📄 Program: <a href=\"_files/modul_inspect/inspect.getmro.py\"><em>modul_inspect/inspect.getmro.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import skola\nimport inspect\n\ninfo = inspect.getmro(skola.Školák)\nprint(info)</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">(&lt;class 'skola.Školák'&gt;, &lt;class 'skola.Člověk'&gt;, &lt;class 'object'&gt;)</pre></div></div>\n  <p>\n    Lépe řečeno – vrátí třídy (danou a její předky) v pořadí, v jakém budou prohledávány pro potřeby nalezení konkrétní metody (tzv. <em>MRO = Method Resolution Order</em>). Teoreticky se <strong>dědičnost řídí pořadím rodičovských tříd, a to postupně prohledáváním do hloubky</strong> (tedy postupně jsou prohledáni všichni rodiče dané třídy, ale než se vyzkouší další v pořadí, je nejdříve prozkoumán „rodokmen“ aktuálně zpracovávané třídy). Pro praktické ukázky se podívejte na chování <a href=\"/materialy/python/objects/super.xml\">funkce <code>super()</code> u tříd</a>, která právě s <strong>řetězcem dědičnosti MRO</strong> pracuje.\n  </p>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    PS: Jedná se o upravený algoritmus převzatý z Perlu, který s vícenásobnou dědičností mezi rozšířenými jazyky přišel jako první.\n  </div></div>\n\n</div>"
     },
@@ -78,8 +107,10 @@
       "id": "id9",
       "idx": 8,
       "title": "Třídy a funkce – „getfullargspec()“",
-      "tags": [],
-      "diff": null,
+      "tags": [
+        "Skip"
+      ],
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Třídy a funkce – „getfullargspec()“</h2></div><div class=\"section-body\">\n\n  <p class=\"enumerate\">\n    Zajímavá je metoda <code>inspect.getfullargspec(FUNKCE)</code>, která vrátí kompletní popis vstupních argumentů dané funkce: \n  </p>\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\n            📄 Program: <a href=\"_files/modul_inspect/inspect.getfullargspec.py\"><em>modul_inspect/inspect.getfullargspec.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import inspect\nfrom pprint import pprint\n\ndef gen():\n    yield 1\n\ninfo = inspect.getfullargspec(gen)\nprint(info)\n\nprint()\n\ninfo = inspect.getfullargspec(pprint)\nprint(info)</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">FullArgSpec(args=[], varargs=None, varkw=None, defaults=None, kwonlyargs=[], kwonlydefaults=None, annotations={})\n\nFullArgSpec(args=['object', 'stream', 'indent', 'width', 'depth'], varargs=None, varkw=None, defaults=(None, 1, 80, None), kwonlyargs=[], kwonlydefaults=None, annotations={})</pre></div></div>\n  \n  <p class=\"enumerate\">\n    S ní spolupracuje šikovná metoda <code>inspect.formatargspec()</code>, která z prvních čtyř jejích návratových hodnot (byla totiž navržena pro spolupráci se starší metodou <em>getargspec()</em>) dokáže vygenerovat přehlednou specifikaci volání dané funkce:\n  </p>\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\n            📄 Program: <a href=\"_files/modul_inspect/inspect.formatargspec.py\"><em>modul_inspect/inspect.formatargspec.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import inspect\nfrom pprint import pprint\n\nargs = inspect.getfullargspec(pprint)\ninfo = inspect.formatargspec(args.args, args.varargs, args.varkw, args.defaults)\nprint(info)</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">(object, stream=None, indent=1, width=80, depth=None)</pre></div></div>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Jak vidíte, ztrácí dnes tahle metoda trochu na kráse, protože <em>getfullargspec()</em> vrací v Python'u 3.x další návratové hodnoty – <em>keyword-only</em> argumenty a anotace – se kterými už nespolupracuje.\n  </div></div>\n\n</div>"
     }
