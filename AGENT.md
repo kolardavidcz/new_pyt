@@ -147,6 +147,29 @@ All code blocks across slides and quizzes adhere to the exact same standard:
 
 ---
 
+## 🎓 Pedagogical Slide Metadata & Subagent Prompting Guidelines
+
+When evaluating, re-tagging, or enriching slides with subagents:
+
+### 1. 5-Tag Taxonomy & Pedagogical Target Ratios
+- **`Core` (~60–70%)**: Indispensable foundational concepts needed during standard 90-minute lectures for university students transitioning from C/C++/Java to Python.
+- **`Skip` (25–35% target)**: Do NOT hesitate to tag slides as Skip. Explicit criteria for Skip:
+  - Raw bytecode / VM opcode disassembly dumps (e.g. `pickletools`, `dis` raw output)
+  - Tool installation steps / package manager CLI flags (e.g. LLVM install, compiler toolchains)
+  - Historical trivia (e.g. Python 2 obsolete builtins, ASCII Protocol 0, CERN 1990s HTML parsers)
+  - Unreadable nested anti-patterns (e.g. 4-level nested list comprehensions)
+  - Boilerplate or empty/TODO placeholder slides
+- **`WOW` (~15–20%)**: Modern Pythonic idioms (Python 3.8–3.13 features, pattern matching, f-strings, dictionary comprehensions, JIT acceleration).
+- **`Tricky` (~15–20%)**: Subtle gotchas and traps for C/Java developers (mutable default arguments, $O(n)$ complexity of `pop(0)` vs `deque`, integer overflow in JIT/C extensions, variable scoping rules).
+- **`Already Studied` (~3–5%)**: Recurring slides repeating material covered in a canonical deep-dive deck. Must link to the canonical lecture with `already_studied_in: { lecture_id, slide_id, lecture_title, week }`.
+
+### 2. Subagent Prompting Best Practices (2x Context Rule)
+- Always provide subagents with **2x detailed instructions**: full slide text, code snippet, surrounding lecture title, target university student profile, and explicit positive/negative criteria for every tag.
+- Never use heuristic shortcuts when evaluating content; let subagents read the full slide contents.
+- Keep subagent concurrency $\le 10$ to prevent API rate limits.
+
+---
+
 ## 🧪 Testing & Verification Suite
 
 Agents MUST execute verification tools before concluding any task:
@@ -175,4 +198,5 @@ node --check app/js/highlight.js && node --check app/js/format.js && node --chec
 1. **No Superficial Symptom Patches**: Never comment out failing assertions, swallow errors, or return dummy fallbacks. Trace root causes with empirical evidence.
 2. **Never Declare Success Without Verification**: Always execute `node tools/check_contrast.mjs`, `node tools/prepare_vercel.mjs`, and syntax audits.
 3. **Preserve User Customization**: Always adhere to user rules and high engineering standards (WCAG 2.1 AA, linting, test reliability).
+
 
