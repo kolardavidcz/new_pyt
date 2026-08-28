@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\n\n    <p>\n        Klasický pythoní <a href=\"/materialy/python/types/dictionaries.xml\">slovník</a> můžete v principu vyrobit především následujícími dvěma metodami:\n    </p>\n    <ul>\n        <li>\n            zavedením z iterovatelného objektu, který obsahuje logicky provázané dvojce klíč-hodnota (např. seznam dvojic), a to buď přímo v konstruktoru nebo nějakým cyklením přes tento iterovatelný objekt a postupným přidáváním jednotlivých dvojic;\n        </li>\n        <li>\n            zavedením z iterovatelného objektu obsahujícím pouze klíče – buď pomocí metody <em>fromkeys()</em>, kdy každý klíč dostane jednu konkrétní výchozí hodnotu, nebo můžete nasadit nějakou složitou rozhodovací mašinérii ve smyčce.\n        </li>\n    </ul>\n    <p>\n        Type <strong><code>collections.defaultdict</code></strong> řeší právě tento druhý problém – jakou výchozí hodnotu přiřadit dosud neexistujícímu klíči.\n    </p>\n\n</div>"
     },
@@ -18,7 +18,7 @@
       "idx": 1,
       "title": "Příklad – klasicky",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -40,7 +40,6 @@
       "idx": 3,
       "title": "Příklad – pomocí „defaultdict“",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",
@@ -54,7 +53,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Zavedení</h2></div><div class=\"section-body\">\n\n    <p>\n        <em>defaultdict</em> je prakticky ve všem úplně stejný jako <a href=\"/materialy/python/types/dictionaries.xml\">klasický slovník</a>. Jedinou výjimkou je právě první parametr konstruktoru, kterým je odkaz na vytvořující funkci (a pak už může následovat klasický iterovatelný objekt jako u <em>xd = dict(ITERABLE)</em>):\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">xd = collections.defaultdict(default_factory=None, iterable=())</pre>\n    <p>\n        Neuvedení prvního parametru nastaví vlastnost <em>xd.default_factory</em> na <code>None</code> a jakýkoliv neexistující klíč pak vyhodí výjimku <em>KeyError</em>. Takže ve většině případů má větší smysl tam skutečně referenci na nějakou funkci uvést ^_^ Přitom tou funkcí může s výhodou být třebas i lambda-funkce, jak ukazuje přepis předchozího příkladu:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = \"abrakadabra\"\n&gt;&gt;&gt; xd = defaultdict(lambda: 0)\n&gt;&gt;&gt; for x in xs:\n...     xd[x] += 1\n...\n&gt;&gt;&gt; xd\ndefaultdict(&lt;function &lt;lambda&gt; at 0x7fc74581ea60&gt;, {'b': 2, 'd': 1, 'r': 2, 'a': 5, 'k': 1})</pre>\n\n</div>"
     },
@@ -63,8 +62,7 @@
       "idx": 5,
       "title": "Srovnání se „setdefault()“",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -77,7 +75,7 @@
       "tags": [
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Poznámky</h2></div><div class=\"section-body\">\n\n    <p class=\"enumerate\">\n        Jako vytvořující funkce se často používají vestavěné konstruktory jako <em>list</em>, <em>set</em>, <em>dict</em> nebo <em>int</em>. Výhodou <em>defaultdict</em>u však je, že v použité funkci se můžete docela vyřádit:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; from collections import defaultdict\n&gt;&gt;&gt; xs = \"abrakadabra\"\n&gt;&gt;&gt; xd = defaultdict(\n  lambda: ['samohláska', 0] if x in 'aeiouy' else ['souhláska', 0]\n)\n&gt;&gt;&gt; for x in xs:\n...     xd[x][1] += 1\n...\n&gt;&gt;&gt; xd\ndefaultdict(&lt;function &lt;lambda&gt; at 0x7fc7473b96a8&gt;,\n  {'b': ['souhláska', 2], \n   'd': ['souhláska', 1],\n   'r': ['souhláska', 2],\n   'a': ['samohláska', 5],\n   'k': ['souhláska', 1]}\n)</pre>\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        (Pozalamováno pro lepší čitelnost.)\n    </div></div>\n    <p>\n        Všimněte si ale, že <strong>vytvořující funkce obdržela proměnnou klíče <code>x</code> automaticky z okolního kontextu!</strong>\n    </p>\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        Což je víc než hloupé, protože to <code>x</code> ve <em>for-in</em> a <em>if-in</em> bohužel není jen pouhá shoda jmen proměnných – lambda-funkce musí opravdu odkazovat na již existující příslušnou proměnnou cyklu :-(\n    </div></div>\n    \n    <p class=\"enumerate\">\n        <em>setdefault()</em> se v tomto případě chová výrazně rozumnějí, protože klíč získává hodnotu předáním jako argument funkce:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; def fn(k):\n...     return ['samohláska', 0] if k in 'aeiouy' else ['souhláska', 0]\n&gt;&gt;&gt; xe = {}\n&gt;&gt;&gt; for x in \"abrakadabra\":\n...     xe.setdefault(x, fn(x))[1] += 1\n&gt;&gt;&gt; xe\n{'a': ['samohláska', 5],\n 'b': ['souhláska', 2],\n 'd': ['souhláska', 1],\n 'k': ['souhláska', 1],\n 'r': ['souhláska', 2]}</pre>\n    <p>\n        Chcete-li se tudíž ve vytvořující funkci jaksepatří „vyřádit“, je <em>setdefault()</em> lepší volba.\n    </p>\n\n</div>"
     }

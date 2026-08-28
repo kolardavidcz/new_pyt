@@ -18,8 +18,7 @@
       "idx": 1,
       "title": "Poznámky k importu",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -41,7 +40,6 @@
       "idx": 3,
       "title": "Zavedení modulů „import *“ &amp; „__all__“",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "pythonic",
@@ -75,7 +73,6 @@
       "idx": 6,
       "title": "Kde Python hledá moduly? II – „sys.path“ (b)",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "newconcept",
@@ -89,7 +86,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Kde Python hledá moduly? III – přidání vlastních cest</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        V důsledku struktury proměnné <em>sys.path</em> je možné standardní pythoní distribuci rozšířit o další místa výskytu balíčků/modulů několika různými způsoby:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Umístěním balíčků/modulů do stejného adresáře, ve kterém je hlavní spouštěný skript.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\"> Aktuální adresář je prvním členem seznamu <em>sys.path</em> a vyhraje nade vším. To je nejjednodušší způsob, pokud uvedené balíčky/moduly nepotřebujete i někde jinde. </div></div>\r\n        </li>\r\n        <li>\r\n            Úpravou obsahu <strong>systémové proměnné <code>PYTHONPATH</code></strong>.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\"> Tuto úpravu musíte provést mimo vlastní pythoní skripty, ale popravdě je pro balíčky/moduly roztroušené všude možně po souborovém systému asi zdaleka nejblbuvzdornější. </div></div>\r\n        </li>\r\n        <li>\r\n            Vyjmenováním (existujících) adresářů do <em>*.pth</em> souborů: Co řádka těchto souborů, to jedna cesta k adresáři. Všechny tyto cesty jsou přidány <strong>na konec</strong> seznamu <em>sys.path</em>, takže nezakryjí systémové adresáře (a už vůbec ne ty v <em>PYTHONPATH</em> nebo dokonce v místě skriptu).\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\"> Umístění nadřazeného adresáře pro <em>*.pth</em> soubory určuje proměnná <code>site.USER_SITE</code>. Nemusí existovat (a příkaz <code>python -m site</code> vám to nahlásí) – pak ho stačí vytvořit. </div></div>\r\n        </li>\r\n    </ul>\r\n    \r\n    <p class=\"enumerate\">\r\n        Jelikož proměnná <em>sys.path</em> je obyčejný seznam, můžete si ji upravit přidáním vlastních cest na vhodná místa. Má to ale drobný zádrhel – <strong>budou-li cesty relativní vůči umístění hlavního skriptu, nebude to fungovat v případě skriptů spouštěných relativně k místu volání</strong> (tj. například jako <code>python3 cesta/skript.py</code>). Oprava je (teoreticky) jednoduchá – stačí cesty uvést absolutně.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jelikož ale u přenositelného programu nemůžete cesty zapsat „natvrdo“, musíte tu absolutní zjistit až po spuštění programu a teprve poté ji k originální relativní doplnit a zapsat do <code>sys.path</code>.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -100,7 +97,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">*.pyc, *.pyo</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Úspěšně naimportované moduly jsou Python'em zkompilovány do bajtkódu interpretru, a to buď do souborů <code>*.pyc</code> (standardně) nebo <code>*.pyo</code> (byl-li interpretr spuštěn s parametrem pro optimalizaci). Jejich (víceméně jedinou) výhodou je, že se rychleji načítají (není třeba znovu procházet zdrojový kód programu, již je připraven v binární podobě pro virtuální počítač Python'u) =&gt; při příštím použití budou dříve k dispozici.\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Python pozná, může-li použít některý ze zkompilovaných souborů nebo byl-li jejich zdrojový <code>*.py</code> soubor mezitím modifikován.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Tyto zkompilované soubory jsou platformně nezávislé (zato jsou pochopitelně zase závislé na konkrétní verzi Python'u a jeho virtuálním počítači). Proto, když na to přijde, můžete váš program distribuovat přímo ve formě těchto <i>byte-compiled</i> souborů, tj. bez zdrojáků – o dost hůře se čtou :)\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        <em>*.pyo</em> vzniknou vyvoláním interpretru s přepínačem <code>-O</code>. V dané době to znamená pouze jediné – z kódu jsou odstraněny všechny příkazy <code>assert</code>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Drsnější varianta <code>-OO</code> pošle dopryč i <em>komentářové řetězce</em>, což už může pochopitelně způsobit havárii některých programů.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -111,7 +108,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">„__name__“ I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož vlastně každý pythonovský zdrojový soubor může sloužit zároveň jako modul i jako skript, potřebujeme mezi těmito použitími rozlišit. K tomu slouží globální proměnná aktuálního modulu/skriptu <code>__name__</code>, která obsahuje:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            řetězec <code>__main__</code> – v případě skriptu; tj. pokud jsme soubor <i>*.py</i> spustili jako „hlavní“, např. z příkazové řádky\r\n        </li>\r\n        <li>\r\n            <em>JménoSouboru</em> (bez přípony) – v případě modulu; tj. pokud jsme soubor <i>*.py</i> naimportovali pomocí příkazu <code>import SOUBOR</code>\r\n        </li>\r\n        <li>\r\n            <em>JménoBalíčku.JménoSouboru</em> (opět bez přípony) – jako v předchozím případě, ale pro modul, který je součástí nějakého balíčku.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\"> Jmen balíčků a podmodulů tam může být samozřejmě více, je-li importovaný modul součástí struktury se složitější hierarchií. Navzájem jsou oddělena standardní tečkou. </div></div>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -120,9 +117,9 @@
       "idx": 10,
       "title": "„__name__“ II",
       "tags": [
-        "Core"
+        "WOW"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">„__name__“ II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Chceme-li tedy, aby se modul při použití jako skript (tj. tehdy, když není <i>import</i>ován) nějak rozumně choval, stačí na jeho konec přidat kód:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">if __name__ == \"__main__\":\n    # kód pro užití modulu jako skriptu</pre>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Typicky se tak výkonnový kód modulu uzavře do několika funkcí, z nichž se ta „hlavní“ v tomto bloku zavolá.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Nezapomeňte, že veškerý kód, který se může vykonat, se při prvním importu modulu také vykoná. Jinými slovy – vše, co není uzavřeno ve funkcích nebo podobně, bude při importu provedeno (pokud tedy samozřejmě ty funkce nebudete rovnou i volat, že ;-).\r\n        </div></div></div>\r\n\r\n</div>"
     },
@@ -131,7 +128,6 @@
       "idx": 11,
       "title": "Kruhový import",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "newconcept",
@@ -156,7 +152,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">„__file__“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Celkem snadno se vám může stát, že se v importech tak říkajíc utopíte a nebudete mít ani nejmenší páru, který sakra modul se nakonec vlastně používá :-) K záchraně pak – alespoň v jednodušších případech – může posloužit speciální proměnná importovaného modulu <code>__file__</code>, která nahlásí, odkud v rámci souborového systému inkrimimovaný pachatel pochází:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; from html import entities\n&gt;&gt;&gt; dir(entities)\n['__builtins__', '__cached__', '__doc__', '__file__', '__initializing__',\n '__loader__', '__name__', '__package__', 'codepoint2name', 'entitydefs',\n 'html5', 'name2codepoint']\n&gt;&gt;&gt; entities.__file__\n'C:\\\\PROGRAMS\\\\Python33\\\\lib\\\\html\\\\entities.py'</pre>\r\n\r\n</div>"
     },
@@ -178,7 +174,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Python 3.3+ vs všichni ostatní I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Princip popsaný na předchozím slajdu funguje v Python'u po celou jeho historii až do verze 3.2 a má své plusy i mínusy:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Na jednu stranu je jednoduchý – co potřebujete do balíčku, „nahážete“ dohromady do jednoho velkého nadřazeného adresáře a jste hotovi.\r\n        </li>\r\n        <li>\r\n            Na druhou stranu máte problém, pokud byste chtěli nějakou jeho podčást použít samostatně v jiném balíčku – Python sice umožňuje z balíčku naimportovat podmodul nezávisle na ostatních, ale vyžaduje-li balíček nějakou inicializaci, musíte ji velmi pravděpodobně právě z tohoto důvodu zopakovat ve všech jeho <em>__init__.py</em> souborech, a to vám při použití podmodulů nezávisle na balíčku rozhodně nepomůže.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Z tohoto a mnoha jiných důvodů byl systém vyhledávání modulů v balíčcích a náležení do balíčků v Python'u 3.3 docela radikálně změněn. Nejdříve se podíváme na ten starší, a <a href=\"?slajd=21\">pak si okomentujeme ten novější</a>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -220,7 +216,7 @@
       "idx": 19,
       "title": "__init__.py II",
       "tags": [
-        "Skip"
+        "WOW"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -231,7 +227,6 @@
       "idx": 20,
       "title": "„__package__“",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "newconcept",
@@ -245,7 +240,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Poznámka k importu „*.pyc“ a „*.pyo“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Mezi řadami Python'u 2.x a 3.x je kromě kosmetického rozdílu v místě generování bajtkódových souborů – stejný adresář pro řadu 2.x a speciální podadresář <code>__pychache__</code> pro řadu 3.x – jeden veliký, převeliký rozdíl:\r\n    </p>\r\n    <blockquote>\r\n        Bajtově zkompilované soubory z podadresáře <code>__pycache__</code> nebudou naimportovány, pokud k nim bude (o úroveň výš) chybět odpovídající zdrojový kód v podobě <em>*.py</em>.\r\n    </blockquote>\r\n    <p>\r\n        Prakticky to pro trojkový Python znamená, že:\r\n    </p>\r\n    <ol>\r\n        <li>\r\n            Pokud odstraníte zdrojový kód importovaného modulu, jeho předkompilovaná podoba z adresáře <em>__pycache__</em> nebude použita.\r\n        </li>\r\n        <li>\r\n            Pokud však tento předkompilovaný soubor přenesete o adresář výše (tedy vedle skriptu, který ho importuje) a patřičně ho přejmenujete (odstraněním části <em>cpython-3N</em>), bude ho již možné naimportovat.\r\n        </li>\r\n    </ol>\r\n    <p>\r\n        PS: Od verze Python'u 3.8 si navíc můžete vybrat, kam se budou moduly předkompilovávat (viz proměnná prostředí <em>PYTHONPYCACHEPREFIX</em>, parametr spuštění interpretu <code>-X pycache_prefix=PATH</code> a info z běžícího programu <code>sys.pycache_prefix</code>). Což je výhodné, potřebujete-li vlastní zdrojové soubory z libovolného důvodu umístit třebas na jiném svazku.\r\n    </p>\r\n\r\n</div>"
     },
@@ -254,7 +249,7 @@
       "idx": 22,
       "title": "Python 3.3+ vs všichni ostatní II",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -265,7 +260,7 @@
       "idx": 23,
       "title": "Srovnání balíčkovacích strategií",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -287,8 +282,7 @@
       "idx": 25,
       "title": "__main__.py I",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -299,7 +293,7 @@
       "idx": 26,
       "title": "__main__.py – příklad",
       "tags": [
-        "Core"
+        "WOW"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -312,7 +306,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">28</span><h2 class=\"section-title\">__main__.py II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Celé to jde dokonce ještě dál – z adresáře obsahujícího soubor <code>__main__.py</code> můžete vyrobit zip-archív (resp. ze souborů v něm obsažených; adresář bude efektivně nahrazen archívem)..\r\n    </p>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">foo.zip/\n    __main__.py\n    bar.py</pre>\r\n    <p>\r\n        ..a chovat se k němu stejně, jako kdyby to byl adresář:\r\n    </p>\r\n    <pre class=\"brush: shell; gutter: false; toolbar: false; \"># python foo.zip\nAhoj, MAIN!</pre>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Dokonce není ani potřeba, aby se archív jmenoval zrovna <em>foo.zip</em>. Narazil jsem na doporučení (zřejmě po vzoru <em>*.pyc</em> a <em>*.pyo</em>) používat koncovku <em>pyz</em>, tedy v našem případě <em>foo.pyz</em>.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Jak ukázal <a href=\"http://utcc.utoronto.ca/~cks/space/blog/python/RunningZipfiles\" class=\"external\">Running Zip Files</a>, dokonce můžete do tohoto <a href=\"_files/foo.runable.pyz\">zip-souboru</a> přidat klasickou unixovou <a href=\"http://en.wikipedia.org/wiki/Shebang_%28Unix%29\" class=\"external\">shebang</a>-hlavičku (ignorovány jsou řádky začínající na <code>#</code>, prázdné řádky a řádky obsahující pouze bílé znaky) a soubor pak můžete na unixových systémech skutečně rovnou spouštět. Jen nezapomeňte, že konce řádků přidaného textu musí být unixové (tedy <em>LF</em>).\r\n        </div></div></div>\r\n\r\n</div>"
     },
@@ -334,7 +328,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">30</span><h2 class=\"section-title\">„dir()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pro ukázání „obsahu“ modulu, tj. objektů dostupných v rámci příslušného modulu (ať už jsou to podmoduly, funkce, proměnné či třeba třídy), slouží globální funkce <code>dir()</code>:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <code>dir(MODUL)</code> – vrátí seřazený seznam řetězců představujících jména objektů dostupných v modulu MODUL\r\n        </li>\r\n        <li>\r\n            <code>dir()</code> – vypíše jména aktuálně definovaných objektů (tj. například v rámci daného sezení)\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Popravdě výpis funkce <code>dir()</code> není nijak přesně definován – prostě se pokusí pokaždé něco vrátit, ale jestli je to všechno, případně co to „všechno“ vlastně znamená, není nijak zaručené ani předepsané.\r\n    </div></div>\r\n    \r\n    <p>\r\n        Příklad čerstvě spuštěného pythoního shellu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; dir()\n['__builtins__', '__doc__', '__name__', '__package__']\n\n&gt;&gt;&gt; xs = [1, 2, 3,]\n&gt;&gt;&gt; dir()\n['__builtins__', '__doc__', '__name__', '__package__', 'xs']\n\n&gt;&gt;&gt; import sys\n&gt;&gt;&gt; dir()\n['__builtins__', '__doc__', '__name__', '__package__', 'sys', 'xs']\n\n&gt;&gt;&gt; dir(sys)\n['__displayhook__', '__doc__', '__excepthook__', '__name__', '__package__',\n '__stderr__', '__stdin__', '__stdout__', '_clear_type_cache',\n '_current_frames', '_getframe', 'api_version', 'argv', 'builtin_module_names',\n 'byteorder', 'call_tracing', 'callstats', 'copyright', 'displayhook',\n 'dllhandle', 'dont_write_bytecode', 'exc_info', 'excepthook', 'exec_prefix',\n 'executable', 'exit', 'flags', 'float_info', 'float_repr_style',\n 'getcheckinterval', 'getdefaultencoding', 'getfilesystemencoding',\n 'getprofile', 'getrecursionlimit', 'getrefcount', 'getsizeof', 'gettrace',\n 'getwindowsversion', 'hexversion', 'int_info', 'intern', 'maxsize',\n 'maxunicode', 'meta_path', 'modules', 'path', 'path_hooks',\n 'path_importer_cache', 'platform', 'prefix', 'ps1', 'ps2', 'setcheckinterval',\n 'setfilesystemencoding', 'setprofile', 'setrecursionlimit', 'settrace',\n 'stderr', 'stdin', 'stdout', 'subversion', 'version', 'version_info',\n 'warnoptions', 'winver']</pre>\r\n\r\n</div>"
     },

@@ -7,10 +7,9 @@
       "idx": 0,
       "title": "Booleovské operátory",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "paradigm",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Booleovské operátory</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    Pravdivostní operátory <code>and</code> a <code>or</code> v Python'u používají zkrácené vyhodnocování, tzn. že je-li možné určit hodnotu výrazu po vyhodnocení jeho prvního operandu, druhý operand není vůbec uvažován. Souhrnně tedy platí:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        <code>x or y</code> : \r\n        je-li <code>x</code> nepravdivé, vrať <code>y</code>, jinak vrať <code>x</code>\r\n    </li>\r\n    <li>\r\n        <code>x and y</code> :\r\n        je-li <code>x</code> pravdivé, vrať <code>y</code>, jinak vrať <code>x</code>\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    Algoritmus vyhodnocování je vskutku takovýto – tyto operace vrací právě jeden ze svých operandů, nikoli booleovskou hodnotu (ale viz následující slajd):\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; a = []    # tedy False\n&gt;&gt;&gt; b = [1]   # tedy True\n\n&gt;&gt;&gt; a and b\n[]                   # tedy False\n&gt;&gt;&gt; a or b\n[1]                  # tedy True</pre>\r\n\r\n  <p>\r\n    K dispozici je samozřejmě i operátor negace <code>not</code>. Má vyšší prioritu než <code>and</code> a to má zase vyšší prioritu než <code>or</code>.\r\n  </p>\r\n  \r\n  <p>\r\n    Jelikož prakticky všechny ostatní operátory mají prioritu vyšší než operátory pravdivostní, tak je závorkování nejen dobrým nápadem pro lepší čitelnost.\r\n  </p>\r\n\r\n</div>"
     },
@@ -19,10 +18,9 @@
       "idx": 1,
       "title": "Pravdivostní hodnoty objektů",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "paradigm",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Pravdivostní hodnoty objektů</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Ačkoli je kvůli čitelnosti dobrým zvykem vypisovat podmínky v plné formě, často můžeme využít toho, že libovolný objekt v Python'u (tedy prakticky cokoliv) je možno testovat na pravdivostní hodnotu. Přitom následující hodnoty jsou pokládány za <code>False</code>, cokoliv jiného za <code>True</code>:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        <code>None</code>\r\n    </li>\r\n    <li>\r\n        <code>False</code>\r\n    </li>\r\n    <li>\r\n        nula v libovolném číselném typu (např. <code>0</code>, <code>0.0</code>, <code>0j</code>)\r\n    </li>\r\n    <li>\r\n        libovolná prázdná sekvence (např. <code>''</code>, <code>()</code>, <code>[]</code>)\r\n    </li>\r\n    <li>\r\n        libovolné prázdné mapování (např. <code>{}</code>)\r\n    </li>\r\n    <li>\r\n        instance uživatelem zavedené třídy, která definuje „magickou“ metodu <code>__bool__</code>, resp. <code>__len__</code>, vrací-li tato metoda boolovské <code>False</code>, resp. celočíselnou <code>0</code>\r\n    </li>\r\n  </ul>\r\n  \r\n  <p>\r\n    Poznámka 1: Python sám od sebe vrací ve většině případů pravdivostní hodnoty ve formě <code>True/False</code>, resp. <code>1/0</code>. Specifickou výjimkou jsou booleovské operace <code>or</code> a <code>and</code>, které vrací jeden ze svých argumentů (viz předchozí slajd).\r\n  </p>\r\n  <p>\r\n    Poznámka 2: Pozor na neprázdné objekty plné <em>False</em> hodnot – třebas taková n-tice <code>(False, [])</code> se už vyhodnotí jako <em>True</em>, protože není prázdná (obsahuje dokonce dva prvky)!\r\n  </p>\r\n\r\n</div>"
     },
@@ -31,9 +29,9 @@
       "idx": 2,
       "title": "Konstruktor „bool()“",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Konstruktor „bool()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jako vestavěný typ (byť tedy vlastně spíš podtyp celých čísel) mají pravdivostní hodnoty svůj vlastní konstruktor <strong><code>bool()</code></strong>, který umí jemu zadaný parametr explicitně vyhodnotit a převést na <code>True</code>/<code>False</code>.\r\n    </p>\r\n    <p>\r\n        Sám o sobě vrací <em>False</em> (asi v konzistenci s „nulovou/prázdnou výchozí hodnotou“ u ostatních typů)..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; bool()\nFalse</pre>\r\n    <p>\r\n        ..ale jinak to, co by člověk se znalostí <a href=\"?slajd=2\">předchozího slajdu</a> očekával:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; bool('')\nFalse\n&gt;&gt;&gt; bool(' ')\nTrue\n&gt;&gt;&gt; bool(0)\nFalse\n&gt;&gt;&gt; bool(1)\nTrue</pre>\r\n\r\n</div>"
     },
@@ -42,7 +40,6 @@
       "idx": 3,
       "title": "Porovnávání",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",
@@ -54,7 +51,6 @@
       "idx": 4,
       "title": "Test shodnosti objektů „is“",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "paradigm",
@@ -66,8 +62,7 @@
       "idx": 5,
       "title": "Operátor výskytu „in“",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -80,7 +75,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Tabulka priorit operátorů</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Tabulka je seřazena od nejvyšší priority k nejnižší, tj. např. operátory porovnávání mají vyšší prioritu než logické operátory:\r\n  </p>\r\n  <table class=\"center\" rules=\"all\">\r\n    <tr>\r\n      <th>operátor</th>\r\n      <th>popis</th>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>(expressions...), [expressions...], {key:datum...}</code>\r\n      </td>\r\n      <td>„výroba“ nebo zobrazení n-tice, zobrazení seznamu či slovníku</td>\r\n      \r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>x[index], x[index:index], x(arguments...), x.attribute</code>\r\n      </td>\r\n      <td>hodnota, výřez, volání, odkaz na atribut</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>**</code>\r\n      </td>\r\n      <td>umocňování</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>-x +x ~x</code>\r\n      </td>\r\n      <td>unární minus a plus, bitové NOT</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>* / // %</code>\r\n      </td>\r\n      <td>násobení, dělení, modulo</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>+ -</code>\r\n      </td>\r\n      <td>sčítání, odčítání</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>&lt;&lt; &gt;&gt;</code>\r\n      </td>\r\n      <td>levý a pravý posun</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>&amp;</code>\r\n      </td>\r\n      <td>bitové AND</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>^</code>\r\n      </td>\r\n      <td>bitové XOR</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>|</code>\r\n      </td>\r\n      <td>bitové OR</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>in, not in, is, is not, &lt;, &lt;=, &gt;, &gt;=, !=, ==</code>\r\n      </td>\r\n      <td>test na přítomnost hodnoty v sekvenci, test na identitu objektů, porovnávání</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>not</code>\r\n      </td>\r\n      <td>booleovské NOT</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>and</code>\r\n      </td>\r\n      <td>booleovské AND</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>or</code>\r\n      </td>\r\n      <td>booleovské OR</td>\r\n    </tr>\r\n    <tr>\r\n      <td>\r\n        <code>lambda</code>\r\n      </td>\r\n      <td>lambda-výraz</td>\r\n    </tr>\r\n  </table>\r\n\r\n</div>"
     }

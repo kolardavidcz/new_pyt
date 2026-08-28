@@ -20,7 +20,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Rekurze s jednou větví – faktoriál</h2></div><div class=\"section-body\">\r\n\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">def faktorial(n):\n    if n == 0:\n        return 1\n    else:\n        return n * faktorial(n-1)\n&gt;&gt;&gt; faktorial(5)\n120\n&gt;&gt;&gt; faktorial(15)\n1307674368000</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Větev <em>else</em> nemusí zjevně býti vůbec explicitně uvedena, a také se tak často činí:\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">def faktorial(n):\n    if n == 0:\n        return 1\n    return n * faktorial(n-1)</pre>\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -51,10 +51,9 @@
       "idx": 4,
       "title": "Graf průběhu výpočtu",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Graf průběhu výpočtu</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    Ukažme si rozpis <strong>stromu volání</strong> pro pouhý devátý člen Fibonacciho posloupnosti:\r\n  </p>\r\n  <img src=\"_files/fibonacci.png\" width=\"800\" class=\"zoom\">\r\n  <p>\r\n    Přitom jsem červeně vyznačil části výpočtu, které mají za úkol zjistit hodnotu čtvrtého členu – jak můžete vidět, v našem programu se tento konkrétní člen počítá nezávisle na sobě hned osmkrát!\r\n  </p>\r\n\r\n</div>"
     },
@@ -63,7 +62,6 @@
       "idx": 5,
       "title": "PS: Fibonacciho posloupnost s jedním rekurzivním voláním",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",
@@ -75,10 +73,9 @@
       "idx": 6,
       "title": "Paměťová náročnost rekurzivních algoritmů",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Paměťová náročnost rekurzivních algoritmů</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Jelikož si zjevně <em>virtuální počítač</em> (vykonávající náš program) musí před každým rekurzivním voláním uložit <em>aktuální stav programu</em>, aby se k němu po vykonání rekurzivních volání dokázal vrátit,..\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Například v naší první ukázce při výpočtu faktoriálu čísla 6 si musel virtuální počítač uložit právě toto číslo plus informaci, že jím má vynásobit návratovou hodnotu z rekurzivního volání a tu následně vrátit.\r\n  </div></div>\r\n  <p>\r\n    .., a že počet těchto volání může růst pěkně rychle,..\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Jak ukazuje už poměrně triviální příklad Fibonacciho posloupnosti.\r\n  </div></div>\r\n  <p>\r\n     ..nepřekvapí, že jsou rekurzivní algoritmy ve své základní podobě pěkně „nenažrané“. Některé jazyky se o to dokážou postarat, Python mezi ně však nepatří a má tak nepřekvapivě na počet rekurzivních kroků pevně stanovenou hranici, většinou kolem tisíce zanořených volání (a když ji překročíte, setkáte se v posledních verzích s výjimkou <em>RecursionError</em>).\r\n  </p>\r\n\r\n</div>"
     },
@@ -109,10 +106,9 @@
       "idx": 9,
       "title": "Praktické použití rekurze",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Praktické použití rekurze</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Z předchozího slajdu by se mohlo zdát, že vede-li řešení úlohy na rekurzivní algoritmus, můžeme to pro jen trošku větší vstupní data rovnou zabalit. Naštěstí tomu tak není – za pomoci <a href=\"memoization.xml\">různých technik</a> se dají rekurzivní algoritmy výrazně zrychlit a vzdávat se jejich názornosti tak nemusíme.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    A to pomíjím fakt, že se často dají přepsat do mnohem méně náročné (byť ne už vždy tak názorné) podoby – třebas n-tý člen Fibonacciho posloupnosti je mnohem inteligentnější spočítat postupně od prvních dvou členů, čímž hned získáme algoritmus s konstantní paměťovou náročností (stačí si pamatovat pouze dva předchozí členy) a lineární náročností časovou (prostě musíme postupně spočítat uvedených <em>n</em> členů). A jde to dokonce i <a href=\"https://cs.wikipedia.org/wiki/Fibonacciho_posloupnost\" class=\"external\">ještě rychleji</a>.\r\n  </div></div>\r\n  <p>\r\n    Prakticky se tedy vyplatí odladit si rekurzivní algoritmus na <strong>malém množství vstupních dat</strong>, následně ho nějakou technikou zrychlit a až teprvé poté do něj dat předhodit více. A také víc než kde jinde – sednout si s tužkou a papírem a spočítat si, zda se řešení uvedeným postupem vůbec máte šanci dočkat ^_~\r\n  </p>\r\n\r\n</div>"
     },
@@ -121,10 +117,9 @@
       "idx": 10,
       "title": "PS: Koncová rekurze („tail call“)",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">PS: Koncová rekurze („tail call“)</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Je-li rekurzivní volání posledním místem výkonného kódu funkce (tedy <em>funkce po něm již pouze vrací hodnotu</em>), je možné rekurzivní volání – tedy sekvenci „ulož návratové informace a vyvolej rekurzivní krok“ – přepsat na přímé volání následujícího kroku bez návratu zpět. Díky tomu:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      na každý rekurzivní krok se ušetří místo v paměti vyhrazené dříve pro návratové informace;\r\n    </li>\r\n    <li>\r\n      vykonávání kódu se zrychlí vynecháním „režije“ potřebné na obsluhu klasických rekurzivních volání.\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    Tato na první pohled banálně vypadající optimalizace<sup>*</sup> je často velice významná. Celá třída úloh se tak stává rekurzivně vůbec naprogramovatelnými, protože při běžné rekurzi by jejich obsluha velmi rychle „zlikvidovala“ dostupné paměťové místo i výpočetní čas.\r\n  </p>\r\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n      <sup>*</sup> Obzvláště v podobě, kdy sice za rekurzivním voláním následuje další část výpočtu, je však možno ji vzít a „poslat“ volané funkci k dopočítání.\r\n    </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n      Funkcionální a logické jazyky (jako Lisp, Scheme, Haskell, ML, Prolog…) obsahují typicky podporu pro <em>koncovou rekurzi</em> často přímo ve standardu (a návrhu) jazyka.\r\n    </div></div></div>\r\n\r\n</div>"
     }

@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <strong>XPath</strong> (= <em>XML Path Language</em>) je (dotazovací) jazyk určený převážně ke dvěma věcem:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            výběr částí XML-dokumentu pro další zpracování;\r\n        </li>\r\n        <li>\r\n            operace nad těmito vybranými částmi.\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Částmi se rozumí nejmenší možné rozumně adresovatelné prvky XML-dokumentu, prakticky tedy uzly příslušné stromové reprezentace dokumentu (elementy, atributy, čistě textové prvky a další).\r\n    </div></div>\r\n    <p>\r\n        V současné době standard finišuje již do třetí verze, přičemž obzvláště mezi verzí první a druhou je několikařádový rozdíl ve složitosti (a mocnosti). V tomto úvodu se proto zaměříme především na verzi <a href=\"http://www.w3.org/TR/xpath/\" class=\"external\">XPath 1.0</a>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -20,7 +20,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Princip I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Princip XPath-dotazu se dá shrnout do následujících čtyř bodů:\r\n    </p>\r\n    <ol start=\"0\">\r\n        <li>\r\n            vybrat <strong>kontext</strong> (startovní místo ve stromové reprezentaci XML-dokumentu) pro dotaz (<em>context node</em>);\r\n        </li>\r\n        <li>\r\n            určit <strong>směr navigace</strong> po stromu od vybraného místa (tzv. <strong>osa</strong>; <em>axis</em>);\r\n        </li>\r\n        <li>\r\n            identifikovat <strong>povolenou cestu</strong> (výpisem požadovaných částí; <em>node test</em>);\r\n        </li>\r\n        <li>\r\n            profiltrovat získaný výsledek na základě <strong>dodatečných podmínek</strong> (<em>predicates</em>).\r\n        </li>\r\n    </ol>\r\n    <p>\r\n        Jelikož všechny tyto prvky se dají řetězit za sebou, je kontext z nultého bodu většinou určován výsledkem předchozí části dotazu, případně může být vnucen zvenčí (např. v rámci nějakého nástroje, třeba z <em>DOM</em>u).\r\n    </p>\r\n\r\n</div>"
     },
@@ -29,10 +29,18 @@
       "idx": 2,
       "title": "Princip II",
       "tags": [
-        "Core"
+        "Already Studied"
       ],
-      "diff": "newconcept",
-      "already_studied_in": null,
+      "diff": "basics",
+      "already_studied_in": {
+        "lecture_id": "lecture:materialy--python--xml--sax",
+        "lecture_title": "materialy--python--xml--sax",
+        "lecture_path": "materialy--python--xml--sax",
+        "slide_id": "id7",
+        "slide_title": "Příklad – reprodukce stromečkové struktury",
+        "week": 99,
+        "reason": "Identický kód a příklad (Příklad – reprodukce stromečkové struktury)"
+      },
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Princip II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ukažme si to radši rovnou pro ukázkové XML..\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false;\">&lt;kořen&gt;\n    &lt;hlavička jazyk=\"cze\"&gt;Nadpis dokumentu v češtině&lt;/hlavička&gt;\n    &lt;hlavička jazyk=\"eng\"&gt;English title&lt;/hlavička&gt;\n    &lt;para&gt;\n    Tady je první odstavec s textem.\n    &lt;/para&gt;\n    &lt;obrázek zdroj=\"obrazky/obr1.jpg\"\n            název=\"Obrázek mezi odstavci.\"/&gt;\n    &lt;para&gt;\n    Tady je druhý odstavec s textem.\n    Pro &lt;zvýraznění&gt;ukázku&lt;/zvýraznění&gt; obsahuje další elementy.\n    &lt;/para&gt;\n&lt;/kořen&gt;</pre>\r\n    <p>\r\n        ..na následujích jednoduchých dotazech:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \"># vrátí objekt složený z obou elementů „hlavička“\n//hlavička\n\n# vrátí pouze první z elementů „hlavička“\n//hlavička[@jazyk='cze']\n\n# vrátí textový obsah prvního z elementů „hlavička“\n//hlavička[1]/text()\n\n# vrátí 2, aneb celkový počet elementů „para“ v dokumentu\ncount(//para)\n\n# vrátí druhý z elementů „para“\n/kořen/para[2]\n\n# vrátí text „ukázku“\n//para[2]/zvýraznění/text()\n\n# vrátí text „druhý“ z druhého z elementů „para“ (odřádkování a mezery…)\nsubstring(//para[2], 14, 5)</pre>\r\n\r\n</div>"
     },
     {
@@ -40,10 +48,9 @@
       "idx": 3,
       "title": "Plná forma příkazů",
       "tags": [
-        "Core",
-        "Tricky"
+        "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Plná forma příkazů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        XPath byl namodelován po vzoru zápisu webových adres a unixové navigaci po adresářové struktuře souborového systému.\r\n    </p>\r\n    <p>\r\n        Přitom nejčastěji používané navigační prostředky mají přiřazeny zkratky nebo jsou implicitní, aby usnadnily zápisy XPath-výrazů. Například první z ukázkových dotazů..\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">//hlavička</pre>\r\n    <p>\r\n        ..by v plné formě měl následující podobu:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">/child::*/child::hlavička</pre>\r\n    <p>\r\n        Přeloženo to znamená:\r\n    </p>\r\n    <blockquote>\r\n        Najdi kořenový element, ať se jmenuje jakkoli (<code>/child::*</code>), a dále pod ním najdi všechny elementy se jménem <em>hlavička</em> (<code>child::hlavička</code>).\r\n    </blockquote>\r\n\r\n</div>"
     },
@@ -85,7 +92,6 @@
       "idx": 7,
       "title": "Identifikace cesty se jmenným prostorem",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "newconcept",
@@ -97,8 +103,7 @@
       "idx": 8,
       "title": "Osy navigace",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -109,9 +114,9 @@
       "idx": 9,
       "title": "Osy navigace – ukázka",
       "tags": [
-        "Core"
+        "WOW"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Osy navigace – ukázka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Osy jsou navrženy tak, že <em>ancestor</em>, <em>descendant</em>, <em>following</em>, <em>preceding</em> a <em>self</em> se navzájem nepřekrývají a dohromady složí celý dokument:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false;\">&lt;root&gt;\n    &lt;level-1 id=\"id-1\"&gt;\n        &lt;level-2 id=\"id-11\"&gt;\n        &lt;/level-2&gt;\n    &lt;/level-1&gt;\n    &lt;level-1 id=\"id-2\"&gt;\n        &lt;level-2 id=\"id-21\"&gt;\n            &lt;level-3 id=\"id-211\"&gt;\n            &lt;/level-3&gt;\n            &lt;level-3 id=\"id-212\"&gt;\n                &lt;level-4 id=\"2121\"&gt;\n                &lt;/level-4&gt;\n                &lt;level-4 id=\"2122\"&gt;\n                &lt;/level-4&gt;\n            &lt;/level-3&gt;\n            &lt;level-3 id=\"id-213\"&gt;\n            &lt;/level-3&gt;\n        &lt;/level-2&gt;\n        &lt;level-2 id=\"id-22\"&gt;\n        &lt;/level-2&gt;\n    &lt;/level-1&gt;\n    &lt;level-1 id=\"id-3\"&gt;\n        &lt;level-2 id=\"id-31\"&gt;\n        &lt;/level-2&gt;\n        &lt;level-2 id=\"id-32\"&gt;\n        &lt;/level-2&gt;\n    &lt;/level-1&gt;\n&lt;/root&gt;</pre>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \"># &lt;root&gt; + &lt;level-1 id=\"id-2\"&gt; + &lt;level-2 id=\"id-21\"&gt;\n//*[@id='id-212']/ancestor::*\n\n# &lt;level-1 id=\"id-1\"&gt; + &lt;level-2 id=\"id-11\"&gt; + &lt;level-3 id=\"id-211\"&gt;\n//*[@id='id-212']/preceding::*\n\n# &lt;level-3 id=\"id-212\"&gt;\n//*[@id='id-212']/self::*\n\n# &lt;level-4 id=\"id-2121\"&gt; + &lt;level-4 id=\"id-2122\"&gt;\n//*[@id='id-212']/descendant::*\n\n# &lt;level-3 id=\"id-213\"&gt; + &lt;level-2 id=\"id-22\"&gt; + &lt;level-1 id=\"id-3\"&gt; +\n# + &lt;level-2 id=\"id-31\"&gt; + &lt;level-2 id=\"id-32\"&gt;\n//*[@id='id-212']/following::*</pre>\r\n\r\n</div>"
     },
@@ -120,10 +125,9 @@
       "idx": 10,
       "title": "Predikáty",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Predikáty</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Většina dotazů na cestu v XPath'u skončí s více než jedním vyhovujícím uzlem stromu, a to je právě místo, kde přijdou na řadu <strong>predikáty</strong> – aniž by změnily aktuální kontext, vyberou z návratové množiny pouze tu podmnožinu prvků, která vyhovuje nějakému dodatečnému požadavku.\r\n    </p>\r\n    <p>\r\n        Predikáty se píší do hranatých závorek <code>[]</code>. Několik jsme jich už viděli v předchozích příkladech – například test na přítomnost atributu (<code>[@lang]</code>) nebo test na konkrétní hodnotu atributu (<code>[@lang='cze']</code>). Dodatečné požadavky však mohou být mnohem složitější, jak ukazuje tento krásný příklad z <a href=\"http://en.wikipedia.org/wiki/XPath#Predicates\" class=\"external\">Wikipedie</a>:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">a[/html/@lang='en'][@href='help.php'][1]/@target</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jelikož predikáty operují na aktuálním kontextu a dají se řetězit za sebou, je jejich pořadí samozřejmě důležité – každý z nich omezí vstupní hodnoty, takže každý následující už operuje na menší množině.\r\n    </div></div>\r\n    <p>\r\n        Výše uvedený predikát vrací hodnoty atributu <em>@target</em> ze všech těch elementů <em>&lt;a&gt;</em>, které postupně splňují následující podmínky:\r\n    </p>\r\n    <table class=\"slim\">\r\n        <tr>\r\n            <td> <code>[/html/@lang='en']</code> </td>\r\n            <td> Nachází se v dokumentu, na jehož kořenovém elementu <em>html</em> je nadefinován atribut <em>lang</em> s hodnotou <em>en</em>. (V rámci predikátu tedy můžeme beztrestně změnit kontext vyhodnocované podmínky.) </td>\r\n        </tr>\r\n        <tr>\r\n            <td> <code>[@href='help.php']</code> </td>\r\n            <td> Jejich atribut <em>href</em> obsahuje hodnotu <em>help.php</em>. (Tady už jsme zase zpátky v kontextu zpracovávaného elementu <em>a</em>.) </td>\r\n        </tr>\r\n        <tr>\r\n            <td> <code>[1]</code> </td>\r\n            <td> Z vyhovující podmnožiny elementů <em>a</em> se vybere pouze první v pořadí podle výskytu ve zdrojovém dokumentu. </td>\r\n        </tr>\r\n    </table>\r\n\r\n</div>"
     },
@@ -132,7 +136,6 @@
       "idx": 11,
       "title": "Predikáty – příklad",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",
@@ -155,9 +158,9 @@
       "idx": 13,
       "title": "a) Funkce pro operace nad řetězci",
       "tags": [
-        "Core"
+        "WOW"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">a) Funkce pro operace nad řetězci</h2></div><div class=\"section-body\">\r\n\r\n    <ul>\r\n        <li>\r\n            <code>string <b>concat</b>(STR, STR, STR*)</code>\r\n            <br>\r\n            Vrací řetězec slepený z libovolného počtu vstupních řetězců.\r\n        </li>\r\n        <li>\r\n            <code>boolean <b>contains</b>(V_ČEM, CO)</code>\r\n            <br>\r\n            Vrací <em>true()</em>, obsahuje-li řetězec V_ČEM na libovolném místě podřetězec CO.\r\n        </li>\r\n        <li>\r\n            <code>string <b>normalize-space</b>(STR?)</code>\r\n            <br>\r\n            Z krajů řetězce odstraní bílé znaky, uvnitř řetězce „zcucne“ jejich sekvence do jedné mezery.\r\n        </li>\r\n        <li>\r\n            <code>string <b>substring</b>(STR, ODKUD, JAK_DALEKO?)</code> , <code>string <b>substring-before</b>(STR, PODŘETĚZEC)</code> , <code>string <b>substring-after</b>(STR, PODŘETĚZEC)</code>\r\n            <br>\r\n            Vrací příslušnou část vstupního řetězce STR; v případě první funkce se počítá od 1, v případě druhých dvou se bere první výskyt uvedeného PODŘETĚZCE.\r\n        </li>\r\n        <li>\r\n            <code>boolean <b>starts-with</b>(CO, ČÍM)</code>\r\n            <br>\r\n            Vrací <em>true()</em>, začíná-li řetězec CO podřetězcem ČÍM.\r\n        </li>\r\n        <li>\r\n            <code>number <b>string-length</b>(STR?)</code>\r\n            <br>\r\n            Vrací délku řetězce ve znacích.\r\n        </li>\r\n        <li>\r\n            <code>string <b>translate</b>(STR, CO, ČÍM)</code>\r\n            <br>\r\n            Nahradí v řetězci STR znaky vyskytující se v řetězci CO za znaky na stejných místech řetězce ČÍM.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -177,10 +180,9 @@
       "idx": 15,
       "title": "c) Funkce pro práci s uzly",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">c) Funkce pro práci s uzly</h2></div><div class=\"section-body\">\r\n\r\n    <ul>\r\n        <li>\r\n            <code>number <b>count</b>(NODESET)</code>\r\n            <br>\r\n            Vrací velikost zadané množiny uzlů NODESET.\r\n        </li>\r\n        <li>\r\n            <code>string <b>name</b>(NODESET?)</code>\r\n            <br>\r\n            Vrací plné jméno prvního prvku z množiny uzlů NODESET (nebo aktuálního kontextu).\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Což je pro elementy a atributy u dokumentu bez jmenných prostorů přesně to, co by člověk čekal. V přítomnosti více „barevných krabic“ a pro jiné typy uzlů se to poněkud komplikuje.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            <code>string <b>local-name</b>(NODESET?)</code> , <code>string <b>namespace-uri</b>(NODESET?)</code>\r\n            <br>\r\n            První z funkcí vrací „vlastní“ jméno prvního prvku z množiny uzlů NODESET (nebo aktuálního kontextu), tj. bez označení jmenného prostoru, kterýžto naopak vrací druhá z funkcí.\r\n        </li>\r\n        <li>\r\n            <code>number <b>last</b>()</code>\r\n            <br>\r\n            Vrací velikost množiny uzlů aktuálního kontextu.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Pozor na rozdíl s funkcí <em>count()</em> – ta operuje na vstupním NODESET'u! Možná se tahle funkce měla jmenovat jinak…\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            <code>number <b>position</b>()</code>\r\n            <br>\r\n            Vrací aktuální pozici při zpracovávání množiny uzlů aktuálního kontextu.\r\n        </li>\r\n        <li>\r\n            <code>node-set <b>id</b>(OBJEKT)</code>\r\n            <br>\r\n            V nějčastějším použití vrací uzel (v aktuálním XML-dokumentu), jehož <a href=\"?slajd=\">ID</a> odpovídá zadanému řetězci OBJEKT.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                V méně častém použití je na vstupu seznam ID v podobě řetězce s mezerami nebo dokonce třeba i množina uzlů, z jejichž textového obsahu jsou příslušná ID vyextrahována, a funkce tak vrací množinu uzlů s odpovídajícími ID.\r\n            </div></div>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -189,10 +191,9 @@
       "idx": 16,
       "title": "d) Funkce vracející pravdivostní hodnotu",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">d) Funkce vracející pravdivostní hodnotu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pravdivostní hodnota typu <em>true/false</em> se v XPath přímo nevyskytuje, místo ní se ve výrazech používají příslušné funkce:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <code>boolean <b>true</b>()</code> , <code>boolean <b>false</b>()</code>\r\n            <br>\r\n            Prostě vrací <em>true</em> nebo <em>false</em> (používají se tedy zvláště v testech).\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Další pravdivostní funkce:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <code>boolean <b>not</b>(BOOLEAN)</code>\r\n            <br>\r\n            Neguje svůj vstup.\r\n        </li>\r\n        <li>\r\n            <code>boolean <b>lang</b>(LANG)</code>\r\n            <br>\r\n            Testuje, zda jazyk zadaný jako LANG odpovídá (alespoň ve formě podmnožiny) definici jazyka pro příslušný kontext odpovídajícím atributem <em>xml:lang</em>.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -201,10 +202,9 @@
       "idx": 17,
       "title": "e) Konverzní funkce mezi datovými typy",
       "tags": [
-        "Core",
-        "Tricky"
+        "Skip"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">e) Konverzní funkce mezi datovými typy</h2></div><div class=\"section-body\">\r\n\r\n    <ul>\r\n        <li>\r\n            <code>boolean <b>boolean</b>(OBJEKT)</code>\r\n            <br>\r\n            Převádí svůj argument na pravdivostní hodnotu.\r\n        </li>\r\n        <li>\r\n            <code>number <b>number</b>(OBJEKT?)</code>\r\n            <br>\r\n            Převádí svůj argument na číslo.\r\n        </li>\r\n        <li>\r\n            <code>string <b>string</b>(OBJEKT?)</code>\r\n            <br>\r\n            Převádí svůj argument na řetězec.\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Ve standardu je naleznete <a href=\"http://www.w3.org/TR/xpath/#corelib\" class=\"external\">u příslušných funkcí podle typů</a>.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -213,7 +213,7 @@
       "idx": 18,
       "title": "Operátory",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -224,10 +224,9 @@
       "idx": 19,
       "title": "a) Identifikace cesty (včetně sjednocení „|“)",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">a) Identifikace cesty (včetně sjednocení „|“)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Téměř všechny operátory, osy, funkce a identifikátory z této skupiny jsme již viděli v příkladech. Patří sem:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <code>/</code> , <code>//</code>\r\n            <br>\r\n            Staré známé operátory pro výběr „přímého potomka“ a „libovolného potomka“.\r\n        </li>\r\n        <li>\r\n            <code>[…]</code>\r\n            <br>\r\n            „Operátor“ podmínky (predikátu).\r\n        </li>\r\n        <li>\r\n            <code>*</code>\r\n            <br>\r\n            Operátor zastupující libovolné jméno elementu nebo atributu.\r\n        </li>\r\n        <li>\r\n            <code>node()</code> , <code>text()</code> , <code>comment()</code> , <code>processing-instruction()</code>\r\n            <br>\r\n            Funkce rozpoznávající postupně libovolný uzel, textový uzel, uzel komentáře a uzel procesní instrukce.\r\n        </li>\r\n        <li>\r\n            <code>|</code>\r\n            <br>\r\n            Operátor <strong>sjednocení</strong> – jeho pomocí se dají „lepit“ dohromady výstupní množiny více nezávislých XPath-dotazů.\r\n            <br>\r\n            <pre class=\"brush: xml; gutter: false; toolbar: false; \">//para[@lang='cz'] | //para[@lang='en']</pre>\r\n        </li>\r\n        <li>\r\n            <code>.</code>\r\n            <br>\r\n            Osa zastupující aktuální kontext.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Často použit jako argument funkcí a stejně často je implicitní a může se vynechat.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            <code>..</code>\r\n            <br>\r\n            Osa zastupující rodiče aktuálního kontextu.\r\n        </li>\r\n        <li>\r\n            <code>@</code>\r\n            <br>\r\n            Identifikátor atributu.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        PS: Z důvodu přehlednosti a úplnosti jsem zde pod označení „operátor“ zahrnul všechny prvky používané v <em>XPath 1.0</em> pro identifikaci cesty.\r\n    </p>\r\n\r\n</div>"
     },
@@ -238,7 +237,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">b) Pravdivostní a porovnávací operátory</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Zatímco porovnávacích operátorů je standardní sada..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">&lt;code&gt;=&lt;/code&gt; &lt;code&gt;!=&lt;/code&gt; &lt;code&gt;&lt;&lt;/code&gt; &lt;code&gt;&gt;&lt;/code&gt; &lt;code&gt;&lt;=&lt;/code&gt; &lt;code&gt;&gt;=&lt;/code&gt;</pre>\r\n    <p>\r\n        ..a s výjimkou porovnávání množin uzlů (viz <a href=\"?slajd=22\">následující slajd</a>) se chovají standardně, pro logické operace je k dispozici klasické..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">&lt;code&gt;and&lt;/code&gt; &lt;code&gt;or&lt;/code&gt;</pre>\r\n    <p>\r\n        ..a negaci zajišťuje nikoli operátor, ale funkce <em>not()</em>.\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Pořadí priorit operátorů od nejvyšší po nejnižší je následující:\r\n    </p>\r\n    <table class=\"center\" border=\"1\">\r\n        <tr>\r\n            <td> <code>&lt;=</code> <code>&lt;</code> <code>&gt;=</code> <code>&gt;</code> </td>\r\n        </tr>\r\n        <tr>\r\n            <td> <code>=</code> <code>!=</code> </td>\r\n        </tr>\r\n        <tr>\r\n            <td> <code>and</code> </td>\r\n        </tr>\r\n        <tr>\r\n            <td> <code>or</code> </td>\r\n        </tr>\r\n    </table>\r\n    <p>\r\n        Přitom jsou všechny operátory zleva asociativní (takže platí např. ekvivalence <code>3&gt;2&gt;1 ⇔ (3&gt;2)&gt;1 ⇔ false</code>).\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Je-li třeba použít operátory <code>&lt;</code> nebo <code>&lt;=</code> uvnitř XML, musíme je pochopitelně odiskejpovat, například:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">&lt;xsl:if test=\"@value &amp;lt; 10\"&gt;…&lt;/xsl:if&gt;</pre>\r\n\r\n</div>"
     },
@@ -247,7 +246,6 @@
       "idx": 21,
       "title": "Poznámka k porovnávání množin uzlů",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "paradigm",
@@ -259,7 +257,6 @@
       "idx": 22,
       "title": "c) Aritmetické operátory",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "resyntax",

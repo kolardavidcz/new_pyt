@@ -40,8 +40,7 @@
       "idx": 3,
       "title": "Argument „self“",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -63,10 +62,9 @@
       "idx": 5,
       "title": "Konstruktor „__init__()“ II",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Konstruktor „__init__()“ II</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Pokud poděděná třída nemění způsob inicializace instance a <strong>vlastní metodu <em>__init__()</em> vůbec nezavede</strong>, nadřazený <em>__init__()</em> volat nemusíte, protože bude automaticky zavolán sám:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">class Rodič:\n    def __init__(self):\n        print('Rodič!')\n\nclass Potomek(Rodič):\n    pass\n\np = Potomek()   # Rodič!</pre>\r\n\r\n    <p class=\"enumerate\">\r\n        Naopak když ji zavedete, zavolá se pak pouze ona..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">class Rodič:\n    def __init__(self):\n        print('Rodič!')\n\nclass Potomek(Rodič):\n    def __init__(self):\n        print('Potomek!')\n\np = Potomek()   # Potomek!</pre>\r\n    <p>\r\n        ..pokud v rámci ní nevyvoláte rodičovskou variantu sami ručně:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">class Rodič:\n    def __init__(self):\n        print('Rodič!')\n\nclass Potomek(Rodič):\n    def __init__(self):\n        super().__init__()\n        print('Potomek!')\n\np = Potomek()   # Rodič! &amp; Potomek!</pre>\r\n\r\n</div>"
     },
@@ -75,7 +73,6 @@
       "idx": 6,
       "title": "Poznámka – „datové“ třídy I",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",
@@ -87,7 +84,6 @@
       "idx": 7,
       "title": "Poznámka – „datové“ třídy II",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "pythonic",
@@ -101,7 +97,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Vícenásobná dědičnost</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Python umožňuje vyrobit třídu s více než jedním rodičem:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">            class Třída(Rodič1, Rodič2, ...):\n                ...</pre>\r\n    <p>\r\n        Aby se vyhnul „oblíbenému“ <a href=\"https://en.wikipedia.org/wiki/Multiple_inheritance#The_diamond_problem\" class=\"external\">problému diamantu</a>, používá upravený perlovský algoritmus pro vyhledání zdroje vykonání příslušné zavolané metody (či vlastnosti). Ten se dá stručně shrnout tak, že <strong>dědičnost se řídí pořadím rodičovských tříd, a to postupně prohledáváním do hloubky</strong>. Koho zajímají podrobnosti, bude se chtít podívat na <a href=\"/materialy/python/modules/inspect.xml?slajd=8\"><em>MRO (Method Resolution Order)</em></a>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -110,8 +106,7 @@
       "idx": 9,
       "title": "Vícenásobná dědičnost – příklad",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -122,8 +117,7 @@
       "idx": 10,
       "title": "Funkce „super()“",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -134,7 +128,7 @@
       "idx": 11,
       "title": "Instanční atributy",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -145,10 +139,9 @@
       "idx": 12,
       "title": "Třídní atributy",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Třídní atributy</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Někdy se nám ale může hodit operovat nikoli s atributy konkrétní instance třídy, nýbrž s atributy rodiče, tedy celé třídy. (V naší testovací struktuře je takovým atributem atribut <code>školáků</code> ve třídě <em>Školák</em>.)\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Síla <em>třídních atributů</em> tkví v tom, že jsou sdíleny všemi instancemi třídy mezi sebou navzájem, takže jakákoli změna v nich je viditelná ve všech jednotlivých instancích/objektech vytvořených z dané třídy.\r\n  </div></div>\r\n  <p>\r\n    Na třídních atributech operují komplementární <em>třídní metody</em> (<code>@classmethod</code>), jejichž použití je následující:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">    class Školák(Člověk):\n        ...\n        školáků = 0\n...\n\n        def __init__(self, ...):\n            ...\n                self.přidej_školáka()\n\n        @classmethod\n        def přidej_školáka(cls):\n                cls.školáků += 1</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    <em>@classmethod</em> je tzv. <a href=\"/materialy/python/functions/decorators.xml\">dekorátor</a> funkce. Prozatím ho berte jako část syntaxe jazyka, která slouží k označení třídnosti dané metody.\r\n  </div></div>\r\n  <p>\r\n    Podobně jako metody instanční, třídní metody také <strong>automaticky dostávají první parametr</strong>. Narozdíl od instačních metod ale tímto parametrem není příslušná instance, nýbrž původní třída! Konkrétní volání tedy vlastně vypadá takto:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># zavolání..\nalisa.přidej_školáka()\n# ..je ekvivalentní zavolání\nalisa.přidej_školáka(Školák)</pre>\r\n  <p>\r\n    Z úplně stejného důvodu jako u instančních metod se pro lepší čitelnost doporučuje tento parametr značit jako <em>cls</em> (což opět není povinné, ale asi už chápete, proč je to <em>velmi</em> doporučované).\r\n  </p>\r\n\r\n</div>"
     },
@@ -168,7 +161,6 @@
       "idx": 14,
       "title": "„Privátní“ atributy",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "paradigm",
@@ -180,7 +172,7 @@
       "idx": 15,
       "title": "Deskriptory (aka „properties“)",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -204,7 +196,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "paradigm",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Užití OOP</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kdy tedy OOP použít? Z hlediska samotného Python'u především v těchto případech:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Když potřebujete zapouzdřit nějaké hodnoty (a občas i funkce) do vlastního jmenného prostoru.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Python samotný totiž jinak dokáže vytvořit vlastní kontext už jen pouze pro celý modul a těla funkcí (čili i metod), jinde ne.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            Když chcete vyrobit objekty, které umí využívat nějaké vestavěné funkce nebo operátory.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Přímo přetížit vestavěný typ nemůžete, ale odvodit si vlastní ano – <em>magických metod</em> je v zásobě hromada. Nu a konečně je to skvělá příležitost pro využití operátoru <code>@</code>, který jinak nic v Python'u nepoužívá ^_~\r\n            </div></div>\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Druhá část odpovědi se týká použití tříd v běžné programátorské praxi – tam se vám budou asi nejvíc hodit:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Když potřebujete dědičnost – typicky kvůli polymorfismu nebo třeba váš tým při práci používá tzv. <em>dyzajnové vzory</em> (<em>design patterns</em>).\r\n        </li>\r\n        <li>\r\n            Při implementaci stavových automatů – třída stav drží a zároveň s ním umí i operovat.\r\n        </li>\r\n        <li>\r\n            …\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pro zajímavost: Kolegové z firmy, kde je Python s přehledem prvním programovacím jazykem, zjišťovali, kdo ve svých kódech používá třídy, a našli celého jednoho člověka. Z hlediska Python'u myslím typický výsledek – většinu jinde běžných použití OOP zde totiž skvěle nahradí moduly.\r\n    </div></div>\r\n\r\n</div>"
     }

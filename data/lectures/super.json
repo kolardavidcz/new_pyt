@@ -7,9 +7,9 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        V <a href=\"oop.xml?slajd=11\">úvodní přednášce o OOP v Python'u</a> jsem zmiňoval, že volání příslušných rodičovských metod z jejich redefinice na potomcích obstarává funkce <code>super()</code>.\r\n    </p>\r\n    <p>\r\n        Jelikož funkce <code>super()</code> toho ale umí mnohem víc, podíváme se jí v této přednášce na zoubek.\r\n    </p>\r\n\r\n</div>"
     },
@@ -18,7 +18,7 @@
       "idx": 1,
       "title": "Možnosti dědění",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -31,7 +31,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Dlouhý řetězec předků I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Instance třídy <em>D</em> hledá metodu <em>mtd()</em> v řetězci předků postupně do historie, až ji najde:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A:\n    def mtd(self):\n        print('A')\n\nclass B(A):\n    def mtd(self):\n        print('B')\n\nclass C(B):\n    def mtd(self):\n        print('C')\n\nclass D(C):\n    def mtd(self):\n        super().mtd()\n\np = D()\np.mtd() # C</pre></div><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A:\n    def mtd(self):\n        print('A')\n\nclass B(A):\n    def mtd(self):\n        print('B')\n\nclass C(B):\n    ...\n\nclass D(C):\n    def mtd(self):\n        super().mtd()\n\np = D()\np.mtd() # B</pre></div></div>\r\n    <p>\r\n        Tady asi není co řešit, tohle by člověk čekal.\r\n    </p>\r\n\r\n</div>"
     },
@@ -40,8 +40,7 @@
       "idx": 3,
       "title": "Dlouhý řetězec předků II",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -54,7 +53,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Více rodičů I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        U více rodičů se hledá postupně zleva doprava:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A:\n    def mtd(self):\n        print('A')\n\nclass B:\n    def mtd(self):\n        print('B')\n\nclass C:\n    def mtd(self):\n        print('C')\n\nclass D(A, B, C):\n    def mtd(self):\n        super().mtd()\n\np = D()\np.mtd() # A</pre></div><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A:\n    ...\n\nclass B:\n    def mtd(self):\n        print('B')\n\nclass C:\n    def mtd(self):\n        print('C')\n\nclass D(A, B, C):\n    def mtd(self):\n        super().mtd()\n\np = D()\np.mtd() # B</pre></div></div>\r\n    <p>\r\n        Také nic, co by člověka překvapilo.\r\n    </p>\r\n\r\n</div>"
     },
@@ -63,10 +62,9 @@
       "idx": 5,
       "title": "Více rodičů II",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Více rodičů II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Dokud se do toho zase nenaveze <code>super()</code>:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A:\n    def mtd(self):\n        print('A')\n\nclass B:\n    def mtd(self):\n        print('B')\n\nclass C:\n    def mtd(self):\n        print('C')\n\nclass D(A, B, C):\n    def mtd(self):\n        super().mtd()\n\np = D()\np.mtd() # A</pre></div><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A:\n    def mtd(self):\n        print('A')\n\nclass B:\n    def mtd(self):\n        print('B')\n\nclass C:\n    def mtd(self):\n        print('C')\n\nclass D(A, B, C):\n    def mtd(self):\n        super(B, self).mtd()\n\np = D()\np.mtd() # C</pre></div></div>\r\n    <p>\r\n        Tady už vysvětlení, proč <code>super(B, self)</code> vrátí metodu z třídy <em>C</em>, vyžaduje trochu kreativního přemýšlení – při čtení zleva doprava je prostě po třídě <em>B</em> dalším předkem třída <em>C</em>. Abychom si v tom udělali pořádek – dojdou-li předci přímí, dalšími jsou <em>sourozenci</em>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -75,8 +73,7 @@
       "idx": 6,
       "title": "„MRO“ (Method Resolution Order) I",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "paradigm",
       "already_studied_in": null,
@@ -87,7 +84,6 @@
       "idx": 7,
       "title": "„MRO“ (Method Resolution Order) II",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "paradigm",
@@ -110,7 +106,6 @@
       "idx": 9,
       "title": "Souhrn",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "newconcept",

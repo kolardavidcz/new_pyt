@@ -18,10 +18,9 @@
       "idx": 1,
       "title": "Metatřídy",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Metatřídy</h2></div><div class=\"section-body\">\n\n    <p>\n        Stejně jako jsou objekty konkrétními instancemi svých tříd (nebo vlastně také typů), <strong>jsou třídy instancemi svých metatříd</strong>:\n    </p>\n    <blockquote>\n        Metatřídy jsou volatelné objekty, které slouží ke tvorbě tříd. Jejich návratovou hodnotou je tudíž volatelný objekt, který pak následně slouží jako konstruktor (nějaké) třídy.\n    </blockquote>\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        V jiných jazycích by se pythoním metatřídám asi říkalo <em>class factory</em>.\n    </div></div>\n    <p>\n        Spoustu věcí, na které se dříve metatřídy především používaly, dnes už dokážou obstarat <a href=\"decorators.xml\">dekorátory tříd</a>, které jsou ovšem podstatně mladšího data. Ale narozdíl od nich <strong>se metatřídy dědí</strong> (jsou to koneckonců vlastně „obyčejné“ typy, něco jako třídy na druhou), takže <strong>metatřídou „odekorované“ chování nových tříd mohou podědit i jejich potomci</strong>, což samozřejmě dekorátory nedokážou.\n    </p>\n\n</div>"
     },
@@ -30,10 +29,9 @@
       "idx": 2,
       "title": "Jak je vytvořena instance třídy",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Jak je vytvořena instance třídy</h2></div><div class=\"section-body\">\n\n    <p>\n        Než se začneme topit v metatřídách, začněmež od něčeho jednoduššího – <strong>zavedením nové instance třídy</strong>. Tento proces je (alespoň od dob zavedení „nových“ objektů ve dvojkovém Python'u) ve skutečnosti dvoustupňový – nejdříve je vytvořen objekt samotný, aby byl následně předán ke svému naplnění vstupními parametry vlastního konstruktoru:\n    </p>\n    <ol>\n        <li>\n            volající kontext si vyžádá zavedení nové instance třídy;\n        </li>\n        <li>\n            tato nová instance třídy je vytvořena zavoláním metody <code>__new__(cls, *args, **kwargs)</code> požadované třídy…\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n                Kde <em>cls</em> je reference na tuto třídu.\n            </div></div>\n        </li>\n        <li>\n            …a následně je její jmenný prostor patřičně upraven voláním metody <code>__init__(self, *args, **kwargs)</code> této třídy;\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n                Kde <em>self</em> je reference na nový objekt čerstvě vytvořený v předchozím kroku.\n            </div></div>\n        </li>\n        <li>\n            takto vyrobený a upravený objekt instance je poté vrácen žadateli.\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">Jinými slovy: Je přidán do jmenného prostoru jeho kontextu.</div></div>\n        </li>\n    </ol>\n    <p>\n        Na tomto procesu je zajímavé, že pythoní programátoři mají možnost se v obou krocích podle svého (zne)uvážení přehrabovat, protože jsou oba dostupné pod svými vlastními „magickými“ metodami.\n    </p>\n\n</div>"
     },
@@ -53,10 +51,9 @@
       "idx": 4,
       "title": "O důležitosti vraceného typu",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">O důležitosti vraceného typu</h2></div><div class=\"section-body\">\n\n    <p>\n        Metodu <em>__new__()</em> si pochopitelně můžete upravit k obrazu svému, ale jakmile se vám podaří nevrátit z ní referenci na správný typ objektu (zde tedy <em>Pokus</em>), odpovídající <em>__init__()</em> se pochopitelně nezavolá (protože <a href=\"oop.xml?slajd=4\">se volá na příslušné třídě</a>). Jako třeba když nevrátíte nic:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class Pokus:\n...     def __new__(cls):\n...         print('__new__:', cls)\n...     def __init__(self):\n...         print('__init__:', self)\n\n&gt;&gt;&gt; p = Pokus()\n__new__: &lt;class '__main__.Pokus'&gt;</pre>\n    <p>\n        Samozřejmě často není důvod vůbec <em>__init__()</em> volat, takže to koneckonců může být i žádané chování. Ale když zrovna není, tak víte, kam se podívat na pravděpodobného viníka.\n    </p>\n\n</div>"
     },
@@ -65,10 +62,9 @@
       "idx": 5,
       "title": "Od „__new__()“ k metatřídám",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Od „__new__()“ k metatřídám</h2></div><div class=\"section-body\">\n\n    <p>\n        Při tvorbě vlastních metatříd <strong>typicky musíte <em>__new__()</em> přepsat, protože</strong> – jak už nyní víme – <strong>to je právě to místo, které je zodpovědné za tvorbu nových tříd</strong>.\n    </p>\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        A pak ještě při dědění z neproměnných vestavěných typů: Má-li býti totiž nově vytvořený objekt co k čemu, nemůže to být pouhá reference na původní neproměnný typ, kterou jedinou můžete získat z <em>__init__()</em>'u – neproměnný typ je totiž od toho neproměnný, že ho nemůžete zaměnit za něco jiného ^_~\n    </div></div>\n    <p>\n        Kdyby ovšem přepsání kroku <em>__new__()</em> bylo to jediné, co by metatřídy dělaly, nikdo by je nepotřeboval a všichni by háčkovali obyčejné třídy (ne že by se metatřídy od tříd nějak extra lišily, že).\n    </p>\n    <p>\n        Ve skutečnosti umí metatřídy kompletně předepsat (a přepsat) způsob, jakým jsou za běhu (tedy dynamicky) vyrobeny nové typy (nebo – chcete-li – třídy). Na což mimochodem je – asi trochu překvapivě vzhledem ke svému běžnému použití – specializována funkce <em>type()</em>.\n    </p>\n\n</div>"
     },
@@ -77,7 +73,6 @@
       "idx": 6,
       "title": "Jak je vytvořena třída",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "paradigm",
@@ -89,10 +84,9 @@
       "idx": 7,
       "title": "„type()“ jako metatřída",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">„type()“ jako metatřída</h2></div><div class=\"section-body\">\n\n    <p>\n        Nejdůležitější metatřídu ze všech tedy všichni dobře znají – je jí totiž (jak už jsem říkal možná trochu překvapivě) stará dobrá známá funkce <em>type()</em>.\n    </p>\n    <p>\n        <a href=\"/materialy/python/objects/introspection.xml?slajd=14\">Jak už víme</a>, běžně slouží funkce <code>type(OBJEKT)</code> ke zjišťování typu OBJEKTu. Návratová hodnota přitom většinou odpovídá atributu <code>OBJEKT.__class__</code>.\n    </p>\n    <p>\n        Se třemi vstupními argumenty se však <em>type</em> promění na <strong>konstruktor tříd aneb tzv. metatřídu</strong>, což je popravdě skrytě její zdaleka nejčastější a nejdůležitější použití:\n    </p>\n    \n    <pre>třída = type(JménoTřídy, RodičeTřídy, JmennýProstorTřídy)</pre>\n    <p>\n        Přitom platí následující korespondence mezi atributy a výslednou třídou:\n    </p>\n    <ul>\n        <li>\n            <em>JménoTřídy</em> – jméno třídy; odpovídá <code>třída.__name__</code>\n        </li>\n        <li>\n            <em>RodičeTřídy</em> – n-tice rodičovských tříd; odpovídá <code>třída.__bases__</code>\n        </li>\n        <li>\n            <em>JmennýProstorTřídy</em> – slovník jmenného prostoru třídy; odpovídá <code>třída.__dict__</code>\n        </li>\n    </ul>\n    <p>\n        Pro obecné metatřídy platí vlastně to samé – jejich odpovědností je <strong>převzít jméno třídy, seznam rodičů a slovník parametrů budoucí třídy a z těchto tří složek onu třídu vytvořit</strong>.\n    </p>\n\n</div>"
     },
@@ -101,7 +95,7 @@
       "idx": 8,
       "title": "„type()“ – příklad",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -114,7 +108,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Jak fungují metatřídy? I</h2></div><div class=\"section-body\">\n\n    <p>\n        Z hlediska programátora fungují metatřídy celkem neviditelně – pokud si použití nějaké výslovně nevyžádá, odehrává se veškerá metatřídní „magie“ mimo jeho dohled: Při zavádění nové třídy se prostě zavolá nejvhodnější dostupný konstruktor, ve většině případů právě funkce <em>type()</em>, který požadovanou třídu vyrobí a vrátí nám ji.\n    </p>\n    <p>\n        Pokud chceme použít nějakou specifickou metatřídu, můžeme si ji při zavádění nové třídy vyžádat pomocí atributu konstruktoru <em>metaclass</em>:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">class Třída(metaclass=Metatřída):\n    pass</pre>\n    <p>\n        Tahle zdánlivě nevinná operace samozřejmě vyžaduje, aby konstruktor <em>Metatřída</em> existoval a choval se tak, jak se spořádaná metatřída chovat má. A to už taková švanda není. V dalším se tomu všemu podíváme na zoubek.\n    </p>\n\n</div>"
     },
@@ -123,9 +117,9 @@
       "idx": 10,
       "title": "Jak fungují metatřídy? II",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Jak fungují metatřídy? II</h2></div><div class=\"section-body\">\n\n    <p class=\"enumerate\">\n        Bez metatřídy napíšeme..\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">class Třída:\n    pass</pre>\n    <p>\n        ..a zavolá se:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">Třída = type(Jméno, Rodiče, JmennýProstor)</pre>\n\n    <p class=\"enumerate\">\n        S metatřídou napíšeme..\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">class Třída(metaclass=Metatřída):\n    pass</pre>\n    <p>\n        ..a zavolá se (alespoň v typickém případě):\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">Třída = Metatřída(Jméno, Rodiče, JmennýProstor)\n\n# což odpovídá volání\nTřída = Metatřída.__new__(Metatřída, Jméno, Rodiče, JmennýProstor)\nMetatřída.__init__(Třída, Jméno, Rodiče, JmennýProstor)</pre>\n    <p>\n        PS: V reálném případě stačí, aby nějaký předek byl založen na metatřídě – Python pak příslušnou volací sekvenci dohledá sám.\n    </p>\n\n</div>"
     },
@@ -136,7 +130,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Jak napsat metatřídu</h2></div><div class=\"section-body\">\n\n    <p class=\"enumerate\">\n        Z praktického hlediska jsou metatřídy obyčejné třídy, na kterých ale definujete „magickou“ metodu <em>__new__()</em>, která je právě volána při „výrobě“ instancí tříd, případně <em>__init__()</em>, která je volána při naplnění nově vytvořené instance daty.\n    </p>\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        A to buď obě najednou nebo aspoň jednu z nich. Častější je zřejmě varianta pouze s <em>__new__()</em>.\n    </div></div>\n    <p>\n        Stejně tak dobře můžeme ještě <a href=\"?slajd=19\">přepsat metodu <em>__call__()</em></a>, která se volá při zavádění instancí, čímž můžeme mimo jiné odseparovat, co třída dělá, od toho, jak je vytvořena.\n    </p>\n    <p class=\"enumerate\">\n        Pokud nadefinujete také metodu <em>__prepare__()</em>, bude tato použita při přípravě jmenného prostoru třídy (jinak se použije běžný pythoní slovník <em>dict()</em>).\n    </p>\n\n</div>"
     },
@@ -145,10 +139,9 @@
       "idx": 12,
       "title": "Příklad I",
       "tags": [
-        "Core",
         "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Příklad I</h2></div><div class=\"section-body\">\n\n    <p>\n        Příklad (upravený z dokumentace) bude určitě názornější. Připravme si následující metatřídu (která pro zajímavost definuje jak <em>__new__()</em>, tak i <em>__prepare__()</em>):\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">class OrderedClass(type):\n\n    @classmethod\n    def __prepare__(metacls, name, bases, **kwargs):\n        print('__prepare__:', metacls, name, bases, kwargs)\n        return collections.OrderedDict()\n\n    def __new__(cls, name, bases, namespace, **kwargs):\n        print('__new__:', cls, name, bases, namespace, kwargs)\n        result = super().__new__(cls, name, bases, dict(namespace))\n        result.members = tuple(namespace)\n        return result</pre>\n\n</div>"
     },
@@ -157,7 +150,7 @@
       "idx": 13,
       "title": "Příklad IIa",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -181,7 +174,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Příklad III</h2></div><div class=\"section-body\">\n\n    <p>\n        Protože jsme uvedenou metatřídu zaváděli proto, abychom získali třídy, které si budou pamatovat pořadí svých atributů (zde konkrétně za pomoci atributu <em>members</em>), vyzkoušejme ještě tuto funkcionalitu:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class A(metaclass=OrderedClass):\n...     def jedna(self): pass\n...     def dva(self): pass\n...     def tři(self): pass\n...     def čtyři(self): pass\n__prepare__: &lt;class '__main__.OrderedClass'&gt; A () {}\n__new__: &lt;class '__main__.OrderedClass'&gt; A () OrderedDict([\n            ('__module__', '__main__'),\n            ('__qualname__', 'A'),\n            ('jedna', &lt;function A.jedna at 0x011027C8&gt;),\n            ('dva', &lt;function A.dva at 0x011023D8&gt;),\n            ('tři', &lt;function A.tři at 0x011026F0&gt;),\n            ('čtyři', &lt;function A.čtyři at 0x01102780&gt;)\n        ]) {}\n\n&gt;&gt;&gt; A.members\n('__module__', '__qualname__', 'jedna', 'dva', 'tři', 'čtyři')</pre>\n    \n\n</div>"
     },
@@ -203,7 +196,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "paradigm",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Když metatřídy nejsou třídy</h2></div><div class=\"section-body\">\n\n    <p>\n        Začněmež rovnou od „obyčejných“ funkcí:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; def fn(*args, **kwargs):\n...     return type('X', (object,), dict(a=1))\n\n&gt;&gt;&gt; class F(metaclass=fn):\n...     pass\n\n# třída\n&gt;&gt;&gt; F\n&lt;class '__main__.X'&gt;\n&gt;&gt;&gt; F.__class__\n&lt;class 'type'&gt;\n&gt;&gt;&gt; F.a\n1\n\n# instance\n&gt;&gt;&gt; F()\n&lt;__main__.X object at 0x00FDEA70&gt;\n&gt;&gt;&gt; F().__class__\n&lt;class '__main__.X'&gt;\n&gt;&gt;&gt; F().a\n1</pre>\n    <p>\n        To bylo nakonec celkem jednoduché. (Byť kvůli dynamické tvorbě třídy v kontextu funkce, který je po návratu z ní zapomenut, můžeme mít kapku problém s introspekcí.)\n    </p>\n\n</div>"
     },
@@ -212,10 +205,9 @@
       "idx": 18,
       "title": "Metoda „__call__()“ &amp; singletony I",
       "tags": [
-        "Core",
         "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Metoda „__call__()“ &amp; singletony I</h2></div><div class=\"section-body\">\n\n    <p>\n        S třídami to ale může být horší. Když totiž šikovně přepíšete jejich metodu <em>__call__()</em>, nemusíte se v odůvodněných případech s <em>__new__()</em> vůbec babrat. Jako třeba v následujícím způsobu přípravy <em>singletonu</em>:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class Singleton(type):\n...     def __init__(self, *args, **kwargs):\n...         print('__init__:', self, args, kwargs)\n...         super().__init__(*args, **kwargs)\n...         self.__instance = None\n...     def __call__(self, *args, **kwargs):\n...         print('__call__:', self, args, kwargs, self.__instance)\n...         if self.__instance is None:\n...             self.__instance = super().__call__(*args, **kwargs)\n...         return self.__instance\n\n&gt;&gt;&gt; class Třída(metaclass=Singleton):\n...     def __init__(self, *args, **kwargs):\n...         print('Třída.__init__:', self, args, kwargs)\n...         self.args = args\n...         self.kwargs = kwargs\n__init__: &lt;class '__main__.Třída'&gt;\n          ('Třída', (), {\n              '__qualname__': 'Třída',\n              '__module__': '__main__',\n              '__init__': &lt;function Třída.__init__ at 0x0113E108&gt;\n          })\n          {}\n\n# 1. volání: dojde k nastavení atributů\n&gt;&gt;&gt; t = Třída(1, a=2)\n__call__: &lt;class '__main__.Třída'&gt;\n          (1,)\n          {'a': 2}\n          None\nTřída.__init__: &lt;__main__.Třída object at 0x011381F0&gt; (1,) {'a': 2}\n&gt;&gt;&gt; t.args, t.kwargs\n((1,), {'a': 2})\n\n# 2. volání: atributy se nepřepíší, protože jsou již jednou nastavené\n&gt;&gt;&gt; t = Třída(3, a=4)\n__call__: &lt;class '__main__.Třída'&gt;\n          (3,)\n          {'a': 4}\n          &lt;__main__.Třída object at 0x011381F0&gt;\n&gt;&gt;&gt; t.args, t.kwargs\n((1,), {'a': 2})</pre>\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        Volně podle <a href=\"http://stackoverflow.com/questions/674304/pythons-use-of-new-and-init\" class=\"external\">Stack Overflow</a>.\n    </div></div>\n    <p>\n        Jelikož zavolání instance vyvolá poděděnou metodu <em>__call__()</em> z příslušné metatřídy, která se aplikuje na volající instanci, dojde tím ke kontrole atributu <em>__instance</em> a podle jejího výsledku bude vytvoření pozměněné instance buď dovoleno nebo zakázáno.\n    </p>\n\n</div>"
     },

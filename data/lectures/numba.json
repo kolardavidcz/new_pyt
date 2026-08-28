@@ -7,8 +7,7 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -30,10 +29,9 @@
       "idx": 2,
       "title": "„@jit“",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">„@jit“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Mezi nejzajímavější prostředky, které <em>Numba</em> nabízí, patří dekorátor <strong><code>@jit</code></strong>. Jeho základní použití je triviální:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">        from numba import jit\n\n        @jit\n        def funkce(parametr):\n            ...</pre>\r\n    <p>\r\n        <em>Numba</em> se v tomto případě pokusí vstupní i návratové typy odhadnout sama a odekorovanou funkci zJITovat. Ve většině případů je to asi to nejlepší (a rozhodně to nejjednodušší), co můžete udělat.\r\n    </p>\r\n\r\n</div>"
     },
@@ -42,10 +40,9 @@
       "idx": 3,
       "title": "„@jit“ s typovou anotací",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "paradigm",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„@jit“ s typovou anotací</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nechcete-li z nejrůznějších důvodů nechat odhadování typů na <em>Numbě</em>, můžete použít <strong>typovou anotaci</strong>, kterou řeknete, o jaké typy se u dané funkce jedná. Jednoduchý příklad upravený <a href=\"http://numba.pydata.org/numba-doc/latest/user/jit.html#eager-compilation\" class=\"external\">podle dokumentace</a>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">from numba import jit, int16\n\n@jit(int16(int16, int16))\ndef fn(x, y):\n    return x + y</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Zatímco <em>Numba</em> samotná se snaží být co nejobecnější, u vlastních kódů musíte vědět, co děláte, jinak vás čekají překvapení o něco dříve, než s obecným řešením:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; fn(1, 2)\n3\n\n&gt;&gt;&gt; fn(2**15, 0)\n-32768\n&gt;&gt;&gt; fn(2**15, -1)\n32767</pre>\r\n    </div></div>\r\n    <p>\r\n        PS: Anotace nemusí být úplná, můžete vynechat typ návratové hodnoty. Podobně se jich dá použít vícero (tedy vyjmenovat více možných <em>otisků funkce</em> pro různé typy), pak už ale záleží na jejich pořadí.\r\n    </p>\r\n\r\n</div>"
     },
@@ -54,10 +51,9 @@
       "idx": 4,
       "title": "„@jit(nopython=True)“",
       "tags": [
-        "Core",
-        "Tricky"
+        "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">„@jit(nopython=True)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <em>Numba</em> se pokusí odekorovanou funkci zJITovat nejvhodnějším možným způsobem (tzv. <em>nopython mode</em>), ale ne vždy se to podaří, v kterémžto případě automaticky spadne do mnohem pomalejšího – ale na druhou stranu zcela Python C API kompatibilního – módu kompilace <em>object mode</em>.\r\n    </p>\r\n    <p>\r\n        Chcete-li uvedenému automatickému překladu předejít, stačí doplnit dekorátor na tvar <code>@jit(nopython=True)</code> – objeví-li <em>Numba</em> při kompilaci konstrukci, se kterou není optimálně proveditelná, místo přechodu na <em>object mode</em> vyhodí výjimku a zpracování kódu zastaví.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Co pak provedete, je na vás. Ideální je pokusit se dekorovanou funkci upravit tak, aby šla zJITovat a <em>Numba</em> přestala házet výjimku, ale nemusí se to vždy snadno podařit.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -66,7 +62,6 @@
       "idx": 5,
       "title": "„@jit“ – souhrn",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "newconcept",
