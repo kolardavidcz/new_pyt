@@ -18,8 +18,7 @@
       "idx": 1,
       "title": "Založení – „mmap()“",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -30,9 +29,9 @@
       "idx": 2,
       "title": "Vlastnosti I",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "resyntax",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Vlastnosti I</h2></div><div class=\"section-body\">\n\n    <p>\n        Jak je vidět, podporuje do paměti namapovaný objekt jistý mix slibovaných obojakých činností <em>souboru</em> a <em>bajtového pole</em>, byť tedy část svými vlastními metodami:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; import mmap\n&gt;&gt;&gt; m = mmap.mmap(-1, 1000)\n&gt;&gt;&gt; m\n&lt;mmap.mmap object at 0x000001BAF0463930&gt;\n&gt;&gt;&gt; dir(m)\n['__class__', '__delattr__', '__delitem__', '__dir__', '__doc__', '__enter__',\n '__eq__', '__exit__', '__format__', '__ge__', '__getattribute__', '__getitem__',\n '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__len__',\n '__lt__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__',\n '__setattr__', '__setitem__', '__sizeof__', '__str__', '__subclasshook__',\n 'close', 'closed', 'find', 'flush', 'move', 'read', 'read_byte', 'readline',\n 'resize', 'rfind', 'seek', 'size', 'tell', 'write', 'write_byte']</pre>\n    <p>\n        Do <em>memory mapped</em> objektu tedy můžeme především zapisovat bajty (pomocí <em>write()</em>) a také je z něj naopak číst (<em>read()</em>), můžeme v něm hledat (binární) podřetězce (<em>find()</em> a <em>rfind()</em>), ale také načítat data (textový) řádek po řádku (<em>readline()</em>).\n    </p>\n\n</div>"
     },
@@ -41,7 +40,6 @@
       "idx": 3,
       "title": "Vlastnosti II",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",
@@ -64,10 +62,9 @@
       "idx": 5,
       "title": "Srovnání rychlosti",
       "tags": [
-        "Core",
         "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Srovnání rychlosti</h2></div><div class=\"section-body\">\n\n    <p>\n        Jelikož <em>memory mapped</em> objekt obchází klasické přístupové cesty k proudu a vyhýbá se dodatečnému kopírování dat, můžeme právem očekávat, že bude rychlejší než přístup přes klasické souborové API.\n    </p>\n    <p>\n        Pokusné čtení takřka pětigigového souboru postupně po čtyřech řádcích tento předpoklad potvrzuje, neboť přístup přes <em>mmap</em>..\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">import mmap\nwith open('ex3.fastq', 'r') as f:\n    with mmap.mmap(f.fileno(), 0, access=mmap.ACCESS_READ) as m:\n        while True:\n            header, seq, com, qual = m.readline(), m.readline(), m.readline(), m.readline()\n            if header == b'': break</pre>\n    <p>\n        ..vykazoval čas kolem 24 sekund<sup>*</sup>, zatímco přístup přes souborové API..\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">with open('ex3.fastq', 'r') as f:\n    while True:\n        header, seq, com, qual = f.readline(), f.readline(), f.readline(), f.readline()\n        if header == '': break</pre>\n    <p>\n        ..se dostal nejlépe na 41 sekund.\n    </p>\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        <sup>*</sup> Nutno podotknout, že při testování dosáhl první pokus času pouze 35 sekund, až všechny následující těch 24. Operační systém asi neměl ihned k dispozici takový kus paměti, zatímco po prvním pokusu už ano. Nicméně i v tomto případě bylo provedení programu rychlejší.\n    </div></div>\n\n</div>"
     },

@@ -18,9 +18,9 @@
       "idx": 1,
       "title": "Poznámka – možnosti zápisu řetězců",
       "tags": [
-        "Core"
+        "WOW"
       ],
-      "diff": "resyntax",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Poznámka – možnosti zápisu řetězců</h2></div><div class=\"section-body\">\n\n    <p>\n        Delší řetězce (bez formátování pomocí trojtých uvozovek) můžete zapsat i jinými způsoby, ale většinou to neprospívá čitelnosti:\n    </p>\n    <ul>\n        <li>\n            Řetězce napsané hned za sebou jsou implicitně spojeny do jednoho:\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = \"Ahoj, \" \"světe!\"\n&gt;&gt;&gt; xs\n'Ahoj, světe!'</pre>\n        </li>\n        <li>\n            Předchozí můžete dokonce rozložit na více řádek, pokud použijete vnější uzavírací (kulaté) závorky:\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = (\n...     \"Ahoj, \"\n...     \"světe!\"\n... )\n&gt;&gt;&gt; xs\n'Ahoj, světe!'</pre>\n        </li>\n        <li>\n            Také můžete řetězce „slepit“ operátorem <code>+</code> a na více řádek je roztáhnout pomocí iskejpovacího znaku <code>\\</code> před koncem řádku:\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = \"Ahoj, \" + \\\n...     \"světe!\"\n&gt;&gt;&gt; xs\n'Ahoj, světe!'</pre>\n        </li>\n    </ul>\n\n    <p>\n        PS: Poslední dva triky platí i pro jiné kusy kódu než jen řetězce.\n    </p>\n\n</div>"
     },
@@ -29,7 +29,7 @@
       "idx": 2,
       "title": "Uvozovky, apostrofy a speciální znaky",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -40,8 +40,7 @@
       "idx": 3,
       "title": "„Syrové“ řetězce",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -63,10 +62,9 @@
       "idx": 5,
       "title": "Řetězce jako sekvence",
       "tags": [
-        "Core",
-        "WOW"
+        "Skip"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Řetězce jako sekvence</h2></div><div class=\"section-body\">\n\n  <p>\n    Řetězce v Python'u 3.X jsou automaticky unicodové =&gt; každý jeden viditelný znak je reprezentován proměnným počtem bajtů. Ale z hlediska běžné práce s řetězci jako <em>sekvenčními typy</em> (kterými řetězce jsou) nás to nemusí zajímat, protože se chovají právě tak, jak bychom čekali – nejmenší podjednotkou řetězce je právě jeden znak:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = \"Ahoj, světe!\"\n\n# délka sekvence\n&gt;&gt;&gt; len(xs)\n12\n\n# konkrétní prvek\n&gt;&gt;&gt; xs[3]\n'j'\n&gt;&gt;&gt; xs[-3]\n't'\n\n# různé výřezy\n&gt;&gt;&gt; xs[3:9]\n'j, svě'\n&gt;&gt;&gt; xs[3:9:2]\n'j v'\n&gt;&gt;&gt; xs[3:]\n'j, světe!'\n&gt;&gt;&gt; xs[-3:]\n'te!'\n\n# dotaz na výskyt prvku\n&gt;&gt;&gt; 'a' in xs\nFalse\n&gt;&gt;&gt; 'A' in xs\nTrue\n&gt;&gt;&gt; 'Ah' in xs\nTrue\n\n# dvě spojené kopie\n&gt;&gt;&gt; xs * 2\n'Ahoj, světe!Ahoj, světe!'</pre>\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n      Mimochodem „násobit“ řetězec můžete i nulou – výsledkem je nepřekvapivě řetězec prázdný.\n    </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n      PS: Komentáře zde pochopitelně nejsou součástí výstupu interaktivního interpretru, slouží pouze k popisu zde zapsaného kódu.\n    </div></div></div>\n\n</div>"
     },
@@ -86,10 +84,9 @@
       "idx": 7,
       "title": "Řetězce jako neměnitelné sekvence",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "paradigm",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Řetězce jako neměnitelné sekvence</h2></div><div class=\"section-body\">\n\n  <p>\n    Řetězce patří mezi sekvence <strong>neměnitelné</strong> (<i>immutable</i>), což znamená, že jejich obsah po vytvoření již není možné měnit:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = \"řetězec\"\n&gt;&gt;&gt; xs[3]\n'ě'\n&gt;&gt;&gt; xs[3] = 'X'\nTraceback (most recent call last):\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\nTypeError: 'str' object does not support item assignment</pre>\n\n  <p>\n    Spojením dvou řetězců však vzniká řetězec zcela nový, proto následující kód je v pořádku:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = xs + \" ukázkový\"\n&gt;&gt;&gt; xs\n'řetězec ukázkový'</pre>\n  \n  <p>\n      PS: Pojmenování následujících slajdů 9-12 je tedy poněkud zavádějící – všechny tam uvedené metody samozřejmě ponechávají originální řetězec netknut, pouze vezmou jeho textový „obsah“, pozmění ho uvedeným způsobem a vrátí ho jako řetězec zbrusu nový.\n  </p>\n\n</div>"
     },
@@ -98,8 +95,7 @@
       "idx": 8,
       "title": "Formátování výstupu – „f''“, „format()“ a „%“",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -110,7 +106,7 @@
       "idx": 9,
       "title": "Formátování výstupu – „center()“, „ljust()“, „rjust()“",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -132,7 +128,6 @@
       "idx": 11,
       "title": "Poznámka",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "pythonic",
@@ -155,7 +150,6 @@
       "idx": 13,
       "title": "Analýza obsahu – „startswith()“ a „endswith()“",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",
@@ -167,7 +161,6 @@
       "idx": 14,
       "title": "Analýza obsahu – „[r]index()“ a „[r]find()“",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "pythonic",
@@ -190,7 +183,6 @@
       "idx": 16,
       "title": "Úprava obsahu – odstraňování znaků „remove[prefix|suffix]()“",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",
@@ -202,7 +194,6 @@
       "idx": 17,
       "title": "Úprava obsahu – odstraňování znaků „[l|r]strip()“",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "pythonic",
@@ -214,7 +205,7 @@
       "idx": 18,
       "title": "Úprava obsahu – záměna znaků „replace()“",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -225,7 +216,7 @@
       "idx": 19,
       "title": "Úprava obsahu – záměna znaků „translate()“ I",
       "tags": [
-        "Core"
+        "WOW"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -236,7 +227,7 @@
       "idx": 20,
       "title": "Úprava obsahu – záměna znaků „translate()“ II",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -249,7 +240,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Úprava obsahu – záměna znaků „translate()“ III</h2></div><div class=\"section-body\">\n\n    <p>\n        Metoda <em>translate()</em> umí také převádět vstupní znaky na libovolně dlouhé řetězce! Překladovou tabulku je v tomto případě nutno zadat pouze jedním parametrem – slovníkem, jehož klíči jsou jednotlivé znaky (nebo jejich <a href=\"/materialy/text/encoding.xml?slajd=6\">unicodové číselné ekvivalenty</a>):\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; transtab = ''.maketrans({\n    'a': 'A',\n    'b': '-b-',\n    99: '123',  # chr(99) -&gt; 'c'\n})\n&gt;&gt;&gt; 'aDbc'.translate(transtab)\n'AD-b-123'</pre>\n\n</div>"
     },
@@ -258,10 +249,9 @@
       "idx": 22,
       "title": "splitting &amp; joining I",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">splitting &amp; joining I</h2></div><div class=\"section-body\">\n\n  <p>\n    Řetězec můžeme podle zadaného podřetězce rozdělit na více částí. Nejobecnější metodou je <code>split()</code>:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = \"Ahoj, světe! Jak se máš?\"\n\n&gt;&gt;&gt; xs.split()\n['Ahoj,', 'světe!', 'Jak', 'se', 'máš?']\n&gt;&gt;&gt; xs.split(' ')\n['Ahoj,', 'světe!', 'Jak', 'se', 'máš?']\n&gt;&gt;&gt; xs.split(' ', 2)\n['Ahoj,', 'světe!', 'Jak se máš?']\n\n&gt;&gt;&gt; xs.split(',')\n['Ahoj', ' světe! Jak se máš?']\n\n&gt;&gt;&gt; xs.split(' s')\n['Ahoj,', 'věte! Jak', 'e máš?']</pre>\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        Bez udání parametrů rozdělí <code>split()</code> zadaný řetězec podle prázdných znaků (<em>whitespaces</em>).\n    </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        Druhý nepovinný parametr určuje maximální počet rozdělení, ke kterým dojde.\n    </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        <code>split()</code> vrací <em>seznam</em>.\n    </div></div></div>\n  <p>\n    Pro srovnání ještě metoda <code>rsplit()</code> – chová se téměř úplně stejně jako <code>split()</code>, pouze rozřezává řetězce zprava doleva:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs.split(' ', 2)\n['Ahoj,', 'světe!', 'Jak se máš?']\n&gt;&gt;&gt; xs.rsplit(' ', 2)\n['Ahoj, světe! Jak', 'se', 'máš?']</pre>\n\n</div>"
     },
@@ -270,8 +260,7 @@
       "idx": 23,
       "title": "splitting &amp; joining II",
       "tags": [
-        "Core",
-        "Tricky"
+        "WOW"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -282,7 +271,6 @@
       "idx": 24,
       "title": "splitting &amp; joining III",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",

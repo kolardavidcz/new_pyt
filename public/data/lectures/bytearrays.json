@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <strong>Bajtová pole</strong> jsou <em>proměnný</em> <a href=\"/materialy/python/types/_sequences.xml\">sekvenční</a> datový typ, jehož prvky jsou <em>celá čísla</em> v rozmezí <code>&lt;0, 255&gt;</code> (tedy vlastně sekvence bajtů).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Existuje k nim i příslušný neproměnný protějšek – <a href=\"bytes.xml\">bajtové řetězce</a>. Rozdíl mezi těmito dvěma objekty je podobný, jako mezi <em>řetězci</em> na jedné straně a <em>seznamy znaků</em> na straně druhé – oboje vypsané po prvcích dá to samé, ale do řetězců nemůžeme „hrabat“, zatímco se seznamy si můžeme dělat, co chceme.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -20,7 +20,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Zavedení – „bytearray()“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <em>Bajtová pole</em> zavádíme konstruktorem <code>bytearray()</code>. Pro jeho parametry platí úplně to samé, co pro paramatry konstruktoru <em>bajtových řetězců</em> <code>bytes()</code>, to znamená:\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Při volání <strong>bez parametru</strong> zavede funkce <em>bytearray()</em> bajtové pole o nulové délce:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xb = bytearray()\n&gt;&gt;&gt; xb\nbytearray(b'')</pre>\r\n  \r\n  <p class=\"enumerate\">\r\n    Je-li vstupním parametrem <strong>řetězec</strong>, musíme navíc přidat i kódování, které bude řídit jeho transformaci na bajtové pole:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xb = bytearray('Ahoj!', 'utf-8')\n&gt;&gt;&gt; xb\nbytearray(b'Ahoj!')</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Na pozadí se zavolá metoda řetězce <code>'Ahoj!'.encode('utf-8')</code>, která provede příslušnou konverzi.\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Při vstupním parametru <strong>celé číslo</strong> je vytvořeno bajtové pole odpovídající délky obsahující samé nuly:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xb = bytearray(7)\n&gt;&gt;&gt; xb\nbytearray(b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00')</pre>\r\n  \r\n  <p class=\"enumerate\">\r\n    Další možností je zadat na vstupu <strong>iterovatelný objekt</strong> (<em>iterable</em>), který vrací čísla v rozmezí <code>&lt;0, 255&gt;</code>. Tato čísla budou následně použita pro inicializaci (bajtového) pole.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Pokud byste potřebovali převést <em>jedno konkrétní číslo</em> na jednoprvkové bajtové pole, kód <code>bytearray([123])</code> nepřekvapivě vrátí právě <code>bytearray(b'{')</code>. (Dělat konverzi z <em>bytes</em> na <em>bytearray</em> jde samozřejmě také, ale je to tuplovaně nešikovné.)\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Poslední možností je použít na vstupu <strong>bafr</strong> (<em>buffer</em>), v klasickém případě tedy odkaz na otevřený soubor. V takovém případě se pro inicializaci bajtového pole použijí data (jednotlivé bajty) z bafru.\r\n  </p>\r\n\r\n</div>"
     },
@@ -29,7 +29,7 @@
       "idx": 2,
       "title": "Bajtová pole jako sekvence",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -53,7 +53,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Bajtová pole jako měnitelné sekvence</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Hlavním důvodem pro použití <em>bajtových polí</em> je to, že narozdíl od <em>bajtových řetězců</em> je můžeme měnit ^_~\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xb = bytearray('ahoj', 'ascii')\n&gt;&gt;&gt; xb\nbytearray(b'ahoj')\n\n# ukázka měnitelnosti\n&gt;&gt;&gt; xb[1]\n104\n&gt;&gt;&gt; xb[1] = 72\n&gt;&gt;&gt; xb\nbytearray(b'aHoj')</pre>\r\n\r\n</div>"
     },

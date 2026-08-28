@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        WSGI (= <em>Web Server Gateway Interface</em>) je pythonovský standard (definovaný v <a class=\"external\" href=\"http://python.org/dev/peps/pep-3333/\">PEP 3333</a>) pro komunikaci mezi serverem a klientem.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Přičemž uvedená rozhraní mohou být libovolně zřetězena, takže vnitřní části řetězce (tzv. <em>middleware</em>) fungují na jednu stranu jako server a na druhou jako klient.\r\n    </div></div>\r\n    <p>\r\n        Běžného uživatele nemusí prakticky vůbec zajímat, protože se s nimi setká pouze v podobě již hotových frejmworků (např. servrová část <em>mod_wsgi</em> pro Apache a klientský balík <em>Django</em>), ale jelikož ne vždy je potřeba jít s kanónem na komára a navíc je ve standardní instalaci Python'u referenční implementace, stojí za to se se základy WSGI seznámit.\r\n    </p>\r\n\r\n</div>"
     },
@@ -18,10 +18,9 @@
       "idx": 1,
       "title": "WSGI-klient",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">WSGI-klient</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Okomentovaná jednoduchá WSGI-aplikace vracející obligátní <em>„Ahoj, světe!“</em> by tak mohla vypadat třeba takto:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\"># WSGI-klient\ndef application(environ, start_response):\n    # vlastní tělo HTTP-odpovědi (pro Python 3.x jako bajtový objekt)\n    body = bytes('Ahoj, světe!', encoding='utf-8')\n    # návratové hlavičky HTTP-odpovědi (kvůli délce vyžadují již známé tělo)\n    response_headers = [\n        (\"Content-type\", \"text/plain\"),\n        (\"Content-length\", str(len(body)) ),\n    ]\n    # „nastartování“ HTTP-odpovědi\n    start_response(\"200 OK\", response_headers)\n    # vrácení iterovatelného objektu s tělem odpovědi\n    return [body,]</pre>\r\n    <ul>\r\n        <li>\r\n            WSGI-standard předepisuje pouze to, že klient je <strong>volatelný objekt s <a href=\"/materialy/python/functions/decorators.xml?slajd=10\"><em>otiskem</em></a></strong> <code>(environ, start_response)</code>, kde první poziční parametr přebírá nastavení prostředí a druhý dostane od serveru odkaz na volatelný objekt, který zahájí odpověď.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Jméno volatelného objektu aplikace (zde funkce) v podobě <em>application</em> vyžaduje pouze <em>mod_wsgi</em> pro servery Apache, u ostatních si můžete wsgi-aplikaci pojmenovat podle libosti. Podobně jména obou pozičních argumentů mohou být zcela libovolná.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            Vlastní tělo zprávy je v rámci HTTP posíláno jako bajty. (Což bylo v Python'u 2.x víceméně výchozí chování řetězců…)\r\n        </li>\r\n        <li>\r\n            Uvedené dvě hlavičky HTTP-odpovědi jsou asi rozumné minimum, které byste měli posílat – bez typu není zaručené, jak se poslaná data zobrazí, a bez délky není možné znát stav přijímání dat.\r\n        </li>\r\n        <li>\r\n            Hlavičky spolu s textem HTTP-stavu poslouží k zahájení přenosu odpovědi na dotaz zavoláním volatelného objektu <em>start_response</em>, který nám poskytl server.\r\n        </li>\r\n        <li>\r\n            Vlastní tělo odpovědi je posíláno po jednotlivých prvcích iterovatelného objektu – proto i obyčejný (bajtový) řetězec budete chtít poslat právě takto, jinak se bude odesílat po jednotlivých bajtech (pokud to vůbec projde – v Python'u 3.2 nikoli).\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -32,7 +31,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">WSGI-klient a WSGI-server</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož Python obsahuje referenční implementaci WSGI, můžeme si zároveň pustit i server:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\"># WSGI-klient\ndef application(environ, start_response):\n    body = bytes('Ahoj, světe!', encoding='utf-8')\n    response_headers = [\n        (\"Content-type\", \"text/plain\"),\n        (\"Content-length\", str(len(body)) ),\n    ]\n    start_response(\"200 OK\", response_headers)\n    return [body,]\n\n# WSGI-server (spuštěn pro jednu odpověď)\nif __name__ == '__main__':\n    from wsgiref.simple_server import make_server\n    server = make_server('localhost', 8080, application)\n    server.handle_request()</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Metoda <em>handle_request()</em> zajistí, že server počká pouze na jeden dotaz, který vyřídí, a po něm se ukončí. Chcete-li, aby server běžel neustále (dokud ho „nezabijete“ nebo nespadne), použijte místo ní metodu <em>serve_forever()</em>.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -41,7 +40,7 @@
       "idx": 3,
       "title": "Proměnné prostředí I",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -63,7 +62,7 @@
       "idx": 5,
       "title": "Získání dat z GETu a POSTu",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -74,10 +73,9 @@
       "idx": 6,
       "title": "GET I",
       "tags": [
-        "Core",
-        "Tricky"
+        "Skip"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">GET I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Hodnota (tedy <strong>řetězec</strong>!) dotazu GET se na straně serveru objeví jako proměnná prostředí <strong>QUERY_STRING</strong>. Konkrétně:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <pre>http://localhost:8080/?Ahoj, světe!</pre>\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Kterýžto dotaz prohlížeč automaticky zakóduje do podoby <code>Ahoj,%20světe!</code>. (Kdybyste to zkoušeli o pár let dříve, asi by tam místo <code>%20</code> bylo <code>+</code> nebo by tam ta mezera možná i zůstala.)\r\n            </div></div>\r\n            ⇒\r\n            <pre>QUERY_STRING: Ahoj,%20sv%C4%9Bte!</pre>\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Pro potřeby komunikace se serverem došlo tedy k dalšímu zakódování do ASCII-podoby – k mezeře přibylo ještě písmeno <em>ě</em> (zde zakódováno v UTF-8). URL (nebo <a href=\"/materialy/net/http.xml?slajd=13\">URI obecně</a>) totiž musí být pouze ASCII.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            <pre>http://localhost:8080/?par1=ahoj&amp;par2=123&amp;par1=456</pre>\r\n            ⇒\r\n            <pre>QUERY_STRING: par1=ahoj&amp;par2=123&amp;par1=456</pre>\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Nedošlo tedy k žádnému automagickému rozložení dotazu na klíče a hodnoty, vše zůstává nadále jedním řetězcem!\r\n            </div></div>\r\n        </li>\r\n    </ul>\r\n    <p>\r\n    </p>\r\n\r\n</div>"
     },
@@ -86,8 +84,7 @@
       "idx": 7,
       "title": "GET II",
       "tags": [
-        "Core",
-        "Tricky"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -98,8 +95,7 @@
       "idx": 8,
       "title": "GET III – „urllib.parse.parse_qs()“",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -110,8 +106,7 @@
       "idx": 9,
       "title": "POST",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -122,7 +117,6 @@
       "idx": 10,
       "title": "POST „application/x-www-form-urlencoded“",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "pythonic",
@@ -134,9 +128,9 @@
       "idx": 11,
       "title": "POST „multipart/form-data“ I",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">POST „multipart/form-data“ I</h2></div><div class=\"section-body\">\r\n    \r\n    <p>\r\n        Obsahuje-li formulář komunikující se serverem alespoň jeden element <code>&lt;input type=\"file\"&gt;</code>, budou data odeslána v podobě těla dokumentu <em>MIME</em>. Než z něj budeme data tahat ven, podíváme se, jak vlastně vypadá.\r\n    </p>\r\n    <p>\r\n        Kód níže při plném vyplnění formuláře..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">import email\nfrom email.iterators import _structure\n\nhtml = \"\"\"\n    &lt;meta charset=\"utf-8\" /&gt;\n    &lt;form method=\"post\" accept-charset=\"utf-8\" enctype=\"multipart/form-data\" action=\"wsgi.5.py\"&gt;\n        &lt;fieldset&gt;\n            &lt;legend&gt;\n                &lt;input type=\"submit\" value=\"odeslat\"&gt;\n            &lt;/legend&gt;\n            &lt;p&gt;\n                Jméno (&lt;em&gt;jedinečná hodnota&lt;/em&gt;): &lt;input type=\"text\" name=\"jmeno\"&gt;\n            &lt;/p&gt;\n            &lt;p&gt;\n                Jazyky (&lt;em&gt;více hodnot&lt;/em&gt;):\n                angličtina &lt;input name=\"jazyky\" type=\"checkbox\" value=\"eng\"&gt; ,\n                ruština &lt;input name=\"jazyky\" type=\"checkbox\" value=\"rus\"&gt; ,\n                japonština &lt;input name=\"jazyky\" type=\"checkbox\" value=\"jap\"&gt;\n            &lt;/p&gt;\n            &lt;p&gt;\n                Fotka: &lt;input name=\"soubor\" type=\"file\"&gt;\n            &lt;/p&gt;\n        &lt;/fieldset&gt;\n    &lt;/form&gt;\n    &lt;p&gt;\n        {}\n    &lt;/p&gt;\n    &lt;pre&gt;{}&lt;/pre&gt;\n\"\"\"\n\ndef application(environ, start_response):\n    if (environ['REQUEST_METHOD'] in ('POST', 'PUT')):\n        cl = int(environ['CONTENT_LENGTH'])\n        data = environ['wsgi.input'].read(cl)   # bytes\n        print(data)\n    else:\n        data = ''\n    body = '&lt;em&gt;wsgi.input&lt;/em&gt; skrz &lt;em&gt;email&lt;/em&gt;:&lt;br/&gt;'\n    response_body = html.format(body, data)\n    response_body = bytes(response_body, encoding='utf-8')\n    response_headers = [\n        (\"Content-type\", \"text/html\"),\n        (\"Content-length\", str(len(response_body)) ),\n    ]\n    start_response(\"200 OK\", response_headers)\n    return [response_body,]\n\nif __name__ == '__main__':\n    from wsgiref.simple_server import make_server\n    server = make_server('localhost', 8080, application)\n    server.serve_forever()</pre>\r\n    <p>\r\n        ..vyprodukuju následující (binární) data:\r\n    </p>\r\n    <pre class=\"brush: plain; gutter: false; toolbar: false;\">b'-----------------------------123504625239007772824141014506\\r\\nContent-Disposition: form-data; name=\"jmeno\"\\r\\n\\r\\nAlisa\\r\\n-----------------------------123504625239007772824141014506\\r\\nContent-Disposition: form-data; name=\"jazyky\"\\r\\n\\r\\neng\\r\\n-----------------------------123504625239007772824141014506\\r\\nContent-Disposition: form-data; name=\"jazyky\"\\r\\n\\r\\nrus\\r\\n-----------------------------123504625239007772824141014506\\r\\nContent-Disposition: form-data; name=\"jazyky\"\\r\\n\\r\\njap\\r\\n-----------------------------123504625239007772824141014506\\r\\nContent-Disposition: form-data; name=\"soubor\"; filename=\"sachovnice.png\"\\r\\nContent-Type: image/png\\r\\n\\r\\n\\x89PNG\\r\\n\\x1a\\n\\x00\\x00\\x00\\rIHDR\\x00\\x00\\x00\\x03\\x00\\x00\\x00\\x03\\x08\\x02\\x00\\x00\\x00\\xd9J\"\\xe8\\x00\\x00\\x00\\x1cIDATx\\x9c%\\xc3\\xb1\\r\\x00\\x00\\x0c\\xc3 &gt;\\xcf\\xe9\\xeeP$\\x84_m\\x83\\x92\\xd4\\x01\\xb4\\xd2\\rr\\xa6|\\xffu\\x00\\x00\\x00\\x00IEND\\xaeB`\\x82\\r\\n-----------------------------123504625239007772824141014506--\\r\\n'</pre>\r\n\r\n</div>"
     },
@@ -189,7 +183,6 @@
       "idx": 16,
       "title": "POST „multipart/form-data“ II",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "pythonic",
@@ -201,7 +194,6 @@
       "idx": 17,
       "title": "Externí knihovna „multipart“",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",
@@ -213,7 +205,7 @@
       "idx": 18,
       "title": "Poznámky",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,

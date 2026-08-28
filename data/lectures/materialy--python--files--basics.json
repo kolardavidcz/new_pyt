@@ -7,10 +7,9 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\n\n  <p>\n    Se soubory v Python'u se na první pohled pracuje velmi podobně, jako kdekoliv jinde – soubor z daného umístění otevřeme, pracujeme s jeho obsahem a na konci ho zase spořádaně uzavřeme:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">f = open('cesta/k/souboru', mode='r', encoding='utf-8')\n...\nf.close()</pre>\n  <p>\n    Výchozí mód je <code>r</code> (tedy textový soubor otevřený pro čtení) a protože je pozičně na druhém místě, zdánlivě by pro textové soubory tedy stačilo psát <code>open('CESTA', 'r')</code> nebo rovnou <code>open('CESTA')</code>. Problém je v tom, že <em>encoding</em> je až <strong>třetí</strong> pojmenovaný parametr (druhým je nastavení mezipaměti <em>buffering</em>) a výchozí kódování je závislé na systému, takže <strong><code>open()</code> bez parametru <em>encoding</em> je v podstatě nepoužitelný (rozhodně nepřenosný)</strong>.\n  </p>\n\n</div>"
     },
@@ -19,10 +18,9 @@
       "idx": 1,
       "title": "Operační kontext „with“",
       "tags": [
-        "Core",
-        "WOW"
+        "Tricky"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Operační kontext „with“</h2></div><div class=\"section-body\">\n\n  <p>\n    Protože cestou se může stát mnoho nepředvídaného, je dobré se pojistit a soubor pro případ takových nenadálých událostí stejně pěkně zavřít.\n  </p>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Soubor se snažíme <em>čistě uzavřít</em> nejen proto, aby nezůstal „viset“ v nějakém nedefinovaném stavu, ale hlavně proto, že veškerá práce s ním je „bafrovaná“ (<em>buffered</em>), takže se snadno stane, že při nekorektním uzavření se část dat třeba vůbec nezapíše, protože zůstala viset připravená v mezipaměti (<em>buffer</em>).\n  </div></div>\n  <p>\n    Po staru to člověk dělal soustavou bloků <code>try-finally</code>, ale v Python'u 3 je mnohem lepší použít příkaz <code>with</code> pro vytvoření příslušného operačního kontextu (<em>runtime context</em>):\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">with open('cesta/k/souboru', encoding='utf-8') as f:\n    BLOK</pre>\n  <p>\n    Uvnitř bloku máme pod identifikátorem <code>f</code> k dispozici otevřený <em>stream</em> (aneb „proud dat“) a můžeme s ním úplně normálně pracovat. Jakmile kód v bloku proběhne, ať už úspěšně nebo neúspěšně, tak je stream automaticky uzavřen (a nemusíme se o to tudíž starat sami).\n  </p>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Technicky vzato objekt typu stream zde funguje jako „správce kontextu“ (<em>context manager</em>) – při vstupu do bloku je zavolána jeho „magická“ metoda <code>__enter__()</code>, při opuštění bloku pak <code>__exit__()</code>. Blíže viz <a class=\"external\" href=\"http://diveintopython3.net/special-method-names.html#context-managers\">B.11</a>.\n  </div></div>\n\n</div>"
     },
@@ -42,7 +40,7 @@
       "idx": 3,
       "title": "Konstruktor „open()“",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "resyntax",
       "already_studied_in": null,
@@ -53,7 +51,7 @@
       "idx": 4,
       "title": "Módy otevření souboru I",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "resyntax",
       "already_studied_in": null,
@@ -66,7 +64,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Módy otevření souboru II</h2></div><div class=\"section-body\">\n\n    <p>\n        Nejen mně přijdou módy otevření souboru poněkud zmatené. <a href=\"https://stackoverflow.com/a/30566011\" class=\"external\">Andrzej Pronobis / Renato Byrro</a> vytvořili rozhodovací diagram, který – pokud jsem se úplně neztratil v testování, což by mě ani trochu nepřekvapilo ^_^ – odpovídá realitě a je docela přehledný:\n    </p>\n    \n    <img src=\"_files/ExWNT-white-bg.png\" width=\"800\" alt=\"módy otevření souboru\">\n    <p>\n        PS: Mód <em>x</em> patří do větve <em>writing</em> – je to tak trochu „nafintěné“ <em>w</em>. Mód <em>x+</em> můžete také použít, ale vzhledem k povaze věci se chová úplně stejně jako <em>x</em>.\n    </p>\n\n</div>"
     },
@@ -86,7 +84,7 @@
       "idx": 7,
       "title": "Zápis do proudu",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "resyntax",
       "already_studied_in": null,
@@ -97,8 +95,7 @@
       "idx": 8,
       "title": "Znaky vs bajty I",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "paradigm",
       "already_studied_in": null,
@@ -109,7 +106,6 @@
       "idx": 9,
       "title": "Znaky vs bajty II",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "paradigm",
@@ -121,7 +117,6 @@
       "idx": 10,
       "title": "Znaky vs bajty III",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "paradigm",
@@ -133,8 +128,7 @@
       "idx": 11,
       "title": "Mezipaměť („buffer“) I",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,

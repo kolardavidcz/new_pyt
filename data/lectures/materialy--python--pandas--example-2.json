@@ -18,7 +18,6 @@
       "idx": 1,
       "title": "Chybějící data I",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "newconcept",
@@ -30,7 +29,6 @@
       "idx": 2,
       "title": "Chybějící data II",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "newconcept",
@@ -55,7 +53,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Jedinečné hodnoty – „unique()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož máme vypsat celkové počty dospělců a obsazené rybníky pro každý druh, musíme nejdříve získat seznam všech druhů:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/birds/04.py\"><em>birds/04.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import pandas as pd\n\ndf = pd.read_excel(\"birds.xlsx\", sheet_name=\"birds\")\n\n# jednotlivé druhy ptáků\ndruhy = df['DRUH_CZ'].unique()\nprint(druhy)\nprint(type(druhy))</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">['potápka malá' 'lyska černá' 'potápka roháč' 'labuť velká'\n'kachna divoká' 'racek chechtavý' 'volavka popelavá' 'volavka bílá'\n'polák chocholačka' 'kopřivka obecná' 'husa velká' 'polák velký'\n'zrzohlávka rudozobá' 'kormorán velký' 'racek bělohlavý' 'lžíčák pestrý'\n'hohol severní' 'hvízdák euroasijský' 'pisík obecký' 'ledňáček říční'\n'moták pochop' 'orel mořský' 'rybák obecný' 'ostralka štíhlá'\n'čírka modrá' 'čáp černý' 'kvakoš noční' 'bez ptáků']\n&lt;class 'numpy.ndarray'&gt;</pre></div></div>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: Jelikož sloupce <em>SAMCI</em> a <em>SAMICE</em> již pro další výpočty nepotřebujeme, vypustil jsem pro přehlednost jejich přetypovávání na <code>\"Int64\"</code>.\r\n    </div></div>\r\n    <p>\r\n        Jak je vidět, na některých rybnících nebyl pozorován žádný pták, řádky s hodnotou <code>'bez ptáků'</code> tak musíme z dalšího zpracování vynechat.\r\n    </p>\r\n\r\n</div>"
     },
@@ -64,9 +62,9 @@
       "idx": 5,
       "title": "Kontrola pro jeden druh",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Kontrola pro jeden druh</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ověřme si nejdříve například pro <em>racka chcechtavého</em>, jak vypadají jeho data:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/birds/05.py\"><em>birds/05.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import pandas as pd\n\ndf = pd.read_excel(\"birds.xlsx\", sheet_name=\"birds\")\n\nkontrolní_druh = df[df['DRUH_CZ'] == 'racek chechtavý']\nprint(kontrolní_druh)</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">RYBNÍK          DRUH_CZ  SAMCI  SAMICE  DOSPĚLCI  MLÁĎATA\n5      3133  racek chechtavý    NaN     NaN         1      NaN\n42     2923  racek chechtavý    NaN     NaN         6      NaN\n54     2923  racek chechtavý    NaN     NaN         4      NaN\n73     2920  racek chechtavý    NaN     NaN         1      NaN\n115    3114  racek chechtavý    NaN     NaN         2      NaN</pre></div></div>\r\n    <p>\r\n        Vidíme, že na rybníce <em>2923</em> byl pozorován – a zapsán – na dvou různých místech. Odpovídající záznam ve výsledné tabulce pro něj tudíž musí obsahovat 4 rybníky (a ne pět) a celkem 14 dospělých jedinců.\r\n    </p>\r\n\r\n</div>"
     },
@@ -75,8 +73,7 @@
       "idx": 6,
       "title": "Prodloužení dat o jeden řádek – „df.loc[len(df)] = …“",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,

@@ -18,9 +18,9 @@
       "idx": 1,
       "title": "Poznámka k Python'u 2.7",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "basics",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Poznámka k Python'u 2.7</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Navzdory původním tvrzením o prakticky nulové „backportaci“ novinek Python'u trojkového zpět do dvojkového toho za ty roky probublalo strašně moc.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Oficiální zdůvodnění snad jest, že to usnadňuje psát kód pro dvojkovou i trojkovou řadu současně. Praktický efekt je spíš ten, že zarytí odpůrci trojky mají čím dál tím více důvodů, proč na trojku vůbec nepřecházet. Pokud tedy nepracují v mezinárodním jazykovém prostředí, tam je dvojka se svojí dualitou „osmibitový řetězec VERSUS unicodový řetězec“ pekelná.\r\n    </div></div>\r\n    <p>\r\n        Takže se snadno může stát, že o nějaké věci tvrdím, že v Python'u dvojkovém nefunguje, zatímco v nějaké – dostatečně poslední – verzi řady 2.7 to tak vůbec už být nemusí.\r\n    </p>\r\n\r\n</div>"
     },
@@ -29,7 +29,7 @@
       "idx": 2,
       "title": "Python 3.x versus Python 2.x",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -40,9 +40,9 @@
       "idx": 3,
       "title": "Kódování řetězců",
       "tags": [
-        "Core"
+        "WOW"
       ],
-      "diff": "basics",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Kódování řetězců</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Začnu rovnou tím nejdůležitějším – způsobem uchovávání řetězců v paměti.\r\n    </p>\r\n\r\n    <p class=\"py3k\">\r\n        V trojkovém Python'u už to asi ani snažší být nemůže – napíšete-li někde typ řetězec (tedy cokoliv v nějaké z <a href=\"/materialy/python/types/strings.xml\">mnoha variant jednoduchých a dvojtých uvozovek</a>), tak neřeknete-li v hlavičce (viz <a href=\"?slajd=5\">následující slajd</a>) kdovíproč jinak, <strong>Python automaticky předpokládá, že jde o textová data v kódování UTF-8</strong>.\r\n    </p>\r\n\r\n    <p class=\"py2k\">\r\n        Zato v Python'u dvojkovém na vás čeká pěkný podraz – <strong>řetězce jsou totiž dvojího druhu</strong>:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong>řetězce unicodové</strong>, značené jako <code>u\"\"</code> nebo <code>U\"\"</code>;\r\n        </li>\r\n        <li>\r\n            <strong>„řetězce“ osmibitové</strong>, značené jako <code>\"\"</code>.\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Plus samozřejmě všechny jejich varianty s apostrofy, případně i trojtým opakováním.\r\n    </div></div>\r\n    <p>\r\n        Přitom platí, že tyhle <strong>dvojkové pseudořetězce se berou buď jako sekvence bajtů, pokud tomu tak konzument chce, nebo jako řetězce textové, pokud má někdo zrovna zájem, pak ale</strong>:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Při uvedení hlavičky kódování zdrojového souboru (např. <code># encoding: utf-8</code>) se osmibitové řetězce vyhodnucují v tomto kódování.\r\n        </li>\r\n        <li>\r\n            <strong>Bez uvedení hlavičky kódování zdrojového souboru se osmibitové řetězce vyhodnocují ve výchozím kódování systému, na kterém skript zrovna běží.</strong>\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Každému je asi jasné, že je zaděláno na pořádný průšvih. Pokud tedy nepíšete všechno jen a pouze jenom jako ASCII…\r\n    </p>\r\n\r\n</div>"
     },
@@ -51,7 +51,7 @@
       "idx": 4,
       "title": "Intermezzo – Kódování zdrojových textů",
       "tags": [
-        "Core"
+        "Tricky"
       ],
       "diff": "resyntax",
       "already_studied_in": null,
@@ -62,9 +62,9 @@
       "idx": 5,
       "title": "Kódování řetězců – Py2k",
       "tags": [
-        "Skip"
+        "Tricky"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Kódování řetězců – Py2k</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Oba druhy řetězců – osmibitové a unicodové – můžete ve dvojkovém Python'u mimo jiné třebas i skládat:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; \"ahoj \" + u\"světe\"\nu'ahoj světe'</pre>\r\n\r\n    <p class=\"enumerate\">\r\n        Jenže daleko horší je, že funkce akceptující na vstupu „obyčejné“ řetězce <code>\"\"</code> si mohou s tímto vstupem dělat, co je zrovna napadne – někdy předpokládají, že jde o sekvenci bajtů, tedy v podstatě binární data, jindy se zase můžou k vaší hrůze rozhodnout, že jde o text ve výchozím kódování toho kterého systému!\r\n    </p>\r\n    <p>\r\n        Je jasné, že tohle je skutečně pořádný průšvih. Kterému se dá „vyhnout“ jedině tak, že se pohybujete pouze na úrovni ASCII (tedy vlastně sedmi bitů), kde jsou oba druhy řetězců v podstatě zaměnitelné.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Převádět takový kód, aby fungoval pod trojkovým Python'em, není vůbec žádný med, jak vás ostatně snadno přesvědčí třebas Mark Pilgrim ve svém <a href=\"http://www.diveintopython3.net/whats-new.html\" class=\"external\">Dive Into Python 3</a>. Ovšem výsledek je miliónkrát lepší.\r\n    </div></div>\r\n\r\n\r\n</div>"
     },
@@ -73,7 +73,6 @@
       "idx": 6,
       "title": "Názvy souborů",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "newconcept",
@@ -85,8 +84,7 @@
       "idx": 7,
       "title": "PS – textové soubory",
       "tags": [
-        "Core",
-        "Tricky"
+        "WOW"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -97,9 +95,9 @@
       "idx": 8,
       "title": "Celá čísla dlouhá vs krátká",
       "tags": [
-        "Core"
+        "WOW"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Celá čísla dlouhá vs krátká</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"py3k\">\r\n        Ve trojkovém Python'u jsou jedna jediná celá čísla, a to „nafukovací“ (tedy <em>dlouhá</em>). Prostě jak velké číslo je potřeba, tak velké se zabere (pokud se vleze někam do paměti samozřejmě):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; 10**18\n1000000000000000000\n&gt;&gt;&gt; 10**23\n100000000000000000000000</pre>\r\n\r\n    <p class=\"py2k\">\r\n        V Python'u dvojkovém existují i celá čísla <em>krátká</em> a ta dlouhá se pak označují postfixem <code>L</code> (jde i <code>l</code>, ale to se snadno plete s jedničkou) a mají vlastní konstruktor <em>long()</em>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; sys.maxint\n9223372036854775807\n&gt;&gt;&gt; 10**18\n1000000000000000000\n&gt;&gt;&gt; 10**23\n100000000000000000000000L</pre>\r\n    <p>\r\n        Práce s <em>krátkými</em> je celkem pochopitelně systémově méně náročná, ale kdo na to má pořád dávat pozor, že.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Ostatně kdo chce psát v čistém Python'u extrémně rychlé programy, asi si vybral špatný jazyk ^_~\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -108,7 +106,6 @@
       "idx": 9,
       "title": "Dělení",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "resyntax",
@@ -120,7 +117,7 @@
       "idx": 10,
       "title": "Oktalová čísla",
       "tags": [
-        "Core"
+        "Tricky"
       ],
       "diff": "resyntax",
       "already_studied_in": null,
@@ -131,7 +128,7 @@
       "idx": 11,
       "title": "Iterátory – „range“",
       "tags": [
-        "Core"
+        "WOW"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -164,7 +161,7 @@
       "idx": 14,
       "title": "Iterátory – „map“",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -175,7 +172,7 @@
       "idx": 15,
       "title": "Iterátory – „filter“",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -186,9 +183,9 @@
       "idx": 16,
       "title": "Iterátory – „next()“ a „__next__()“",
       "tags": [
-        "Core"
+        "WOW"
       ],
-      "diff": "pythonic",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Iterátory – „next()“ a „__next__()“</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"py3k\">\r\n        Když už jsme u iterátorů – další prvek sekvence se v trojkovém Python'u vyvolává pomocí vestavěné funkce <em>next()</em>, která nepřekvapivě volá magickou metodu <em>__next__()</em> objektu iterátoru:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = 'ahoj'\n&gt;&gt;&gt; i = xs.__iter__()   # ve skutečnosti by se volalo „iter(xs)“\n&gt;&gt;&gt; i.__next__()        # ve skutečnosti by se volalo „next(i)“\n'a'</pre>\r\n\r\n    <p class=\"py2k\">\r\n        Ve dvojkovém Python'u se metoda iterátoru jmenovala pro zmatení nepřítele naprosto nemagicky <em>Iterátor.next()</em>, i když konstruktor iterátoru byl očekávaně magicky <em>Iterátor.__iter__()</em>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = 'ahoj'\n&gt;&gt;&gt; i = xs.__iter__()\n&gt;&gt;&gt; i.next()\n'a'</pre>\r\n\r\n</div>"
     },
@@ -197,7 +194,6 @@
       "idx": 17,
       "title": "Generátorová notace",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",
@@ -220,10 +216,9 @@
       "idx": 19,
       "title": "Porovnávání hodnot",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Porovnávání hodnot</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"py2k\">\r\n        Při porovnávání hodnot provádí Python 2.x implicitní konverzi typů..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; 2 &lt; '1'\nTrue</pre>\r\n    <p>\r\n        ..nebo dokonce vyloženě páchá magii:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; len &lt; len\nFalse</pre>\r\n    <p>\r\n        Dává vám to smysl? Asi moc ne, že. Tudíž není moc divu, že..\r\n    </p>\r\n\r\n    <p class=\"py3k\">\r\n        ..ve trojce už nic takového není:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; 2 &lt; '1'\nTraceback (most recent call last):\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\nTypeError: unorderable types: int() &lt; str()\n\n&gt;&gt;&gt; len &lt; len\nTraceback (most recent call last):\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\nTypeError: unorderable types: builtin_function_or_method() &lt; builtin_function_or_method()</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Čimž samozřejmě netvrdím, že vaše objekty (či dokonce funkce) se porovnávat nedají, protože <a href=\"/materialy/python/sorting/advanced.xml\">dají, když budete chtít</a>.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -232,7 +227,6 @@
       "idx": 20,
       "title": "Řazení objektů",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",
@@ -244,10 +238,9 @@
       "idx": 21,
       "title": "„True + True“",
       "tags": [
-        "Already Studied",
-        "Tricky"
+        "Already Studied"
       ],
-      "diff": "basics",
+      "diff": "paradigm",
       "already_studied_in": {
         "lecture_id": "lecture:materialy/python/pitfalls.html",
         "lecture_title": "Pythoní záludnosti & Pasti v jazyce",
@@ -264,10 +257,9 @@
       "idx": 22,
       "title": "Bublání ven proměnných generátorové notace",
       "tags": [
-        "Already Studied",
-        "Tricky"
+        "Already Studied"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": {
         "lecture_id": "lecture:materialy/python/pitfalls.html",
         "lecture_title": "Pythoní záludnosti & Pasti v jazyce",
@@ -295,10 +287,9 @@
       "idx": 24,
       "title": "Krajně nebezpečný „input()“",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Krajně nebezpečný „input()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zkuste uhodnout, co bude v proměnné <code>xs</code>, když následujícímu programu zadáte na vstupu řetězec <em>os.getcwd()</em>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">import os\nxs = input('Vstup: ')</pre>\r\n    <p class=\"py3k\">\r\n        Ve trojkovém Python'u pěkně spořádaně zadaný řetězec <code>'os.getcwd()'</code>.\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; import os\n&gt;&gt;&gt; xs = input('Vstup: ')\nVstup: os.getcwd()\n&gt;&gt;&gt; xs\n'os.getcwd()'</pre>\r\n    <p class=\"py2k\">\r\n        Ovšem v Python'u dvojkovém to snad radši ani nechcete vědět:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; import os\n&gt;&gt;&gt; xs = input('Vstup: ')\nVstup: os.getcwd()\n&gt;&gt;&gt; xs\n'C:\\\\PROFILES\\\\pirat'</pre>\r\n    <p>\r\n        Ano, je to tak – <strong>dvojkový Python automaticky volá na vstup funkce <em>input()</em> extrémně nebezpečnou funkci <em>eval()</em></strong>!!! Radši si ani nezkoušet představit, co všechno se tímhle dá způsobit… Vstup bez vyhodnocení vrací ve dvojkové řadě funkce <code>raw_input()</code>, která se chová obdobně jako trojkový <em>input()</em>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -318,8 +309,7 @@
       "idx": 26,
       "title": "Výjimky – „except“",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "resyntax",
       "already_studied_in": null,
@@ -330,7 +320,7 @@
       "idx": 27,
       "title": "Výjimky – „raise“",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "resyntax",
       "already_studied_in": null,
@@ -343,7 +333,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">29</span><h2 class=\"section-title\">Použití metatříd</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"py3k\">\r\n        Zatímco v trojkovém Python'u zavedete konkrétní metatřídu u třídy pomocí pojmenovaného parametru..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">        class MojeTřída(metaclass=M):\n            ...</pre>\r\n\r\n    <p class=\"py2k\">\r\n        ..ve dvojkovém to byl/je magický parametr v těle třídy:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">        class MojeTřída:\n            __metaclass__ = M\n...</pre>\r\n\r\n</div>"
     },
@@ -352,7 +342,6 @@
       "idx": 29,
       "title": "„super()“",
       "tags": [
-        "Core",
         "WOW"
       ],
       "diff": "pythonic",

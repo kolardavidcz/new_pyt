@@ -7,9 +7,9 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Výroba <strong>sdílených knihoven</strong> (<em>shared libraries</em>) a jejich následné použití z Python'u se poměrně značně liší podle jazyka, ve kterém danou knihovnu napíšete. V dalším upozorním na specifické vlastnosti konkrétních jazyků:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <a href=\"?slajd=2\">C</a>\r\n        </li>\r\n        <li>\r\n            <a href=\"?slajd=4\">C++</a>\r\n        </li>\r\n        <li>\r\n            <a href=\"?slajd=6\">D</a>\r\n        </li>\r\n        <li>\r\n            <a href=\"?slajd=8\">Haskell</a>\r\n        </li>\r\n        <li>\r\n            <a href=\"?slajd=10\">Ada</a>\r\n        </li>\r\n    </ul>\r\n    \r\n    <p>\r\n        PS: Za pomoc s kódy pro C++ a vysvětlení chování překladačů děkuji Míru Šimkovi.\r\n    </p>\r\n\r\n</div>"
     },
@@ -20,7 +20,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">C</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        S knihovnami v jazyce <strong>C</strong> je práce zdaleka nejsnažší, protože ty jsou přímo podporovány modulem <em>ctypes</em>. Ale i tak máme k dispozici několik různých scénářů:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Neoznačíte-li žádnou z funkcí pro export, budou překladem <code>gcc [-O] -shared mylib.c -o mylib.dll</code> exportovány automaticky všechny (a přímo pod svými jmény).\r\n        </li>\r\n        <li>\r\n            Windows: Jakmile při stejném způsobu kompilace některé z funkcí označíte prefixem <code>__declspec(dllexport)</code>, budou exportovány pouze tyto.\r\n        </li>\r\n        <li>\r\n            Linux: Podobného efektu dosáhnete pod Linuxem pomocí prefixu <code>__attribute__((visibility(\"default\")))</code>, ale musíte změnit způsob překladu na <code>gcc -fvisibility=hidden -shared mylib.c -o mylib.so</code> .\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Je-li tedy váš kód určen pro více platforem, je v tuto chvíli čas na vhodné makro ^_~\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -29,8 +29,7 @@
       "idx": 2,
       "title": "C – volání",
       "tags": [
-        "Already Studied",
-        "Core"
+        "Already Studied"
       ],
       "diff": "basics",
       "already_studied_in": {
@@ -49,10 +48,9 @@
       "idx": 3,
       "title": "C++",
       "tags": [
-        "Core",
         "Tricky"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">C++</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        S knihovnami v jazyce <strong>C++</strong>, je práce téměř stejná jako s knihovnami v jazyce <em>C</em> – víceméně se jen liší způsob exportu jmen funkcí. Při překladu pomocí <code>g++ [-O] -shared mylib.cc -o mylib.dll</code> platí:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Funkce označené jako <code>static</code> jsou privátní (lokální) pro danou knihovnu a neexportují se.\r\n        </li>\r\n        <li>\r\n            Funkce bez prefixu se vyexportují zamanglovaně.\r\n        </li>\r\n        <li>\r\n            Pouze funkce s prefixem <code>extern \"C\"</code> jsou na knihovně viditelné pod svým skutečným jménem.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        PS: V <em>MS Visual C++</em> je to trošku jinak – neexportuje se nic, pokud tak nepřikážeme. Přitom funkce označené <code>_declspec(dllexport)</code> vyjdou ven zamanglované, funkce označené <code>extern \"C\" _declspec(dllexport)</code> pak nezamanglované.\r\n    </p>\r\n\r\n</div>"
     },
@@ -63,7 +61,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">C++ – volání</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Příklad pro <em>g++</em> a základní typ <code>int</code>:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            → Input: <a href=\"_files/cc_smycka/mylib.cc\"><em>cc_smycka/mylib.cc</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">int smycka1(int n) {\n    int i = 0;\n    while (i&lt;=n) {\n        i++;\n    }\n    return n;\n}\n\nstatic int smycka2(int n) {\n    int i = 0;\n    while (i&lt;=n) {\n        i++;\n    }\n    return n;\n}\n\nextern \"C\" int smycka3(int n) {\n    int i = 0;\n    while (i&lt;=n) {\n        i++;\n    }\n    return n;\n}</pre></div><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/cc_smycka/test.py\"><em>cc_smycka/test.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nfrom ctypes import cdll\n\nmylib = cdll.LoadLibrary('mylib.dll')\nprint( dir(mylib), '\\n' )\n\nprint( mylib, '\\n' )\nprint( mylib._Z7smycka1i, '\\n' )\nprint( mylib._Z7smycka1i(1000000), '\\n' )\nprint( mylib.smycka3, '\\n' )\nprint( mylib.smycka3(1000000), '\\n' )</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">['_FuncPtr', '__class__', '__delattr__', '__dict__', '__doc__', '__eq__',\n'__format__', '__ge__', '__getattr__', '__getattribute__', '__getitem__',\n'__gt__', '__hash__', '__init__', '__le__', '__lt__', '__module__', '__ne__',\n'__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__',\n'__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_func_flags_',\n'_func_restype_', '_handle', '_name']\n\n&lt;CDLL 'mylib.dll', handle 6e580000 at b5b590&gt;\n\n&lt;_FuncPtr object at 0x00BC7D50&gt;\n\n1000000\n\n&lt;_FuncPtr object at 0x00BC7DC8&gt;\n\n1000000</pre></div></div>\r\n\r\n</div>"
     },

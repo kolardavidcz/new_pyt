@@ -40,8 +40,7 @@
       "idx": 3,
       "title": "„install“ – instalace balíčků I",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -63,8 +62,7 @@
       "idx": 5,
       "title": "„freeze“ &amp; „--requirement“ – záznam a rekonstrukce závislostí",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -75,8 +73,7 @@
       "idx": 6,
       "title": "Kam instalovat?",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -87,8 +84,7 @@
       "idx": 7,
       "title": "„uninstall“ – odinstalace balíčků",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -110,9 +106,9 @@
       "idx": 9,
       "title": "Balíčky s binárními komponentami",
       "tags": [
-        "Skip"
+        "Tricky"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Balíčky s binárními komponentami</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jsou-li instalované balíčky „čistý“ Python, není s nimi většinou vůbec žádný problém. Často však balíčky obsahují binární komponenty, ovšem v klasické podobě jsou distribuovány pouze v podobě zdrojových kódů a instalace tak zahrnuje i jejich kompilaci do cílové binární podoby.\r\n    </p>\r\n    <p>\r\n        Zatímco pod unixovými systémy není co řešit, na Windows musíte nainstalovat <a href=\"http://mingw.org\" class=\"external\"><strong>MinGW</strong></a> a následně dát Python'u vědět, že jej může pro kompilaci využít, vytvořením souboru <strong>pydistutils.cfg</strong> ve svém domovském adresáři, do nějž stačí uvést:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">[build]\ncompiler=mingw32</pre>\r\n    <p>\r\n        Tento konfigurační soubor toho umí více (třeba i přepsat cílové umístění vytvořených balíčků), ale pro instalaci balíčků s binárními komponentami více potřeba skutečně (a kupodivu) není.\r\n    </p>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Hlavní uživatelský domovský adresář slouží pro globální nastavení, ale každé virtuální prostředí může vyžadovat vlastní a nebo můžete instalaci volat ze shellu MinGW, které má domovský adresář zase pod sebou.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Popravdě tento soubor může být ještě i na jiných místech a ke všemu pod několika dalšími jmény, ale pro dané použití snad netřeba to komplikovat…\r\n        </div></div></div>\r\n    <p>\r\n        PS: K testování nastavení je vhodný například balíček <a href=\"http://www.pocoo.org/projects/markupsafe/\" class=\"external\"><em>markupsafe</em></a> – obsahuje soubor <em>_speedups.c</em>, který se v případě úspěchu při instalaci přeloží na binární komponentu <em>_speedups.pyd</em>, ale přitom je schopen fungovat i bez ní.\r\n    </p>\r\n\r\n</div>"
     },
@@ -121,10 +117,9 @@
       "idx": 10,
       "title": "„wheel“ – univerzální binární balíčky",
       "tags": [
-        "Core",
         "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">„wheel“ – univerzální binární balíčky</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Neustálá rekompilace binárních komponent se může velmi rychle stát pěkně otravnou (třebas při správě skupiny počítačů), nehledě na to, že pro většinu uživatelů operačního systému Windows je velmi těžko proveditelná. Nepřekvapí proto, že už nejstarší balíčkovací systémy Python'u umožňovaly distribuci binárních komponent již zkompilovaných. To s sebou ale samozřejmě neslo hromadu jiných problémů (různé verze pro různé cílové platformy), takže <em>pip</em> podporu distribuce binárních komponent z praktických důvodů vůbec neobsahuje.\r\n    </p>\r\n    <p>\r\n        K té primárně  slouží až nejnovější formát balíčků <a href=\"http://legacy.python.org/dev/peps/pep-0427/\" class=\"external\">wheel</a>. Soubory mají typicky příponu <em>whl</em> a prakticky jde o zazipovaný adresář s definovanou vnitřní strukturou obsahující kromě vlastních pythoních zdrojáků a zkompilovaných komponent především metadata.\r\n    </p>\r\n    <hr>\r\n    <p>\r\n        Jelikož zvláště pod Windows není kompilace binárních komponent v naprosté většině případů běžně proveditelná, zůstávají uživatelé odkázáni na dobré duše, které připraví instalátory s binárními komponentami již zkompilovanými. Některé projekty je poskytují samy, pro ostatní je zde pak především „kompilační hrdina“ <a href=\"http://www.lfd.uci.edu/~gohlke/pythonlibs/\" class=\"external\">Christoph Gohlke</a>. Výhodou jeho byť instalátorů je fakt, že často již vyhovují standardu <em>wheel</em>, takže je můžete celkem snadno předělat na klasické wheelovské balíčky a ty už instalovat se všemi možnostmi, které nabízí <em>pip</em>.\r\n    </p>\r\n    <p>\r\n        Příklad instalace <em>wheel</em>'u a následně binárního balíčku <em>lxml</em>:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \"># Nejdříve nainstalujeme balíček „wheel“:\npip install wheel\n# Nyní ho již můžeme použít pro konverzi instalátoru..\nwheel convert lxml-3.3.5.win32-py3.4.exe\n# ..na standardní balíček ve formátu „wheel“:\npip install --user lxml-3.3.5-cp34-none-win32.whl</pre>\r\n\r\n</div>"
     },
@@ -133,7 +128,6 @@
       "idx": 11,
       "title": "Závěrečná poznámka",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "basics",

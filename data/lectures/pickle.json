@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Modul <strong>pickle</strong> je jedním z prostředků vyhrazených pro perzistentní ukládání pythoních dat. To znamená, že data jím uložená mohou být např. k dispozici mezi dvěma časově vzdálenými běhy programu (a to i jiného).\r\n    </p>\r\n    <p>\r\n        Umí zaserializovat (téměř libovolnou) pythonovskou strukturu pomocí příslušného <em>pickle</em>-protokolu a uložit ji jako <strong>binární</strong> objekt buď <em>do proměnné</em> nebo <em>do souboru</em>. A samozřejmě ji pak zase umí z proměnné/souboru načíst a rozserializovat zpátky do příslušné struktury.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Nejčastější použití asi najde piklení do souboru, ale stejně tak dobře můžete posílat zapiklené struktury po síti nebo ukládat do databáze.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -18,7 +18,7 @@
       "idx": 1,
       "title": "Protokol",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -31,7 +31,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Metody modulu „pickle“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Modul <code>pickle</code> umí piklit a rozpiklovávat v zásadě do/z dvou různých míst – paměti nebo proudu (<em>stream</em>u):\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        do/z <strong>paměti</strong>:\r\n        <ul>\r\n            <li>\r\n              <code>po = pickle.dumps(o)</code> – zapiklí objekt <em>o</em> do proměnné <em>po</em> typu <i>bytes()</i>\r\n            </li>\r\n            <li>\r\n              <code>o = pickle.loads(po)</code> – rozpiklí bajt-objekt <em>po</em> do datové struktury <em>o</em>\r\n            </li>\r\n        </ul>\r\n    </li>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Všimněte si koncového <em>s</em> u metod pro piklení přes paměť.\r\n    </div></div>\r\n    <li>\r\n        do/z <strong>proudu</strong>:\r\n        <ul>\r\n            <li>\r\n              <code>pickle.dump(o, file)</code> – zapiklí objekt <em>o</em> do binárního souboru <em>file</em>\r\n            </li>\r\n            <li>\r\n              <code>o = pickle.load(file)</code> – rozpiklí do objektu <em>o</em> zapiklenou strukturu v binárním souboru <em>file</em>\r\n            </li>\r\n        </ul>\r\n    </li>\r\n  </ul>\r\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <em>file</em> je objekt typu <em>stream</em>, tj. <code>file = open('soubor', 'rwb')</code>, nikoli cesta k souboru.\r\n    </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <em>dump</em>-metody mají několik dalších nepovinných parametrů, ale pokud nebudete sdílet zapiklené struktury mezi různými verzemi Python'u, může vám to být celkem jedno.\r\n    </div></div></div>\r\n\r\n</div>"
     },
@@ -51,10 +51,9 @@
       "idx": 4,
       "title": "Co lze zapiklit",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Co lze zapiklit</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Zaserializovat je možné následující typy:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        <code>None</code>, <code>True</code>, <code>False</code>\r\n    </li>\r\n    <li>\r\n        celá, reálná a komplexní čísla\r\n    </li>\r\n    <li>\r\n        řetězce (unicodové), bajtové řetězce a bajtová pole\r\n    </li>\r\n    <li>\r\n        n-tice, seznamy, množiny a slovníky, pokud obsahují piklitelné typy\r\n    </li>\r\n    <li>\r\n        funkce definované na globální úrovni modulu\r\n    </li>\r\n    <li>\r\n        vestavěné funkce definované na globální úrovni modulu\r\n    </li>\r\n    <li>\r\n        třídy definované na globální úrovni modulu\r\n    </li>\r\n    <li>\r\n        instance tříd, jejichž atributy <code>__dict__</code> a <code>__setstate__()</code> jsou piklitelné\r\n    </li>\r\n  </ul>\r\n  \r\n  <p>\r\n    Přitom:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        Pokus o zapiklení nepiklitelného objektu vyhodí výjimku <em>PicklingError</em>, blíže neurčený počet bajtů však mezitím už může být zapsán do otevřeného proudu. Podobně při pokusu o piklení velmi rekurzivních dat můžete narazit na hranice rekurze (výjimka <em>RuntimeError</em>).\r\n    </li>\r\n    <li>\r\n        Piklení probíhá na úrovni <em>plně kvalifikovaných jmen</em>, nikoli příslušných zdrojových kódů. Tzn. že funkce a třídy (včetně uživatelem definovaných) jsou zapikleny pod svým jménem a jménem rodičovského modulu. Při odpiklení pak musí být příslušný modul a v něm příslušná funkce či třída k dispozici.\r\n    </li>\r\n    <li>\r\n        Ze tříd jsou piklena pouze data instancí. To proto, aby byl zapiklený objekt použitelný i tehdy, pokud základní třídu nějak (rozumně) upravíme.\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
     },
@@ -63,7 +62,7 @@
       "idx": 5,
       "title": "Příklad – funkce",
       "tags": [
-        "Core"
+        "Tricky"
       ],
       "diff": "paradigm",
       "already_studied_in": null,
@@ -74,7 +73,6 @@
       "idx": 6,
       "title": "K (ne)bezpečnosti piklení",
       "tags": [
-        "Core",
         "Tricky"
       ],
       "diff": "paradigm",
@@ -99,7 +97,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Modul „pickletools“ – příkazová řádka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Od verze Python'u 3.2 umožňuje modul <code>pickletools</code> i své přímé volání z příkazové řádky:\r\n    </p>\r\n    <pre class=\"brush: bash; gutter: false; toolbar: false; \">python -m pickletools [přepínače] soubor [soubor…]</pre>\r\n    <p>\r\n        Dostupné přepínače jsou:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <code>-a</code>, <code>--annotate</code><br>\r\n            doplní každý operační kód popisem jeho funkce\r\n        </li>\r\n        <li>\r\n            <code>-o</code>, <code>--output=&lt;file&gt;</code><br>\r\n            jméno souboru pro zápis výstupu příkazu\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">Zdá se, že modul má zatím při použití tohoto přepínače problémy s výstupem pro ne-ASCII kódovaná data a struktury.</div></div>\r\n        </li>\r\n        <li>\r\n            <code>-l</code>, <code>--indentlevel=&lt;num&gt;</code><br>\r\n            počet mezer použitých při odsazování úrovní výstupu\r\n        </li>\r\n        <li>\r\n            <code>-m</code>, <code>--memo</code><br>\r\n            \r\n            pro vícero překládaných objektů se pokusí udržet stejnou interní mapovací tabulku\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">Tohle je asi zrovna užitečnější spíš z programového API než tady.</div></div>\r\n        </li>\r\n        <li>\r\n            <code>-p</code>, <code>--preamble=&lt;preamble&gt;</code><br>\r\n            při výpisu výstupů pro vícero vstupních souborů doplní před každý jednotlivý výpis uvedený text (ve výchozím nastavení jméno zpracovávaného souboru)\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
