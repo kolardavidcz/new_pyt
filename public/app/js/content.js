@@ -83,16 +83,57 @@ export function showWeek(weekId) {
 
   const items = weekVisibleItems(week);
   const isGray = week.week === 99 || week.isRemovedSection;
-  const weekLabel = isGray ? "Gray Section" : `Week ${week.week}`;
+  const weekLabel = isGray ? "Regál samostudia" : `Týden ${week.week}`;
+  
   const header = el("div", { className: "catalog-header" },
     el("h1", {}, `${weekLabel}: ${week.title}`),
     week.description ? el("p", { className: "desc" }, week.description) : null,
     el("div", { className: "catalog-stats" },
-      el("span", {}, `${items.length} items visible`),
-      el("span", {}, `${(week.lectures || []).length} lectures`),
-      el("span", {}, `${(week.exercises || []).length} exercises`),
+      el("span", { className: "catalog-stat-pill" }, `⏱️ ${week.time_estimate || "90 min přednáška + 45 min lab"}`),
+      el("span", { className: "catalog-stat-pill" }, `📚 ${(week.lectures || []).length} přednášek`),
+      el("span", { className: "catalog-stat-pill" }, `💻 ${(week.exercises || []).length} cvičení`),
+      el("span", { className: "catalog-stat-pill" }, `🔍 ${items.length} zobrazeno`),
     ),
   );
+
+  // Pedagogical Callouts
+  if (week.objective || week.c_java_bridge) {
+    const callouts = el("div", { className: "week-hero-callouts" });
+    if (week.objective) {
+      callouts.appendChild(el("div", { className: "week-hero-callout objective" },
+        el("span", { className: "callout-icon" }, "🎯"),
+        el("div", { className: "callout-body" },
+          el("strong", {}, "Cíl týdne"),
+          el("span", {}, week.objective),
+        ),
+      ));
+    }
+    if (week.c_java_bridge) {
+      callouts.appendChild(el("div", { className: "week-hero-callout bridge" },
+        el("span", { className: "callout-icon" }, "⚡"),
+        el("div", { className: "callout-body" },
+          el("strong", {}, "Most z C / C++ / Javy"),
+          el("span", {}, week.c_java_bridge),
+        ),
+      ));
+    }
+    header.appendChild(callouts);
+  }
+
+  // Milestone Banner
+  if (week.milestone) {
+    const m = week.milestone;
+    const milestoneEl = el("div", { className: "week-milestone-card" },
+      el("div", { className: "milestone-badge" }, `🏆 Semestrální projektový milník ${m.number}`),
+      el("h3", { className: "milestone-title" }, m.title),
+      el("p", { className: "milestone-desc" }, m.desc),
+      el("div", { className: "milestone-skills" },
+        ...(m.skills || []).map((s) => el("span", { className: "milestone-skill-pill" }, s)),
+      ),
+    );
+    header.appendChild(milestoneEl);
+  }
+
   main.appendChild(header);
   main.appendChild(buildWeekCatalogBlock(week, { hideTitle: true }));
 }
@@ -106,7 +147,7 @@ function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = false }
 
   if (!hideTitle) {
     const isGray = week.week === 99 || week.isRemovedSection;
-    const badgeText = isGray ? "Gray" : `W${week.week}`;
+    const badgeText = isGray ? "Shelf" : `W${week.week}`;
     const titleRow = el("div", { className: "week-block-header" });
     if (showWeekLink) {
       const btn = el("button", {
@@ -127,13 +168,45 @@ function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = false }
     wrap.appendChild(titleRow);
   }
 
+  // If Week 99 and has shelves, group them nicely
+  if (week.week === 99 && week.shelves && week.shelves.length) {
+    const matchedSlugs = new Set();
+    for (const shelf of week.shelves) {
+      const shelfItems = items.filter((it) => {
+        const matches = (shelf.slugs || []).some(s => (it.slug || "").includes(s) || (it.path || "").includes(s));
+        if (matches) matchedSlugs.add(it.id);
+        return matches;
+      });
+
+      if (shelfItems.length) {
+        const shelfSec = el("div", { className: "shelf-section" },
+          el("div", { className: "shelf-header" },
+            el("h2", {}, `${shelf.icon || "📁"} ${shelf.title}`),
+            shelf.desc ? el("p", {}, shelf.desc) : null,
+          ),
+        );
+        const grid = el("div", { className: "card-grid" });
+        for (const item of shelfItems) grid.appendChild(itemCard(item));
+        shelfSec.appendChild(grid);
+        wrap.appendChild(shelfSec);
+      }
+    }
+
+    // Uncategorized shelf items
+    const remainingItems = items.filter(it => !matchedSlugs.has(it.id));
+    if (remainingItems.length) {
+      wrap.appendChild(section("Ostatní doplňková témata", remainingItems));
+    }
+    return wrap;
+  }
+
   const lectures = items.filter((i) => i.kind === "lecture");
   const exercises = items.filter((i) => i.kind === "exercise");
 
-  if (lectures.length) wrap.appendChild(section("Lectures", lectures));
-  if (exercises.length) wrap.appendChild(section("Exercises", exercises));
+  if (lectures.length) wrap.appendChild(section("Přednášky (Lectures)", lectures));
+  if (exercises.length) wrap.appendChild(section("Cvičení & Projekty (Labs)", exercises));
   if (!items.length) {
-    wrap.appendChild(el("p", { className: "desc" }, "No items match the current filters in this week."));
+    wrap.appendChild(el("p", { className: "desc" }, "Žádné položky neodpovídají aktuálnímu filtru."));
   }
   return wrap;
 }
