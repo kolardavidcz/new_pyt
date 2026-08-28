@@ -1,450 +1,388 @@
 {
-  "argparse": [
+  "pandas_overview": [
     {
       "id": "q1",
-      "type": "predict_output",
-      "question": "Jaká hodnota se uloží do args.v při volání bez argumentů?",
+      "type": "multiple_choice",
+      "question": "Jak je v knihovně Pandas vnitřně koncepčně strukturován objekt DataFrame?",
       "options": [
-        "A) None",
-        "B) SILENT",
-        "C) VERBOSE",
-        "D) True"
+        "A) Jako trojrozměrný tenzor v NumPy, kde první dimenze drží datové typy a zbylé dvě drží hodnoty tabulky.",
+        "B) Jako statická pole C-struktur alokovaná v souvislém bloku paměti s pevně zafixovaným počtem řádků i sloupců.",
+        "C) Jako slovník sloupců, kde klíče jsou názvy sloupců a hodnotami jsou objekty Series sdílející společný index.",
+        "D) Jako jednorozměrný spojový seznam řádků, kde každý prvek obsahuje n-tici s libovolně proměnnými typy dat."
       ],
-      "answer": 1,
-      "explanation": "U přepínače s nargs='?' se hodnota const použije v případě, že je přepínač -v na příkazové řádce přítomen bez hodnoty. Pokud přepínač není zadán vůbec, použije se hodnota default ('SILENT').",
-      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-v', nargs='?', const='VERBOSE', default='SILENT')\nargs = parser.parse_args([])\nprint(args.v)"
+      "answer": 2,
+      "explanation": "DataFrame je v podstatě mapování (slovník) z názvů sloupců na jednorozměrná pole Series, přičemž všechny sloupce sdílejí stejný řádkový index. Přidání sloupce je proto levné, zatímco přidání řádku je náročné.",
+      "code": null
     },
     {
       "id": "q2",
-      "type": "predict_output",
-      "question": "Jakou výchozí hodnotu má přepínač s nastavením action='store_true'?",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o procházení řádků v Pandas pomocí cyklu for nebo metody iterrows():\n\nRuční iterace po řádcích DataFrame pomocí cyklu for nebo iterrows() je doporučený a nejrychlejší způsob úpravy dat v Pandas.",
       "options": [
-        "A) None",
-        "B) True",
-        "C) False",
-        "D) AttributeError"
+        "A) Nepravda – iterace po řádcích je v Pandas považována za antipattern; pro efektivní zpracování se používají vektorizované operace.",
+        "B) Pravda – iterace po řádcích přímo využívá C-API Pythonu, a je proto znatelně rychlejší než vektorizovaný výpočet přes sloupce."
       ],
-      "answer": 2,
-      "explanation": "Akce store_true automaticky nastavuje výchozí hodnotu na boolovské False. Pokud uživatel přepínač na příkazové řádce použije, hodnota v atributu force se změní na True.",
-      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-f', '--force', action='store_true')\nargs = parser.parse_args([])\nprint(args.force)"
+      "answer": 0,
+      "explanation": "Procházení po řádcích u sloupcově orientovaného DataFrame vyžaduje opakovaný přístup napříč všemi samostatnými objekty Series. Vytváří obrovskou režii, proto jde v Pandas o známý antipattern.",
+      "code": null
     },
     {
       "id": "q3",
-      "type": "predict_output",
-      "question": "Jaký bude výstup parseru při opakovaném použití přepínače s action='append'?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte chybějící syntaxi závorek pro výběr pod-tabulky se sloupci A a B jako nového DataFrame:\n\nimport pandas as pd\ndf = pd.DataFrame({'A': [1, 2], 'B': [3, 4], 'C': [5, 6]})\nsub_df = df________'A', 'B'________:",
       "options": [
-        "A) ('a.py', 'b.py')",
-        "B) ['b.py']",
-        "C) 'b.py'",
-        "D) ['a.py', 'b.py']"
+        "[ a ]",
+        "([ a ])",
+        "{( a )}",
+        "[[ a ]]"
       ],
       "answer": 3,
-      "explanation": "Akce action='append' nezapříčiní přepsání hodnoty poslední zadanou, ale každou novou hodnotu postupně přidá jako nový prvek do jednoho kumulativního seznamu.",
-      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-i', '--include', action='append')\nargs = parser.parse_args(['-i', 'a.py', '-i', 'b.py'])\nprint(args.include)"
+      "explanation": "Jednoduché hranaté závorky df['A'] vrací jednorozměrný objekt Series. Pro výběr více sloupců a zachování typu DataFrame se seznam názvů sloupců předává uvnitř dvojitých závorek df[['A', 'B']].",
+      "expected": "[[ a ]]",
+      "code": "import pandas as pd\ndf = pd.DataFrame({'A': [1, 2], 'B': [3, 4], 'C': [5, 6]})\nsub_df = df________'A', 'B'________"
     },
     {
       "id": "q4",
-      "type": "multiple_choice",
-      "question": "Co vrací metoda parse_known_args() modulu argparse?",
+      "type": "predict_output",
+      "question": "Jaký datový typ vrátí metoda df['kategorie'].unique() při zavolání na sloupec Pandas?",
       "options": [
-        "A) Dvojici (Namespace s rozpoznanými argumenty, seznam nerozpoznaných argumentů).",
-        "B) Pouze slovník s rozpoznanými argumenty, přičemž neznámé argumenty zcela ignoruje.",
-        "C) Výjimku UnrecognizedArgumentError, pokud se v příkazu objeví neznámý přepínač.",
-        "D) Objekt typu Namespace obsahující jak rozpoznané, tak neznámé argumenty dohromady."
+        "A) NumPy pole ndarray obsahující pouze unikátní hodnoty z daného sloupce.",
+        "B) Nový objekt typu Pandas Series indexovaný celými čísly od nuly nahoru.",
+        "C) Standardní pythonovský seznam list všech unikátních řetězců v datovém sloupci.",
+        "D) Vestavěnou pythonovskou množinu set bez zachování původního pořadí prvků."
       ],
       "answer": 0,
-      "explanation": "Metoda parse_known_args() při výskytu neznámých argumentů neselže, ale vrátí n-tici: první prvek je Namespace s parsovanými argumenty a druhý je seznam zbylých nerozpoznaných řetězců.",
+      "explanation": "Metoda .unique() na objektu Series nevrací Python list ani set, ale NumPy jednorozměrné pole ndarray unikátních hodnot v pořadí jejich prvního výskytu.",
       "code": null
     },
     {
       "id": "q5",
-      "type": "fill_blank_choice",
-      "question": "Doplňte speciální výjimku modulu argparse pro signalizaci neplatné hodnoty z vlastní konverzní funkce:",
-      "code_snippet": "from argparse import ArgumentParser, ________\n\ndef positive_int(val):\n    n = int(val)\n    if n <= 0:\n        raise ________('Číslo musí být kladné!')\n    return n",
+      "type": "multiple_choice",
+      "question": "Proč se při vyhodnocování složených podmínek ve fancy indexingu v Pandas musí používat operátory &, | a ~ místo and, or a not?",
       "options": [
-        "ParseError",
-        "ArgumentTypeError",
-        "ArgumentValueError",
-        "InvalidOptionError"
+        "A) Slova and a or jsou v syntaxi Pandas vyrazena z důvodu zrychlení parsování výrazů při spuštění kódu v C-rozhraní.",
+        "B) Bitové operátory jsou přetíženy pro prvek po prvku (element-wise), zatímco Python and/or vyhodnocují pravdivost celého objektu.",
+        "C) Bitové operátory automaticky konvertují chybějící hodnoty NaN na False, což klíčová slova and a or nedokážou zaručit.",
+        "D) Operátory and a or pracují výhradně s celými čísly, zatímco bitové operátory & a | fungují i pro řetězce a desetinná čísla."
       ],
       "answer": 1,
-      "explanation": "Vlastní validační funkce v type= modulu argparse vyhazují argparse.ArgumentTypeError, kterou parser zpracuje a zobrazí chybovou hlášku CLI.",
-      "code": "import argparse\n\ndef positive_int(val):\n    num = int(val)\n    if num <= 0:\n        raise argparse.________(\"Číslo musí být kladné\")\n    return num",
-      "expected": "ArgumentTypeError"
+      "explanation": "Klíčová slova and a or se snaží zkonvertovat celý objekt Series na jedinou logickou hodnotu (vyvolá ValueError: Truth value of a Series is ambiguous). Pro porovnání po prvcích se musí použít bitové operátory &, |, ~ a podmínky obalit v závorkách.",
+      "code": null
     },
     {
       "id": "q6",
-      "type": "multiple_choice",
-      "question": "Jaké chování zajistí kód group = parser.add_mutually_exclusive_group(required=True)?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte chybějící vlastnost pro použití vektorizovaných řetězcových metod nad sloupcem Series:\n\nimport pandas as pd\ndf = pd.DataFrame({'jmena': ['Anna', 'Petr', 'Pavel']})\nmask = df['jmena'].________.startswith('P'):",
       "options": [
-        "A) Skupina automaticky skryje nápovědu pro všechny obsažené přepínače z výpisu -h.",
-        "B) Přepínače ze skupiny se stanou povinné všechny současně při spuštění skriptu.",
-        "C) Uživatel musí zadat právě jeden argument z dané skupiny, jinak parser selže.",
-        "D) Uživatel může zadat všechny přepínače ze zadané skupiny naráz v libovolném pořadí."
+        "char",
+        "string",
+        "str",
+        "text"
       ],
       "answer": 2,
-      "explanation": "add_mutually_exclusive_group() vynucuje, že lze vybrat nejvýše jeden argument ze skupiny. Parametr required=True navíc zaručuje, že alespoň jeden z nich musí být povinně zadán.",
-      "code": null
+      "explanation": "Akcesor .str zpřístupňuje vektorizované řetězcové metody (jako contains(), startswith(), lower()) nad všemi prvkami objektu Series.",
+      "expected": "str",
+      "code": "import pandas as pd\ndf = pd.DataFrame({'jmena': ['Anna', 'Petr', 'Pavel']})\nmask = df['jmena'].________.startswith('P')"
     },
     {
       "id": "q7",
       "type": "predict_output",
-      "question": "Jaká hodnota převáží při spuštění skriptu bez argumentů?",
+      "question": "Co vrátí výraz df.iloc[0:2] zavolaný na DataFrame se 5 řádky?",
       "options": [
-        "A) ['alpha', 'beta']",
-        "B) None",
-        "C) alpha",
-        "D) beta"
+        "A) Objekt Series představující hodnoty z nultého sloupce pro první dva řádky.",
+        "B) Nový DataFrame obsahující první tři řádky (na pozicích 0, 1 a 2).",
+        "C) Jediný prvek z prvního řádku a druhého sloupce v původní tabulce df.",
+        "D) Nový DataFrame obsahující první dva řádky (na pozicích indexu 0 a 1)."
       ],
       "answer": 3,
-      "explanation": "Metoda parser.set_defaults(...) má vyšší prioritu než parametr default= v add_argument(), takže přepíše původní výchozí hodnotu 'alpha' na 'beta'.",
-      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-x', default='alpha')\nparser.set_defaults(x='beta')\nargs = parser.parse_args([])\nprint(args.x)"
+      "explanation": "Pseudometoda iloc[] používá celočíselné pozicové indexování dodržující konvence slicing [start:stop], kde stop pozice (2) není zahrnuta. Výsledkem pro 0:2 jsou tedy řádky 0 a 1.",
+      "code": null
     },
     {
       "id": "q8",
-      "type": "predict_output",
-      "question": "Co se stane při spuštění skriptu s nargs='+' bez předání jakéhokoliv argumentu?",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi metodami df.info() a df.head() v Pandas?",
       "options": [
-        "A) Skript ukončí běh se zprávou o chybě z důvodu nedostatečného počtu argumentů.",
-        "B) Skript vrátí objekt Namespace s prázdným seznamem uloženým v atributu files.",
-        "C) Skript vytvoří objekt Namespace, kde má atribut files uloženou hodnotu None.",
-        "D) Skript se pozastaví a bude čekat na zadání názvů souborů ze standardního vstupu."
+        "A) info() vypisuje technické shrnutí sloupců, typů a paměti, zatímco head() vrací prvních několik řádků datových hodnot.",
+        "B) info() odstraňuje z tabulky neplatné řádky NaN, zatímco head() vybírá pouze sloupečky s číselnými hodnotami.",
+        "C) info() mění datové typy sloupců na optimálnější, zatímco head() seřadí hodnoty v tabulce podle prvního sloupce.",
+        "D) info() vrací nový DataFrame s popisnou statistikou, zatímco head() ukládá načtená data přímo na disk do souboru."
       ],
       "answer": 0,
-      "explanation": "Násobnost nargs='+' vyžaduje alespoň 1 zadanou hodnotu. Nezadá-li uživatel žádnou, parse_args() vypíše usage, zobrazí chybu 'too few arguments' a okamžitě skript ukončí.",
-      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('files', nargs='+')\nargs = parser.parse_args([])"
+      "explanation": "df.info() vypíše na standardní výstup souhrn o počtu nepotvrzených (non-null) záznamů, datových typech dtype každého sloupce a využití paměti. df.head() vrací nový DataFrame obsahující počáteční řádky.",
+      "code": null
     }
   ],
-  "execution_subprocess": [
+  "MatPlotLib": [
     {
       "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jaký je hlavní rozdíl mezi voláním z rodiny os.exec*() a funkcí subprocess.run()?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte funkci pro zjištění aktuálně aktivního renderovacího backendu knihovny Matplotlib:",
       "options": [
-        "A) os.exec*() nahradí běžící proces novým procesem, zatímco subprocess.run() vytvoří dceřiný proces a počká na něj.",
-        "B) subprocess.run() funguje výhradně pod systémem Linux, zatímco rodina os.exec*() je určena výhradně pro Windows OS.",
-        "C) subprocess.run() nahradí běžící proces novým procesem, zatímco os.exec*() vrátí objekt typu CompletedProcess.",
-        "D) os.exec*() spouští proces asynchronně na pozadí, zatímco subprocess.run() vyžaduje vytvoření nového vlákna."
+        "show_backend",
+        "get_backend",
+        "current_backend",
+        "get_renderer"
       ],
-      "answer": 0,
-      "explanation": "Volání os.exec*() kompletně nahradí stávající proces nově spuštěným programem (stejně jako C execve()), takže se do původního Python skriptu již nevrátí. subprocess.run() spouští podproces a čeká na jeho dokončení.",
-      "code": null
+      "answer": 1,
+      "explanation": "Funkce matplotlib.get_backend() vrací název právě nastaveného backendu pro vykreslování grafů (např. 'QtAgg', 'TkAgg' nebo 'inline').",
+      "code": "import matplotlib\n\n# Zjištění aktivního grafického backendu:\nbackend = matplotlib.________()\n# Výstup např.: 'QtAgg' nebo 'inline'",
+      "expected": "get_backend"
     },
     {
       "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Doplňte parametr funkce subprocess.run(), který při nenulovém návratovém kódu automaticky vyvolá výjimku CalledProcessError:",
+      "type": "multiple_choice",
+      "question": "Co se stane, pokud funkci plt.plot() předáme pouze jednu jednodimenzionální sekvenci hodnot plt.plot([10, 20, 15])?",
       "options": [
-        "raise_err",
-        "check",
-        "exception",
-        "strict"
+        "A) Zadané hodnoty se použijí pro osu x a pro osu y se automaticky doplňují nulové hodnoty stejné délky.",
+        "B) Vyvolá se ValueError z důvodu chybějící druhé sekvence souřadnic nezbytné pro vykreslení osy y.",
+        "C) Zadané hodnoty se použijí pro osu y a pro osu x se automaticky vygeneruje posloupnost indexů 0, 1, 2.",
+        "D) Vykreslí se bodový graf na úhlopříčce, kde hodnoty osy x i osy y budou vzájemně shodné a rovny vstupu."
       ],
-      "answer": 1,
-      "explanation": "Parametr check=True zajistí, že pokud proces skončí s nenulovým návratovým kódem, funkce subprocess.run() okamžitě vyvolá výjimku CalledProcessError.",
-      "code": "import subprocess\n\n# Vyvolání výjimky CalledProcessError při chybovém návratovém kódu:\nresult = subprocess.run([\"ls\", \"/neexistujici_cesta\"], ________=True)",
-      "expected": "check"
+      "answer": 2,
+      "explanation": "Předáme-li funkci `plt.plot()` pouze jediný seznam či pole hodnot, Matplotlib předpokládá, že jde o hodnoty na svislé ose y. Pro vodorovnou osu x vygeneruje automatické indexy `0, 1, ..., N-1`.",
+      "code": null
     },
     {
       "id": "q3",
       "type": "multiple_choice",
-      "question": "Co se stane při volání subprocess.run(\"ls -l\") bez nastavení shell=True na systému Linux?",
+      "question": "Co v metodě plt.plot(x, y, 'ro-') specifikuje třetí řetězcový parametr 'ro-'?",
       "options": [
-        "A) Výpočet se zastaví s výjimkou ValueError, protože řetězce bez hranatých závorek nejsou v run() povoleny.",
-        "B) Příkaz proběhne v systémovém shellu /bin/sh a vypíše podrobný seznam souborů v aktuálním adresáři.",
-        "C) Systém vyvolá FileNotFoundError, protože hledá binární soubor s doslovným názvem \"ls -l\" včetně mezery.",
-        "D) Funkce automaticky rozdělá řetězec podle mezer a spustí příkaz ls s předaným parametrem -l."
+        "A) Vytvoření rastrového (r) obrázku s ortogonálním (o) promítáním os a automatickou mřížkou (-).",
+        "B) Vykreslení růžového (r) obdélníkového (o) rámce okolo celého grafu s průhlednou výplní (-).",
+        "C) Vykreslení červených (r) bodů bez spojovací čáry s rotací popisků (o) o nastavený úhel (-).",
+        "D) Vykreslení červené (r) plné čáry (-) spojující jednotlivé datové body označené kroužky (o)."
       ],
-      "answer": 2,
-      "explanation": "Bez shell=True předává subprocess.run() prvotní argument přímo systémovému volání execv(). Systém hledá spustitelný soubor s přesným názvem \"ls -l\" (i s mezerou), což selže na FileNotFoundError. Správný zápis bez shellu je [\"ls\", \"-l\"].",
+      "answer": 3,
+      "explanation": "Formátovací řetězec v Matplotlibu kombinuje barvu ('r' = red), značku bodu ('o' = circle marker) a typ čáry ('-' = solid line). Výsledkem je červená plná čára s kroužky v datových bodech.",
       "code": null
     },
     {
       "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Doplňte parametr funkce subprocess.run(), který dekóduje zachycený výstup ze surových bajtů do textového řetězce pomocí zvoleného kódování:",
+      "type": "multiple_choice",
+      "question": "Jakým způsobem se docílí zobrazení popisu řad v legendě v modulu matplotlib.pyplot?",
       "options": [
-        "decode",
-        "charset",
-        "text_mode",
-        "encoding"
+        "A) Nastavením argumentu label ve funkci plot() a následným zavoláním samostatné funkce plt.legend().",
+        "B) Vytvořením samostatného textového pole pomocí plt.text() s explicitními souřadnicemi legendy.",
+        "C) Přímým předáním seznamu názvů řad jako jediného povinného argumentu do funkce plt.show().",
+        "D) Automatickým načtením jmen proměnných předaných do funkce plot() při zavolání plt.axis()."
       ],
-      "answer": 3,
-      "explanation": "Parametr encoding=\"utf-8\" (nebo zkráceně text=True) způsobí, že zachycený proud stdout a stderr je automaticky dekódován na řetězec str.",
-      "code": "import subprocess\n\n# Automatické dekódování stdout na str místo bytes:\nres = subprocess.run([\"whoami\"], capture_output=True, ________=\"utf-8\")\nprint(type(res.stdout))  # <class 'str'>",
-      "expected": "encoding"
+      "answer": 0,
+      "explanation": "Jednotlivým křivkám předáme pojmenovaný parametr `label='Název'` při volání `plt.plot()`. Aby se však legenda skutečně vykreslila do grafu, je nutné následně explicitně zavolat `plt.legend()`.",
+      "code": null
     },
     {
       "id": "q5",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení o spouštění externích procesů přes shell:\n\nPředání neošetřeného uživatelského vstupu do subprocess.run(cmd, shell=True) představuje vážné bezpečnostní riziko (shell injection), kterému lze zabránit ošetřením vstupu pomocí shlex.quote().",
+      "type": "multiple_choice",
+      "question": "Co vyjadřuje volání plt.subplot(211) v modulu pyplot?",
       "options": [
-        "A) Pravda – shell=True interpretuje řetězec přes /bin/sh či cmd.exe, kde nebezpečné znaky odescapuje právě funkce shlex.quote().",
-        "B) Nepravda – shell=True automaticky sanitizuje všechny předané argumenty a použití shlex.quote() vyvolá chybu v syntaxi shellu."
+        "A) Mřížku o 21 řádcích a 1 sloupci, přičemž aktivuje první buňku pro vykreslení nového podgrafu.",
+        "B) Mřížku o 2 řádcích a 1 sloupci, přičemž aktivuje první (horní) buňku pro kreslení podgrafu.",
+        "C) Nastavení rozlišení výstupního grafu na 211 DPI bez vytvoření nové mřížky pro podgrafy.",
+        "D) Vykreslení 211 samostatných bodů do jediného grafu s předdefinovaným stylem čar a bodů."
       ],
-      "answer": 0,
-      "explanation": "Spuštění shellu nad neuvozovaným uživatelským vstupem umožňuje útočníkovi vložit další příkazy (shell injection). Funkce shlex.quote() bezpečně obalí a odescapuje argument pro použití v shellu.",
+      "answer": 1,
+      "explanation": "Zkrácený zápis `plt.subplot(211)` je ekvivalentní `plt.subplot(2, 1, 1)`. První číslice udává počet řádků (2), druhá počet sloupců (1) a třetí index aktivní buňky (1 = první buňka).",
       "code": null
     },
     {
       "id": "q6",
-      "type": "predict_output",
-      "question": "Jaký bude typ a cíl zachycení chybového výstupu při použití stderr=subprocess.STDOUT v subprocess.run()?",
+      "type": "multiple_choice",
+      "question": "Jak se liší pojmenování metod pro nastavení popisků os na objektu Axes oproti top-level funkcím pyplot?",
       "options": [
-        "A) Chybový výstup stderr se přesměruje do stejného proudu jako standardní výstup stdout a uloží do result.stdout.",
-        "B) Standardní výstup stdout se přesměruje do chybového výstupu stderr a uloží se výhradně do result.stderr.",
-        "C) Chybový výstup stderr způsobí vyhození výjimky subprocess.STDOUTError okamžitě při zapsání chyby.",
-        "D) Chybový výstup stderr se vytiskne přímo na konzoli terminálu a v návratovém objektu result zůstane None."
+        "A) Metody na objektu Axes se volají s velkým počátečním písmenem (ax.Xlabel()), pyplot používá malé.",
+        "B) Metody na objektu Axes vyžadují předání objektu Figure jako prvního povinného argumentu metody.",
+        "C) Metody na objektu Axes mají předponu set_ (např. ax.set_xlabel()), zatímco pyplot volá plt.xlabel().",
+        "D) Metody na objektu Axes používají camelCase (např. ax.setXLabel()), zatímco pyplot vyžaduje snake_case."
       ],
-      "answer": 0,
-      "explanation": "Speciální konstanta subprocess.STDOUT předaná do parametru stderr přikáže rozhraní slít chybový výstup stderr přímo do výstupního proudu stdout.",
+      "answer": 2,
+      "explanation": "Objektově orientované rozhraní Matplotlibu na objektu `Axes` používá metody s předponou `set_` (např. `ax.set_xlabel()`, `ax.set_title()`, `ax.set_xlim()`), zatímco modul `pyplot` nabízí přímé funkce bez předpony (např. `plt.xlabel()`).",
       "code": null
     },
     {
       "id": "q7",
       "type": "multiple_choice",
-      "question": "Kdy je nutné použít třídu subprocess.Popen s metodou communicate() místo funkce subprocess.run()?",
+      "question": "Jak Matplotlib interně zpracovává objekty typu datetime předávané jako souřadnice na osách?",
       "options": [
-        "A) Při nastavování proměnných prostředí env, protože parametr env je dostupný výhradně v nízkoúrovňové třídé Popen.",
-        "B) Při potřebě asynchronního běhu procesů na pozadí nebo oboustranného datového proudění během provádění podprocesu.",
-        "C) Při provádění příkazů na operačním systému Windows, protože subprocess.run() je určen výhradně pro Unix systémy.",
-        "D) Při přesměrování standardního výstupu do souboru na disku, protože subprocess.run() přesměrování souborů nepodporuje."
-      ],
-      "answer": 1,
-      "explanation": "Funkce subprocess.run() je synchronní a čeká na dokončení procesu. Třída Popen umožňuje asynchronní spuštění procesu na pozadí, průběžné posílání dat na stdin za běhu a ruční řízení podprocesu.",
-      "code": null
-    }
-  ],
-  "mmap": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jak se chová objekt vytvořený pomocí modulu mmap?",
-      "options": [
-        "A) Funguje výhradně jako klasický textový řetězec str uložený v operační paměti.",
-        "B) Kombinuje rozhraní souborového proudu (read/seek) a měnitelného bajtového pole.",
-        "C) Automaticky šifruje a komprimuje souborová data zapsaná na pevný disk.",
-        "D) Slouží jako databázový index pro rychlé vyhledávání v relacích na disku."
-      ],
-      "answer": 1,
-      "explanation": "Objekt mmap namapuje soubor přímo do paměti a poskytuje hybridní rozhraní – podporuje souborové metody (read, readline, seek) i přístup přes indexy a výřezy jako bytearray.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaké omezení platí pro parametr offset při alokaci mmap.mmap()?",
-      "options": [
-        "A) Parametr offset musí vždy začínat od nuly, posun uvnitř souboru není podporován.",
-        "B) Parametr offset udává přesný počet textových řádků přeskočených při mapování.",
-        "C) Parametr offset musí být celočíselným násobkem mmap.ALLOCATIONGRANULARITY.",
-        "D) Offset může být libovolné číslo v rozsahu od 0 do celkové velikosti souboru."
-      ],
-      "answer": 2,
-      "explanation": "Operační systém vyžaduje Zarovnání offsetu paměťových stránek. V Pythonu musí být offset v mmap celočíselným násobkem mmap.ALLOCATIONGRANULARITY (obvykle 64 KiB / 65536 B).",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "predict_output",
-      "question": "Jaký typ a hodnotu vrátí metoda read_byte() nad objektem mmap?",
-      "options": [
-        "A) b'A' <class 'bytes'>",
-        "B) 'A' <class 'str'>",
-        "C) 0 <class 'int'>",
-        "D) 65 <class 'int'>"
+        "A) Vyžaduje předem manuální konverzi na UNIX timestamp (sekundy), jinak vyvolá výjimku TypeError.",
+        "B) Zaokrouhlí je na nejbližší celé hodiny a vytvoří z nich indexovaný slovník pro popis osy x.",
+        "C) Převede je na textové řetězce a vykreslí je jako kategoriální osu s rovnoměrnými rozstupy bodů.",
+        "D) Přepočítá je na číselné hodnoty reprezentující počet dní od počátku letopočtu pro polohování."
       ],
       "answer": 3,
-      "explanation": "Metoda read_byte() přečte 1 bajt a vrátí ho jako celé číslo (int, ASCII 65 pro 'A') a posune ukazatel o 1. Metoda read(1) by naopak vrátila bajtový objekt b'A' (bytes).",
-      "code": "import mmap\nwith mmap.mmap(-1, 10) as m:\n    m.write(b'ABC')\n    m.seek(0)\n    val = m.read_byte()\n    print(val, type(val))"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jakým způsobem je nutné předat regulární výraz při vyhledávání v objektu mmap?",
-      "options": [
-        "A) Vzor musí být definován jako bajtový řetězec s předponou rb (např. rb'pattern').",
-        "B) Regulární výrazy nelze nad objektem mmap z důvodu paměťových omezení použít.",
-        "C) Vzor musí být předán jako běžný textový Unicode řetězec str v kódování UTF-8.",
-        "D) Vzor je nutné nejprve převést na celočíselné pole ASCII hodnot jednotlivých znaků."
-      ],
-      "answer": 0,
-      "explanation": "Jelikož mmap reprezentuje neopracovaná bajtová data v paměti, operace a regexpy nad mmap vyžadují bajtový vzor (byte regex pattern) s předponou rb''.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co znamená předání hodnoty -1 jako prvního argumentu (fileno) do mmap.mmap(-1, length)?",
-      "options": [
-        "A) Soubor se otevře v neomezeném režimu paměti, kde jeho délka může dynamicky rost.",
-        "B) Vytvoří se anonymní paměťový blok neprovázaný se žádným konkrétním souborem.",
-        "C) Funkce vyhodí výjimku ValueError z důvodu neplatného souborového popisovače.",
-        "D) Otevře se v režimu pro čtení naposledy modifikovaný soubor z pevného disku."
-      ],
-      "answer": 1,
-      "explanation": "Hodnota fileno = -1 slouží k vytvoření anonymního alokovaného paměťového bloku (anonymous memory mapping) v RAM, který není vázán na žádný fyzický soubor na disku.",
+      "explanation": "Matplotlib nativně podporuje `datetime` objekty tak, že je interně zkonvertuje na desítková čísla odpovídající počtu dní od 1. 1. 0001 (pomocí např. `date2num`), což umožňuje přesné výpočty i škálování časové osy.",
       "code": null
     }
   ],
-  "externalibs_overview": [
+  "times+dates": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "K čemu slouží vestavěný modul ctypes v Pythonu?",
+      "question": "Jaký atribut určuje, zda je objekt datetime v Pythonu naivní (naive) nebo informovaný (aware)?",
       "options": [
-        "A) Zabezpečuje šifrování komunikace mezi procesy při přenosu objektů přes síťové sokety v lokální síti.",
-        "B) Slouží k automatické paralelizaci Python smyček vytvořením více systémových vláken bez zámku GIL.",
-        "C) Umožňuje přímé volání funkcí ze sdílených C knihoven (.dll / .so) a poskytuje datové typy kompatibilní s C.",
-        "D) Překládá zdrojový kód Pythonu do samostatného spustitelného binárního souboru bez nutnosti C kompilátoru."
+        "A) Atribut utc_offset, který vrací celočíselný posun v sekundách nebo hodnotu -1 při nepřiřazení.",
+        "B) Atribut is_aware, který obsahuje logickou hodnotu False u naivních a True u informovaných.",
+        "C) Atribut timezone, který uchovává textový název časového pásma nebo prázdný řetězec \"\".",
+        "D) Atribut tzinfo, který obsahuje None u naivních objektů a instanci časové zóny u informovaných."
       ],
-      "answer": 2,
-      "explanation": "Modul ctypes je FFI (Foreign Function Interface) knihovna v Pythonu, která dovoluje načítat sdílené dynamické knihovny napsané v C (DLL/.so) a předávat jim C-kompatibilní datové typy.",
+      "answer": 3,
+      "explanation": "Naivní objekty datetime mají v atributu tzinfo hodnotu None. Informované objekty obsahují referenci na instanci třídy dědící z tzinfo (např. timezone.utc nebo objekt z pytz).",
       "code": null
     },
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Doplňte atribut objektu funkce z načtené knihovny v ctypes pro definici očekávaných typů vstupních parametrů:",
+      "question": "Doplňte funkci z modulu calendar, která převede časovou n-tici struct_time v čase UTC na počet sekund od počátku epochy (timestamp).",
       "options": [
-        "param_types",
-        "restype",
-        "signature",
-        "argtypes"
+        "timegm",
+        "mktime",
+        "mktimes",
+        "gmtime"
       ],
-      "answer": 3,
-      "explanation": "Atribut argtypes určuje seznam typů z modulu ctypes, které C funkce přijímá. Atribut restype se používá pro definici návratového typu.",
-      "expected": "argtypes",
-      "code": "import ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.spoctu_suma.________ = [ctypes.c_int, ctypes.c_int]"
+      "answer": 0,
+      "explanation": "Funkce calendar.timegm() zpracovává struct_time v UTC a vrací počet sekund od unixové epochy (na rozdíl od time.mktime(), který předpokládá lokální čas).",
+      "code": "import time\nimport calendar\n\n# Časová struktura v koordinovaném světovém čase (UTC)\ntime_struct = time.gmtime()\n\n# Převod UTC struktury na unixový timestamp\nepoch_seconds = calendar.________(time_struct)\n# Výstup: 1770000000",
+      "expected": "timegm"
     },
     {
       "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jak vyvolat v ctypes C funkci ze sdílené knihovny lib, jejíž název není platným identifikátorem v Pythonu (např. my-func)?",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o chování metody datetime.timestamp() při volání na naivním objektu datetime:\n\nMetoda timestamp() u naivního objektu datetime automaticky předpokládá, že zadaný čas je v UTC, a provede přímý výpočet bez závislosti na nastavení systému.",
       "options": [
-        "A) Voláním funkce přes vestavěnou funkci getattr(lib, \"my-func\") předáním názvu jako řetězce.",
-        "B) Volání takové funkce není v ctypes možné a C knihovna se musí překompilovat s jiným názvem.",
-        "C) Přepsáním pomlčky na podtržítko v Python skriptu, což ctypes automaticky namapuje v paměti.",
-        "D) Načtením knihovny s parametrem rename_rules={\"my-func\": \"my_func\"} v konstruktoru CDLL."
+        "A) Nepravda – u naivního objektu se předpokládá lokální čas systému a k přepočtu na epochu se použije platformní céčkovská funkce mktime().",
+        "B) Pravda – u naivního objektu se předpokládá univerzální čas UTC a k přepočtu na epochu se použije interní matematika bez závislosti na systému."
       ],
       "answer": 0,
-      "explanation": "Pokud název exportované funkce v C knihovně není platný Python identifikátor (obsahuje např. pomlčku nebo tečku), nelze použít tečkovou notaci lib.my-func. Místo toho se použije getattr(lib, \"my-func\").",
+      "explanation": "Pokud je objekt datetime naivní (tzinfo=None), metoda timestamp() jej interpretuje jako lokální čas a používá kód spoléhající na platformní funkci mktime(), což může vést k chybám či výjimce OverflowError.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi metodami datetime.strptime() a datetime.strftime()?",
+      "options": [
+        "A) strptime() provádí konverzi času do UTC pásma, zatímco strftime() převede UTC čas na lokální časovou zónu systému.",
+        "B) strptime() převádí textový řetězec na objekt datetime, zatímco strftime() formátuje datetime objekt na textový řetězec.",
+        "C) strptime() vypisuje časový objekt na standardní výstup, zatímco strftime() načítá vstupní čas z konzole od uživatele.",
+        "D) strptime() zjišťuje aktuální systémový čas, zatímco strftime() nastavuje nový systémový čas operačního systému."
+      ],
+      "answer": 1,
+      "explanation": "strptime (string parse time) parsuje text podle zadávaného formátu na objekt datetime. strftime (string format time) převádí objekt datetime na zformátovaný textový řetězec.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu, která přiřadí naivnímu objektu datetime časovou zónu UTC beze změny hodnot hodin a minut.",
+      "options": [
+        "astimezone",
+        "set_tz",
+        "replace",
+        "convert"
+      ],
+      "answer": 2,
+      "explanation": "Metoda datetime.replace(tzinfo=...) vytvoří novou instanci se zadanou časovou zónou bez časového posunu hodnot hodin a minut.",
+      "code": "from datetime import datetime, timezone\n\n# Naivní čas záznamu z laboratorního spektrometru\nnaive_dt = datetime(2026, 8, 9, 14, 30, 0)\n\n# Přiřazení časové zóny UTC při zachování identického času 14:30\naware_dt = naive_dt.________(tzinfo=timezone.utc)\n# Výstup: datetime.datetime(2026, 8, 9, 14, 30, tzinfo=datetime.timezone.utc)",
+      "expected": "replace"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "K čemu slouží parametr fold v metodě replace() u objektu datetime zavedený v Pythonu 3.6?",
+      "options": [
+        "A) K určení způsobu zaokrouhlování mikrosekund při převodu na celé sekundy (0 dolů, 1 nahoru k celému číslu).",
+        "B) K zapnutí automatické korekce přestupných sekund nahromaděných v éře UNIXového počítání (0 vypnuto, 1 zapnuto).",
+        "C) K nastavení počtu nanosekund přidávaných k běžné sekundové přesnosti (0 pro sekundy, 1 pro nanosekundy).",
+        "D) K rozlišení dvou stejných lokálních časů nastávajících při zimním posunu času (0 pro dřívější, 1 pro pozdější)."
+      ],
+      "answer": 3,
+      "explanation": "Při podzimním přechodu z letního času na standardní čas nastávají stejné nástěnné časy dvakrát. Parametr fold rozlišuje první (0) a druhý (1) průchod stejného zobrazeného času.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Jaký bude účinek spuštění následujícího příkazu v Pythonu na platformě Linux?",
+      "options": [
+        "A) Nastaví čas posledního přístupu i čas poslední modifikace souboru data.txt na aktuální systémový čas.",
+        "B) Vynuluje čas modifikace i čas přístupu souboru data.txt na začátek UNIXové epochy (1. ledna 1970).",
+        "C) Vyvolá výjimku TypeError, protože funkce os.utime() striktně vyžaduje předání n-tice časových údajů.",
+        "D) Smaže veškerá časová razítka souboru data.txt a nastaví přístupová práva k souboru na hodnotu 000."
+      ],
+      "answer": 0,
+      "explanation": "Volání os.utime(path) bez dalších argumentů (nebo s times=None) nastaví čas přístupu (atime) i modifikace (mtime) zadané cesty na aktuální systémový čas.",
+      "code": "import os\nos.utime(\"data.txt\")"
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi funkcemi time.localtime() a time.gmtime() z modulu time?",
+      "options": [
+        "A) localtime() provádí konverzi času pouze pro systém Windows, zatímco gmtime() funguje výhradně na systémech typu POSIX/Linux.",
+        "B) localtime() vrací struct_time v lokální časové zóně, zatímco gmtime() vrací struct_time v koordinovaném světovém čase UTC.",
+        "C) localtime() bere v úvahu pouze přestupné sekundy, zatímco gmtime() započítává pouze posuny letního a zimního času na Zemi.",
+        "D) localtime() vrací čas jako číslo typu float, zatímco gmtime() vrací objekt reprezentující zónu v podobě textového řetězce."
+      ],
+      "answer": 1,
+      "explanation": "Obě funkce převádějí sekundy od epochy na n-tici struct_time. localtime() zohledňuje nastavené lokální časové pásmo a DST, zatímco gmtime() vrací čas v nultém poledníku (UTC).",
+      "code": null
+    }
+  ],
+  "pandas_example_1": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jakou externí knihovnu vyžaduje Pandas při prvním pokusu o načtení excelovského souboru .xlsx přes pd.read_excel()?",
+      "options": [
+        "A) Knihovnu xlsxwriter pro generování grafů a maker přímo uvnitř excelového sešitu.",
+        "B) Knihovnu openpyxl pro čtení a zápis moderních souborů ve formátu XLSX.",
+        "C) Knihovnu xlwt pro vytvoření zpětné kompatibility se starými binárními soubory.",
+        "D) Knihovnu pytz pro správnou interpretaci časových zón v buňkách s datem a časem."
+      ],
+      "answer": 1,
+      "explanation": "Pandas samotný neobsahuje parser pro Excel formáty. Pro načítání moderních .xlsx souborů spoléhá na knihovnu openpyxl (případně xlrd pro staré .xls).",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Doplňte parametr do funkce read_excel() pro načtení konkrétního listu sešitu pojmenovaného data:\n\nimport pandas as pd\ndf = pd.read_excel('klementinum.xlsx', ________='data'):",
+      "options": [
+        "work_sheet",
+        "sheet",
+        "sheet_name",
+        "tab_name"
+      ],
+      "answer": 2,
+      "explanation": "Parametr sheet_name ve funkci pd.read_excel() určuje, který list sešitu se má načíst (lze předat název jako řetězec, číslo listu od 0, nebo seznam pro načtení více listů).",
+      "expected": "sheet_name",
+      "code": "import pandas as pd\ndf = pd.read_excel('klementinum.xlsx', ________='data')"
+    },
+    {
+      "id": "q3",
+      "type": "predict_output",
+      "question": "Co vypočítá metoda df.describe() zavolaná na číselné sloupce v DataFrame?",
+      "options": [
+        "A) Korelační matici vzájemných lineárních závislostí mezi všemi dvojicemi číselných sloupců v dané tabulce.",
+        "B) Přesné počty výskytů všech unikátních řetězcových hodnot v každém sloupci seřazené od nejčastějších po nejméně časté.",
+        "C) Vektorizovaný součet všech prvků v řádcích s následným rozdělením podle jednotlivých měsíčních kategorií.",
+        "D) Základní popisné statistické charakteristiky jako počet, průměr, směrodatnou odchylku, minima, kvartily a maxima."
+      ],
+      "answer": 3,
+      "explanation": "describe() generuje pro číselné sloupce přehled souhrnných statistik: count, mean, std, min, 25% kvartil, 50% medián, 75% kvartil a max.",
       "code": null
     },
     {
       "id": "q4",
       "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení o načítání sdílených knihoven v modulu ctypes:\n\nZatímco Windows umožňuje odkazovat na sdílenou knihovnu relativní cestou, Linux striktně vyžaduje absolutní cestu k souboru knihovny.",
+      "question": "Vyhodnoťte pravdivost tvrzení o použití metody df.describe() na sloupec obsahující čísla měsíců (1 až 12):\n\nMetoda describe() automaticky rozpozná, že číslo měsíce je kategorický údaj, a místo průměru a směrodatné odchylky vrátí frekvenční tabulku výskytů.",
       "options": [
-        "A) Nepravda – Linux automaticky prohledává aktuální složku se skriptem, zatímco Windows vyžaduje výhradně absolutní cesty.",
-        "B) Pravda – Na Linuxu dynamický linker nehledá v aktuálním adresáři, proto je nutné předat např. os.path.abspath(\"mylib.so\")."
+        "A) Pravda – describe() provádí sémantickou analýzu dat a pro čísla v rozmezí 1–12 přepne výpočet na počty unikátních hodnot.",
+        "B) Nepravda – describe() počítá statistiky (průměr, std) slepě pro jakýkoliv číselný typ (int/float), i když pro číslo měsíce nedávají smysl."
       ],
       "answer": 1,
-      "explanation": "Pod Linuxem systémový linker neprohledává aktuální pracovní adresář (z bezpečnostních důvodů), takže ctypes.CDLL(\"mylib.so\") selže. Je nutné zadat absolutní cestu (např. přes os.path.join(os.getcwd(), \"mylib.so\")).",
+      "explanation": "Metoda describe() pracuje pouze na základě datového typu (dtype). Pokud je sloupec měsíce uložen jako int64, vypočítá pro něj průměr a směrodatnou odchylku bez ohledu na věcný smysl.",
       "code": null
-    },
-    {
-      "id": "q5",
-      "type": "fill_blank_choice",
-      "question": "Doplňte atribut pro nastavení návratového typu C funkce vracející 64bitové číslo s plovoucí čárkou:",
-      "options": [
-        "result",
-        "restype",
-        "argtypes",
-        "return_type"
-      ],
-      "answer": 1,
-      "explanation": "Atribut restype říká modulu ctypes, jaký typ (např. ctypes.c_double nebo ctypes.c_int) C funkce vrací, aby mohla být návratová hodnota správně přetypována na Python objekt.",
-      "expected": "restype",
-      "code": "import ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.vypocti_prumer.________ = ctypes.c_double"
-    }
-  ],
-  "bytes": [
-    {
-      "id": "q1",
-      "type": "predict_output",
-      "question": "Jaký typ mají výstupy při přístupu k prvkům bajtového řetězce?",
-      "options": [
-        "A) <class 'int'> <class 'str'>",
-        "B) <class 'str'> <class 'bytes'>",
-        "C) <class 'bytes'> <class 'bytes'>",
-        "D) <class 'int'> <class 'bytes'>"
-      ],
-      "answer": 3,
-      "explanation": "Přístup k celému jednomu prvku b[0] vrací celočíselnou ASCII hodnotu (int, zde 80 pro 'P'). Výřez b[0:1] vrací nový bajtový řetězec (bytes, b'P'). U textových str vrací obojí typ str.",
-      "code": "b = b'Python'\nprint(type(b[0]), type(b[0:1]))"
-    },
-    {
-      "id": "q2",
-      "type": "predict_output",
-      "question": "Jaký je rozdíl mezi konstruktorem bytes(3) a bytes([3])?",
-      "options": [
-        "A) b'\\x00\\x00\\x00' b'\\x03'",
-        "B) b'\\x00' b'\\x03\\x03\\x03'",
-        "C) b'\\x03\\x03\\x03' b'\\x03'",
-        "D) b'\\x03' b'\\x03'"
-      ],
-      "answer": 0,
-      "explanation": "Volání bytes(N) s celým číslem alokuje N nulových bajtů (b'\\x00\\x00\\x00'). Konstruktor s iterovatelem bytes([3]) převede čísla v rozmezí 0-255 na odpovídající bajty (b'\\x03').",
-      "code": "b1 = bytes(3)\nb2 = bytes([3])\nprint(b1, b2)"
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Co se stane při pokusu o úpravu prvku v bajtovém řetězci bytes?",
-      "options": [
-        "A) Vyhodí výjimku ValueError, protože zadaná hodnota 65 neodpovídá typu str.",
-        "B) Vyhodí výjimku TypeError, protože objekt typu bytes je neměnný (immutable).",
-        "C) Kód automaticky zkonvertuje objekt proměnné data na nový typ bytearray.",
-        "D) Hodnota prvního bajtu se v objektu úspěšně přepíše z 97 na novou hodnotu 65."
-      ],
-      "answer": 1,
-      "explanation": "Typ bytes je neměnná sekvence (immutable). Při pokusu o úpravu b[0] vyhodí TypeError: 'bytes' object does not support item assignment. Pro modifikovatelné bajty je nutné použít bytearray.",
-      "code": "data = b'ahoj'\ndata[0] = 65"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Který způsob formátování je podporován pro bajtové řetězce bytes v Pythonu 3?",
-      "options": [
-        "A) Formátované řetězce s novým prefiksem fb (například zápis fb'{data}').",
-        "B) Standardní metoda .format() (například zápis b'{}'.format(b'data')).",
-        "C) Interpolace textu pomocí operátoru % (například zápis b'%b' % b'data').",
-        "D) Bajtové řetězce v Pythonu 3 neposkytují vůbec žádné formátovací mechanizmy."
-      ],
-      "answer": 2,
-      "explanation": "Pro bajtové řetězce byla v Pythonu 3.5 zpětně přidána interpolace pomocí operátoru %. Metoda .format() ani f-řetězce s prefiksem fb pro typ bytes neexistují.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "fill_blank_choice",
-      "question": "Doplňte metodu pro dekódování bajtového řetězce bytes na textový řetězec str:",
-      "code_snippet": "raw_bytes = b'\\xc5\\x99etezec'\ntext = raw_bytes.________('utf-8')",
-      "options": [
-        "encode",
-        "parse",
-        "to_str",
-        "decode"
-      ],
-      "answer": 3,
-      "explanation": "Metoda bytes.decode() převádí binární bajty na textový řetězec str pomocí specifikovaného kódování.",
-      "code": "raw_bytes = b\"V\\xc5\\xa0CHT Praha\"\ntext = raw_bytes.________(\"utf-8\")\n# Výstup: 'VŠCHT Praha'",
-      "expected": "decode"
-    },
-    {
-      "id": "q6",
-      "type": "predict_output",
-      "question": "Jaké hodnoty vrací cyklus for při iteraci přes bajtový řetězec bytes?",
-      "options": [
-        "A) 65 66",
-        "B) 0 1",
-        "C) A B",
-        "D) b'A' b'B'"
-      ],
-      "answer": 0,
-      "explanation": "Iterace přes bytes vrací jednotlivé celočíselné hodnoty bajtů (int 0-255). ASCII hodnota 'A' je 65 a 'B' je 66. Znaky nebo podřetězce b'A' se při iteraci nevytváří.",
-      "code": "for item in b'AB':\n    print(item, end=' ')"
     }
   ]
 }

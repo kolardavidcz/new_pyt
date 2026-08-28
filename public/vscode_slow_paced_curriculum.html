@@ -1,0 +1,5013 @@
+<!DOCTYPE html>
+<html lang="cs" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VS Code Slow-Paced Curriculum Planner (W0..W12 + W99) — newpyt</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --vscode-bg: #1e1e1e;
+      --vscode-sidebar: #252526;
+      --vscode-titlebar: #323233;
+      --vscode-activitybar: #333333;
+      --vscode-tab-active: #1e1e1e;
+      --vscode-tab-inactive: #2d2d2d;
+      --vscode-statusbar: #007acc;
+      --vscode-border: #333333;
+      --vscode-card: #252526;
+      --vscode-hover: #2a2d2e;
+      --vscode-text: #cccccc;
+      --vscode-text-bright: #ffffff;
+      --vscode-text-muted: #858585;
+      --vscode-blue: #007acc;
+      --vscode-accent: #38bdf8;
+      
+      --tag-core: #4fc1ff;
+      --tag-core-bg: rgba(79, 193, 255, 0.16);
+      --tag-wow: #c586c0;
+      --tag-wow-bg: rgba(197, 134, 192, 0.16);
+      --tag-tricky: #f48771;
+      --tag-tricky-bg: rgba(244, 135, 113, 0.16);
+      --tag-skip: #858585;
+      --tag-skip-bg: rgba(133, 133, 133, 0.14);
+    }
+    body {
+      background-color: var(--vscode-bg);
+      color: var(--vscode-text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .study-tile {
+      background: var(--vscode-card);
+      border: 1px solid var(--vscode-border);
+      border-radius: 4px;
+      cursor: grab;
+      user-select: none;
+      transition: all 0.12s ease;
+    }
+    .study-tile:hover {
+      border-color: #007acc;
+      background: var(--vscode-hover);
+    }
+    .study-tile.tile-skip {
+      opacity: 0.65;
+      border-style: dashed;
+      background: #1c1c1c;
+    }
+    .study-tile.tile-skip:hover {
+      opacity: 0.95;
+    }
+    .study-tile:active {
+      cursor: grabbing;
+      opacity: 0.7;
+    }
+    .study-tile.dragging {
+      opacity: 0.35;
+      border-color: #007acc;
+      border-style: dashed;
+    }
+    .week-dropzone.drag-over {
+      background: rgba(0, 122, 204, 0.08);
+      border-color: #007acc;
+      border-style: dashed;
+    }
+    .quickpick-popover {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(4px);
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .study-tile:hover .quickpick-popover {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .badge-Core { background: var(--tag-core-bg); color: var(--tag-core); border: 1px solid rgba(79, 193, 255, 0.3); }
+    .badge-WOW { background: var(--tag-wow-bg); color: var(--tag-wow); border: 1px solid rgba(197, 134, 192, 0.3); }
+    .badge-Tricky { background: var(--tag-tricky-bg); color: var(--tag-tricky); border: 1px solid rgba(244, 135, 113, 0.3); }
+    .badge-Skip { background: var(--tag-skip-bg); color: var(--tag-skip); border: 1px solid rgba(133, 133, 133, 0.3); }
+  </style>
+</head>
+<body class="flex flex-col h-screen">
+
+  <!-- 1. VS Code Title Bar -->
+  <div class="h-8 bg-[#323233] border-b border-[#252526] flex items-center justify-between px-3 text-xs text-[#cccccc] select-none flex-shrink-0">
+    <div class="flex items-center gap-2">
+      <span class="text-[#007acc] font-bold text-sm">🐍</span>
+      <span class="font-medium text-white">newpyt</span>
+      <span class="text-[#858585]"> — Slow-Paced Curriculum (13 Weeks: W0..W12 + W99)</span>
+    </div>
+    <div class="flex items-center gap-3 text-[#858585] text-[11px] font-mono">
+      <span class="text-[#4ec9b0]">SKIP tags = 0 live min (Reference)</span>
+      <span>course.json</span>
+      <span>UTF-8</span>
+    </div>
+  </div>
+
+  <!-- 2. Main VS Code Workbench Body -->
+  <div class="flex flex-1 overflow-hidden">
+    
+    <!-- 2A. Activity Bar (Far Left) -->
+    <div class="w-12 bg-[#333333] border-r border-[#252526] flex flex-col items-center py-2 gap-3 flex-shrink-0 select-none">
+      <button title="Explorer" class="w-10 h-10 flex items-center justify-center text-[#858585] hover:text-white rounded">📁</button>
+      <button title="Curriculum Roadmap" class="w-10 h-10 flex items-center justify-center text-[#858585] hover:text-white rounded">🗺️</button>
+      <button title="Progress & Sandbox" class="w-10 h-10 flex items-center justify-center text-white border-l-2 border-[#007acc] bg-[#252526]">📊</button>
+      <button title="Settings" class="w-10 h-10 flex items-center justify-center text-[#858585] hover:text-white rounded mt-auto">⚙️</button>
+    </div>
+
+    <!-- 2B. Editor & Progress Center Workspace -->
+    <div class="flex-1 flex flex-col bg-[#1e1e1e] overflow-hidden">
+      
+      <!-- Editor Tabs Bar -->
+      <div class="h-9 bg-[#252526] border-b border-[#1e1e1e] flex items-center px-2 gap-1 select-none flex-shrink-0">
+        <div class="h-full bg-[#1e1e1e] border-t-2 border-[#007acc] px-4 flex items-center gap-2 text-xs font-semibold text-white">
+          <span>📊</span> <span>slow_paced_progress.json</span>
+          <span class="text-[10px] text-[#858585] hover:text-white ml-2 cursor-pointer">✕</span>
+        </div>
+        <div class="h-full bg-[#2d2d2d] px-3 flex items-center gap-2 text-xs text-[#858585] hover:text-white cursor-pointer">
+          <span>📁</span> <span>data/course.json</span>
+        </div>
+
+        <div class="ml-auto flex items-center gap-2 text-xs pr-2">
+          <button onclick="resetToSlowPaced()" class="px-2.5 py-1 rounded bg-[#2d2d2d] hover:bg-[#3c3c3c] text-white border border-[#3c3c3c] text-[11px] font-medium transition-colors">
+            🌟 Výchozí zpomalený rozvrh (W0..W12)
+          </button>
+          <button onclick="exportCurriculumJson()" class="px-3 py-1 rounded bg-[#007acc] hover:bg-[#0062a3] text-white font-semibold text-[11px] flex items-center gap-1 shadow-sm transition-colors">
+            💾 Export JSON
+          </button>
+        </div>
+      </div>
+
+      <!-- Breadcrumbs Bar -->
+      <div class="h-6 bg-[#1e1e1e] border-b border-[#2d2d2d] flex items-center px-4 text-[11px] text-[#858585] gap-1.5 select-none flex-shrink-0">
+        <span>newpyt</span> <span>›</span> <span>curriculum</span> <span>›</span> <span class="text-[#cccccc]">slow_paced_13w.json</span>
+      </div>
+
+      <!-- Scrollable Progress & Board Content -->
+      <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+        
+        <!-- VS Code Style Progress Hero Card -->
+        <div class="bg-[#252526] border border-[#333333] rounded-lg p-5 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-6">
+            
+            <!-- Circular Progress SVG -->
+            <div class="flex items-center gap-4">
+              <div class="relative w-16 h-16 flex-shrink-0 flex items-center justify-center">
+                <svg viewBox="0 0 36 36" class="w-16 h-16 -rotate-90">
+                  <path class="text-[#333333]" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path id="hero-progress-fg" class="text-[#007acc] transition-all duration-300" stroke-width="3.5" stroke-dasharray="0, 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span id="hero-progress-pct" class="text-sm font-bold text-white font-mono">0%</span>
+                  <span class="text-[9px] text-[#858585] uppercase">hotovo</span>
+                </div>
+              </div>
+
+              <div>
+                <h2 class="text-base font-bold text-white flex items-center gap-2">
+                  <span>Zpomalený výukový plán (13 Týdnů: W0 až W12)</span>
+                  <span class="text-xs font-normal text-[#4ec9b0] font-mono">[SKIP = Reference materiál]</span>
+                </h2>
+                <p class="text-xs text-[#858585] max-w-xl mt-0.5">
+                  Rozvolněné tempo pro začátek semestru (W1: Typy a čísla, W2: Text & Regex, W3: Sekvence & Seznamy, W4: Slovníky & Výjimky, W5: Funkce). <strong class="text-white">Přednášky s tagem SKIP se nezapočítávají do času přednášky</strong> a slouží jako doplňková reference.
+                </p>
+              </div>
+            </div>
+
+            <!-- Stats Boxes -->
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              <div class="bg-[#1e1e1e] border border-[#333333] px-3 py-2 rounded text-center min-w-[85px]">
+                <strong id="stat-total" class="text-sm font-bold text-white font-mono block">0</strong>
+                <span class="text-[10px] text-[#858585]">témat celkem</span>
+              </div>
+              <div class="bg-[#1e1e1e] border border-[#333333] px-3 py-2 rounded text-center min-w-[85px]">
+                <strong id="stat-studied" class="text-sm font-bold text-[#4fc1ff] font-mono block">0</strong>
+                <span class="text-[10px] text-[#858585]">hotovo</span>
+              </div>
+              <div class="bg-[#1e1e1e] border border-[#333333] px-3 py-2 rounded text-center min-w-[85px]">
+                <strong id="stat-core" class="text-sm font-bold text-[#c586c0] font-mono block">0</strong>
+                <span class="text-[10px] text-[#858585]">Core Path</span>
+              </div>
+              <div class="bg-[#1e1e1e] border border-[#333333] px-3 py-2 rounded text-center min-w-[85px]">
+                <strong id="stat-overloaded" class="text-sm font-bold text-[#f48771] font-mono block">0</strong>
+                <span class="text-[10px] text-[#858585]">přetíženo</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Dual Progress Bars -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-[#333333] text-xs">
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] text-[#858585]">
+                <span>Core Lecture Path:</span>
+                <span id="label-core-pct" class="font-mono text-white">0%</span>
+              </div>
+              <div class="h-1.5 bg-[#1e1e1e] rounded-full overflow-hidden border border-[#333333]">
+                <div id="bar-core-pct" class="h-full bg-[#007acc] transition-all duration-300" style="width:0%"></div>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px] text-[#858585]">
+                <span>Laboratoře & Praktická cvičení:</span>
+                <span id="label-lab-pct" class="font-mono text-white">0%</span>
+              </div>
+              <div class="h-1.5 bg-[#1e1e1e] rounded-full overflow-hidden border border-[#333333]">
+                <div id="bar-lab-pct" class="h-full bg-[#4ec9b0] transition-all duration-300" style="width:0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Study Board with Drag & Drop Weeks -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between text-xs text-[#858585] px-1">
+            <span class="font-bold text-[#cccccc] uppercase tracking-wider text-[11px]">13 Výukových bloků (Study Board W0..W12 + W99)</span>
+            <span>Časový rozpočet live přednášky: 90 min (~25–35 live slidů)</span>
+          </div>
+
+          <div id="weeks-board" class="space-y-3">
+            <!-- Weeks generated dynamically -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- 4. VS Code Status Bar (Bottom) -->
+  <div class="h-6 bg-[#007acc] text-white flex items-center justify-between px-3 text-[11px] select-none flex-shrink-0 font-sans">
+    <div class="flex items-center gap-3">
+      <span class="flex items-center gap-1"><span>⚡</span> <span>Ready</span></span>
+      <span>master*</span>
+      <span>0 errors, 0 warnings</span>
+    </div>
+    <div class="flex items-center gap-4 font-mono text-[10px]">
+      <span id="statusbar-weeks-count">13 Weeks (W0..W12)</span>
+      <span>WCAG 2.1 AA Compliant</span>
+      <span>newpyt v2.0</span>
+    </div>
+  </div>
+
+  <!-- Export JSON Modal -->
+  <div id="export-modal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-[#252526] border border-[#333333] rounded-lg max-w-2xl w-full p-5 shadow-2xl space-y-4 animate-in fade-in zoom-in duration-150">
+      <div class="flex items-center justify-between border-b border-[#333333] pb-2">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>💾</span> <span>Exportovaná struktura osnovy (JSON)</span>
+        </h3>
+        <button onclick="closeExportModal()" class="text-[#858585] hover:text-white font-bold text-sm">✕</button>
+      </div>
+      <p class="text-xs text-[#858585]">
+        Tento JSON odpovídá přesné konfiguraci osnovy po vašich drag-and-drop úpravách a lze jej přímo použít jako <code class="text-[#38bdf8]">data/course.json</code>.
+      </p>
+      <textarea id="export-json-textarea" readonly class="w-full h-72 bg-[#1e1e1e] border border-[#333333] text-xs font-mono p-3 rounded text-[#cccccc] focus:outline-none"></textarea>
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#333333]">
+        <button onclick="copyExportJson()" id="btn-copy-json" class="px-3 py-1.5 rounded bg-[#007acc] hover:bg-[#0062a3] text-white text-xs font-semibold">
+          Kopírovat do schránky
+        </button>
+        <button onclick="closeExportModal()" class="px-3 py-1.5 rounded bg-[#333333] hover:bg-[#3c3c3c] text-[#cccccc] text-xs font-semibold">
+          Zavřít
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let curriculum = [
+  {
+    "week": 0,
+    "id": "week-0",
+    "title": "Příprava prostředí & Verzovací systém Git",
+    "objective": "Ovládnutí moderního vývojového prostředí: interpret Python 3, virtuální prostředí (venv/conda), Jupyter notebooky a verzovací systém Git.",
+    "c_java_bridge": "V C/C++/Javě kompilujeme do binárek nebo bajtkódu před spuštěním. V Pythonu interpret přímo čte a kompiluje zdrojové soubory do .pyc v paměti.",
+    "milestone": null,
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/packages/virtual_overview.html",
+        "kind": "lecture",
+        "title": "Úvod do virtuálních prostředí (venv a conda)",
+        "path": "vyuka_downloaded/materialy/python/packages/virtual_overview.html",
+        "slug": "virtual_overview",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Teoretické odůvodnění potřeby separace knihoven v jednotlivých Python projektech.",
+        "compare": "Na rozdíl od Javy (Maven stahuje globálně do ~/.m2) nebo C++ (vcpkg), Python standardně cpe balíčky do jedné složky site-packages. Virtuální prostředí jsou kritická pro izolaci projektů.",
+        "week": 0,
+        "exists": true,
+        "quiz_deck": "virtual_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0 (Základy)",
+            "reason": "Ideální startovní bod pro pochopení izolace prostředí."
+          },
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Pokud studenti již venv znají z domova."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/packages/pip.html",
+        "kind": "lecture",
+        "title": "Správce balíčků pip & wheel",
+        "path": "vyuka_downloaded/materialy/python/packages/pip.html",
+        "slug": "pip",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Instalace, aktualizace a odstraňování externích balíčků z registru PyPI.",
+        "compare": "Ekvivalent k Maven (Java) nebo NuGet / vcpkg (C++). Zde instaluješ balíčky napřímo: 'pip install <nazev>'.",
+        "week": 0,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:dvcs/git.html",
+        "kind": "lecture",
+        "title": "Verzovací systém Git – základy",
+        "path": "vyuka_downloaded/materialy/dvcs/git.html",
+        "slug": "git",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Git",
+        "compare": "Téma původně zařazené do Týdne 0.",
+        "week": 0,
+        "targetWeek": 0,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/pitfalls.html",
+        "kind": "lecture",
+        "title": "Pythoní záludnosti & Pasti v jazyce",
+        "path": "vyuka_downloaded/materialy/python/pitfalls.html",
+        "slug": "pitfalls",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 9,
+        "diff": "paradigm",
+        "desc": "Master přehled záludností, mutabilních výchozích argumentů, LEGB scopingu a tuple mutací.",
+        "compare": "Kritické vědět! Např. 'def foo(x=[])' vyhodnotí prázdný seznam pouze jednou při definici funkce, nikoliv při každém volání.",
+        "week": 0,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0 (Teaser)",
+            "reason": "Silný 'eye-opener' a bourání mýtů pro C/Java programátory hned na startu."
+          },
+          {
+            "targetWeek": 11,
+            "label": "Týden 11 (Kvalita & Pasti)",
+            "reason": "Systematické shrnutí všech jazykových záludností před finální zkouškou."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:techs/recursion/overview.html",
+        "kind": "lecture",
+        "title": "rekurzivní algoritmy a jejich náročnost",
+        "path": "vyuka_downloaded/materialy/techs/recursion/overview.html",
+        "slug": "recursion_overview",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 4,
+        "diff": "paradigm",
+        "desc": "Vyřazená přednáška: Rekurze",
+        "compare": "Téma původně zařazené do Týdne 4.",
+        "week": 0,
+        "targetWeek": 4,
+        "exists": true,
+        "isRemoved": true,
+        "quiz_deck": "recursion_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/install.html",
+        "kind": "lecture",
+        "title": "Instalační kuchařka",
+        "path": "vyuka_downloaded/materialy/python/install.html",
+        "slug": "install",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Přehled instalace standardního interpretru Python 3 pro různé platformy.",
+        "compare": "Srovnatelné s instalací Java JDK nebo C++ toolchainu. V Pythonu se spustitelný soubor hned integruje do terminálu jako interaktivní REPL.",
+        "week": 0,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/more-versions.html",
+        "kind": "lecture",
+        "title": "Vícero verzí Pythonu v systému",
+        "path": "vyuka_downloaded/materialy/python/more-versions.html",
+        "slug": "more-versions",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Jak řešit situace, kdy je v operačním systému přítomno více verzí Pythonu.",
+        "compare": "Analogie k managementu Java JDK verzí (např. pomocí SDKMAN!). Zde se řeší aliasy interpretru py, python3, python atd.",
+        "week": 0,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/packages/conda_overview.html",
+        "kind": "lecture",
+        "title": "Conda - víc než Python?",
+        "path": "vyuka_downloaded/materialy/python/packages/conda_overview.html",
+        "slug": "conda_overview",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Představení systému Conda, který funguje jako správce balíčků i celých prostředí nezávisle na platformě.",
+        "compare": "Conda spravuje jakékoliv binární balíčky, včetně C/C++ knihoven. Java Maven řeší pouze Java závislosti, C++ vcpkg pouze C++ zdrojáky.",
+        "week": 0,
+        "exists": true,
+        "quiz_deck": "conda_overview",
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/packages/conda.html",
+        "kind": "lecture",
+        "title": "Conda - základy práce",
+        "path": "vyuka_downloaded/materialy/python/packages/conda.html",
+        "slug": "conda",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Základní command-line příkazy pro práci s prostředími v Condě.",
+        "compare": "Příkazy conda create, activate a install. Nahrazuje kombinaci venv + pip.",
+        "week": 0,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/jupyter/overview.html",
+        "kind": "lecture",
+        "title": "Úvod do Jupyter Notebooku",
+        "path": "vyuka_downloaded/materialy/jupyter/overview.html",
+        "slug": "jupyter_overview",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Webové vývojové prostředí umožňující míchat formátovaný text (Markdown) a živý, spustitelný kód.",
+        "compare": "V Javě/C++ píšeme kód do souborů, který pak celý překládáme. Jupyter umožňuje interaktivně spouštět kód v buňkách za zachování stavu paměti.",
+        "week": 0,
+        "exists": true,
+        "quiz_deck": "jupyter_overview",
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/jupyter/usage.html",
+        "kind": "lecture",
+        "title": "Jupyter - základy práce",
+        "path": "vyuka_downloaded/materialy/jupyter/usage.html",
+        "slug": "usage",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Jak psát a spouštět buňky, klávesové zkratky a práce se stavy interpretru.",
+        "compare": "Užitečné pro průzkumnou analýzu dat a experimentování, kde se nechce pokaždé spouštět celý program.",
+        "week": 0,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:dvcs/git.advanced.html",
+        "kind": "lecture",
+        "title": "Git pokročilý – rebase, vetvení & hooks",
+        "path": "vyuka_downloaded/materialy/dvcs/git.advanced.html",
+        "slug": "git.advanced",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 4,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Git – pokročilejší koncepty",
+        "compare": "Téma původně zařazené do Týdne 0.",
+        "week": 0,
+        "targetWeek": 0,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": []
+  },
+  {
+    "week": 1,
+    "id": "week-1",
+    "title": "Typový model, Řízení běhu & Čísla",
+    "objective": "Pochopení paměťového modelu referencí na haldě, celých čísel s libovolnou přesností (int), reálných čísel (float) a řídicích konstrukcí if/for/while.",
+    "c_java_bridge": "Proměnná v Pythonu není paměťový slot fixního typu jako v C/Javě (int x), ale pojmenovaná reference ukazující na dynamický objekt na haldě.",
+    "milestone": null,
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/types/_remarks.html",
+        "kind": "lecture",
+        "title": "Obecné poznámky k typům",
+        "path": "vyuka_downloaded/materialy/python/types/_remarks.html",
+        "slug": "_remarks",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "paradigm",
+        "desc": "Jak interpret reprezentuje proměnné v paměti a jak funguje dynamické typování.",
+        "compare": "Na rozdíl od Javy a C++ nemá Python primitivní typy na zásobníku (jako int, float). Všechno v Pythonu je objekt na haldě, proměnné jsou jen ukazatele (jména) svázané s objekty.",
+        "week": 1,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 1,
+            "label": "Týden 1 (Reference)",
+            "reason": "Klíčové pro vysvětlení pointerového referenčního modelu hned v 1. přednášce."
+          },
+          {
+            "targetWeek": 0,
+            "label": "Týden 0 (Úvod)",
+            "reason": "Lze představit jako součást celkového seznámení s interpretrem."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/basics.html",
+        "kind": "lecture",
+        "title": "Základní řídicí konstrukce",
+        "path": "vyuka_downloaded/materialy/python/basics.html",
+        "slug": "control_flow",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Podmínky if-elif-else, smyčky for a while, syntaxe bloků pomocí odsazování.",
+        "compare": "Bloky kódu se neohraničují {} jako v Javě/C++, ale odsazením. C-style smyčka 'for (int i=0; i<N; i++)' neexistuje, 'for' je v Pythonu vždy 'for-each' iterátorem.",
+        "week": 1,
+        "exists": true,
+        "quiz_deck": "control_flow",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 2,
+            "label": "Týden 2",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/types/numbers.html",
+        "kind": "lecture",
+        "title": "Čísla (int, float, complex)",
+        "path": "vyuka_downloaded/materialy/python/types/numbers.html",
+        "slug": "numbers",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Reprezentace celých čísel s libovolnou přesností (int), reálných čísel (float) a nativní podpora komplexních čísel.",
+        "compare": "Python int je 'nafukovací' a při překročení 32/64 bitů automaticky přejde na libovolnou přesnost (jako BigInteger v Javě). Python float je implementován jako C double (64-bit IEEE 754).",
+        "week": 1,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 2,
+            "label": "Týden 2",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/cmd/print.html",
+        "kind": "lecture",
+        "title": "Hrátky s printem",
+        "path": "vyuka_downloaded/materialy/python/cmd/print.html",
+        "slug": "print",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Vše o vestavěné funkci print(), její parametry sep a end, a formátování pomocí f-stringů.",
+        "compare": "Moderní Python f-stringy 'f\\\\",
+        "week": 1,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 2,
+            "label": "Týden 2",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/cmd/overview.html",
+        "kind": "lecture",
+        "title": "input() a sys.argv",
+        "path": "vyuka_downloaded/materialy/python/cmd/overview.html",
+        "slug": "cmd_overview",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Zpracování argumentů příkazové řádky pomocí sys.argv, getopt a argparse.",
+        "compare": "",
+        "week": 1,
+        "exists": true,
+        "quiz_deck": "cmd_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 2,
+            "label": "Týden 2",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise:priklady/python/zaklady.html",
+        "kind": "exercise",
+        "title": "Základy Python'u",
+        "path": "vyuka_downloaded/priklady/python/zaklady.html",
+        "slug": "priklady--python--zaklady",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 1.",
+        "compare": "",
+        "week": 1
+      },
+      {
+        "id": "exercise:priklady/python/typy.cisla.html",
+        "kind": "exercise",
+        "title": "Čísla",
+        "path": "vyuka_downloaded/priklady/python/typy.cisla.html",
+        "slug": "priklady--python--typy.cisla",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 1.",
+        "compare": "",
+        "week": 1
+      },
+      {
+        "id": "exercise:priklady/python/procvicovani.cisla.html",
+        "kind": "exercise",
+        "title": "Procvičování – hrátky s čísly",
+        "path": "vyuka_downloaded/priklady/python/procvicovani.cisla.html",
+        "slug": "priklady--python--procvicovani.cisla",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 1.",
+        "compare": "",
+        "week": 1
+      },
+      {
+        "id": "exercise:priklady/python/procvicovani.ansi-print.html",
+        "kind": "exercise",
+        "title": "Procvičování – hrátky s „printem“",
+        "path": "vyuka_downloaded/priklady/python/procvicovani.ansi-print.html",
+        "slug": "priklady--python--procvicovani.ansi-print",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 1.",
+        "compare": "",
+        "week": 1
+      }
+    ]
+  },
+  {
+    "week": 2,
+    "id": "week-2",
+    "title": "Textové řetězce (str), Unicode & Regulární výrazy",
+    "objective": "Unicode v Pythonu 3, neměnnost (immutability), metody str, f-stringy, základy čtení souborů a parsování regulárními výrazy (modul re).",
+    "c_java_bridge": "Regulární výrazy v Pythonu nahrazují desítky řádků manuálního parsování (strtok, sscanf) v C/C++.",
+    "milestone": null,
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/types/strings.html",
+        "kind": "lecture",
+        "title": "Řetězce (str)",
+        "path": "vyuka_downloaded/materialy/python/types/strings.html",
+        "slug": "strings",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Reprezentace textu. Neměnnost (immutability), základní operace, indexování a řetězcové řezy (slicing).",
+        "compare": "Podobně jako Java String je Python str immutable (neměnný). Python nabízí nativní syntaxi řezů 's[start:stop:krok]', což v C++/Javě vyžaduje metody substring.",
+        "week": 2,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 2,
+            "label": "Týden 2 (Samostatný text)",
+            "reason": "V pomalejším tempu má text a regexy vlastní týden."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1 (Rychlý start)",
+            "reason": "Pokud chcete řetězce pokrýt hned se základní syntaxí."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/regexps/overview.html",
+        "kind": "lecture",
+        "title": "Regulární výrazy v Pythonu",
+        "path": "vyuka_downloaded/materialy/python/regexps/overview.html",
+        "slug": "regexps_overview",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Vyhledávání a nahrazování textových vzorů pomocí modulu re.",
+        "compare": "Shodná syntaxe regulárních výrazů jako v Javě/C++, ale s mnohem čistším rozhraním (re.search, re.findall).",
+        "week": 2,
+        "exists": true,
+        "quiz_deck": "regexps_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 2,
+            "label": "Týden 2 (Text & Regex)",
+            "reason": "Ideální spojení s řetězci a čtením souborů."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1 (Základní regexy)",
+            "reason": "Umožňuje okamžitě zadat reálné parsovací úlohy v 1. cvičení."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/files/overview.html",
+        "kind": "lecture",
+        "title": "Čtení a zápis ze/do souborů",
+        "path": "vyuka_downloaded/materialy/python/files/overview.html",
+        "slug": "files_overview",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Základy práce se souborovými proudy pomocí vestavěné funkce open().",
+        "compare": "Výrazně méně ukecané než Java FileReader/BufferedReader nebo C++ fstream.",
+        "week": 2,
+        "exists": true,
+        "quiz_deck": "files_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 3,
+            "label": "Týden 3",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/text/encoding.html",
+        "kind": "lecture",
+        "title": "Kódování textů & Unicode",
+        "path": "vyuka_downloaded/materialy/text/encoding.html",
+        "slug": "encoding",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Rozdíly mezi znakovými sadami, reprezentace Unicode v paměti a kódování do bajtových proudů.",
+        "compare": "Python 3 striktně odděluje text ('str') od binárních bajtů ('bytes'). V Javě odpovídá rozdílu mezi String a byte[].",
+        "week": 2,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 3,
+            "label": "Týden 3",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise:priklady/python/typy.retezce.html",
+        "kind": "exercise",
+        "title": "Řetězce",
+        "path": "vyuka_downloaded/priklady/python/typy.retezce.html",
+        "slug": "priklady--python--typy.retezce",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 2.",
+        "compare": "",
+        "week": 2
+      },
+      {
+        "id": "exercise:priklady/python/procvicovani.2.html",
+        "kind": "exercise",
+        "title": "Procvičování 2 – parsování souborů",
+        "path": "vyuka_downloaded/priklady/python/procvicovani.2.html",
+        "slug": "priklady--python--procvicovani.2",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 2.",
+        "compare": "",
+        "week": 2
+      }
+    ]
+  },
+  {
+    "week": 3,
+    "id": "week-3",
+    "title": "Sekvence, Řezy (Slicing), N-tice & Seznamy",
+    "objective": "Sekvenční protokol, indexování a řezy [start:stop:step], n-tice (tuple, NamedTuple), dynamické seznamy (list) a Timsort řazení.",
+    "c_java_bridge": "Řezy nahrazují vnořené for-smyčky. Seznam je dynamické heterogenní pole (std::vector<PyObject*>), n-tice je neměnný heterogenní záznam.",
+    "milestone": null,
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/types/_sequences.html",
+        "kind": "lecture",
+        "title": "sekvenční typy",
+        "path": "vyuka_downloaded/materialy/python/types/_sequences.html",
+        "slug": "_sequences",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "pythonic",
+        "desc": "Společné vlastnosti řetězců, seznamů a n-tic (indexování, výřezy, operátory in a +).",
+        "compare": "",
+        "week": 3,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 4,
+            "label": "Týden 4",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/types/tuples.html",
+        "kind": "lecture",
+        "title": "N-tice (Tuples) & NamedTuples",
+        "path": "vyuka_downloaded/materialy/python/types/tuples.html",
+        "slug": "tuples",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Neměnná sekvence (tuple) a její pojmenovaná varianta z modulu collections.",
+        "compare": "V Javě/C++ pro vrácení více hodnot z funkce potřebujete vyrobit pomocnou třídu, strukturu, nebo std::pair/tuple. Python má vestavěnou podporu pro tuple unpacking: 'x, y = z'.",
+        "week": 3,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 3,
+            "label": "Týden 3 (Sekvence & Řezy)",
+            "reason": "Základní neměnná n-tice představená před seznamy."
+          },
+          {
+            "targetWeek": 4,
+            "label": "Týden 4 (Hashovatelné klíče)",
+            "reason": "Vysvětlení n-tice jako klíče do slovníku (dict)."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/types.plus/NamedTuples.html",
+        "kind": "lecture",
+        "title": "Pojmenované n-tice (namedtuple)",
+        "path": "vyuka_downloaded/materialy/python/types.plus/NamedTuples.html",
+        "slug": "NamedTuples",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Použití namedtuple pro čitelnější přístup k datům bez overheadu plnohodnotných tříd.",
+        "compare": "Ekvivalent k Java record (Java 14+) nebo C++ read-only struct, ale plně kompatibilní se standardními sekvencemi.",
+        "week": 3,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 3,
+            "label": "Týden 3 (Strukturované n-tice)",
+            "reason": "Představení self-documenting záznamů jako náhrada struct v C."
+          },
+          {
+            "targetWeek": 5,
+            "label": "Týden 5 (Typové anotace)",
+            "reason": "Spojení s typing.NamedTuple a PEP 526."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/types/lists.html",
+        "kind": "lecture",
+        "title": "Seznamy (Lists) & array",
+        "path": "vyuka_downloaded/materialy/python/types/lists.html",
+        "slug": "lists",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 10,
+        "diff": "basics",
+        "desc": "Modifikovatelné dynamické pole (list). Metody modifikace, vkládání a mazání prvků.",
+        "compare": "Ekvivalent k std::vector v C++ a ArrayList v Javě. Python list je však heterogenní - může v sobě mít objekty libovolných typů zároveň.",
+        "week": 3,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 3,
+            "label": "Týden 3 (Základní seznamy)",
+            "reason": "Klíčový dynamický heterogenní kontejner jazyka."
+          },
+          {
+            "targetWeek": 4,
+            "label": "Týden 4 (Kolekce)",
+            "reason": "Srovnání výkonu a vyhledávání list vs set vs dict."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/sorting/overview.html",
+        "kind": "lecture",
+        "title": "Základy řazení v Pythonu",
+        "path": "vyuka_downloaded/materialy/python/sorting/overview.html",
+        "slug": "sorting_overview",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Jak funguje stabilní Timsort. Rozdíl mezi list.sort() (in-place) a sorted() (vrací nový seznam).",
+        "compare": "V Javě/C++ implementujeme Comparator / operator<. Python používá parametr 'key=', kam předáme jednoargumentovou funkci, která z objektu vytáhne porovnávací hodnotu.",
+        "week": 3,
+        "exists": true,
+        "quiz_deck": "sorting_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 4,
+            "label": "Týden 4",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/types.plus/arrays.html",
+        "kind": "lecture",
+        "title": "Typovaná pole array",
+        "path": "vyuka_downloaded/materialy/python/types.plus/arrays.html",
+        "slug": "arrays",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Ukládání homogenních primitivních typů za účelem šetření paměti.",
+        "compare": "Vhodné pro interoperabilitu s C kódem. Ekvivalent k std::vector s fixním C typem.",
+        "week": 3,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 4,
+            "label": "Týden 4",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise:priklady/python/typy.ntice.html",
+        "kind": "exercise",
+        "title": "N-tice",
+        "path": "vyuka_downloaded/priklady/python/typy.ntice.html",
+        "slug": "priklady--python--typy.ntice",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 3.",
+        "compare": "",
+        "week": 3
+      },
+      {
+        "id": "exercise:priklady/python/typy.seznamy.html",
+        "kind": "exercise",
+        "title": "Seznamy",
+        "path": "vyuka_downloaded/priklady/python/typy.seznamy.html",
+        "slug": "priklady--python--typy.seznamy",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 3.",
+        "compare": "",
+        "week": 3
+      },
+      {
+        "id": "exercise:priklady/python/procvicovani.3.html",
+        "kind": "exercise",
+        "title": "Procvičování 3",
+        "path": "vyuka_downloaded/priklady/python/procvicovani.3.html",
+        "slug": "priklady--python--procvicovani.3",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 3.",
+        "compare": "",
+        "week": 3
+      }
+    ]
+  },
+  {
+    "week": 4,
+    "id": "week-4",
+    "title": "Hashovací tabulky (Dict, Set) & Ošetření výjimek (EAFP)",
+    "objective": "Interní fungování kompaktních slovníků (dict, defaultdict), množinová algebra (set, frozenset) a robustní ošetřování chyb výjimkami.",
+    "c_java_bridge": "V C vracíme chybové kódy (LBYL). V Pythonu preferujeme výjimky (EAFP: Easier to Ask for Forgiveness than Permission).",
+    "milestone": {
+      "id": "milestone-1",
+      "number": 1,
+      "title": "CLI Tokenizér & Frekvenční analyzátor textu",
+      "desc": "Vytvořte robustní nástroj pro parsování nestrukturovaných textových logů, extrakci klíčových tokenů pomocí regulárních výrazů, frekvenční agregaci do slovníků a bezpečné ošetření I/O chyb.",
+      "skills": [
+        "Regulární výrazy (re)",
+        "Hashovací tabulky (dict/set)",
+        "Řezy sekvencí",
+        "Ošetření výjimek (try-except)"
+      ]
+    },
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/types/dictionaries.html",
+        "kind": "lecture",
+        "title": "Slovníky (Dictionaries) & defaultdict",
+        "path": "vyuka_downloaded/materialy/python/types/dictionaries.html",
+        "slug": "dictionaries",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 10,
+        "diff": "basics",
+        "desc": "Rychlý klíč-hodnota kontejner. Metody get, setdefault a update.",
+        "compare": "Ekvivalent k HashMap v Javě a std::unordered_map v C++. Od verze 3.7 si navíc pamatují pořadí, v jakém byly prvky vloženy.",
+        "week": 4,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 4,
+            "label": "Týden 4 (Hashování)",
+            "reason": "Základní stavební kámen celého CPython runtime."
+          },
+          {
+            "targetWeek": 3,
+            "label": "Týden 3 (Datové struktury)",
+            "reason": "Pokud chcete pokrýt všechny základní kontejnery naráz."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/types.plus/DefaultDicts.html",
+        "kind": "lecture",
+        "title": "DefaultDict",
+        "path": "vyuka_downloaded/materialy/python/types.plus/DefaultDicts.html",
+        "slug": "DefaultDicts",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Slovník z modulu collections, který automaticky vyrobí výchozí prvek při dotazu na neexistující klíč.",
+        "compare": "V Javě k tomu slouží map.computeIfAbsent(), v Pythonu je to nativní součást typového systému pomocí defaultdict.",
+        "week": 4,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 4,
+            "label": "Týden 4 (Agregace)",
+            "reason": "Přirozené rozšíření slovníku pro frekvenční analýzu a seskupování."
+          },
+          {
+            "targetWeek": 5,
+            "label": "Týden 5 (Funkce & Factory)",
+            "reason": "Demonstrace default_factory jako callable funkce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/types/sets.html",
+        "kind": "lecture",
+        "title": "Množiny (Sets & Frozensets)",
+        "path": "vyuka_downloaded/materialy/python/types/sets.html",
+        "slug": "sets",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Rychlé vyhledávání duplicit, matematické operace jako průnik, sjednocení a symetrický rozdíl.",
+        "compare": "Ekvivalent k HashSet v Javě a std::unordered_set v C++. Frozenset je neměnná hashovatelná množina.",
+        "week": 4,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 5,
+            "label": "Týden 5",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/types/frozensets.html",
+        "kind": "lecture",
+        "title": "„zmražené“ množiny",
+        "path": "vyuka_downloaded/materialy/python/types/frozensets.html",
+        "slug": "frozensets",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 7,
+        "diff": "resyntax",
+        "desc": "Použití frozenset jako immutable klíčů ve slovnících a prvků jiných množin.",
+        "compare": "",
+        "week": 4,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 5,
+            "label": "Týden 5",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/exceptions/exceptions.html",
+        "kind": "lecture",
+        "title": "Výjimky v Pythonu",
+        "path": "vyuka_downloaded/materialy/python/exceptions/exceptions.html",
+        "slug": "exceptions",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Zpracování chyb pomocí try-except-else-finally bloků a vyvolávání chyb pomocí raise.",
+        "compare": "Python nemá Checked Exceptions (všechny výjimky jsou Unchecked jako RuntimeException v Javě). Blok 'else' po try se spustí, pokud k výjimce nedošlo.",
+        "week": 4,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 4,
+            "label": "Týden 4 (EAFP)",
+            "reason": "Zavedení idiomu EAFP před psaním komplexních funkcí v W5."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1 (Řízení toku)",
+            "reason": "Výjimky jako součást základního řízení toku programu."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/types/boolean.html",
+        "kind": "lecture",
+        "title": "Boolean a priority operátorů",
+        "path": "vyuka_downloaded/materialy/python/types/boolean.html",
+        "slug": "boolean",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Typ bool jako podtřída int. Logické operátory and, or, not a short-circuit evaluation.",
+        "compare": "V Pythonu se píší logické operátory slovy 'and', 'or', 'not' namísto '&&', '||', '!'. Hodnoty jako prázdný seznam, 0, None se vyhodnocují jako False.",
+        "week": 4,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 5,
+            "label": "Týden 5",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise:priklady/python/typy.slovniky.html",
+        "kind": "exercise",
+        "title": "Slovníky",
+        "path": "vyuka_downloaded/priklady/python/typy.slovniky.html",
+        "slug": "priklady--python--typy.slovniky",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 4.",
+        "compare": "",
+        "week": 4
+      },
+      {
+        "id": "exercise:priklady/python/typy.mnoziny.html",
+        "kind": "exercise",
+        "title": "Množiny",
+        "path": "vyuka_downloaded/priklady/python/typy.mnoziny.html",
+        "slug": "priklady--python--typy.mnoziny",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 4.",
+        "compare": "",
+        "week": 4
+      },
+      {
+        "id": "exercise:priklady/python/vyjimky.html",
+        "kind": "exercise",
+        "title": "Výjimky",
+        "path": "vyuka_downloaded/priklady/python/vyjimky.html",
+        "slug": "priklady--python--vyjimky",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 4.",
+        "compare": "",
+        "week": 4
+      },
+      {
+        "id": "exercise:priklady/python/procvicovani.staty.html",
+        "kind": "exercise",
+        "title": "Procvičování – hustota obyvatelstva",
+        "path": "vyuka_downloaded/priklady/python/procvicovani.staty.html",
+        "slug": "priklady--python--procvicovani.staty",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 4.",
+        "compare": "",
+        "week": 4
+      }
+    ]
+  },
+  {
+    "week": 5,
+    "id": "week-5",
+    "title": "Funkce do hloubky, Scoping (LEGB) & Balíčky",
+    "objective": "Funkce jako First-Class Citizens, variabilní parametry (*args, **kwargs), lexikální scoping (LEGB), typové anotace (PEP 526) a modulární architektura.",
+    "c_java_bridge": "Funkce jsou plnohodnotné objekty s atributy. Uzávěry fungují přirozeně bez nutnosti anonymních vnitřních tříd z Javy.",
+    "milestone": null,
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/functions/overview.html",
+        "kind": "lecture",
+        "title": "Úvod do funkcí a definice def",
+        "path": "vyuka_downloaded/materialy/python/functions/overview.html",
+        "slug": "functions_overview",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Definice funkcí klíčovým slovem def, předávání referencí na objekty a návratové hodnoty.",
+        "compare": "Funkce mohou stát samostatně (jako v C++) a nemusí patřit žádné třídě (na rozdíl od Javy). Parametry se předávají hodnotou odkazu (pass-by-value-of-reference).",
+        "week": 5,
+        "exists": true,
+        "quiz_deck": "functions_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 5,
+            "label": "Týden 5 (Funkce)",
+            "reason": "First-Class funkce a parametry."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1 (Rychlý start)",
+            "reason": "Definice def f() pro studenty, kteří chtějí hned modularizovat kód."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/functions/parameters.html",
+        "kind": "lecture",
+        "title": "Argumenty a parametry",
+        "path": "vyuka_downloaded/materialy/python/functions/parameters.html",
+        "slug": "parameters",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "pythonic",
+        "desc": "Defaultní parametry, poziční a pojmenované argumenty, a sběrné parametry *args a **kwargs.",
+        "compare": "Python nepodporuje přetěžování metod (overloading) na základě signatury. Místo toho se píše jedna funkce s volitelnými / pojmenovanými argumenty a variabilním počtem parametrů.",
+        "week": 5,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 5,
+            "label": "Týden 5 (Parametry)",
+            "reason": "Variabilní *args a **kwargs, keyword-only parametry."
+          },
+          {
+            "targetWeek": 6,
+            "label": "Týden 6 (Dekorátory)",
+            "reason": "Předpoklad pro psaní univerzálních wrapperů @dekorátorů."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/functions/scope.html",
+        "kind": "lecture",
+        "title": "Scope (obor viditelnosti LEGB)",
+        "path": "vyuka_downloaded/materialy/python/functions/scope.html",
+        "slug": "scope",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "paradigm",
+        "desc": "Pravidlo LEGB (Local, Enclosing, Global, Built-in) a chování klíčových slov global a nonlocal.",
+        "compare": "V Pythonu bloky jako if, for nezakládají nový scope. Změna globální proměnné uvnitř funkce vyžaduje explicitní klíčové slovo global, jinak se vytvoří nová lokální proměnná.",
+        "week": 5,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 5,
+            "label": "Týden 5 (LEGB Scope)",
+            "reason": "Vysvětlení lexikálního scopingu a proměnných nonlocal / global."
+          },
+          {
+            "targetWeek": 0,
+            "label": "Týden 0 (Pasti)",
+            "reason": "Zahrnutí do rozboru UnboundLocalError."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/functions/advanced-2.html",
+        "kind": "lecture",
+        "title": "Funkce jako First-Class Citizen",
+        "path": "vyuka_downloaded/materialy/python/functions/advanced-2.html",
+        "slug": "advanced-2",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Vysvětlení faktu, že funkce jsou plnohodnotné objekty, které lze ukládat a předávat jako argumenty.",
+        "compare": "V C++ k tomu slouží funkční ukazatele nebo std::function, v Javě funkcionální rozhraní. V Pythonu je každá funkce rovnou objektem.",
+        "week": 5,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 6,
+            "label": "Týden 6",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/functions/annotations.html",
+        "kind": "lecture",
+        "title": "Anotace typů & Modul typing (PEP 526)",
+        "path": "vyuka_downloaded/materialy/python/functions/annotations.html",
+        "slug": "annotations",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Anotace funkcí, proměnných a objektů, typování kontejnerů, ClassVar a __future__.annotations.",
+        "compare": "Typové anotace jsou pouze informativní. Interpret je za běhu nijak nevynucuje. Slouží k tomu, aby Python získal výhody staticky typovaných jazyků jako Java/C++ během psaní kódu.",
+        "week": 5,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 6,
+            "label": "Týden 6",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/modules/_modules.html",
+        "kind": "lecture",
+        "title": "Moduly, Balíčky & Namespaces",
+        "path": "vyuka_downloaded/materialy/python/modules/_modules.html",
+        "slug": "_modules",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Architektura modulů, importy, sys.path, __name__ == '__main__', __init__.py a balíčky.",
+        "compare": "",
+        "week": 5,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 6,
+            "label": "Týden 6",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/modules/random.html",
+        "kind": "lecture",
+        "title": "random",
+        "path": "vyuka_downloaded/materialy/python/modules/random.html",
+        "slug": "random",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 4,
+        "diff": "basics",
+        "desc": "Generování náhodných čísel, výběr prvků (choice, sample) a zamíchání (shuffle).",
+        "compare": "",
+        "week": 5,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 6,
+            "label": "Týden 6",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/functions/functional.html",
+        "kind": "lecture",
+        "title": "functional",
+        "path": "vyuka_downloaded/materialy/python/functions/functional.html",
+        "slug": "functional",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 4,
+        "diff": "basics",
+        "desc": "Archivní / zrušená přednáška: functional (Afinita k W4)",
+        "compare": "Tato přednáška je uložena v regálu zrušených materiálů.",
+        "week": 5,
+        "weekAffinity": 4,
+        "isCanceled": true,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 6,
+            "label": "Týden 6",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise:priklady/python/funkce.html",
+        "kind": "exercise",
+        "title": "Funkce",
+        "path": "vyuka_downloaded/priklady/python/funkce.html",
+        "slug": "priklady--python--funkce",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 5.",
+        "compare": "",
+        "week": 5
+      },
+      {
+        "id": "exercise:priklady/python/big.html",
+        "kind": "exercise",
+        "title": "Velká data",
+        "path": "vyuka_downloaded/priklady/python/big.html",
+        "slug": "priklady--python--big",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 5.",
+        "compare": "",
+        "week": 5
+      }
+    ]
+  },
+  {
+    "week": 6,
+    "id": "week-6",
+    "title": "Iterátory, Generátory & Funkcionální Python",
+    "objective": "Líné vyhodnocování datových proudů pomocí generátorů (yield), itertools combinatorics a metaprogramování funkcí přes @dekorátory.",
+    "c_java_bridge": "Generátory s yield umožňují zpracovávat gigabajtové soubory v O(1) paměti bez složitých stavových automatů.",
+    "milestone": null,
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/iterators/iterators.html",
+        "kind": "lecture",
+        "title": "Iterátory (Protokol)",
+        "path": "vyuka_downloaded/materialy/python/iterators/iterators.html",
+        "slug": "iterators",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "newconcept",
+        "desc": "Jak z třídy udělat iterovatelný objekt implementací metod __iter__ a __next__.",
+        "compare": "Ekvivalent k Java rozhraní Iterable a Iterator.",
+        "week": 6,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 7,
+            "label": "Týden 7",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/generators/generators.html",
+        "kind": "lecture",
+        "title": "Generátory (funkce s yield)",
+        "path": "vyuka_downloaded/materialy/python/generators/generators.html",
+        "slug": "generators",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 10,
+        "diff": "newconcept",
+        "desc": "Líné generování sekvencí pomocí yield bez nutnosti alokovat celou kolekci v paměti.",
+        "compare": "V Javě/C++ vyžaduje líná generace psaní složitého stavového iterátoru. Python to řeší pouhým použitím klíčového slova yield uvnitř funkce.",
+        "week": 6,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 6,
+            "label": "Týden 6 (Líné streamy)",
+            "reason": "Klíčový koncept yield pro práci s velkými daty v O(1) paměti."
+          },
+          {
+            "targetWeek": 7,
+            "label": "Týden 7 (Iterátory & Dunders)",
+            "reason": "Návaznost na iterační dunder metody __iter__ a __next__."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/types/_comprehensions.html",
+        "kind": "lecture",
+        "title": "Generátorová notace a comprehensions",
+        "path": "vyuka_downloaded/materialy/python/types/_comprehensions.html",
+        "slug": "_comprehensions",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 9,
+        "diff": "pythonic",
+        "desc": "Kompaktní vytváření seznamů, množin a slovníků jedním řádkem (list/dict/set comprehensions).",
+        "compare": "V jiných jazycích odpovídá kombinaci map() a filter() či streamům v Javě.",
+        "week": 6,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 6,
+            "label": "Týden 6 (Funkcionální styl)",
+            "reason": "Comprehensions a generátorové výrazy."
+          },
+          {
+            "targetWeek": 3,
+            "label": "Týden 3 (Tvorba seznamů)",
+            "reason": "List comprehensions hned po představení seznamů."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/functions/advanced-1.html",
+        "kind": "lecture",
+        "title": "Uzávěry (Closures) & Lambda",
+        "path": "vyuka_downloaded/materialy/python/functions/advanced-1.html",
+        "slug": "advanced-1",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Definice vnořené funkce, která si zachovává vazbu na lokální proměnné své obalující funkce.",
+        "compare": "V Javě lambdy mohou přistupovat pouze k (effectively) final proměnným. Python uzávěry umožňují i zápis pomocí klíčového slova nonlocal.",
+        "week": 6,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 7,
+            "label": "Týden 7",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/functions/decorators.html",
+        "kind": "lecture",
+        "title": "Dekorátory funkcí",
+        "path": "vyuka_downloaded/materialy/python/functions/decorators.html",
+        "slug": "decorators",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "newconcept",
+        "desc": "Obalování funkcí jiným kódem za účelem logování, měření času nebo řízení přístupu.",
+        "compare": "V Javě se toto řeší pomocí AOP (Aspect-Oriented Programming) a Spring proxy objektů, což je extrémně složité. Python má pro to nativní syntaxi @dekorator.",
+        "week": 6,
+        "exists": true,
+        "quiz_deck": "decorators",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 6,
+            "label": "Týden 6 (Metaprogramování)",
+            "reason": "Obalování funkcí přes uzávěry a @syntaxi."
+          },
+          {
+            "targetWeek": 7,
+            "label": "Týden 7 (Class Decorators)",
+            "reason": "Příprava na dekorátory tříd a @property v OOP."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/techs/recursion/memoization.html",
+        "kind": "lecture",
+        "title": "Memoizace a rekurze",
+        "path": "vyuka_downloaded/materialy/techs/recursion/memoization.html",
+        "slug": "memoization",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 7,
+        "diff": "pythonic",
+        "desc": "Automatické cachování mezivýsledků rekurzivních funkcí za účelem zrychlení výpočtu.",
+        "compare": "Přidáním dekorátoru '@functools.lru_cache' nad rekurzivní funkci (např. Fibonacci) zredukujete časovou složitost z exponenciální na lineární.",
+        "week": 6,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 6,
+            "label": "Týden 6 (@lru_cache)",
+            "reason": "Demonstrace síly dekorátorů na dynamickém programování (Fibonacci)."
+          },
+          {
+            "targetWeek": 11,
+            "label": "Týden 11 (Optimalizace)",
+            "reason": "Součást profilování a zrychlování pomalých funkcí."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/fp.html",
+        "kind": "lecture",
+        "title": "Funkcionální Python (itertools)",
+        "path": "vyuka_downloaded/materialy/python/fp.html",
+        "slug": "fp",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 8,
+        "diff": "paradigm",
+        "desc": "Práce s nekonečnými iterátory a funkcionálními konstrukcemi z modulů itertools a functools.",
+        "compare": "Elegantní funkcionální doplňky. Itertools nabízí funkce jako chain, cycle, groupby, což zjednodušuje složité algoritmy.",
+        "week": 6,
+        "exists": true,
+        "quiz_deck": "fp",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 7,
+            "label": "Týden 7",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/generators/coroutines.html",
+        "kind": "lecture",
+        "title": "Korutiny",
+        "path": "vyuka_downloaded/materialy/python/generators/coroutines.html",
+        "slug": "coroutines",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 6,
+        "diff": "newconcept",
+        "desc": "Vyřazená přednáška: Generátory a korutiny",
+        "compare": "Téma původně zařazené do Týdne 5.",
+        "week": 6,
+        "targetWeek": 5,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 7,
+            "label": "Týden 7",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise:priklady/python/iteratory.html",
+        "kind": "exercise",
+        "title": "Generátory a iterátory",
+        "path": "vyuka_downloaded/priklady/python/iteratory.html",
+        "slug": "priklady--python--iteratory",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 6.",
+        "compare": "",
+        "week": 6
+      },
+      {
+        "id": "exercise:priklady/python/dekoratory.html",
+        "kind": "exercise",
+        "title": "Dekorátory",
+        "path": "vyuka_downloaded/priklady/python/dekoratory.html",
+        "slug": "priklady--python--dekoratory",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 6.",
+        "compare": "",
+        "week": 6
+      },
+      {
+        "id": "exercise:bioinfo/fastN.html",
+        "kind": "exercise",
+        "title": "bioinfo/fastN.html",
+        "path": "vyuka_downloaded/bioinfo/fastN.html",
+        "slug": "bioinfo--fastN",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 6.",
+        "compare": "",
+        "week": 6
+      }
+    ]
+  },
+  {
+    "week": 7,
+    "id": "week-7",
+    "title": "Objektově orientovaný Python & Python Data Model",
+    "objective": "Třídy, konstruktory __init__, kooperativní vícenásobná dědičnost přes super(), dunder přetížení operátorů, context managers with a deskriptory.",
+    "c_java_bridge": "Python nepoužívá interface jako Java, ale duck typing a formální Abstract Base Classes (ABCs). Přetížení operátorů řídí dunders.",
+    "milestone": {
+      "id": "milestone-2",
+      "number": 2,
+      "title": "Samopopisný Maticový datový model s perzistencí",
+      "desc": "Implementujte univerzální maticovou třídu s plnou podporou operátorů (+, *, @, [], iterace), validací přes deskriptory, perzistencí a kontextovým manažerem pro bezpečné transakce.",
+      "skills": [
+        "Dunder metody (__getitem__, __matmul__)",
+        "Deskriptory & Properties",
+        "Kontextový manažer (with)",
+        "Class Decorators"
+      ]
+    },
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/objects/oop.html",
+        "kind": "lecture",
+        "title": "Třídy a konstruktory (OOP)",
+        "path": "vyuka_downloaded/materialy/python/objects/oop.html",
+        "slug": "oop",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 10,
+        "diff": "basics",
+        "desc": "Definice třídy, atributy instance, metody a explicitní předávání instance pomocí parametru self.",
+        "compare": "Parametr self (ekvivalent Java/C++ 'this') musí být explicitně deklarován jako první argument každé metody třídy. Všechny atributy jsou standardně veřejné (public).",
+        "week": 7,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 7,
+            "label": "Týden 7 (OOP Core)",
+            "reason": "Třídy, instance, konstruktor __init__ a referenční self."
+          },
+          {
+            "targetWeek": 6,
+            "label": "Týden 6 (Časnější OOP)",
+            "reason": "Pokud chcete začít OOP dříve."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/objects/super.html",
+        "kind": "lecture",
+        "title": "Vícenásobná dědičnost & super()",
+        "path": "vyuka_downloaded/materialy/python/objects/super.html",
+        "slug": "super",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 8,
+        "diff": "resyntax",
+        "desc": "Jak Python řeší dědičnost z více tříd najednou a jak algoritmus MRO (Method Resolution Order) vyhodnocuje pořadí volání metod.",
+        "compare": "Java nepovoluje vícenásobnou dědičnost tříd. C++ ji povoluje, ale má problém s diamantovou dědičností. Python to řeší robustně pomocí MRO (C3 linearization) a voláním super().",
+        "week": 7,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 8,
+            "label": "Týden 8",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "exercise:priklady/python/magic.html",
+        "kind": "lecture",
+        "title": "Cyklický seznam & Magic dunders",
+        "path": "vyuka_downloaded/priklady/python/magic.html",
+        "slug": "magic",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "pythonic",
+        "desc": "Implementace vlastního kontejneru přetěžujícího __getitem__, __len__ a __iter__.",
+        "compare": "",
+        "week": 7,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 7,
+            "label": "Týden 7 (Data Model)",
+            "reason": "Dunder metody pro přetížení operátorů (+, *, [], @)."
+          },
+          {
+            "targetWeek": 8,
+            "label": "Týden 8 (NumPy & Matice)",
+            "reason": "Aplikace dunder metod při tvorbě vlastní maticové třídy."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/files/with.html",
+        "kind": "lecture",
+        "title": "Kontextový manažer (with)",
+        "path": "vyuka_downloaded/materialy/python/files/with.html",
+        "slug": "with",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "pythonic",
+        "desc": "Protokol kontextového manažeru pomocí dunder metod __enter__ a __exit__ pro bezpečné uvolňování zdrojů.",
+        "compare": "Ekvivalent k Java try-with-resources (AutoCloseable) a C++ RAII vzorům. Zajišťuje uvolnění prostředků i v případě výskytu výjimky.",
+        "week": 7,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 7,
+            "label": "Týden 7 (Context Managers)",
+            "reason": "Protokol __enter__ a __exit__ pro bezpečné uvolňování zdrojů."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9 (Soubory & SQLite)",
+            "reason": "Spojení s otevíráním souborů a SQLite transakcemi."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/objects/descriptors.html",
+        "kind": "lecture",
+        "title": "Deskriptory a properties",
+        "path": "vyuka_downloaded/materialy/python/objects/descriptors.html",
+        "slug": "descriptors",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 8,
+        "diff": "newconcept",
+        "desc": "Pokročilé řízení přístupu k atributům pomocí metod __get__ a __set__.",
+        "compare": "Používá se pod kapotou pro realizaci dekorátoru @property (gettery/settery) a v ORM systémech.",
+        "week": 7,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 7,
+            "label": "Týden 7 (Deskriptory)",
+            "reason": "Řízený přístup k atributům (__get__, __set__) a @property."
+          },
+          {
+            "targetWeek": 99,
+            "label": "W99 (Pokročilé reference)",
+            "reason": "Ponechání jako volitelné samostudium pro zájemce o CPython internálie."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/objects/decorators.html",
+        "kind": "lecture",
+        "title": "dekorátory tříd",
+        "path": "vyuka_downloaded/materialy/python/objects/decorators.html",
+        "slug": "class_decorators",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 4,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Dekorátory tříd",
+        "compare": "Téma původně zařazené do Týdne 6.",
+        "week": 7,
+        "exists": true,
+        "quiz_deck": "class_decorators",
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 8,
+            "label": "Týden 8",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/sorting/advanced.html",
+        "kind": "lecture",
+        "title": "třídění a porovnávání",
+        "path": "vyuka_downloaded/materialy/python/sorting/advanced.html",
+        "slug": "advanced",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 4,
+        "diff": "basics",
+        "desc": "Archivní / zrušená přednáška: třídění a porovnávání (Afinita k W2)",
+        "compare": "Tato přednáška je uložena v regálu zrušených materiálů.",
+        "week": 7,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 8,
+            "label": "Týden 8",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/objects/introspection.html",
+        "kind": "lecture",
+        "title": "introspekce",
+        "path": "vyuka_downloaded/materialy/python/objects/introspection.html",
+        "slug": "introspection",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 4,
+        "diff": "basics",
+        "desc": "Archivní / zrušená přednáška: introspekce (Afinita k W6)",
+        "compare": "Tato přednáška je uložena v regálu zrušených materiálů.",
+        "week": 7,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 8,
+            "label": "Týden 8",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/objects/ABCs.html",
+        "kind": "lecture",
+        "title": "Abstract Base Classes (ABCs)",
+        "path": "vyuka_downloaded/materialy/python/objects/ABCs.html",
+        "slug": "ABCs",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 4,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: „Abstract Base Classes“",
+        "compare": "Téma původně zařazené do Týdne 6.",
+        "week": 7,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 8,
+            "label": "Týden 8",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/objects/meta.html",
+        "kind": "lecture",
+        "title": "Metatřídy (Metaclasses)",
+        "path": "vyuka_downloaded/materialy/python/objects/meta.html",
+        "slug": "meta",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 7,
+        "diff": "paradigm",
+        "desc": "Vyřazená přednáška: Objekty pro pokročilé",
+        "compare": "Téma původně zařazené do Týdne 6.",
+        "week": 7,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 8,
+            "label": "Týden 8",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise:priklady/python/magic.html",
+        "kind": "exercise",
+        "title": "Aplikace magických metod",
+        "path": "vyuka_downloaded/priklady/python/magic.html",
+        "slug": "priklady--python--magic",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 7.",
+        "compare": "",
+        "week": 7
+      },
+      {
+        "id": "exercise:priklady/python/procvicovani.sifry.html",
+        "kind": "exercise",
+        "title": "Procvičování – šifry",
+        "path": "vyuka_downloaded/priklady/python/procvicovani.sifry.html",
+        "slug": "priklady--python--procvicovani.sifry",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 7.",
+        "compare": "",
+        "week": 7
+      },
+      {
+        "id": "exercise:priklady/python/procvicovani.hry2.html",
+        "kind": "exercise",
+        "title": "Procvičování – hry, Život",
+        "path": "vyuka_downloaded/priklady/python/procvicovani.hry2.html",
+        "slug": "priklady--python--procvicovani.hry2",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 7.",
+        "compare": "",
+        "week": 7
+      }
+    ]
+  },
+  {
+    "week": 8,
+    "id": "week-8",
+    "title": "Vědecké výpočty: Homogenní pole NumPy & Vektorizace",
+    "objective": "Paměťové rozložení ndarray, multi-dimenzionální řezy, mechanismus broadcasting, ufuncs, vektorizace a JIT kompilace s Numba.",
+    "c_java_bridge": "Místo for cyklů v Pythonu provádíme operace nad celými bloky paměti v C rychlosti se strides přístupem.",
+    "milestone": null,
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/numpy/overview.html",
+        "kind": "lecture",
+        "title": "Úvod do NumPy",
+        "path": "vyuka_downloaded/materialy/python/numpy/overview.html",
+        "slug": "numpy_overview",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Tvorba a vlastnosti homogenních polí ndarray. Rychlostní srovnání s čistým Pythonem.",
+        "compare": "Python smyčky jsou pomalé kvůli dynamickému typování. NumPy přesouvá cykly do kompilovaných C/Fortran knihoven pod kapotou.",
+        "week": 8,
+        "exists": true,
+        "quiz_deck": "numpy_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 8,
+            "label": "Týden 8 (NumPy)",
+            "reason": "Okamžitá aplikace po OOP a Data Modelu (ndarrays)."
+          },
+          {
+            "targetWeek": 4,
+            "label": "Týden 4 (Vědecký rychlý start)",
+            "reason": "V numericky orientovaném kurzu přesunout co nejdříve."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/numpy/arrays.creation.html",
+        "kind": "lecture",
+        "title": "NumPy: Tvorba polí, datové typy & vlastnosti (ndarrays)",
+        "path": "vyuka_downloaded/materialy/python/numpy/arrays.creation.html",
+        "slug": "arrays.creation",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: NumPy – tvorba a vlastnosti polí",
+        "compare": "Téma původně zařazené do Týdne 9.",
+        "week": 8,
+        "targetWeek": 9,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/numpy/arrays.operation.html",
+        "kind": "lecture",
+        "title": "NumPy: Základní matematické operace & univerzální funkce (ufuncs)",
+        "path": "vyuka_downloaded/materialy/python/numpy/arrays.operation.html",
+        "slug": "arrays.operation",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: NumPy – operace s polemi",
+        "compare": "Téma původně zařazené do Týdne 9.",
+        "week": 8,
+        "targetWeek": 9,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 8,
+            "label": "Týden 8 (Vektorizace)",
+            "reason": "Ufuncs a eliminace for-smyček v C rychlosti."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9 (Vědecké výpočty)",
+            "reason": "Návaznost na 2D/3D maticové transformace."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/numpy/arrays.slicing.html",
+        "kind": "lecture",
+        "title": "NumPy: Pokročilé výřezy, 2D/3D slicing & paměťové rozvržení",
+        "path": "vyuka_downloaded/materialy/python/numpy/arrays.slicing.html",
+        "slug": "arrays.slicing",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Vyřazená přednáška: NumPy – výřezy polí, optimalizace",
+        "compare": "Téma původně zařazené do Týdne 9.",
+        "week": 8,
+        "targetWeek": 9,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/numpy/broadcasting.html",
+        "kind": "lecture",
+        "title": "Broadcasting",
+        "path": "vyuka_downloaded/materialy/python/numpy/broadcasting.html",
+        "slug": "broadcasting",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Jak NumPy provádí matematické operace mezi poli s různými dimenzemi.",
+        "compare": "Umožňuje přičíst jednorozměrný vektor ke každému řádku matice bez nutnosti psát cykly for.",
+        "week": 8,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 8,
+            "label": "Týden 8 (Broadcasting)",
+            "reason": "Základní pravidlo pro operace nad maticemi různých rozměrů."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9 (Pokročilý NumPy)",
+            "reason": "Představení společně se strides a paměťovými řezy."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/numpy/vectorization.html",
+        "kind": "lecture",
+        "title": "Vektorizace a řezy v NumPy",
+        "path": "vyuka_downloaded/materialy/python/numpy/vectorization.html",
+        "slug": "vectorization",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Nahrazování explicitních cyklů vektorovými zápisy a pokročilá práce s indexováním (řezy).",
+        "compare": "Klíč k efektivnímu psaní v NumPy. Namísto procházení prvků matice v cyklech provedeme operaci nad celým objektem naráz.",
+        "week": 8,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/modules/struct.html",
+        "kind": "lecture",
+        "title": "struct",
+        "path": "vyuka_downloaded/materialy/python/modules/struct.html",
+        "slug": "struct",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 7,
+        "diff": "resyntax",
+        "desc": "Balení a rozbalování binárních dat (C-structs) pomocí formátovacích řetězců.",
+        "compare": "",
+        "week": 8,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/speed/numba.html",
+        "kind": "lecture",
+        "title": "Optimalizace a Numba JIT",
+        "path": "vyuka_downloaded/materialy/python/speed/numba.html",
+        "slug": "numba",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 8,
+        "diff": "newconcept",
+        "desc": "Kompilace Python kódu do strojového kódu za běhu pomocí LLVM compileru.",
+        "compare": "Dekorátor @jit z knihovny Numba zrychlí kritické matematické výpočty na úroveň čistého C++.",
+        "week": 8,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise:priklady/media/grafika.2.html",
+        "kind": "exercise",
+        "title": "Základní grafické operace – Numpy a Pillow",
+        "path": "vyuka_downloaded/priklady/media/grafika.2.html",
+        "slug": "priklady--media--grafika.2",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 8.",
+        "compare": "",
+        "week": 8
+      },
+      {
+        "id": "exercise:priklady/media/steganografie.html",
+        "kind": "exercise",
+        "title": "Steganografie",
+        "path": "vyuka_downloaded/priklady/media/steganografie.html",
+        "slug": "priklady--media--steganografie",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 8.",
+        "compare": "",
+        "week": 8
+      }
+    ]
+  },
+  {
+    "week": 9,
+    "id": "week-9",
+    "title": "Souborový systém, Moderní I/O (Pathlib) & SQLite3",
+    "objective": "Moderní objektové cesty pathlib.Path, binární/textové proudy, serializace a vestavěná relační databáze SQLite3.",
+    "c_java_bridge": "pathlib přetěžuje operátor / pro cesty. SQLite3 je zabudovaná přímo v Pythonu bez nutnosti DB serveru.",
+    "milestone": null,
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/files/basics.html",
+        "kind": "lecture",
+        "title": "Práce se soubory (Textové a binární stromy)",
+        "path": "vyuka_downloaded/materialy/python/files/basics.html",
+        "slug": "files_basics",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Základy I/O operací, textové soubory, kódování UTF-8, binární data, seek/tell a buffering.",
+        "compare": "V textovém režimu Python automaticky překládá konce řádků (\\\\\\\\r\\\\\\\\n -> \\\\\\\\n). V binárním režimu čte surová data bez úprav.",
+        "week": 9,
+        "exists": true,
+        "quiz_deck": "files_basics",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 9,
+            "label": "Týden 9 (Soubory & I/O)",
+            "reason": "Základní práce se soubory, textový vs binární režim."
+          },
+          {
+            "targetWeek": 2,
+            "label": "Týden 2 (První čtení souborů)",
+            "reason": "Představení základního open('soubor.txt') na začátku semestru."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/files/pathlib.html",
+        "kind": "lecture",
+        "title": "Modul pathlib (cesty)",
+        "path": "vyuka_downloaded/materialy/python/files/pathlib.html",
+        "slug": "pathlib",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "pythonic",
+        "desc": "Moderní objektová reprezentace cest v souborovém systému.",
+        "compare": "Nahrazuje staré Céčkovské funkce z modulu os.path. Používá přetížený operátor '/' pro spojování cest: 'cesta / \\\\",
+        "week": 9,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 9,
+            "label": "Týden 9 (Moderní cesty)",
+            "reason": "Objektová práce s cestami přes pathlib.Path a operátor /."
+          },
+          {
+            "targetWeek": 1,
+            "label": "Týden 1 (Soubory)",
+            "reason": "Nahrazení starého os.path moderním přístupem od začátku."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/db/sqlite.html",
+        "kind": "lecture",
+        "title": "Vestavěná databáze SQLite",
+        "path": "vyuka_downloaded/materialy/python/db/sqlite.html",
+        "slug": "sqlite",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Práce s transakční SQL databází SQLite integrovanou přímo v standardní knihovně Pythonu.",
+        "compare": "Ekvivalent k JDBC připojení k SQLite. V Pythonu nepotřebujete stahovat žádné externí JAR knihovny, stačí 'import sqlite3'.",
+        "week": 9,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 9,
+            "label": "Týden 9 (SQLite DB)",
+            "reason": "Relační transakční databáze přímo před Pandas v W10."
+          },
+          {
+            "targetWeek": 12,
+            "label": "Týden 12 (Systémová perzistence)",
+            "reason": "Spojení se systémovými datovými proudy a CLI."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/modules/os.html",
+        "kind": "lecture",
+        "title": "souborový systém postaru",
+        "path": "vyuka_downloaded/materialy/python/modules/os.html",
+        "slug": "os",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Práce se složkami, cestami a manipulace se soubory před příchodem pathlib.",
+        "compare": "",
+        "week": 9,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 10,
+            "label": "Týden 10",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/files/fileinput.html",
+        "kind": "lecture",
+        "title": "fileinput",
+        "path": "vyuka_downloaded/materialy/python/files/fileinput.html",
+        "slug": "fileinput",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 4,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: „fileinput“ – vícenásobný vstup",
+        "compare": "Téma původně zařazené do Týdne 8.",
+        "week": 9,
+        "targetWeek": 8,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 10,
+            "label": "Týden 10",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/serialization/shelve.html",
+        "kind": "lecture",
+        "title": "shelve",
+        "path": "vyuka_downloaded/materialy/python/serialization/shelve.html",
+        "slug": "shelve",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 4,
+        "diff": "basics",
+        "desc": "Archivní / zrušená přednáška: shelve (Afinita k W8)",
+        "compare": "Tato přednáška je uložena v regálu zrušených materiálů.",
+        "week": 9,
+        "weekAffinity": 8,
+        "isCanceled": true,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 10,
+            "label": "Týden 10",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise:materialy/media/pnm.html",
+        "kind": "exercise",
+        "title": "materialy/media/pnm.html",
+        "path": "vyuka_downloaded/materialy/media/pnm.html",
+        "slug": "materialy--media--pnm",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 9.",
+        "compare": "",
+        "week": 9
+      }
+    ]
+  },
+  {
+    "week": 10,
+    "id": "week-10",
+    "title": "Tabulková analýza (Pandas) & Vědecká vizualizace (Matplotlib)",
+    "objective": "Analýza tabulkových dat (Series & DataFrame), práce s časovými řadami datetime a vykreslování grafů v Matplotlib.",
+    "c_java_bridge": "Pandas nahrazuje in-memory tabulky a SQL dotazy nad CSV/Excel daty. Matplotlib poskytuje syntaxi identickou s Matlabem.",
+    "milestone": null,
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/pandas/overview.html",
+        "kind": "lecture",
+        "title": "Úvod do knihovny Pandas",
+        "path": "vyuka_downloaded/materialy/python/pandas/overview.html",
+        "slug": "pandas_overview",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Základní datové struktury Series (sloupec) a DataFrame (tabulka). Indexování a filtrace.",
+        "compare": "Ekvivalent k relační SQL tabulce přímo v operační paměti. V Javě/C++ byste pro analýzu tabulkových dat museli psát obrovské množství kódu pro parsování a agregaci.",
+        "week": 10,
+        "exists": true,
+        "quiz_deck": "pandas_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 10,
+            "label": "Týden 10 (Pandas)",
+            "reason": "Tabulková analýza dat (Series, DataFrame) a agregace."
+          },
+          {
+            "targetWeek": 6,
+            "label": "Týden 6 (Data Science start)",
+            "reason": "Rychlý přechod na data po zvládnutí základních kolekcí."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/pypi/MatPlotLib.html",
+        "kind": "lecture",
+        "title": "Matplotlib (Grafy)",
+        "path": "vyuka_downloaded/materialy/python/pypi/MatPlotLib.html",
+        "slug": "MatPlotLib",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Vykreslování vědeckých grafů, histogramů a vizualizací dat.",
+        "compare": "Představuje standard pro vědecké publikace v Pythonu. Podobné jako kreslení grafů v Matlabu.",
+        "week": 10,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 10,
+            "label": "Týden 10 (Grafy & Pandas)",
+            "reason": "Vědecká vizualizace dat v návaznosti na Pandas tabulky."
+          },
+          {
+            "targetWeek": 8,
+            "label": "Týden 8 (Vědecké grafy)",
+            "reason": "Vizuální vykreslování matematických funkcí hned po NumPy."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/modules/times+dates.html",
+        "kind": "lecture",
+        "title": "time, calendar a datetime",
+        "path": "vyuka_downloaded/materialy/python/modules/times+dates.html",
+        "slug": "times+dates",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Práce s datem, časem, časovými pásmy a formátováním (strftime/strptime).",
+        "compare": "",
+        "week": 10,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 10,
+            "label": "Týden 10 (Časové řady v Pandas)",
+            "reason": "Spojení s manipulací časových razítek v tabulkách."
+          },
+          {
+            "targetWeek": 12,
+            "label": "Týden 12 (Systémové časovače)",
+            "reason": "OS systémový čas, POSIX epocha a přesné měření v perf_counter."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/pandas/example-1.html",
+        "kind": "lecture",
+        "title": "Příklad - Klementinum",
+        "path": "vyuka_downloaded/materialy/python/pandas/example-1.html",
+        "slug": "pandas_example_1",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Analýza historických teplotních měření v pražském Klementinu.",
+        "compare": "Praktická ukázka agregací, průměrování a vyhledávání extrémů v datové sadě o tisících řádků.",
+        "week": 10,
+        "exists": true,
+        "quiz_deck": "pandas_example_1",
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 11,
+            "label": "Týden 11",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise:materialy/python/pandas/example-2.html",
+        "kind": "exercise",
+        "title": "materialy/python/pandas/example-2.html",
+        "path": "vyuka_downloaded/materialy/python/pandas/example-2.html",
+        "slug": "materialy--python--pandas--example-2",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 10.",
+        "compare": "",
+        "week": 10
+      }
+    ]
+  },
+  {
+    "week": 11,
+    "id": "week-11",
+    "title": "Kvalita kódu, Automatizované testování & Profilování",
+    "objective": "Dokumentační testy doctest, testovací framework unittest, mikrobenchmarky timeit, profilování cProfile a přehled akcelerace.",
+    "c_java_bridge": "V dynamickém jazyce nahrazují automatizované unit testy chybějící typovou kontrolu kompilátoru z C/Javy.",
+    "milestone": null,
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/testing/unittests.html",
+        "kind": "lecture",
+        "title": "Unit-testy (unittest)",
+        "path": "vyuka_downloaded/materialy/python/testing/unittests.html",
+        "slug": "unittests",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Definice testovacích tříd, assert metod a testovacích přípravků (setUp, tearDown).",
+        "compare": "Modul unittest je přímo inspirován Java frameworkem JUnit.",
+        "week": 11,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 11,
+            "label": "Týden 11 (Kvalita kódu)",
+            "reason": "Psaní robustních testovacích suit pro finální semestrální projekt."
+          },
+          {
+            "targetWeek": 5,
+            "label": "Týden 5 (Test-Driven Development)",
+            "reason": "Zavedení TDD před tvorbou rozsáhlejších OOP tříd."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/testing/timeit.html",
+        "kind": "lecture",
+        "title": "Měření výkonu & Profilování (timeit, cProfile, pstats)",
+        "path": "vyuka_downloaded/materialy/python/testing/timeit.html",
+        "slug": "timeit",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "pythonic",
+        "desc": "Mikro-benchmarking pomocí timeit a komplexní profilování aplikací přes cProfile a pstats.",
+        "compare": "cProfile vytvoří statistiku volání funkcí a času v nich stráveného, což odhalí úzká hrdla programu.",
+        "week": 11,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 11,
+            "label": "Týden 11 (Měření výkonu)",
+            "reason": "Mikrobenchmarky a profilace úzkých hrdel v cProfile."
+          },
+          {
+            "targetWeek": 12,
+            "label": "Týden 12 (C-FFI akcelerace)",
+            "reason": "Měření zrychlení před a po nasazení Cythonu / Numba."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/speed/overview.html",
+        "kind": "lecture",
+        "title": "Přehled akcelerace & Performance toolchains (PyPy, Numba, Cython)",
+        "path": "vyuka_downloaded/materialy/python/speed/overview.html",
+        "slug": "speed_overview",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 8,
+        "diff": "newconcept",
+        "desc": "Vyřazená přednáška: Jak na rychlost – úvod",
+        "compare": "Téma původně zařazené do Týdne 13.",
+        "week": 11,
+        "targetWeek": 13,
+        "exists": true,
+        "isRemoved": true,
+        "quiz_deck": "speed_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 12,
+            "label": "Týden 12",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/testing/doctests.html",
+        "kind": "lecture",
+        "title": "Dokumentační testy (doctest)",
+        "path": "vyuka_downloaded/materialy/python/testing/doctests.html",
+        "slug": "doctests",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 4,
+        "diff": "basics",
+        "desc": "Spustitelná dokumentace v docstringách a CLI testování.",
+        "compare": "Unikátní koncept Pythonu. Testy slouží zároveň jako živá dokumentace v kódu. Pokud se chování změní, dokumentace přestane procházet testy.",
+        "week": 11,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 12,
+            "label": "Týden 12",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": [
+      {
+        "id": "exercise:priklady/python/procvicovani.pstnost.html",
+        "kind": "exercise",
+        "title": "Procvičování – náhoda a pravděpodobnost",
+        "path": "vyuka_downloaded/priklady/python/procvicovani.pstnost.html",
+        "slug": "priklady--python--procvicovani.pstnost",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Praktická cvičení a programátorské úlohy pro Týden 11.",
+        "compare": "",
+        "week": 11
+      }
+    ]
+  },
+  {
+    "week": 12,
+    "id": "week-12",
+    "title": "Systémové programování, CLI, Subprocesy & C-FFI / Cython",
+    "objective": "CLI parser argparse, řízení procesů a rour subprocess, bajtové buffery bytes, paměťové mapování mmap a C-rozšíření přes ctypes a Cython.",
+    "c_java_bridge": "Přímé propojení rychlého vývoje v Pythonu s nativní rychlostí kompilovaného C kódu.",
+    "milestone": {
+      "id": "milestone-3",
+      "number": 3,
+      "title": "Akcelerovaný CLI filtr signálů a obrazů v Cythonu / C-FFI",
+      "desc": "Vytvořte produkční CLI utilitu v argparse, která zpracovává binární datové proudy, deleguje výpočetně náročné filtry do C/Cythonu a porovnává výkonnostní metriky.",
+      "skills": [
+        "CLI rozhraní (argparse)",
+        "Subprocesy & Roury (subprocess)",
+        "Binární data & mmap",
+        "C-Interoperabilita (ctypes / Cython)"
+      ]
+    },
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/cmd/argparse.html",
+        "kind": "lecture",
+        "title": "Příkazová řádka (argparse)",
+        "path": "vyuka_downloaded/materialy/python/cmd/argparse.html",
+        "slug": "argparse",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Parsování parametrů a přepínačů předaných skriptu z terminálu.",
+        "compare": "Standardní knihovna pro tvorbu profesionálních CLI utilit s automatickým generováním nápovědy --help.",
+        "week": 12,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 12,
+            "label": "Týden 12 (CLI utility)",
+            "reason": "Tvorba produkčních konzolových nástrojů s přepínači a nápovědou."
+          },
+          {
+            "targetWeek": 0,
+            "label": "Týden 0 (CLI skripty)",
+            "reason": "Spouštění skriptů z terminálu s argumenty."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/cmd/execution_subprocess.html",
+        "kind": "lecture",
+        "title": "Spouštění procesů: od os.system() k subprocess",
+        "path": "vyuka_downloaded/materialy/python/cmd/execution_subprocess.html",
+        "slug": "execution_subprocess",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 9,
+        "diff": "basics",
+        "desc": "Spouštění vnějších příkazů, os.system vs subprocess.run, pipes, stdio přesměrování a bezpečnost.",
+        "compare": "Ekvivalent k Java ProcessBuilder a C fork/exec. Modul subprocess.run() poskytuje velmi bezpečné a robustní rozhraní.",
+        "week": 12,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 12,
+            "label": "Týden 12 (Subprocesy)",
+            "reason": "Řízení externích programů a rour přes subprocess.Popen."
+          },
+          {
+            "targetWeek": 11,
+            "label": "Týden 11 (Systémová orchestrace)",
+            "reason": "Integrace externích nástrojů a automatizace testů."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/files/mmap.html",
+        "kind": "lecture",
+        "title": "Mapování souborů do paměti (mmap)",
+        "path": "vyuka_downloaded/materialy/python/files/mmap.html",
+        "slug": "mmap",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 7,
+        "diff": "newconcept",
+        "desc": "Nízkoúrovňové namapování souboru přímo do virtuální paměti procesu.",
+        "compare": "Ekvivalent k MappedByteBuffer v Javě. Umožňuje manipulovat s gigabajtovými soubory s minimální režií a bez načítání celého obsahu do RAM.",
+        "week": 12,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/externalibs/overview.html",
+        "kind": "lecture",
+        "title": "FFI a modul ctypes",
+        "path": "vyuka_downloaded/materialy/python/externalibs/overview.html",
+        "slug": "externalibs_overview",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 7,
+        "diff": "newconcept",
+        "desc": "Načítání sdílených C knihoven (.dll/.so) a volání jejich funkcí přímo z Pythonu.",
+        "compare": "Mnohem jednodušší a méně ukecané rozhraní než Java JNI (Java Native Interface).",
+        "week": 12,
+        "exists": true,
+        "quiz_deck": "externalibs_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/types/bytes.html",
+        "kind": "lecture",
+        "title": "Bajtové řetězce (bytes, bytearray)",
+        "path": "vyuka_downloaded/materialy/python/types/bytes.html",
+        "slug": "bytes",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 8,
+        "diff": "resyntax",
+        "desc": "Reprezentace surových binárních dat. Rozdíly mezi neměnným bytes a měnitelným bytearray.",
+        "compare": "Ekvivalent k byte[] v Javě. Zásadní pro síťovou komunikaci a zpracování souborových formátů.",
+        "week": 12,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 12,
+            "label": "Týden 12 (Binární data)",
+            "reason": "Surové bajtové buffery bytes a bytearray pro C-interoperabilitu."
+          },
+          {
+            "targetWeek": 2,
+            "label": "Týden 2 (Bajtové typy)",
+            "reason": "Představení rozdílu mezi Unicode str a surovými bajty."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/cython/overview.html",
+        "kind": "lecture",
+        "title": "Cython - kompilace do C",
+        "path": "vyuka_downloaded/materialy/python/cython/overview.html",
+        "slug": "cython_overview",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 8,
+        "diff": "newconcept",
+        "desc": "Psaní modulů v hybridním jazyce kombinujícím Python a C, které se kompilují přímo na nativní kód.",
+        "compare": "Umožňuje psát rychlostí C++ za použití Python syntaxe. Využívá se pro tvorbu knihoven jako NumPy a Pandas.",
+        "week": 12,
+        "exists": true,
+        "quiz_deck": "cython_overview",
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 12,
+            "label": "Týden 12 (Cython & C-FFI)",
+            "reason": "Překlad výpočetně náročných funkcí přímo do C kódu."
+          },
+          {
+            "targetWeek": 11,
+            "label": "Týden 11 (Výkonnostní toolchains)",
+            "reason": "Představení po profilování v cProfile."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/speed/example-1.html",
+        "kind": "lecture",
+        "title": "Příklad: Filtrace obrázků & JIT akcelerace",
+        "path": "vyuka_downloaded/materialy/python/speed/example-1.html",
+        "slug": "speed_example_1",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 4,
+        "diff": "paradigm",
+        "desc": "Vyřazená přednáška: Jak na rychlost – příklad s filtrací obrázků",
+        "compare": "Téma původně zařazené do Týdne 13.",
+        "week": 12,
+        "targetWeek": 13,
+        "exists": true,
+        "isRemoved": true,
+        "quiz_deck": "speed_example_1",
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 99,
+            "label": "W99 (Regál)",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": []
+  },
+  {
+    "week": 99,
+    "id": "week-99",
+    "title": "Regál doplňkových a rozšiřujících přednášek (Self-Study Shelf)",
+    "objective": "Regál doplňkových témat pro samostudium: webové protokoly, XML/XPath, grafická prostředí Tkinter a historická témata.",
+    "c_java_bridge": "Rozšiřující přehled knihoven pro specifické domény a historické komparace Python 2 vs 3.",
+    "milestone": null,
+    "lectures": [
+      {
+        "id": "lecture:materialy/python/pypi/CherryPy.html",
+        "kind": "lecture",
+        "title": "CherryPy a webové formuláře",
+        "path": "vyuka_downloaded/materialy/python/pypi/CherryPy.html",
+        "slug": "CherryPy",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Objektově orientovaný webový micro-framework pro Python a parsování parametrů z dotazů GET/POST.",
+        "compare": "Minimalistický webový server. Metody objektů jsou přímo vystaveny jako URL cesty.",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:web/html/forms.html",
+        "kind": "lecture",
+        "title": "Úvod do HTML formulářů",
+        "path": "vyuka_downloaded/materialy/web/html/forms.html",
+        "slug": "forms",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Formuláře",
+        "compare": "Téma původně zařazené do Týdne 7.",
+        "week": 99,
+        "targetWeek": 7,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:web/html/forms-input.html",
+        "kind": "lecture",
+        "title": "element <input>",
+        "path": "vyuka_downloaded/materialy/web/html/forms-input.html",
+        "slug": "forms-input",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Formuláře",
+        "compare": "Téma původně zařazené do Týdne 7.",
+        "week": 99,
+        "targetWeek": 7,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:dvcs/overview.html",
+        "kind": "lecture",
+        "title": "DVCS – přehled",
+        "path": "vyuka_downloaded/materialy/dvcs/overview.html",
+        "slug": "dvcs_overview",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 2,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Distributed Version Control Systems – Overview",
+        "compare": "Téma původně zařazené do Týdne 0.",
+        "week": 99,
+        "targetWeek": 0,
+        "exists": true,
+        "isRemoved": true,
+        "quiz_deck": "dvcs_overview",
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:dvcs/hg.html",
+        "kind": "lecture",
+        "title": "mercurial",
+        "path": "vyuka_downloaded/materialy/dvcs/hg.html",
+        "slug": "hg",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 2,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Mercurial",
+        "compare": "Téma původně zařazené do Týdne 0.",
+        "week": 99,
+        "targetWeek": 0,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/3vs2.html",
+        "kind": "lecture",
+        "title": "Py3k vs Py2k",
+        "path": "vyuka_downloaded/materialy/python/3vs2.html",
+        "slug": "3vs2",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 2,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Py3k versus Python 2.x",
+        "compare": "Téma původně zařazené do Týdne 0.",
+        "week": 99,
+        "targetWeek": 0,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/overview.2.html",
+        "kind": "lecture",
+        "title": "overview.2",
+        "path": "vyuka_downloaded/materialy/python/overview.2.html",
+        "slug": "materialy--python--overview.2",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 2,
+        "diff": "basics",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 45,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/overview.0.html",
+        "kind": "lecture",
+        "title": "overview.0",
+        "path": "vyuka_downloaded/materialy/python/overview.0.html",
+        "slug": "materialy--python--overview.0",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 2,
+        "diff": "basics",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 60,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/files/texts.html",
+        "kind": "lecture",
+        "title": "texts",
+        "path": "vyuka_downloaded/materialy/python/files/texts.html",
+        "slug": "materialy--python--files--texts",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 12,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/files/binary.html",
+        "kind": "lecture",
+        "title": "binary",
+        "path": "vyuka_downloaded/materialy/python/files/binary.html",
+        "slug": "materialy--python--files--binary",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 8,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/serialization/overview.html",
+        "kind": "lecture",
+        "title": "Úvod do serializace",
+        "path": "vyuka_downloaded/materialy/python/serialization/overview.html",
+        "slug": "serialization_overview",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Přehled serializačních nástrojů (krátký úvod)",
+        "compare": "Téma původně zařazené do Týdne 3.",
+        "week": 99,
+        "targetWeek": 3,
+        "exists": true,
+        "isRemoved": true,
+        "quiz_deck": "serialization_overview",
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/objects/basics.html",
+        "kind": "lecture",
+        "title": "Úvod do tříd pro ne-OOP programátory",
+        "path": "vyuka_downloaded/materialy/python/objects/basics.html",
+        "slug": "objects_basics",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Třídy a objekty v Python'u",
+        "compare": "Téma původně zařazené do Týdne 6.",
+        "week": 99,
+        "targetWeek": 6,
+        "exists": true,
+        "isRemoved": true,
+        "quiz_deck": "objects_basics",
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/functions/generic.html",
+        "kind": "lecture",
+        "title": "„přetěžování“ funkcí",
+        "path": "vyuka_downloaded/materialy/python/functions/generic.html",
+        "slug": "generic",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 4,
+        "diff": "pythonic",
+        "desc": "Vyřazená přednáška: Generické funkce",
+        "compare": "Téma původně zařazené do Týdne 4.",
+        "week": 99,
+        "targetWeek": 4,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/modules/textwrap.html",
+        "kind": "lecture",
+        "title": "textwrap",
+        "path": "vyuka_downloaded/materialy/python/modules/textwrap.html",
+        "slug": "textwrap",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Manipulace s textem pomocí modulu „textwrap“",
+        "compare": "Téma původně zařazené do Týdne 7.",
+        "week": 99,
+        "targetWeek": 7,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/gui/tkinter/index.html",
+        "kind": "lecture",
+        "title": "Úvod do GUI a Tkinter",
+        "path": "vyuka_downloaded/materialy/python/gui/tkinter/index.html",
+        "slug": "index",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: GUI – Tkinter",
+        "compare": "Téma původně zařazené do Týdne 13.",
+        "week": 99,
+        "targetWeek": 13,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/gui/tkinter/PhotoImage.html",
+        "kind": "lecture",
+        "title": "PhotoImage",
+        "path": "vyuka_downloaded/materialy/python/gui/tkinter/PhotoImage.html",
+        "slug": "PhotoImage",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: GUI – Tkinter a obrázky (GIF &amp; PNM)",
+        "compare": "Téma původně zařazené do Týdne 13.",
+        "week": 99,
+        "targetWeek": 13,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:media/png.html",
+        "kind": "lecture",
+        "title": "PNG",
+        "path": "vyuka_downloaded/materialy/media/png.html",
+        "slug": "png",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: PNG",
+        "compare": "Téma původně zařazené do Týdne 8.",
+        "week": 99,
+        "targetWeek": 8,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/net/wsgi.html",
+        "kind": "lecture",
+        "title": "WSGI",
+        "path": "vyuka_downloaded/materialy/python/net/wsgi.html",
+        "slug": "wsgi",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: WSGI",
+        "compare": "Téma původně zařazené do Týdne 7.",
+        "week": 99,
+        "targetWeek": 7,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "exercise:materialy/brainfuck/overview.html",
+        "kind": "lecture",
+        "title": "Brainfuck Interpreter",
+        "path": "vyuka_downloaded/materialy/brainfuck/overview.html",
+        "slug": "overview",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Implementace kompletního interpretru pro minimalistický ezoterní jazyk Brainfuck.",
+        "compare": "Skvělé cvičení na pointery, pásku a řízení toku programu.",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/xml/sax.html",
+        "kind": "lecture",
+        "title": "sax",
+        "path": "vyuka_downloaded/materialy/python/xml/sax.html",
+        "slug": "materialy--python--xml--sax",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 7,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/web/xml/namespaces.html",
+        "kind": "lecture",
+        "title": "namespaces",
+        "path": "vyuka_downloaded/materialy/web/xml/namespaces.html",
+        "slug": "materialy--web--xml--namespaces",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 4,
+        "diff": "resyntax",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 17,
+        "liveSlides": 14,
+        "estMinutes": 31,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/web/xml/xpath.html",
+        "kind": "lecture",
+        "title": "xpath",
+        "path": "vyuka_downloaded/materialy/web/xml/xpath.html",
+        "slug": "materialy--web--xml--xpath",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 4,
+        "diff": "pythonic",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 24,
+        "liveSlides": 21,
+        "estMinutes": 46,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/web/xml/xpath2.html",
+        "kind": "lecture",
+        "title": "xpath2",
+        "path": "vyuka_downloaded/materialy/web/xml/xpath2.html",
+        "slug": "materialy--web--xml--xpath2",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 4,
+        "diff": "pythonic",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 40,
+        "liveSlides": 28,
+        "estMinutes": 62,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/web/xml/schematron.html",
+        "kind": "lecture",
+        "title": "schematron",
+        "path": "vyuka_downloaded/materialy/web/xml/schematron.html",
+        "slug": "materialy--web--xml--schematron",
+        "tags": [
+          "Tricky"
+        ],
+        "relevance": 4,
+        "diff": "resyntax",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 17,
+        "liveSlides": 13,
+        "estMinutes": 29,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/web/xml_html_dom.html",
+        "kind": "lecture",
+        "title": "xml_html_dom",
+        "path": "vyuka_downloaded/materialy/web/xml_html_dom.html",
+        "slug": "materialy--web--xml_html_dom",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 11,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/brainfuck/programming.html",
+        "kind": "lecture",
+        "title": "programming",
+        "path": "vyuka_downloaded/materialy/brainfuck/programming.html",
+        "slug": "materialy--brainfuck--programming",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 2,
+        "diff": "basics",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 8,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/pypi/MatPlotLib_animace.html",
+        "kind": "lecture",
+        "title": "animace",
+        "path": "vyuka_downloaded/materialy/python/pypi/MatPlotLib_animace.html",
+        "slug": "MatPlotLib_animace",
+        "tags": [
+          "WOW"
+        ],
+        "relevance": 4,
+        "diff": "pythonic",
+        "desc": "Vyřazená přednáška: Knihovna „MatPlotLib“ – animace",
+        "compare": "Téma původně zařazené do Týdne 13.",
+        "week": 99,
+        "targetWeek": 13,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/packages/venv.html",
+        "kind": "lecture",
+        "title": "Modul venv",
+        "path": "vyuka_downloaded/materialy/python/packages/venv.html",
+        "slug": "venv",
+        "tags": [
+          "Core"
+        ],
+        "relevance": 8,
+        "diff": "basics",
+        "desc": "Vytváření a aktivace lokálních virtuálních prostředí přímo pomocí standardní knihovny.",
+        "compare": "Vytvoří kopii interpretru a izolovanou složku site-packages v kořeni projektu. Aktivace modifikuje PATH shellu.",
+        "week": 99,
+        "exists": true,
+        "totalSlides": 10,
+        "liveSlides": 8,
+        "estMinutes": 18,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:materialy/python/serialization/pickle.html",
+        "kind": "lecture",
+        "title": "Serializace – modul pickle a pickletools",
+        "path": "vyuka_downloaded/materialy/python/serialization/pickle.html",
+        "slug": "pickle",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Perzistentní ukládání objektů, binární pickle protokoly, bezpečnostní rizika unpicklování a inspekce přes pickletools.",
+        "compare": "Podobné jako Java ObjectOutputStream. Pozor na bezpečnost - pickle.load() může spustit libovolný kód ukrytý v souboru!",
+        "week": 99,
+        "exists": true,
+        "quiz_deck": "pickle",
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      },
+      {
+        "id": "lecture:python/functions/_functions.html",
+        "kind": "lecture",
+        "title": "Funkce čtené podruhé",
+        "path": "vyuka_downloaded/materialy/python/functions/_functions.html",
+        "slug": "_functions",
+        "tags": [
+          "Skip"
+        ],
+        "relevance": 3,
+        "diff": "basics",
+        "desc": "Vyřazená přednáška: Funkce čtené podruhé",
+        "compare": "Téma původně zařazené do Týdne 4.",
+        "week": 99,
+        "targetWeek": 4,
+        "exists": true,
+        "isRemoved": true,
+        "totalSlides": 10,
+        "liveSlides": 0,
+        "estMinutes": 0,
+        "suggestions": [
+          {
+            "targetWeek": 0,
+            "label": "Týden 0",
+            "reason": "Alternativní flexibilní zařazení."
+          },
+          {
+            "targetWeek": 9,
+            "label": "Týden 9",
+            "reason": "Následující logický krok ve výuce."
+          }
+        ],
+        "studied": false
+      }
+    ],
+    "exercises": []
+  }
+];
+    const initialCurriculum = JSON.parse(JSON.stringify(curriculum));
+
+    function renderBoard() {
+      const container = document.getElementById('weeks-board');
+      container.innerHTML = '';
+
+      let totalDecks = 0;
+      let studiedDecks = 0;
+      let coreDecks = 0;
+      let coreStudied = 0;
+      let overloadedCount = 0;
+
+      curriculum.forEach((weekObj) => {
+        const isGray = weekObj.week === 99;
+        const weekLabel = isGray ? 'W99' : 'W' + weekObj.week;
+
+        let liveSlides = 0;
+        let weekStudied = 0;
+        let skipDecksCount = 0;
+
+        weekObj.lectures.forEach(l => {
+          totalDecks++;
+          const tag = l.tags?.[0] || 'Core';
+          const isSkip = tag === 'Skip';
+          const isCore = tag === 'Core';
+          
+          if (isSkip) {
+            skipDecksCount++;
+          } else {
+            if (isCore) coreDecks++;
+            liveSlides += (l.liveSlides || 7);
+          }
+
+          if (l.studied) {
+            studiedDecks++;
+            weekStudied++;
+            if (isCore) coreStudied++;
+          }
+        });
+
+        const estMins = Math.round(liveSlides * 2.2);
+        let statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#1e1e1e] text-[#4ec9b0] border border-[#333333]">⚖️ ' + estMins + ' min (~' + liveSlides + ' slides) · OPTIMAL</span>';
+        if (estMins > 95 && !isGray) {
+          overloadedCount++;
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#1e1e1e] text-[#f48771] border border-[#f48771]/30">🚨 ' + estMins + ' min (~' + liveSlides + ' slides) · OVERLOAD</span>';
+        } else if (estMins < 50 && !isGray) {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#1e1e1e] text-[#4fc1ff] border border-[#333333]">🟢 ' + estMins + ' min (~' + liveSlides + ' slides) · LIGHT</span>';
+        } else if (isGray) {
+          statusBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-mono text-[#858585] border border-[#333333]">📦 Self-Study Shelf</span>';
+        }
+
+        const weekSec = document.createElement('section');
+        weekSec.className = 'bg-[#252526] border ' + (isGray ? 'border-dashed border-[#333333] opacity-90' : 'border-[#333333]') + ' rounded';
+        weekSec.dataset.week = weekObj.week;
+
+        const weekPct = weekObj.lectures.length ? Math.round((weekStudied / weekObj.lectures.length) * 100) : 0;
+
+        weekSec.innerHTML = `
+          <!-- Week Header Row -->
+          <div class="px-3 py-2 bg-[#2d2d2d] border-b border-[#333333] flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-[#1e1e1e] text-[#4fc1ff] border border-[#333333]">
+                ${weekLabel}
+              </span>
+              <h3 class="font-bold text-white text-xs">${weekObj.title}</h3>
+            </div>
+
+            <div class="flex items-center gap-2">
+              ${weekObj.milestone ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-[#2d2d2d] text-[#e2b714] border border-[#e2b714]/30">🏆 ' + weekObj.milestone.title + '</span>' : ''}
+              ${statusBadge}
+              <span class="text-[11px] text-[#858585] font-mono">${weekStudied}/${weekObj.lectures.length} (${weekPct}%)</span>
+            </div>
+          </div>
+
+          <!-- Dropzone Tiles Grid -->
+          <div class="week-dropzone p-3 min-h-[70px] transition-colors"
+               ondragover="handleDragOver(event)" 
+               ondragleave="handleDragLeave(event)" 
+               ondrop="handleDrop(event, ${weekObj.week})">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+              ${weekObj.lectures.map((l) => renderStudyTileHtml(l, weekObj.week)).join('')}
+            </div>
+
+            ${weekObj.lectures.length === 0 ? '<div class="text-[11px] text-[#858585] py-4 text-center italic">Přetáhněte sem přednášky.</div>' : ''}
+          </div>
+        `;
+
+        container.appendChild(weekSec);
+      });
+
+      // Update Hero Stats
+      document.getElementById('stat-total').textContent = totalDecks;
+      document.getElementById('stat-studied').textContent = studiedDecks;
+      document.getElementById('stat-core').textContent = coreDecks;
+      document.getElementById('stat-overloaded').textContent = overloadedCount;
+
+      const totalPct = totalDecks ? Math.round((studiedDecks / totalDecks) * 100) : 0;
+      document.getElementById('hero-progress-pct').textContent = totalPct + '%';
+      document.getElementById('hero-progress-fg').setAttribute('stroke-dasharray', totalPct + ', 100');
+
+      const corePct = coreDecks ? Math.round((coreStudied / coreDecks) * 100) : 0;
+      document.getElementById('label-core-pct').textContent = corePct + '%';
+      document.getElementById('bar-core-pct').style.width = corePct + '%';
+
+      const labPct = totalPct;
+      document.getElementById('label-lab-pct').textContent = labPct + '%';
+      document.getElementById('bar-lab-pct').style.width = labPct + '%';
+    }
+
+    function renderStudyTileHtml(l, weekNumber) {
+      const tag = l.tags?.[0] || 'Core';
+      const isSkip = tag === 'Skip';
+      const suggestions = l.suggestions || [];
+
+      return `
+        <div class="study-tile ${isSkip ? 'tile-skip' : ''} relative p-2.5 flex flex-col justify-between space-y-1.5"
+             draggable="true"
+             ondragstart="handleDragStart(event, '${l.slug}', ${weekNumber})"
+             ondragend="handleDragEnd(event)">
+          
+          <!-- Top Row: Checkbox + Title + Badge -->
+          <div class="flex items-start justify-between gap-1.5">
+            <div class="flex items-center gap-1.5 overflow-hidden">
+              <input type="checkbox" ${l.studied ? 'checked' : ''} 
+                onchange="toggleStudied('${l.slug}', this.checked)"
+                class="w-3 h-3 rounded bg-[#1e1e1e] border-[#333333] text-[#007acc] cursor-pointer">
+              <span class="font-bold text-[11px] ${isSkip ? 'text-[#858585]' : 'text-[#cccccc]'} hover:text-white line-clamp-1" title="${l.title}">
+                ${l.title}
+              </span>
+            </div>
+            <span class="px-1 py-0.2 rounded text-[9px] font-bold uppercase tracking-wider badge-${tag}">
+              ${tag}
+            </span>
+          </div>
+
+          <!-- Bottom Row: Slides, Minutes & Slug -->
+          <div class="flex items-center justify-between text-[10px] text-[#858585] font-mono pt-1 border-t border-[#333333]">
+            <span>${isSkip ? '0 min (Ref)' : (l.liveSlides || 7) + ' slides (~' + (l.estMinutes || 15) + ' min)'}</span>
+            <span class="text-[#666666]">${l.slug}</span>
+          </div>
+
+          <!-- Hover VS Code QuickPick / Suggestion Popover -->
+          <div class="quickpick-popover absolute left-0 right-0 -bottom-1 translate-y-full z-40 bg-[#252526] border border-[#007acc] rounded p-2.5 shadow-2xl space-y-1.5 text-xs">
+            <div class="flex items-center justify-between border-b border-[#333333] pb-1">
+              <span class="font-bold text-[#38bdf8] uppercase text-[9px] tracking-wider">💡 2 Doporučená umístění</span>
+              <span class="text-[9px] text-[#858585] font-mono">rel: ${l.relevance}/10</span>
+            </div>
+            
+            <div class="space-y-1">
+              ${suggestions.slice(0, 2).map((sug) => `
+                <div class="bg-[#1e1e1e] p-1.5 rounded border border-[#333333] flex items-center justify-between gap-2">
+                  <div class="space-y-0.5">
+                    <div class="font-bold text-white text-[10px]">${sug.label}</div>
+                    <div class="text-[9px] text-[#858585]">${sug.reason}</div>
+                  </div>
+                  <button onclick="moveDeckToWeek('${l.slug}', ${sug.targetWeek})" 
+                    class="px-2 py-0.5 rounded bg-[#007acc]/20 hover:bg-[#007acc] text-[#38bdf8] hover:text-white border border-[#007acc]/40 text-[9px] font-bold transition-all whitespace-nowrap">
+                    Přesunout ➔
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+        </div>
+      `;
+    }
+
+    let draggedSlug = null;
+    let sourceWeek = null;
+
+    function handleDragStart(e, slug, weekNum) {
+      draggedSlug = slug;
+      sourceWeek = weekNum;
+      e.target.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', slug);
+    }
+
+    function handleDragEnd(e) {
+      e.target.classList.remove('dragging');
+      document.querySelectorAll('.week-dropzone').forEach(el => el.classList.remove('drag-over'));
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      const dropzone = e.target.closest('.week-dropzone');
+      if (dropzone) dropzone.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      const dropzone = e.target.closest('.week-dropzone');
+      if (dropzone) dropzone.classList.remove('drag-over');
+    }
+
+    function handleDrop(e, targetWeekNum) {
+      e.preventDefault();
+      const dropzone = e.target.closest('.week-dropzone');
+      if (dropzone) dropzone.classList.remove('drag-over');
+
+      if (!draggedSlug || sourceWeek === null) return;
+      moveDeckToWeek(draggedSlug, targetWeekNum);
+      draggedSlug = null;
+      sourceWeek = null;
+    }
+
+    function moveDeckToWeek(slug, targetWeekNum) {
+      let foundDeck = null;
+      for (const w of curriculum) {
+        const idx = w.lectures.findIndex(l => l.slug === slug);
+        if (idx !== -1) {
+          foundDeck = w.lectures.splice(idx, 1)[0];
+          break;
+        }
+      }
+
+      if (!foundDeck) return;
+
+      const targetWeek = curriculum.find(w => w.week === targetWeekNum);
+      if (targetWeek) {
+        targetWeek.lectures.push(foundDeck);
+      }
+
+      renderBoard();
+    }
+
+    function toggleStudied(slug, isChecked) {
+      for (const w of curriculum) {
+        const deck = w.lectures.find(l => l.slug === slug);
+        if (deck) {
+          deck.studied = isChecked;
+          break;
+        }
+      }
+      renderBoard();
+    }
+
+    function resetToSlowPaced() {
+      curriculum = JSON.parse(JSON.stringify(initialCurriculum));
+      renderBoard();
+    }
+
+    function exportCurriculumJson() {
+      const exportObj = {
+        meta: {
+          version: "2.0.0-slow-paced-13w",
+          updated_at: new Date().toISOString()
+        },
+        weeks: curriculum.map(w => ({
+          week: w.week,
+          id: w.id,
+          title: w.title,
+          objective: w.objective,
+          c_java_bridge: w.c_java_bridge,
+          milestone: w.milestone,
+          lectures: w.lectures.map(l => ({
+            id: l.id,
+            kind: "lecture",
+            title: l.title,
+            path: l.path,
+            slug: l.slug,
+            tags: l.tags,
+            relevance: l.relevance,
+            diff: l.diff,
+            desc: l.desc,
+            compare: l.compare,
+            week: w.week
+          })),
+          exercises: (w.exercises || []).map(ex => ({
+            id: ex.id,
+            kind: "exercise",
+            title: ex.title,
+            path: ex.path,
+            slug: ex.slug,
+            tags: ex.tags,
+            relevance: ex.relevance,
+            diff: ex.diff,
+            desc: ex.desc,
+            compare: ex.compare,
+            week: w.week
+          }))
+        }))
+      };
+
+      document.getElementById('export-json-textarea').value = JSON.stringify(exportObj, null, 2);
+      const modal = document.getElementById('export-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeExportModal() {
+      const modal = document.getElementById('export-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function copyExportJson() {
+      const textarea = document.getElementById('export-json-textarea');
+      textarea.select();
+      navigator.clipboard.writeText(textarea.value);
+      const btn = document.getElementById('btn-copy-json');
+      btn.textContent = '✓ Zkopírováno!';
+      setTimeout(() => { btn.textContent = 'Kopírovat do schránky'; }, 2000);
+    }
+
+    renderBoard();
+  </script>
+</body>
+</html>
