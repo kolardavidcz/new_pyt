@@ -1,689 +1,387 @@
 {
-  "numpy_overview": [
+  "times+dates": [
     {
       "id": "q1",
-      "type": "predict_output",
-      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "type": "multiple_choice",
+      "question": "Jaký atribut určuje, zda je objekt datetime v Pythonu naivní (naive) nebo informovaný (aware)?",
       "options": [
-        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
-        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
-        "C) Vektor array([3, 8]) získaný násobením po složkách.",
-        "D) Výjimka ValueError kvůli nedefinovanému skládání vektorů."
+        "A) Atribut utc_offset, který vrací celočíselný posun v sekundách nebo hodnotu -1 při nepřiřazení.",
+        "B) Atribut is_aware, který obsahuje logickou hodnotu False u naivních a True u informovaných.",
+        "C) Atribut timezone, který uchovává textový název časového pásma nebo prázdný řetězec \"\".",
+        "D) Atribut tzinfo, který obsahuje None u naivních objektů a instanci časové zóny u informovaných."
       ],
-      "answer": 2,
-      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "answer": 3,
+      "explanation": "Naivní objekty datetime mají v atributu tzinfo hodnotu None. Informované objekty obsahují referenci na instanci třídy dědící z tzinfo (např. timezone.utc nebo objekt z pytz).",
       "code": null
     },
     {
       "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte funkci z modulu calendar, která převede časovou n-tici struct_time v čase UTC na počet sekund od počátku epochy (timestamp).",
       "options": [
-        "A) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
-        "B) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
-        "C) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách.",
-        "D) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení."
+        "timegm",
+        "mktime",
+        "mktimes",
+        "gmtime"
       ],
-      "answer": 3,
-      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
-      "code": null
+      "answer": 0,
+      "explanation": "Funkce calendar.timegm() zpracovává struct_time v UTC a vrací počet sekund od unixové epochy (na rozdíl od time.mktime(), který předpokládá lokální čas).",
+      "code": "import time\nimport calendar\n\n# Časová struktura v koordinovaném světovém čase (UTC)\ntime_struct = time.gmtime()\n\n# Převod UTC struktury na unixový timestamp\nepoch_seconds = calendar.________(time_struct)\n# Výstup: 1770000000",
+      "expected": "timegm"
     },
     {
       "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Který moderní Python operátor provádí algebraické maticové násobení dvou np.ndarray objektů?",
-      "options": [
-        "@",
-        "*",
-        "%",
-        "&"
-      ],
-      "answer": 0,
-      "explanation": "Od Pythonu 3.5 byl zaveden operátor @ (např. matrix_a @ matrix_b) přímo pro maticové násobení vícerozměrných polí.",
-      "expected": "@",
-      "code": "res = matrix_a ________ matrix_b"
-    },
-    {
-      "id": "q4",
       "type": "true_false_tricky",
-      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "question": "Vyhodnoťte pravdivost tvrzení o chování metody datetime.timestamp() při volání na naivním objektu datetime:\n\nMetoda timestamp() u naivního objektu datetime automaticky předpokládá, že zadaný čas je v UTC, a provede přímý výpočet bez závislosti na nastavení systému.",
       "options": [
-        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
-        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+        "A) Nepravda – u naivního objektu se předpokládá lokální čas systému a k přepočtu na epochu se použije platformní céčkovská funkce mktime().",
+        "B) Pravda – u naivního objektu se předpokládá univerzální čas UTC a k přepočtu na epochu se použije interní matematika bez závislosti na systému."
       ],
-      "answer": 1,
-      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "answer": 0,
+      "explanation": "Pokud je objekt datetime naivní (tzinfo=None), metoda timestamp() jej interpretuje jako lokální čas a používá kód spoléhající na platformní funkci mktime(), což může vést k chybám či výjimce OverflowError.",
       "code": null
-    },
-    {
-      "id": "q5",
-      "type": "predict_output",
-      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
-      "options": [
-        "A) array([1, 1, 1])",
-        "B) array([1, 2, 3])",
-        "C) array([0, 0, 0])",
-        "D) array([0, 1, 2])"
-      ],
-      "answer": 1,
-      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
-      "code": null
-    }
-  ],
-  "arrays.creation": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jak se liší metody flatten() a ravel() při převedení vícerozměrného pole na jednorozměrný vektor?",
-      "options": [
-        "A) Obě metody vždy vytvářejí novou kopii paměti a liší se pouze v pořadí řazení prvků v paměti.",
-        "B) flatten() vždy vytváří novou kopii paměti, zatímco ravel() vrací podle možností pouhý pohled.",
-        "C) Obě metody vrací výhradně nový pohled na původní data a nealokují žádnou novou paměťový blok.",
-        "D) ravel() vždy vytváří novou kopii paměti, zatímco flatten() vrací podle možností pouhý pohled."
-      ],
-      "answer": 1,
-      "explanation": "Metoda flatten() pokaždé alokuje nové pole a zkopíruje data. Metoda ravel() zachovává odkaz na původní paměťový blok (vrací view) a vytváří kopii pouze tehdy, když data nejsou v paměti souvislá.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "predict_output",
-      "question": "Co vrátí atribut shape pro pole vytvořené výrazem np.arange(12).reshape(3, -1)?",
-      "options": [
-        "A) (4, 3)",
-        "B) (2, 3)",
-        "C) (3, 4)",
-        "D) (3, 2)"
-      ],
-      "answer": 2,
-      "explanation": "Hodnota -1 v reshape informuje NumPy, aby příslušnou dimenzi dopočítal z celkového počtu prvků. 12 prvků rozdělených do 3 řádků dá 12 / 3 = 4 sloupce.",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Která funkce knihovny NumPy vytvoří 2D matici s jedničkami na zadané diagonále (posunuté parametrem k) a nulami jinde?",
-      "options": [
-        "tri",
-        "identity",
-        "diag",
-        "eye"
-      ],
-      "answer": 3,
-      "explanation": "Funkce np.eye(N, k=k) generuje 2D matici s jedničkami na diagonále určené parametrem k (k=0 hlavní diagonála, k=1 nadúhlopříčka).",
-      "code": "import numpy as np\n\n# Vytvoření matice 3x3 s jedničkami na diagonále posunuté o +1 nad hlavní\nmatrix = np.________(3, k=1)\n# Vystup:\n# array([[0., 1., 0.],\n#        [0., 0., 1.],\n#        [0., 0., 0.]])",
-      "expected": "eye"
     },
     {
       "id": "q4",
-      "type": "predict_output",
-      "question": "Co je výstupem příkazu np.linspace(2.0, 4.0, num=5)?",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi metodami datetime.strptime() a datetime.strftime()?",
       "options": [
-        "A) array([2. , 2.5, 3. , 3.5, 4. ])",
-        "B) array([2. , 2.25, 2.5, 2.75, 3. ])",
-        "C) array([2. , 2.4, 2.8, 3.2, 3.6])",
-        "D) array([2. , 2.5, 3. , 3.5, 4.5])"
+        "A) strptime() provádí konverzi času do UTC pásma, zatímco strftime() převede UTC čas na lokální časovou zónu systému.",
+        "B) strptime() převádí textový řetězec na objekt datetime, zatímco strftime() formátuje datetime objekt na textový řetězec.",
+        "C) strptime() vypisuje časový objekt na standardní výstup, zatímco strftime() načítá vstupní čas z konzole od uživatele.",
+        "D) strptime() zjišťuje aktuální systémový čas, zatímco strftime() nastavuje nový systémový čas operačního systému."
       ],
-      "answer": 0,
-      "explanation": "Na rozdíl od arange funkce linspace implicitně zahrnuje koncový bod intervalu (endpoint=True). Pět rovnoměrně rozložených bodů mezi 2.0 a 4.0 vytváří krok 0.5.",
+      "answer": 1,
+      "explanation": "strptime (string parse time) parsuje text podle zadávaného formátu na objekt datetime. strftime (string format time) převádí objekt datetime na zformátovaný textový řetězec.",
       "code": null
     },
     {
       "id": "q5",
-      "type": "multiple_choice",
-      "question": "Jaký je rozdíl mezi funkcemi np.concatenate((a, b)) a np.stack((a, b)) pro dvě pole se stejným tvarem (3, 3)?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu, která přiřadí naivnímu objektu datetime časovou zónu UTC beze změny hodnot hodin a minut.",
       "options": [
-        "A) concatenate vyhladí pole do 1D vektoru o délce 18, zatímco stack zachová dvě samostatná 2D pole v seznamu.",
-        "B) concatenate spojí pole v existující dimenzi na tvar (6, 3), zatímco stack vytvoří novou dimenzi (2, 3, 3).",
-        "C) Obě funkce vrátí rozměrově zcela identické 2D pole o tvaru (3, 6) a liší se pouze v interní alokaci paměti.",
-        "D) stack spojí pole v existující dimenzi na tvar (6, 3), zatímco concatenate vytvoří novou dimenzi (2, 3, 3)."
+        "astimezone",
+        "set_tz",
+        "replace",
+        "convert"
       ],
-      "answer": 1,
-      "explanation": "np.concatenate spájí pole podél již existující osy (přičemž ndim se nemění). np.stack vytváří novou osu a pole skládá podél ní, čímž zvýší ndim o 1.",
-      "code": null
+      "answer": 2,
+      "explanation": "Metoda datetime.replace(tzinfo=...) vytvoří novou instanci se zadanou časovou zónou bez časového posunu hodnot hodin a minut.",
+      "code": "from datetime import datetime, timezone\n\n# Naivní čas záznamu z laboratorního spektrometru\nnaive_dt = datetime(2026, 8, 9, 14, 30, 0)\n\n# Přiřazení časové zóny UTC při zachování identického času 14:30\naware_dt = naive_dt.________(tzinfo=timezone.utc)\n# Výstup: datetime.datetime(2026, 8, 9, 14, 30, tzinfo=datetime.timezone.utc)",
+      "expected": "replace"
     },
     {
       "id": "q6",
-      "type": "predict_output",
-      "question": "Jaký výstup vrátí volání np.where(np.array([10, 20, 30]) > 15, 1, 0)?",
+      "type": "multiple_choice",
+      "question": "K čemu slouží parametr fold v metodě replace() u objektu datetime zavedený v Pythonu 3.6?",
       "options": [
-        "A) array([1, 0, 0])",
-        "B) array([0, 0, 1])",
-        "C) array([0, 1, 1])",
-        "D) array([1, 1, 0])"
+        "A) K určení způsobu zaokrouhlování mikrosekund při převodu na celé sekundy (0 dolů, 1 nahoru k celému číslu).",
+        "B) K zapnutí automatické korekce přestupných sekund nahromaděných v éře UNIXového počítání (0 vypnuto, 1 zapnuto).",
+        "C) K nastavení počtu nanosekund přidávaných k běžné sekundové přesnosti (0 pro sekundy, 1 pro nanosekundy).",
+        "D) K rozlišení dvou stejných lokálních časů nastávajících při zimním posunu času (0 pro dřívější, 1 pro pozdější)."
       ],
-      "answer": 2,
-      "explanation": "Formát np.where(condition, x, y) funguje jako vektorizovaný ternární operátor. Na pozicích, kde je podmínka splněna (20 > 15 a 30 > 15), vrací 1, jinak 0.",
+      "answer": 3,
+      "explanation": "Při podzimním přechodu z letního času na standardní čas nastávají stejné nástěnné časy dvakrát. Parametr fold rozlišuje první (0) a druhý (1) průchod stejného zobrazeného času.",
       "code": null
     },
     {
       "id": "q7",
-      "type": "predict_output",
-      "question": "Co vrátí operace np.choose([1, 0, 2], choices=[[1, 2, 3], [10, 20, 30], [100, 200, 300]])?",
+      "type": "multiple_choice",
+      "question": "Jaký bude účinek spuštění následujícího příkazu v Pythonu na platformě Linux?",
       "options": [
-        "A) array([1, 20, 300])",
-        "B) array([100, 2, 30])",
-        "C) array([10, 200, 3])",
-        "D) array([10, 2, 300])"
+        "A) Nastaví čas posledního přístupu i čas poslední modifikace souboru data.txt na aktuální systémový čas.",
+        "B) Vynuluje čas modifikace i čas přístupu souboru data.txt na začátek UNIXové epochy (1. ledna 1970).",
+        "C) Vyvolá výjimku TypeError, protože funkce os.utime() striktně vyžaduje předání n-tice časových údajů.",
+        "D) Smaže veškerá časová razítka souboru data.txt a nastaví přístupová práva k souboru na hodnotu 000."
+      ],
+      "answer": 0,
+      "explanation": "Volání os.utime(path) bez dalších argumentů (nebo s times=None) nastaví čas přístupu (atime) i modifikace (mtime) zadané cesty na aktuální systémový čas.",
+      "code": "import os\nos.utime(\"data.txt\")"
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi funkcemi time.localtime() a time.gmtime() z modulu time?",
+      "options": [
+        "A) localtime() provádí konverzi času pouze pro systém Windows, zatímco gmtime() funguje výhradně na systémech typu POSIX/Linux.",
+        "B) localtime() vrací struct_time v lokální časové zóně, zatímco gmtime() vrací struct_time v koordinovaném světovém čase UTC.",
+        "C) localtime() bere v úvahu pouze přestupné sekundy, zatímco gmtime() započítává pouze posuny letního a zimního času na Zemi.",
+        "D) localtime() vrací čas jako číslo typu float, zatímco gmtime() vrací objekt reprezentující zónu v podobě textového řetězce."
+      ],
+      "answer": 1,
+      "explanation": "Obě funkce převádějí sekundy od epochy na n-tici struct_time. localtime() zohledňuje nastavené lokální časové pásmo a DST, zatímco gmtime() vrací čas v nultém poledníku (UTC).",
+      "code": null
+    }
+  ],
+  "pandas_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jak je v knihovně Pandas vnitřně koncepčně strukturován objekt DataFrame?",
+      "options": [
+        "A) Jako trojrozměrný tenzor v NumPy, kde první dimenze drží datové typy a zbylé dvě drží hodnoty tabulky.",
+        "B) Jako statická pole C-struktur alokovaná v souvislém bloku paměti s pevně zafixovaným počtem řádků i sloupců.",
+        "C) Jako slovník sloupců, kde klíče jsou názvy sloupců a hodnotami jsou objekty Series sdílející společný index.",
+        "D) Jako jednorozměrný spojový seznam řádků, kde každý prvek obsahuje n-tici s libovolně proměnnými typy dat."
+      ],
+      "answer": 2,
+      "explanation": "DataFrame je v podstatě mapování (slovník) z názvů sloupců na jednorozměrná pole Series, přičemž všechny sloupce sdílejí stejný řádkový index. Přidání sloupce je proto levné, zatímco přidání řádku je náročné.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o procházení řádků v Pandas pomocí cyklu for nebo metody iterrows():\n\nRuční iterace po řádcích DataFrame pomocí cyklu for nebo iterrows() je doporučený a nejrychlejší způsob úpravy dat v Pandas.",
+      "options": [
+        "A) Nepravda – iterace po řádcích je v Pandas považována za antipattern; pro efektivní zpracování se používají vektorizované operace.",
+        "B) Pravda – iterace po řádcích přímo využívá C-API Pythonu, a je proto znatelně rychlejší než vektorizovaný výpočet přes sloupce."
+      ],
+      "answer": 0,
+      "explanation": "Procházení po řádcích u sloupcově orientovaného DataFrame vyžaduje opakovaný přístup napříč všemi samostatnými objekty Series. Vytváří obrovskou režii, proto jde v Pandas o známý antipattern.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Doplňte chybějící syntaxi závorek pro výběr pod-tabulky se sloupci A a B jako nového DataFrame:\n\nimport pandas as pd\ndf = pd.DataFrame({'A': [1, 2], 'B': [3, 4], 'C': [5, 6]})\nsub_df = df________'A', 'B'________:",
+      "options": [
+        "[ a ]",
+        "([ a ])",
+        "{( a )}",
+        "[[ a ]]"
       ],
       "answer": 3,
-      "explanation": "np.choose vybírá z pole možností choices podle indexů: pro 1. prvek vybere choices[1][0] = 10, pro 2. prvek choices[0][1] = 2 a pro 3. prvek choices[2][2] = 300.",
+      "explanation": "Jednoduché hranaté závorky df['A'] vrací jednorozměrný objekt Series. Pro výběr více sloupců a zachování typu DataFrame se seznam názvů sloupců předává uvnitř dvojitých závorek df[['A', 'B']].",
+      "expected": "[[ a ]]",
+      "code": "import pandas as pd\ndf = pd.DataFrame({'A': [1, 2], 'B': [3, 4], 'C': [5, 6]})\nsub_df = df________'A', 'B'________"
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "Jaký datový typ vrátí metoda df['kategorie'].unique() při zavolání na sloupec Pandas?",
+      "options": [
+        "A) NumPy pole ndarray obsahující pouze unikátní hodnoty z daného sloupce.",
+        "B) Nový objekt typu Pandas Series indexovaný celými čísly od nuly nahoru.",
+        "C) Standardní pythonovský seznam list všech unikátních řetězců v datovém sloupci.",
+        "D) Vestavěnou pythonovskou množinu set bez zachování původního pořadí prvků."
+      ],
+      "answer": 0,
+      "explanation": "Metoda .unique() na objektu Series nevrací Python list ani set, ale NumPy jednorozměrné pole ndarray unikátních hodnot v pořadí jejich prvního výskytu.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Proč se při vyhodnocování složených podmínek ve fancy indexingu v Pandas musí používat operátory &, | a ~ místo and, or a not?",
+      "options": [
+        "A) Slova and a or jsou v syntaxi Pandas vyrazena z důvodu zrychlení parsování výrazů při spuštění kódu v C-rozhraní.",
+        "B) Bitové operátory jsou přetíženy pro prvek po prvku (element-wise), zatímco Python and/or vyhodnocují pravdivost celého objektu.",
+        "C) Bitové operátory automaticky konvertují chybějící hodnoty NaN na False, což klíčová slova and a or nedokážou zaručit.",
+        "D) Operátory and a or pracují výhradně s celými čísly, zatímco bitové operátory & a | fungují i pro řetězce a desetinná čísla."
+      ],
+      "answer": 1,
+      "explanation": "Klíčová slova and a or se snaží zkonvertovat celý objekt Series na jedinou logickou hodnotu (vyvolá ValueError: Truth value of a Series is ambiguous). Pro porovnání po prvcích se musí použít bitové operátory &, |, ~ a podmínky obalit v závorkách.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "fill_blank_choice",
+      "question": "Doplňte chybějící vlastnost pro použití vektorizovaných řetězcových metod nad sloupcem Series:\n\nimport pandas as pd\ndf = pd.DataFrame({'jmena': ['Anna', 'Petr', 'Pavel']})\nmask = df['jmena'].________.startswith('P'):",
+      "options": [
+        "char",
+        "string",
+        "str",
+        "text"
+      ],
+      "answer": 2,
+      "explanation": "Akcesor .str zpřístupňuje vektorizované řetězcové metody (jako contains(), startswith(), lower()) nad všemi prvkami objektu Series.",
+      "expected": "str",
+      "code": "import pandas as pd\ndf = pd.DataFrame({'jmena': ['Anna', 'Petr', 'Pavel']})\nmask = df['jmena'].________.startswith('P')"
+    },
+    {
+      "id": "q7",
+      "type": "predict_output",
+      "question": "Co vrátí výraz df.iloc[0:2] zavolaný na DataFrame se 5 řádky?",
+      "options": [
+        "A) Objekt Series představující hodnoty z nultého sloupce pro první dva řádky.",
+        "B) Nový DataFrame obsahující první tři řádky (na pozicích 0, 1 a 2).",
+        "C) Jediný prvek z prvního řádku a druhého sloupce v původní tabulce df.",
+        "D) Nový DataFrame obsahující první dva řádky (na pozicích indexu 0 a 1)."
+      ],
+      "answer": 3,
+      "explanation": "Pseudometoda iloc[] používá celočíselné pozicové indexování dodržující konvence slicing [start:stop], kde stop pozice (2) není zahrnuta. Výsledkem pro 0:2 jsou tedy řádky 0 a 1.",
       "code": null
     },
     {
       "id": "q8",
       "type": "multiple_choice",
-      "question": "Jak vypočítá NumPy paměťové odsazení (offset v bajtech) pro prvek m[i, j] v 2D poli pomocí atributu strides?",
+      "question": "Jaký je hlavní rozdíl mezi metodami df.info() a df.head() v Pandas?",
       "options": [
-        "A) offset = m.strides[0] * i + m.strides[1] * j",
-        "B) offset = (m.strides[0] + m.strides[1]) * (i + j)",
-        "C) offset = m.strides[1] * i + m.strides[0] * j",
-        "D) offset = m.itemsize * i * j + m.strides[0]"
+        "A) info() vypisuje technické shrnutí sloupců, typů a paměti, zatímco head() vrací prvních několik řádků datových hodnot.",
+        "B) info() odstraňuje z tabulky neplatné řádky NaN, zatímco head() vybírá pouze sloupečky s číselnými hodnotami.",
+        "C) info() mění datové typy sloupců na optimálnější, zatímco head() seřadí hodnoty v tabulce podle prvního sloupce.",
+        "D) info() vrací nový DataFrame s popisnou statistikou, zatímco head() ukládá načtená data přímo na disk do souboru."
       ],
       "answer": 0,
-      "explanation": "Atribut strides udává počet bajtů, které je nutné přeskočit v paměti pro posun o 1 index v dané dimenzi. Pro 2D pole je offset od začátku data roven strides[0]*i + strides[1]*j.",
-      "code": null
-    },
-    {
-      "id": "q9",
-      "type": "true_false_tricky",
-      "question": "Porovnejte výsledek metody nonzero() a porovnání s nula v NumPy.",
-      "options": [
-        "A) Metoda nonzero() vrací n-tici polí s indexy nenulových prvků, zatímco porovnání x != 0 vrací pravdivostní masku.",
-        "B) Metoda nonzero() vrací pravdivostní masku nenulových prvků, zatímco porovnání x != 0 vrací n-tici polí s indexy."
-      ],
-      "answer": 0,
-      "explanation": "x.nonzero() vrací tuple indexových polí pro každou dimenzi (ekvivalent np.where(x != 0)), zatímco výraz x != 0 vrací boolean ndarray stejného tvaru jako x.",
+      "explanation": "df.info() vypíše na standardní výstup souhrn o počtu nepotvrzených (non-null) záznamů, datových typech dtype každého sloupce a využití paměti. df.head() vrací nový DataFrame obsahující počáteční řádky.",
       "code": null
     }
   ],
-  "arrays.operation": [
+  "pandas_example_1": [
     {
       "id": "q1",
-      "type": "predict_output",
-      "question": "Co je výsledkem výrazu np.sum(np.array([[1, 2], [3, 4]]), axis=0)?",
+      "type": "multiple_choice",
+      "question": "Jakou externí knihovnu vyžaduje Pandas při prvním pokusu o načtení excelovského souboru .xlsx přes pd.read_excel()?",
       "options": [
-        "A) array([2, 8])",
-        "B) array([4, 6])",
-        "C) array([1, 9])",
-        "D) array([3, 7])"
+        "A) Knihovnu xlsxwriter pro generování grafů a maker přímo uvnitř excelového sešitu.",
+        "B) Knihovnu openpyxl pro čtení a zápis moderních souborů ve formátu XLSX.",
+        "C) Knihovnu xlwt pro vytvoření zpětné kompatibility se starými binárními soubory.",
+        "D) Knihovnu pytz pro správnou interpretaci časových zón v buňkách s datem a časem."
       ],
       "answer": 1,
-      "explanation": "Parametr axis=0 provádí redukční sčítání podél nulté osy (napříč řádky). Sečtou se tedy odpovídající sloupce: 1+3=4 a 2+4=6.",
+      "explanation": "Pandas samotný neobsahuje parser pro Excel formáty. Pro načítání moderních .xlsx souborů spoléhá na knihovnu openpyxl (případně xlrd pro staré .xls).",
       "code": null
     },
     {
       "id": "q2",
-      "type": "multiple_choice",
-      "question": "Proč je při slučování pravdivostních podmínek u polí v NumPy nutné psát (a <= b) & (b <= c) s prázdnými závorkami?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte parametr do funkce read_excel() pro načtení konkrétního listu sešitu pojmenovaného data:\n\nimport pandas as pd\ndf = pd.read_excel('klementinum.xlsx', ________='data'):",
       "options": [
-        "A) Operátor & má v Pythonu nižší prioritu než porovnávací operátory <=, závorky slouží pouze pro přehlednost kódu.",
-        "B) NumPy vyžaduje závorky z důvodu optimalizace C-vektorizace, jinak vygeneruje výjimku typu RuntimeError.",
-        "C) Operátor & má v Pythonu vyšší prioritu než porovnávací operátory <=, bez závorek tak selže syntaktický rozklad.",
-        "D) Operátor & automaticky převede vstupní pole na celá čísla, pokud výrazy po stranách neuzavřete do n-tice."
+        "work_sheet",
+        "sheet",
+        "sheet_name",
+        "tab_name"
       ],
       "answer": 2,
-      "explanation": "V Pythonu mají bitové operátory (&, |, ~) vyšší prioritu než porovnávací operátory (<=, ==). Výraz a <= b & b <= c by se tak vyhodnotil jako a <= (b & b) <= c.",
-      "code": null
+      "explanation": "Parametr sheet_name ve funkci pd.read_excel() určuje, který list sešitu se má načíst (lze předat název jako řetězec, číslo listu od 0, nebo seznam pro načtení více listů).",
+      "expected": "sheet_name",
+      "code": "import pandas as pd\ndf = pd.read_excel('klementinum.xlsx', ________='data')"
     },
     {
       "id": "q3",
       "type": "predict_output",
-      "question": "Jaký výstup vrátí volání np.argsort(np.array([40, 10, 30, 20]))?",
+      "question": "Co vypočítá metoda df.describe() zavolaná na číselné sloupce v DataFrame?",
       "options": [
-        "A) array([0, 2, 3, 1])",
-        "B) array([3, 1, 2, 0])",
-        "C) array([10, 20, 30, 40])",
-        "D) array([1, 3, 2, 0])"
+        "A) Korelační matici vzájemných lineárních závislostí mezi všemi dvojicemi číselných sloupců v dané tabulce.",
+        "B) Přesné počty výskytů všech unikátních řetězcových hodnot v každém sloupci seřazené od nejčastějších po nejméně časté.",
+        "C) Vektorizovaný součet všech prvků v řádcích s následným rozdělením podle jednotlivých měsíčních kategorií.",
+        "D) Základní popisné statistické charakteristiky jako počet, průměr, směrodatnou odchylku, minima, kvartily a maxima."
       ],
       "answer": 3,
-      "explanation": "np.argsort vrací pole indexů, které by původní pole seřadily vzestupně: nejmenší prvek 10 je na pozici 1, 20 je na pozici 3, 30 na 2 a 40 na 0.",
+      "explanation": "describe() generuje pro číselné sloupce přehled souhrnných statistik: count, mean, std, min, 25% kvartil, 50% medián, 75% kvartil a max.",
       "code": null
     },
     {
       "id": "q4",
-      "type": "predict_output",
-      "question": "Jaký výstup vrátí výraz np.cumsum(np.array([1, 2, 3, 4]))?",
-      "options": [
-        "A) array([1, 3, 6, 10])",
-        "B) array([10, 9, 7, 4])",
-        "C) array([1, 2, 3, 4])",
-        "D) array([1, 2, 6, 24])"
-      ],
-      "answer": 0,
-      "explanation": "Funkce cumsum počítá kumulativní součet prvků: [1, 1+2, 1+2+3, 1+2+3+4] = [1, 3, 6, 10].",
-      "code": null
-    },
-    {
-      "id": "q5",
       "type": "true_false_tricky",
-      "question": "Porovnejte funkce np.array_equal(a, b) a a == b při porovnání dvou polí NumPy.",
+      "question": "Vyhodnoťte pravdivost tvrzení o použití metody df.describe() na sloupec obsahující čísla měsíců (1 až 12):\n\nMetoda describe() automaticky rozpozná, že číslo měsíce je kategorický údaj, a místo průměru a směrodatné odchylky vrátí frekvenční tabulku výskytů.",
       "options": [
-        "A) np.array_equal vrací pole booleanů prvek po prvku, zatímco a == b vrací jediný skalární boolean True/False.",
-        "B) np.array_equal vrací jediný skalární boolean True/False, zatímco a == b vrací pole booleanů prvek po prvku."
+        "A) Pravda – describe() provádí sémantickou analýzu dat a pro čísla v rozmezí 1–12 přepne výpočet na počty unikátních hodnot.",
+        "B) Nepravda – describe() počítá statistiky (průměr, std) slepě pro jakýkoliv číselný typ (int/float), i když pro číslo měsíce nedávají smysl."
       ],
       "answer": 1,
-      "explanation": "a == b provádí prvek po prvku porovnání a vrací boolean ndarray. np.array_equal porovná celek a vrací skalární True pouze tehdy, když mají obě pole stejný tvar i identické prvky.",
+      "explanation": "Metoda describe() pracuje pouze na základě datového typu (dtype). Pokud je sloupec měsíce uložen jako int64, vypočítá pro něj průměr a směrodatnou odchylku bez ohledu na věcný smysl.",
       "code": null
-    },
-    {
-      "id": "q6",
-      "type": "fill_blank_choice",
-      "question": "Která univerzální funkce (ufunc) z modulu NumPy spočítá přirozený logaritmus (ln) po prvcích pole?",
-      "options": [
-        "log10",
-        "log",
-        "exp",
-        "ln"
-      ],
-      "answer": 1,
-      "explanation": "Funkce np.log() počítá v NumPy přirozený logaritmus (ln) prvek po prvku. Pro dekadický logaritmus slouží np.log10().",
-      "code": "import numpy as np\n\nconcentrations = np.array([1.0, np.e, np.e**2])\nln_c = np.________(concentrations)\n# Vystup: array([0., 1., 2.])",
-      "expected": "log"
     }
   ],
-  "arrays.slicing": [
+  "MatPlotLib": [
     {
       "id": "q1",
-      "type": "predict_output",
-      "question": "Co se stane s původním polem a po provedení následujícího kódu?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte funkci pro zjištění aktuálně aktivního renderovacího backendu knihovny Matplotlib:",
       "options": [
-        "A) Pole a bude mít hodnoty array([99, 2, 3, 4]).",
-        "B) Pole a bude mít hodnoty array([1, 2, 3, 4]).",
-        "C) Pole a bude mít hodnoty array([1, 99, 3, 4]).",
-        "D) Pole a bude mít hodnoty array([1, 2, 99, 4])."
+        "show_backend",
+        "get_backend",
+        "current_backend",
+        "get_renderer"
       ],
-      "answer": 2,
-      "explanation": "Klasický výřez [1:3] nevytváří novou kopii dat, ale pouze nový pohled (view). Úprava prvku v b přímo mění paměť původního pole a.",
-      "code": "a = np.array([1, 2, 3, 4])\nb = a[1:3]\nb[0] = 99"
+      "answer": 1,
+      "explanation": "Funkce matplotlib.get_backend() vrací název právě nastaveného backendu pro vykreslování grafů (např. 'QtAgg', 'TkAgg' nebo 'inline').",
+      "code": "import matplotlib\n\n# Zjištění aktivního grafického backendu:\nbackend = matplotlib.________()\n# Výstup např.: 'QtAgg' nebo 'inline'",
+      "expected": "get_backend"
     },
     {
       "id": "q2",
       "type": "multiple_choice",
-      "question": "Co se stane s původním polem a po provedení fancy indexování v tomto kódu?",
+      "question": "Co se stane, pokud funkci plt.plot() předáme pouze jednu jednodimenzionální sekvenci hodnot plt.plot([10, 20, 15])?",
       "options": [
-        "A) Pole a se zredukuje na 2D matici array([[1, 99], [3, 4]]) vytvořením kopie.",
-        "B) Kód selže s výjimkou IndexError, protože seznam indexů nevytváří platný výřez.",
-        "C) Pole a se změní na array([1, 99, 3, 4]), protože fancy indexování vrací pohled.",
-        "D) Pole a zůstane array([1, 2, 3, 4]), protože fancy indexování vrací kopii."
+        "A) Zadané hodnoty se použijí pro osu x a pro osu y se automaticky doplňují nulové hodnoty stejné délky.",
+        "B) Vyvolá se ValueError z důvodu chybějící druhé sekvence souřadnic nezbytné pro vykreslení osy y.",
+        "C) Zadané hodnoty se použijí pro osu y a pro osu x se automaticky vygeneruje posloupnost indexů 0, 1, 2.",
+        "D) Vykreslí se bodový graf na úhlopříčce, kde hodnoty osy x i osy y budou vzájemně shodné a rovny vstupu."
       ],
-      "answer": 3,
-      "explanation": "Fancy indexing (indexování seznamem nebo polem indexů) na rozdíl od výřezu vždy alokuje a vrací zcela novou kopii paměti. Změna b se v a neprojeví.",
-      "code": "a = np.array([1, 2, 3, 4])\nb = a[[1, 2]]\nb[0] = 99"
+      "answer": 2,
+      "explanation": "Předáme-li funkci `plt.plot()` pouze jediný seznam či pole hodnot, Matplotlib předpokládá, že jde o hodnoty na svislé ose y. Pro vodorovnou osu x vygeneruje automatické indexy `0, 1, ..., N-1`.",
+      "code": null
     },
     {
       "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Který objekt modulu NumPy se používá při indexaci k přidání nové dimenze o velikosti 1 do pole?",
+      "type": "multiple_choice",
+      "question": "Co v metodě plt.plot(x, y, 'ro-') specifikuje třetí řetězcový parametr 'ro-'?",
       "options": [
-        "newaxis",
-        "dim",
-        "addaxis",
-        "expand"
+        "A) Vytvoření rastrového (r) obrázku s ortogonálním (o) promítáním os a automatickou mřížkou (-).",
+        "B) Vykreslení růžového (r) obdélníkového (o) rámce okolo celého grafu s průhlednou výplní (-).",
+        "C) Vykreslení červených (r) bodů bez spojovací čáry s rotací popisků (o) o nastavený úhel (-).",
+        "D) Vykreslení červené (r) plné čáry (-) spojující jednotlivé datové body označené kroužky (o)."
       ],
-      "answer": 0,
-      "explanation": "Konstanta np.newaxis (alias pro None) vloží na danou pozici v indexu novou osu o velikosti 1.",
-      "code": "import numpy as np\n\nvector = np.array([10, 20, 30])  # shape: (3,)\ncolumn_matrix = vector[:, np.________]  # shape: (3, 1)\n# Vystup: array([[10], [20], [30]])",
-      "expected": "newaxis"
+      "answer": 3,
+      "explanation": "Formátovací řetězec v Matplotlibu kombinuje barvu ('r' = red), značku bodu ('o' = circle marker) a typ čáry ('-' = solid line). Výsledkem je červená plná čára s kroužky v datových bodech.",
+      "code": null
     },
     {
       "id": "q4",
-      "type": "true_false_tricky",
-      "question": "Porovnejte chování metody take() a fancy indexování pomocí seznamu indexů pro 1D pole.",
+      "type": "multiple_choice",
+      "question": "Jakým způsobem se docílí zobrazení popisu řad v legendě v modulu matplotlib.pyplot?",
       "options": [
-        "A) Metoda take() provádí výběr v dané ose rychleji než fancy indexování přes hranaté závorky.",
-        "B) Fancy indexování přes hranaté závorky provádí výběr v dané ose rychleji než metoda take()."
+        "A) Nastavením argumentu label ve funkci plot() a následným zavoláním samostatné funkce plt.legend().",
+        "B) Vytvořením samostatného textového pole pomocí plt.text() s explicitními souřadnicemi legendy.",
+        "C) Přímým předáním seznamu názvů řad jako jediného povinného argumentu do funkce plt.show().",
+        "D) Automatickým načtením jmen proměnných předaných do funkce plot() při zavolání plt.axis()."
       ],
       "answer": 0,
-      "explanation": "Metoda a.take(indices, axis=0) je C-optimalizovaný dedikovaný selektor pro výběr v jedné ose a dosahuje vyššího výkonu než obecný fancy indexing.",
+      "explanation": "Jednotlivým křivkám předáme pojmenovaný parametr `label='Název'` při volání `plt.plot()`. Aby se však legenda skutečně vykreslila do grafu, je nutné následně explicitně zavolat `plt.legend()`.",
       "code": null
     },
     {
       "id": "q5",
-      "type": "predict_output",
-      "question": "Jaký tvar (shape) bude mít pole b vytvořené výrazem b = a[..., 1:] pro 2D pole a o tvaru (3, 4)?",
+      "type": "multiple_choice",
+      "question": "Co vyjadřuje volání plt.subplot(211) v modulu pyplot?",
       "options": [
-        "A) (4, 3)",
-        "B) (3, 3)",
-        "C) (1, 3)",
-        "D) (3, 4)"
+        "A) Mřížku o 21 řádcích a 1 sloupci, přičemž aktivuje první buňku pro vykreslení nového podgrafu.",
+        "B) Mřížku o 2 řádcích a 1 sloupci, přičemž aktivuje první (horní) buňku pro kreslení podgrafu.",
+        "C) Nastavení rozlišení výstupního grafu na 211 DPI bez vytvoření nové mřížky pro podgrafy.",
+        "D) Vykreslení 211 samostatných bodů do jediného grafu s předdefinovaným stylem čar a bodů."
       ],
       "answer": 1,
-      "explanation": "Ellipsis (...) zastupuje všechny předchozí osy (zde 1. dimenzi o velikosti 3). Druhá dimenze s výřezem 1: zredukuje 4 sloupce na 3 (indexy 1, 2, 3), takže výsledek má tvar (3, 3).",
+      "explanation": "Zkrácený zápis `plt.subplot(211)` je ekvivalentní `plt.subplot(2, 1, 1)`. První číslice udává počet řádků (2), druhá počet sloupců (1) a třetí index aktivní buňky (1 = první buňka).",
       "code": null
     },
     {
       "id": "q6",
       "type": "multiple_choice",
-      "question": "Jak se liší zvětšení pole pomocí metody a.resize((2, 4)) a funkce np.resize(a, (2, 4)) pro pole a = np.array([[1, 2], [3, 4]])?",
+      "question": "Jak se liší pojmenování metod pro nastavení popisků os na objektu Axes oproti top-level funkcím pyplot?",
       "options": [
-        "A) Obě možnosti doplní nová místa nulami, ale metoda a.resize vždy vytváří úplně novou kopii dat v paměti.",
-        "B) Funkce np.resize doplní nová místa nulami, zatímco metoda a.resize doplní nová místa opakováním původních dat.",
-        "C) Metoda a.resize doplní nová místa nulami, zatímco funkce np.resize doplní nová místa opakováním původních dat.",
-        "D) Obě možnosti doplní nová místa opakováním dat, ale funkce np.resize selže, pokud na data existují pohledy."
+        "A) Metody na objektu Axes se volají s velkým počátečním písmenem (ax.Xlabel()), pyplot používá malé.",
+        "B) Metody na objektu Axes vyžadují předání objektu Figure jako prvního povinného argumentu metody.",
+        "C) Metody na objektu Axes mají předponu set_ (např. ax.set_xlabel()), zatímco pyplot volá plt.xlabel().",
+        "D) Metody na objektu Axes používají camelCase (např. ax.setXLabel()), zatímco pyplot vyžaduje snake_case."
       ],
       "answer": 2,
-      "explanation": "Metoda a.resize() mění tvar in-place a při zvětšení doplňuje nuly (vyžaduje absence pohledů nebo refcheck=False). Funkce np.resize() vrací novou kopii a při zvětšení opakuje prvky z původního pole.",
-      "code": null
-    },
-    {
-      "id": "q7",
-      "type": "predict_output",
-      "question": "Jaký výstup vrátí volání a.compress(a % 2 == 1, axis=0) pro pole a = np.array([2, 3, 4, 5, 6, 7])?",
-      "options": [
-        "A) array([0, 1, 0])",
-        "B) array([2, 4, 6])",
-        "C) array([1, 3, 5])",
-        "D) array([3, 5, 7])"
-      ],
-      "answer": 3,
-      "explanation": "Metoda compress vyberie prvky odpovídající True v pravdivostním poli. Podmínka a % 2 == 1 vybere lichá čísla: 3, 5 a 7.",
-      "code": null
-    }
-  ],
-  "broadcasting": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Kdy jsou dva rozměry os podle pravidla broadcasting v NumPy navzájem kompatibilní pro binární operaci?",
-      "options": [
-        "A) Pokud jsou odpovídající si rozměry os od konce buď zcela shodné, nebo je jeden z nich roven hodnotě 1.",
-        "B) Pokud mají obě pole stejný celkový počet prvkets bez ohledu na počet a rozměry jednotlivých dimenzí.",
-        "C) Pokud jsou všechny rozměry obou polí násobky čísla 2 a obě pole jsou alokována v souvislé paměti.",
-        "D) Pokud jsou odpovídající si rozměry os od začátku buď zcela shodné, nebo je jejich součet sudé číslo."
-      ],
-      "answer": 0,
-      "explanation": "Broadcasting zarovnává dimenze od konce (poslední osa směrem doleva). Dvě osy jsou kompatibilní právě tehdy, když mají stejnou velikost nebo je jedna z nich rovna 1 (ta se fiktivně roztáhne).",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "predict_output",
-      "question": "Jaký tvar bude mít výsledné pole po sečtení polí o tvarech (8, 1, 6, 1) a (7, 1, 5)?",
-      "options": [
-        "A) (7, 1, 6, 5)",
-        "B) (8, 7, 6, 5)",
-        "C) (8, 7, 1, 5)",
-        "D) (8, 1, 6, 5)"
-      ],
-      "answer": 1,
-      "explanation": "Zarovnání od konce: (8, 1, 6, 1) vs (1, 7, 1, 5). Porovnání os po osách dává: max(8,1)=8, max(1,7)=7, max(6,1)=6, max(1,5)=5 -> výsledek má tvar (8, 7, 6, 5).",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Co se stane při pokusu o sečtení polí a = np.array([0, 10, 20, 30]) a b = np.array([0, 1, 2])?",
-      "options": [
-        "A) Pole b se automaticky doplní nulou na konci na tvar (4,) a sečte se na [0, 11, 21, 30].",
-        "B) Výpočet selže s výjimkou TypeError kvůli nepřítomnosti 2D maticového operátoru @.",
-        "C) Výpočet selže s výjimkou ValueError kvůli nekompatibilním tvarům (4,) a (3,).",
-        "D) Vznikne 2D matice o tvaru (4, 3) obsahující všechny kombinace součtů prvků polí."
-      ],
-      "answer": 2,
-      "explanation": "Tvary (4,) a (3,) jsou v koncové ose nekompatibilní (4 != 3 a ani jedno není 1), proto NumPy vyvolá ValueError: operands could not be broadcast together.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "predict_output",
-      "question": "Jaký výstup vrátí operace np.array([[0], [10]]) + np.array([1, 2, 3])?",
-      "options": [
-        "A) array([[1, 11], [2, 12], [3, 13]])",
-        "B) array([[0, 1, 2], [11, 12, 13]])",
-        "C) array([[1, 2, 3], [10, 10, 10]])",
-        "D) array([[1, 2, 3], [11, 12, 13]])"
-      ],
-      "answer": 3,
-      "explanation": "První pole má tvar (2, 1), druhé (3,) tzn. (1, 3). Výsledný tvar je (2, 3). První řádek: 0 + [1,2,3] = [1,2,3]. Druhý řádek: 10 + [1,2,3] = [11,12,13].",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "fill_blank_choice",
-      "question": "Doplňte výraz pro povýšení 1D pole a o rozměru (4,) na sloupcový vektor (4, 1) umožňující broadcasting s polem o rozměru (3,).",
-      "options": [
-        "newaxis",
-        "axis",
-        "reshape",
-        "expand"
-      ],
-      "answer": 0,
-      "explanation": "Výraz a[:, np.newaxis] vytvoří z 1D pole sloupcovou matici o tvaru (4, 1), která se při sčítání s polem (3,) automaticky rozšíří na tvar (4, 3).",
-      "code": "import numpy as np\n\na = np.array([1, 2, 3, 4])  # shape: (4,)\nb = np.array([10, 20, 30])   # shape: (3,)\n\n# Vytvoření matice součtů tvaru (4, 3) přes broadcasting\ngrid = a[:, np.________] + b\n# grid.shape je (4, 3)",
-      "expected": "newaxis"
-    }
-  ],
-  "vectorization": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jaký je primární důvod pro vyhýbání se klasickým zanořeným smyčkám typu for přes prvky pole v NumPy?",
-      "options": [
-        "A) NumPy při použití smyčky for automaticky převádí všechna celá čísla na plovoucí čárku bez vědomí vývojáře.",
-        "B) Smyčky v čistoautorském Pythonu přinášejí velkou režii interpretu, zatímco vektorizované operace běží v C.",
-        "C) Pythonní smyčky zamknou paměťový buffer pole ndarray, takže z nich nelze zapisovat do jiných objektů NumPy.",
-        "D) Zanořené smyčky v Pythonu mají omezenou hloubku zanoření, takže na 3D a vyšší pole je vůbec nelze použít."
-      ],
-      "answer": 1,
-      "explanation": "Vektorizace nahrazuje pomalé smyčky v čistém Pythonu kompilovaným kódem v C. Pythonní smyčky nesou obrovskou režii dynamického typování, správy referencí a interpretu v každé iteraci, zatímco NumPy provede operaci nad souvislým blokem paměti v kompilovaném C rozhraní.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Kterou funkci modulu numpy použijete jako dekorátor pro převod skalární Python funkce na funkci pracující s NumPy poli prvek po prvku?",
-      "options": [
-        "elementwise",
-        "array_func",
-        "vectorize",
-        "ufunc"
-      ],
-      "answer": 2,
-      "explanation": "Dekorátor np.vectorize převede běžnou skalární Python funkci na univerzální funkci aplikovatelnou na celá NumPy pole prvek po prvku.",
-      "code": "import numpy as np\n\n@np.________\ndef classify_ph(val: float) -> str:\n    if val < 7.0:\n        return \"acidic\"\n    elif val > 7.0:\n        return \"basic\"\n    return \"neutral\"\n\nph_array = np.array([2.5, 7.0, 11.2])\n# classify_ph(ph_array) -> array(['acidic', 'neutral', 'basic'], dtype='<U7')",
-      "expected": "vectorize"
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jaký bude výsledek vykonání následujícího kódu pro 2D NumPy pole?",
-      "options": [
-        "A) TypeError — dekorovaná funkce nedokáže zpracovat dvoudimenzionální matici bez určení osy parametrů axis.",
-        "B) array([0, 1, 0, 1]) — dekorátor automaticky zploští vstupní pole do jednodimenzionálního vektoru výsledků.",
-        "C) 1 — funkce vyhodnotí matici jako jeden celistvý objekt a vrátí skalární pravdivostní hodnotu pro celé pole.",
-        "D) array([[0, 1], [0, 1]]) — funkce aplikuje podmínku prvek po prvku a zachová dvoudimenzionální tvar pole."
-      ],
-      "answer": 3,
-      "explanation": "Funkce odekorovaná pomocí `@np.vectorize` aplikuje vnitřní logiku na každý prvek vstupního pole bez ohledu na jeho dimenzionalitu a vrátí nové `ndarray` přesně stejného tvaru (shape), v tomto případě 2D matici `[[0, 1], [0, 1]]`.",
-      "code": "import numpy as np\n\n@np.vectorize\ndef f(x):\n    return 1 if x > 0 else 0\n\nprint(f(np.array([[-1, 2], [0, 5]])))"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jak se chová vestavěná funkce np.sign() při předání n-dimenzionálního pole ndarray?",
-      "options": [
-        "A) Aplikuje matematickou funkci signum na každý jednotlivý prvek pole bez ohledu na jeho dimenzionalitu a tvar.",
-        "B) Vyžaduje 1D vektor a pro vícerozměrná pole vždy vyvolá výjimku ValueError z důvodu neplatné dimenzionality.",
-        "C) Vrátí skalární hodnotu 1, pokud jsou všechny prvky pole kladné, a -1, pokud je v poli alespoň jedno záporné.",
-        "D) Vypočítá znaménko determinantu pro 2D matice a pro 1D vektory vrátí znaménko součtu všech obsažených prvků."
-      ],
-      "answer": 0,
-      "explanation": "Univerzální funkce (ufunc) v NumPy, jako je `np.sign()`, jsou navrženy tak, aby přijímaly skaláry i vícerozměrná pole libovolných rozměrů (0D, 1D, 2D atd.) a prováděly požadovanou operaci prvek po prvku s zachováním tvaru pole.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "fill_blank_choice",
-      "question": "Který operátor provede v Pythonu a NumPy maticové násobení či skalární součin dvou 1D vektorů?",
-      "options": [
-        "^",
-        "@",
-        "*",
-        "**"
-      ],
-      "answer": 1,
-      "explanation": "Infixový operátor @ provádí v NumPy maticové a vektorové násobení (skalární součin u 1D vektorů), zatímco operátor * násobí prvky po složkách.",
-      "code": "import numpy as np\n\nv = np.array([1.0, 2.0, 3.0])\n# Skalární součin vektoru v se sebou samým: 1*1 + 2*2 + 3*3\ndot_product = v ________ v\n# Vystup: 14.0",
-      "expected": "@"
-    }
-  ],
-  "struct": [
-    {
-      "id": "q1",
-      "type": "predict_output",
-      "question": "Jaký datový typ navrací funkce struct.unpack() po rozbalení jediného čtyřbajtového celého čísla?",
-      "options": [
-        "A) Objekt bajtů (bytes) s vyčištěným bajtovým pořadím přeloženým na danou architekturu procesoru.",
-        "B) Samotné celé číslo (int) reprezentující dekódovanou hodnotu z načteného bajtového řetězce.",
-        "C) N-tici (tuple) obsahující rozbalenou hodnotu jako svůj jediný prvek pro zachování konzistence.",
-        "D) Slovník (dict) s klíčem odpovídajícím použitému formátovacímu znaku a vyhodnocenou hodnotou."
-      ],
-      "answer": 2,
-      "explanation": "Funkce `struct.unpack()` vždy navrací n-tici (tuple), a to i v případě, že se rozbaluje pouze jediná hodnota (např. `(333,)`). Toto sjednocené chování zajišťuje konzistentní rozhraní bez ohledu na počet rozbalovaných prvků.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Co vrátí volání struct.unpack('>I', b'\\x00\\x00\\x01\\x00')?",
-      "options": [
-        "A) struct.error — vyvolá výjimku, protože daný bajtový řetězec b'\\x00\\x00\\x01\\x00' nemá platný prefix.",
-        "B) (1,) — rozbalí 4bajtové celé číslo v řazení little-endian, kde se bajty načítají zprava do leva.",
-        "C) 256 — rozbalí skalární celé číslo bez n-tice, protože byl v řetězci použit jediný formátovací znak.",
-        "D) (256,) — rozbalí 4bajtové celé číslo v řazení big-endian, kde hodnota 0x0100 odpovídá číslu 256."
-      ],
-      "answer": 3,
-      "explanation": "Znak `>` specifikuje pořadí bajtů big-endian a znak `I` odpovídá 4bajtovému unsigned int. Bajty `b'\\x00\\x00\\x01\\x00'` představují v big-endian hodnotu `0x00000100` = 256. Výsledek je vrácen jako jednoprvková n-tice `(256,)`.",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jaký je rozdíl mezi formátovacími znaky 10s a 10c v modulu struct?",
-      "options": [
-        "A) 10s reprezentuje jeden 10bajtový objekt bytes, zatímco 10c znamená 10 samostatných 1bajtových hodnot.",
-        "B) 10s vyžaduje ukončovací nulový bajt \\x00, zatímco 10c načítá přesně 10 bajtů bez jakéhokoliv ukončení.",
-        "C) 10s funguje pouze s big-endian pořadím bajtů, zatímco 10c vyžaduje little-endian pořadí bajtů paměti.",
-        "D) 10s reprezentuje řetězec typu str v kódování UTF-8, zatímco 10c představuje pole C-style znaků char."
-      ],
-      "answer": 0,
-      "explanation": "V modulu `struct` označuje zápis `10s` jeden souvislý 10bajtový objekt typu `bytes`. Naproti tomu `10c` označuje opakovací činitel pro 10 samostatných jednobajtových hodnot `bytes` (v rozbalené n-tici tedy vznikne 10 samostatných prvků).",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Která třída z modulu struct slouží k předkompilování binárního formátovacího řetězce pro efektivní opakované balení a rozbalování dat?",
-      "options": [
-        "Format",
-        "Struct",
-        "Pattern",
-        "Packer"
-      ],
-      "answer": 1,
-      "explanation": "Třída struct.Struct(fmt) vytvoří předkompilovaný objekt formátu, jehož metody pack() a unpack() jsou výrazně rychlejší při opakovaném volání.",
-      "code": "import struct\n\n# Předkompilování formátu pro 32bitové celé číslo (big-endian)\nunpacker = struct.________(\">i\")\nvalue, = unpacker.unpack(b\"\\x00\\x00\\x00\\x2a\")\n# Vystup: 42",
-      "expected": "Struct"
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Který znak na začátku formátovacího řetězce v modulu struct nastavuje síťové (network) pořadí bajtů?",
-      "options": [
-        "A) < — určuje little-endian pořadí bajtů v paměti se standardní velikostí datových typů a bez zarovnání.",
-        "B) = — určuje přirozené pořadí bajtů v platformě se standardní velikostí datových typů a bez zarovnání.",
-        "C) ! — určuje síťové pořadí bajtů (big-endian) se standardní velikostí datových typů a bez zarovnání.",
-        "D) @ — určuje přirozené pořadí bajtů z platformy s přirozenou velikostí datových typů a zarovnáním."
-      ],
-      "answer": 2,
-      "explanation": "Znak `!` na začátku formátovacího řetězce nastavuje síťové pořadí bajtů (network byte order), což je v binárních síťových protokolech alias pro big-endian se standardní velikostí C typů bez paměťového zarovnávání.",
-      "code": null
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Jak se liší výstup metody calcsize() u formátů '@' a '<' na 64bitovém systému pro řetězec 'cl' (char, long)?",
-      "options": [
-        "A) @ vrátí 9 bajtů bez zarovnání, zatímco < automaticky doplní nulové bajty na nejbližší násobek osmi (16 B).",
-        "B) @ i < vrátí shodně 9 bajtů, protože zarovnávání bajtů se u standardních typů C vyžaduje výhradně pro float.",
-        "C) Oba formáty vyvolají výjimku struct.error, protože kombinace znakového a dlouhého typu je v Pythonu neplatná.",
-        "D) @ použije přirozené zarovnání C-struktur (16 B), zatímco < vypne zarovnávání a vrátí součet velikostí (9 B)."
-      ],
-      "answer": 3,
-      "explanation": "Formát `@` aktivuje přirozené zarovnání architektury kompilátoru C (na 64bitovém systému vyžaduje typ long zarovnání na 8 B), takže rozvržení `cl` vytvoří 1 B char + 7 B výplň + 8 B long = 16 B. Formát `<` zarovnání vypíná a vrátí přesný součet 1 B + 8 B = 9 B.",
+      "explanation": "Objektově orientované rozhraní Matplotlibu na objektu `Axes` používá metody s předponou `set_` (např. `ax.set_xlabel()`, `ax.set_title()`, `ax.set_xlim()`), zatímco modul `pyplot` nabízí přímé funkce bez předpony (např. `plt.xlabel()`).",
       "code": null
     },
     {
       "id": "q7",
       "type": "multiple_choice",
-      "question": "Jaký je hlavní důvod pro použití metody struct.pack_into() namísto klasické metody struct.pack()?",
+      "question": "Jak Matplotlib interně zpracovává objekty typu datetime předávané jako souřadnice na osách?",
       "options": [
-        "A) Umožňuje zapsat zabalená binární data přímo do existujícího zapisovatelného bajtového bufferu na daný offset.",
-        "B) Poskytuje šifrování binárních dat pomocí symetrického klíče před jejich okamžitým uložením na fyzický disk.",
-        "C) Zrychluje kompilaci formátovacího řetězce uvolněním globálního zámku interpretu GIL během celého balení dat.",
-        "D) Automaticky převádí všechny řetězce Pythonu z kódování UTF-8 do C-style pole bajtů zakončeného nulovým bajtem."
-      ],
-      "answer": 0,
-      "explanation": "Metoda `struct.pack_into(fmt, buffer, offset, v1, ...)` zapisuje zabalené bajty přímo do předem alokovaného měnitelného paměťového bufferu (jako je `bytearray`) od zadaného offsetu, čímž eliminuje potřebu vytvářet nové dočasné objekty typu `bytes`.",
-      "code": null
-    }
-  ],
-  "numba": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Co se stane, pokud kód uvnitř funkce odekorované @jit(nopython=True) obsahuje konstrukci nepodporovanou Numbou?",
-      "options": [
-        "A) Numba ignoruje nepodporovanou část kódu a nahradí ji prázdnou instrukcí pass bez upozornění vývojáře aplikace.",
-        "B) Numba vyvolá výjimku a zastaví kompilaci, místo aby přešla do pomalejšího režimu kompatibility object mode.",
-        "C) Numba se automaticky přepne do režimu C-API (object mode) a funkci zkompiluje s pomalejším během v Pythonu.",
-        "D) Numba vygeneruje varování do sys.stderr a přenese vykonávání celého kódu na grafickou kartu přes modul CUDA."
-      ],
-      "answer": 1,
-      "explanation": "Při nastavení `nopython=True` Numba zakáže automatický záložní přechod do pomalejšího `object mode` (který je závislý na C-Python API). Pokud objeví nekombilovatelnou konstrukci, vyvolá kompilátor výjimku a ukončí zpracování.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký je výsledek volání fn(2**15, 0) při použití následující typové anotace v Numbě?",
-      "options": [
-        "A) OverflowError — Python zachytí přetečení typu a vyvolá standardní výjimku interpretu.",
-        "B) 32768 — Python automaticky rozšíří typ na 32bitové celé číslo bez ztráty samotné hodnoty.",
-        "C) -32768 — dojde k přetečení 16bitového celého čísla se znaménkem v C-reprezentaci typu.",
-        "D) TypeError — Numba odmítne předanou hodnotu 32768, protože překračuje definovaný rozsah."
-      ],
-      "answer": 2,
-      "explanation": "Anotací `int16(int16, int16)` vynutíme kompilaci funkce pro 16bitová celá čísla se znaménkem (rozsah -32768 až 32767). Předaná hodnota 2**15 (32768) při operaci v C-kompilovaném kódu přeteče na záporné číslo -32768.",
-      "code": "from numba import jit, int16\n\n@jit(int16(int16, int16))\ndef fn(x, y):\n    return x + y"
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Kterému parametru dekorátoru @jit v Numbě předáme hodnotu True pro uvolnění globálního zámku interpretu (GIL)?",
-      "options": [
-        "A) parallel — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech.",
-        "B) free_gil — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech.",
-        "C) no_lock — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech.",
-        "D) nogil — uvolní GIL během provádění zkompilovaného kódu, což umožní běh ve více vláknech."
+        "A) Vyžaduje předem manuální konverzi na UNIX timestamp (sekundy), jinak vyvolá výjimku TypeError.",
+        "B) Zaokrouhlí je na nejbližší celé hodiny a vytvoří z nich indexovaný slovník pro popis osy x.",
+        "C) Převede je na textové řetězce a vykreslí je jako kategoriální osu s rovnoměrnými rozstupy bodů.",
+        "D) Přepočítá je na číselné hodnoty reprezentující počet dní od počátku letopočtu pro polohování."
       ],
       "answer": 3,
-      "explanation": "Parametr `nogil=True` v dekorátoru `@numba.jit` instructs kompilátor k uvolnění Globálního zámku interpretu (GIL) během provádění nativního kódu zkompilovaného Numbou, což dovoluje využít plný paralelismus více vláken Pythonu.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Kam Numba ukládá zkompilované binární verze funkcí při zapnutí parametru cache=True u dekorátoru @jit?",
-      "options": [
-        "A) Do standardního adresáře __pycache__ nacházejícího se vedle zdrojového souboru s kódovými moduly.",
-        "B) Přímým zápisem do systémové operační paměti RAM bez možnosti uložení zkompilovaného kódu na disk.",
-        "C) Do dočasného systémového adresáře /tmp nebo C:\\Temp určeného pro mezipaměť operačního systému.",
-        "D) Do skrytého globálního adresáře .numba_cache v domovské složce pro právě přihlášeného uživatele."
-      ],
-      "answer": 0,
-      "explanation": "Pokud je u dekorátoru `@jit` nastaven parametr `cache=True`, Numba uloží zkompilovaný binární kód do standardního adresáře `__pycache__` nacházejícího se ve stejné složce jako zdrojový `.py` soubor.",
+      "explanation": "Matplotlib nativně podporuje `datetime` objekty tak, že je interně zkonvertuje na desítková čísla odpovídající počtu dní od 1. 1. 0001 (pomocí např. `date2num`), což umožňuje přesné výpočty i škálování časové osy.",
       "code": null
     }
   ]

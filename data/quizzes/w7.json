@@ -1,243 +1,518 @@
 {
-  "cmd_overview": [
+  "files_basics": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Jaký datový typ vrací funkce input() po zadání vstupu uživatelem v Pythonu 3?",
+      "question": "Proč je volání open('data.txt') bez parametru encoding v Pythonu nepřenositelné?",
       "options": [
-        "A) Objekt typu bytes reprezentující surovou bajtovou posloupnost ze vstupu.",
-        "B) Automaticky odvozený typ int, float nebo str podle obsahu vstupu.",
-        "C) Vždy řetězec str bez ohledu na to, zda vstup obsahuje číslice nebo písmena.",
-        "D) Speciální objekt typu UserInput zapouzdřující text i časové razítko."
+        "A) Soubor se otevře v binárním režimu a čtení vrátí bajtový objekt místo řetězce.",
+        "B) Výchozí kódování závisí na operačním systému a jeho lokálním nastavení prostředí.",
+        "C) Výchozí kódování je vždy ASCII a neumí automaticky dekódovat české znaky UTF-8.",
+        "D) Funkce vyžaduje parametr encoding povinně, jinak vyhodí výjimku TypeError."
+      ],
+      "answer": 1,
+      "explanation": "Bez parametru encoding použije Python locale.getpreferredencoding(False), což se liší mezi OS (např. Windows používá cp1250 a Linux UTF-8). Výchozí kódování není pevný ASCII (B) ani binární režim (D) a parametr není syntakticky povinný (C).",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jaký výstup vypíše kód při čtení vícebajtového znaku UTF-8?",
+      "options": [
+        "A) 1",
+        "B) 4",
+        "C) 3",
+        "D) 6"
       ],
       "answer": 2,
-      "explanation": "Funkce input() v Pythonu 3 vrací výhradně řetězec typu str. Pokud je potřeba číslo, musí se navrácený řetězec explicitně převést např. pomocí int().",
+      "explanation": "Znak '狼' zabírá v UTF-8 přesně 3 bajty. Metoda read(1) přečte 1 znak, ale tell() vrací aktuální offset v souboru vyjádřený v bajtech (3). Hodnota 1 představuje mýtus, že tell() počítá přečtené znaky.",
+      "code": "with open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('狼.cz')\n\nwith open('data.txt', 'r', encoding='utf-8') as f:\n    char = f.read(1)\n    print(f.tell())"
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Doplňte klíčové slovo pro bezpečné správcování kontextu souboru:",
+      "code_snippet": "________ open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('test')",
+      "options": [
+        "try",
+        "context",
+        "using",
+        "with"
+      ],
+      "answer": 3,
+      "explanation": "Příkaz with v Pythonu aktivuje kontextový manažer, který automaticky zavolá __enter__() při vstupu a __exit__() při opuštění bloku, čímž spolehlivě uzavře soubor. Slovo using pochází z C#.",
+      "expected": "with",
+      "code": "vysledek = ________"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jak se liší režim otevření souboru 'x' od režimu 'w'?",
+      "options": [
+        "A) Režim 'x' selže s výjimkou FileExistsError, pokud cíl již existuje.",
+        "B) Režim 'x' slouží výhradně k otvírání binárních souborů na systém Windows.",
+        "C) Režim 'x' vytváří dočasný soubor, který se po zavření sám vymaže.",
+        "D) Režim 'x' otevře soubor pro čtení i zápis bez smazání jeho obsahu."
+      ],
+      "answer": 0,
+      "explanation": "Režim 'x' (exkluzivní vytvoření) selže s FileExistsError, pokud soubor již existuje, což brání nechtěnému přepsání dat. Režim 'w' naopak existující soubor okamžitě smaže a přepíše.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co se stane při nastavení pozice ukazatele seek(1) na vícebajtový znak UTF-8?",
+      "options": [
+        "A) Kód vyhodí výjimku IndexError, protože pozice 1 neodpovídá hranici znaků.",
+        "B) Kód vyhodí výjimku UnicodeDecodeError, protože pozice 1 je uprostřed znaku.",
+        "C) Kód přečte druhý bajt znaku a vrátí odpovídající jednobajtový znak ASCII.",
+        "D) Metoda seek(1) úspěšně přeskočí celý znak '狼' a metoda read(1) vrátí tečku '.'."
+      ],
+      "answer": 1,
+      "explanation": "Znak '狼' má v UTF-8 délku 3 bajty. Přesun na offset 1 skočí do středu bajtové sekvence tohoto znaku. Následné čtení read(1) selže s UnicodeDecodeError, protože dekodér narazí na neplatný počáteční bajt.",
+      "code": "with open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('狼.cz')\n\nwith open('data.txt', 'r', encoding='utf-8') as f:\n    f.seek(1)\n    f.read(1)"
+    },
+    {
+      "id": "q6",
+      "type": "true_false_tricky",
+      "question": "Rozhodněte o pravdivosti tvrzení: V Pythonu 3 lze u textového souboru zcela vypnout bafrování nastavením argumentu buffering=0.",
+      "options": [
+        "A) Tvrzení je pravdivé. Nastavení buffering=0 plně vypíná mezipaměť jak u binárních, tak u všech textových souborů.",
+        "B) Tvrzení je nepravdivé. Nastavení buffering=0 je povoleno pouze v binárním režimu; v textovém vyhodí výjimku ValueError."
+      ],
+      "answer": 1,
+      "explanation": "V textovém režimu Python nepodporuje unbuffered I/O (buffering=0 vyhodí ValueError). Textové soubory podporují pouze buffering=1 (řádkové bafrování) nebo celočíselnou velikost mezipaměti > 1.",
+      "code": null
+    }
+  ],
+  "pathlib": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Jaký bude výstup z následujícího spojování cest v modulu pathlib?",
+      "options": [
+        "A) /tmp/data.txt",
+        "B) /pokus/data.txt",
+        "C) /tmp/pokus/data.txt",
+        "D) /tmp//pokus/data.txt"
+      ],
+      "answer": 1,
+      "explanation": "Při spojování cest operátorem / způsobení absolutní cesty (začínající /) resetuje předchozí nahromaděnou cestu. Proto se '/tmp' ignoruje a vznikne '/pokus/data.txt'.",
+      "code": "from pathlib import PurePath\np = PurePath('/tmp') / '/pokus' / 'data.txt'\nprint(p)"
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Co vrátí atribut p.stem pro cestu p = Path('/var/log/app.tar.gz')?",
+      "options": [
+        "A) app",
+        "B) .tar.gz",
+        "C) app.tar",
+        "D) app.tar.gz"
+      ],
+      "answer": 2,
+      "explanation": "Atribut .stem odsekne pouze poslední příponu (.gz), takže vrátí 'app.tar'. Celé jméno je 'app.tar.gz' (.name) a seznam všech přípon je ['.tar', '.gz'] (.suffixes).",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jaký datový typ mají prvky vrácené generátorem p.iterdir()?",
+      "options": [
+        "A) Prosté řetězce (str) obsahující relativní cesty k jednotlivým souborům a složkám.",
+        "B) N-tice (tuple) obsahující název souboru a jeho metadata vrácená ze systémového stat.",
+        "C) Souborové popisovače (file descriptors) otevřené pro čtení obsahu adresáře.",
+        "D) Objekty typu Path (PosixPath nebo WindowsPath) reprezentující příslušné položky."
+      ],
+      "answer": 3,
+      "explanation": "Generátor iterdir() vrací objekty Path (resp. PosixPath/WindowsPath), nikoli prosté řetězce str. To umožňuje přímo volat metody jako .is_file() nebo .stat() na navrácených prvcích.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi třídami PurePath a Path v modulu pathlib?",
+      "options": [
+        "A) PurePath provádí pouze řetězcové operace bez přístupu k souborovému systému.",
+        "B) PurePath slouží k načítání textových souborů, zatímco Path spravuje binární soubory.",
+        "C) PurePath je starší zastaralá třída určená pro zpětnou kompatibilitu s Pythonem 2.",
+        "D) PurePath podporuje výhradně operační systém Linux, zatímco Path funguje i na Windows."
+      ],
+      "answer": 0,
+      "explanation": "PurePath a její podtřídy provádí pouze syntaktické úpravy cest v paměti bez přímého I/O volání OS. Třída Path dědí z PurePath a přidává reálné operace se souborovým systémem.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu objektu Path pro rekurzivní vyhledání souborů odpovídajících vzoru ve všech podsložkách:",
+      "code_snippet": "from pathlib import Path\np = Path('/projekty')\npy_files = list(p.________('*.py'))",
+      "options": [
+        "find",
+        "rglob",
+        "glob_all",
+        "iterdir"
+      ],
+      "answer": 1,
+      "explanation": "Metoda Path.rglob(pattern) rekurzivně prochází adresář i všechny jeho podsložky a vyhledává shody s daným vzorem.",
+      "code": "from pathlib import Path\n\nproject_root = Path(\".\")\n# Rekurzivní vyhledání všech Python skriptů v podadresářích:\npy_files = list(project_root.________(\"*.py\"))",
+      "expected": "rglob"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Co provede metoda p.resolve() na objektu Path?",
+      "options": [
+        "A) Pouze připojí aktuální pracovní adresář před relativní cestu bez řešení symlinků.",
+        "B) Vytvoří nový soubor na zadané cestě, pokud daný soubor na disku dosud neexistuje.",
+        "C) Převede cestu na kanonickou, odstraní symbolické odkazy a eliminujeme sekvence ..",
+        "D) Změní přístupová práva souboru tak, aby odpovídala absolutním právům vlastníka."
+      ],
+      "answer": 2,
+      "explanation": "Metoda resolve() vytvoří absolutní kanonickou cestu – nahradí symbolické odkazy jejich cílem a odstraní relativní složky jako '.' a '..'. Metoda absolute() pouze připojí cwd bez řešení symlinků.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "true_false_tricky",
+      "question": "Rozhodněte o pravdivosti tvrzení: Třída pathlib.Path obsahuje vestavěnou metodu p.copy(), která slouží k přímému kopírování souborů.",
+      "options": [
+        "A) Tvrzení je pravdivé. Metoda p.copy() je standardní součástí Path od Pythonu 3.4.",
+        "B) Tvrzení je nepravdivé. Path metodu pro kopírování nemá; je nutné použít modul shutil."
+      ],
+      "answer": 1,
+      "explanation": "Třída Path v modulu pathlib kupodivu neposkytuje metodu pro kopírování. Pro kopírování souborů je nutné importovat modul shutil a použít např. shutil.copy2(src, dst).",
+      "code": null
+    }
+  ],
+  "with": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaká hodnota vrácená z metody __exit__() způsobí potlačení výjimky vzniklé uvnitř bloku with?",
+      "options": [
+        "A) Nepravdivá hodnota False (nebo None), která interpretu sdělí, že byla výjimka úspěšně zpracována.",
+        "B) Řetězec s názvem zachycené výjimky, který se předá nadřazenému bloku try-except k logování.",
+        "C) Pravdivá hodnota True (nebo jakýkoliv pravdivý objekt), která interpretu sdělí, že byla výjimka zpracována.",
+        "D) Objekt výjimky typu BaseException, který nahradí původně vyvolanou výjimku v aktuálním kontextu."
+      ],
+      "answer": 2,
+      "explanation": "Pokud __exit__() vrátí True (pravdivou hodnotu), Python výjimku potlačí a kód pokračuje za blokem with. Pokud vrátí False nebo None, výjimka se propaguje výše.",
       "code": null
     },
     {
       "id": "q2",
       "type": "multiple_choice",
-      "question": "Jaký výstup vytvoří následující kód při spuštění příkazem python3 app.py data.txt?",
+      "question": "Jaký bude výstup následujícího kódu využívajícího generátorový kontextový manažer?",
       "options": [
-        "A) Vypíše text data.txt:app.py představující první argument a název skriptu.",
-        "B) Vypíše text python3:app.py představující spouštěč a název skriptu v CLI.",
-        "C) Vyvolá IndexError, protože seznam sys.argv obsahuje pouze předané argumenty.",
-        "D) Vypíše text app.py:data.txt představující název skriptu a první argument."
+        "A) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku StopIteration kvůli vyčerpání generátoru.",
+        "B) Vypíše START, DATA, END dvakrát za sebou, protože generátor se při dalším vstupu automaticky restartuje.",
+        "C) Vypíše START, DATA, END a při druhém vstupu neprovede nic, protože proměnná val již obsahuje řetězec DATA.",
+        "D) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku RuntimeError: generator didn't yield."
       ],
       "answer": 3,
-      "explanation": "V seznamu sys.argv je na indexu 0 vždy uložen název spouštěného skriptu (app.py), zatímco první uživatelský argument předaný skriptu je na indexu 1 (data.txt).",
-      "code": "import sys\nprint(f\"{sys.argv[0]}:{sys.argv[1]}\")"
+      "explanation": "Generátor vytvořený pomocí @contextmanager je jednorázový. Jednou vyčerpaný generátorový objekt uložený do proměnné cm nelze znovu použít v dalším bloku with; pokus o to vyvolá RuntimeError: generator didn't yield.",
+      "code": "from contextlib import contextmanager\n\n@contextmanager\ndef my_ctx():\n    print(\"START\")\n    yield \"DATA\"\n    print(\"END\")\n\ncm = my_ctx()\nwith cm as val:\n    print(val)\nwith cm as val:\n    print(val)"
     },
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte porovnávací výraz pro kontrolu, že skript obdržel právě dva uživatelské argumenty:\n\nimport sys\nif len(sys.argv) ________ 3:\n    print(\"Chyba: Očekávány přesně 2 argumenty!\")\n    sys.exit(1):",
+      "question": "Doplňte klíčové slovo pro předání spravovaného prostředku z kontextového manažeru @contextmanager:",
       "options": [
-        "!=",
-        "==",
-        "<=",
-        "<"
+        "yield",
+        "pass",
+        "return",
+        "send"
       ],
       "answer": 0,
-      "explanation": "Seznam sys.argv obsahuje název skriptu na indexu 0 plus předané argumenty. Pro přesně 2 uživatelské argumenty musí mít len(sys.argv) hodnotu 3, proto při != 3 vypíšeme chybu a ukončíme skript.",
-      "expected": "!=",
-      "code": "import sys\nif len(sys.argv) ________ 3:\n    print(\"Chyba: Očekávány přesně 2 argumenty!\")\n    sys.exit(1)"
+      "explanation": "Generátorový kontextový manažer předává spravovaný objekt do bloku with pomocí klíčového slova yield.",
+      "code": "from contextlib import contextmanager\n\n@contextmanager\ndef open_database(host):\n    conn = connect(host)\n    try:\n        ________ conn\n    finally:\n        conn.close()",
+      "expected": "yield"
     },
     {
       "id": "q4",
       "type": "multiple_choice",
-      "question": "Jak předat v Unixovém terminálu skriptu přes sys.argv jeden argument obsahující mezeru?",
+      "question": "Jaké argumenty obdrží metoda __exit__(self, exc_type, exc_val, exc_tb) při normálním ukončení bloku with bez výjimky?",
       "options": [
-        "A) Nahrazením mezery podtržítkem ještě před předáním skriptu na příkazové řádce.",
-        "B) Obalením argumentu do uvozovek nebo použitím zpětného lomítka před mezerou.",
-        "C) Vložením středníku přímo na místo mezery mezi jednotlivými slovy v argumentu.",
-        "D) Předřazením znaku plus před každé slovo tvořící hodnotu zadaného argumentu."
+        "A) Argument exc_type bude StopIteration, zatímco zbývající dva budou None.",
+        "B) Všechny tři argumenty exc_type, exc_val a exc_tb budou mít hodnotu None.",
+        "C) Argumenty obdrží instanci třídy SuccessState s informací o bezchybném průběhu.",
+        "D) Metoda __exit__() se při bezchybném doběhu bloku with vůbec nevolá."
       ],
       "answer": 1,
-      "explanation": "Unixový shell rozděluje argumenty podle mezer. Pokud má argument mezeru obsahovat, musí se ohradit uvozovkami \"arg s mezerou\" nebo mezera odescapovat arg\\ s\\ mezerou.",
+      "explanation": "Dokončí-li se blok with bez vyvolání výjimky, Python zavolá __exit__ s argumenty (None, None, None).",
       "code": null
     },
     {
       "id": "q5",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení o modulu getopt z příkazové řádky Pythonu:\n\nModul getopt automaticky generuje nápovědu --help a provádí validaci typu parametrů bez nutnosti psát vlastní obslužný kód.",
+      "type": "multiple_choice",
+      "question": "Co bude vytištěno při spuštění následujícího kódu s vlastní třídou kontextového manažeru?",
       "options": [
-        "A) Nepravda – getopt pouze naparkuje přepínače a argumenty do seznamu, nápovědu --help i validaci typu musí vývojář napsat ručně.",
-        "B) Pravda – getopt vestavěně kontroluje typy argumentů i povinnost přepínačů a při předání --help automaticky vypíše nápovědu."
+        "A) Vypíše False None, protože výstup z __enter__() se zahodí a proměnná res se inicializuje na None.",
+        "B) Vypíše True RESOURCE, protože proměnná res v příkazu as vždy odkazuje přímo na kontextový manažer m.",
+        "C) Vypíše False RESOURCE, protože res dostane návratovou hodnotu z __enter__(), nikoliv objekt m.",
+        "D) Vyvolá výjimku AttributeError, protože metoda __enter__() musí vracet výhradně samotný objekt self."
+      ],
+      "answer": 2,
+      "explanation": "Proměnná za klíčovým slovem as přebírá návratovou hodnotu metody __enter__(). Jelikož ta vrátila řetězec \"RESOURCE\", proměnná res drží tento řetězec a nikoliv objekt m (res is m je tedy False).",
+      "code": "class Manager:\n    def __enter__(self):\n        return \"RESOURCE\"\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        return False\n\nm = Manager()\nwith m as res:\n    print(res is m, res)"
+    },
+    {
+      "id": "q6",
+      "type": "fill_blank_choice",
+      "question": "Doplňte návratovou hodnotu metody __exit__, která potlačí vzniklou výjimku a zabrání jejímu dalšímu šíření:",
+      "options": [
+        "None",
+        "False",
+        "self",
+        "True"
+      ],
+      "answer": 3,
+      "explanation": "Pokud metoda __exit__() vrátí pravdivou hodnotu (True), Python výjimku potlačí a nepokračuje v jejím šíření.",
+      "code": "class SuppressErrors:\n    def __enter__(self):\n        return self\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        if exc_type is not None:\n            print(f\"Zachycena výjimka: {exc_val}\")\n            return ________",
+      "expected": "True"
+    },
+    {
+      "id": "q7",
+      "type": "true_false_tricky",
+      "question": "Zápis with A() as a, B() as b: v Pythonu 3.10+ odpovídá zanořenému with A() as a: with B() as b: a volání metod __enter__ a __exit__ probíhá ve stejném lexikálním pořadí (nejprve A, potom B u obou kroků).",
+      "options": [
+        "A) Tvrzení je pravdivé; oba kontexty se otevírají i zavírají ve stejném lexikálním pořadí shora dolů (nejprve A a potom B u vstupů i ukončení).",
+        "B) Tvrzení je nepravdivé; metody __enter__ probíhají v pořadí A a pak B, ale čistící metody __exit__ probíhají v opačném pořadí (nejprve B a až poté A)."
+      ],
+      "answer": 1,
+      "explanation": "Kontextové manažery při vícenásobném zápisu fungují jako zanořené bloky: vstupní metody __enter__ se volají v pořadí zápisu (zleva doprava: A, pak B), ale čistící metody __exit__ se volají v opačném pořadí (nejprve vnitřní B, potom vnější A).",
+      "code": null
+    }
+  ],
+  "fileinput": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Odkud čte kód `fileinput.input()`, pokud skriptu nebyly při spuštění předány žádné argumenty souborů?",
+      "options": [
+        "A) Ze standardního vstupu (sys.stdin), takže může zpracovávat data předaná přes pipeline.",
+        "B) Vyvolá výjimku FileNotFoundError, protože nebyl zadán žádný název vstupního souboru.",
+        "C) Vrátí prázdný iterátor, který okamžitě ukončí cyklus for bez načtení jakéhokoliv řádku.",
+        "D) Automaticky prohledá aktuální adresář a otevře první nalezený soubor s příponou .txt."
       ],
       "answer": 0,
-      "explanation": "Modul getopt je nejstarší C-style modul. Pouze rozparsuje přepínače na dvojice (o, a) a seznam argumentů. Veškerou validaci, typové konverze i formátování nápovědy si vývojář musí implementovat sám.",
+      "explanation": "Pokud v sys.argv[1:] nejsou předány žádné soubory (nebo je předán argument '-'), fileinput.input() transparentně čte ze standardního vstupu sys.stdin.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jaký účinek má nastavení parametru `inplace=True` při volání `fileinput.input()`?",
+      "options": [
+        "A) Uzamkne všechny právě zpracovávané soubory na disku proti zápisu ze strany ostatních procesů.",
+        "B) Přesměruje standardní výstup (sys.stdout) do právě zpracovávaného souboru, čímž jej přepíše.",
+        "C) Otevře všechny soubory v režimu pro připsání na konec (append) bez modifikace stávajících řádků.",
+        "D) Načte celý obsah všech zadaných souborů do paměti RAM ještě před zahájením samotné iterace."
+      ],
+      "answer": 1,
+      "explanation": "Parametr inplace=True přesměruje standardní výstup print() přímo do právě čteného souboru. Původní soubor je zálohován/přesunut a jeho obsah je nahrazen tištěným výstupem.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Doplňte funkci modulu `fileinput`, která vrací pořadové číslo řádku v rámci právě otevřeného souboru (resetované na 1 pro každý soubor).",
+      "options": [
+        "lineno",
+        "line_number",
+        "filelineno",
+        "fileno"
+      ],
+      "answer": 2,
+      "explanation": "`fileinput.filelineno()` vrací číslo řádku v aktuálním souboru (od 1), zatímco `fileinput.lineno()` vrací kumulativní celkový počet řádků přes všechny soubory.",
+      "code": "import fileinput\n\n# Zpracování souborů mereni_1.log a mereni_2.log\nfor line in fileinput.input(files=(\"mereni_1.log\", \"mereni_2.log\")):\n    # Získání čísla řádku v rámci aktuálního souboru\n    current_line = fileinput.________()\n    print(f\"{fileinput.filename()}:{current_line} -> {line.strip()}\")",
+      "expected": "filelineno"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Které komprimované formáty souborů dokáže automaticky otevírat předpřipravená hook funkce `fileinput.hook_compressed`?",
+      "options": [
+        "A) Komprimované archivní soubory s příponami .zip, .tar a .7z.",
+        "B) Jakékoliv komprimované soubory s příponami jako .xz a .rar.",
+        "C) Pouze komprimované archivní soubory s jedinou příponou .zip.",
+        "D) Soubory s komprimovanými příponami .gz (gzip) a .bz2 (bzip2)."
+      ],
+      "answer": 3,
+      "explanation": "fileinput.hook_compressed detekuje soubory podle přípony .gz nebo .bz2 a automaticky je otevře s využitím modulů gzip nebo bz2.",
+      "code": null
+    }
+  ],
+  "shelve": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Který datový typ je v modulu shelve vyžadován pro klíče perzistentního slovníku?",
+      "options": [
+        "A) Jakýkoliv piklitelný objekt.",
+        "B) Výhradně textové řetězce str.",
+        "C) Libovolný immutable typ s hash().",
+        "D) Pouze celá čísla int a str."
+      ],
+      "answer": 1,
+      "explanation": "Backend dbm pod modulem shelve vyžaduje striktně řetězcové klíče (str). Hodnotami v perzistentním slovníku mohou být libovolné serializovatelné pythoní objekty.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký účinek má příkaz db['seznam'].append(99) v databázi shelve při výchozím nastavení writeback=False?",
+      "options": [
+        "A) Kód selže a vyvolá výjimku PermissionError kvůli zápisu do neotevřené vyrovnávací paměti.",
+        "B) Změna se uloží do paměťové cache a provede se její zapsání až při volání metody db.close().",
+        "C) Seznam v databázi zůstane nezměněn, protože modifikace mutable objektu se bez přiřazení nezapsala.",
+        "D) Změna se okamžitě zapíše na disk do souboru databáze bez nutnosti jakéhokoliv dalšího zásahu."
+      ],
+      "answer": 2,
+      "explanation": "Při výchozím writeback=False vrací db['seznam'] odpicklovaný dočasný objekt. Příkaz .append(99) modifikuje tuto kopii. Pro uložení na disk je nutné znovupřiřazení db['seznam'] = temp.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "true_false_tricky",
+      "question": "Posuďte výhody a nevýhody otevření databáze shelve s parametrem writeback=True.",
+      "options": [
+        "A) Nepravda: Zrychluje zavírání databáze, ale zakazuje použití in-place mutable operací na slovníku.",
+        "B) Pravda: Umožňuje přímé modifikace mutable objektů, ale udržuje v paměti cache všech načtených položek."
+      ],
+      "answer": 1,
+      "explanation": "Nastavení writeback=True uchovává všechny načtené i upravené položky v paměťovém cache slovníku. To umožňuje in-place úpravy, ale dramaticky zvyšuje spotřebu paměti a zpomaluje sync/close.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "fill_blank_choice",
+      "question": "Která hodnota parametru flag ve funkci shelve.open() vynutí vytvoření nové prázdné databáze s přepsáním existujícího souboru?",
+      "options": [
+        "'c'",
+        "'w'",
+        "'r'",
+        "'n'"
+      ],
+      "answer": 3,
+      "explanation": "Příznak flag='n' (new) otevře databázi pro čtení i zápis a vždy vytvoří novou prázdnou databázi s přepsáním původního souboru.",
+      "code": "import shelve\n\n# Otevření databáze pro zápis s vynuceným vytvořením nového souboru\nwith shelve.open(\"lab_results.db\", flag=________) as db:\n    db[\"experiment_1\"] = {\"yield\": 0.85, \"purity\": 0.99}",
+      "expected": "'n'"
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jaká omezení platí pro přístup více procesů či skriptů k téže databázi modulu shelve?",
+      "options": [
+        "A) Pro zápis může mít databázi otevřenou současně pouze jediný proces; pro čtení více procesů.",
+        "B) Konkurentní čtení i zápis jsou podporovány výhradně v případě použití backendu dbm.dumb.",
+        "C) Databázi může mít současně otevřenou právě jeden proces bez ohledu na čtení či zápis.",
+        "D) Databáze plně podporuje paralelní zápis z více procesů díky zámkům na úrovni backendu."
+      ],
+      "answer": 0,
+      "explanation": "Modul shelve nezajišťuje zamykání pro paratelní zápis. Zápis z více procesů naráz může poškodit databázi. Paralelní čtení z více procesů je bezpečné.",
       "code": null
     },
     {
       "id": "q6",
       "type": "predict_output",
-      "question": "Jaký datový typ bude mít proměnná opts_dict po spuštění níže uvedeného kódu?",
+      "question": "Které soubory vytvoří záložní backend dbm.dumb na disku při práci s databází pojmenovanou mojedata?",
       "options": [
-        "A) Seznam řetězců list uchovávající původní přepínače z příkazové řádky.",
-        "B) Uspořádaná n-tice tuple obsahující dvojice název přepínače a jeho hodnota.",
-        "C) Standardní Python slovník dict mapující názvy cílových klíčů na jejich hodnoty.",
-        "D) Objekt třídy Values z modulu optparse uchovávající načtené nastavení."
+        "A) Pouze jediný binární soubor s příponou mojedata.db vytvořený ve složce projektu.",
+        "B) Soubory mojedata.dat a mojedata.dir (případně mojedata.bak při spuštěném provozu).",
+        "C) Dvojici souborů mojedata.sqlite a mojedata.log pro podporu transakčního logování.",
+        "D) Trojici souborů mojedata.txt, mojedata.json a mojedata.bin v cache adresáři."
       ],
-      "answer": 2,
-      "explanation": "Funkce parse_args() vrací objekt optparse.Values. Pro jeho převod na běžný slovník dict slouží vestavěná funkce vars(), která vrací slovník atributů daného objektu.",
-      "code": "from optparse import OptionParser\nparser = OptionParser()\nparser.add_option(\"-f\", \"--file\", dest=\"filename\")\noptions, args = parser.parse_args([\"-f\", \"test.txt\"])\nopts_dict = vars(options)"
-    },
-    {
-      "id": "q7",
-      "type": "fill_blank_choice",
-      "question": "Doplňte chybějící parametr do add_option v modulu optparse tak, aby přepínač akceptoval pouze vybrané hodnoty ze seznamu:\n\nparser.add_option(\n    \"-e\", \"--env\",\n    action=\"store\",\n    dest=\"environment\",\n    type=\"choice\",\n    ________=[\"production\", \"staging\", \"testing\"]\n):",
-      "options": [
-        "values",
-        "options",
-        "allowed",
-        "choices"
-      ],
-      "answer": 3,
-      "explanation": "Při použití type=\"choice\" v optparse se povolené hodnoty přepínače specifikují v parametru choices jako seznam nebo n-tice řetězců.",
-      "expected": "choices",
-      "code": "parser.add_option(\n    \"-e\", \"--env\",\n    action=\"store\",\n    dest=\"environment\",\n    type=\"choice\",\n    ________=[\"production\", \"staging\", \"testing\"]\n)"
-    },
-    {
-      "id": "q8",
-      "type": "multiple_choice",
-      "question": "Který z modulů pro práci s argumenty v příkazové řádce představuje v historii Pythonu nejnovější generaci přidanou v Pythonu 3.2?",
-      "options": [
-        "A) argparse – novější standardní modul poskytující pokročilé parsování a nápovědu.",
-        "B) click – moderní externí knihovna z PyPI založená výhradně na dekorátorech.",
-        "C) optparse – starší modul představený v Pythonu 2.3 a dnes označený za zastaralý.",
-        "D) getopt – nízkoúrovňový modul podle vzoru klasické céčkovské funkce getopt()."
-      ],
-      "answer": 0,
-      "explanation": "Vývoj v Pythonu šel od sys.argv přes getopt a optparse (od Py 2.3) až k modulu argparse představenému v Pythonu 3.2. Modul click je knihovna třetí strany z PyPI.",
+      "answer": 1,
+      "explanation": "Čistě pythoní backend dbm.dumb vytváří dvojici souborů .dat a .dir (plus .bak během manipulace), které uchovávají indexy klíčů a samotná bajtová data.",
       "code": null
     }
   ],
-  "CherryPy": [
+  "sqlite": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Jaká je hlavní architektura a úkol knihovny CherryPy při zpracování webových požadavků?",
+      "question": "Proč se změny v databázi SQLite (INSERT, UPDATE) neprojeví v souboru ihned po zavolání cursor.execute()?",
       "options": [
-        "A) Spravovat na klientské straně prohlížeče DOM strom a spouštět asynchronní JavaScript kód.",
-        "B) Přijmout HTTP požadavek a podle URL ho přemapovat na odpovídající metodu třídy serveru.",
-        "C) Zabezpečit šifrování TCP síťových paketů a řídit routování IP adres na úrovni systému.",
-        "D) Automaticky vygenerovat kompletní databázový ORM model a HTML šablony pro celou aplikaci."
+        "A) Změny se zapíší až v okamžiku, kdy velikost vyrovnávací paměti přesáhne velikost RAM.",
+        "B) SQLite vyžaduje ruční uvolnění databázového zámku zavoláním sqlite3.flush_buffers().",
+        "C) Všechny zápisové operace probíhají ve vedlejším vlákně až po uzavření objektu kurzoru.",
+        "D) Změny jsou drženy v transakci a pro jejich uložení je nutné zavolat connection.commit()."
       ],
-      "answer": 1,
-      "explanation": "CherryPy je minimalistický Python web framework, jehož hlavním úkolem je přijmout HTTP požadavek, najít podle URL příslušnou vystavenou metodu a vrátit její odpovídající textový či HTML výstup.",
+      "answer": 3,
+      "explanation": "V ovladači sqlite3 probíhají úpravy v transakci. Bez zavolání connection.commit() na objektu připojení se provedené změny při ukončení zruší.",
       "code": null
     },
     {
       "id": "q2",
       "type": "multiple_choice",
-      "question": "Na jakou URL adresu bude reagovat níže uvedená metoda webového serveru CherryPy?",
+      "question": "Jaký je správný způsob předávání proměnných do SQL dotazu pro ochranu před SQL injection v sqlite3?",
       "options": [
-        "A) Na adresu http://localhost:8080/vystava/exponaty včetně názvu obslužné třídy.",
-        "B) Výhradně na kořenovou adresu http://localhost:8080/ jako výchozí úvodní stránka.",
-        "C) Na adresu http://localhost:8080/exponaty po odeslání HTTP požadavku GET nebo POST.",
-        "D) Na adresu http://localhost:8080/api/exponaty s automaticky přidaným prefiksem."
+        "A) Použitím symbolů ? a předáním hodnot jako n-tice v druhém argumentu cursor.execute().",
+        "B) Spojením řetězců operátorem + a ošetřením uvozovek metodou str.replace(\"'\", \"''\").",
+        "C) Formátováním řetězců pomocí f-stringů přímo v textu SQL příkazu před jeho odesláním.",
+        "D) Převodem všech vstupních proměnných na bajtový typ bytes před jejich vložením do SQL."
       ],
-      "answer": 2,
-      "explanation": "CherryPy mapuje název metody přímo na URL pod kořenovým mountpointem (/). Metoda exponaty se tak automaticky zpřístupní na adrese /exponaty.",
-      "code": "import cherrypy\n\nclass Vystava:\n    @cherrypy.expose\n    def exponaty(self):\n        return \"Seznam exponátů\"\n\ncherrypy.quickstart(Vystava())"
+      "answer": 0,
+      "explanation": "Použití zástupných symbolů ? (nebo pojmenovaných :name) zajišťuje, že databázový ovladač vstupy bezpečně escapuje a znemožní útoky SQL Injection. F-stringy či spájení řetězců jsou hrubá chyba.",
+      "code": null
     },
     {
       "id": "q3",
       "type": "multiple_choice",
-      "question": "Jak CherryPy předává parametry z HTTP dotazu (metodou GET i POST) do obslužné metody v Pythonu?",
+      "question": "Která metoda objektu Cursor je nejvhodnější pro efektivní vložení velkého množství řádků z kolekce parametrů?",
       "options": [
-        "A) Předává všechny parametry jako jediný slovník do prvního argumentu metody.",
-        "B) Vyžaduje manuální rozparsování řetězce dotazu pomocí modulu urllib v metodě.",
-        "C) Ukládá přicházející parametry výhradně do slovníku v objektu request.params.",
-        "D) Mapuje parametry dotazu přímo na pojmenované argumenty příslušné obslužné metody."
+        "A) cursor.execute_bulk(sql, data)",
+        "B) cursor.executemany(sql, data)",
+        "C) cursor.executescript(sql, data)",
+        "D) cursor.fetchmany(sql, data)"
       ],
-      "answer": 3,
-      "explanation": "Bez ohledu na to, zda byly parametry předány v URL (GET) nebo v těle (POST), CherryPy je automaticky namapuje na pojmenované argumenty metody (např. def info(self, jmeno, vek)).",
+      "answer": 1,
+      "explanation": "Metoda executemany() přijímá SQL šablonu se zástupnými symboly a sekvenci parametrů, které efektivně vykoná v rámci jednoho volání.",
       "code": null
     },
     {
       "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Doplňte konfigurační klíč pro aktivaci nástroje obsluhy statických souborů ve frameworku CherryPy:",
+      "type": "multiple_choice",
+      "question": "Jak se liší metoda cursor.executescript() od standardní metody cursor.execute()?",
       "options": [
-        "on",
-        "enable",
-        "active",
-        "enabled"
+        "A) Spouští SQL příkazy v externím procesu SQLite CLI místo vnitřní C knihovny Pythonu.",
+        "B) Automaticky volá commit() po každém řádku a ignoruje veškeré syntaktické chyby.",
+        "C) Umožňuje vykonat více SQL příkazů oddělených středníkem předaných v jediném řetězci.",
+        "D) Převádí SQL dotaz do Python bajtkódu pro zrychlení opakovaných databázových dotazů."
       ],
-      "answer": 0,
-      "explanation": "CherryPy používá konvenci tools.<název_nástroje>.on: True pro zapnutí jednotlivých vestavěných modulů a nástrojů.",
-      "code": "config = {\n    \"/static\": {\n        \"tools.staticdir.________\": True,\n        \"tools.staticdir.dir\": \"/var/www/public\"\n    }\n}",
-      "expected": "on"
+      "answer": 2,
+      "explanation": "Metoda execute() vykoná pouze jeden SQL dotaz, zatímco executescript() dokáže zpracovat celý skript složený z více SQL příkazů oddělených středníky.",
+      "code": null
     },
     {
       "id": "q5",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení o cestách v konfiguraci pro servírování statických souborů v CherryPy:\n\nVšechny cesty k adresářům předávané do nastavení tools.staticdir.dir musí být z bezpečnostních důvodů uvedeny zásadně jako absolutní cesty.",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu kurzoru z rozhraní Python DB-API 2.0 (např. sqlite3), která načte z výsledku SQL dotazu právě jeden následující řádek.",
       "options": [
-        "A) Pravda – CherryPy vyžaduje v konfiguraci tools.staticdir.dir výhradně absolutní cestu v souborovém systému.",
-        "B) Nepravda – CherryPy preferuje z důvodu přenositelnosti relativní cesty vztažené k aktuálnímu pracovnímu adresáři."
+        "readline",
+        "get_one",
+        "fetchrow",
+        "fetchone"
       ],
-      "answer": 0,
-      "explanation": "CherryPy z bezpečnostních důvodů (vyhnutí se neoprávněnému procházení adresářů) striktně vyžaduje, aby cesty v konfiguraci statických adresářů byly absolutní (lze použít např. os.path.abspath()).",
-      "code": null
+      "answer": 3,
+      "explanation": "Metoda cursor.fetchone() vrátí jeden následující řádek z výsledku SQL dotazu jako n-tici (tuple), nebo None, pokud již žádný další záznam neexistuje.",
+      "code": "import sqlite3\n\nconn = sqlite3.connect(\"laborator.db\")\ncursor = conn.cursor()\n\ncursor.execute(\"SELECT vzorek_id, koncentrace FROM mereni WHERE id = ?\", (42,))\n# Načtení jediného nalezeného záznamu jako tuple\nrow = cursor.________()\n# Výstup: ('VZ-42', 0.015) nebo None",
+      "expected": "fetchone"
     },
     {
       "id": "q6",
       "type": "multiple_choice",
-      "question": "Jak se po zpracování dekorátorem @cherrypy.popargs namapují části URL /art/nirvana/nevermind?",
+      "question": "Jaké zkratky (shortcuts) nabízejí objekty připojení Connection podle standardu DB API 2 v sqlite3?",
       "options": [
-        "A) Hodnotou artist bude 'art' a příslušnou hodnotou album bude 'nirvana'.",
-        "B) Hodnotou artist bude 'nirvana' a příslušnou hodnotou album bude 'nevermind'.",
-        "C) Hodnotou artist bude 'nevermind' a příslušnou hodnotou album bude 'nirvana'.",
-        "D) Vyvolá 404 Not Found, protože dekorátor popargs nepodporuje více argumentů."
-      ],
-      "answer": 1,
-      "explanation": "Dekorátor @cherrypy.popargs('artist', 'album') postupně odebere (popne) z cesty URL následující dvě části a předá je metodě index jako pojmenované argumenty artist='nirvana' a album='nevermind'.",
-      "code": "import cherrypy\n\n@cherrypy.popargs('artist', 'album')\nclass Music:\n    @cherrypy.expose\n    def index(self, artist, album):\n        return f\"{artist} - {album}\"\n\ncherrypy.quickstart(Music(), '/art')"
-    },
-    {
-      "id": "q7",
-      "type": "multiple_choice",
-      "question": "Jak správně spustit webový server CherryPy s více navzájem nezávislými aplikacemi pripojenými na různé cesty URL?",
-      "options": [
-        "A) Opakovaným sekvenčním voláním metody cherrypy.quickstart() v cyklu pro každou jednotlivou aplikaci zvlášť.",
-        "B) Sloučením všech tříd aplikací do jedné společné třídy předané jako argument do cherrypy.quickstart().",
-        "C) Připojením aplikací pomocí cherrypy.tree.mount() a spuštěním engine přes engine.start() a engine.block().",
-        "D) Vytvořením více samostatných systémových vláken, kde každé vlákno zavolá metodu cherrypy.quickstart()."
-      ],
-      "answer": 2,
-      "explanation": "Metoda quickstart() slouží pouze jako zkratka pro jedinou aplikaci. Pro více aplikací se použije tree.mount(App1(), '/app1'), tree.mount(App2(), '/app2') a server se spustí přes cherrypy.engine.start() a cherrypy.engine.block().",
-      "code": null
-    },
-    {
-      "id": "q8",
-      "type": "fill_blank_choice",
-      "question": "Doplňte metodu frameworku CherryPy pro zápis zprávy do systémového logu:",
-      "options": [
-        "logger",
-        "write_log",
-        "error",
-        "log"
-      ],
-      "answer": 3,
-      "explanation": "Funkce cherrypy.log(msg) zapíše předanou zprávu do standardního aplikačního logu CherryPy serveru.",
-      "code": "import cherrypy\n\nclass WebService:\n    @cherrypy.expose\n    def process_data(self):\n        cherrypy.________(\"Zpracování požadavku dokončeno\")\n        return \"Hotovo\"",
-      "expected": "log"
-    },
-    {
-      "id": "q9",
-      "type": "multiple_choice",
-      "question": "Jak vyřešit kolizi složených závorek {} při generování HTML obsahu obsahujícího CSS styly přes metodu str.format()?",
-      "options": [
-        "A) Zdvojením složených závorek {{ a }} ve zbylém neformátovaném obsahu šablony.",
-        "B) Přechodem na nepodporovaný tvar složených závorek s dolarem ${ a } v celém kódu.",
-        "C) Předsazením zpětného lomítka \\{ a \\} před každou složenou závorku v CSS stylu.",
-        "D) Obalením celého CSS bloku do HTML značky <raw> zabraňující interpretaci závorek."
+        "A) Metody execute(), executemany() a executescript() lze volat přímo na objektu Connection.",
+        "B) Při výskytu chyb v SQL dotazu se automaticky spouští opravný skript v prostředí SQLite.",
+        "C) Připojení k databázi se automaticky uzavře po 60 sekundách bez volání connection.close().",
+        "D) Tabulky vytvořené v SQLite se v Pythonu automaticky namapují na datové třídy dataclass."
       ],
       "answer": 0,
-      "explanation": "V Pythonním řetězcové metodě format() se literal složená závorka zapisuje zdvojeně {{ a }}. To zabrání chybě KeyError nebo ValueError při formátování šablony obsahující CSS či JS kód.",
+      "explanation": "Objekty Connection v modulu sqlite3 nabízejí zkratky connection.execute(...) apod., které si samy interně vytvoří dočasný kurzor a zavolají požadovanou operaci.",
       "code": null
     }
   ]

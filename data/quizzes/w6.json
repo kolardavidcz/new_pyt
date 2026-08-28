@@ -98,91 +98,6 @@
       "code": null
     }
   ],
-  "super": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Co vypíše následující kód při zavolání metody `c.test()`?",
-      "options": [
-        "A) Vyvolá TypeError, protože prvním argumentem funkce super() musí být instance objektu.",
-        "B) Vyvolá AttributeError, protože třída A nedědí z třídy B a nemá přístup k jejím metodám.",
-        "C) Vypíše řetězec 'A', protože super(A, self) odkazuje přímo na rodičovskou třídu A.",
-        "D) Vypíše řetězec 'B', protože hledání v MRO třídy C pokračuje po třídě A dalším rodičem B."
-      ],
-      "answer": 3,
-      "explanation": "První parametr `type` ve `super(A, self)` určuje třídu v MRO rodokmenu instance `c` (`C -> A -> B -> object`), od jejíhož NÁSLEDUJÍCÍHO prvku se začne metoda vyhledávat. Za třídou `A` v MRO třídy `C` následuje třída `B`, proto se zavolá `B.test()`.",
-      "code": "class A:\n    def test(self):\n        return \"A\"\n\nclass B:\n    def test(self):\n        return \"B\"\n\nclass C(A, B):\n    def test(self):\n        return super(A, self).test()\n\nc = C()\nprint(c.test())"
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký bude výsledek vykonání kódu při volání `b.greet()` s vnořenou funkcí?",
-      "options": [
-        "A) Vyvolá RuntimeError, protože bezargumentový super() nefunguje uvnitř vnořené funkce bez self.",
-        "B) Vypíše řetězec 'Hello World', protože super() automaticky vyhledá instanci v nadřazeném rozsahu.",
-        "C) Vypíše hodnotu None, protože vnořená funkce inner nepředává argumenty do nadřazené metody.",
-        "D) Vyvolá AttributeError, protože vnořená funkce inner nemá přístup k metodám rodičovské třídy."
-      ],
-      "answer": 0,
-      "explanation": "Bezargumentové volání `super()` spoléhá na kompilátorem vkládanou proměnnou `__class__` a první argument metody (`self`). Uvnitř vnořené funkce `inner()`, která nemá parametr `self`, toto automatické doplnění selže a vyvolá `RuntimeError: super(): __class__ cell not found` (případně `TypeError`).",
-      "code": "class A:\n    def greet(self):\n        return \"Hello\"\n\nclass B(A):\n    def greet(self):\n        def inner():\n            return super().greet() + \" World\"\n        return inner()\n\nb = B()\nprint(b.greet())"
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jaké bude pořadí výpisů při vytvoření instance `c = C()` v diamantové dědičnosti?",
-      "options": [
-        "A) Vypíše postupně C, A, Base, protože třída A zavolá přímo konstruktor Base.",
-        "B) Vypíše postupně C, A, B, Base díky kooperativnímu řetězení v MRO pořadí.",
-        "C) Vypíše postupně C, A, Base, B, Base kvůli dvojímu volání rodiče Base.",
-        "D) Vyvolá TypeError, protože třídy A a B dědí ze stejné základní třídy Base."
-      ],
-      "answer": 1,
-      "explanation": "MRO pro třídu `C` je `[C, A, B, Base, object]`. Volání `super().__init__()` uvnitř `A.__init__` nevyvolá přímo `Base.__init__`, ale předá řízení dalšímu prvku v MRO rodokmenu třídy `C`, což je `B.__init__`. Až `B.__init__` zavolá `Base.__init__`, takže každý konstruktor se zavolá právě jednou.",
-      "code": "class Base:\n    def __init__(self):\n        print(\"Base\")\n\nclass A(Base):\n    def __init__(self):\n        print(\"A\")\n        super().__init__()\n\nclass B(Base):\n    def __init__(self):\n        print(\"B\")\n        super().__init__()\n\nclass C(A, B):\n    def __init__(self):\n        print(\"C\")\n        super().__init__()\n\nc = C()"
-    },
-    {
-      "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Doplňte název atributu třídy obsahujícího n-tici s pořadím prohledávání metod (MRO):",
-      "options": [
-        "__bases__",
-        "__hierarchy__",
-        "__mro__",
-        "__order__"
-      ],
-      "answer": 2,
-      "explanation": "Speciální atribut __mro__ (Method Resolution Order) obsahuje n-tici tříd určující prioritu vyhledávání metod a atributů.",
-      "code": "class Base: pass\nclass Derived(Base): pass\n\nresolution_order = Derived.________\n# Výstup: (<class '__main__.Derived'>, <class '__main__.Base'>, <class 'object'>)",
-      "expected": "__mro__"
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co přesně specifikuje prvotní argument `type` ve volání `super(type, object)`?",
-      "options": [
-        "A) Cílovou rodičovskou třídu, jejíž metoda se má přímo spustit s vynecháním ostatních předků.",
-        "B) Typ objektu, na kterém se má vyhledávání zastavit při dosažení vrchní úrovně dědičnosti.",
-        "C) Výchozí třídu, která se použije jako záložní řešení v případě nenalezení metody v potomcích.",
-        "D) Třídu v MRO řetězci, od jejíž následující pozice se započne vyhledávání požadované metody."
-      ],
-      "answer": 3,
-      "explanation": "První parametr `type` nenařizuje spuštění metody přímo z dané třídy; určuje bod v MRO rodokmenu druhého argumentu, od jehož následujícího souseda se začne hledat.",
-      "code": null
-    },
-    {
-      "id": "q6",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení: Volání `super()` s oběma explicitními parametry `super(Třída, objekt)` lze použít výhradně uvnitř instančních metod dané třídy.",
-      "options": [
-        "A) Nepravda – `super(Třída, objekt)` s oběma parametry lze použít kdekoli v kódu, protože oba parametry plně určují MRO i prohledávanou instanci.",
-        "B) Pravda – `super()` vyžaduje vazbu na kontext třídy a při použití mimo její metody vyvolá chybu SyntaxError bez ohledu na předané argumenty."
-      ],
-      "answer": 0,
-      "explanation": "Při předání obou argumentů `super(Třída, objekt)` má funkce vše potřebné (MRO i objekt) a lze ji zavolat kdekoli v kódu mimo těla metod. Pouze bezargumentová varianta `super()` vyžaduje běhový kontext metody.",
-      "code": null
-    }
-  ],
   "magic": [
     {
       "id": "q1",
@@ -283,74 +198,88 @@
       "code": null
     }
   ],
-  "iterators": [
+  "super": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Co se stane při pokusu použít instanci `MojIter` v cyklu `for` v níže uvedeném kódu?",
+      "question": "Co vypíše následující kód při zavolání metody `c.test()`?",
       "options": [
-        "A) Vypíše hodnotu None, protože chybějící metoda __iter__() automaticky inicializuje prázdný iterátor.",
-        "B) Vyvolá AttributeError, protože metoda __next__() musí být vždy zadekorována dekorátorem @iterator.",
-        "C) Vyvolá TypeError, protože cyklus for vyžaduje implementaci metody __iter__() pro vytvoření iterátoru.",
-        "D) Vypíše hodnotu 1 a skončí, protože metoda __next__() je plně postačující pro provádění cyklu for."
+        "A) Vyvolá TypeError, protože prvním argumentem funkce super() musí být instance objektu.",
+        "B) Vyvolá AttributeError, protože třída A nedědí z třídy B a nemá přístup k jejím metodám.",
+        "C) Vypíše řetězec 'A', protože super(A, self) odkazuje přímo na rodičovskou třídu A.",
+        "D) Vypíše řetězec 'B', protože hledání v MRO třídy C pokračuje po třídě A dalším rodičem B."
       ],
-      "answer": 2,
-      "explanation": "Cyklus `for` na začátku volá funkci `iter(obj)`, která vyžaduje přítomnost metody `__iter__()`. Pouhá existence metody `__next__()` bez `__iter__()` nestačí a vyvolá `TypeError: 'MojIter' object is not iterable`.",
-      "code": "class MojIter:\n    def __next__(self):\n        return 1\n\nfor x in MojIter():\n    print(x)\n    break"
+      "answer": 3,
+      "explanation": "První parametr `type` ve `super(A, self)` určuje třídu v MRO rodokmenu instance `c` (`C -> A -> B -> object`), od jejíhož NÁSLEDUJÍCÍHO prvku se začne metoda vyhledávat. Za třídou `A` v MRO třídy `C` následuje třída `B`, proto se zavolá `B.test()`.",
+      "code": "class A:\n    def test(self):\n        return \"A\"\n\nclass B:\n    def test(self):\n        return \"B\"\n\nclass C(A, B):\n    def test(self):\n        return super(A, self).test()\n\nc = C()\nprint(c.test())"
     },
     {
       "id": "q2",
       "type": "multiple_choice",
-      "question": "Jaký bude výstup po vyčerpání prvků z instance `Odpocet`?",
+      "question": "Jaký bude výsledek vykonání kódu při volání `b.greet()` s vnořenou funkcí?",
       "options": [
-        "A) Vypíše '2 1 0' bez vyhození výjimky, protože hodnota 0 se vyhodnotí jako platný poslední prvek sekvence.",
-        "B) Vypíše '2 1 None', protože po vyčerpání hodnot vrací funkce next() implicitní prázdnou hodnotu None.",
-        "C) Vyvolá IndexError, protože ruční volání funkce next() na vyčerpaném iterátoru vyvolá chybový stav pole.",
-        "D) Vypíše '2 1' a následně 'Konec', protože po dosažení nulové hodnoty vyvolá metoda __next__ StopIteration."
+        "A) Vyvolá RuntimeError, protože bezargumentový super() nefunguje uvnitř vnořené funkce bez self.",
+        "B) Vypíše řetězec 'Hello World', protože super() automaticky vyhledá instanci v nadřazeném rozsahu.",
+        "C) Vypíše hodnotu None, protože vnořená funkce inner nepředává argumenty do nadřazené metody.",
+        "D) Vyvolá AttributeError, protože vnořená funkce inner nemá přístup k metodám rodičovské třídy."
       ],
-      "answer": 3,
-      "explanation": "První dvě volání `next(it)` vrátí hodnoty `2` a `1`. Třetí volání narazí na `self.val <= 0`, což vyvolá výjimku `StopIteration`, kterou blok `except` zachytí a vypíše `'Konec'`.",
-      "code": "class Odpocet:\n    def __init__(self, start):\n        self.val = start\n    def __iter__(self):\n        return self\n    def __next__(self):\n        if self.val <= 0:\n            raise StopIteration\n        self.val -= 1\n        return self.val + 1\n\nit = Odpocet(2)\nprint(next(it), next(it))\ntry:\n    print(next(it))\nexcept StopIteration:\n    print(\"Konec\")"
+      "answer": 0,
+      "explanation": "Bezargumentové volání `super()` spoléhá na kompilátorem vkládanou proměnnou `__class__` a první argument metody (`self`). Uvnitř vnořené funkce `inner()`, která nemá parametr `self`, toto automatické doplnění selže a vyvolá `RuntimeError: super(): __class__ cell not found` (případně `TypeError`).",
+      "code": "class A:\n    def greet(self):\n        return \"Hello\"\n\nclass B(A):\n    def greet(self):\n        def inner():\n            return super().greet() + \" World\"\n        return inner()\n\nb = B()\nprint(b.greet())"
     },
     {
       "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte návratovou hodnotu metody __iter__() pro splnění iterátorového protokolu:",
+      "type": "multiple_choice",
+      "question": "Jaké bude pořadí výpisů při vytvoření instance `c = C()` v diamantové dědičnosti?",
       "options": [
-        "self",
-        "iter(self)",
-        "next(self)",
-        "self.__next__()"
+        "A) Vypíše postupně C, A, Base, protože třída A zavolá přímo konstruktor Base.",
+        "B) Vypíše postupně C, A, B, Base díky kooperativnímu řetězení v MRO pořadí.",
+        "C) Vypíše postupně C, A, Base, B, Base kvůli dvojímu volání rodiče Base.",
+        "D) Vyvolá TypeError, protože třídy A a B dědí ze stejné základní třídy Base."
       ],
-      "answer": 0,
-      "explanation": "Objekt implementující __next__() musí ve své metodě __iter__() vracet sám sebe (self), aby vyhověl iterátorovému protokolu.",
-      "code": "class CountdownIterator:\n    def __init__(self, count):\n        self.count = count\n\n    def __iter__(self):\n        return ________\n\n    def __next__(self):\n        if self.count <= 0:\n            raise StopIteration\n        self.count -= 1\n        return self.count + 1",
-      "expected": "self"
+      "answer": 1,
+      "explanation": "MRO pro třídu `C` je `[C, A, B, Base, object]`. Volání `super().__init__()` uvnitř `A.__init__` nevyvolá přímo `Base.__init__`, ale předá řízení dalšímu prvku v MRO rodokmenu třídy `C`, což je `B.__init__`. Až `B.__init__` zavolá `Base.__init__`, takže každý konstruktor se zavolá právě jednou.",
+      "code": "class Base:\n    def __init__(self):\n        print(\"Base\")\n\nclass A(Base):\n    def __init__(self):\n        print(\"A\")\n        super().__init__()\n\nclass B(Base):\n    def __init__(self):\n        print(\"B\")\n        super().__init__()\n\nclass C(A, B):\n    def __init__(self):\n        print(\"C\")\n        super().__init__()\n\nc = C()"
     },
     {
       "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jaké podmínky musí objekt splňovat, aby mohl být předán do vestavěné funkce `reversed()`?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte název atributu třídy obsahujícího n-tici s pořadím prohledávání metod (MRO):",
       "options": [
-        "A) Musí definovat výhradně metodu __reversed__(), protože jiné záložní protokoly Python při reverzování nepodporuje.",
-        "B) Musí definovat metodu __reversed__(), nebo implementovat metody __len__() a __getitem__() sekvenčního protokolu.",
-        "C) Musí dědit ze třídy ReversibleIterator a přetěžovat metodu __backward__() určenou pro zpětnou iteraci prvků.",
-        "D) Musí definovat metody __iter__() a __next__() běžného dopředného iterátoru s příznakem reverse=True v hlavičce."
+        "__bases__",
+        "__hierarchy__",
+        "__mro__",
+        "__order__"
       ],
-      "answer": 1,
-      "explanation": "Funkce `reversed()` nejprve hledá metodu `__reversed__()`. Pokud chybí, pokusí se použít sekvenční protokol vyžadující metody `__len__()` a `__getitem__()` pro přístup přes celočíselné indexy od konce.",
-      "code": null
+      "answer": 2,
+      "explanation": "Speciální atribut __mro__ (Method Resolution Order) obsahuje n-tici tříd určující prioritu vyhledávání metod a atributů.",
+      "code": "class Base: pass\nclass Derived(Base): pass\n\nresolution_order = Derived.________\n# Výstup: (<class '__main__.Derived'>, <class '__main__.Base'>, <class 'object'>)",
+      "expected": "__mro__"
     },
     {
       "id": "q5",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení: Každý iterovatelný objekt (iterable) v Pythonu musí sám přímo definovat metodu `__next__()`.",
+      "type": "multiple_choice",
+      "question": "Co přesně specifikuje prvotní argument `type` ve volání `super(type, object)`?",
       "options": [
-        "A) Nepravda – Iterovatelný objekt vyžaduje pouze metodu __iter__() vracející samostatný objekt iterátoru s metodu __next__().",
-        "B) Pravda – Každý objekt, po kterém lze v Pythonu iterovat pomocí cyklu for, musí sám přímo obsahovat plnou metodu __next__()."
+        "A) Cílovou rodičovskou třídu, jejíž metoda se má přímo spustit s vynecháním ostatních předků.",
+        "B) Typ objektu, na kterém se má vyhledávání zastavit při dosažení vrchní úrovně dědičnosti.",
+        "C) Výchozí třídu, která se použije jako záložní řešení v případě nenalezení metody v potomcích.",
+        "D) Třídu v MRO řetězci, od jejíž následující pozice se započne vyhledávání požadované metody."
+      ],
+      "answer": 3,
+      "explanation": "První parametr `type` nenařizuje spuštění metody přímo z dané třídy; určuje bod v MRO rodokmenu druhého argumentu, od jehož následujícího souseda se začne hledat.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení: Volání `super()` s oběma explicitními parametry `super(Třída, objekt)` lze použít výhradně uvnitř instančních metod dané třídy.",
+      "options": [
+        "A) Nepravda – `super(Třída, objekt)` s oběma parametry lze použít kdekoli v kódu, protože oba parametry plně určují MRO i prohledávanou instanci.",
+        "B) Pravda – `super()` vyžaduje vazbu na kontext třídy a při použití mimo její metody vyvolá chybu SyntaxError bez ohledu na předané argumenty."
       ],
       "answer": 0,
-      "explanation": "Iterovatelný objekt (`iterable`, např. seznam `list`) nemusí mít metodu `__next__()`. Stačí, když jeho metoda `__iter__()` vrátí nový objekt iterátoru (`iterator`), který metodu `__next__()` obsahuje.",
+      "explanation": "Při předání obou argumentů `super(Třída, objekt)` má funkce vše potřebné (MRO i objekt) a lze ji zavolat kdekoli v kódu mimo těla metod. Pouze bezargumentová varianta `super()` vyžaduje běhový kontext metody.",
       "code": null
     }
   ],
@@ -410,106 +339,6 @@
       ],
       "answer": 1,
       "explanation": "Podle dokumentace vyžaduje `@total_ordering` implementaci metody `__eq__()` plus alespoň jedné ze čtyř neekvivalentních porovnávacích metod (`__lt__`, `__le__`, `__gt__`, `__ge__`).",
-      "code": null
-    }
-  ],
-  "with": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jaká hodnota vrácená z metody __exit__() způsobí potlačení výjimky vzniklé uvnitř bloku with?",
-      "options": [
-        "A) Nepravdivá hodnota False (nebo None), která interpretu sdělí, že byla výjimka úspěšně zpracována.",
-        "B) Řetězec s názvem zachycené výjimky, který se předá nadřazenému bloku try-except k logování.",
-        "C) Pravdivá hodnota True (nebo jakýkoliv pravdivý objekt), která interpretu sdělí, že byla výjimka zpracována.",
-        "D) Objekt výjimky typu BaseException, který nahradí původně vyvolanou výjimku v aktuálním kontextu."
-      ],
-      "answer": 2,
-      "explanation": "Pokud __exit__() vrátí True (pravdivou hodnotu), Python výjimku potlačí a kód pokračuje za blokem with. Pokud vrátí False nebo None, výjimka se propaguje výše.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký bude výstup následujícího kódu využívajícího generátorový kontextový manažer?",
-      "options": [
-        "A) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku StopIteration kvůli vyčerpání generátoru.",
-        "B) Vypíše START, DATA, END dvakrát za sebou, protože generátor se při dalším vstupu automaticky restartuje.",
-        "C) Vypíše START, DATA, END a při druhém vstupu neprovede nic, protože proměnná val již obsahuje řetězec DATA.",
-        "D) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku RuntimeError: generator didn't yield."
-      ],
-      "answer": 3,
-      "explanation": "Generátor vytvořený pomocí @contextmanager je jednorázový. Jednou vyčerpaný generátorový objekt uložený do proměnné cm nelze znovu použít v dalším bloku with; pokus o to vyvolá RuntimeError: generator didn't yield.",
-      "code": "from contextlib import contextmanager\n\n@contextmanager\ndef my_ctx():\n    print(\"START\")\n    yield \"DATA\"\n    print(\"END\")\n\ncm = my_ctx()\nwith cm as val:\n    print(val)\nwith cm as val:\n    print(val)"
-    },
-    {
-      "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte klíčové slovo pro předání spravovaného prostředku z kontextového manažeru @contextmanager:",
-      "options": [
-        "yield",
-        "pass",
-        "return",
-        "send"
-      ],
-      "answer": 0,
-      "explanation": "Generátorový kontextový manažer předává spravovaný objekt do bloku with pomocí klíčového slova yield.",
-      "code": "from contextlib import contextmanager\n\n@contextmanager\ndef open_database(host):\n    conn = connect(host)\n    try:\n        ________ conn\n    finally:\n        conn.close()",
-      "expected": "yield"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jaké argumenty obdrží metoda __exit__(self, exc_type, exc_val, exc_tb) při normálním ukončení bloku with bez výjimky?",
-      "options": [
-        "A) Argument exc_type bude StopIteration, zatímco zbývající dva budou None.",
-        "B) Všechny tři argumenty exc_type, exc_val a exc_tb budou mít hodnotu None.",
-        "C) Argumenty obdrží instanci třídy SuccessState s informací o bezchybném průběhu.",
-        "D) Metoda __exit__() se při bezchybném doběhu bloku with vůbec nevolá."
-      ],
-      "answer": 1,
-      "explanation": "Dokončí-li se blok with bez vyvolání výjimky, Python zavolá __exit__ s argumenty (None, None, None).",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co bude vytištěno při spuštění následujícího kódu s vlastní třídou kontextového manažeru?",
-      "options": [
-        "A) Vypíše False None, protože výstup z __enter__() se zahodí a proměnná res se inicializuje na None.",
-        "B) Vypíše True RESOURCE, protože proměnná res v příkazu as vždy odkazuje přímo na kontextový manažer m.",
-        "C) Vypíše False RESOURCE, protože res dostane návratovou hodnotu z __enter__(), nikoliv objekt m.",
-        "D) Vyvolá výjimku AttributeError, protože metoda __enter__() musí vracet výhradně samotný objekt self."
-      ],
-      "answer": 2,
-      "explanation": "Proměnná za klíčovým slovem as přebírá návratovou hodnotu metody __enter__(). Jelikož ta vrátila řetězec \"RESOURCE\", proměnná res drží tento řetězec a nikoliv objekt m (res is m je tedy False).",
-      "code": "class Manager:\n    def __enter__(self):\n        return \"RESOURCE\"\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        return False\n\nm = Manager()\nwith m as res:\n    print(res is m, res)"
-    },
-    {
-      "id": "q6",
-      "type": "fill_blank_choice",
-      "question": "Doplňte návratovou hodnotu metody __exit__, která potlačí vzniklou výjimku a zabrání jejímu dalšímu šíření:",
-      "options": [
-        "None",
-        "False",
-        "self",
-        "True"
-      ],
-      "answer": 3,
-      "explanation": "Pokud metoda __exit__() vrátí pravdivou hodnotu (True), Python výjimku potlačí a nepokračuje v jejím šíření.",
-      "code": "class SuppressErrors:\n    def __enter__(self):\n        return self\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        if exc_type is not None:\n            print(f\"Zachycena výjimka: {exc_val}\")\n            return ________",
-      "expected": "True"
-    },
-    {
-      "id": "q7",
-      "type": "true_false_tricky",
-      "question": "Zápis with A() as a, B() as b: v Pythonu 3.10+ odpovídá zanořenému with A() as a: with B() as b: a volání metod __enter__ a __exit__ probíhá ve stejném lexikálním pořadí (nejprve A, potom B u obou kroků).",
-      "options": [
-        "A) Tvrzení je pravdivé; oba kontexty se otevírají i zavírají ve stejném lexikálním pořadí shora dolů (nejprve A a potom B u vstupů i ukončení).",
-        "B) Tvrzení je nepravdivé; metody __enter__ probíhají v pořadí A a pak B, ale čistící metody __exit__ probíhají v opačném pořadí (nejprve B a až poté A)."
-      ],
-      "answer": 1,
-      "explanation": "Kontextové manažery při vícenásobném zápisu fungují jako zanořené bloky: vstupní metody __enter__ se volají v pořadí zápisu (zleva doprava: A, pak B), ale čistící metody __exit__ se volají v opačném pořadí (nejprve vnitřní B, potom vnější A).",
       "code": null
     }
   ],
@@ -596,6 +425,77 @@
       "answer": 0,
       "explanation": "Metody jsou nedatové deskriptory (non-data descriptors), protože definují pouze metodu __get__. Protože nedefinují __set__, lze název metody na konkrétní instanci snadno přepsat přiřazením nové hodnoty do instance.__dict__.",
       "code": null
+    }
+  ],
+  "class_decorators": [
+    {
+      "id": "q_decor_1",
+      "type": "multiple_choice",
+      "question": "Kdy přesně dochází k vyhodnocení a aplikaci dekorátoru třídy?",
+      "options": [
+        "A) Při prvním vytvoření instance dané třídy během běhu aplikace.",
+        "B) Až po ukončení vykonávání bloku if __name__ == '__main__':.",
+        "C) Okamžitě po vyhodnocení těla třídy při definici (v čase importu).",
+        "D) Při zavolání jakékoliv metody vytvořené instance dané třídy."
+      ],
+      "answer": 2,
+      "explanation": "Dekorátor třídy se vykoná ihned po zpracování definice třídy interpretem. Výraz `@dec class A: pass` je ekvivalentní zápisu `A = dec(A)`. Aplikace dekorátoru je posledním krokem vytváření objektu třídy a nečeká na tvorbu konkrétních instancí.",
+      "code": null
+    },
+    {
+      "id": "q_decor_2",
+      "type": "fill_blank_choice",
+      "question": "Doplňte dekorátor ze standardní knihovny pro automatické dopočítání porovnávacích metod:",
+      "options": [
+        "rich_comparisons",
+        "auto_comparisons",
+        "order_derivation",
+        "total_ordering"
+      ],
+      "answer": 3,
+      "explanation": "Dekorátor `@functools.total_ordering` vezme třídu, která definuje metodu `__eq__` a jednu z porovnávacích metod (`__lt__`, `__le__`, `__gt__`, `__ge__`), a zbývající porovnávací operátory dopočítá a doplní jako atributy objektu třídy.",
+      "expected": "total_ordering",
+      "code": "from functools import ________\n\n@total_ordering\nclass Bod:\n    def __eq__(self, other): return self.x == other.x\n    def __lt__(self, other): return self.x < other.x"
+    },
+    {
+      "id": "q_decor_3",
+      "type": "multiple_choice",
+      "question": "Jaký požadavek musí třída splňovat, aby na ni šel úspěšně aplikovat dekorátor `@functools.total_ordering`?",
+      "options": [
+        "A) Musí definovat metodu __eq__ a současně alespoň jednu z metod __lt__, __le__, __gt__ nebo __ge__.",
+        "B) Musí definovat metody __hash__ a __eq__ a současně implementovat rozhraní pro řazení v C/Java.",
+        "C) Musí definovat všechny čtyři nerovnostní metody a současně alespoň jednu z metod __eq__ nebo __ne__.",
+        "D) Musí dědit z abstrakce functools.Comparable a současně přetížit rozhraní magické metody __cmp__."
+      ],
+      "answer": 0,
+      "explanation": "Dekorátor `@total_ordering` vyžaduje definici rovnosti (`__eq__`) a alespoň jednoho základního vztahu uspořádání (např. `__lt__`). Ze znalosti rovnosti a jedné relace dokáže matematicky doplňkově generovat zbývající operátory (jako `__gt__` nebo `__ge__`).",
+      "code": null
+    },
+    {
+      "id": "q_decor_4",
+      "type": "true_false_tricky",
+      "question": "Pravda nebo Nepravda: V Pythonu jsou funkce i běžné objekty tříd reprezentovány jako objekty, přičemž volatelnost určuje přítomnost magické metody `__call__`.",
+      "options": [
+        "A) Pravda – Vše v Pythonu je objekt a přidáním metody __call__ do libovolné třídy se její instance stanou callable stejným způsobem jako funkce.",
+        "B) Nepravda – Funkce jsou speciální nízkoúrovňové datové typy interpretu CPython a třídy s metodou __call__ nelze volat syntaxí s kulatými závorkami."
+      ],
+      "answer": 0,
+      "explanation": "Funkce v Pythonu jsou objekty (mají atribut `__call__`). Libovolná třída, jejíž instance implementuje metodu `__call__`, se stává volatelným objektem (callable) a lze ji pak syntakticky používat jako funkci.",
+      "code": null
+    },
+    {
+      "id": "q_decor_5",
+      "type": "multiple_choice",
+      "question": "Jaký bude výstup tohoto kódu při porovnání objektů dekorované třídy pomocí operátoru `>`?",
+      "options": [
+        "A) Způsobí chybovou výjimku TypeError, protože operátor > nebyl ve třídě explicitně nadefinován.",
+        "B) Vrátí hodnotu False, protože @total_ordering automaticky odvodil metodu __gt__ z __eq__ a __lt__.",
+        "C) Vrátí objekt typu NotImplemented, protože porovnávání dvou instancí vyžaduje definici metody __cmp__.",
+        "D) Vrátí hodnotu True, protože dekorátor @total_ordering při spuštění automaticky obrací pořadí operandů."
+      ],
+      "answer": 1,
+      "explanation": "Třída definuje `__eq__` a `__lt__`. Dekorátor `@total_ordering` automaticky doplní `__gt__`. Výraz `p1 > p2` porovná ceny (10 > 20), což vyhodnotí jako `False`. Bez použití `@total_ordering` by kód vyvolal `TypeError`.",
+      "code": "from functools import total_ordering\n\n@total_ordering\nclass Polozka:\n    def __init__(self, cena):\n        self.cena = cena\n    def __eq__(self, jiná):\n        return self.cena == jiná.cena\n    def __lt__(self, jiná):\n        return self.cena < jiná.cena\n\np1 = Polozka(10)\np2 = Polozka(20)\nprint(p1 > p2)"
     }
   ],
   "introspection": [

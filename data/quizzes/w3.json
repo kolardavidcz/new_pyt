@@ -113,77 +113,6 @@
       "code": null
     }
   ],
-  "DefaultDicts": [
-    {
-      "id": "q1",
-      "type": "predict_output",
-      "question": "Co bude výstupem po spuštění následujícího kódu?",
-      "options": [
-        "A) KeyError",
-        "B) 0",
-        "C) None",
-        "D) 1"
-      ],
-      "answer": 3,
-      "explanation": "Pouhé čtení neexistujícího klíče d['a'] u defaultdict způsobí automatické zavolání default_factory (zde list()), vložení klíče s touto hodnotou do slovníku a zvětšení jeho délky na 1.",
-      "code": "from collections import defaultdict\nd = defaultdict(list)\nx = d['a']\nprint(len(d))"
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jak se zachová defaultdict(None) při přístupu k neexistujícímu klíči?",
-      "options": [
-        "A) Vyvolá výjimku KeyError, neboť chybí platná tovární funkce.",
-        "B) Vrátí hodnotu None a nový klíč v pořádku uloží do slovníku.",
-        "C) Vytvoří prázdný slovník a vypíše varování o absenci továrny.",
-        "D) Vyvolá výjimku TypeError, neboť hodnota None není callable."
-      ],
-      "answer": 0,
-      "explanation": "Pokud je default_factory nastavena na None, přístup k neexistujícímu klíči vyvolá standardní výjimku KeyError.",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte tovární funkci do `defaultdict`, která zajistí výchozí číselnou hodnotu 0 pro dosud neevidované prvky.",
-      "options": [
-        "0",
-        "int",
-        "int()",
-        "float"
-      ],
-      "answer": 1,
-      "explanation": "Předáním konstruktoru `int` jako tovární funkce (default_factory) vrací `defaultdict` při přístupu k novému klíči hodnotu `int()`, tedy `0`.",
-      "code": "from collections import defaultdict\n\n# Počítadlo výskytů atomů v molekule\natom_counts = defaultdict(________)\n\nfor atom in [\"C\", \"H\", \"C\", \"H\", \"O\", \"H\"]:\n    atom_counts[atom] += 1\n\nprint(atom_counts[\"C\"])  # 2\nprint(atom_counts[\"N\"])  # 0 (automaticky inicializováno)",
-      "expected": "int"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jaký je zásadní rozdíl v chování a výkonu mezi `defaultdict(list)` a voláním běžné metody `d.setdefault(k, [])`?",
-      "options": [
-        "A) setdefault funguje pouze s neměnnými typy (int, str), zatímco defaultdict akceptuje pouze měnitelné kontejnery.",
-        "B) Mezi oběma přístupy není žádný výkonnostní ani sémantický rozdíl, liší se pouze zápisem syntaxe.",
-        "C) defaultdict volá tovární funkci líně pouze při absenci klíče, zatímco u setdefault(k, []) se nový prázdný seznam vytvoří v paměti při každém volání.",
-        "D) defaultdict neumí do slovníku vložit nově vytvořený klíč, zatímco setdefault klíč vždy trvale zapíše."
-      ],
-      "answer": 2,
-      "explanation": "Při volání d.setdefault(k, []) se prázdný seznam [] v argumentu vytvoří v paměti vždy (eagerly), i když klíč ve slovníku již existuje. Naproti tomu defaultdict volá továrnu list líně (lazy) výhradně ve chvíli, kdy klíč skutečně chybí.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "true_false_tricky",
-      "question": "Tovární funkce předaná do defaultdict dostává při volání hledaný klíč jako svojí vstupní hodnotu.",
-      "options": [
-        "A) Pravda – tovární funkce přebírá klíč jako svůj první parametr.",
-        "B) Nepravda – tovární funkce se volá bez jakýchkoliv parametrů."
-      ],
-      "answer": 1,
-      "explanation": "Interní metoda __missing__(key) u defaultdict volá self.default_factory() bez parametrů. Hledaný klíč se předané funkci nepředává.",
-      "code": null
-    }
-  ],
   "sets": [
     {
       "id": "q1",
@@ -375,6 +304,77 @@
       "answer": 3,
       "explanation": "Operátor & (průnik / intersection) funguje pro frozenset stejně jako pro set a vrací nový frozenset obsahující prvky přítomné v obou množinách, tedy {2, 3}.",
       "code": "fs1 = frozenset([1, 2, 3])\nfs2 = frozenset([2, 3, 4])\nprint(fs1 & fs2)"
+    }
+  ],
+  "DefaultDicts": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co bude výstupem po spuštění následujícího kódu?",
+      "options": [
+        "A) KeyError",
+        "B) 0",
+        "C) None",
+        "D) 1"
+      ],
+      "answer": 3,
+      "explanation": "Pouhé čtení neexistujícího klíče d['a'] u defaultdict způsobí automatické zavolání default_factory (zde list()), vložení klíče s touto hodnotou do slovníku a zvětšení jeho délky na 1.",
+      "code": "from collections import defaultdict\nd = defaultdict(list)\nx = d['a']\nprint(len(d))"
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se zachová defaultdict(None) při přístupu k neexistujícímu klíči?",
+      "options": [
+        "A) Vyvolá výjimku KeyError, neboť chybí platná tovární funkce.",
+        "B) Vrátí hodnotu None a nový klíč v pořádku uloží do slovníku.",
+        "C) Vytvoří prázdný slovník a vypíše varování o absenci továrny.",
+        "D) Vyvolá výjimku TypeError, neboť hodnota None není callable."
+      ],
+      "answer": 0,
+      "explanation": "Pokud je default_factory nastavena na None, přístup k neexistujícímu klíči vyvolá standardní výjimku KeyError.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Doplňte tovární funkci do `defaultdict`, která zajistí výchozí číselnou hodnotu 0 pro dosud neevidované prvky.",
+      "options": [
+        "0",
+        "int",
+        "int()",
+        "float"
+      ],
+      "answer": 1,
+      "explanation": "Předáním konstruktoru `int` jako tovární funkce (default_factory) vrací `defaultdict` při přístupu k novému klíči hodnotu `int()`, tedy `0`.",
+      "code": "from collections import defaultdict\n\n# Počítadlo výskytů atomů v molekule\natom_counts = defaultdict(________)\n\nfor atom in [\"C\", \"H\", \"C\", \"H\", \"O\", \"H\"]:\n    atom_counts[atom] += 1\n\nprint(atom_counts[\"C\"])  # 2\nprint(atom_counts[\"N\"])  # 0 (automaticky inicializováno)",
+      "expected": "int"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je zásadní rozdíl v chování a výkonu mezi `defaultdict(list)` a voláním běžné metody `d.setdefault(k, [])`?",
+      "options": [
+        "A) setdefault funguje pouze s neměnnými typy (int, str), zatímco defaultdict akceptuje pouze měnitelné kontejnery.",
+        "B) Mezi oběma přístupy není žádný výkonnostní ani sémantický rozdíl, liší se pouze zápisem syntaxe.",
+        "C) defaultdict volá tovární funkci líně pouze při absenci klíče, zatímco u setdefault(k, []) se nový prázdný seznam vytvoří v paměti při každém volání.",
+        "D) defaultdict neumí do slovníku vložit nově vytvořený klíč, zatímco setdefault klíč vždy trvale zapíše."
+      ],
+      "answer": 2,
+      "explanation": "Při volání d.setdefault(k, []) se prázdný seznam [] v argumentu vytvoří v paměti vždy (eagerly), i když klíč ve slovníku již existuje. Naproti tomu defaultdict volá továrnu list líně (lazy) výhradně ve chvíli, kdy klíč skutečně chybí.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Tovární funkce předaná do defaultdict dostává při volání hledaný klíč jako svojí vstupní hodnotu.",
+      "options": [
+        "A) Pravda – tovární funkce přebírá klíč jako svůj první parametr.",
+        "B) Nepravda – tovární funkce se volá bez jakýchkoliv parametrů."
+      ],
+      "answer": 1,
+      "explanation": "Interní metoda __missing__(key) u defaultdict volá self.default_factory() bez parametrů. Hledaný klíč se předané funkci nepředává.",
+      "code": null
     }
   ],
   "exceptions": [
@@ -587,125 +587,6 @@
       ],
       "answer": 0,
       "explanation": "pickle neukládá metody třídy ani její kód, ale pouze členské proměnné (typicky ze slovníku __dict__) a odkaz na název třídy a modulu. Při unpicklování se znovu načte třída z modulu a naplní se uloženými atributy.",
-      "code": null
-    }
-  ],
-  "_functions": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Co vrátí volání funkce fn() v následujícím kódu?",
-      "code_snippet": "def fn():\n    return 1, \"a\", [2, 3]\n\nres = fn()\nprint(type(res), res)",
-      "options": [
-        "A) <class 'list'> [1, 'a', [2, 3]] — návratová hodnota složená z více prvků vytvoří měnitelný seznam se všemi položkami.",
-        "B) <class 'tuple'> (1, 'a', [2, 3]) — čárkami oddělené hodnoty za return jsou automaticky zabaleny do objektu typu n-tice.",
-        "C) <class 'int'> 1 — návratové slovo return vrací v tomto zápisu pouze první zadanou hodnotu a ostatní ignoruje.",
-        "D) <class 'dict'> {0: 1, 1: 'a', 2: [2, 3]} — Python převede vrácené hodnoty na slovník s číselnými klíči podle pořadí."
-      ],
-      "answer": 1,
-      "explanation": "V Pythonu zápis return a, b, c nevytváří samostatné návratové hodnoty, ale konstruuje jediný objekt typu tuple (n-tice). Závorky jsou u n-tice volitelné, klíčovým prvkem pro její vytvoření je čárka.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Doplňte token do definice funkce pro výpočet pH, který vynutí zadání parametru `temperature` výhradně jako pojmenovaného argumentu.",
-      "code_snippet": "def fn(a, b, ________, c=10):\n    return a + b + c",
-      "options": [
-        "/",
-        "*args",
-        "*",
-        "**"
-      ],
-      "answer": 2,
-      "explanation": "Samostatná hvězdička `*` v hlavičce funkce označuje hranici keyword-only parametrů — všechny parametry uvedené za ní musí být volány s názvem argumentu.",
-      "code": "def calculate_ph(h_concentration, ________, temperature=298.15):\n    import math\n    return -math.log10(h_concentration)\n\n# Platné volání: calculate_ph(1e-7, temperature=300)\n# Neplatné volání: calculate_ph(1e-7, 300) -> TypeError",
-      "expected": "*"
-    },
-    {
-      "id": "q3",
-      "type": "predict_output",
-      "question": "Co vypíše druhý volací příkaz fn() v níže uvedeném kódu?",
-      "code_snippet": "val = 100\n\ndef fn(x=val):\n    print(x)\n\nval = 500\nfn()",
-      "options": [
-        "A) None — po změně globální proměnné se zruší propojení výchozího parametru a funkce vrátí prázdnou hodnotu.",
-        "B) TypeError — změna hodnoty proměnné použité v hlavičce funkce způsobí chybu typu při spuštění definice.",
-        "C) 500 — parametr si udržuje dynamický odkaz na globální proměnnou a načte její aktuální hodnotu při spuštění.",
-        "D) 100 — výchozí hodnota parametru se vyhodnotí jednorázově při definici funkce, nikoli při jejím pozdějším volání."
-      ],
-      "answer": 3,
-      "explanation": "Výrazy pro výchozí hodnoty parametrů se vyhodnocují v okamžiku provádění příkazu def. Proměnná x se tak sváže s objektem 100. Následná změna proměnné val na 500 již nemá na dříve vytvořenou výchozí hodnotu parametru žádný vliv.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Co vypíše druhý volací příkaz fn(2) bez zadaného druhého argumentu?",
-      "code_snippet": "def fn(x, y=[]):\n    y.append(x)\n    return y\n\nfn(1)\nres = fn(2)\nprint(res)",
-      "options": [
-        "A) [1, 2] — výchozí seznam se vytvoří pouze jednou při definici funkce a jeho modifikace přetrvávají mezi voláními.",
-        "B) [2] — při každém volání bez druhého argumentu se inicializuje nový prázdný seznam a starý je smazán z paměti.",
-        "C) AttributeError — metoda append vyvolá výjimku, protože výchozí parametr je vyhodnocen jako neměnná n-tice.",
-        "D) [1] — funkce vrací předchozí stav seznamu před přidáním nového prvku z důvodu nesynchronizovaného zápisu."
-      ],
-      "answer": 0,
-      "explanation": "Seznam [] ve výchozím parametru je vytvořen pouze jednou při definici funkce def. Všechna volání fn() bez druhého argumentu sdílejí stejný objekt v paměti. Volání fn(1) do něj přidá 1 a volání fn(2) přidá 2, takže výsledek je [1, 2].",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Které z následujících volání funkce def fn(a, b, /, c): pass vyvolá chybu TypeError?",
-      "options": [
-        "A) fn(1, 2, c=3) — parametr c za lomítkem vyžaduje povinné předání jménem a nelze mu předat poziční hodnotu.",
-        "B) fn(a=1, b=2, c=3) — parametry před lomítkem / jsou definovány jako výhradně poziční a nelze je volat jménem.",
-        "C) fn(1, 2, 3) — hodnota pro parametr c nesmí být předána pozičně, pokud jsou předchozí parametry odděleny lomítkem.",
-        "D) fn(a=1, 2, 3) — poziční argumenty nesmí předcházet pojmenovaným argumentům při jakémkoliv volání funkce."
-      ],
-      "answer": 1,
-      "explanation": "Lomítko / v definici parametrů označuje, že všechny parametry stojící před ním (a a b) jsou positional-only. Zkuste-li je předat pomocí jména (a=1, b=2), Python vyvolá TypeError. Parametr c za lomítkem lze předat jak pozičně (fn(1, 2, 3)), tak pojmenovaně (fn(1, 2, c=3)).",
-      "code": null
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Jakou hodnotu vypíše následující kód s vnořenou funkcí?",
-      "code_snippet": "def make_multiplier(factor):\n    def multiply(number):\n        return number * factor\n    return multiply\n\ndouble = make_multiplier(2)\nprint(double(5))",
-      "options": [
-        "A) 25 — vnitřní funkce vynásobí předaný argument sám sebou a ignoruje proměnnou zapsanou ve vnějším rozsahu.",
-        "B) NameError — proměnná factor z vnější funkce již po návratu neexistuje a vnitřní funkce k ní nemá přístup.",
-        "C) 10 — vnitřní funkce si uchovává přístup k proměnné factor z vnějšího rozsahu i po skončení vnější funkce.",
-        "D) TypeError — vrácená vnitřní funkce vyžaduje při spuštění dva argumenty včetně původního parametru factor."
-      ],
-      "answer": 2,
-      "explanation": "Jde o princip uzávěru (closure). Vnitřní funkce multiply si při svém vzniku zapamatuje lexikální kontext vnější funkce, v tomto případě hodnotu factor = 2. Volání double(5) tedy spočítá 5 * 2 = 10.",
-      "code": null
-    },
-    {
-      "id": "q7",
-      "type": "true_false_tricky",
-      "question": "Do jakých datových typů zabalují operátory *args a **kwargs proměnný počet vstupních parametrů ve funkci?",
-      "options": [
-        "A) Nepravda: *args vytvoří měnitelný seznam list pro parametry a **kwargs vytvoří n-tice tuple složenou ze dvojic klíč-hodnota.",
-        "B) Pravda: *args přetváří poziční parametry do objektu typu tuple (n-tice) a **kwargs přetváří pojmenované parametry do slovníku dict."
-      ],
-      "answer": 1,
-      "explanation": "Operátor * před parametrem sjednotí všechny přebývající poziční argumenty do neměnné n-tice tuple. Operátor ** sjednotí všechny pojmenované argumenty do slovníku dict.",
-      "code": null
-    },
-    {
-      "id": "q8",
-      "type": "multiple_choice",
-      "question": "Co se stane při pokusu o spuštění následujícího kódu?",
-      "code_snippet": "def fn(x, y=3):\n    return x ** y\n\nres = fn(x=2, 4)",
-      "options": [
-        "A) Proběhne výpočet s výsledkem 16, protože Python automaticky přiřadí druhý argument 4 zbývajícímu parametru y.",
-        "B) Proběhne výpočet s výsledkem 8, protože první pojmenovaný argument vyruší platnost druhého zadaného argumentu.",
-        "C) Nastane TypeError, protože parametr x obdrží dvě různé hodnoty a parametr y zůstane bez zadané výchozí hodnoty.",
-        "D) Nastane SyntaxError, protože v definici volání funkce nesmí žádný poziční argument následovat za pojmenovaným argumentem."
-      ],
-      "answer": 3,
-      "explanation": "V Pythonu platí přísné syntaktické pravidlo: při volání funkce se nesmí za pojmenovaným argumentem (zde x=2) objevit čistě poziční argument (4). Python takový kód odmítne zkompilovat a vyvolá SyntaxError: positional argument follows keyword argument.",
       "code": null
     }
   ]

@@ -1,202 +1,4 @@
 {
-  "_remarks": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Proč je zápis `{}` pro vytvoření prázdného slovníku rychlejší než volání `dict()`?",
-      "options": [
-        "A) Zápis `{}` překládá interpretr přímo na jedinou bajtkódovou instrukci, zatímco `dict()` vyžaduje dohledání jména v globálním prostoru.",
-        "B) Zápis `{}` alokuje paměť přímo v paměti procesoru, zatímco `dict()` vytváří objekt v dynamické paměti RAM pro celé prostředí.",
-        "C) Zápis `{}` automaticky zamkne slovník proti úpravám, zatímco `dict()` vytváří dynamickou a libovolně měnitelnou datovou strukturu.",
-        "D) Zápis `{}` provádí kontrolu typů klíčů již při překladu, zatímco `dict()` odkládá všechny kontroly typů až na samotný běh programu."
-      ],
-      "answer": 0,
-      "explanation": "Zápis `{}` odpovídá přímo instrukci BUILD_MAP v bajtkódu. Volání `dict()` vyžaduje dohledání jména v globálním/vestavěném jmenném prostoru a teprve poté zavolání callable objektu.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "predict_output",
-      "question": "Co vypíše následující kód po úpravě seznamu přes odkaz?",
-      "code": "xs = ['a', 'b', 'c']\nys = xs\nxs.remove('b')\nprint(ys)",
-      "options": [
-        "A) `['a', 'b', 'c']` — přiřazení `ys = xs` vytvoří nezávislou kopii obsahu seznamu, takže `ys` zůstane nezměněn.",
-        "B) `['a', 'c']` — proměnné `xs` a `ys` odkazují na stejný objekt v paměti, takže změna v `xs` se projeví i v `ys`.",
-        "C) `None` — metoda `remove()` modifikuje seznam na místě a vrací novou prázdnou hodnotu, která se přiřadí do `ys`.",
-        "D) `['b']` — metoda `remove()` odstraní ze seznamu zbývající prvky a v odkazované proměnné ponechá pouze vymazaný prvek."
-      ],
-      "answer": 1,
-      "explanation": "V Pythonu přiřazení `ys = xs` nevytváří kopii, ale nový alias k témuž objektu v paměti. Modifikace `xs.remove('b')` upraví samotný objekt, což je viditelné i přes jméno `ys`."
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Co vypíše následující kód demonstrující mělkou kopii u vnořených seznamů?",
-      "code": "xs = [1, ['a', 'b']]\nys = xs[:]\nxs[1].pop()\nprint(ys)",
-      "options": [
-        "A) `[1, ['a', 'b']]` — výřez `xs[:]` vytvoří kompletní hlubokou kopii včetně všech vnořených datových struktur.",
-        "B) `[1, []]` — metoda `pop()` vyprázdní vnořený seznam v primárním objektu i ve všech jeho nezávislých kopiích.",
-        "C) `[1, ['a']]` — mělká kopie zkopíruje pouze vnější seznam, vnitřní seznam zůstává sdílený v obou proměnných.",
-        "D) `[['a']]` — zkopírovaný seznam automaticky odstraní celočíselné prvky na nultém indexu při úpravě podseznamu."
-      ],
-      "answer": 2,
-      "explanation": "Výřez `xs[:]` vytvoří mělkou kopii vnějšího seznamu. Prvky uvnitř (vnořený seznam `['a', 'b']`) jsou však stále stejné reference. Úprava `xs[1].pop()` se proto projeví i v `ys`."
-    },
-    {
-      "id": "q4",
-      "type": "true_false_tricky",
-      "question": "Lze n-tici `(1, 2, [3, 4])` použít jako klíč ve slovníku, protože samotná n-tice je immutable typ?",
-      "options": [
-        "A) Pravda — typ `tuple` je neproměnný, takže jeho heš je konstantní bez ohledu na datové typy vnořených prvků.",
-        "B) Nepravda — n-tice je hešovatelná pouze tehdy, pokud jsou hešovatelné všechny prvky, které sama obsahuje."
-      ],
-      "answer": 1,
-      "explanation": "Aby byla n-tice hešovatelná (a použitelná jako klíč slovníku nebo prvek množiny), musejí být hešovatelné i všechny její prvky. Protože obsahuje mutable seznam `[3, 4]`, volání `hash()` vyvolá TypeError.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "predict_output",
-      "question": "Co vypíše kód porovnávající vyprázdnění slovníku metodou `clear()` a přiřazením `{}`?",
-      "code": "d1 = d2 = {'a': 1, 'b': 2}\nd1.clear()\nprint(d2)",
-      "options": [
-        "A) `{'a': 1, 'b': 2}` — metoda `clear()` se aplikuje pouze na jméno `d1` a druhý ukazatel `d2` ponechá netknutý.",
-        "B) `None` — zavolání `clear()` smaže celý slovník z paměti a vrátí speciální konduktor `None` pro oba odpovídající proměnné.",
-        "C) `KeyError` — odstranění všech prvků způsobí chybu klíče při pokusu o přistoupení k prázdnému slovníku přes `d2`.",
-        "D) `{}` — metoda `clear()` vyprázdní existující objekt v paměti, na který odkazuje jak `d1`, tak `d2`."
-      ],
-      "answer": 3,
-      "explanation": "Metoda `d1.clear()` modifikuje stávající objekt slovníku přímo v paměti. Protože `d2` odkazuje na tentýž objekt, zobrazí se vyprázdněný slovník `{}`."
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Jaký je rozdíl v asymptotické časové složitosti operace `x in kontejner` pro seznam (`list`) a množinu (`set`)?",
-      "options": [
-        "A) U seznamu je časová složitost O(n), protože vyžaduje lineární prohledání; u množiny je v průměrném případě O(1) díky hešování.",
-        "B) U seznamu závisí časová složitost na seřazení prvků v rozsahu O(1) až O(n); u množiny je vždy striktně kvadratická O(n^2).",
-        "C) U seznamu je časová složitost O(1) díky přímému indexování prvků; u množiny je O(n) kvůli nutnosti proít se všemi heši.",
-        "D) Pro oba typy je časová složitost operace `in` zcela shodná a dosahuje nejhoršího možného případu O(log n) pro všechny vstupy."
-      ],
-      "answer": 0,
-      "explanation": "Seznam vyžaduje prohledání prvek po prvku (O(n)). Množina využívá hešovací tabulku, takže vyhledání prvku probíhá v průměrném čase O(1).",
-      "code": null
-    },
-    {
-      "id": "q7",
-      "type": "fill_blank_choice",
-      "question": "Doplňte konstruktor pro vytvoření prázdné množiny (protože literál {} vytvoří prázdný slovník):",
-      "code": "# Vytvoření prázdné měnitelné množiny:\nempty_set = ________()\nprint(type(empty_set))  # <class 'set'>",
-      "options": [
-        "tuple",
-        "set",
-        "dict",
-        "frozenset"
-      ],
-      "answer": 1,
-      "explanation": "Zápis {} vytváří prázdný slovník (dict), proto se pro inicializaci prázdné množiny musí volat konstruktor set().",
-      "expected": "set"
-    },
-    {
-      "id": "q8",
-      "type": "multiple_choice",
-      "question": "Proč v Pythonu platí `hash(1) == hash(1.0)`, ale `id(1) == id(1.0)` je v obecném případě `False`?",
-      "options": [
-        "A) Funkce `hash()` převádí všechna reálná čísla na celá čísla, zatímco `id()` zjišťuje aktuální úroveň zanoření objektu v programu.",
-        "B) Funkce `hash()` a `id()` jsou plně zastupitelné a uvedený rozdíl vrací pouze interpretr spuštěný v optimalizačním režimu `-O`.",
-        "C) Funkce `hash()` vrací stejnou hodnotu pro čísla se stejnou matematickou hodnotou, zatímco `id()` vrací unikátní adresu objektu v paměti.",
-        "D) Funkce `hash()` porovnává bajtové kódování typů na disku, zatímco `id()` přepočítává celkový počet alokovaných bajtů v paměti."
-      ],
-      "answer": 2,
-      "explanation": "`hash()` je navržen tak, aby pro hodnoty, které se sobě rovnají (`1 == 1.0`), vracel stejný heš. `id()` vrací adresu konkrétní instance objektu v paměti RAM.",
-      "code": null
-    }
-  ],
-  "_sequences": [
-    {
-      "id": "q1",
-      "type": "predict_output",
-      "question": "Co vypíše následující kód využívající výřez se záporným krokem na řetězci?",
-      "code": "sekvence = \"Python\"\nprint(sekvence[::-2])",
-      "options": [
-        "A) `Pty` — výřez bere každý druhý znak od začátku a ignoruje záporné znaménko v definici kroku.",
-        "B) `nohtyP` — záporný krok zprovozní kompletní převrácení řetězce a ignoruje číselnou hodnotu kroku.",
-        "C) `ValueError` — záporný krok výřezu je povolen pouze u seznamů a u řetězců vyvolá chybu typu.",
-        "D) `nhP` — výřez prochází řetězec od konce k začátku a bere každý druhý znak z původního textu."
-      ],
-      "answer": 3,
-      "explanation": "Zápis `[::-2]` prochází řetězec od konce do začátku s krokem -2. Pro \"Python\" vezme indexy -1 ('n'), -3 ('h') a -5 ('P'), čímž vznikne \"nhP\"."
-    },
-    {
-      "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Doplňte vestavěnou funkci pro současné získání indexu a hodnoty prvku při iteraci ve for cyklu:",
-      "code": "names = [\"Alice\", \"Bob\", \"Charlie\"]\n\n# Iterace s automatickým číslováním indexů:\nfor idx, name in ________(names):\n    print(f\"{idx}: {name}\")\n# Výstup: 0: Alice, 1: Bob, 2: Charlie",
-      "options": [
-        "enumerate",
-        "zip",
-        "sorted",
-        "range"
-      ],
-      "answer": 0,
-      "explanation": "Funkce enumerate(iterable) vrací iterátor dvojic (index, prvek) počínaje indexem 0 (nebo zadaným start).",
-      "expected": "enumerate"
-    },
-    {
-      "id": "q3",
-      "type": "predict_output",
-      "question": "Co bude obsahem seznamu `xs` po provedení příkazu `del` nad výřezem?",
-      "code": "xs = [10, 20, 30, 40, 50]\ndel xs[1:4]\nprint(xs)",
-      "options": [
-        "A) `[10, 40, 50]` — příkaz `del` smaže prvky na indexech 1 až 4 včetně obou hraničních hodnot výřezu.",
-        "B) `[10, 50]` — příkaz `del` odstraní prvky na indexech 1, 2 a 3 (prvek na indexu 4 již do výřezu nepatří).",
-        "C) `[20, 30, 40]` — příkaz `del` vymaže okrajové prvky a ponechá vybraný výřez uvnitř nového seznamu.",
-        "D) `[10, 30, 50]` — příkaz `del` odstraňuje prvky na sudých pozicích uvnitř definovaného výřezu seznamu."
-      ],
-      "answer": 1,
-      "explanation": "Výřez `1:4` zahrnuje prvky na indexech 1, 2 a 3 (tj. hodnoty 20, 30, 40). Příkaz `del xs[1:4]` tyto tři prvky ze seznamu modifikací na místě odstraní, takže zůstane `[10, 50]`."
-    },
-    {
-      "id": "q4",
-      "type": "true_false_tricky",
-      "question": "Lze použít příkaz `del` k odstranění podřetězce z řetězce pomocí výřezu, například `del text[1:3]`?",
-      "options": [
-        "A) Nepravda — řetězce jsou neměnný (immutable) typ, takže jakýkoliv pokus o smazání jejich části vyvolá TypeError.",
-        "B) Pravda — příkaz `del` funguje univerzálně pro všechny sekvenční typy v Pythonu bez ohledu na mutabilitu."
-      ],
-      "answer": 0,
-      "explanation": "Příkaz `del` s indexem nebo výřezem vyžaduje, aby objekt podporoval mazání prvků (metodu `__delitem__`). Řetězce jsou immutable a operaci `__delitem__` nepodporují.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "predict_output",
-      "question": "Co vypíše přístup přes záporný index u následujícího seznamu?",
-      "code": "xs = [100, 200, 300, 400]\nprint(xs[-2])",
-      "options": [
-        "A) `400` — záporné znaménko obrací celý seznam a přístup vrací prvek ze záporně posunuté pozice konce.",
-        "B) `200` — záporný index odčítá pozici od nuly směrem doprava a vrací druhý prvek od začátku seznamu.",
-        "C) `300` — záporné indexování počítá od konce seznamu, kde index `-1` představuje poslední prvek a `-2` předposlední.",
-        "D) `IndexError` — záporné indexy nejsou v Pythonu povoleny a vyžadují explicitní výpočet `len(xs) - 2`."
-      ],
-      "answer": 2,
-      "explanation": "Záporné indexy počítají prvky od konce sekvence: `-1` je poslední prvek (400), `-2` je předposlední prvek (300)."
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Jak se liší chování vestavěné funkce `sorted(sekvence)` od metody `sekvence.sort()`?",
-      "options": [
-        "A) `sorted()` modifikuje původní objekt přímo v paměti, zatímco `sort()` vytváří hlubokou kopii seřazeného pole.",
-        "B) `sorted()` funguje pouze pro čísla a vyvolá chybu na textu, zatímco `sort()` dokáže seřadit libovolné datové typy.",
-        "C) `sorted()` i `sort()` fungují zcela totožně a liší se pouze tím, že `sort()` je zastaralá funkce určená k odebrání.",
-        "D) `sorted()` vrací nový seřazený seznam a původní sekvenci neupravuje, zatímco `sort()` řadí seznam přímo na místě."
-      ],
-      "answer": 3,
-      "explanation": "Funkce `sorted()` přijímá jakýkoliv iterovatelný objekt a vrací nový seřazený seznam. Metoda `.sort()` je dostupná pouze pro seznamy (`list`) a seřadí prvky in-place s návratovou hodnotou `None`.",
-      "code": null
-    }
-  ],
   "control_flow": [
     {
       "id": "q1",
@@ -698,6 +500,149 @@
       "explanation": "Ve formátovacím minijazyku Pythonu znak ^ zarovnává na střed, < doleva a > doprava.",
       "code": "title = \"VŠCHT\"\n\n# Zarovnání textu na střed s celkovou šířkou pole 10 znaků:\nformatted = f\"{title:________10}\"\n# Výstup: '  VŠCHT   '",
       "expected": "^"
+    }
+  ],
+  "regexps_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Proč se při kompilaci regulárních výrazů v Pythonu doporučuje používat raw string literály (např. r'\\d+\\w+')?",
+      "options": [
+        "A) Potlačují vyhodnocování zpětných lomítek na úrovni Pythonu a zabraňují nutnosti zdvojování \\\\.",
+        "B) Zrychlují kompilaci regulárního výrazu vytvořením konstantního objektu v bytecode před prováděním.",
+        "C) Povolují používání víceřádkových komentářů uvnitř vzoru bez aktivace rozšiřujícího režimu verbose.",
+        "D) Automaticky převádějí celý vzor na velká písmena bez ohledu na nastavené kompilační příznaky modulu."
+      ],
+      "answer": 0,
+      "explanation": "Použití raw stringu (`r'...'`) zabraňuje interpretu Pythonu ve vyhodnocování sekvencí se zpětným lomítkem (např. `\\n`, `\\t`). Regulární výraz tak dostane přesné zpětné lomítko bez nutnosti psát nepřehledné zdvojené `\\\\`.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Co vrací metoda re.finditer(pattern, string) při vyhledání všech zásahů v textu?",
+      "options": [
+        "A) Generátor vracející n-tice indexů počátku a konce jednotlivých zásahů bez samotných textových dat.",
+        "B) Iterátor postupně generující jednotlivé objekty zásahu (Match objects) obsahující podrobné informace.",
+        "C) Seznam (list) obsahující výhradně textové řetězce všech nalezených podřetězců vyhovujících vzoru.",
+        "D) Slovník (dict) mapující názvy pojmenovaných skupin na seznamy jejich nalezených výskytů v textu."
+      ],
+      "answer": 1,
+      "explanation": "Metoda `re.finditer()` vrací iterátor vracející objekty shody (`Match` objects) pro všechny nepřekrývající se výskyty vzoru v textu, což šetří paměť a umožňuje přistupovat k pozicím i podskupinám.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "predict_output",
+      "question": "Jak se liší výstup metody re.findall() u vzoru bez podskupin oproti vzoru s podskupinami?",
+      "options": [
+        "A) Bez skupin vrací iterátor objektů Match, se skupinami vrací přímý seznam slovníků skupin groupdict.",
+        "B) Bez skupin vrací seznam řetězců, se skupinami vyvolá výjimku re.error kvůli nekompatibilitě typů.",
+        "C) Bez skupin vrací seznam shodných řetězců, se skupinami vrací seznam n-tic zachycených podskupin.",
+        "D) Bez skupin vrací n-tici všech celých zásahů, se skupinami vrací seznam celých shody včetně zápisů."
+      ],
+      "answer": 2,
+      "explanation": "Pokud regulární výraz neobsahuje žádné podskupiny `()`, `findall()` vrací jednoduchý seznam zachycených řetězců. Pokud však výraz podskupiny obsahuje, vrací seznam n-tic (tuples) obsahujících hodnoty jednotlivých podskupin.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl v chování mezi funkcemi re.match() a re.search()?",
+      "options": [
+        "A) match prohledává celý řetězec kdekoliv, zatímco search vyžaduje shodu přes celý řetězec do konce.",
+        "B) match funguje výhradně s předkompilovanými vzory, zatímco search přijímá i nekompilovaný řetězec.",
+        "C) match vrací pouze Boolean hodnotu True/False, zatímco search vrací plnohodnotný objekt shody Match.",
+        "D) match hledá shodu výhradně od začátku řetězce, zatímco search prohledává celý řetězec kdekoliv."
+      ],
+      "answer": 3,
+      "explanation": "Funkce `re.match()` zkoumá shodu se vzorem pouze na samotném začátku řetězce (index 0). Naproti tomu `re.search()` prohledává celý řetězec a vrátí první nalezenou shodu kdekoliv v textu.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Co vrátí volání m.group(1, 2) na objektu Match m, který úspěšně zachytil alespoň dvě podskupiny?",
+      "options": [
+        "A) N-tici (tuple) dvou řetězců odpovídajících první a druhé zachycené podskupině regulárního výrazu.",
+        "B) Slovník (dict) obsahující celočíselné klíče 1 a 2 mapované na příslušné zachycené řetězce skupin.",
+        "C) Spojený řetězec vzniklý konkatenačním sloučením první a druhé zachycené podskupiny bez oddělovače.",
+        "D) Seznam (list) obsahující celou shodu m.group(0) a následně obě zachycené podskupiny v pořadí."
+      ],
+      "answer": 0,
+      "explanation": "Předání více argumentů (indexů nebo jmen skupin) metodě `.group()` vrátí n-tici (tuple) obsahující odpovídající hodnoty pro každý zadaný argument v daném pořadí.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu pro získání slovníku pojmenovaných skupin ze zachyceného objektu Match:\n\nimport re\npattern = re.compile(r'(?P<user>\\w+):(?P<role>\\w+)')\nmatch = pattern.search('user:admin')\ndata = match.________():",
+      "options": [
+        "namedgroups",
+        "groupdict",
+        "get_groups",
+        "dictgroups"
+      ],
+      "answer": 1,
+      "explanation": "Metoda `groupdict()` na objektu `Match` vrací slovník, kde klíči jsou jména pojmenovaných skupin definovaná pomocí `(?P<name>...)` a hodnotami jsou odpovídající zachycené podřetězce.",
+      "expected": "groupdict",
+      "code": "import re\npattern = re.compile(r'(?P<user>\\w+):(?P<role>\\w+)')\nmatch = pattern.search('user:admin')\ndata = match.________()"
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Jak ovlivní přítomnost podskupiny v regulárním výrazu chování funkce re.split()?",
+      "options": [
+        "A) Vyvolá výjimku ValueError, protože metoda split nepodporuje regulární výrazy s podskupinami.",
+        "B) Rozdělí řetězec pouze na prvním výskytu a ignoruje všechny následující shody v dalším textu.",
+        "C) Zahrne zachycené podskupiny jako samostatné prvky do výsledného vráceného seznamu oddělených částí.",
+        "D) Odstraní všechny oddělovače z výstupního seznamu a vrací pouze spojené nerozdělené n-tice znaků."
+      ],
+      "answer": 2,
+      "explanation": "Pokud regulární výraz v `re.split()` obsahuje podskupiny v závorkách `()`, jsou texty zachycené těmito podskupinami také vloženy do výsledného vráceného seznamu mezi oddělené části.",
+      "code": null
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Proč se pro odkazování na skupiny v nahrazovacím řetězci metody re.sub() doporučuje zápis \\g<1>0 místo \\10?",
+      "options": [
+        "A) Zrychluje provádění substituce přímým adresováním paměťového ukazatele na zachycenou skupinu.",
+        "B) Umožňuje nahrazování neosetřených Unicode znaků bez nutnosti specifikovat explicitní kódování.",
+        "C) Zajišťuje kompatibilitu se staršími verzemi Pythonu 2, které neuplatňovaly zápis se zpětným lomítkem.",
+        "D) Zabraňuje dvouznačnosti mezi odkazem na skupinu číslo 1 následovanou nulou a skupinou číslo 10."
+      ],
+      "answer": 3,
+      "explanation": "Zápis `\\g<1>0` jednoznačně určuje odkaz na podskupinu číslo 1 následovaný doslovným znakem `0`. Zápis `\\10` by interpret regulárních výrazů vyhodnotil jako odkaz na podskupinu číslo 10.",
+      "code": null
+    },
+    {
+      "id": "q9",
+      "type": "predict_output",
+      "question": "Co je návratovou hodnotou metody re.subn(pattern, repl, string)?",
+      "options": [
+        "A) Dvojice (n-tice) tvořená novým upraveným řetězcem a celkovým počtem provedených nahrazení v textu.",
+        "B) Seznam všech mezivýsledků vzniklých postupným prováděním jednotlivých nahrazení v řetězci.",
+        "C) Objekt typu Match obsahující podrobné rozbalené údaje o posledním nahrazeném podřetězci.",
+        "D) Pouze celočíselný počet provedených substitucí v textu bez samotného vytvořeného nového řetězce."
+      ],
+      "answer": 0,
+      "explanation": "Metoda `re.subn()` provádí stejnou substituci jako `re.sub()`, ale navrací n-tici `(new_string, number_of_subs)`, která obsahuje nový řetězec a celkový počet provedených nahrazení.",
+      "code": null
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "question": "Jak se mění interpretace regulárního výrazu při zapnutí kompilačního příznaku re.VERBOSE?",
+      "options": [
+        "A) Automaticky se zapíná ignorování velikosti písmen a vyhledávání přes více řádků současně.",
+        "B) Ignorují se netisknutelné bílé znaky mimo třídy [] a je povoleno vkládat komentáře pomocí znaku #.",
+        "C) Zvedá se maximální povolený počet zachycených skupin z výchozího limitu 99 na neomezený počet.",
+        "D) Povolují se rozšířené matematické operátory pro počítání opakování prvků v prohledávaném textu."
+      ],
+      "answer": 1,
+      "explanation": "Příznak `re.VERBOSE` (neboli `re.X`) ignoruje mezery a odřádkování ve vzoru (pokud nejsou uvnitř znakové třídy `[]` nebo eskapované) a umožňuje psát poznámky a komentáře uvozené znakem `#`.",
+      "code": null
     }
   ]
 }
