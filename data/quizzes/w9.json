@@ -1,273 +1,333 @@
 {
-  "pandas_overview": [
+  "doctests": [
     {
       "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jak je v knihovně Pandas vnitřně koncepčně strukturován objekt DataFrame?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte funkci modulu doctest, která prohledá docstringy aktuálního modulu a automaticky spustí všechny nalezené interaktivní testy.",
       "options": [
-        "A) Jako trojrozměrný tenzor v NumPy, kde první dimenze drží datové typy a zbylé dvě drží hodnoty tabulky.",
-        "B) Jako statická pole C-struktur alokovaná v souvislém bloku paměti s pevně zafixovaným počtem řádků i sloupců.",
-        "C) Jako slovník sloupců, kde klíče jsou názvy sloupců a hodnotami jsou objekty Series sdílející společný index.",
-        "D) Jako jednorozměrný spojový seznam řádků, kde každý prvek obsahuje n-tici s libovolně proměnnými typy dat."
+        "testfile",
+        "testmod",
+        "main",
+        "run_all"
       ],
-      "answer": 2,
-      "explanation": "DataFrame je v podstatě mapování (slovník) z názvů sloupců na jednorozměrná pole Series, přičemž všechny sloupce sdílejí stejný řádkový index. Přidání sloupce je proto levné, zatímco přidání řádku je náročné.",
-      "code": null
+      "answer": 1,
+      "explanation": "Funkce doctest.testmod() prozkoumá docstringy všech funkcí a tříd v modulu a ověří, zda jejich návratové hodnoty odpovídají zapsaným testům.",
+      "code": "import doctest\n\ndef calculate_ph(h_concentration: float) -> float:\n    \"\"\"\n    Výpočet pH z koncentrace oxoniových iontů.\n    >>> calculate_ph(1e-7)\n    7.0\n    \"\"\"\n    import math\n    return round(-math.log10(h_concentration), 2)\n\nif __name__ == \"__main__\":\n    doctest.________()",
+      "expected": "testmod"
     },
     {
       "id": "q2",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení o procházení řádků v Pandas pomocí cyklu for nebo metody iterrows():\n\nRuční iterace po řádcích DataFrame pomocí cyklu for nebo iterrows() je doporučený a nejrychlejší způsob úpravy dat v Pandas.",
+      "type": "multiple_choice",
+      "question": "Jak se z příkazové řádky spustí doctesty pro modul moje_logika.py s podrobným výpisem (verbose)?",
       "options": [
-        "A) Nepravda – iterace po řádcích je v Pandas považována za antipattern; pro efektivní zpracování se používají vektorizované operace.",
-        "B) Pravda – iterace po řádcích přímo využívá C-API Pythonu, a je proto znatelně rychlejší než vektorizovaný výpočet přes sloupce."
+        "A) python -m unittest -v moje_logika.py",
+        "B) python moje_logika.py --doctest-verbose",
+        "C) python -m doctest -v moje_logika.py",
+        "D) python doctest --verbose moje_logika.py"
       ],
-      "answer": 0,
-      "explanation": "Procházení po řádcích u sloupcově orientovaného DataFrame vyžaduje opakovaný přístup napříč všemi samostatnými objekty Series. Vytváří obrovskou režii, proto jde v Pandas o známý antipattern.",
+      "answer": 2,
+      "explanation": "Přepínač -m doctest spustí modul doctest jako skript a předá mu parametr -v pro podrobný výstup. unittest by spustil testovací třídy unittest, nikoli docstringy.",
       "code": null
     },
     {
       "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte chybějící syntaxi závorek pro výběr pod-tabulky se sloupci A a B jako nového DataFrame:\n\nimport pandas as pd\ndf = pd.DataFrame({'A': [1, 2], 'B': [3, 4], 'C': [5, 6]})\nsub_df = df________'A', 'B'________:",
+      "type": "predict_output",
+      "question": "Jaký výstup vytvoří spuštění python -m doctest moje_logika.py, pokud všechny testy v docstringách projdu bez chyb?",
       "options": [
-        "[ a ]",
-        "([ a ])",
-        "{( a )}",
-        "[[ a ]]"
+        "A) Vypíše se textový řetězec \"OK (tests=3, failures=0)\" na stdout.",
+        "B) Vypíše se hlášení \"SUCCESS\" spolu s celkovým časem vykonání v ms.",
+        "C) Zobrazí se kompletní seznam otestovaných dokumentačních funkcí.",
+        "D) Neprodlevně se nevypíše vůbec žádný textový výstup na konzoli."
       ],
       "answer": 3,
-      "explanation": "Jednoduché hranaté závorky df['A'] vrací jednorozměrný objekt Series. Pro výběr více sloupců a zachování typu DataFrame se seznam názvů sloupců předává uvnitř dvojitých závorek df[['A', 'B']].",
-      "expected": "[[ a ]]",
-      "code": "import pandas as pd\ndf = pd.DataFrame({'A': [1, 2], 'B': [3, 4], 'C': [5, 6]})\nsub_df = df________'A', 'B'________"
+      "explanation": "Doctest je navržen podle principu 'no news is good news' – pokud všechny testy uspějí, nevypisuje do konzole žádný výstup (pokud nebyl zadán příznak -v).",
+      "code": null
     },
     {
       "id": "q4",
-      "type": "predict_output",
-      "question": "Jaký datový typ vrátí metoda df['kategorie'].unique() při zavolání na sloupec Pandas?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte direktivu doctestu, která přikáže přeskočit testování výstupu na daném řádku docstringu.",
       "options": [
-        "A) NumPy pole ndarray obsahující pouze unikátní hodnoty z daného sloupce.",
-        "B) Nový objekt typu Pandas Series indexovaný celými čísly od nuly nahoru.",
-        "C) Standardní pythonovský seznam list všech unikátních řetězců v datovém sloupci.",
-        "D) Vestavěnou pythonovskou množinu set bez zachování původního pořadí prvků."
+        "+SKIP",
+        "PASS",
+        "NO_TEST",
+        "IGNORE"
       ],
       "answer": 0,
-      "explanation": "Metoda .unique() na objektu Series nevrací Python list ani set, ale NumPy jednorozměrné pole ndarray unikátních hodnot v pořadí jejich prvního výskytu.",
-      "code": null
+      "explanation": "Direktiva # doctest: +SKIP instruuje modul doctest, aby ignoroval a netestoval výstup daného řádku (např. u náhodných nebo nedeterministických výsledků).",
+      "code": "def generate_random_spectrum():\n    \"\"\"\n    Generuje náhodná spektrometrická data.\n\n    >>> generate_random_spectrum()  # doctest: ________\n    [0.124, 0.985, 0.432]\n    \"\"\"\n    import random\n    return [round(random.random(), 3) for _ in range(3)]",
+      "expected": "+SKIP"
     },
     {
       "id": "q5",
       "type": "multiple_choice",
-      "question": "Proč se při vyhodnocování složených podmínek ve fancy indexingu v Pandas musí používat operátory &, | a ~ místo and, or a not?",
+      "question": "Jakým způsobem lze začlenit doctesty modulu logika do standardního běhu unittest sady?",
       "options": [
-        "A) Slova and a or jsou v syntaxi Pandas vyrazena z důvodu zrychlení parsování výrazů při spuštění kódu v C-rozhraní.",
-        "B) Bitové operátory jsou přetíženy pro prvek po prvku (element-wise), zatímco Python and/or vyhodnocují pravdivost celého objektu.",
-        "C) Bitové operátory automaticky konvertují chybějící hodnoty NaN na False, což klíčová slova and a or nedokážou zaručit.",
-        "D) Operátory and a or pracují výhradně s celými čísly, zatímco bitové operátory & a | fungují i pro řetězce a desetinná čísla."
+        "A) Nastavením globální proměnné prostředí PYTHON_DOCTEST_ENABLE=1 před spuštěním sady testů.",
+        "B) Definováním funkce load_tests vracející tests.addTests(doctest.DocTestSuite(logika)).",
+        "C) Zavoláním metody unittest.register_doctest(logika) přímo uvnitř testovací metody setUp().",
+        "D) Importováním balíčku logika přímo do konstruktoru hlavní testovací třídy unittest.TestCase."
       ],
       "answer": 1,
-      "explanation": "Klíčová slova and a or se snaží zkonvertovat celý objekt Series na jedinou logickou hodnotu (vyvolá ValueError: Truth value of a Series is ambiguous). Pro porovnání po prvcích se musí použít bitové operátory &, |, ~ a podmínky obalit v závorkách.",
-      "code": null
-    },
-    {
-      "id": "q6",
-      "type": "fill_blank_choice",
-      "question": "Doplňte chybějící vlastnost pro použití vektorizovaných řetězcových metod nad sloupcem Series:\n\nimport pandas as pd\ndf = pd.DataFrame({'jmena': ['Anna', 'Petr', 'Pavel']})\nmask = df['jmena'].________.startswith('P'):",
-      "options": [
-        "char",
-        "string",
-        "str",
-        "text"
-      ],
-      "answer": 2,
-      "explanation": "Akcesor .str zpřístupňuje vektorizované řetězcové metody (jako contains(), startswith(), lower()) nad všemi prvkami objektu Series.",
-      "expected": "str",
-      "code": "import pandas as pd\ndf = pd.DataFrame({'jmena': ['Anna', 'Petr', 'Pavel']})\nmask = df['jmena'].________.startswith('P')"
-    },
-    {
-      "id": "q7",
-      "type": "predict_output",
-      "question": "Co vrátí výraz df.iloc[0:2] zavolaný na DataFrame se 5 řádky?",
-      "options": [
-        "A) Objekt Series představující hodnoty z nultého sloupce pro první dva řádky.",
-        "B) Nový DataFrame obsahující první tři řádky (na pozicích 0, 1 a 2).",
-        "C) Jediný prvek z prvního řádku a druhého sloupce v původní tabulce df.",
-        "D) Nový DataFrame obsahující první dva řádky (na pozicích indexu 0 a 1)."
-      ],
-      "answer": 3,
-      "explanation": "Pseudometoda iloc[] používá celočíselné pozicové indexování dodržující konvence slicing [start:stop], kde stop pozice (2) není zahrnuta. Výsledkem pro 0:2 jsou tedy řádky 0 a 1.",
-      "code": null
-    },
-    {
-      "id": "q8",
-      "type": "multiple_choice",
-      "question": "Jaký je hlavní rozdíl mezi metodami df.info() a df.head() v Pandas?",
-      "options": [
-        "A) info() vypisuje technické shrnutí sloupců, typů a paměti, zatímco head() vrací prvních několik řádků datových hodnot.",
-        "B) info() odstraňuje z tabulky neplatné řádky NaN, zatímco head() vybírá pouze sloupečky s číselnými hodnotami.",
-        "C) info() mění datové typy sloupců na optimálnější, zatímco head() seřadí hodnoty v tabulce podle prvního sloupce.",
-        "D) info() vrací nový DataFrame s popisnou statistikou, zatímco head() ukládá načtená data přímo na disk do souboru."
-      ],
-      "answer": 0,
-      "explanation": "df.info() vypíše na standardní výstup souhrn o počtu nepotvrzených (non-null) záznamů, datových typech dtype každého sloupce a využití paměti. df.head() vrací nový DataFrame obsahující počáteční řádky.",
-      "code": null
-    }
-  ],
-  "pandas_example_1": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jakou externí knihovnu vyžaduje Pandas při prvním pokusu o načtení excelovského souboru .xlsx přes pd.read_excel()?",
-      "options": [
-        "A) Knihovnu xlsxwriter pro generování grafů a maker přímo uvnitř excelového sešitu.",
-        "B) Knihovnu openpyxl pro čtení a zápis moderních souborů ve formátu XLSX.",
-        "C) Knihovnu xlwt pro vytvoření zpětné kompatibility se starými binárními soubory.",
-        "D) Knihovnu pytz pro správnou interpretaci časových zón v buňkách s datem a časem."
-      ],
-      "answer": 1,
-      "explanation": "Pandas samotný neobsahuje parser pro Excel formáty. Pro načítání moderních .xlsx souborů spoléhá na knihovnu openpyxl (případně xlrd pro staré .xls).",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Doplňte parametr do funkce read_excel() pro načtení konkrétního listu sešitu pojmenovaného data:\n\nimport pandas as pd\ndf = pd.read_excel('klementinum.xlsx', ________='data'):",
-      "options": [
-        "work_sheet",
-        "sheet",
-        "sheet_name",
-        "tab_name"
-      ],
-      "answer": 2,
-      "explanation": "Parametr sheet_name ve funkci pd.read_excel() určuje, který list sešitu se má načíst (lze předat název jako řetězec, číslo listu od 0, nebo seznam pro načtení více listů).",
-      "expected": "sheet_name",
-      "code": "import pandas as pd\ndf = pd.read_excel('klementinum.xlsx', ________='data')"
-    },
-    {
-      "id": "q3",
-      "type": "predict_output",
-      "question": "Co vypočítá metoda df.describe() zavolaná na číselné sloupce v DataFrame?",
-      "options": [
-        "A) Korelační matici vzájemných lineárních závislostí mezi všemi dvojicemi číselných sloupců v dané tabulce.",
-        "B) Přesné počty výskytů všech unikátních řetězcových hodnot v každém sloupci seřazené od nejčastějších po nejméně časté.",
-        "C) Vektorizovaný součet všech prvků v řádcích s následným rozdělením podle jednotlivých měsíčních kategorií.",
-        "D) Základní popisné statistické charakteristiky jako počet, průměr, směrodatnou odchylku, minima, kvartily a maxima."
-      ],
-      "answer": 3,
-      "explanation": "describe() generuje pro číselné sloupce přehled souhrnných statistik: count, mean, std, min, 25% kvartil, 50% medián, 75% kvartil a max.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení o použití metody df.describe() na sloupec obsahující čísla měsíců (1 až 12):\n\nMetoda describe() automaticky rozpozná, že číslo měsíce je kategorický údaj, a místo průměru a směrodatné odchylky vrátí frekvenční tabulku výskytů.",
-      "options": [
-        "A) Pravda – describe() provádí sémantickou analýzu dat a pro čísla v rozmezí 1–12 přepne výpočet na počty unikátních hodnot.",
-        "B) Nepravda – describe() počítá statistiky (průměr, std) slepě pro jakýkoliv číselný typ (int/float), i když pro číslo měsíce nedávají smysl."
-      ],
-      "answer": 1,
-      "explanation": "Metoda describe() pracuje pouze na základě datového typu (dtype). Pokud je sloupec měsíce uložen jako int64, vypočítá pro něj průměr a směrodatnou odchylku bez ohledu na věcný smysl.",
-      "code": null
-    }
-  ],
-  "MatPlotLib": [
-    {
-      "id": "q1",
-      "type": "fill_blank_choice",
-      "question": "Doplňte funkci pro zjištění aktuálně aktivního renderovacího backendu knihovny Matplotlib:",
-      "options": [
-        "show_backend",
-        "get_backend",
-        "current_backend",
-        "get_renderer"
-      ],
-      "answer": 1,
-      "explanation": "Funkce matplotlib.get_backend() vrací název právě nastaveného backendu pro vykreslování grafů (např. 'QtAgg', 'TkAgg' nebo 'inline').",
-      "code": "import matplotlib\n\n# Zjištění aktivního grafického backendu:\nbackend = matplotlib.________()\n# Výstup např.: 'QtAgg' nebo 'inline'",
-      "expected": "get_backend"
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Co se stane, pokud funkci plt.plot() předáme pouze jednu jednodimenzionální sekvenci hodnot plt.plot([10, 20, 15])?",
-      "options": [
-        "A) Zadané hodnoty se použijí pro osu x a pro osu y se automaticky doplňují nulové hodnoty stejné délky.",
-        "B) Vyvolá se ValueError z důvodu chybějící druhé sekvence souřadnic nezbytné pro vykreslení osy y.",
-        "C) Zadané hodnoty se použijí pro osu y a pro osu x se automaticky vygeneruje posloupnost indexů 0, 1, 2.",
-        "D) Vykreslí se bodový graf na úhlopříčce, kde hodnoty osy x i osy y budou vzájemně shodné a rovny vstupu."
-      ],
-      "answer": 2,
-      "explanation": "Předáme-li funkci `plt.plot()` pouze jediný seznam či pole hodnot, Matplotlib předpokládá, že jde o hodnoty na svislé ose y. Pro vodorovnou osu x vygeneruje automatické indexy `0, 1, ..., N-1`.",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Co v metodě plt.plot(x, y, 'ro-') specifikuje třetí řetězcový parametr 'ro-'?",
-      "options": [
-        "A) Vytvoření rastrového (r) obrázku s ortogonálním (o) promítáním os a automatickou mřížkou (-).",
-        "B) Vykreslení růžového (r) obdélníkového (o) rámce okolo celého grafu s průhlednou výplní (-).",
-        "C) Vykreslení červených (r) bodů bez spojovací čáry s rotací popisků (o) o nastavený úhel (-).",
-        "D) Vykreslení červené (r) plné čáry (-) spojující jednotlivé datové body označené kroužky (o)."
-      ],
-      "answer": 3,
-      "explanation": "Formátovací řetězec v Matplotlibu kombinuje barvu ('r' = red), značku bodu ('o' = circle marker) a typ čáry ('-' = solid line). Výsledkem je červená plná čára s kroužky v datových bodech.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jakým způsobem se docílí zobrazení popisu řad v legendě v modulu matplotlib.pyplot?",
-      "options": [
-        "A) Nastavením argumentu label ve funkci plot() a následným zavoláním samostatné funkce plt.legend().",
-        "B) Vytvořením samostatného textového pole pomocí plt.text() s explicitními souřadnicemi legendy.",
-        "C) Přímým předáním seznamu názvů řad jako jediného povinného argumentu do funkce plt.show().",
-        "D) Automatickým načtením jmen proměnných předaných do funkce plot() při zavolání plt.axis()."
-      ],
-      "answer": 0,
-      "explanation": "Jednotlivým křivkám předáme pojmenovaný parametr `label='Název'` při volání `plt.plot()`. Aby se však legenda skutečně vykreslila do grafu, je nutné následně explicitně zavolat `plt.legend()`.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co vyjadřuje volání plt.subplot(211) v modulu pyplot?",
-      "options": [
-        "A) Mřížku o 21 řádcích a 1 sloupci, přičemž aktivuje první buňku pro vykreslení nového podgrafu.",
-        "B) Mřížku o 2 řádcích a 1 sloupci, přičemž aktivuje první (horní) buňku pro kreslení podgrafu.",
-        "C) Nastavení rozlišení výstupního grafu na 211 DPI bez vytvoření nové mřížky pro podgrafy.",
-        "D) Vykreslení 211 samostatných bodů do jediného grafu s předdefinovaným stylem čar a bodů."
-      ],
-      "answer": 1,
-      "explanation": "Zkrácený zápis `plt.subplot(211)` je ekvivalentní `plt.subplot(2, 1, 1)`. První číslice udává počet řádků (2), druhá počet sloupců (1) a třetí index aktivní buňky (1 = první buňka).",
+      "explanation": "Unittest rozhraní vyhledává funkci load_tests(loader, tests, pattern), do které lze přidat testovací sadu vytvořenou pomocí doctest.DocTestSuite(modul).",
       "code": null
     },
     {
       "id": "q6",
       "type": "multiple_choice",
-      "question": "Jak se liší pojmenování metod pro nastavení popisků os na objektu Axes oproti top-level funkcím pyplot?",
+      "question": "K čemu slouží direktiva doctest.FAIL_FAST (resp. příkazový přepínač -o FAIL_FAST nebo -f)?",
       "options": [
-        "A) Metody na objektu Axes se volají s velkým počátečním písmenem (ax.Xlabel()), pyplot používá malé.",
-        "B) Metody na objektu Axes vyžadují předání objektu Figure jako prvního povinného argumentu metody.",
-        "C) Metody na objektu Axes mají předponu set_ (např. ax.set_xlabel()), zatímco pyplot volá plt.xlabel().",
-        "D) Metody na objektu Axes používají camelCase (např. ax.setXLabel()), zatímco pyplot vyžaduje snake_case."
+        "A) Přesměruje chybové zprávy ze standardního chybového výstupu přímo do souboru logu.",
+        "B) Zapne optimalizovaný JIT kompilátor pro zrychlení celkového porovnávání řetězců.",
+        "C) Zastaví vykonávání doctestů ihned při výskytu první selhané kontrolní podmínky.",
+        "D) Přeskočí všechny časově náročné testy a spustí pouze jednoduché aritmetické operace."
       ],
       "answer": 2,
-      "explanation": "Objektově orientované rozhraní Matplotlibu na objektu `Axes` používá metody s předponou `set_` (např. `ax.set_xlabel()`, `ax.set_title()`, `ax.set_xlim()`), zatímco modul `pyplot` nabízí přímé funkce bez předpony (např. `plt.xlabel()`).",
+      "explanation": "Příznak FAIL_FAST ukončí testování hned po první chybě, což šetří čas při ladění dlouhých sad docstring testů.",
+      "code": null
+    }
+  ],
+  "unittests": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaké pravidlo musí splňovat metody v třídě odvozené od unittest.TestCase, aby byly automaticky spuštěny?",
+      "options": [
+        "A) Metoda musí být deklarována jako statická dekorátorem @staticmethod.",
+        "B) Jméno metody musí končit příponou _test a vracet hodnotu True.",
+        "C) Metoda musí mít dekorátor @unittest.test a nesmí přijímat self.",
+        "D) Jméno metody musí začínat předponou test, např. test_vypocet()."
+      ],
+      "answer": 3,
+      "explanation": "Test runner v unittest vyhledává ve třídách TestCase všechny metody, jejichž název začíná řetězcem test.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký je přesný rozdíl v okamžiku spuštění metod setUp() a tearDown() při běhu testovací třídy?",
+      "options": [
+        "A) setUp() se spouští před každou testovací metodou a tearDown() po každé testovací metodě.",
+        "B) setUp() se volá výhradně při selhání testu a tearDown() proběhne u úspěšných testů.",
+        "C) setUp() se spouští pouze před celou třídou a tearDown() až po dokončení všech testů.",
+        "D) setUp() inicializuje globální proměnné modulu a tearDown() uvolňuje paměť C rozšíření."
+      ],
+      "answer": 0,
+      "explanation": "Metody setUp() a tearDown() slouží jako test fixtures spouštěné individuálně před a po každé jednotlivé testovací metodě, čímž zajišťují izolaci testů.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Která assertion metoda v unittest ověřuje vyvolání očekávané výjimky při zavolání funkce?",
+      "options": [
+        "A) assertCatch(ExceptionType, func, *args)",
+        "B) assertRaises(ExceptionType, func, *args)",
+        "C) assertExcept(ExceptionType, func, *args)",
+        "D) assertThrow(ExceptionType, func, *args)"
+      ],
+      "answer": 1,
+      "explanation": "assertRaises(exc, callable, *args) kontroluje, zda zavolání callable(*args) vyvolá výjimku typu exc.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je přesný rozdíl mezi assertEqual(a, b) a assertIs(a, b) v knihovně unittest?",
+      "options": [
+        "A) assertEqual funguje výhradně pro čísla, zatímco assertIs slouží ke kontrole řetězců.",
+        "B) assertEqual vyvolá výjimku TypeError, zatímco assertIs vyvolá varování UserWarning.",
+        "C) assertEqual porovnává hodnoty přes a == b, zatímco assertIs porovnává identitu přes a is b.",
+        "D) assertEqual porovnává identitu v paměti, zatímco assertIs porovnává datové typy proměnných."
+      ],
+      "answer": 2,
+      "explanation": "assertEqual testuje rovnost obsahu/hodnoty (==), kdežto assertIs testuje identitu v paměti (id(a) == id(b) resp. a is b).",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co ověřuje metoda assertCountEqual(a, b) při porovnání dvou sekvencí v unittest?",
+      "options": [
+        "A) Zda mají sekvence a a b pouze stejný celkový počet prvků navrácený vestavěnou funkcí len().",
+        "B) Zda sekvence a a b začínají i končí stejným prvkem a mají shodnou celkovou délku typu.",
+        "C) Zda součet číselných hodnot prvků v sekvenci a odpovídá součtu hodnot prvků v sekvenci b.",
+        "D) Zda sekvence a a b obsahují stejné prvky se stejnými četnostmi, bez ohledu na jejich pořadí."
+      ],
+      "answer": 3,
+      "explanation": "assertCountEqual nekontroluje pouze délku (len), ale ověřuje, že obě kolekce obsahují přesně stejné prvky ve stejných počtech (četnostech), přičemž pořadí prvků ignoruje.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaký je výchozí počet desetinných míst při porovnání reálných čísel pomocí assertAlmostEqual(a, b)?",
+      "options": [
+        "A) 7 desetinných míst",
+        "B) 9 desetinných míst",
+        "C) 5 desetinných míst",
+        "D) 2 desetinná místa"
+      ],
+      "answer": 0,
+      "explanation": "Metoda assertAlmostEqual(a, b) ve výchozím nastavení ověřuje round(a - b, 7) == 0, tedy zaokrouhluje na 7 desetinných míst.",
       "code": null
     },
     {
       "id": "q7",
-      "type": "multiple_choice",
-      "question": "Jak Matplotlib interně zpracovává objekty typu datetime předávané jako souřadnice na osách?",
+      "type": "true_false_tricky",
+      "question": "Pokud testovací metoda v unittestu neobsahuje žádný assert ani vyvolanou výjimku, jak dopadne test?",
       "options": [
-        "A) Vyžaduje předem manuální konverzi na UNIX timestamp (sekundy), jinak vyvolá výjimku TypeError.",
-        "B) Zaokrouhlí je na nejbližší celé hodiny a vytvoří z nich indexovaný slovník pro popis osy x.",
-        "C) Převede je na textové řetězce a vykreslí je jako kategoriální osu s rovnoměrnými rozstupy bodů.",
-        "D) Přepočítá je na číselné hodnoty reprezentující počet dní od počátku letopočtu pro polohování."
+        "A) Test runner přeruší vykonávání celého souboru a vyžaduje doplnění typu v docstringu.",
+        "B) Test bude vyhodnocen jako úspěšný (passed), i když kód neověřil vůbec žádné podmínky.",
+        "C) Test selže s chybou AssertionError, protože chybí explicitní výrok ke kontrole stavu.",
+        "D) Test skončí ve stavu Error z důvodu nepřítomnosti návratové hodnoty typu boolean."
+      ],
+      "answer": 1,
+      "explanation": "V unittest test projde, pokud během jeho běhu nenastane žádná nezachycená výjimka (včetně AssertionError). Pokud test neobsahuje žádné tvrzení a nehodí výjimku, vyhodnotí se jako úspěšný.",
+      "code": null
+    }
+  ],
+  "timeit": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Proč modul timeit při měření doby vykonávání kódu standardně vypíná garbage collector (GC)?",
+      "options": [
+        "A) GC v Pythonu nelze spustit uvnitř vedlejšího vlákna, ve kterém modul měření provádí.",
+        "B) Vypnutí GC je nutné pro převod pythonního kódu do rychlých instrukcí C v paměti.",
+        "C) Zajišťuje tím stabilnější a reprodukovatelnější výsledky neovlivněné úklidem paměti.",
+        "D) Zabraňuje havárii interpreteru při opakovaném vytváření proměnných v globálním prostoru."
+      ],
+      "answer": 2,
+      "explanation": "Běh garbage collectoru zanáší do měření nahodilé časové odchylky. Proto jej timeit ve výchozím stavu vypíná, aby poskytl konzistentnější výsledky.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "K čemu slouží parametr setup při vytváření instance timeit.Timer(stmt, setup)?",
+      "options": [
+        "A) Nastavuje časový limit v sekundách, po jehož překročení je měření skriptu stornováno.",
+        "B) Definuje seznam C knihoven, které mají mít přednost před čistou implementací Pythonu.",
+        "C) Určuje cestu k profilovacímu souboru, do kterého se uloží kompletní výstup cProfile.",
+        "D) Obsahuje kód pro inicializaci proměnných, který se provede, ale nezapočítává do měření."
       ],
       "answer": 3,
-      "explanation": "Matplotlib nativně podporuje `datetime` objekty tak, že je interně zkonvertuje na desítková čísla odpovídající počtu dní od 1. 1. 0001 (pomocí např. `date2num`), což umožňuje přesné výpočty i škálování časové osy.",
+      "explanation": "setup se vykoná před spuštěním měřeného příkazu stmt, aby připravil potřebné proměnné/objekty bez zkreslení vlastního měřeného času.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Podle jaké hodnoty ze seznamu časů z Timer.repeat() je správné vyhodnocovat nejrychlejší běh?",
+      "options": [
+        "A) Minimální hodnota, protože nejlépe vystihuje reálný čas bez vnějších ruchů OS.",
+        "B) Medián naměřených časů, protože eliminuje extrémní odchylky na začátku a konci.",
+        "C) Směrodatná odchylka měření, která vyjadřuje míru využití vyrovnávací paměti CPU.",
+        "D) Aritmetický průměr všech hodnot, jelikož vyrovnává výkyvy způsobené plánovačem OS."
+      ],
+      "answer": 0,
+      "explanation": "Dokumentace timeit zdůrazňuje, že jediným reprezentativním údajem je minimum (min()), protože jakýkoliv jiný vliv OS (context switch, I/O, paging) čas jedině prodlouží.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "fill_blank_choice",
+      "question": "Kterým přepínačem předáte modulu timeit v příkazové řádce inicializační kód (setup), který se provede pouze jednou před měřením?",
+      "options": [
+        "-n",
+        "-s",
+        "-i",
+        "-t"
+      ],
+      "answer": 1,
+      "explanation": "Přepínač -s (zkratka pro --setup) v modulu timeit definuje kód, který se provede pouze jednou při inicializaci před měřicí smyčkou.",
+      "code": "# Změření rychlosti výpočtu molární hmotnosti s jednorázovým importem knihovny\npython -m timeit ________ \"import math; val = 12.011\" \"math.sqrt(val)\"",
+      "expected": "-s"
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co se stane, pokud při měření přes CLI python -m timeit nespecifikujeme počet opakování přepínačem -n?",
+      "options": [
+        "A) Kód se spustí pouze jednou a naměřený čas se vynásobí konstanta frekvence procesoru.",
+        "B) Vykoná se přesně 1 000 000 opakování bez ohledu na to, jak dlouho výpočet kódu trvá.",
+        "C) Modul automaticky zvyšuje počet opakování, dokud celková doba nedosáhne alespoň 0,2 s.",
+        "D) Měření selže s chybou ValueError, protože počet opakování je povinný argument CLI."
+      ],
+      "answer": 2,
+      "explanation": "Pokud -n není zadáno, timeit automaticky zkouší sekvence 1, 2, 5, 10, 20, 50... opakování, dokud celková doba celého běhu nepřesáhne 0,2 sekundy.",
+      "code": null
+    }
+  ],
+  "speed_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jakým způsobem probíhá vývoj a překlad samotného interpretu PyPy?",
+      "options": [
+        "A) Zdrojový kód PyPy se kompiluje přímo do systémového assembleru procesoru přes LLVM bez mezikroku v C.",
+        "B) PyPy je napsán v C++ a využívá rozhraní Java Virtual Machine pro dynamický překlad bytekódu v paměti.",
+        "C) Kód napsaný v RPythonu se přeloží do jazyka C a následně zkompiluje do spustitelné binárky interpretu.",
+        "D) PyPy funguje jako skript v čistém Pythonu, který dynamicky upravuje bytecode CPythonu před spuštěním."
+      ],
+      "answer": 2,
+      "explanation": "Vývoj PyPy probíhá tak, že je napsán v omezené podmnožině Pythonu zvané RPython (Restricted Python). RPython je přeložen do C a následně zkompilován běžným C kompilátorem.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Doplňte parametr dekorátoru @jit, který zaručí vyhození výjimky při neschopnosti zkompilovat kód bez Python C-API:",
+      "options": [
+        "strict",
+        "fastmath",
+        "pure_c",
+        "nopython"
+      ],
+      "answer": 3,
+      "explanation": "Parametr nopython=True (nebo samostatný dekorátor @njit) zakáže fallback do pomalého object mode. Pokud Numba nemůže kód přeložit do čistého nativního kódu bez Python C-API, vyvolá výjimku.",
+      "expected": "nopython",
+      "code": "from numba import jit\n\n@jit(________=True)\ndef vypocet(x):\n    return x.sum()"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní účel dekorátoru @vectorize v knihovně Numba oproti standardnímu @jit?",
+      "options": [
+        "A) Vytvoří ze skalární funkce univerzální funkce (ufunc) schopnou pracovat nad vícerozměrnými poli.",
+        "B) Zabezpečí automatickou konverzi Python objektů na C-struktury bez nutnosti instalace knihovny LLVM.",
+        "C) Přeloží Python kód dopředu (AOT) do samostatného dynamického knihovního souboru .so nebo .dll na disku.",
+        "D) Uvolní Globální zámek interpretu (GIL) a automaticky rozloží výpočet mezi více samostatných OS procesů."
+      ],
+      "answer": 0,
+      "explanation": "Dekorátor @vectorize umožňuje napsat funkci pro skalární hodnoty a automaticky z ní vygeneruje NumPy ufunc, která podporuje broadcasting a operace nad vícerozměrnými n-dimenzionálními poli.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "Co umožní nastavení parametru nogil=True u dekorátoru @jit v Numbě během provádění zkompilované funkce?",
+      "options": [
+        "A) Vypne kontrolu přetečení paměti u polí NumPy a zrychlí indexaci prvků vynecháním platnostních testů.",
+        "B) Uvolní Globální zámek interpretu (GIL), takže zkompilovaná funkce může běžet souběžně ve více vláknech.",
+        "C) Přesune provádění výpočtu z procesoru CPU přímo na grafický akcelerátor GPU s využitím rozhraní CUDA.",
+        "D) Zaručí, že funkce bude moci přistupovat k dynamickým objektům typu dict a list bez použití zámku."
+      ],
+      "answer": 1,
+      "explanation": "Parametr nogil=True instruuje Numbu, aby během vykonávání zkompilovaného nativního kódu uvolnila GIL (Global Interpreter Lock). Díky tomu mohou jiná Python vlákna běžet současně na jiných CPU jádrech.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o kompilačním modelu Cythonu a Numby:\n\nCython typicky využívá AOT kompilaci skrze překlad do C a C kompilátor před spuštěním skriptu, zatímco Numba primárně využívá JIT kompilaci přes LLVM za běhu.",
+      "options": [
+        "A) Nepravda – Numba vyžaduje ruční překlad přes C kompilátor před během skriptu, zatímco Cython provádí JIT kompilaci v paměti.",
+        "B) Pravda – Cython vyžaduje předpřeklad C souboru a vytvoření rozšíření (setup.py), zatímco Numba kompiluje kód při spuštění."
+      ],
+      "answer": 1,
+      "explanation": "Cython překládá .pyx soubory do C/C++ předem (AOT) a kompiluje je do sdílené knihovny. Numba analyzuje Python kód za běhu a při prvním spuštění generuje strojový kód pomocí JIT (LLVM).",
       "code": null
     }
   ]
