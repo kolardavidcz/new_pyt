@@ -1,263 +1,450 @@
 {
-  "doctests": [
+  "argparse": [
     {
       "id": "q1",
-      "type": "fill_blank_choice",
-      "question": "Doplňte funkci modulu doctest, která prohledá docstringy aktuálního modulu a automaticky spustí všechny nalezené interaktivní testy.",
+      "type": "predict_output",
+      "question": "Jaká hodnota se uloží do args.v při volání bez argumentů?",
       "options": [
-        "testfile",
-        "testmod",
-        "main",
-        "run_all"
+        "A) None",
+        "B) SILENT",
+        "C) VERBOSE",
+        "D) True"
       ],
       "answer": 1,
-      "explanation": "Funkce doctest.testmod() prozkoumá docstringy všech funkcí a tříd v modulu a ověří, zda jejich návratové hodnoty odpovídají zapsaným testům.",
-      "code": "import doctest\n\ndef calculate_ph(h_concentration: float) -> float:\n    \"\"\"\n    Výpočet pH z koncentrace oxoniových iontů.\n    >>> calculate_ph(1e-7)\n    7.0\n    \"\"\"\n    import math\n    return round(-math.log10(h_concentration), 2)\n\nif __name__ == \"__main__\":\n    doctest.________()",
-      "expected": "testmod"
+      "explanation": "U přepínače s nargs='?' se hodnota const použije v případě, že je přepínač -v na příkazové řádce přítomen bez hodnoty. Pokud přepínač není zadán vůbec, použije se hodnota default ('SILENT').",
+      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-v', nargs='?', const='VERBOSE', default='SILENT')\nargs = parser.parse_args([])\nprint(args.v)"
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jakou výchozí hodnotu má přepínač s nastavením action='store_true'?",
+      "options": [
+        "A) None",
+        "B) True",
+        "C) False",
+        "D) AttributeError"
+      ],
+      "answer": 2,
+      "explanation": "Akce store_true automaticky nastavuje výchozí hodnotu na boolovské False. Pokud uživatel přepínač na příkazové řádce použije, hodnota v atributu force se změní na True.",
+      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-f', '--force', action='store_true')\nargs = parser.parse_args([])\nprint(args.force)"
+    },
+    {
+      "id": "q3",
+      "type": "predict_output",
+      "question": "Jaký bude výstup parseru při opakovaném použití přepínače s action='append'?",
+      "options": [
+        "A) ('a.py', 'b.py')",
+        "B) ['b.py']",
+        "C) 'b.py'",
+        "D) ['a.py', 'b.py']"
+      ],
+      "answer": 3,
+      "explanation": "Akce action='append' nezapříčiní přepsání hodnoty poslední zadanou, ale každou novou hodnotu postupně přidá jako nový prvek do jednoho kumulativního seznamu.",
+      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-i', '--include', action='append')\nargs = parser.parse_args(['-i', 'a.py', '-i', 'b.py'])\nprint(args.include)"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Co vrací metoda parse_known_args() modulu argparse?",
+      "options": [
+        "A) Dvojici (Namespace s rozpoznanými argumenty, seznam nerozpoznaných argumentů).",
+        "B) Pouze slovník s rozpoznanými argumenty, přičemž neznámé argumenty zcela ignoruje.",
+        "C) Výjimku UnrecognizedArgumentError, pokud se v příkazu objeví neznámý přepínač.",
+        "D) Objekt typu Namespace obsahující jak rozpoznané, tak neznámé argumenty dohromady."
+      ],
+      "answer": 0,
+      "explanation": "Metoda parse_known_args() při výskytu neznámých argumentů neselže, ale vrátí n-tici: první prvek je Namespace s parsovanými argumenty a druhý je seznam zbylých nerozpoznaných řetězců.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Doplňte speciální výjimku modulu argparse pro signalizaci neplatné hodnoty z vlastní konverzní funkce:",
+      "code_snippet": "from argparse import ArgumentParser, ________\n\ndef positive_int(val):\n    n = int(val)\n    if n <= 0:\n        raise ________('Číslo musí být kladné!')\n    return n",
+      "options": [
+        "ParseError",
+        "ArgumentTypeError",
+        "ArgumentValueError",
+        "InvalidOptionError"
+      ],
+      "answer": 1,
+      "explanation": "Vlastní validační funkce v type= modulu argparse vyhazují argparse.ArgumentTypeError, kterou parser zpracuje a zobrazí chybovou hlášku CLI.",
+      "code": "import argparse\n\ndef positive_int(val):\n    num = int(val)\n    if num <= 0:\n        raise argparse.________(\"Číslo musí být kladné\")\n    return num",
+      "expected": "ArgumentTypeError"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaké chování zajistí kód group = parser.add_mutually_exclusive_group(required=True)?",
+      "options": [
+        "A) Skupina automaticky skryje nápovědu pro všechny obsažené přepínače z výpisu -h.",
+        "B) Přepínače ze skupiny se stanou povinné všechny současně při spuštění skriptu.",
+        "C) Uživatel musí zadat právě jeden argument z dané skupiny, jinak parser selže.",
+        "D) Uživatel může zadat všechny přepínače ze zadané skupiny naráz v libovolném pořadí."
+      ],
+      "answer": 2,
+      "explanation": "add_mutually_exclusive_group() vynucuje, že lze vybrat nejvýše jeden argument ze skupiny. Parametr required=True navíc zaručuje, že alespoň jeden z nich musí být povinně zadán.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "predict_output",
+      "question": "Jaká hodnota převáží při spuštění skriptu bez argumentů?",
+      "options": [
+        "A) ['alpha', 'beta']",
+        "B) None",
+        "C) alpha",
+        "D) beta"
+      ],
+      "answer": 3,
+      "explanation": "Metoda parser.set_defaults(...) má vyšší prioritu než parametr default= v add_argument(), takže přepíše původní výchozí hodnotu 'alpha' na 'beta'.",
+      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-x', default='alpha')\nparser.set_defaults(x='beta')\nargs = parser.parse_args([])\nprint(args.x)"
+    },
+    {
+      "id": "q8",
+      "type": "predict_output",
+      "question": "Co se stane při spuštění skriptu s nargs='+' bez předání jakéhokoliv argumentu?",
+      "options": [
+        "A) Skript ukončí běh se zprávou o chybě z důvodu nedostatečného počtu argumentů.",
+        "B) Skript vrátí objekt Namespace s prázdným seznamem uloženým v atributu files.",
+        "C) Skript vytvoří objekt Namespace, kde má atribut files uloženou hodnotu None.",
+        "D) Skript se pozastaví a bude čekat na zadání názvů souborů ze standardního vstupu."
+      ],
+      "answer": 0,
+      "explanation": "Násobnost nargs='+' vyžaduje alespoň 1 zadanou hodnotu. Nezadá-li uživatel žádnou, parse_args() vypíše usage, zobrazí chybu 'too few arguments' a okamžitě skript ukončí.",
+      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('files', nargs='+')\nargs = parser.parse_args([])"
+    }
+  ],
+  "execution_subprocess": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi voláním z rodiny os.exec*() a funkcí subprocess.run()?",
+      "options": [
+        "A) os.exec*() nahradí běžící proces novým procesem, zatímco subprocess.run() vytvoří dceřiný proces a počká na něj.",
+        "B) subprocess.run() funguje výhradně pod systémem Linux, zatímco rodina os.exec*() je určena výhradně pro Windows OS.",
+        "C) subprocess.run() nahradí běžící proces novým procesem, zatímco os.exec*() vrátí objekt typu CompletedProcess.",
+        "D) os.exec*() spouští proces asynchronně na pozadí, zatímco subprocess.run() vyžaduje vytvoření nového vlákna."
+      ],
+      "answer": 0,
+      "explanation": "Volání os.exec*() kompletně nahradí stávající proces nově spuštěným programem (stejně jako C execve()), takže se do původního Python skriptu již nevrátí. subprocess.run() spouští podproces a čeká na jeho dokončení.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Doplňte parametr funkce subprocess.run(), který při nenulovém návratovém kódu automaticky vyvolá výjimku CalledProcessError:",
+      "options": [
+        "raise_err",
+        "check",
+        "exception",
+        "strict"
+      ],
+      "answer": 1,
+      "explanation": "Parametr check=True zajistí, že pokud proces skončí s nenulovým návratovým kódem, funkce subprocess.run() okamžitě vyvolá výjimku CalledProcessError.",
+      "code": "import subprocess\n\n# Vyvolání výjimky CalledProcessError při chybovém návratovém kódu:\nresult = subprocess.run([\"ls\", \"/neexistujici_cesta\"], ________=True)",
+      "expected": "check"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Co se stane při volání subprocess.run(\"ls -l\") bez nastavení shell=True na systému Linux?",
+      "options": [
+        "A) Výpočet se zastaví s výjimkou ValueError, protože řetězce bez hranatých závorek nejsou v run() povoleny.",
+        "B) Příkaz proběhne v systémovém shellu /bin/sh a vypíše podrobný seznam souborů v aktuálním adresáři.",
+        "C) Systém vyvolá FileNotFoundError, protože hledá binární soubor s doslovným názvem \"ls -l\" včetně mezery.",
+        "D) Funkce automaticky rozdělá řetězec podle mezer a spustí příkaz ls s předaným parametrem -l."
+      ],
+      "answer": 2,
+      "explanation": "Bez shell=True předává subprocess.run() prvotní argument přímo systémovému volání execv(). Systém hledá spustitelný soubor s přesným názvem \"ls -l\" (i s mezerou), což selže na FileNotFoundError. Správný zápis bez shellu je [\"ls\", \"-l\"].",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "fill_blank_choice",
+      "question": "Doplňte parametr funkce subprocess.run(), který dekóduje zachycený výstup ze surových bajtů do textového řetězce pomocí zvoleného kódování:",
+      "options": [
+        "decode",
+        "charset",
+        "text_mode",
+        "encoding"
+      ],
+      "answer": 3,
+      "explanation": "Parametr encoding=\"utf-8\" (nebo zkráceně text=True) způsobí, že zachycený proud stdout a stderr je automaticky dekódován na řetězec str.",
+      "code": "import subprocess\n\n# Automatické dekódování stdout na str místo bytes:\nres = subprocess.run([\"whoami\"], capture_output=True, ________=\"utf-8\")\nprint(type(res.stdout))  # <class 'str'>",
+      "expected": "encoding"
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o spouštění externích procesů přes shell:\n\nPředání neošetřeného uživatelského vstupu do subprocess.run(cmd, shell=True) představuje vážné bezpečnostní riziko (shell injection), kterému lze zabránit ošetřením vstupu pomocí shlex.quote().",
+      "options": [
+        "A) Pravda – shell=True interpretuje řetězec přes /bin/sh či cmd.exe, kde nebezpečné znaky odescapuje právě funkce shlex.quote().",
+        "B) Nepravda – shell=True automaticky sanitizuje všechny předané argumenty a použití shlex.quote() vyvolá chybu v syntaxi shellu."
+      ],
+      "answer": 0,
+      "explanation": "Spuštění shellu nad neuvozovaným uživatelským vstupem umožňuje útočníkovi vložit další příkazy (shell injection). Funkce shlex.quote() bezpečně obalí a odescapuje argument pro použití v shellu.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "predict_output",
+      "question": "Jaký bude typ a cíl zachycení chybového výstupu při použití stderr=subprocess.STDOUT v subprocess.run()?",
+      "options": [
+        "A) Chybový výstup stderr se přesměruje do stejného proudu jako standardní výstup stdout a uloží do result.stdout.",
+        "B) Standardní výstup stdout se přesměruje do chybového výstupu stderr a uloží se výhradně do result.stderr.",
+        "C) Chybový výstup stderr způsobí vyhození výjimky subprocess.STDOUTError okamžitě při zapsání chyby.",
+        "D) Chybový výstup stderr se vytiskne přímo na konzoli terminálu a v návratovém objektu result zůstane None."
+      ],
+      "answer": 0,
+      "explanation": "Speciální konstanta subprocess.STDOUT předaná do parametru stderr přikáže rozhraní slít chybový výstup stderr přímo do výstupního proudu stdout.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Kdy je nutné použít třídu subprocess.Popen s metodou communicate() místo funkce subprocess.run()?",
+      "options": [
+        "A) Při nastavování proměnných prostředí env, protože parametr env je dostupný výhradně v nízkoúrovňové třídé Popen.",
+        "B) Při potřebě asynchronního běhu procesů na pozadí nebo oboustranného datového proudění během provádění podprocesu.",
+        "C) Při provádění příkazů na operačním systému Windows, protože subprocess.run() je určen výhradně pro Unix systémy.",
+        "D) Při přesměrování standardního výstupu do souboru na disku, protože subprocess.run() přesměrování souborů nepodporuje."
+      ],
+      "answer": 1,
+      "explanation": "Funkce subprocess.run() je synchronní a čeká na dokončení procesu. Třída Popen umožňuje asynchronní spuštění procesu na pozadí, průběžné posílání dat na stdin za běhu a ruční řízení podprocesu.",
+      "code": null
+    }
+  ],
+  "mmap": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jak se chová objekt vytvořený pomocí modulu mmap?",
+      "options": [
+        "A) Funguje výhradně jako klasický textový řetězec str uložený v operační paměti.",
+        "B) Kombinuje rozhraní souborového proudu (read/seek) a měnitelného bajtového pole.",
+        "C) Automaticky šifruje a komprimuje souborová data zapsaná na pevný disk.",
+        "D) Slouží jako databázový index pro rychlé vyhledávání v relacích na disku."
+      ],
+      "answer": 1,
+      "explanation": "Objekt mmap namapuje soubor přímo do paměti a poskytuje hybridní rozhraní – podporuje souborové metody (read, readline, seek) i přístup přes indexy a výřezy jako bytearray.",
+      "code": null
     },
     {
       "id": "q2",
       "type": "multiple_choice",
-      "question": "Jak se z příkazové řádky spustí doctesty pro modul moje_logika.py s podrobným výpisem (verbose)?",
+      "question": "Jaké omezení platí pro parametr offset při alokaci mmap.mmap()?",
       "options": [
-        "A) python -m unittest -v moje_logika.py",
-        "B) python moje_logika.py --doctest-verbose",
-        "C) python -m doctest -v moje_logika.py",
-        "D) python doctest --verbose moje_logika.py"
+        "A) Parametr offset musí vždy začínat od nuly, posun uvnitř souboru není podporován.",
+        "B) Parametr offset udává přesný počet textových řádků přeskočených při mapování.",
+        "C) Parametr offset musí být celočíselným násobkem mmap.ALLOCATIONGRANULARITY.",
+        "D) Offset může být libovolné číslo v rozsahu od 0 do celkové velikosti souboru."
       ],
       "answer": 2,
-      "explanation": "Přepínač -m doctest spustí modul doctest jako skript a předá mu parametr -v pro podrobný výstup. unittest by spustil testovací třídy unittest, nikoli docstringy.",
+      "explanation": "Operační systém vyžaduje Zarovnání offsetu paměťových stránek. V Pythonu musí být offset v mmap celočíselným násobkem mmap.ALLOCATIONGRANULARITY (obvykle 64 KiB / 65536 B).",
       "code": null
     },
     {
       "id": "q3",
       "type": "predict_output",
-      "question": "Jaký výstup vytvoří spuštění python -m doctest moje_logika.py, pokud všechny testy v docstringách projdu bez chyb?",
+      "question": "Jaký typ a hodnotu vrátí metoda read_byte() nad objektem mmap?",
       "options": [
-        "A) Vypíše se textový řetězec \"OK (tests=3, failures=0)\" na stdout.",
-        "B) Vypíše se hlášení \"SUCCESS\" spolu s celkovým časem vykonání v ms.",
-        "C) Zobrazí se kompletní seznam otestovaných dokumentačních funkcí.",
-        "D) Neprodlevně se nevypíše vůbec žádný textový výstup na konzoli."
+        "A) b'A' <class 'bytes'>",
+        "B) 'A' <class 'str'>",
+        "C) 0 <class 'int'>",
+        "D) 65 <class 'int'>"
       ],
       "answer": 3,
-      "explanation": "Doctest je navržen podle principu 'no news is good news' – pokud všechny testy uspějí, nevypisuje do konzole žádný výstup (pokud nebyl zadán příznak -v).",
-      "code": null
+      "explanation": "Metoda read_byte() přečte 1 bajt a vrátí ho jako celé číslo (int, ASCII 65 pro 'A') a posune ukazatel o 1. Metoda read(1) by naopak vrátila bajtový objekt b'A' (bytes).",
+      "code": "import mmap\nwith mmap.mmap(-1, 10) as m:\n    m.write(b'ABC')\n    m.seek(0)\n    val = m.read_byte()\n    print(val, type(val))"
     },
     {
       "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Doplňte direktivu doctestu, která přikáže přeskočit testování výstupu na daném řádku docstringu.",
+      "type": "multiple_choice",
+      "question": "Jakým způsobem je nutné předat regulární výraz při vyhledávání v objektu mmap?",
       "options": [
-        "+SKIP",
-        "PASS",
-        "NO_TEST",
-        "IGNORE"
+        "A) Vzor musí být definován jako bajtový řetězec s předponou rb (např. rb'pattern').",
+        "B) Regulární výrazy nelze nad objektem mmap z důvodu paměťových omezení použít.",
+        "C) Vzor musí být předán jako běžný textový Unicode řetězec str v kódování UTF-8.",
+        "D) Vzor je nutné nejprve převést na celočíselné pole ASCII hodnot jednotlivých znaků."
       ],
       "answer": 0,
-      "explanation": "Direktiva # doctest: +SKIP instruuje modul doctest, aby ignoroval a netestoval výstup daného řádku (např. u náhodných nebo nedeterministických výsledků).",
-      "code": "def generate_random_spectrum():\n    \"\"\"\n    Generuje náhodná spektrometrická data.\n\n    >>> generate_random_spectrum()  # doctest: ________\n    [0.124, 0.985, 0.432]\n    \"\"\"\n    import random\n    return [round(random.random(), 3) for _ in range(3)]",
-      "expected": "+SKIP"
+      "explanation": "Jelikož mmap reprezentuje neopracovaná bajtová data v paměti, operace a regexpy nad mmap vyžadují bajtový vzor (byte regex pattern) s předponou rb''.",
+      "code": null
     },
     {
       "id": "q5",
       "type": "multiple_choice",
-      "question": "Jakým způsobem lze začlenit doctesty modulu logika do standardního běhu unittest sady?",
+      "question": "Co znamená předání hodnoty -1 jako prvního argumentu (fileno) do mmap.mmap(-1, length)?",
       "options": [
-        "A) Nastavením globální proměnné prostředí PYTHON_DOCTEST_ENABLE=1 před spuštěním sady testů.",
-        "B) Definováním funkce load_tests vracející tests.addTests(doctest.DocTestSuite(logika)).",
-        "C) Zavoláním metody unittest.register_doctest(logika) přímo uvnitř testovací metody setUp().",
-        "D) Importováním balíčku logika přímo do konstruktoru hlavní testovací třídy unittest.TestCase."
+        "A) Soubor se otevře v neomezeném režimu paměti, kde jeho délka může dynamicky rost.",
+        "B) Vytvoří se anonymní paměťový blok neprovázaný se žádným konkrétním souborem.",
+        "C) Funkce vyhodí výjimku ValueError z důvodu neplatného souborového popisovače.",
+        "D) Otevře se v režimu pro čtení naposledy modifikovaný soubor z pevného disku."
       ],
       "answer": 1,
-      "explanation": "Unittest rozhraní vyhledává funkci load_tests(loader, tests, pattern), do které lze přidat testovací sadu vytvořenou pomocí doctest.DocTestSuite(modul).",
-      "code": null
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "K čemu slouží direktiva doctest.FAIL_FAST (resp. příkazový přepínač -o FAIL_FAST nebo -f)?",
-      "options": [
-        "A) Přesměruje chybové zprávy ze standardního chybového výstupu přímo do souboru logu.",
-        "B) Zapne optimalizovaný JIT kompilátor pro zrychlení celkového porovnávání řetězců.",
-        "C) Zastaví vykonávání doctestů ihned při výskytu první selhané kontrolní podmínky.",
-        "D) Přeskočí všechny časově náročné testy a spustí pouze jednoduché aritmetické operace."
-      ],
-      "answer": 2,
-      "explanation": "Příznak FAIL_FAST ukončí testování hned po první chybě, což šetří čas při ladění dlouhých sad docstring testů.",
+      "explanation": "Hodnota fileno = -1 slouží k vytvoření anonymního alokovaného paměťového bloku (anonymous memory mapping) v RAM, který není vázán na žádný fyzický soubor na disku.",
       "code": null
     }
   ],
-  "unittests": [
+  "externalibs_overview": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Jaké pravidlo musí splňovat metody v třídě odvozené od unittest.TestCase, aby byly automaticky spuštěny?",
+      "question": "K čemu slouží vestavěný modul ctypes v Pythonu?",
       "options": [
-        "A) Metoda musí být deklarována jako statická dekorátorem @staticmethod.",
-        "B) Jméno metody musí končit příponou _test a vracet hodnotu True.",
-        "C) Metoda musí mít dekorátor @unittest.test a nesmí přijímat self.",
-        "D) Jméno metody musí začínat předponou test, např. test_vypocet()."
+        "A) Zabezpečuje šifrování komunikace mezi procesy při přenosu objektů přes síťové sokety v lokální síti.",
+        "B) Slouží k automatické paralelizaci Python smyček vytvořením více systémových vláken bez zámku GIL.",
+        "C) Umožňuje přímé volání funkcí ze sdílených C knihoven (.dll / .so) a poskytuje datové typy kompatibilní s C.",
+        "D) Překládá zdrojový kód Pythonu do samostatného spustitelného binárního souboru bez nutnosti C kompilátoru."
       ],
-      "answer": 3,
-      "explanation": "Test runner v unittest vyhledává ve třídách TestCase všechny metody, jejichž název začíná řetězcem test.",
+      "answer": 2,
+      "explanation": "Modul ctypes je FFI (Foreign Function Interface) knihovna v Pythonu, která dovoluje načítat sdílené dynamické knihovny napsané v C (DLL/.so) a předávat jim C-kompatibilní datové typy.",
       "code": null
     },
     {
       "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký je přesný rozdíl v okamžiku spuštění metod setUp() a tearDown() při běhu testovací třídy?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte atribut objektu funkce z načtené knihovny v ctypes pro definici očekávaných typů vstupních parametrů:",
       "options": [
-        "A) setUp() se spouští před každou testovací metodou a tearDown() po každé testovací metodě.",
-        "B) setUp() se volá výhradně při selhání testu a tearDown() proběhne u úspěšných testů.",
-        "C) setUp() se spouští pouze před celou třídou a tearDown() až po dokončení všech testů.",
-        "D) setUp() inicializuje globální proměnné modulu a tearDown() uvolňuje paměť C rozšíření."
+        "param_types",
+        "restype",
+        "signature",
+        "argtypes"
       ],
-      "answer": 0,
-      "explanation": "Metody setUp() a tearDown() slouží jako test fixtures spouštěné individuálně před a po každé jednotlivé testovací metodě, čímž zajišťují izolaci testů.",
-      "code": null
+      "answer": 3,
+      "explanation": "Atribut argtypes určuje seznam typů z modulu ctypes, které C funkce přijímá. Atribut restype se používá pro definici návratového typu.",
+      "expected": "argtypes",
+      "code": "import ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.spoctu_suma.________ = [ctypes.c_int, ctypes.c_int]"
     },
     {
       "id": "q3",
       "type": "multiple_choice",
-      "question": "Která assertion metoda v unittest ověřuje vyvolání očekávané výjimky při zavolání funkce?",
+      "question": "Jak vyvolat v ctypes C funkci ze sdílené knihovny lib, jejíž název není platným identifikátorem v Pythonu (např. my-func)?",
       "options": [
-        "A) assertCatch(ExceptionType, func, *args)",
-        "B) assertRaises(ExceptionType, func, *args)",
-        "C) assertExcept(ExceptionType, func, *args)",
-        "D) assertThrow(ExceptionType, func, *args)"
+        "A) Voláním funkce přes vestavěnou funkci getattr(lib, \"my-func\") předáním názvu jako řetězce.",
+        "B) Volání takové funkce není v ctypes možné a C knihovna se musí překompilovat s jiným názvem.",
+        "C) Přepsáním pomlčky na podtržítko v Python skriptu, což ctypes automaticky namapuje v paměti.",
+        "D) Načtením knihovny s parametrem rename_rules={\"my-func\": \"my_func\"} v konstruktoru CDLL."
       ],
-      "answer": 1,
-      "explanation": "assertRaises(exc, callable, *args) kontroluje, zda zavolání callable(*args) vyvolá výjimku typu exc.",
+      "answer": 0,
+      "explanation": "Pokud název exportované funkce v C knihovně není platný Python identifikátor (obsahuje např. pomlčku nebo tečku), nelze použít tečkovou notaci lib.my-func. Místo toho se použije getattr(lib, \"my-func\").",
       "code": null
     },
     {
       "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jaký je přesný rozdíl mezi assertEqual(a, b) a assertIs(a, b) v knihovně unittest?",
-      "options": [
-        "A) assertEqual funguje výhradně pro čísla, zatímco assertIs slouží ke kontrole řetězců.",
-        "B) assertEqual vyvolá výjimku TypeError, zatímco assertIs vyvolá varování UserWarning.",
-        "C) assertEqual porovnává hodnoty přes a == b, zatímco assertIs porovnává identitu přes a is b.",
-        "D) assertEqual porovnává identitu v paměti, zatímco assertIs porovnává datové typy proměnných."
-      ],
-      "answer": 2,
-      "explanation": "assertEqual testuje rovnost obsahu/hodnoty (==), kdežto assertIs testuje identitu v paměti (id(a) == id(b) resp. a is b).",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co ověřuje metoda assertCountEqual(a, b) při porovnání dvou sekvencí v unittest?",
-      "options": [
-        "A) Zda mají sekvence a a b pouze stejný celkový počet prvků navrácený vestavěnou funkcí len().",
-        "B) Zda sekvence a a b začínají i končí stejným prvkem a mají shodnou celkovou délku typu.",
-        "C) Zda součet číselných hodnot prvků v sekvenci a odpovídá součtu hodnot prvků v sekvenci b.",
-        "D) Zda sekvence a a b obsahují stejné prvky se stejnými četnostmi, bez ohledu na jejich pořadí."
-      ],
-      "answer": 3,
-      "explanation": "assertCountEqual nekontroluje pouze délku (len), ale ověřuje, že obě kolekce obsahují přesně stejné prvky ve stejných počtech (četnostech), přičemž pořadí prvků ignoruje.",
-      "code": null
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Jaký je výchozí počet desetinných míst při porovnání reálných čísel pomocí assertAlmostEqual(a, b)?",
-      "options": [
-        "A) 7 desetinných míst",
-        "B) 9 desetinných míst",
-        "C) 5 desetinných míst",
-        "D) 2 desetinná místa"
-      ],
-      "answer": 0,
-      "explanation": "Metoda assertAlmostEqual(a, b) ve výchozím nastavení ověřuje round(a - b, 7) == 0, tedy zaokrouhluje na 7 desetinných míst.",
-      "code": null
-    },
-    {
-      "id": "q7",
       "type": "true_false_tricky",
-      "question": "Pokud testovací metoda v unittestu neobsahuje žádný assert ani vyvolanou výjimku, jak dopadne test?",
+      "question": "Vyhodnoťte pravdivost tvrzení o načítání sdílených knihoven v modulu ctypes:\n\nZatímco Windows umožňuje odkazovat na sdílenou knihovnu relativní cestou, Linux striktně vyžaduje absolutní cestu k souboru knihovny.",
       "options": [
-        "A) Test runner přeruší vykonávání celého souboru a vyžaduje doplnění typu v docstringu.",
-        "B) Test bude vyhodnocen jako úspěšný (passed), i když kód neověřil vůbec žádné podmínky.",
-        "C) Test selže s chybou AssertionError, protože chybí explicitní výrok ke kontrole stavu.",
-        "D) Test skončí ve stavu Error z důvodu nepřítomnosti návratové hodnoty typu boolean."
+        "A) Nepravda – Linux automaticky prohledává aktuální složku se skriptem, zatímco Windows vyžaduje výhradně absolutní cesty.",
+        "B) Pravda – Na Linuxu dynamický linker nehledá v aktuálním adresáři, proto je nutné předat např. os.path.abspath(\"mylib.so\")."
       ],
       "answer": 1,
-      "explanation": "V unittest test projde, pokud během jeho běhu nenastane žádná nezachycená výjimka (včetně AssertionError). Pokud test neobsahuje žádné tvrzení a nehodí výjimku, vyhodnotí se jako úspěšný.",
-      "code": null
-    }
-  ],
-  "timeit": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Proč modul timeit při měření doby vykonávání kódu standardně vypíná garbage collector (GC)?",
-      "options": [
-        "A) GC v Pythonu nelze spustit uvnitř vedlejšího vlákna, ve kterém modul měření provádí.",
-        "B) Vypnutí GC je nutné pro převod pythonního kódu do rychlých instrukcí C v paměti.",
-        "C) Zajišťuje tím stabilnější a reprodukovatelnější výsledky neovlivněné úklidem paměti.",
-        "D) Zabraňuje havárii interpreteru při opakovaném vytváření proměnných v globálním prostoru."
-      ],
-      "answer": 2,
-      "explanation": "Běh garbage collectoru zanáší do měření nahodilé časové odchylky. Proto jej timeit ve výchozím stavu vypíná, aby poskytl konzistentnější výsledky.",
+      "explanation": "Pod Linuxem systémový linker neprohledává aktuální pracovní adresář (z bezpečnostních důvodů), takže ctypes.CDLL(\"mylib.so\") selže. Je nutné zadat absolutní cestu (např. přes os.path.join(os.getcwd(), \"mylib.so\")).",
       "code": null
     },
     {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "K čemu slouží parametr setup při vytváření instance timeit.Timer(stmt, setup)?",
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Doplňte atribut pro nastavení návratového typu C funkce vracející 64bitové číslo s plovoucí čárkou:",
       "options": [
-        "A) Nastavuje časový limit v sekundách, po jehož překročení je měření skriptu stornováno.",
-        "B) Definuje seznam C knihoven, které mají mít přednost před čistou implementací Pythonu.",
-        "C) Určuje cestu k profilovacímu souboru, do kterého se uloží kompletní výstup cProfile.",
-        "D) Obsahuje kód pro inicializaci proměnných, který se provede, ale nezapočítává do měření."
+        "result",
+        "restype",
+        "argtypes",
+        "return_type"
+      ],
+      "answer": 1,
+      "explanation": "Atribut restype říká modulu ctypes, jaký typ (např. ctypes.c_double nebo ctypes.c_int) C funkce vrací, aby mohla být návratová hodnota správně přetypována na Python objekt.",
+      "expected": "restype",
+      "code": "import ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.vypocti_prumer.________ = ctypes.c_double"
+    }
+  ],
+  "bytes": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Jaký typ mají výstupy při přístupu k prvkům bajtového řetězce?",
+      "options": [
+        "A) <class 'int'> <class 'str'>",
+        "B) <class 'str'> <class 'bytes'>",
+        "C) <class 'bytes'> <class 'bytes'>",
+        "D) <class 'int'> <class 'bytes'>"
       ],
       "answer": 3,
-      "explanation": "setup se vykoná před spuštěním měřeného příkazu stmt, aby připravil potřebné proměnné/objekty bez zkreslení vlastního měřeného času.",
-      "code": null
+      "explanation": "Přístup k celému jednomu prvku b[0] vrací celočíselnou ASCII hodnotu (int, zde 80 pro 'P'). Výřez b[0:1] vrací nový bajtový řetězec (bytes, b'P'). U textových str vrací obojí typ str.",
+      "code": "b = b'Python'\nprint(type(b[0]), type(b[0:1]))"
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jaký je rozdíl mezi konstruktorem bytes(3) a bytes([3])?",
+      "options": [
+        "A) b'\\x00\\x00\\x00' b'\\x03'",
+        "B) b'\\x00' b'\\x03\\x03\\x03'",
+        "C) b'\\x03\\x03\\x03' b'\\x03'",
+        "D) b'\\x03' b'\\x03'"
+      ],
+      "answer": 0,
+      "explanation": "Volání bytes(N) s celým číslem alokuje N nulových bajtů (b'\\x00\\x00\\x00'). Konstruktor s iterovatelem bytes([3]) převede čísla v rozmezí 0-255 na odpovídající bajty (b'\\x03').",
+      "code": "b1 = bytes(3)\nb2 = bytes([3])\nprint(b1, b2)"
     },
     {
       "id": "q3",
       "type": "multiple_choice",
-      "question": "Podle jaké hodnoty ze seznamu časů z Timer.repeat() je správné vyhodnocovat nejrychlejší běh?",
+      "question": "Co se stane při pokusu o úpravu prvku v bajtovém řetězci bytes?",
       "options": [
-        "A) Minimální hodnota, protože nejlépe vystihuje reálný čas bez vnějších ruchů OS.",
-        "B) Medián naměřených časů, protože eliminuje extrémní odchylky na začátku a konci.",
-        "C) Směrodatná odchylka měření, která vyjadřuje míru využití vyrovnávací paměti CPU.",
-        "D) Aritmetický průměr všech hodnot, jelikož vyrovnává výkyvy způsobené plánovačem OS."
+        "A) Vyhodí výjimku ValueError, protože zadaná hodnota 65 neodpovídá typu str.",
+        "B) Vyhodí výjimku TypeError, protože objekt typu bytes je neměnný (immutable).",
+        "C) Kód automaticky zkonvertuje objekt proměnné data na nový typ bytearray.",
+        "D) Hodnota prvního bajtu se v objektu úspěšně přepíše z 97 na novou hodnotu 65."
       ],
-      "answer": 0,
-      "explanation": "Dokumentace timeit zdůrazňuje, že jediným reprezentativním údajem je minimum (min()), protože jakýkoliv jiný vliv OS (context switch, I/O, paging) čas jedině prodlouží.",
-      "code": null
+      "answer": 1,
+      "explanation": "Typ bytes je neměnná sekvence (immutable). Při pokusu o úpravu b[0] vyhodí TypeError: 'bytes' object does not support item assignment. Pro modifikovatelné bajty je nutné použít bytearray.",
+      "code": "data = b'ahoj'\ndata[0] = 65"
     },
     {
       "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Kterým přepínačem předáte modulu timeit v příkazové řádce inicializační kód (setup), který se provede pouze jednou před měřením?",
+      "type": "multiple_choice",
+      "question": "Který způsob formátování je podporován pro bajtové řetězce bytes v Pythonu 3?",
       "options": [
-        "-n",
-        "-s",
-        "-i",
-        "-t"
+        "A) Formátované řetězce s novým prefiksem fb (například zápis fb'{data}').",
+        "B) Standardní metoda .format() (například zápis b'{}'.format(b'data')).",
+        "C) Interpolace textu pomocí operátoru % (například zápis b'%b' % b'data').",
+        "D) Bajtové řetězce v Pythonu 3 neposkytují vůbec žádné formátovací mechanizmy."
       ],
-      "answer": 1,
-      "explanation": "Přepínač -s (zkratka pro --setup) v modulu timeit definuje kód, který se provede pouze jednou při inicializaci před měřicí smyčkou.",
-      "code": "# Změření rychlosti výpočtu molární hmotnosti s jednorázovým importem knihovny\npython -m timeit ________ \"import math; val = 12.011\" \"math.sqrt(val)\"",
-      "expected": "-s"
+      "answer": 2,
+      "explanation": "Pro bajtové řetězce byla v Pythonu 3.5 zpětně přidána interpolace pomocí operátoru %. Metoda .format() ani f-řetězce s prefiksem fb pro typ bytes neexistují.",
+      "code": null
     },
     {
       "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co se stane, pokud při měření přes CLI python -m timeit nespecifikujeme počet opakování přepínačem -n?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu pro dekódování bajtového řetězce bytes na textový řetězec str:",
+      "code_snippet": "raw_bytes = b'\\xc5\\x99etezec'\ntext = raw_bytes.________('utf-8')",
       "options": [
-        "A) Kód se spustí pouze jednou a naměřený čas se vynásobí konstanta frekvence procesoru.",
-        "B) Vykoná se přesně 1 000 000 opakování bez ohledu na to, jak dlouho výpočet kódu trvá.",
-        "C) Modul automaticky zvyšuje počet opakování, dokud celková doba nedosáhne alespoň 0,2 s.",
-        "D) Měření selže s chybou ValueError, protože počet opakování je povinný argument CLI."
+        "encode",
+        "parse",
+        "to_str",
+        "decode"
       ],
-      "answer": 2,
-      "explanation": "Pokud -n není zadáno, timeit automaticky zkouší sekvence 1, 2, 5, 10, 20, 50... opakování, dokud celková doba celého běhu nepřesáhne 0,2 sekundy.",
-      "code": null
+      "answer": 3,
+      "explanation": "Metoda bytes.decode() převádí binární bajty na textový řetězec str pomocí specifikovaného kódování.",
+      "code": "raw_bytes = b\"V\\xc5\\xa0CHT Praha\"\ntext = raw_bytes.________(\"utf-8\")\n# Výstup: 'VŠCHT Praha'",
+      "expected": "decode"
+    },
+    {
+      "id": "q6",
+      "type": "predict_output",
+      "question": "Jaké hodnoty vrací cyklus for při iteraci přes bajtový řetězec bytes?",
+      "options": [
+        "A) 65 66",
+        "B) 0 1",
+        "C) A B",
+        "D) b'A' b'B'"
+      ],
+      "answer": 0,
+      "explanation": "Iterace přes bytes vrací jednotlivé celočíselné hodnoty bajtů (int 0-255). ASCII hodnota 'A' je 65 a 'B' je 66. Znaky nebo podřetězce b'A' se při iteraci nevytváří.",
+      "code": "for item in b'AB':\n    print(item, end=' ')"
     }
   ]
 }

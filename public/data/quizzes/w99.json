@@ -1590,105 +1590,6 @@
       "code": null
     }
   ],
-  "recursion_overview": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jak se zachová následující rekurzivní funkce bez definované kotvy rekurze?",
-      "code": "def nekonecno(n):\n    return nekonecno(n + 1)\nnekonecno(1)",
-      "options": [
-        "A) Program se zacyklí do nekonečna bez vyvolání chyby a postupně zaplní paměť procesoru.",
-        "B) Program selže s výjimkou RecursionError po dosažení maximální hloubky zásobníku volání.",
-        "C) Nastane výjimka MemoryError z důvodu alokace paměti pro nekonečný seznam dat na haldě.",
-        "D) Python automaticky převede funkci na cyklus while a po dosažení limitu vrátí hodnotu None."
-      ],
-      "answer": 1,
-      "explanation": "Python má z bezpečnostních důvodů nastaven limit pro maximální hloubku zanoření rekurze (standardně cca 1000 volání). Při jeho překročení vyvolá interpretr výjimku RecursionError."
-    },
-    {
-      "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Doplňte správnou podmínku pro zavedení kotvy rekurze při výpočtu faktoriálu.",
-      "code": "def faktorial(n):\n    if ________:\n        return 1\n    return n * faktorial(n - 1)",
-      "options": [
-        "n > 1  # pokračuje v rekurzivním volání dokud je n větší než základní konstanta 1.",
-        "n % 2 == 0  # zastavuje rekurzi pouze",
-        "n <= 1  # zastaví rekurzivní volání",
-        "n == 100  # ukončí rekurzi po dosažení stého kroku výpočtu a vrátí mezivýsledek."
-      ],
-      "answer": 2,
-      "explanation": "Kotva rekurze (base case) musí zastavit další rekurzivní volání. Pro faktoriál je definováno 0! = 1! = 1, tedy podmínka n <= 1 vrací hodnotu 1 a zamezuje zápornému zanoření.",
-      "expected": "n <= 1"
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jaká je časová složitost naivní rekurzivní funkce pro n-tý člen Fibonacciho posloupnosti fib(n-1) + fib(n-2)?",
-      "options": [
-        "A) Logaritmická O(log n) — výpočet se v každém kroku půlí podle zlatého řezu posloupnosti.",
-        "B) Lineární O(n) — každý člen posloupnosti se počítá v celém průběhu výpočtu právě jednou.",
-        "C) Kvadratická O(n^2) — výpočet vyžaduje dvě vnořené smyčky pro každý prvek posloupnosti.",
-        "D) Exponenciální O(2^n) — každé nekoncové volání vyvolá dvě nová rekurzivní volání stromu."
-      ],
-      "answer": 3,
-      "explanation": "Naivní rekurzivní řešení Fibonacciho posloupnosti vytváří binární strom volání s hloubkou n. Počet uzlů stromu a tím i celkový počet volání roste exponenciálně jako O(2^n), protože stejné podproblémy se počítají opakovaně.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "true_false_tricky",
-      "question": "Posouzení optimalizace koncové rekurze (tail call optimization) v interpretru CPython:",
-      "options": [
-        "A) CPython neprovádí automatickou optimalizaci koncové rekurze, takže i koncové rekurzivní volání zaplňuje zásobník.",
-        "B) CPython automaticky detekuje koncovou rekurzi a nahrazuje ji přímým skokem bez alokace nového rámce zásobníku."
-      ],
-      "answer": 0,
-      "explanation": "Na rozdíl od funkcionálních jazyků (Lisp, Scheme, Haskell) CPython nepodporuje optimalizaci koncové rekurze (TCO). Každé rekurzivní volání alokuje nový rámec na zásobníku bez ohledu na to, zda jde o koncovou rekurzi.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "predict_output",
-      "question": "Co vypíše následující kód počítající součet prvků seznamu rekurzivně?",
-      "code": "def suma(xs):\n    if not xs:\n        return 0\n    return xs[0] + suma(xs[1:])\nprint(suma([1, 2, 3, 4]))",
-      "options": [
-        "A) 10 — rekurzivně se přičítá první prvek a volá se funkce na zbytek seznamu až do prázdného.",
-        "B) [1, 2, 3, 4] — funkce vrátí nezměněný původní seznam z důvodu absence operace násobení.",
-        "C) 4 — rekurzivní funkce vrátí pouze celkovou délku původního zadaného seznamu namísto součtu.",
-        "D) 0 — kotva rekurze vrátí nulovou hodnotu, která přemaže veškeré předchozí mezivýsledky."
-      ],
-      "answer": 0,
-      "explanation": "V prvním kroku 1 + suma([2,3,4]), pak 2 + suma([3,4]), 3 + suma([4]), 4 + suma([]). Prázdný seznam vrátí 0, celkový součet je 1 + 2 + 3 + 4 + 0 = 10."
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Jaká je paměťová složitost rekurzivní funkce pro faktoriál vyžadující n zanořených volání?",
-      "options": [
-        "A) Kvadratická O(n^2) — pro každý rekurzivní krok se alokuje kopie celého kódu funkce v RAM.",
-        "B) Lineární O(n) — v paměti musí být v nejhlubším bodě zanoření uloženo n rámců zásobníku.",
-        "C) Konstantní O(1) — paměťové nároky nezávisí na n, protože se přepisuje pouze jedna proměnná.",
-        "D) Exponenciální O(2^n) — zásobník volání se pro každou úroveň zdvojuje do stromové struktury."
-      ],
-      "answer": 1,
-      "explanation": "Každé rekurzivní volání si ukládá svůj stav (rámec funkce s lokálními proměnnými a návratovou adresou) na zásobník. Při zanoření do hloubky n je na zásobníku zároveň n rámců, což odpovídá paměťové složitosti O(n).",
-      "code": null
-    },
-    {
-      "id": "q7",
-      "type": "multiple_choice",
-      "question": "Proč je iterativní řešení výpočtu Fibonacciho posloupnosti pomocí smyčky výhodnější než naivní rekurze?",
-      "options": [
-        "A) Převádí výpočet celých čísel na operace s plovoucí řádkovou čárkou pro vyšší přesnost a rychlost.",
-        "B) Zamezuje přetečení číselného rozsahu proměnných při výpočtu velkých členů posloupnosti v RAM.",
-        "C) Snižuje časovou složitost na O(n) a paměťovou složitost na O(1) udržováním dvou posledních hodnot.",
-        "D) Umožňuje automatické paralelní zpracování celého výpočtu na všech dostupných jádrech procesoru."
-      ],
-      "answer": 2,
-      "explanation": "Iterativní přístup si pamatuje pouze dva předchozí členy v proměnných, což vyžaduje konstantní paměť O(1) a lineární čas O(n) bez nebezpečí přetečení zásobníku nebo opakovaného výpočtu stejných prvků.",
-      "code": null
-    }
-  ],
   "MatPlotLib_animace": [
     {
       "id": "q1",
@@ -1772,6 +1673,1106 @@
       ],
       "answer": 1,
       "explanation": "ArtistAnimation projde seznam frames a v zadaném časovém intervalu (zde 200 ms) zobrazuje pouze artisty přiřazené k danému snímku (v tomto případě příslušnou čáru line)."
+    }
+  ],
+  "more-versions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaký zápis shebang hlavičky zaručí nejvyšší přenositelnost skriptu pro Python 3 mezi Linuxem a Windows?",
+      "options": [
+        "A) #! C:\\Python311\\python.exe pro použití absolutní cesty k instalaci interpretru ve Windows.",
+        "B) #!/usr/bin/python3.11 pro pevné provázání s konkrétní systémovou cestou instalace na disku OS.",
+        "C) #!/usr/bin/env python3 pro dynamické vyhledání Pythonu 3 v proměnné PATH uživatelského prostředí.",
+        "D) #! python pro obecné zavolání výchozího systémového interpretru bez specifikace konkrétní verze."
+      ],
+      "answer": 2,
+      "explanation": "Zápis `#!/usr/bin/env python3` vyhledá spustitelný `python3` v proměnné PATH prostředí, což funguje v linuxových distribucích i ve Windows spouštěči `py.exe`.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Kterým přepínačem spouštěče py ve Windows vynutíte spuštění skriptu v Pythonu verze 3 bez ohledu na shebang v souboru?",
+      "code": "# Vynucení spuštění laboratorního skriptu v Pythonu 3\npy ________ experiment_titration.py",
+      "options": [
+        "-env:python3",
+        "/v:3",
+        "--python3",
+        "-3"
+      ],
+      "answer": 3,
+      "explanation": "Příkazový spouštěč py.exe ve Windows přijímá parametr -3, který má přednost před shebang řádkem v souboru i výchozí asociací v systému.",
+      "expected": "-3"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Co způsobuje nastavení proměnné prostředí PY_PYTHON=3 v operačním systému Windows?",
+      "options": [
+        "A) Nastaví pro spouštěč py.exe výchozí verzi 3 u skriptů, které nemají specifikovanou verzi v shebangu.",
+        "B) Přepíše textovou hlavičku shebang ve všech souborech s příponou .py na hodnotu #!/usr/bin/env python3.",
+        "C) Zamezí možnosti instalovat starší verze Pythonu 2 na daném počítači s operačním systémem Windows.",
+        "D) Přesměruje volání příkazu python z běžného rozhraní Windows přímo do linuxového prostředí WSL."
+      ],
+      "answer": 0,
+      "explanation": "Proměnná prostředí `PY_PYTHON=3` instructuje windowsí spouštěč `py.exe`, aby v případech, kdy není explicitně určena verze, spustil Python 3 namísto Pythonu 2.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Který mechanismus má nejvyšší prioritu při rozhodování spouštěče py.exe o verzi Pythonu?",
+      "options": [
+        "A) Verze Pythonu zapsaná na prvním řádku souboru uvnitř shebang hlavičky (např. #!/usr/bin/env python3).",
+        "B) Explicitní parametr verze předaný přímo na příkazové řádce při spuštění (např. py -3 skript.py).",
+        "C) Verze Pythonu, která byla na daný počítač nainstalována jako chronologicky nejnovější ze všech.",
+        "D) Hodnota nastavená v uživatelské nebo systémové proměnné prostředí operačního systému PY_PYTHON."
+      ],
+      "answer": 1,
+      "explanation": "Explicitní argument spouštěče (`py -3`) má nejvyšší prioritu. Přetlačuje jak shebang uvnitř souboru, tak nastavení proměnné `PY_PYTHON` i výchozí systémové chování.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jak se řeší instalace vlastních verzí Pythonu na operačním systému macOS oproti Linuxu?",
+      "options": [
+        "A) Na macOS nelze spouštět více verzí Pythonu současně kvůli omezením grafického rozhraní Aqua GUI.",
+        "B) Všechny verze Pythonu sdílí jediný systémový adresář pro knihovny v umístění /usr/bin/python.",
+        "C) Systémový Python je chráněn operačním systémem a vývojářské verze se instalují přes Homebrew či Conda.",
+        "D) macOS automaticky přeposílá všechny příkazy z terminálu na vzdálený linuxový server přes protokol SSH."
+      ],
+      "answer": 2,
+      "explanation": "macOS obsahuje systémový Python chráněný operačním systémem. Pro vlastní potřeby vývoje je doporučeno instalovat oddělené verze pomocí balíčkovacího systému Homebrew nebo Conda v terminálu.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "true_false_tricky",
+      "question": "Spouští příkaz python v terminálu linuxových distribucí vždy Python 3?",
+      "options": [
+        "A) Pravda – všechny linuxové distribuce bez výjimky od roku 2015 odkazují příkaz python na Python 3.",
+        "B) Nepravda – závisí na distribuci; některé distribuce pod příkazem python stále spouští Python 2."
+      ],
+      "answer": 1,
+      "explanation": "Názvosloví binárky `python` v Linuxu závisí na konkrétní distribuci. Zatímco Arch Linux odkazuje na Python 3, mnohé jiné distribuce udržovaly `python` jako odkaz na Python 2.",
+      "code": null
+    }
+  ],
+  "usage": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co označuje symbol [*] v hranatých závorkách na levé straně buňky s kódem v Jupyter Notebooku?",
+      "code": "In [*]: import time; time.sleep(10)",
+      "options": [
+        "A) Výstup buňky byl zakázán uživatelem pomocí klávesové zkratky O.",
+        "B) V buňce došlo k syntaktické chybě a běh interpretru byl zastaven.",
+        "C) Kód v buňce byl označen jako záložka a nebude se znovu vyhodnocovat.",
+        "D) Buňka právě probíhá a výpočet na pozadí ještě nebyl dokončen."
+      ],
+      "answer": 3,
+      "explanation": "Hvězdička [*] vyjadřuje, že kernel v buňce právě vykonává kód. Po dokončení výpočtu se změří pořadové číslo spuštění."
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký je rozdíl mezi automatickým ukládáním autosave a ručním uložením pomocí CTRL+S v Jupyter Notebooku?",
+      "options": [
+        "A) Autosave ukládá stav do otevřeného souboru, zatímco CTRL+S vytváří záložní checkpoint.",
+        "B) Autosave ukládá pouze textové buňky, zatímco CTRL+S ukládá výstup kódu a grafy.",
+        "C) Autosave uchovává historii 10 verzí, zatímco CTRL+S ukládá verzi do gitu.",
+        "D) Autosave zapisuje na vzdálený server, zatímco CTRL+S ukládá soubor na lokální disk."
+      ],
+      "answer": 0,
+      "explanation": "Ruční uložení (Ctrl+S nebo S v příkazovém módu) vytvoří tzv. checkpoint v podadresáři .ipynb_checkpoints. Funkce Revert to Checkpoint umožňuje návrat k tomuto uloženému stavu.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Která klávesová zkratka v příkazovém režimu (Command Mode) Jupyter Notebooku okamžitě smaže vybranou buňku?",
+      "code": "# Jupyter Command Mode (modrý pruh vlevo po stisku Esc)\n# Smazání aktivní buňky:\n________",
+      "options": [
+        "XX",
+        "DD",
+        "BS",
+        "DEL"
+      ],
+      "answer": 1,
+      "explanation": "V příkazovém režimu Jupyteru (Command Mode) stisknutí klávesy D dvakrát za sebou (DD) okamžitě odstraní aktuální buňku.",
+      "expected": "DD"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Co udělá klávesová zkratka ALT+ENTER při spuštění kódové buňky v Jupyter Notebooku?",
+      "code": "In [1]: print(\"Ahoj\")  # Stisknuto ALT+ENTER",
+      "options": [
+        "A) Vykoná kód buňky a automaticky zrestartuje kernel bez smazání proměnných.",
+        "B) Vykoná kód buňky a pouze posune fokus v příkazovém módu na následující buňku.",
+        "C) Vykoná kód buňky, založí pod ní novou prázdnou buňku a přepne do editačního módu.",
+        "D) Vykoná kód buňky v samostatném novém okně webového prohlížeče na pozadí."
+      ],
+      "answer": 2,
+      "explanation": "Alt+Enter vykoná kód buňky, vytvoří pod ní novou buňku (below) a umístí v ní kurzor v editačním módu (zelený okraj)."
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jaký je zásadní rozdíl mezi klávesovými zkratkami II a 00 v příkazovém módu Jupyter Notebooku?",
+      "options": [
+        "A) II restartuje celý Jupyter server, zatímco 00 zmaže pouze výstupní text aktuální buňky.",
+        "B) II přepne buňku do formátu Markdown, zatímco 00 ji převede na surovou buňku typu Raw.",
+        "C) II uloží checkpoint souboru na disk, zatímco 00 načte předchozí verzi z adresáře checkpoints.",
+        "D) II se pokusí přerušit výpočet, zatímco 00 restartuje kernel a smaže všechny proměnné z paměti."
+      ],
+      "answer": 3,
+      "explanation": "II posílá přerušení (interrupt) dlouho běžícímu výpočtu. 00 restartuje kernel, čímž zruší stav paměti a všechny definované proměnné.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "fill_blank_choice",
+      "question": "Který buňkový magický příkaz (cell magic) v Jupyter Notebooku uloží veškerý kód dané buňky do souboru na disku?",
+      "code": "________ analysis_module.py\n\ndef calculate_molarity(moles, volume_liters):\n    \"\"\"Výpočet látkové koncentrace roztoku.\"\"\"\n    return moles / volume_liters",
+      "options": [
+        "%%writefile",
+        "%%save_code",
+        "%filedump",
+        "%exportfile"
+      ],
+      "answer": 0,
+      "explanation": "Magický příkaz %%writefile nazev_souboru.py vezme obsah celé buňky v notebooku a zapíše jej do souboru na disku.",
+      "expected": "%%writefile"
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Jaký je v Jupyter Notebooku rozdíl mezi řádkovým magickým příkazem %time a celobuňkovým %%time?",
+      "options": [
+        "A) %time funguje výhradně v Pythonu 2, zatímco %%time je novější příkaz zavedený v JupyterLabu.",
+        "B) %time měří dobu vykonání pouze na daném řádku, zatímco %%time měří čas běhu celého bloku buňky.",
+        "C) %time spouští měření pomocí modulu timeit, zatímco %%time používá nízkoúrovňové C funkce OS.",
+        "D) %time zjišťuje velikost paměti alokované řádkem, zatímco %%time měří využití procesoru CPU."
+      ],
+      "answer": 1,
+      "explanation": "Příkazy začínající % jsou řádkové (aplikují se na řádek, kde jsou zapsané), zatímco příkazy s %% jsou celobuňkové a řídí zpracování celé buňky.",
+      "code": null
+    },
+    {
+      "id": "q8",
+      "type": "fill_blank_choice",
+      "question": "Který řádkový magický příkaz v Jupyter Notebooku přehledně zobrazí tabulku všech aktivních proměnných, jejich typů a obsahu?",
+      "code": "sample_name = \"Kyselina benzoová\"\ntemperatures = [21.5, 22.0, 21.8]\nmolar_mass = 122.12\n\n# Zobrazení přehledu proměnných v paměti kernelu\n________",
+      "options": [
+        "%list",
+        "%dir",
+        "%whos",
+        "%vars"
+      ],
+      "answer": 2,
+      "explanation": "Magický příkaz %whos zobrazí strukturovanou tabulku proměnných v paměti interaktivního kernelu včetně jejich datových typů a velikosti.",
+      "expected": "%whos"
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "Jak zapišete v Markdown buňce matematickou rovnici tak, aby se vyrendrovala v samostatném odstavci zarovnaná na střed?",
+      "options": [
+        "A) Vložením příkazu %latex na první řádek a uzavřením textu do složených závorek.",
+        "B) Použitím jednotných dolarů ($ výraz $) na začátku a na konci samostatného řádku.",
+        "C) Obalením výrazu do tří zpětných uvozovek (```math výraz ```) podle GitHub Markdownu.",
+        "D) Obalením výrazu do dvojitých dolarů ($$ zápis rovnice $$) pro MathJax odstavcovou sazbu."
+      ],
+      "answer": 3,
+      "explanation": "V Markdownu (MathJax) se pro inline rovnici používá $ ... $ a pro samostatnou rovnici na novém řádku zarovnanou na střed $$ ... $$.",
+      "code": null
+    },
+    {
+      "id": "q10",
+      "type": "true_false_tricky",
+      "question": "Spuštění cizího Jupyter notebooku ze neověřeného zdroje je bezpečné, pokud nepovolíte editační mód.",
+      "options": [
+        "A) Nepravda – vyhodnocení kódových buněk spouští kód pod vaším systémovým účtem s plnými právy.",
+        "B) Pravda – rozhraní webového prohlížeče izoluje kód buňky v bezpečné sandboxové paměti OS."
+      ],
+      "answer": 0,
+      "explanation": "Běh buněk v Jupyteru probíhá v lokálním pythoním kernelu pod právy uživatele spouštějícího jupyteří server. Spuštění škodlivého kódu v notebooku má stejné dopady jako spuštění .py skriptu z terminálu.",
+      "code": null
+    }
+  ],
+  "jupyter_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jak vznikl název a projekt Jupyter rozdělením od původního projektu IPython v roce 2014?",
+      "options": [
+        "A) Sloučením vývojových týmů jazyků Java, Python a Rust do jednoho společného komunitního fondu.",
+        "B) Vyčleněním jazykově nezávislého prostředí z IPythonu a odvozením názvu z jazyků Julia, Python a R.",
+        "C) Přejmenováním systému IPython z důvodu licenčního sporu se společností Anaconda Continuum.",
+        "D) Přepsáním původní konzole IPythonu do jazyka JavaScript a vytvořením nového jádra pro C++."
+      ],
+      "answer": 1,
+      "explanation": "V roce 2014 byly jazykově nezávislé části (webové rozhraní, protokol) vyčleněny do projektu Jupyter (akronym pro Julia, Python, R). IPython zůstal jako kernel obsluhující Python.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl v uživatelském rozhraní mezi Jupyter Notebook a JupyterLab?",
+      "options": [
+        "A) Jupyter Notebook vyžaduje placenou licenci, zatímco JupyterLab je vydáván pod svobodnou licencí MIT.",
+        "B) Jupyter Notebook funguje v terminálu, zatímco JupyterLab je samostatná aplikace bez webového serveru.",
+        "C) Jupyter Notebook zobrazuje jeden pracovní list, zatímco JupyterLab je multitabové prostředí pro více souborů.",
+        "D) Jupyter Notebook slouží pouze pro spracování jazyka C, zatímco JupyterLab podporuje výhradně Python 3."
+      ],
+      "answer": 2,
+      "explanation": "Jupyter Notebook poskytuje klasické jednoduché webové rozhraní zaměřené na jeden otevřený notebook. JupyterLab je moderní více-panelové/multitabové IDE prostředí.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který příkaz zaregistruje virtuální prostředí myenv jako samostatný kernel do Jupyteru?",
+      "code": "python -m ________ install --user --name myenv --display-name \"Python (myenv)\"",
+      "options": [
+        "condalib",
+        "notebook",
+        "jupyterlab",
+        "ipykernel"
+      ],
+      "answer": 3,
+      "explanation": "Modul ipykernel umožňuje zaregistrovat pythoní prostředí jako dostupný kernel do Jupyteru pomocí příkazu python -m ipykernel install.",
+      "expected": "ipykernel"
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "Jaký příkaz spustí jupyteří server na specifickém síťovém portu 9999 s prací v adresáři /projekty?",
+      "code": "$ jupyter notebook ________",
+      "options": [
+        "A) --port 9999 --notebook-dir=/projekty pro nastavení portu a pracovního adresáře serveru.",
+        "B) --listen 9999 --root=/projekty pro otevření síťového rozhraní v administrátorském režimu.",
+        "C) -p 9999 -d /projekty pro spuštění na pozadí s automatickým vytvořením nového souboru.",
+        "D) --bind 9999 --path=/projekty pro nasměrování webového prohlížeče do složky uživatele."
+      ],
+      "answer": 0,
+      "explanation": "Příkaz jupyter notebook přijímá přepínače --port PORT pro volbu portu a --notebook-dir=ADRESÁŘ pro nastavení kořenového adresáře."
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Při instalaci JupyterLabu do virtuálního prostředí ztratí uživatel možnost spouštět klasické rozhraní Jupyter Notebook.",
+      "options": [
+        "A) Pravda – JupyterLab je nekompatibilní náhrada, která původní Jupyter Notebook trvale odinstaluje.",
+        "B) Nepravda – balíček jupyterlab v rámci svých závislostí nainstaluje i klasický Jupyter Notebook."
+      ],
+      "answer": 1,
+      "explanation": "jupyterlab obsahuje balíček jupyter_server i klasické rozhraní jupyter notebook, takže v prostředí s JupyterLabem lze stále spouštět i původní rozhraní.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jakým způsobem se do instalace Jupyteru přidávají podporované programovací jazyky (např. JavaScript nebo R)?",
+      "options": [
+        "A) Úpravou systémové proměnné PATH přímo v souboru konfigurace JupyterLabu.",
+        "B) Instalací příslušného kernelu pro daný jazyk a jeho registrací do systému Jupyter.",
+        "C) Změnou přípony souboru z .ipynb na příponu zdrojového kódu daného jazyka.",
+        "D) Automatickým zapnutím zabudovaného kompilátoru v základním balíčku IPythonu."
+      ],
+      "answer": 1,
+      "explanation": "Jupyter je jazykově agnostic rozhraní. Podpora pro další jazyky se dosahuje instalací odpovídajícího kernelu (např. ijavascript pro JS, IRkernel pro R).",
+      "code": null
+    }
+  ],
+  "venv": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Který příkaz vytvoří nové virtuální prostředí ve složce .venv v aktuálním adresáři?",
+      "options": [
+        "A) pip install venv .venv",
+        "B) pyvenv create --dir .venv",
+        "C) python create venv .venv",
+        "D) python -m venv .venv"
+      ],
+      "answer": 3,
+      "explanation": "Standardní způsob od Pythonu 3.8 je spuštění modulu `venv` pomocí příkazu `python -m venv <cesta>`.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Co způsobí použití přepínače --system-site-packages při vytváření prostředí modulem venv?",
+      "options": [
+        "A) Zpřístupní balíčky z globálního adresáře site-packages, přičemž lokální balíčky mají stále prioritu.",
+        "B) Zkopíruje všechny globálně dostupné balíčky přímo do lokální složky site-packages daného prostředí.",
+        "C) Povolí automatické zapisování všech nově instalovaných knihoven přímo do globální instalace systému.",
+        "D) Odstraní z nově vytvářeného virtuálního prostředí správce pip a zakáže instalaci lokálních balíčků."
+      ],
+      "answer": 0,
+      "explanation": "Přepínač nastavení klíč `include-system-site-packages = True` v `pyvenv.cfg`. Globální balíčky budou dostupné, ale pokud nainstalujete lokální balíček stejného jména, použije se lokální.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Co se stane s proměnnou prostředí PATH v příkazové řádce při aktivaci virtuálního prostředí?",
+      "options": [
+        "A) Do proměnné PATH se uloží cesta k repozitáři PyPI pro prioritní stahování nových balíčků z internetu.",
+        "B) Na její začátek se přidá cesta k podadresáři bin (resp. Scripts ve Windows) daného virtuálního prostředí.",
+        "C) Původní obsah proměnné PATH se kompletně smaže a nahradí pouze absolutní cestou k souboru python.exe.",
+        "D) Aktivace proměnnou PATH vůbec nemění, pouze vytváří dočasný zástupce na ploše operačního systému."
+      ],
+      "answer": 1,
+      "explanation": "Aktivace prostředí (např. přes `source activate` nebo `activate.bat`) předřadí složku binárek venvu na samý začátek systémové proměnné PATH.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaké hodnoty vrátí sys.base_prefix a sys.prefix uvnitř aktivovaného virtuálního prostředí .venv?",
+      "code": "import sys\nprint(sys.base_prefix == sys.prefix)",
+      "options": [
+        "A) True, protože obě proměnné vždy ukazují na hlavní systémovou instalaci Pythonu bez ohledu na venv.",
+        "B) Vyvolá AttributeError, protože atribut sys.base_prefix existuje pouze mimo virtuální prostředí.",
+        "C) False, protože sys.prefix ukazuje na složku prostředí .venv, zatímco sys.base_prefix na základní Python.",
+        "D) True, protože obě proměnné se po aktivaci virtuálního prostředí automaticky přenastaví na cestu k .venv."
+      ],
+      "answer": 2,
+      "explanation": "`sys.base_prefix` uchovává cestu k původní hlavní instalaci Pythonu (nemění se), zatímco `sys.prefix` ukazuje na kořenový adresář spuštěného virtuálního prostředí (mění se)."
+    },
+    {
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Kterým shellovým příkazem v systému Linux nebo macOS aktivujete virtuální prostředí v aktuální relaci terminálu?",
+      "code": "# Aktivace virtuálního prostředí pro bioinformatický projekt\n________ .venv/bin/activate",
+      "options": [
+        "python",
+        "execute",
+        "import",
+        "source"
+      ],
+      "answer": 3,
+      "explanation": "Příkaz source (případně tečka .) provede skript activate přímo v běžícím shellu, díky čemuž nastaví proměnné prostředí PATH a VIRTUAL_ENV.",
+      "expected": "source"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Proč se nedoporučuje verzovat složku virtuálního prostředí .venv v systému Git?",
+      "options": [
+        "A) Prostředí obsahuje stovky megabajtů závislostí a binárek, které lze snadno zregenerovat z requirements.txt.",
+        "B) Operační systém vyžaduje pro verzování složky .venv speciální komerční licenci systému správy verzí.",
+        "C) Git neumí zpracovat symbolické odkazy a při nahrávání na vzdálený repozitář poškodí soubor pyvenv.cfg.",
+        "D) Soubor .gitignore zapsaný v adresáři .venv znemožňuje odeslání jakéhokoliv kódu projektu na GitHub."
+      ],
+      "answer": 0,
+      "explanation": "Složka `.venv` je velká a obsahuje platformně závislé binárky a symlinky. Projekt má verzovat pouze `requirements.txt`, ze kterého lze prostředí kdekoliv znova postavit.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "true_false_tricky",
+      "question": "Je nutné virtuální prostředí explicitně aktivovat, pokud spouštíme skript zadáním plné cesty k pythonu ve venv?",
+      "options": [
+        "A) Pravda – bez předchozího zavolání skriptu activate bude Python ignorovat lokální složku site-packages.",
+        "B) Nepravda – při použití binárky z `<venv>/bin/python` se kód spustí v prostředí venv i bez aktivace shellu."
+      ],
+      "answer": 1,
+      "explanation": "Aktivace pouze upravuje PATH v shellu. Pokud spustíte kód přímo spouštěčem `<venv>/bin/python` (nebo `<venv>\\Scripts\\python.exe`), Python automaticky detekuje soubor `pyvenv.cfg` a použije venv.",
+      "code": null
+    }
+  ],
+  "virtual_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co tvoří podle specifikace PEP 405 technickou podstatu virtuálního prostředí v Pythonu 3.3+?",
+      "options": [
+        "A) Kompletní virtuální stroj obsahující samostatný operační systém a nezávislý souborový systém disku.",
+        "B) Speciální větev v systému Git, která uchovává binární soubory závislostí odděleně od zdrojového kódu.",
+        "C) Šifrovaný archiv obsahující kompilované soubory bajtkódu všech nainstalovaných balíčků v systému.",
+        "D) Konfigurační soubor pyvenv.cfg a upravené vyhledávání knihoven přes sys.prefix a modul site."
+      ],
+      "answer": 3,
+      "explanation": "Podle PEP 405 spočívá virtuální prostředí v souboru `pyvenv.cfg` a modifikaci vyhledávací mechaniky interpretru, kdy modul `site` přenastaví `sys.prefix` na složku virtuálního prostředí.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Který klíč v konfiguračním souboru pyvenv.cfg určuje cestu k původní systémové binárce Pythonu?",
+      "options": [
+        "A) Klíč home, který odkazuje na adresář obsahující nadřazenou pythoní binárku použité instalace.",
+        "B) Klíč path, který specifikuje relativní cestu k rozhraní pip pro stahování balíčků ze serveru PyPI.",
+        "C) Klíč system, který zapíná sdílení všech uživatelských knihoven mezi jednotlivými prostředími.",
+        "D) Klíč base, který uchovává seznam všech dostupných balíčků nainstalovaných v globálním prostředí."
+      ],
+      "answer": 0,
+      "explanation": "Klíč `home` v `pyvenv.cfg` určuje složku se systémovou pythoní binárkou, ze které prostředí čerpá výchozí standardní knihovny.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Které tři prvky musí obsahovat minimální virtuální prostředí vytvořené v Pythonu 3.3+?",
+      "options": [
+        "A) Zdrojové kódy všech prvků projektu, verzovací soubor .gitignore a konfigurační skript setup.py.",
+        "B) Spouštěcí binárku (či symlink), konfigurační soubor pyvenv.cfg a složku site-packages pro moduly.",
+        "C) Uživatelský profil rozhraní pip, vyhledávací index PyPI a globální proměnné prostředí Windows OS.",
+        "D) Kompletní kopii standardní knihovny CPythonu, kompilátor GCC a vývojové prostředí Thonny IDE."
+      ],
+      "answer": 1,
+      "explanation": "Minimální virtuální prostředí vyžaduje symlink/kopii pythoní binárky v `bin` (resp. `Scripts`), konfigurační `pyvenv.cfg` a lokální adresář `site-packages` pro instalované balíčky.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "fill_blank_choice",
+      "question": "Který vestavěný modul Pythonu se automaticky spouští při startu interpretu a registruje cesty k site-packages do sys.path?",
+      "code": "import ________\n\n# Výpis všech automaticky nakonfigurovaných cest k balíčkům\npackage_paths = site.getsitepackages()\n# Výstup: ['/usr/local/lib/python3.11/dist-packages', ...]",
+      "options": [
+        "importlib",
+        "os.env",
+        "site",
+        "sys.path"
+      ],
+      "answer": 2,
+      "explanation": "Modul site se automaticky načítá při startu Pythonu a stará se o konfiguraci sys.path podle přítomnosti pyvenv.cfg nebo výchozích systémových cest.",
+      "expected": "site"
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Sdílí nově vytvořené virtuální prostředí ve výchozím nastavení balíčky nainstalované v globální instalaci Pythonu?",
+      "options": [
+        "A) Nepravda – výchozí virtuální prostředí je izolované a nesdílí balíčky z globálního site-packages.",
+        "B) Pravda – nově vytvořené virtuální prostředí automaticky zkopíruje všechny balíčky z globální instalace."
+      ],
+      "answer": 0,
+      "explanation": "Virtuální prostředí je standardně kompletně čisté a izolované od balíčků nainstalovaných v globálním či uživatelském prostředí, pokud nebylo vytvořeno s přepínačem `--system-site-packages`.",
+      "code": null
+    }
+  ],
+  "pickle": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Který mód otevření souboru je vyžadován při zápisu zapiklených dat metodou pickle.dump()?",
+      "options": [
+        "A) 'wt' — modul pickle generuje textový výstup kódovaný automaticky v systémech UTF-8.",
+        "B) 'a+' — modul pickle vyžaduje režim připsání na konec souboru pro správnou serializaci.",
+        "C) 'r+' — modul pickle potřebuje režim pro čtení i zápis z důvodu kontroly zapsaných dat.",
+        "D) 'wb' — modul pickle vytváří binární bajtový tok, který vyžaduje přímý binární zápis."
+      ],
+      "answer": 3,
+      "explanation": "Metoda pickle.dump() zapisuje serializovaná data v binárním formátu (objekt typu bytes), proto musí být výstupní soubor otevřen v binárním režimu zápisu ('wb'). V textovém režimu by pokus o zápis bajtů vyvolal výjimku TypeError.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Která funkce modulu pickle deserializuje objekt přímo z bajtového řetězce (bytes) v paměti?",
+      "code": "import pickle\n\nserialized_sample = b\"\\x80\\x04\\x95\\x19\\x00\\x00\\x00\\x00\\x00\\x00\\x00}\\x94\\x8c\\x06sample\\x94\\x8c\\x07ethanol\\x94s.\"\nmeasurement = pickle.________(serialized_sample)\n# Vystup: {'sample': 'ethanol'}",
+      "options": [
+        "loads",
+        "load",
+        "dumps",
+        "dump"
+      ],
+      "answer": 0,
+      "explanation": "Funkce pickle.loads() načítá a deserializuje objekt z předaného bajtového řetězce v paměti, zatímco pickle.load() čte ze souborového proudu.",
+      "expected": "loads"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Co se stane při pokusu o zapiklení uživatelsky definované funkce v Pythonu?",
+      "options": [
+        "A) Uloží se kompletní zdrojový kód funkce i se všemi lokálními proměnnými v těle funkce.",
+        "B) Uloží se pouze plně kvalifikované jméno funkce a název modulu, nikoli její zdrojový kód.",
+        "C) Vyvolá se okamžitě výjimka PicklingError, protože funkce nelze v Pythonu piklit.",
+        "D) Funkce se automaticky převede na anonymní lambda výraz a uloží jako spustitelný bajtkód."
+      ],
+      "answer": 1,
+      "explanation": "Modul pickle neukládá bytecode ani zdrojový kód funkcí a tříd. Zapisuje pouze referenci v podobě jejich plného jména a mateřského modulu, takže při unpicklování musí daná funkce v cílovém prostředí existovat pod stejným jménem.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Posouzení bezpečnosti deserializace neověřených zapiklených dat z neznámých zdrojů:",
+      "options": [
+        "A) Deserializace pomocí pickle.load() je zcela bezpečná, protože modul pickle provádí sanitaci vstupních bajtů a nepovoluje spouštění funkcí.",
+        "B) Deserializace pomocí pickle.load() představuje kritické bezpečnostní riziko, protože proces rozbalení může automaticky spustit libovolný kód."
+      ],
+      "answer": 1,
+      "explanation": "Při rozbalování zapiklených dat dochází k instanciaci objektů a volání konstruktorů či speciálních metod, což umožňuje útočníkovi podvrhnout bajtkód vykonávající libovolné příkazy v operačním systému. Pro nedůvěryhodná data je nutné se pickle vyhnout.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jaká výjimka nastane při pokusu o zapiklení generátorového výrazu pomocí pickle.dumps()?",
+      "code": "import pickle\ngen = (x**2 for x in range(10))\npickle.dumps(gen)",
+      "options": [
+        "A) TypeError — operace dumps() přijímá pouze sekvenční typy jako seznamy nebo n-tice v paměti.",
+        "B) AttributeError — objekt generátoru nemá vytvořen atribut __dict__ pro uložení vnitřního stavu.",
+        "C) PicklingError — generátory udržují vnitřní stav iterátoru a nepatří mezi piklitelné objekty.",
+        "D) ValueError — generátorový výraz vyžaduje explicitní konverzi na seznam před serializací dat."
+      ],
+      "answer": 2,
+      "explanation": "Generátory, otevřené soubory, síťová spojení nebo databázová připojení nelze serializovat. Pokus o zapiklení nepiklitelného objektu vyvolá výjimku pickle.PicklingError."
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "K čemu primárně slouží modul pickletools ve standardní knihovně Pythonu?",
+      "options": [
+        "A) Automaticky převádí binární struktury modulu pickle do lidsky čitelného formátu JSON či XML.",
+        "B) Zrychluje vykonávání metod pickle.dump() a pickle.load() pomocí C-rozšíření interpretru.",
+        "C) Šifruje zapiklená data pomocí symetrického šifrovacího klíče před uložením na lokální disk.",
+        "D) Umožňuje inspekci a disasemblaci instrukcí piklicího protokolu bez spuštění nebezpečného kódu."
+      ],
+      "answer": 3,
+      "explanation": "Modul pickletools poskytuje funkci dis(), která disasembruje bajtový tok piklicího protokolu na jednotlivé operační kódy. To umožňuje offline analýzu struktury uložených dat bez rizika vykonání škodlivého kódu z neznámého souboru.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Co přesně se uloží při serializaci instance uživatelské třídy pomocí modulu pickle?",
+      "options": [
+        "A) Uloží se pouze atributy instance z __dict__ a odkaz na příslušnou třídu a modul.",
+        "B) Uloží se celá třída se všemi statickými metodami a nadřazenou dědičnou hierarchií.",
+        "C) Uloží se pouze binární adresa paměťového ukazatele na objekt v běžícím procesu.",
+        "D) Uloží se kompletní definice všech metod třídy včetně veškerého zdrojového kódu."
+      ],
+      "answer": 0,
+      "explanation": "pickle neukládá metody třídy ani její kód, ale pouze členské proměnné (typicky ze slovníku __dict__) a odkaz na název třídy a modulu. Při unpicklování se znovu načte třída z modulu a naplní se uloženými atributy.",
+      "code": null
+    }
+  ],
+  "_functions": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co vrátí volání funkce fn() v následujícím kódu?",
+      "code_snippet": "def fn():\n    return 1, \"a\", [2, 3]\n\nres = fn()\nprint(type(res), res)",
+      "options": [
+        "A) <class 'list'> [1, 'a', [2, 3]] — návratová hodnota složená z více prvků vytvoří měnitelný seznam se všemi položkami.",
+        "B) <class 'tuple'> (1, 'a', [2, 3]) — čárkami oddělené hodnoty za return jsou automaticky zabaleny do objektu typu n-tice.",
+        "C) <class 'int'> 1 — návratové slovo return vrací v tomto zápisu pouze první zadanou hodnotu a ostatní ignoruje.",
+        "D) <class 'dict'> {0: 1, 1: 'a', 2: [2, 3]} — Python převede vrácené hodnoty na slovník s číselnými klíči podle pořadí."
+      ],
+      "answer": 1,
+      "explanation": "V Pythonu zápis return a, b, c nevytváří samostatné návratové hodnoty, ale konstruuje jediný objekt typu tuple (n-tice). Závorky jsou u n-tice volitelné, klíčovým prvkem pro její vytvoření je čárka.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Doplňte token do definice funkce pro výpočet pH, který vynutí zadání parametru `temperature` výhradně jako pojmenovaného argumentu.",
+      "code_snippet": "def fn(a, b, ________, c=10):\n    return a + b + c",
+      "options": [
+        "/",
+        "*args",
+        "*",
+        "**"
+      ],
+      "answer": 2,
+      "explanation": "Samostatná hvězdička `*` v hlavičce funkce označuje hranici keyword-only parametrů — všechny parametry uvedené za ní musí být volány s názvem argumentu.",
+      "code": "def calculate_ph(h_concentration, ________, temperature=298.15):\n    import math\n    return -math.log10(h_concentration)\n\n# Platné volání: calculate_ph(1e-7, temperature=300)\n# Neplatné volání: calculate_ph(1e-7, 300) -> TypeError",
+      "expected": "*"
+    },
+    {
+      "id": "q3",
+      "type": "predict_output",
+      "question": "Co vypíše druhý volací příkaz fn() v níže uvedeném kódu?",
+      "code_snippet": "val = 100\n\ndef fn(x=val):\n    print(x)\n\nval = 500\nfn()",
+      "options": [
+        "A) None — po změně globální proměnné se zruší propojení výchozího parametru a funkce vrátí prázdnou hodnotu.",
+        "B) TypeError — změna hodnoty proměnné použité v hlavičce funkce způsobí chybu typu při spuštění definice.",
+        "C) 500 — parametr si udržuje dynamický odkaz na globální proměnnou a načte její aktuální hodnotu při spuštění.",
+        "D) 100 — výchozí hodnota parametru se vyhodnotí jednorázově při definici funkce, nikoli při jejím pozdějším volání."
+      ],
+      "answer": 3,
+      "explanation": "Výrazy pro výchozí hodnoty parametrů se vyhodnocují v okamžiku provádění příkazu def. Proměnná x se tak sváže s objektem 100. Následná změna proměnné val na 500 již nemá na dříve vytvořenou výchozí hodnotu parametru žádný vliv.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Co vypíše druhý volací příkaz fn(2) bez zadaného druhého argumentu?",
+      "code_snippet": "def fn(x, y=[]):\n    y.append(x)\n    return y\n\nfn(1)\nres = fn(2)\nprint(res)",
+      "options": [
+        "A) [1, 2] — výchozí seznam se vytvoří pouze jednou při definici funkce a jeho modifikace přetrvávají mezi voláními.",
+        "B) [2] — při každém volání bez druhého argumentu se inicializuje nový prázdný seznam a starý je smazán z paměti.",
+        "C) AttributeError — metoda append vyvolá výjimku, protože výchozí parametr je vyhodnocen jako neměnná n-tice.",
+        "D) [1] — funkce vrací předchozí stav seznamu před přidáním nového prvku z důvodu nesynchronizovaného zápisu."
+      ],
+      "answer": 0,
+      "explanation": "Seznam [] ve výchozím parametru je vytvořen pouze jednou při definici funkce def. Všechna volání fn() bez druhého argumentu sdílejí stejný objekt v paměti. Volání fn(1) do něj přidá 1 a volání fn(2) přidá 2, takže výsledek je [1, 2].",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Které z následujících volání funkce def fn(a, b, /, c): pass vyvolá chybu TypeError?",
+      "options": [
+        "A) fn(1, 2, c=3) — parametr c za lomítkem vyžaduje povinné předání jménem a nelze mu předat poziční hodnotu.",
+        "B) fn(a=1, b=2, c=3) — parametry před lomítkem / jsou definovány jako výhradně poziční a nelze je volat jménem.",
+        "C) fn(1, 2, 3) — hodnota pro parametr c nesmí být předána pozičně, pokud jsou předchozí parametry odděleny lomítkem.",
+        "D) fn(a=1, 2, 3) — poziční argumenty nesmí předcházet pojmenovaným argumentům při jakémkoliv volání funkce."
+      ],
+      "answer": 1,
+      "explanation": "Lomítko / v definici parametrů označuje, že všechny parametry stojící před ním (a a b) jsou positional-only. Zkuste-li je předat pomocí jména (a=1, b=2), Python vyvolá TypeError. Parametr c za lomítkem lze předat jak pozičně (fn(1, 2, 3)), tak pojmenovaně (fn(1, 2, c=3)).",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jakou hodnotu vypíše následující kód s vnořenou funkcí?",
+      "code_snippet": "def make_multiplier(factor):\n    def multiply(number):\n        return number * factor\n    return multiply\n\ndouble = make_multiplier(2)\nprint(double(5))",
+      "options": [
+        "A) 25 — vnitřní funkce vynásobí předaný argument sám sebou a ignoruje proměnnou zapsanou ve vnějším rozsahu.",
+        "B) NameError — proměnná factor z vnější funkce již po návratu neexistuje a vnitřní funkce k ní nemá přístup.",
+        "C) 10 — vnitřní funkce si uchovává přístup k proměnné factor z vnějšího rozsahu i po skončení vnější funkce.",
+        "D) TypeError — vrácená vnitřní funkce vyžaduje při spuštění dva argumenty včetně původního parametru factor."
+      ],
+      "answer": 2,
+      "explanation": "Jde o princip uzávěru (closure). Vnitřní funkce multiply si při svém vzniku zapamatuje lexikální kontext vnější funkce, v tomto případě hodnotu factor = 2. Volání double(5) tedy spočítá 5 * 2 = 10.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "true_false_tricky",
+      "question": "Do jakých datových typů zabalují operátory *args a **kwargs proměnný počet vstupních parametrů ve funkci?",
+      "options": [
+        "A) Nepravda: *args vytvoří měnitelný seznam list pro parametry a **kwargs vytvoří n-tice tuple složenou ze dvojic klíč-hodnota.",
+        "B) Pravda: *args přetváří poziční parametry do objektu typu tuple (n-tice) a **kwargs přetváří pojmenované parametry do slovníku dict."
+      ],
+      "answer": 1,
+      "explanation": "Operátor * před parametrem sjednotí všechny přebývající poziční argumenty do neměnné n-tice tuple. Operátor ** sjednotí všechny pojmenované argumenty do slovníku dict.",
+      "code": null
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Co se stane při pokusu o spuštění následujícího kódu?",
+      "code_snippet": "def fn(x, y=3):\n    return x ** y\n\nres = fn(x=2, 4)",
+      "options": [
+        "A) Proběhne výpočet s výsledkem 16, protože Python automaticky přiřadí druhý argument 4 zbývajícímu parametru y.",
+        "B) Proběhne výpočet s výsledkem 8, protože první pojmenovaný argument vyruší platnost druhého zadaného argumentu.",
+        "C) Nastane TypeError, protože parametr x obdrží dvě různé hodnoty a parametr y zůstane bez zadané výchozí hodnoty.",
+        "D) Nastane SyntaxError, protože v definici volání funkce nesmí žádný poziční argument následovat za pojmenovaným argumentem."
+      ],
+      "answer": 3,
+      "explanation": "V Pythonu platí přísné syntaktické pravidlo: při volání funkce se nesmí za pojmenovaným argumentem (zde x=2) objevit čistě poziční argument (4). Python takový kód odmítne zkompilovat a vyvolá SyntaxError: positional argument follows keyword argument.",
+      "code": null
+    }
+  ],
+  "times+dates": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaký atribut určuje, zda je objekt datetime v Pythonu naivní (naive) nebo informovaný (aware)?",
+      "options": [
+        "A) Atribut utc_offset, který vrací celočíselný posun v sekundách nebo hodnotu -1 při nepřiřazení.",
+        "B) Atribut is_aware, který obsahuje logickou hodnotu False u naivních a True u informovaných.",
+        "C) Atribut timezone, který uchovává textový název časového pásma nebo prázdný řetězec \"\".",
+        "D) Atribut tzinfo, který obsahuje None u naivních objektů a instanci časové zóny u informovaných."
+      ],
+      "answer": 3,
+      "explanation": "Naivní objekty datetime mají v atributu tzinfo hodnotu None. Informované objekty obsahují referenci na instanci třídy dědící z tzinfo (např. timezone.utc nebo objekt z pytz).",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Doplňte funkci z modulu calendar, která převede časovou n-tici struct_time v čase UTC na počet sekund od počátku epochy (timestamp).",
+      "options": [
+        "timegm",
+        "mktime",
+        "mktimes",
+        "gmtime"
+      ],
+      "answer": 0,
+      "explanation": "Funkce calendar.timegm() zpracovává struct_time v UTC a vrací počet sekund od unixové epochy (na rozdíl od time.mktime(), který předpokládá lokální čas).",
+      "code": "import time\nimport calendar\n\n# Časová struktura v koordinovaném světovém čase (UTC)\ntime_struct = time.gmtime()\n\n# Převod UTC struktury na unixový timestamp\nepoch_seconds = calendar.________(time_struct)\n# Výstup: 1770000000",
+      "expected": "timegm"
+    },
+    {
+      "id": "q3",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o chování metody datetime.timestamp() při volání na naivním objektu datetime:\n\nMetoda timestamp() u naivního objektu datetime automaticky předpokládá, že zadaný čas je v UTC, a provede přímý výpočet bez závislosti na nastavení systému.",
+      "options": [
+        "A) Nepravda – u naivního objektu se předpokládá lokální čas systému a k přepočtu na epochu se použije platformní céčkovská funkce mktime().",
+        "B) Pravda – u naivního objektu se předpokládá univerzální čas UTC a k přepočtu na epochu se použije interní matematika bez závislosti na systému."
+      ],
+      "answer": 0,
+      "explanation": "Pokud je objekt datetime naivní (tzinfo=None), metoda timestamp() jej interpretuje jako lokální čas a používá kód spoléhající na platformní funkci mktime(), což může vést k chybám či výjimce OverflowError.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi metodami datetime.strptime() a datetime.strftime()?",
+      "options": [
+        "A) strptime() provádí konverzi času do UTC pásma, zatímco strftime() převede UTC čas na lokální časovou zónu systému.",
+        "B) strptime() převádí textový řetězec na objekt datetime, zatímco strftime() formátuje datetime objekt na textový řetězec.",
+        "C) strptime() vypisuje časový objekt na standardní výstup, zatímco strftime() načítá vstupní čas z konzole od uživatele.",
+        "D) strptime() zjišťuje aktuální systémový čas, zatímco strftime() nastavuje nový systémový čas operačního systému."
+      ],
+      "answer": 1,
+      "explanation": "strptime (string parse time) parsuje text podle zadávaného formátu na objekt datetime. strftime (string format time) převádí objekt datetime na zformátovaný textový řetězec.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu, která přiřadí naivnímu objektu datetime časovou zónu UTC beze změny hodnot hodin a minut.",
+      "options": [
+        "astimezone",
+        "set_tz",
+        "replace",
+        "convert"
+      ],
+      "answer": 2,
+      "explanation": "Metoda datetime.replace(tzinfo=...) vytvoří novou instanci se zadanou časovou zónou bez časového posunu hodnot hodin a minut.",
+      "code": "from datetime import datetime, timezone\n\n# Naivní čas záznamu z laboratorního spektrometru\nnaive_dt = datetime(2026, 8, 9, 14, 30, 0)\n\n# Přiřazení časové zóny UTC při zachování identického času 14:30\naware_dt = naive_dt.________(tzinfo=timezone.utc)\n# Výstup: datetime.datetime(2026, 8, 9, 14, 30, tzinfo=datetime.timezone.utc)",
+      "expected": "replace"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "K čemu slouží parametr fold v metodě replace() u objektu datetime zavedený v Pythonu 3.6?",
+      "options": [
+        "A) K určení způsobu zaokrouhlování mikrosekund při převodu na celé sekundy (0 dolů, 1 nahoru k celému číslu).",
+        "B) K zapnutí automatické korekce přestupných sekund nahromaděných v éře UNIXového počítání (0 vypnuto, 1 zapnuto).",
+        "C) K nastavení počtu nanosekund přidávaných k běžné sekundové přesnosti (0 pro sekundy, 1 pro nanosekundy).",
+        "D) K rozlišení dvou stejných lokálních časů nastávajících při zimním posunu času (0 pro dřívější, 1 pro pozdější)."
+      ],
+      "answer": 3,
+      "explanation": "Při podzimním přechodu z letního času na standardní čas nastávají stejné nástěnné časy dvakrát. Parametr fold rozlišuje první (0) a druhý (1) průchod stejného zobrazeného času.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Jaký bude účinek spuštění následujícího příkazu v Pythonu na platformě Linux?",
+      "options": [
+        "A) Nastaví čas posledního přístupu i čas poslední modifikace souboru data.txt na aktuální systémový čas.",
+        "B) Vynuluje čas modifikace i čas přístupu souboru data.txt na začátek UNIXové epochy (1. ledna 1970).",
+        "C) Vyvolá výjimku TypeError, protože funkce os.utime() striktně vyžaduje předání n-tice časových údajů.",
+        "D) Smaže veškerá časová razítka souboru data.txt a nastaví přístupová práva k souboru na hodnotu 000."
+      ],
+      "answer": 0,
+      "explanation": "Volání os.utime(path) bez dalších argumentů (nebo s times=None) nastaví čas přístupu (atime) i modifikace (mtime) zadané cesty na aktuální systémový čas.",
+      "code": "import os\nos.utime(\"data.txt\")"
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi funkcemi time.localtime() a time.gmtime() z modulu time?",
+      "options": [
+        "A) localtime() provádí konverzi času pouze pro systém Windows, zatímco gmtime() funguje výhradně na systémech typu POSIX/Linux.",
+        "B) localtime() vrací struct_time v lokální časové zóně, zatímco gmtime() vrací struct_time v koordinovaném světovém čase UTC.",
+        "C) localtime() bere v úvahu pouze přestupné sekundy, zatímco gmtime() započítává pouze posuny letního a zimního času na Zemi.",
+        "D) localtime() vrací čas jako číslo typu float, zatímco gmtime() vrací objekt reprezentující zónu v podobě textového řetězce."
+      ],
+      "answer": 1,
+      "explanation": "Obě funkce převádějí sekundy od epochy na n-tici struct_time. localtime() zohledňuje nastavené lokální časové pásmo a DST, zatímco gmtime() vrací čas v nultém poledníku (UTC).",
+      "code": null
+    }
+  ],
+  "fileinput": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Odkud čte kód `fileinput.input()`, pokud skriptu nebyly při spuštění předány žádné argumenty souborů?",
+      "options": [
+        "A) Ze standardního vstupu (sys.stdin), takže může zpracovávat data předaná přes pipeline.",
+        "B) Vyvolá výjimku FileNotFoundError, protože nebyl zadán žádný název vstupního souboru.",
+        "C) Vrátí prázdný iterátor, který okamžitě ukončí cyklus for bez načtení jakéhokoliv řádku.",
+        "D) Automaticky prohledá aktuální adresář a otevře první nalezený soubor s příponou .txt."
+      ],
+      "answer": 0,
+      "explanation": "Pokud v sys.argv[1:] nejsou předány žádné soubory (nebo je předán argument '-'), fileinput.input() transparentně čte ze standardního vstupu sys.stdin.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jaký účinek má nastavení parametru `inplace=True` při volání `fileinput.input()`?",
+      "options": [
+        "A) Uzamkne všechny právě zpracovávané soubory na disku proti zápisu ze strany ostatních procesů.",
+        "B) Přesměruje standardní výstup (sys.stdout) do právě zpracovávaného souboru, čímž jej přepíše.",
+        "C) Otevře všechny soubory v režimu pro připsání na konec (append) bez modifikace stávajících řádků.",
+        "D) Načte celý obsah všech zadaných souborů do paměti RAM ještě před zahájením samotné iterace."
+      ],
+      "answer": 1,
+      "explanation": "Parametr inplace=True přesměruje standardní výstup print() přímo do právě čteného souboru. Původní soubor je zálohován/přesunut a jeho obsah je nahrazen tištěným výstupem.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Doplňte funkci modulu `fileinput`, která vrací pořadové číslo řádku v rámci právě otevřeného souboru (resetované na 1 pro každý soubor).",
+      "options": [
+        "lineno",
+        "line_number",
+        "filelineno",
+        "fileno"
+      ],
+      "answer": 2,
+      "explanation": "`fileinput.filelineno()` vrací číslo řádku v aktuálním souboru (od 1), zatímco `fileinput.lineno()` vrací kumulativní celkový počet řádků přes všechny soubory.",
+      "code": "import fileinput\n\n# Zpracování souborů mereni_1.log a mereni_2.log\nfor line in fileinput.input(files=(\"mereni_1.log\", \"mereni_2.log\")):\n    # Získání čísla řádku v rámci aktuálního souboru\n    current_line = fileinput.________()\n    print(f\"{fileinput.filename()}:{current_line} -> {line.strip()}\")",
+      "expected": "filelineno"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Které komprimované formáty souborů dokáže automaticky otevírat předpřipravená hook funkce `fileinput.hook_compressed`?",
+      "options": [
+        "A) Komprimované archivní soubory s příponami .zip, .tar a .7z.",
+        "B) Jakékoliv komprimované soubory s příponami jako .xz a .rar.",
+        "C) Pouze komprimované archivní soubory s jedinou příponou .zip.",
+        "D) Soubory s komprimovanými příponami .gz (gzip) a .bz2 (bzip2)."
+      ],
+      "answer": 3,
+      "explanation": "fileinput.hook_compressed detekuje soubory podle přípony .gz nebo .bz2 a automaticky je otevře s využitím modulů gzip nebo bz2.",
+      "code": null
+    }
+  ],
+  "shelve": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Který datový typ je v modulu shelve vyžadován pro klíče perzistentního slovníku?",
+      "options": [
+        "A) Jakýkoliv piklitelný objekt.",
+        "B) Výhradně textové řetězce str.",
+        "C) Libovolný immutable typ s hash().",
+        "D) Pouze celá čísla int a str."
+      ],
+      "answer": 1,
+      "explanation": "Backend dbm pod modulem shelve vyžaduje striktně řetězcové klíče (str). Hodnotami v perzistentním slovníku mohou být libovolné serializovatelné pythoní objekty.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký účinek má příkaz db['seznam'].append(99) v databázi shelve při výchozím nastavení writeback=False?",
+      "options": [
+        "A) Kód selže a vyvolá výjimku PermissionError kvůli zápisu do neotevřené vyrovnávací paměti.",
+        "B) Změna se uloží do paměťové cache a provede se její zapsání až při volání metody db.close().",
+        "C) Seznam v databázi zůstane nezměněn, protože modifikace mutable objektu se bez přiřazení nezapsala.",
+        "D) Změna se okamžitě zapíše na disk do souboru databáze bez nutnosti jakéhokoliv dalšího zásahu."
+      ],
+      "answer": 2,
+      "explanation": "Při výchozím writeback=False vrací db['seznam'] odpicklovaný dočasný objekt. Příkaz .append(99) modifikuje tuto kopii. Pro uložení na disk je nutné znovupřiřazení db['seznam'] = temp.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "true_false_tricky",
+      "question": "Posuďte výhody a nevýhody otevření databáze shelve s parametrem writeback=True.",
+      "options": [
+        "A) Nepravda: Zrychluje zavírání databáze, ale zakazuje použití in-place mutable operací na slovníku.",
+        "B) Pravda: Umožňuje přímé modifikace mutable objektů, ale udržuje v paměti cache všech načtených položek."
+      ],
+      "answer": 1,
+      "explanation": "Nastavení writeback=True uchovává všechny načtené i upravené položky v paměťovém cache slovníku. To umožňuje in-place úpravy, ale dramaticky zvyšuje spotřebu paměti a zpomaluje sync/close.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "fill_blank_choice",
+      "question": "Která hodnota parametru flag ve funkci shelve.open() vynutí vytvoření nové prázdné databáze s přepsáním existujícího souboru?",
+      "options": [
+        "'c'",
+        "'w'",
+        "'r'",
+        "'n'"
+      ],
+      "answer": 3,
+      "explanation": "Příznak flag='n' (new) otevře databázi pro čtení i zápis a vždy vytvoří novou prázdnou databázi s přepsáním původního souboru.",
+      "code": "import shelve\n\n# Otevření databáze pro zápis s vynuceným vytvořením nového souboru\nwith shelve.open(\"lab_results.db\", flag=________) as db:\n    db[\"experiment_1\"] = {\"yield\": 0.85, \"purity\": 0.99}",
+      "expected": "'n'"
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jaká omezení platí pro přístup více procesů či skriptů k téže databázi modulu shelve?",
+      "options": [
+        "A) Pro zápis může mít databázi otevřenou současně pouze jediný proces; pro čtení více procesů.",
+        "B) Konkurentní čtení i zápis jsou podporovány výhradně v případě použití backendu dbm.dumb.",
+        "C) Databázi může mít současně otevřenou právě jeden proces bez ohledu na čtení či zápis.",
+        "D) Databáze plně podporuje paralelní zápis z více procesů díky zámkům na úrovni backendu."
+      ],
+      "answer": 0,
+      "explanation": "Modul shelve nezajišťuje zamykání pro paratelní zápis. Zápis z více procesů naráz může poškodit databázi. Paralelní čtení z více procesů je bezpečné.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "predict_output",
+      "question": "Které soubory vytvoří záložní backend dbm.dumb na disku při práci s databází pojmenovanou mojedata?",
+      "options": [
+        "A) Pouze jediný binární soubor s příponou mojedata.db vytvořený ve složce projektu.",
+        "B) Soubory mojedata.dat a mojedata.dir (případně mojedata.bak při spuštěném provozu).",
+        "C) Dvojici souborů mojedata.sqlite a mojedata.log pro podporu transakčního logování.",
+        "D) Trojici souborů mojedata.txt, mojedata.json a mojedata.bin v cache adresáři."
+      ],
+      "answer": 1,
+      "explanation": "Čistě pythoní backend dbm.dumb vytváří dvojici souborů .dat a .dir (plus .bak během manipulace), které uchovávají indexy klíčů a samotná bajtová data.",
+      "code": null
+    }
+  ],
+  "cython_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co přesně představuje projekt Cython z hlediska architektury?",
+      "options": [
+        "A) JIT kompilátor napsaný v C++, který nahrazuje standardní virtuální stroj CPython za běhu.",
+        "B) Samostatný interpret Pythonu nezařazený do CPythonu, který nevyžaduje použití kompilátoru C.",
+        "C) Jazyk rozšiřující Python o statické typy a kompilátor překládající tento kód do jazyka C/C++.",
+        "D) Grafické vývojové prostředí určené pro automatický přepis Python skriptů do jazyka Java."
+      ],
+      "answer": 2,
+      "explanation": "Cython je jednak programovací jazyk (nadmnožina Pythonu doplněná o statické C typy) a jednak kompilátor, který tento kód překládá do C nebo C++, jež se následně kompiluje do C extension modulu.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Doplňte klíčové slovo Cythonu pro definici staticky typované celočíselné C proměnné i:",
+      "options": [
+        "var",
+        "static",
+        "typed",
+        "cdef"
+      ],
+      "answer": 3,
+      "explanation": "Klíčové slovo cdef slouží v Cythonu k definici staticky typovaných C proměnných, funkcí nebo struktur. Proměnné vytvořené přes cdef nemají režii Python objektů (PyObject).",
+      "expected": "cdef",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jakého zrychlení typicky dosáhne čistý Python skript bez typových anotací pouhým překladem pomocí Cythonu?",
+      "options": [
+        "A) Zrychlení o 20 % až 50 % díky eliminaci režie interpretace bajtkódu virtuálním strojem.",
+        "B) Žádného zrychlení, protože bez klíčového slova cdef se vygeneruje identický bajtkód.",
+        "C) Zpomalení o 50 %, protože volání C-API přes vygenerované C soubory přináší novou režii.",
+        "D) Zrychlení o 100x až 1000x, protože Cython automaticky odvodí všechny statické C typy."
+      ],
+      "answer": 0,
+      "explanation": "Čistý Python kód (bez cdef) přeložený Cythonem běží přes C-API CPythonu. Odstraní se pouze režie interpretace eval-smyčky bytekódu, což typicky přináší zrychlení o cca 20 % až 50 %.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je rozdíl mezi deklarací funkce pomocí cdef a cpdef v Cythonu?",
+      "options": [
+        "A) Obě slova jsou zcela synonymní a liší se pouze historickou verzí Cythonu, ve které byla představena.",
+        "B) cdef vytvoří rychlou funkci volatelnou pouze z C/Cythonu, zatímco cpdef vytvoří obě verze pro C i Python.",
+        "C) cpdef vytvoří funkci volatelnou pouze z Pythonu, zatímco cdef vytvoří funkci volatelnou výhradně z C++.",
+        "D) cdef automaticky uvolní Globální zámek interpretu (GIL), zatímco cpdef GIL striktně vyžaduje."
+      ],
+      "answer": 1,
+      "explanation": "Funkce deklarovaná jako cdef má čisté C rozhraní a nelze ji volat z Pythonu. cpdef vygeneruje jak rychlou C funkci, tak Python wrapper, takže ji lze volat jak z C/Cythonu, tak přímo z Python skriptu.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o závislosti vygenerovaného C kódu z Cythonu:\n\nVygenerovaný C kód z Cythonu spoléhá na hlavičkové soubory a knihovny CPythonu, takže výsledný zkompilovaný modul nelze spustit samostatně bez CPython prostředí.",
+      "options": [
+        "A) Pravda – Cython generuje C kód využívající Python C-API (objekty PyObject), které vyžadují prostředí CPythonu.",
+        "B) Nepravda – Cython generuje zcela nezávislý standalone binární spustitelný kód bez jakýchkoli závislostí."
+      ],
+      "answer": 0,
+      "explanation": "Kód vygenerovaný Cythonem úzce spolupracuje s hlavním interpretem CPythonu a volá jeho C-API (rozhraní Python.h). Proto zkompilovaný modul .so/.pyd vyžaduje CPython pro svůj běh.",
+      "code": null
+    }
+  ],
+  "speed_example_1": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Proč dosáhl prvotní pokus o cythonizaci s výrazem (vyrez * maska).sum() horšího času (3,1 s) než čistý Python (1,8 s)?",
+      "options": [
+        "A) Knihovna Pillow zablokovala přístup k paměťovému bufferu obrázku, takže Cython musel kopírovat celou matici.",
+        "B) Výraz vyvolal vnitřní přetečení paměti typu float, což přinutilo CPython přejít do záložního režimu interpretace.",
+        "C) Načítání výřezů alokovalo v každém kroku smyčky nové objekty a volalo pomalé C-API (žluté řádky v cython -a).",
+        "D) Cython zkompiloval maticové násobení do jednovláknového C kódu bez využití vektorových instrukcí SSE a AVX."
+      ],
+      "answer": 2,
+      "explanation": "V prvotním Cython kódu vytvářel výraz np.array(vyrez) v každé iteraci zanořené smyčky nový Python objekt. Nástroj cython -a označil řádek sytě žlutou barvou, což signalizuje intenzivní volání C-API CPythonu uvnitř smyčky.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jaká úprava kódu v Cythonu snížila čas vykonání filtru obrázku z 3,1 s na špičkových 0,14 s?",
+      "options": [
+        "A) Použití dekorátoru @jit(nopython=True) nad původní cythoní funkcí a vypnutí kontroly mezí indexace polí.",
+        "B) Převod celého 3D pole RGB obrázku na jednorozměrný Python seznam objektů typu float před voláním filtru.",
+        "C) Zvýšení počtu vláken v modulu threading a rozdělení jednotlivých barevných kanálů obrázku do skriptů.",
+        "D) Nahrazení jednořádkového maticového násobení (vyrez * maska).sum() zanořenou C smyčkou přes jednotlivé prvky."
+      ],
+      "answer": 3,
+      "explanation": "Odstraněním NumPy operací nad výřezy a přepsáním násobení matice na přímou zanořenou C smyčku se kód zcela zbavil volání Python C-API uvnitř smyček, což snížilo čas na 0,14 s.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Na čem je založen princip vektorizace konvolučního filtru v čistém NumPy bez použití smyček for?",
+      "options": [
+        "A) Na součtu 9 posunutých 2D výřezů (views) původní matice s odpovídajícími koeficienty v jediném výrazu.",
+        "B) Na paralelním zpracování jednotlivých bajtů obrázku pomocí grafické karty přes externí modul CUDA.",
+        "C) Na automatickém převodu 2D matice obrázku do frekvenční domény pomocí rychlé Fourierovy transformace (FFT).",
+        "D) Na použití funkce np.vectorize() nad původní nevektorizovanou pythonní funkcí se zanořenou smyčkou."
+      ],
+      "answer": 0,
+      "explanation": "Vektorizace nahradila smyčku tím, že vytvořila 9 stejně velkých posunutých výřezů matice (např. M[0:-2, 0:-2], M[1:-1, 1:-1]), vynásobila je koeficienty masky a sečetla je najednou kompilovanou C operací NumPy.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "Která dvojice metod dosáhla v ukázkovém srovnání filtru obrázku nejvyššího zrychlení (kolem 11x až 13x)?",
+      "options": [
+        "A) Numba s nastavením nopython=False a Cython s použitím volání np.array().",
+        "B) Optimalizovaný Cython s C smyčkami a vektorizované řešení v čistém NumPy.",
+        "C) Naivní Python smyčka a funkce np.vectorize() aplikovaná na skalární funkci.",
+        "D) Naivní nevektorizovaný Python s NumPy a Numba bez použití mezipaměti."
+      ],
+      "answer": 1,
+      "explanation": "Optimalizovaný Cython (s manuální C smyčkou) dosáhl času 0,14 s (13x zrychlení) a vektorizovaný NumPy dosáhl 0,16 s (11x zrychlení). Naivní smyčka trvala 1,8 s.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o mezipaměti v Numbě:\n\nPři opakovaném spouštění skriptu s Numba dekorátorem s parametrem cache=True odpadá režie prvotní JIT kompilace, protože Numba načte předkompilovaný nativní kód přímo z disku.",
+      "options": [
+        "A) Pravda – Uložení kompilátu na disk snížilo čas běhu z 0,54 s (první spuštění) na 0,35 s při dalších spuštěních.",
+        "B) Nepravda – Parametr cache=True udrží data obrázku v L1 paměti, ale kód se musí při každém spuštění kompilovat znovu."
+      ],
+      "answer": 0,
+      "explanation": "Numba při cache=True uloží vygenerovaný nativní kód na disk (do __pycache__). Při dalším spuštění načte již zkompilovaný kód a vyhne se režii kompilátoru LLVM.",
+      "code": null
     }
   ]
 }
