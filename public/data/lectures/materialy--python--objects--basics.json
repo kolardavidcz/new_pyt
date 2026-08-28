@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Zavedení třídy</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Zcela v duchu <a href=\"overview.xml\">úvodu</a> můžeme nejjednodušší třídu vyrobit jako zobecnění <em>pojmenované n-tice</em>. Narozdíl od n-tice však u třídy můžeme měnit hodnoty jejích prvků:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class MyClass:\n...     a, b, c = 1, 2, 3\n...\n&gt;&gt;&gt; MyClass\n&lt;class '__main__.MyClass'&gt;\n\n&gt;&gt;&gt; MyClass.a\n1\n&gt;&gt;&gt; MyClass.a = 'ahoj'\n&gt;&gt;&gt; MyClass.a\n'ahoj'</pre>\r\n  <p>\r\n    Tím jsme získali <em>jeden</em> pojmenovaný objekt, který umožňuje přístup ke svým prvkům pomocí tečkové notace (nebo jinými slovy – zavedli jsme nový jmenný prostor). To jsme si zase tak moc nepomohli...\r\n  </p>\r\n\r\n</div>"
     },
@@ -18,9 +18,9 @@
       "idx": 1,
       "title": "Alias na třídu",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "paradigm",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Alias na třídu</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n     ...a přiřazení jiného jména třídě to samozřejmě nijak nevylepší:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; mc = MyClass\n&gt;&gt;&gt; mc\n&lt;class '__main__.MyClass'&gt;\n\n&gt;&gt;&gt; MyClass.a\n1\n&gt;&gt;&gt; mc.a\n1\n\n# Tam..\n&gt;&gt;&gt; MyClass.a = 'ahoj'\n&gt;&gt;&gt; MyClass.a\n'ahoj'\n&gt;&gt;&gt; mc.a\n'ahoj'\n\n# ..i zpět to samozřejmě funguje stejně.\n&gt;&gt;&gt; mc.b\n2\n&gt;&gt;&gt; MyClass.b\n2\n&gt;&gt;&gt; mc.b = 'svete'\n&gt;&gt;&gt; mc.b\n'svete'\n&gt;&gt;&gt; MyClass.b\n'svete'</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Provedením <code>mc = MyClass</code> jsme pouze objektu v paměti „přilepili“ další identifikátor.\r\n  </div></div>\r\n  \r\n  <p>\r\n    Tímto způsobem jsme vlastně zavedli <em>alias</em> na základní třídu, což nám bude v budoucnu k užitku.\r\n  </p>\r\n\r\n</div>"
     },
@@ -29,9 +29,10 @@
       "idx": 2,
       "title": "Instance třídy I",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": "resyntax",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Instance třídy I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Operování přímo s konkrétními třídami jako na předchozím slajdu je sice možné, ale dost by omezovalo jejich použití. Zajímavější je, pokud uvedenou třídu použijeme jako <em>konstruktor</em> pro jednotlivé její <em>instance</em>:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class MyClass:\n...     a, b, c = 1, 2, 3\n...\n&gt;&gt;&gt; MyClass\n&lt;class '__main__.MyClass'&gt;\n&gt;&gt;&gt; dir(MyClass)\n['__class__', '__delattr__', '__dict__', '__doc__', '__eq__', '__format__',\n '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__le__',\n '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__',\n '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__',\n '__weakref__', 'a', 'b', 'c']\n\n# A) Instance 'mc1' třídy 'MyClass' podědí vlastnosti svého rodiče:\n&gt;&gt;&gt; mc1 = MyClass()\n&gt;&gt;&gt; mc1\n&lt;__main__.MyClass object at 0xb75dda0c&gt;\n&gt;&gt;&gt; MyClass.a\n1\n&gt;&gt;&gt; mc1.a\n1\n\n# B) Pokud na potomkovi ale něco změníme, rodič se to nedozví:\n&gt;&gt;&gt; mc1.a = 'ahoj'\n&gt;&gt;&gt; mc1.a\n'ahoj'\n&gt;&gt;&gt; MyClass.a\n1\n\n# C) Podobně pokud nyní změníme něco na rodiči,\n#    potomek bude taktéž zanechán v blahé nevědomosti:\n&gt;&gt;&gt; MyClass.a = 'svete'\n&gt;&gt;&gt; MyClass.a\n'svete'\n&gt;&gt;&gt; mc1.a\n'ahoj'\n\n# D) Nový potomek 'mc2' ale nyní podědí i nový stav rodiče:\n&gt;&gt;&gt; mc2 = MyClass()\n&gt;&gt;&gt; mc2\n&lt;__main__.MyClass object at 0xb75ddd6c&gt;\n&gt;&gt;&gt; mc2.a\n'svete'</pre>\r\n  \r\n  <p>\r\n    Všimněte si, že při použití třídy jako <em>konstruktoru</em> ji <strong>voláme</strong>, tedy se závorkami – <code>MyClass()</code>.\r\n  </p>\r\n\r\n</div>"
     },
@@ -43,7 +44,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "pythonic",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Instance třídy II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Situace se „kapku“ změní, pokud <strong>atribut je proměnného typu</strong> a použijeme operace pro úpravu hodnot tohoto typu:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class MyClass:\n...     a, b = 1, [2, 3]\n\n# A) Instance třídy podědí vlastnosti svého rodiče:\n&gt;&gt;&gt; mc1 = MyClass()\n&gt;&gt;&gt; mc1.a\n1\n&gt;&gt;&gt; mc1.b\n[2, 3]\n\n# B) A pokud na potomkovi přesměrujeme odkaz na jiný typ, rodič se to nedozví:\n&gt;&gt;&gt; mc1.b = 'ahoj'\n&gt;&gt;&gt; mc1.b\n'ahoj'\n&gt;&gt;&gt; MyClass.b\n[2, 3]\n\n# C1) Když se ale místo změny hodnoty začneme přehrabovat ve vnitřnostech\n#     proměnného datového typu, začnou se dít věci:\n&gt;&gt;&gt; mc2 = MyClass()\n&gt;&gt;&gt; mc2.b\n[2, 3]\n&gt;&gt;&gt; mc3 = MyClass()\n&gt;&gt;&gt; mc3.b\n[2, 3]\n&gt;&gt;&gt; mc2.b.append(4)\n&gt;&gt;&gt; mc2.b\n[2, 3, 4]\n&gt;&gt;&gt; mc3.b\n[2, 3, 4]\n&gt;&gt;&gt; MyClass.b\n[2, 3, 4]\n\n# C2) A to samozřejmě nezávisle na místě způsobení změny:\n&gt;&gt;&gt; mc3.b.append(5)\n&gt;&gt;&gt; mc3.b\n[2, 3, 4, 5]\n&gt;&gt;&gt; mc2.b\n[2, 3, 4, 5]\n&gt;&gt;&gt; MyClass.b\n[2, 3, 4, 5]\n\n# C3) Nepřekvapivě na potomka, který zaměnil typ za jiný, to ale nemá vliv:\n&gt;&gt;&gt; mc1.b\n'ahoj'</pre>\r\n\r\n</div>"
     },
@@ -54,7 +55,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Funkce jako atributy tříd I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kromě „obyčejných“ proměnných můžeme do tříd schovat samozřejmě i funkce. A dokud se ke třídě chováme jako ke jmennému prostoru, všechno funguje přesně tak, jak bychom čekali:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class T:\n... \n...     a = 'Ahoj!'\n... \n...     def fn(x):\n...         return f'Zavoláno: fn({x})'\n\n&gt;&gt;&gt; T.a\n'Ahoj!'\n&gt;&gt;&gt; T.fn\n&lt;function T.fn at 0x000001F4751C0D60&gt;\n&gt;&gt;&gt; T.fn(666)\n'Zavoláno: fn(666)'\n&gt;&gt;&gt; T.fn('Baf!')\n'Zavoláno: fn(Baf!)'</pre>\r\n\r\n</div>"
     },
@@ -66,7 +67,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Funkce jako atributy tříd II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jakmile ale začneme třídy používat jako konstruktory instancí, vystrčí na nás nos podle mě kardinálně špatné rozhodnutí tvůrců Python'u:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class T:\n... \n...     a = 'Ahoj!'\n... \n...     def fn(x):\n...         return f'Zavoláno: fn({x})'\n\n&gt;&gt;&gt; t = T()\n&gt;&gt;&gt; t.fn\n&lt;bound method T.fn of &lt;__main__.T object at 0x000001F4749AB830&gt;&gt;\n&gt;&gt;&gt; t.fn(666)\nTraceback (most recent call last):\n  File \"&lt;pyshell#7&gt;\", line 1, in &lt;module&gt;\n    t.fn(666)\nTypeError: T.fn() takes 1 positional argument but 2 were given</pre>\r\n    <p>\r\n        Dva poziční argumenty? Jenom proto, že jsem funkci zavolal na instanci? Co to má znamenat?\r\n    </p>\r\n\r\n</div>"
     },
@@ -88,7 +89,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Funkce jako atributy tříd IV</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jenže to má ten důsledek, že <em>jedna a ta samá funkce</em> se v rámci instance volá s jiným počtem parametrů než v rámci jmenného prostoru třídy:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class T:\n... \n...     a = 'Ahoj!'\n... \n...     def fn(x, y):\n...         return f'Zavoláno: fn({x}, {y})'\n\n&gt;&gt;&gt; T.fn(666)\nTraceback (most recent call last):\n  File \"&lt;pyshell#13&gt;\", line 1, in &lt;module&gt;\n    T.fn(666)\nTypeError: T.fn() missing 1 required positional argument: 'y'\n&gt;&gt;&gt; T.fn('Baf!', 666)\n'Zavoláno: fn(Baf!, 666)'</pre>\r\n\r\n</div>"
     },
@@ -110,7 +111,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "pythonic",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Instanční metody – jak to bohužel je</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nakonec tedy bohužel, <strong>funkce bez dekorátoru v bloku třídy jsou automaticky brány jako <em>instanční</em> a při svém volání na instanci automaticky dostanou navíc referenci na tuto instanci jako svůj první poziční parametr</strong> (což je přesně práce dekorátoru, kdyby tam býval byl!):\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">class T:\n\n    a = 'Ahoj!'\n\n    def fn(self, y):\n        return f'Zavoláno: fn({self}, {y})'</pre>\r\n    <p>\r\n        Nemusí se nám to líbit (mně ani trochu), ale prostě to tak je :-(\r\n    </p>\r\n    <p>\r\n        PS: Název <em>self</em> se pro tento první atribut používá čistě dohodou, aby se zdůraznilo, že jde o referenci na instanci. Ve vlastním zájmu tuto dohodu neporušujte – je to jediná nápověda, že se tyto funkce chovají jinak, než by člověk z jejich zápisu čekal.\r\n    </p>\r\n\r\n</div>"
     },
@@ -131,9 +132,9 @@
       "idx": 11,
       "title": "Třídní metody II",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Třídní metody II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Z pochopitelných důvodů se tento atribut prozměnu dohodou označuje jako <em>cls</em>..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">class T:\n\n    a = 'Ahoj!'\n\n    @classmethod\n    def fn(cls, y):\n        return f'Zavoláno: fn({cls}, {y})'</pre>\r\n    <p>\r\n        ..a každý vidí, že má smysl se tím řídit – hned na první pohled je jasné, že jde o reterenci na třídu (<em>class</em>).\r\n    </p>\r\n\r\n</div>"
     },
@@ -153,9 +154,10 @@
       "idx": 13,
       "title": "Emulace typu „record“ z jazyka Pascal",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
-      "diff": "paradigm",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Emulace typu „record“ z jazyka Pascal</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Nehledě na (podle mě) nevhodný a matoucí zápis, když už jsme se s tímto rozdílem mezi atributy <em>instančními</em> a <em>třídními</em> seznámili, můžeme tu vlastnost, že atributy instance nemají s atributy třídy nic společného, využít ještě o kus dál – na každé instanci si můžeme dodefinovat libovolné další atributy, které potřebujeme.\r\n  </p>\r\n  <p>\r\n    Prakticky úplnou obdobu pascalovského typu <em>záznam</em> (<em>record</em>) tak získáme například takto:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">class Zaměstnanec:\n    pass\n\njan = Zaměstnanec()   # vyrobení prázdného záznamu o zaměstnanci\n\n# naplnění polí (atributů) záznamu\njan.jméno = 'Jan Novák'\njan.oddělení = 'počítačová laboratoř'\njan.plat = 15000</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Upraveno podle dokumentace.\r\n  </div></div>\r\n  <p>\r\n    Prostě jsme vytvořili prázdný objekt, z něj vyrobili taktéž zcela prázdnou instanci a do ní jsme „naházeli“ všechna potřebná data.\r\n  </p>\r\n\r\n</div>"
     },
@@ -175,9 +177,9 @@
       "idx": 15,
       "title": "Metody – „self“",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "basics",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Metody – „self“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    <a href=\"?slajd=7\">Jak už víme</a>, pokusíme-li se metodu <em>identifikace()</em> zavolat přímo na třídě, se zlou se potážeme..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">Člověk.identifikace()\n    --&gt;\nTypeError: identifikace() takes exactly 1 argument (0 given)</pre>\r\n  <p>\r\n    ..zatímco volání na instanci nečiní žádné potíže:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">alisa.identifikace()\n    --&gt;\n\"Dobrý den! Jmenuji se Алиса Селезнева.\"</pre>\r\n  <p>\r\n    Celý „vtip“  je schován v tom, že parametr <code>self</code> metody <em>identifikace()</em> odkazuje na právě zavedenou instanci třídy, která je při volání příslušné metody předána Python'em automaticky jako její první parametr, tj.:\r\n  </p>\r\n  <blockquote>\r\n    Při zavolání této metody ve výše uvedeném tvaru <code>alisa.identifikace()</code> se tak vlastně ve skutečnosti volá kód <code>Člověk.identifikace(alisa)</code>.\r\n  </blockquote>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n      Tady je důvod pro pojmenování <em>self</em> asi vidět nejjasněji.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -239,10 +241,9 @@
       "idx": 20,
       "title": "Dědičnost II",
       "tags": [
-        "Skip",
-        "Tricky"
+        "Skip"
       ],
-      "diff": "paradigm",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Dědičnost II</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    I když použijeme <em>super()</em>, pořád se na rodičovskou třídu odkazujeme jejím jménem při zavedení poděděné třídy a při případné refaktorizaci kódu nás tak čeká spousta práce s přepisováním (a nezapomenutím na nějaký výskyt).\r\n  </p>\r\n  <p>\r\n    Tento problém je ovšem možné snadno vyřešit – stačí zavést <em>alias</em> na rodičovskou třídu a v kódu používat dále pouze ten (což jsme ostatně viděli už na <a href=\"?slajd=2\">druhém slajdu</a>):\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">    class Člověk():\n        ...\n\n    AliasČlověk = Člověk\n\n    class Školák(AliasČlověk):\n        ...</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Samozřejmě nezáleží na tom, jak svůj alias pojmenujete, je to normální „proměnná“.\r\n  </div></div>\r\n  <p>\r\n    Při refaktorizaci pak stačí zaměnit jediné místo kódu.\r\n  </p>\r\n\r\n  <p class=\"enumerate\">\r\n    Mimochodem něco podobného se týká i rodičovských tříd definovaných v jiných <em>modulech</em>. Chcete-li z takové třídy dědit, musíte ji nejdříve do aktuálního modulu naimportovat. A jestli ji naimportujete jako součást celého modulu, nebo pouze ji, nebo pod nějakým jiným jménem, je zcela na vás.\r\n  </p>\r\n\r\n</div>"
     },
@@ -253,7 +254,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "paradigm",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Dědičnost III</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Neupravuje-li potomek chování rodičovské inicializace, metodu <em>__init__()</em> pak na něm dokonce ani nemusíme definovat a Python zavolá příslušnou rodičovskou sám. Pokud však jakoukoli rodičovskou instanční metodu (tedy i <em>__init__()</em>) na potomkovi předefinujeme, příslušný rodičovský originál musíme – vyžaduje-li to logika kódu – zavolat sami:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">class Rodič:\n    ...\n    def fn(self, atr1):\n        ...\n...\n\nclass Potomek(Rodič):\n    ...\n    # upravená metoda 'fn()'\n    def fn(self, atr1, atr2):\n        # případné volání rodičovské metody\n        Rodič.fn(self, atr1)\n        # následuje kód, kde (snad :) využijeme i 'atr2'\n...\n...</pre>\r\n  <p>\r\n      PS: Tohle je přesně místo, kde budete chtít použít <code>super()</code>. Jelikož tato funkce toho ale umí mnohem víc, než by člověk na první pohled čekal, je jí věnována <a href=\"super.xml\">samostatná přednáška</a>.\r\n  </p>\r\n\r\n</div>"
     },
@@ -275,7 +276,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Třídní atributy</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Někdy se nám ale může hodit operovat nikoli s atributy konkrétní instance třídy, nýbrž s atributy rodiče. Vzpomeneme-li si na první slajd, je implementace jasná – stačí vynechat slovíčko <em>self</em> a odkazovat se přímo na uvedenou rodičovskou třídu (neuvedený kód se opět zachovává):\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">    class Školák(Člověk):\n        ...\n        školáků = 0\n...\n        def __init__(self, ...):\n            ...\n                Školák.školáků += 1</pre>\r\n  <p>\r\n    Síla <em>třídních atributů</em> tkví v tom, že jsou sdíleny všemi instancemi třídy mezi sebou navzájem (jak už jsme viděli), takže jakákoli změna v nich je viditelná ve všech jednotlivých instancích/objektech vytvořených z dané třídy.\r\n  </p>\r\n  <p>\r\n    PS: Zjevně místo <em>Školák</em>a můžete dosadit libovolný jiný dostupný objekt, ale to už by daný kód dělal něco úplně jiného, než jste zamýšleli… Proto je mnohem lepší napsat to rovnou jako dále pomocí <em>třídní metody</em>.\r\n  </p>\r\n\r\n</div>"
     },
@@ -286,7 +287,7 @@
       "tags": [
         "Already Studied"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": {
         "lecture_id": "lecture:materialy/python/objects/oop.html",
         "lecture_title": "Třídy a konstruktory (OOP)",
@@ -315,7 +316,6 @@
       "title": "„Privátní“ atributy",
       "tags": [
         "Already Studied",
-        "Core",
         "Tricky"
       ],
       "diff": "paradigm",

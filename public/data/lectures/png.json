@@ -7,7 +7,7 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -18,9 +18,10 @@
       "idx": 1,
       "title": "Struktura PNG",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Struktura PNG</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Globální struktura PNG-souboru je následující:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      hlavička – vždy stejných 8 bajtů <code>89 50 4E 47 0D 0A 1A 0A</code>, jinak to není PNG\r\n    </li>\r\n    <li>\r\n      série tzv. <em>chunků</em> různých typů, které mají všechny stejnou strukturu:\r\n      <ol>\r\n        <li>\r\n            délka dat chunku [4 bajty]\r\n        </li>\r\n        <li>\r\n            typ chunku [4 bajty]\r\n        </li>\r\n        <li>\r\n            data chunku\r\n        </li>\r\n        <li>\r\n            kontrolní součet (<em>CRC</em>) chunku [4 bajty]\r\n        </li>\r\n      </ol>\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    PS: Struktura hlavičky kromě i lidsky viditelné identifikace (2.-4. bajt představují <code>PNG</code>) slouží k odchycení možných problémů při přenosu – první bajt testuje zachování nejvyššího bitu, další pak překlady řádků nebo <em>EOF</em>.\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Nejjednodušší sekvence chunků, která poskytne validní PNG-obrázek, je takováto:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      <code>IHDR</code> – hlavička; obsahuje všechny informace potřebné k rozkódování obrázku\r\n    </li>\r\n    <li>\r\n      <code>IDAT</code> – vlastní data obrázku\r\n    </li>\r\n    <li>\r\n      <code>IEND</code> – ukončovací chunk (neobsahuje žádná data)\r\n    </li>\r\n  </ul>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Chunků <code>IDAT</code> může být více. Měly by být všechny za sebou.\r\n  </div></div>\r\n  <p>\r\n    PS: Druhý nejjednodušší typ obrázku bude ještě mezi <code>IHDR</code> a <code>IDAT</code> obsahovat barevnou paletu <code>PLTE</code>.\r\n  </p>\r\n\r\n</div>"
     },
@@ -31,7 +32,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Chunk IHDR</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Chunk <code>IHDR</code>, je vlastně úplně nejdůležitější – zjistíme z něj totiž obecné informace o obrázku včetně všech potřebných pro jeho dekódování. Struktura jeho datové části je následující:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n      šířka obrázku v pixelech [4 bajty]\r\n    </li>\r\n    <li>\r\n      výška obrázku v pixelech [4 bajty]\r\n    </li>\r\n    <li>\r\n      bitová hloubka [1 bajt]\r\n    </li>\r\n    <li>\r\n      barvový typ [1 bajt]\r\n    </li>\r\n    <li>\r\n      metoda komprese [1 bajt]\r\n    </li>\r\n    <li>\r\n      metoda filtrace [1 bajt]\r\n    </li>\r\n    <li>\r\n      metoda prokládání [1 bajt]\r\n    </li>\r\n  </ol>\r\n  <p>\r\n    Díky tomu, že datová část obsahuje vždy právě 13 bajtů, je začátek chunku <code>IHDR</code> vždy stejný – po délce dat <code>b'\\x00\\x00\\x00\\r'</code> (tedy 13 hexadecimálně) následuje typ chunku <code>b'IHDR'</code>. Dále následuje 13 bajtů údajů a nakonec 4 bajty kontrolního součtu (z hlavičky a dat).\r\n  </p>\r\n\r\n</div>"
     },
@@ -62,8 +63,7 @@
       "idx": 5,
       "title": "Chunk(y) IDAT",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -74,7 +74,8 @@
       "idx": 6,
       "title": "Filtrace I",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -98,7 +99,7 @@
       "title": "Tabulka rekonstrukčních filtrů",
       "tags": [
         "Core",
-        "Tricky"
+        "WOW"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -111,7 +112,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Příklad – PNG bez palety, 8 bpp</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Podívejme se na zub obrázku <a href=\"_files/sachovnice.png\">sachovnice.png</a>, který je v osmibitové barevné hloubce a neobsahuje barvovou paletu:\r\n  </p>\r\n  <img src=\"_files/sachovnice.scale30.png\" width=\"90\" height=\"90\" alt=\"3x3 px &amp; 24 bpp\" title=\"\" align=\"center\">\r\n  <pre class=\"brush: plain; gutter: false; toolbar: false;\">STRUKTURA:\n    header: b'\\x89PNG\\r\\n\\x1a\\n'\n    chunks:\n    {\n    'length': b'\\x00\\x00\\x00\\r',\n    'type':   b'IHDR',\n    'data':   b'\\x00\\x00\\x00\\x03\\x00\\x00\\x00\\x03\\x08\\x02\\x00\\x00\\x00',\n    'CRC':    b'\\xd9J\"\\xe8',\n    },\n    {\n    'length': b'\\x00\\x00\\x00\\x1c',\n    'type':   b'IDAT',\n    'data':   b'x\\x9c%\\xc3\\xb1\\r\\x00\\x00\\x0c\\xc3 &gt;\\xcf\\xe9\\xeeP$\\x84_m\\x83\\x92\\xd4\\x01\\xb4\\xd2\\rr',\n    'CRC':    b'\\xa6|\\xffu',\n    },\n    {\n    'length': b'\\x00\\x00\\x00\\x00',\n    'type':   b'IEND',\n    'data':   b'',\n    'CRC':    b'\\xaeB`\\x82',\n    }\n\nIHDR (obrázky s jinou konečnou pěticí než právě 82000 nebudeme zpracovávat):\n    {\n    'width':  3,\n    'height': 3,\n    'bit depth':   8,\n    'colour type': 2,\n    'compression method': 0,\n    'filter method':      0,\n    'interlace method':   0,\n    }\n\nIDAT:\n    b'x\\x9c%\\xc3\\xb1\\r\\x00\\x00\\x0c\\xc3 &gt;\\xcf\\xe9\\xeeP$\\x84_m\\x83\\x92\\xd4\\x01\\xb4\\xd2\\rr'\n\nIDAT – rozkomprimovaný:\n    b'\\x00\\xff\\x00\\x00\\x00\\xff\\x00\\x00\\x00\\xff\\x00\\xff\\xff\\xff\\x7f\\x7f\\x7f\\x00\\x00\\x00\\x00\\xff\\xff\\x00\\xff\\x00\\xff\\x00\\xff\\xff'\n\nIDAT – zafiltrované scanlines ve tvaru \"(filtr, [(RGB-hodnoty jednotlivých pixelů), ])\":\n    [ (0, [(255, 0, 0), (0, 255, 0), (0, 0, 255)]),\n    (0, [(255, 255, 255), (127, 127, 127), (0, 0, 0)]),\n    (0, [(255, 255, 0), (255, 0, 255), (0, 255, 255)]) ]\n\nIDAT – odfiltrované pixely (tady je to jednoduché, když je filtr 0 ^_^):\n    [ [(255, 0, 0), (0, 255, 0), (0, 0, 255)],\n    [(255, 255, 255), (127, 127, 127), (0, 0, 0)],\n    [(255, 255, 0), (255, 0, 255), (0, 255, 255)] ]</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Viz <a href=\"_files/sachovnice.log\">sachovnice.log</a>.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -120,7 +121,8 @@
       "idx": 10,
       "title": "Příklad – PNG s paletou, 4 bpp",
       "tags": [
-        "Skip"
+        "Core",
+        "WOW"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -131,9 +133,10 @@
       "idx": 11,
       "title": "Poznámky",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Poznámky</h2></div><div class=\"section-body\">\r\n  \r\n  <p class=\"enumerate\">\r\n    Ze způsobu pojmenování typu chunku (tedy podle toho, které bity jsou nastavené; prakticky se to projevuje zápisem buď velkými nebo malými písmeny) se dá poznat mnohem více – zda je příslušný chunk nutný pro přečtení obrázku (např. <em>IDAT</em> versus <em>tEXt</em>), veřejný či privátní (pro nějakou konkrétní aplikaci) nebo zachovává-li se při transformaci obrázku (např. <em>hIST</em>).\r\n  </p>\r\n  <p>\r\n    Praktická stránka věci: Pro zpracování obrázku vás zajímají pouze chunky, jejichž typ je zapsán verzálkami (velkými písmeny).\r\n  </p>\r\n\r\n  <p class=\"enumerate\">\r\n    Vícebajtová čísla (např. délka dat) jsou zakódována v pořadí <em>big endian</em>, tedy od nejvýznamnějšího bajtu vlevo po nejméně významný vpravo (tj. poslední bajt vpravo určuje číslo v rozmezí 0-255, předchozí v násobcích 256 atd.).\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Viz <a href=\"http://www.w3.org/TR/PNG/#7Integers-and-byte-order\" class=\"external\">http://www.w3.org/TR/PNG/#7Integers-and-byte-order</a>\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Pro rozkomprimování zakomprimovaných chunků <code>IDAT</code> můžete použít knihovní metodu <em>zlib.decompress()</em>, která implementuje algoritmus <em>DEFLATE</em>.\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Kontrolní součet se provádí nad sekvencí <em>typ chunku + data chunku</em>, je ho tedy možno počítat průběžně. Použitý algoritmus není moc vhodný pro delší data (nedokáže v nich už tak snadno rozpoznat chybu), proto se v praxi datové chunky <code>IDAT</code> dělí obvykle po 8 kB. V zápočtovém programu můžete použít implementaci CRC <em>zlib.crc32()</em>.\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Více viz <a href=\"http://www.root.cz/clanky/nepovinne-chunky-v-png-a-kontrola-pomoci-crc/\" class=\"external\">\r\nhttp://www.root.cz/clanky/nepovinne-chunky-v-png-a-kontrola-pomoci-crc/</a>. Pro ukázkovou implementaci CRC-algoritmu viz <a href=\"http://www.w3.org/TR/PNG/#D-CRCAppendix\" class=\"external\">http://www.w3.org/TR/PNG/#D-CRCAppendix</a>.\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Barvová paleta je v datech příslušného chunku <code>PLTE</code> uložena nekomprimovaně.\r\n  </p>\r\n\r\n  <p class=\"enumerate\">\r\n    Prokládání v PNG je jakýsi vtipný kompromis mezi původním GIFem (přenos různých řádků) a formátem JPEG (přenos různě významných členů transformace). Jeho nejmenší složkou jsou bloky 8x8, z nichž se přenáší hodnoty pixelů podle následujícího schématu:\r\n  </p>\r\n  <p style=\"width: 600px; margin: 0 auto;\">\r\n    <img src=\"_files/png-interlacing.gif\" width=\"256\" height=\"256\" alt=\"\" title=\"Ilustrace průběhu prokládání u formátu PNG\" align=\"left\">\r\n    <pre style=\"align: right;\">1 6 4 6 2 6 4 6\n7 7 7 7 7 7 7 7\n5 6 5 6 5 6 5 6\n7 7 7 7 7 7 7 7\n3 6 4 6 3 6 4 6\n7 7 7 7 7 7 7 7\n5 6 5 6 5 6 5 6\n7 7 7 7 7 7 7 7</pre>\r\n    <br clear=\"all\">\r\n  </p>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Viz <a href=\"http://www.root.cz/clanky/radkove-filtry-v-png/\" class=\"external\">http://www.root.cz/clanky/radkove-filtry-v-png/</a>\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -142,8 +145,7 @@
       "idx": 12,
       "title": "Poznámky k „výrobě“ PNG",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,

@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pro ilustraci principu použití <a href=\"/materialy/python/speed/numba.xml\"><em>Numby</em></a> a <a href=\"/materialy/python/cython/intro.xml\"><em>Cythonu</em></a> pro zrychlení vykonávání běhu pythoních programů a srovnání jejich přístupu použijeme aplikaci korelačního/konvolučního filtru na RGB-obrázek.\r\n    </p>\r\n    <p>\r\n        V praxi by to samozřejmě nikdo nedělal, protože příslušné operace jsou už dávno napsány v Céčku v několika externích knihovnách (především tedy samotném <em>Pillow</em>, kterou budeme používat pro načtení originálu a uložení výsledku operace), ale aplikace korelačního/konvolučního filtru je snad natolik názorná operace, že se k ilustraci hodí.\r\n    </p>\r\n\r\n</div>"
     },
@@ -18,7 +18,7 @@
       "idx": 1,
       "title": "Zadání",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -29,9 +29,9 @@
       "idx": 2,
       "title": "Komentáře",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Komentáře</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Příslušný filtr se aplikuje na dvourozměrné pole $m×n$, náš obrázek je však RGB, konkrétně po načtení jako numpy-pole tvaru $375×500×3$. A protože numbajovský dekorátor <em>@jit</em> se pochopitelně aplikuje na funkce, napíšeme aplikaci filtru jako funkci nad dvourozměrným polem, přestože by totéž šlo napsat lineárně pomocí zanořené smyčky (přes příslušné tři vrstvy obrazu).\r\n    </p>\r\n    <div id=\"RGB\" class=\"tabobr\">\r\n        <table id=\"R\">\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n        </table>\r\n        <table id=\"G\">\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n        </table>\r\n        <table id=\"B\">\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n        </table>\r\n    </div>\r\n\r\n    <p class=\"enumerate\">\r\n        Uvedený korelační/konvoluční filtr má „problém“ v krajních řádcích a sloupcích, který z důvodů co nejjednoduššího kódu vyřešíme tak, že výstupní obrázek bude o tento okrajový rámeček menší (bude tedy mít rozměr $373×498×3$).\r\n    </p>\r\n    <div class=\"tabobr\">\r\n        <table class=\"blue\">\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n        </table>\r\n        →\r\n        <table class=\"gray\">\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td class=\"blue\"></td><td class=\"blue\"></td><td class=\"blue\"></td><td></td></tr>\r\n            <tr><td></td><td class=\"blue\"></td><td class=\"blue\"></td><td class=\"blue\"></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td><td></td><td></td></tr>\r\n        </table>\r\n    </div>\r\n\r\n    <p class=\"enumerate\">\r\n        Vlastní zostření obrázku se provede jeho součtem s výsledkem aplikace zostřovacího filtru, celkově tedy budeme aplikovat filtr (masku):\r\n    </p>\r\n    $$\r\n        (\\table 0, 0, 0; 0, 1, 0; 0, 0, 0) + (\\table -1, -1, -1; -1, 8, -1; -1, -1, -1) = (\\table -1, -1, -1; -1, 9, -1; -1, -1, -1)\r\n    $$\r\n\r\n    <p class=\"enumerate\">\r\n        Pro načtení obrázku a uložení výsledku ve formátu JPEG použijeme příslušné funkce z knihovny <em>Pillow</em>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -40,8 +40,7 @@
       "idx": 3,
       "title": "Python + Numpy nevektorizovaně",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -76,7 +75,8 @@
       "idx": 6,
       "title": "Cython I",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -98,7 +98,8 @@
       "idx": 8,
       "title": "Cython III",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -109,7 +110,8 @@
       "idx": 9,
       "title": "Cython IV",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -120,7 +122,8 @@
       "idx": 10,
       "title": "Cython V",
       "tags": [
-        "Skip"
+        "Core",
+        "WOW"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -155,7 +158,8 @@
       "idx": 13,
       "title": "Srovnání",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
       "diff": "basics",
       "already_studied_in": null,

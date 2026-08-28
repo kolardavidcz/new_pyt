@@ -7,7 +7,7 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -20,7 +20,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Rozdělení</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Rodina formátů <b>Netpbm</b> je extrémně jednoduchá na zpracovávání (a ruku v ruce s tím extrémně nevhodná na uchovávání :). Obsahuje celkem 6 různých formátů lišících se barevnou „hloubkou“ a typem kódování:\r\n    </p>\r\n    <table align=\"center\">\r\n        <tr>\r\n            <th> identifikátor pro kódování<br>ASCII / binary </th>\r\n            <th> typ </th>\r\n        </tr>\r\n        <tr>\r\n            <td> P1 / P4 </td>\r\n            <td> PBM = portable bitmap (černobílé) </td>\r\n        </tr>\r\n        <tr>\r\n            <td> P2 / P5 </td>\r\n            <td> PGM = portable graymap (odstíny šedé) </td>\r\n        </tr>\r\n        <tr>\r\n            <td> P3 / P6 </td>\r\n            <td> PPM = portable pixmap (RGB) </td>\r\n        </tr>\r\n    </table>\r\n    <p>\r\n        <i>ASCII</i> se bezvadně čte, ale pochopitelně je oproti <i>binary</i> pekelně nafouknuté – kde v binárním P6 pro zápis RGB-pixelu stačí 3 bajty, tam ASCII P3 potřebuje bajtů až 11 (a to počítám pouze mezery mezi barvami jednoho pixelu, nikoli mezi jednotlivými pixely).\r\n    </p>\r\n\r\n</div>"
     },
@@ -29,10 +29,9 @@
       "idx": 2,
       "title": "Struktura",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Struktura</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Struktura PNM-formátů je obecně následující:\r\n    </p>\r\n    <pre>identifikátor↵↵          # identifikátor podle tabulky výše\n[# komentář↵↵]           # nepovinný; často je zde název souboru\nšířka↵↵výška↵↵           # rozměry zadány jako dekadické číslo v ASCII\nmaximální-počet-barev↵   # zadán jako dekadické číslo v ASCII; &gt;0 &amp; &lt;=255 (resp. 65536)\ndata-obrázku             # „mřížka“ pixelů o daném počtu řádků a sloupců</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <code>↵↵</code> představuje libovolný počet bílých znaků (<em>whitespace</em>, tj. mezery, TABy, CR, LF), <code>↵</code> zastupuje právě jeden bílý znak.\r\n    </div></div>\r\n    <p>\r\n        Dejte si pozor, kam a jak píšete komentáře – obecně všechno za znakem <code>#</code> je pokládáno za komentář, to znamená i uprostřed řádky (a hlavně odřádkování na konci komentáře), což může někdy udělat nečekanou paseku. Podobně není (u ASCII-kódování) doporučováno mít datové řádky delší než 70 znaků. A nakonec data obrázku by také měla končit na <em>whitespace</em>, protože některé programy si s tím jinak neporadí.\r\n    </p>\r\n\r\n</div>"
     },
@@ -55,7 +54,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">PBM binary</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Binární podoba, tedy varianta P4, se z pochopitelných důvodů úspornosti liší od binárních variant vícebarevných formátů PGM a PPM:\r\n    </p>\r\n    <blockquote>\r\n        Po hlavičce, která je společná ASCII i binární variantě, následují (za povinným <strong>právě jedním prázdným znakem/bajtem</strong>) data obrázku v podobě – <em>co 8 pixelů, to jeden bajt</em>.\r\n    </blockquote>\r\n    <p>\r\n        Každých osm sloupečků je tedy sloučeno do jednoho bajtu, ve kterém jejich barvové hodnoty (černá/bílá) představuje nastavení příslušných bitů (0/1). „Přebytečné“ sloupečky (tedy sloupečky, které musíme doplnit, abychom dostali celý počet bajtů) jsou „shrnuty“ do posledního bajtu v podobě nul.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: V principu prohlížeče obrázků na data v „přebytečných“ sloupcích nemají důvod vůbec brát zřetel, takže do nich můžete schovat, co vás napadne, a neomezovat se jen na stadardní nuly. Co třebas šifrovaná zpráva v kódování na tři bity? ^_~\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -86,7 +85,8 @@
       "idx": 7,
       "title": "PGM binary",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -119,8 +119,7 @@
       "idx": 10,
       "title": "Srovnávací tabulka",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -131,7 +130,8 @@
       "idx": 11,
       "title": "Poznámky",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
       "diff": "basics",
       "already_studied_in": null,

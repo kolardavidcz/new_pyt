@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Často potřebujete ve svém programu někam odložit dočasná pracovní data. Existují standardní místa, která byste měli zkusit použít (např. <em>C:\\TEMP</em> nebo <em>/tmp</em>) a která jsou k tomu např. svými právy pro zápis uzpůsobena.\r\n  </p>\r\n  <p>\r\n    Starat se o to všechno ale sám a navíc tak, aby to fungovalo na libovolné cílové platformě, je dosti otrava a navíc další bezvadné místo na zanešení chyb (a to nejen bezpečnostních). Python právě pro tyto potřeby obsahuje velmi univerzální modul <code>tempfile</code>.\r\n  </p>\r\n\r\n</div>"
     },
@@ -18,8 +18,7 @@
       "idx": 1,
       "title": "Práce s dočasnými objekty",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -30,9 +29,10 @@
       "idx": 2,
       "title": "Umístění dočasných souborů",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Umístění dočasných souborů</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Ačkoli většině funkcí modulu <em>tempfile</em> můžete vnutit vlastní umístění dočasných souborů, opravdu to není dobrý nápad, pokud pro to nemáte skutečně dobrý důvod.\r\n  </p>\r\n  <p>\r\n    Python sám bude hledat vhodné místo podle následujícího algoritmu:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n        Adresář uložený v proměnné prostředí <code>TMPDIR</code>.\r\n    </li>\r\n    <li>\r\n        Adresář uložený v proměnné prostředí <code>TEMP</code>.\r\n    </li>\r\n    <li>\r\n        Adresář uložený v proměnné prostředí <code>TMP</code>.\r\n    </li>\r\n    <li>\r\n        Platformně závislé umístění:\r\n        <ul>\r\n            <li>\r\n                <em>Windows</em>: postupně adresáře <code>C:\\TEMP</code>, <code>C:\\TMP</code>, <code>\\TEMP</code> a <code>\\TMP</code>\r\n            </li>\r\n            <li>\r\n                <em>všude jinde</em>: postupně adresáře <code>/tmp</code>, <code>/var/tmp</code> a <code>/usr/tmp</code>\r\n            </li>\r\n        </ul>\r\n    </li>\r\n    <li>\r\n        Jako místo poslední záchrany se Python pokusí použít aktuální pracovní adresář (tedy typicky místo spuštění programu).\r\n    </li>\r\n  </ol>\r\n\r\n</div>"
     },
@@ -44,7 +44,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„TemporaryFile“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Ačkoli plný konstruktor <code>TemporaryFile</code> pro tvorbu <strong>dočasných nepojmenovaných souborů</strong>, které jsou před každým pokud možno schovány (tím je myšleno, že jejich jméno není dostupné v programu a podporuje-li to platforma, tak ani v ní), je dosti šílený..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">tempfile.TemporaryFile(mode='w+b', buffering=None, encoding=None,\n                        newline=None, suffix='', prefix='tmp', dir=None)</pre>\r\n  <p>\r\n    ..pro běžné použití vzhledem k rozumnému výchozímu nastavení jednotlivých atributů není většinou potřeba používat složitější konstrukci než tuto:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">with tempfile.TemporaryFile() as fp:\n    BLOK</pre>\r\n  <p>\r\n    Z hlediska snad všech standardních operací se s výstupním objektem <em>fp</em> zachází stejně jako s každým běžným souborem.\r\n  </p>\r\n\r\n</div>"
     },
@@ -56,7 +56,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">„NamedTemporaryFile“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Konstruktor <code>NamedTemporaryFile</code> pro tvorbu <strong>dočasných pojmenovaných souborů</strong> je podobně šílený..\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">tempfile.NamedTemporaryFile(mode='w+b', buffering=None, encoding=None,\n                            newline=None, suffix='', prefix='tmp', dir=None,\n                            delete=True)</pre>\r\n  <p>\r\n    ..ale opět se s ním pracuje stejně jako s normálním souborem. Oproti <em>TemporaryFile</em> je tu však samozřejmě několik rozdílů:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        Vytvořený objekt má viditelné jméno. Je přístupné pod parametrem <em>file</em> na otevřeném proudu (<em>stream</em>u).\r\n    </li>\r\n    <li>\r\n        Změnou parametru <em>delete</em> můžete určit, zda se dočasný soubor po ukončení práce s ním má ihned smazat (výchozí nastavení) nebo ne.\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
     },

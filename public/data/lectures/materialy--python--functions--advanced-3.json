@@ -7,10 +7,9 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "paradigm",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož v Python'u hrají funkce velmi důležitou roli, nepřekvapí, že v rámci knihovního modulu <em>functools</em> je k dispozici armáda metod pro funkce tzv. <strong>vyššího řádu</strong> (<em>higher order functions</em>) – funkce, které operují na funkcích a (případně) vrací další funkce.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        A protože v Python'u je funkce (přinejmenším) všechno, co implementuje magickou metodu <code>__call__()</code>, tak to nemusí být jen funkce v klasickém smyslu slova.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -19,10 +18,8 @@
       "idx": 1,
       "title": "„wraps()“ – kopie otisku funkce",
       "tags": [
-        "Core",
-        "WOW",
-        "Tricky",
-        "Already Studied"
+        "Already Studied",
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": {
@@ -44,7 +41,7 @@
         "Core",
         "WOW"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">„partial()“ – částečné vyhodnocení některých argumentů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Představte si, že ve svém programu používáte nějakou funkci s jistým přednastavením některých parametrů tak často, že už vám jejich neustálé přepisování začne lézt krkem. Nemusí, protože od toho je tu funkce <code>functools.partial()</code>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">from functools import partial\n\nprint_bez_odřádkování = partial(print, end='')\nprint_do_souboru = partial(print, file=STREAM)\nopen_unicode = partial(open, encoding='utf-8')</pre>\r\n    <p>\r\n        Navzdory příkladům výše to funguje i pro nepojmenované parametry, jak ukazuje příklad přímo z dokumentace:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; basetwo = partial(int, base=2)\n&gt;&gt;&gt; basetwo.__doc__ = 'Convert base 2 string to an int.'\n&gt;&gt;&gt; basetwo('10010')\n18</pre>\r\n    <p>\r\n        PS: Jelikož metody objektů jsou také funkce, jen v trochu jiném kontextu, existuje pro ně obdoba této funkce v podobě <code>functools.partialmethod</code>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -55,7 +52,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "paradigm",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„reduce()“ – redukce iterátorů na jednu hodnotu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nepotřebujete-li znát všechny mezivýsledky postupné redukce iterovatelného objektu předloženou <em>binární funkcí</em> (což zařídí <a href=\"/materialy/python/iterators/itertools.xml?slajd=9\"><code>itertools.accumulate()</code></a>), můžete použít funkci <code>functools.reduce()</code>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; from functools import reduce\n\n# Vlastně provede ((((5 + 2) + 4) + 3) + 6):\n&gt;&gt;&gt; reduce(lambda x, y: x + y, [5, 2, 4, 3, 6])\n20</pre>\r\n    <p>\r\n        Jejím prvním parametrem je tedy binární funkce (funkce o dvou parametrech mezi kterými implementuje <em>binární operaci</em>) a druhým pak příslušný iterovatelný objekt. Případný třetí parametr pak představuje počáteční (inicializační) hodnotu pro operaci a je předřazen prvkům zpracovávaného iterátoru:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; from functools import reduce\n\n# Vlastně provede (((((1 + 5) + 2) + 4) + 3) + 6):\n&gt;&gt;&gt; reduce(lambda x, y: x + y, [5, 2, 4, 3, 6], 1)\n21</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Pokud inicializační parametr není přítomen a vstupní sekvence má právě délku 1, vrací se celkově právě jen tento první prvek.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -77,10 +74,9 @@
       "title": "„lru_cache()“ – podpora pro memoizaci",
       "tags": [
         "Core",
-        "WOW",
-        "Already Studied"
+        "WOW"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">„lru_cache()“ – podpora pro memoizaci</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Dekorátor <code>lru_cache()</code> si ukládá slovník argumentů dekorované funkce a jim odpovídajících výsledků, ale pouze do jisté hloubky (LRU = <em>least recently used</em>; ve výchozím nastavení 128). To pochopitelně značně zrychluje opětovná volání funkce pro stejné argumenty, protože se už nemusí znovu počítat nebo stahovat z internetu a podobně. Vzhledem k tomu <strong>má</strong> ale pochopitelně <strong>smysl dekorovat pouze funkce</strong>, které:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            opravdu budete často během běhu programu volat se stejnými parametry;\r\n        </li>\r\n        <li>\r\n            argumenty jsou hešovatelné a zadávané pokaždé ve stejném pořadí (stávají se totiž klíči slovníku);\r\n        </li>\r\n        <li>\r\n            nemají vedlejší efekty (těžko kešovat něco, co nezávisí pouze na svých argumentech nebo nevrací na daný dotaz pokaždé totéž).\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Třebas <code>time()</code> nebo <code>random()</code> jsou krásný protipříklad.\r\n            </div></div>\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Zatímco rekurzivní funkce bez vedlejších efektů jsou tedy naprosto jasný kandidát na použití keše, nemá naopak vůbec smysl kešovat generátory nebo asynchronní funkce.\r\n    </p>\r\n    <p>\r\n        PS: Mezipaměť užívaná tímto dekorátorem je <em>threadsafe</em>, takže zůstává konzistentní, i když je volána z různých vláken ve stejnou dobu.\r\n    </p>\r\n\r\n</div>"
     },
@@ -90,10 +86,9 @@
       "title": "„cache()“ ==  „lru_cache(maxsize=None)“",
       "tags": [
         "Core",
-        "WOW",
-        "Already Studied"
+        "WOW"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">„cache()“ ==  „lru_cache(maxsize=None)“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        V některých případech má smysl LRU vypnout a kešovat všechna volání dekorované funkce, například u hluboce rekurzivních funkcí. To zařizuje volání ve tvaru <code>lru_cache(maxsize=None)</code>. Protože je to užitečné a v některých scénářích často užívané, Python 3.9 na to zavedl zkratku <code>@cache</code>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">from functools import cache\n\n@cache\ndef fibonacci(n):\n    if n&lt;= 1:\n        return n\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)\n\nprint(fibonacci(111))           # 70492524767089125814114\nprint(fibonacci.cache_info())   # CacheInfo(hits=109, misses=112, maxsize=None, currsize=112)</pre>\r\n    <p>\r\n        Dekorátor <code>@cache</code> je pro uvedená použití rychlejší (a také méně náročný) než <code>@lru_cache</code>, protože nemusí řešit odstraňování hodnot, které překročily nastavený limit, z mezipaměti.\r\n    </p>\r\n\r\n</div>"
     },
@@ -103,8 +98,7 @@
       "title": "„totalordering()“ – porovnávání instancí tříd",
       "tags": [
         "Core",
-        "WOW",
-        "Already Studied"
+        "WOW"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -115,10 +109,9 @@
       "idx": 8,
       "title": "PS: Varianty pro metody tříd",
       "tags": [
-        "WOW",
-        "Tricky"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">PS: Varianty pro metody tříd</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Je třeba zmínit, že některé z dekorátorů existují i ve variantách pro metody tříd, konkrétně <code>@cached_property</code>, <code>@partialmethod</code> a <code>@singledispatchmethod</code>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jelikož metody tříd jsou v Python'u navrženy <a href=\"/materialy/python/objects/basics.xml?slajd=9\">nepříliš šťastně</a> a hlavně jejich správnou funkcionalitu zajišťují <a href=\"/materialy/python/objects/oop.xml?slajd=13\">odpovídající dekorátory</a>, musí s nimi tyto dekorátory pochopitelně spolupracovat, aby celou mašinérii tříd nerozbořily.\r\n    </div></div>\r\n    <p>\r\n        Podrobnosti zde ale uvádět nebudu a zájemce odkazuji na <a href=\"https://docs.python.org/3/library/functools.html\" class=\"external\">oficiální dokumentaci k modulu <em>functools</em></a>.\r\n    </p>\r\n\r\n</div>"
     }

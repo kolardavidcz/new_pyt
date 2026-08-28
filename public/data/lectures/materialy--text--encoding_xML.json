@@ -7,7 +7,7 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -18,9 +18,10 @@
       "idx": 1,
       "title": "Metody určení kódování HTML",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Metody určení kódování HTML</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Načítáte-li ze serveru HTML-dokument (kterýžto je v podstatě obyčejným textem), můžete jeho kódování zjistit v principu třemi rozdílnými způsoby:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n        sdělí vám ho server v rámci <a href=\"/materialy/net/http.xml?slajd=7\">návratové hlavičky HTTP-dotazu</a>;\r\n    </li>\r\n    <li>\r\n        odvážně budete předpokládat vhodné kódování, typicky starou známou spodní polovinu ASCII-tabulky, a s pomocí něj se pokusíte (s trochou štěstí někde na začátku dokumentu) nalézt jeho kódování uvedené v dedikované značce <code>&lt;meta&gt;</code>;\r\n    </li>\r\n    <li>\r\n        bez debat provedete (nejen statistickou) analýzu bajtů a na jejím základě se pokusíte použité kódování odhadnout.\r\n    </li>\r\n  </ol>\r\n  \r\n  <p>\r\n    Pár komentářů k jednotlivým bodům:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n        Teoreticky nejsprávnější řešení – kódování dokumentu znáte dřív, než se ho pokusíte přečíst. Prakticky ovšem často velmi těžko proveditelné – server by musel znát kódování pro každý jednotlivý na něm uložený soubor.\r\n        <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            V souladu s historickým vývojem posílaly servery z počátku všechno většinou jako angličtinu, tedy nejčastěji jako <em>ISO-8859-1</em> (tzv. <em>Latin 1</em>). Jelikož v tom opravdu moc nezapíšete, naučily se časem rozlišovat kódování alespoň na úrovni adresářů. Ale pokud někdo potřeboval soubory v různých kódováních, měl smůlu. Natožpak potřeboval-li smíchat více (jednodušších) kódování v rámci jednoho souboru ^_^\r\n        </div></div>\r\n    </li>\r\n    <li>\r\n        Na první pohled zajímavý nápad – autor dokumentu přece ví, v jakém kódování dokument připravil. Už na ten druhý ovšem naprosto typická <em>hlava-22</em> – abyste mohli z vnitřku dokumentu informaci o kódování vůbec přečíst, musíte nejdřív vědět, v jakém kódování k obsahu souboru přistupovat ^_~\r\n        <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Přes uvedený zdánlivě neřešitelný problém se tento způsob používá poměrně často. Umístíte-li příslušnou informační <em>meta</em>-hlavičku co nejblíže začátku dokumentu, bude před ní nanejvýš pár obecných HTML-značek, takže s předpokladem ASCII se k hledané informaci většinou poměrně rychle dostanete.\r\n        </div></div>\r\n    </li>\r\n    <li>\r\n        Bez debat nejnevhodnější řešení – je složité, náročné na provedení a může se mýlit. Vynechá-li však server informaci o kódování a v souboru ji rychle pomocí druhé metody nenajdete, nic jiného vám nezbyde.\r\n        <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Spoustu zajímavých informací o této problematice se můžete dozvědět při učení Python'u z knihy <a _href=\"http://DiveIntoPython3.org\" href=\"http://DiveIntoPython3.net\">Dive Into Python 3</a> – její část se totiž zabývá převodem kódu pro detekci kódování z Python'u 2.x na Python 3.x.\r\n        </div></div>\r\n    </li>\r\n  </ol>\r\n  \r\n  <p>\r\n    PS: Z důvodu snížení informačního šumu jsem zcela vypustil, že jak server, tak hlavička dokumentu vám o kódování mohou bohapustě lhát. Byť snad většinou nechtěně nebo nedopatřením. Pak už vás nezachrání ani metoda číslo 3, protože kromě vás jako čtenáře si všichni ostatní (tedy váš prohlížeč) budou myslet, že je přece všechno jasně dáno a není co řešit. (Ve skutečnosti to bylo ještě horší, protože třeba takový <em>Internet Explorer</em> v české jazykové verzi „pro jistotu“ rovnou předpokládal, že český text přece musí být zapsán v kódování <em>CP-1250</em>.)\r\n  </p>\r\n\r\n</div>"
     },
@@ -29,9 +30,9 @@
       "idx": 2,
       "title": "Kódování HTML",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Kódování HTML</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Standard HTML obsahuje prakticky od počátku sadu speciálních informačních značek <em>&lt;meta&gt;</em>. Ta pro označení kódování textu byla namodelována podle odpovídající HTTP-hlavičky. Proto tedy informaci z HTTP-hlavičky..\r\n  </p>\r\n  <pre class=\"brush: text; gutter: false; toolbar: false; \">Content-Type: text/html; charset=ISO-8859-1</pre>\r\n  <p>\r\n    ..odpovídá klasicky následující <em>meta</em>-informace v HTML:\r\n  </p>\r\n  <pre class=\"brush: html; gutter: false; toolbar: false; \">&lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\"&gt;</pre>\r\n  <br>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n      V případě XHTML by značka musela být navíc ještě ukončena\r\n      <pre class=\"brush: html; gutter: false; toolbar: false; \">&lt;meta http-equiv=\"Content-Type\"\n        content=\"text/html; charset=ISO-8859-1\" /&gt;</pre>\r\n      což spoustě programů dělalo (a asi ještě pořád dělá) neuvěřitelné těžkosti...\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    Uvedená <em>meta</em>-hlavička je pro označení něčeho tak důležitého a jasného až příliš složitá. Standard <strong>HTML5</strong> tak přišel se zcela pragmatickým řešením – k označení kódování dokumentu stačí následující jednoduchá konstrukce:\r\n  </p>\r\n  <pre class=\"brush: html; gutter: false; toolbar: false; \">&lt;meta charset=\"ISO-8859-1\"&gt;</pre>\r\n  <br>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Důvod je mimochodem zcela banální – již pěknou řádku let tento způsob zápisu totiž podporují úplně všichni. Víte proč? V <em>HTML</em> totiž uvozovky kolem hodnot atributů nejsou na mnoha místech vyžadovány. Většinou si tak s nimi nelámali hlavu nejen ručně píšící autoři, ale často dokonce i profesionální programy. A myslíte, že uvozovky v atributu <code>content=\"text/html; charset=ISO-8859-1\"</code> (mimochodem jedny z mála, které pochopitelně nebylo možno vynechávat :-) zůstaly ušetřeny?\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -42,7 +43,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Kódování XML</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Standard <em>XML</em> vznikal mnohem později než HTML a také za úplně jiné situace a z jiných důvodů a pro jiné účely. Otázka kódování textu v něm proto byla vyřešena velmi jednoduše již od samého počátku:\r\n  </p>\r\n  <blockquote>\r\n    Kódování dokumentu je součástí hlavičky XML, tj. konstrukce <code>&lt;?xml version=\"1.0\" encoding=\"UTF-8\"?&gt;</code>, která musí být v rámci XML-souboru uvedena jako úplně první.\r\n  </blockquote>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Ve verzi standardu 1.0 nebyla tato hlavička sice povinná, ale v případě její nepřítomnosti bylo automaticky předepsáno, že dokument musí být v kódování UTF-8. Nebyl-li, přesně podle standardu se jednoduše nezpracoval. \r\n  </div></div>\r\n  <p>\r\n    Jelikož tato hlavička musí být v dokumentu první a jelikož se celá skládá pouze ze znaků spodní poloviny ASCII-tabulky, dá se pro zjištění kódování dokumentu vždy s úspěchem použít <a href=\"?slajd=2\">metoda 2</a> z předchozích slajdů – parser za předpokladu kódování ASCII načte začátek XML-dokumentu dostatečně dlouhý na to, aby si přečetl skutečně použité kódování (které se totiž může projevit nejdříve až po hlavičce, i když třebas už v názvu kořenového elementu).\r\n  </p>\r\n\r\n</div>"
     },
@@ -51,7 +52,7 @@
       "idx": 4,
       "title": "Znakové entity",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -62,7 +63,7 @@
       "idx": 5,
       "title": "Znakové entity – číselné",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -76,7 +77,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Znakové entity – pojmenovaé</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Naproti tomu <strong>pojmenované entity</strong> se poměrně dobře „rozpoznávají“, protože jejich názvy bývají docela mnemonické, ale fungují na druhou stranu pouze tam, kde jsou definovány. Což pro čisté XML znamená přesně právě pouze následující čtyři základní:\r\n  </p>\r\n  <table class=\"center\" border=\"0\">\r\n    <col>\r\n    <col>\r\n    <col>\r\n    <col>\r\n    <col style=\"text-align: left;\">\r\n    <tr>\r\n      <th>entita</th>\r\n      <th width=\"55\" rowspan=\"5\"></th>\r\n      <th>znak</th>\r\n      <th width=\"55\" rowspan=\"5\"></th>\r\n      <th>zdůvodnění</th>\r\n    </tr>\r\n    <tr>\r\n      <td> <code>&amp;amp;</code> </td>\r\n      <td> &amp; </td>\r\n      <td style=\"text-align: left;\"> abychom nepsali entity, když nechceme </td>\r\n    </tr>\r\n    <tr>\r\n      <td> <code>&amp;lt;</code> </td>\r\n      <td> &lt; </td>\r\n      <td style=\"text-align: left;\"> abychom neotvírali elementy, když nechceme </td>\r\n    </tr>\r\n    <tr>\r\n      <td> <code>&amp;gt;</code> </td>\r\n      <td> &gt; </td>\r\n      <td style=\"text-align: left;\"> symetricky k předchozímu, ale v principu není potřeba </td>\r\n    </tr>\r\n    <tr>\r\n      <td> <code>&amp;quot;</code> </td>\r\n      <td> \" </td>\r\n      <td style=\"text-align: left;\"> pro psaní uvozovek uvnitř atributů </td>\r\n    </tr>\r\n  </table>\r\n  <p>\r\n    V rámci svých dokumentů si pochopitelně můžete uvedenou sadu rozšířit. Třeba takové HTML má pojmenovaných entit (navíc ke čtyřem předchozím) zavedenou celou řadu:\r\n  </p>\r\n  <table class=\"center\" border=\"0\">\r\n    <tr>\r\n      <th>entita</th>\r\n      <th width=\"55\" rowspan=\"6\"></th>\r\n      <th>znak</th>\r\n      <th width=\"55\" rowspan=\"6\"></th>\r\n      <th>význam</th>\r\n    </tr>\r\n    <tr>\r\n      <td> <code>&amp;nbsp;</code> </td>\r\n      <td>     </td>\r\n      <td style=\"text-align: left;\"> pevná mezera </td>\r\n    </tr>\r\n    <tr>\r\n      <td> <code>&amp;ndash;</code> </td>\r\n      <td> –  </td>\r\n      <td style=\"text-align: left;\"> enková pomlčka </td>\r\n    </tr>\r\n    <tr>\r\n      <td> <code>&amp;alpha;</code> </td>\r\n      <td> α  </td>\r\n      <td style=\"text-align: left;\"> řecké písmeno alfa </td>\r\n    </tr>\r\n    <tr>\r\n      <td> <code>&amp;euro;</code> </td>\r\n      <td> €  </td>\r\n      <td style=\"text-align: left;\"> znak euro </td>\r\n    </tr>\r\n    <tr>\r\n      <td> … </td>\r\n      <td> … </td>\r\n      <td style=\"text-align: left;\"> … </td>\r\n    </tr>\r\n  </table>\r\n  <br>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Je to převážně z historických důvodů kvůli kódováním a fontům. Koho zajímá víc, podívá se do <a href=\"http://dev.w3.org/html5/spec/Overview.html#named-character-references\" class=\"external\">specifikace</a> nebo do (dnes již trochu zastaralého) pythoního modulu <a href=\"/materialy/python/modules/html.entites.xml\">html.entities</a>.\r\n  </div></div>\r\n\r\n</div>"
     }

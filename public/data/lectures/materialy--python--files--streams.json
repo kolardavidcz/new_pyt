@@ -7,10 +7,9 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <a href=\"texts.xml\">Textové</a> a <a href=\"binary.xml\">binární soubory</a> otevřené pro čtení/zápis jsou ve skutečnosti pouze dva z mnoha různých objektů, ke kterým je možno přistupovat podobným způsobem. Tyto objekty přitom dokonce ani nemusí „fyzicky“ existovat v souborovém systému – úplně stačí, aby nějaký objekt v paměti poskytoval odpovídající programátorské rozhraní (API).\r\n    </p>\r\n    <p>\r\n        Obecně se objektům umožňujícím čtení a zápis dat z/do „sebe“ říká <strong>proudy</strong> (<em>streams</em>).\r\n    </p>\r\n\r\n</div>"
     },
@@ -19,9 +18,10 @@
       "idx": 1,
       "title": "„IOBase“ aneb Jedna třída jim všem vládne",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">„IOBase“ aneb Jedna třída jim všem vládne</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Na samém počátku všech proudových tříd stojí jejich nejzákladnější ABC-třída <strong>IOBase</strong>. Do jejího „veřejného“ API patří tyto metody:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">&lt;code&gt;close&lt;/code&gt;, &lt;code&gt;closed&lt;/code&gt;, &lt;code&gt;fileno&lt;/code&gt;, &lt;code&gt;flush&lt;/code&gt;, &lt;code&gt;isatty&lt;/code&gt;, &lt;code&gt;&lt;em&gt;read&lt;/em&gt;&lt;/code&gt;, &lt;code&gt;readable&lt;/code&gt;, &lt;code&gt;&lt;em&gt;readinto&lt;/em&gt;&lt;/code&gt;, &lt;code&gt;readline&lt;/code&gt;, &lt;code&gt;readlines&lt;/code&gt;, &lt;code&gt;seek&lt;/code&gt;, &lt;code&gt;seekable&lt;/code&gt;, &lt;code&gt;tell&lt;/code&gt;, &lt;code&gt;truncate&lt;/code&gt;, &lt;code&gt;&lt;em&gt;write&lt;/em&gt;&lt;/code&gt;, &lt;code&gt;writeable&lt;/code&gt;, &lt;code&gt;writelines&lt;/code&gt;</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Ačkoli metody <code>read()</code>, <code>readinto()</code> a <code>write()</code> v jejím rámci deklarovány (či přímo implementovány) nejsou, protože jejich <a href=\"/materialy/python/functions/decorators.xml?slajd=10\">otisky</a> jsou různé pro každou ze tří dalších tříd, které z <em>IOBase</em> dědí.\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Samotnou <em>IOBase</em> v programech použít dost dobře nemůžete, ale z její „neveřejné“ části API je vidět, že:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <code>__enter__</code>, <code>__exit__</code> – její instance je možno používat uvnitř kontextu <em>with</em>;\r\n        </li>\r\n        <li>\r\n            <code>__iter__</code>, <code>__next__</code> – přes otevřené proudy je možno iterovat.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Například pomocí smyčky <em>for-in</em>. Iterace probíhá přes <em>řádky</em>, přičemž aktuální definice řádku záleží na typu proudu – bajty pro binární proudy, řetězce pro textové.\r\n            </div></div>\r\n        </li>\r\n    </ul>\r\n    <p>\r\n    </p>\r\n    <p>\r\n    </p>\r\n\r\n</div>"
     },
@@ -32,7 +32,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Hierarchie ABC-tříd</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ze základní ABC-třídy <em>IOBase</em> dědí následující tři ABC-třídy specializované na konkrétní typ proudů:\r\n    </p>\r\n    <table border=\"1\">\r\n        <tr>\r\n            <th>ABC-třída</th>\r\n            <th>metody navíc oproti <em>IOBase</em></th>\r\n            <th>použití</th>\r\n        </tr>\r\n        <tr>\r\n            <td> <strong>RawIOBase</strong> </td>\r\n            <td> <code>read</code>, <code>readall</code>, <code>readinto</code>, <code>write</code> </td>\r\n            <td> nízkoúrovňový přístup k vlastnímu „železu“ (například) </td>\r\n        </tr>\r\n        <tr>\r\n            <td> <strong>BufferedIOBase</strong> </td>\r\n            <td> <code>detach</code>, <code>read</code>, <code>readinto</code>, <code>read1</code>, <code>write</code> </td>\r\n            <td> optimalizovaný přístup k binárním proudům </td>\r\n        </tr>\r\n        <tr>\r\n            <td> <strong>TextIOBase</strong> </td>\r\n            <td> <code>detach</code>, <code>encoding</code>, <code>errors</code>, <code>newlines</code>, <code>read</code>, <code>readline</code>, <code>write</code> </td>\r\n            <td> přístup k textovým proudům </td>\r\n        </tr>\r\n    </table>\r\n    <p>\r\n        Tyto tři třídy také ještě nejsou určeny k přímému použití v programech.\r\n    </p>\r\n\r\n</div>"
     },
@@ -41,9 +41,9 @@
       "idx": 3,
       "title": "Třídy „užitkové“",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Třídy „užitkové“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Z dříve uvedených ABC-tříd jsou pak odvozeny třídy, které už je možné používat pro programovou práci s proudy. Aniž bychom zabíhali do přílišných <a href=\"http://docs.python.org/3/library/io.html\" class=\"external\">detailů</a>, jedná se především o třídy pro práci se:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <a href=\"?slajd=5\">soubory v souborovém systému</a> – tedy „skutečnými fyzickými“ soubory, ať už binárními nebo textovými;\r\n        </li>\r\n        <li>\r\n            <a href=\"?slajd=6\">proudy v paměti</a> – tedy objekty typu <em>proud</em>, které ale existují pouze v paměti.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n    </p>\r\n\r\n</div>"
     },
@@ -77,7 +77,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Binární versus textové proudy</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zdůrazněmež pro jistotu ještě jednou základní rozdíly mezi zpracováváním textových a binárních souborů (proudů):\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Proudy <strong>binární</strong> jsou čteny a zapisovány po jednotlivých bajtech (byť většinou po jejich větších úsecích) a s těmito bajty se během čtení/zápisu nic neděje.\r\n        </li>\r\n        <li>\r\n            Proudy <strong>textové</strong> vyhodnucují vstupní či výstupní sekvence bajtů na základě zvoleného nebo systémového kódování a v závislosti na něm provádějí příslušnou konverzi mezi znaky a odpovídajícími sekvencemi bajtů. Navíc jsou specielně ošetřovány konce řádků – Python (ve výchozím nastavení) provádí jejich automatickou konverzi z příslušného platformně závislého pozadí na jednotné pracovní <code>\\n</code> uvnitř pythoních programů.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -89,7 +89,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Funkce „open()“ – parametry</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Funkce <em>open()</em> je ve své plné síle mnohem mocnější, než se na první pohled zdá:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)</pre>\r\n    <p>\r\n        S většinou jsme se již setkali, zde je význam zbývajících:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <code>errors</code> – u textových proudů umožňuje určit způsob reakce na chyby při (de)kódování;\r\n        </li>\r\n        <li>\r\n            <code>newline</code> – u textových proudů umožňuje přenastavit automatický překlad konců řádek na jiný;\r\n        </li>\r\n        <li>\r\n            <code>closefd</code> – pro soubor otevřený nikoli pomocí jména, ale přímo pomocí popisovače souboru umožňuje ponechat popisovač otevřený i po zavření souboru;\r\n        </li>\r\n        <li>\r\n            <code>opener</code> – umožňuje použít vlastní způsob otevření referencovaného souboru.\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Viz <a href=\"http://docs.python.org/3/library/functions.html#open\" class=\"external\">http://docs.python.org/3/library/functions.html#open</a> .\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -100,7 +100,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Funkce „open()“ – módy</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pro pořádek ještě přehled možných nastavení módu pro práci se soubory:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong>r</strong> – čtení;\r\n        </li>\r\n        <li>\r\n            <strong>w</strong> – zápis;\r\n        </li>\r\n        <li>\r\n            <strong>x</strong> – vytvoření (exkluzivně, pro existující soubor selže s výjimkou <em>FileExistsError</em>);\r\n        </li>\r\n        <li>\r\n            <strong>a</strong> – přidávání na konec pro existující soubor, jinak jako zápis;\r\n        </li>\r\n        <li>\r\n            <strong>b</strong> – binární;\r\n        </li>\r\n        <li>\r\n            <strong>t</strong> – textový;\r\n        </li>\r\n        <li>\r\n            <strong>+</strong> – kombinace čtení a zápisu (<em>r+</em> otevře <em>již existující</em> soubor a umístí popisovač na začátek, <em>w+</em> exisující soubor při otvírání smaže).\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Označení textových proudů <em>t</em> je implicitní a většinou se neuvádí (tj. místo <em>tr</em> nebo <em>rt</em> a podobně se píše jen <em>r</em>). Selže-li přístup k souboru, je vyhozena výjimka <em>OSError</em> (od verze 3.3, dříve <em>IOError</em>).\r\n    </div></div>\r\n\r\n</div>"
     },

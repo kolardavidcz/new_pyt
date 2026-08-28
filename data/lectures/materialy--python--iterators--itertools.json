@@ -7,10 +7,9 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\n\n    <p>\n        Jelikož <a href=\"iterators.xml\">iterátory</a> jsou v Python'u (zvláště trojkovém) úplně všude, nepřekvapí, že ve standardní knihovně je k dispozici modul, který nabízí přehršel funkcí, které produkují iterátory v nejrůznější podobě:\n    </p>\n    <ul>\n        <li>\n            potenciálně <a href=\"?slajd=2\">nekonečné</a> iterátory\n        </li>\n        <li>\n            <a href=\"?slajd=5\">kombinatorické</a> iterátory\n        </li>\n        <li>\n            iterátory nad <a href=\"?slajd=9\">skupinou sekvencí</a> a ostatní\n        </li>\n    </ul>\n    <p>\n        Kompletní dokumentaci najdete na <a href=\"https://docs.python.org/3/library/itertools.html\" class=\"external\">oficiálním webu</a>, zde si ukážeme jenom přehled dostupných funkcí s příklady (většinou podle oficiální dokumentace).\n    </p>\n    <p>\n        PS: Nezapomeňme, že (z historických důvodů) je několik iterátorových funkcí k dispozici už rovnou v základním jemnném prostoru – jmenovitě <code>zip()</code>, <code>map()</code> a <code>filter()</code>.\n    </p>\n\n</div>"
     },
@@ -19,7 +18,8 @@
       "idx": 1,
       "title": "„count(start=0, step=1)“",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -78,7 +78,7 @@
       "title": "„combinations(I, r)“",
       "tags": [
         "Core",
-        "WOW"
+        "Tricky"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -147,8 +147,7 @@
       "idx": 12,
       "title": "„dropwhile()“ &amp; „takewhile()“",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -159,9 +158,9 @@
       "idx": 13,
       "title": "„filterfalse()“ (vs „filter()“)",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">„filterfalse()“ (vs „filter()“)</h2></div><div class=\"section-body\">\n\n    <p>\n        Kde vestavěná funkce <code>filter()</code> vrací prvky, které splňují podmínku..\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; [x for x in filter(lambda x: x&lt;5, [1,4,6,3,8])]\n[1, 4, 3]</pre>\n    <p>\n        ..tam <code>itertools.filterfalse()</code> nepřekvapivě vrací prvky, které podmínku NEsplňují:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; [x for x in filterfalse(lambda x: x&lt;5, [1,4,6,3,8])]\n[6, 8]</pre>\n\n</div>"
     },
@@ -173,7 +172,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">„groupby()“</h2></div><div class=\"section-body\">\n\n    <p>\n        Tato funkce shlukuje dohromady stejné za sebou jdoucí prvky a zároveň s jejich iterátorem vrací i příslušný prvek (tak trochu jako <a href=\"/materialy/python/types/dictionaries.xml?slajd=9\">průchod po slovníku</a>):\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; for k,g in groupby('AAAABBBCCDAABBB'):\n...     print(k, list(g))\nA ['A', 'A', 'A', 'A']\nB ['B', 'B', 'B']\nC ['C', 'C']\nD ['D']\nA ['A', 'A']\nB ['B', 'B', 'B']</pre>\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        Kde nepřekvapivě <em>k,g</em> mnemotechnicky značí <em>key, group</em>.\n    </div></div>\n    <p>\n        Skupina shluklých prvků <em>group</em> (či <em>g</em>) v každém kroku obsahuje relevantní data odpovídající aktuálnímu klíči <em>key</em> (či <em>k</em>), jen je třeba si dát pozor na to, že <strong>i tato skupina je iterátorem</strong>.\n    </p>\n\n</div>"
     },
@@ -183,7 +182,7 @@
       "title": "„islice()“",
       "tags": [
         "Core",
-        "WOW"
+        "Tricky"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -232,7 +231,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "resyntax",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">„tee(iterable, n=N)“</h2></div><div class=\"section-body\">\n\n    <p>\n        Ve výchozím nastavení vrací <code>tee()</code> dvě „kopie“ toho samého iterátoru v podobě dvojce, ale můžete to změnit pomocí parametru <em>n</em>: <code>a, b, c = tee(it, n=3)</code> (jméno parametru je možno vynechat). Když necháte vrátit pouze jednu kopii, dostanete nazpět také n-tici, ale poměrně nezvyklou – pouze s jedním prvkem, tzv. <strong>jednici</strong>. K té se <a href=\"/materialy/python/types/tuples.xml?slajd=12\">musíte chovat trošku jinak</a>, než jste asi zvyklí, jak ukazuje následující příklad „forknutého“ iterátoru, který umožňuje nahlédnout příští prvky dříve, než skutečně dorazí:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \"># a) pracovní iterátor\n&gt;&gt;&gt; it = iter(randint(0, 10) for _ in range(10))\n&gt;&gt;&gt; a, = tee(it, 1)         # získání prvku jednice prvním způsobem\n&gt;&gt;&gt; a\n&lt;itertools._tee object at 0x0000020D024292C0&gt;\n&gt;&gt;&gt; next(a)\n8\n&gt;&gt;&gt; next(a)\n10\n\n# b) „fork“ pracovního iterátoru\n&gt;&gt;&gt; [forked_a] = tee(a, 1)  # získání prvku jednice druhým způsobem\n&gt;&gt;&gt; forked_a\n&lt;itertools._tee object at 0x0000020D0242A3C0&gt;\n# „vidí“, co bude následovat...\n&gt;&gt;&gt; next(forked_a)\n8\n&gt;&gt;&gt; next(forked_a)\n7\n# ...aniž by to ovlivnilo původní iterátor\n&gt;&gt;&gt; next(a)\n8\n&gt;&gt;&gt; next(a)\n7</pre>\n\n</div>"
     },

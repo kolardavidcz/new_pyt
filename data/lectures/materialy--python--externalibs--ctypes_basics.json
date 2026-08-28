@@ -30,7 +30,7 @@
       "idx": 2,
       "title": "Přehled typů",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "resyntax",
       "already_studied_in": null,
@@ -41,6 +41,7 @@
       "idx": 3,
       "title": "Důležité poznámky",
       "tags": [
+        "Core",
         "Tricky"
       ],
       "diff": "newconcept",
@@ -52,10 +53,9 @@
       "idx": 4,
       "title": "Volání funkcí – typy argumentů „argtypes“",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Volání funkcí – typy argumentů „argtypes“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Sdílenou funkci musíte tedy samozřejmě zavolat se správnými typy parametrů. To můžete zařídit buď jejich explicitním přetypováním při každém volání nebo lépe vyjmenováním příslušných typů v seznamu atributu <strong><code>argtypes</code></strong>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; from ctypes import CDLL, c_char_p, c_int, c_double\n&gt;&gt;&gt; libc = CDLL('libc.so.6')\n&gt;&gt;&gt; printf = libc.printf\n\n# a) explicitní přetypování\n&gt;&gt;&gt; printf(b\"String '%s', Int %d, Double %f\\n\", b\"Hi\", 10, c_double(2.2))\nString 'Hi', Int 10, Double 2.200000\n37\n\n# b) označení typů „dopředu“\n&gt;&gt;&gt; printf.argtypes = [c_char_p, c_char_p, c_int, c_double]\n&gt;&gt;&gt; printf(b\"String '%s', Int %d, Double %f\\n\", b\"Hi\", 10, 2.2)\nString 'Hi', Int 10, Double 2.200000\n37</pre>\r\n    <p>\r\n        Uvedený způsob volání vás pak zachrání při pokusu předat špatné typy:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; printf(b\"%d %d %d\", 1, 2, 3)\nTraceback (most recent call last):\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\nctypes.ArgumentError: argument 2: &lt;class 'TypeError'&gt;: wrong type</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Bez invence podle dokumentace.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -64,9 +64,10 @@
       "idx": 5,
       "title": "Argumenty funkcí – „_as_parameter_“",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Argumenty funkcí – „_as_parameter_“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Práci s parametry si můžete na jednu stranu zesložitit, ale na druhu také zpřehlednit, použitím tříd s atributem <strong><code>_as_parameter_</code></strong> (ať už <a href=\"/materialy/python/objects/descriptors.xml?slajd=7\">datovým nebo ne</a>). Modul <em>ctypes</em> se totiž po tomto parametru bude koukat, použijete-li při volání instanci takové třídy:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; import ctypes\n&gt;&gt;&gt; libc = ctypes.CDLL('libc.so.6')\n&gt;&gt;&gt; libc\n&lt;CDLL 'libc.so.6', handle 7f45598819b0 at 7f45596b09e8&gt;\n&gt;&gt;&gt; printf = libc.printf\n&gt;&gt;&gt; printf\n&lt;_FuncPtr object at 0x7f45596c6048&gt;\n\n&gt;&gt;&gt; class Bottles():\n...     def __init__(self, number):\n...         self._as_parameter_ = number\n...\n&gt;&gt;&gt; bottles = Bottles(42)\n\n&gt;&gt;&gt; printf(b\"%d bottles of beer\\n\", bottles)\n42 bottles of beer\n19\n&gt;&gt;&gt; o = printf(b\"%d bottles of beer\\n\", bottles)\n42 bottles of beer</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Bez invence přímo podle dokumentace.\r\n    </div></div>\r\n    <p>\r\n        PS: Rozumí se samo sebou, že uvedený parametr musí vracet buď celé číslo nebo řetězec (i bajtový).\r\n    </p>\r\n\r\n</div>"
     },
@@ -75,7 +76,8 @@
       "idx": 6,
       "title": "Argumenty funkcí – „from_param()“",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -89,7 +91,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Volání funkcí – typ návratové hodnoty „restype“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Podobně se ve výchozím nastavení od sdílených funkcí čeká, že spořádaně vrátí Céčkovské celé číslo (<em>int</em>). Není-li tomu tak, musíte správný typ nastavit pomocí atributu <strong><code>restype</code></strong>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; from ctypes import CDLL, c_char, c_char_p, c_int, c_double\n&gt;&gt;&gt; libc = CDLL('libc.so.6')\n&gt;&gt;&gt; strchr = libc.strchr\n\n&gt;&gt;&gt; strchr.argtypes = [c_char_p, c_char]\n&gt;&gt;&gt; strchr.restype = c_char_p\n&gt;&gt;&gt; strchr(b\"abcdef\", b\"d\")\nb'def'</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Bez invence podle dokumentace.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -98,7 +100,7 @@
       "idx": 8,
       "title": "Vlastní ošetření návratové hodnoty funkcí",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -109,7 +111,8 @@
       "idx": 9,
       "title": "Rozšířené ošetření (případné) chyby",
       "tags": [
-        "Skip"
+        "Core",
+        "WOW"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -120,7 +123,8 @@
       "idx": 10,
       "title": "Předávání ukazatelů (pointerů)",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -131,8 +135,7 @@
       "idx": 11,
       "title": "Předávání „struct“ a „union“",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -143,7 +146,8 @@
       "idx": 12,
       "title": "Předávání polí",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
       "diff": "pythonic",
       "already_studied_in": null,

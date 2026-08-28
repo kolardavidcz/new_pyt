@@ -7,9 +7,9 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "paradigm",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jedním z velmi zábavných (a navíc ještě užitečných :-) použití želví grafiky je kreslení fraktálních obrazců pomocí rekurze (nebo smyček). V této přednášce si na příkladu stromu rozebereme základní principy, a pak se je pokusíme ještě trochu vylepšit.\r\n    </p>\r\n    <p>\r\n        PS: Mimochodem existují i rozšíření želví grafiky do tří rozměrů, která se používají kupříkladu pro reálně vypadající imitace rostlin.\r\n    </p>\r\n\r\n</div>"
     },
@@ -18,7 +18,7 @@
       "idx": 1,
       "title": "Zadání příkladu",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -41,10 +41,9 @@
       "title": "Rozbor zadání II – invariantní funkce",
       "tags": [
         "Core",
-        "Tricky",
-        "WOW"
+        "Tricky"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Rozbor zadání II – invariantní funkce</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Rekurzivní krok je asi celkem jasný – na konci každého kmene/větve s želvou otočenou příslušným směrem ji necháme nakreslit kopii předchozí práce ve zmenšeném měřítku. A to hned dvakrát – jednou směrem vlevo, podruhé vpravo.\r\n    </p>\r\n    <p>\r\n        Zároveň je asi také jasné, že aby to mohlo fungovat, musí „želva“ po dokončení práce na příslušné (zmenšené) kopii stát opět na konci předchozí větve, jinak by pokus o vykreslení kopie druhým směrem začal na úplně špatném místě.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Což mimochodem znamená, že po dokončení kreslení stromu bude „želva“ stát ve výchozí pozici otočená stejným směrem jako na začátku!\r\n    </div></div>\r\n    <p>\r\n        Odborně se tomu říká, že (příslušná rekurzivní) funkce musí být <strong>stavovým invariantem</strong> (<em>state invariant</em>) – jejím voláním se sice něco stalo (nakreslily se další části stromu), nicméně po jejím ukončení se „želva“ nachází ve stejném stavu jako na jejím začátku.\r\n    </p>\r\n\r\n</div>"
     },
@@ -53,7 +52,7 @@
       "idx": 4,
       "title": "Náčrt bez rekurze",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -64,6 +63,7 @@
       "idx": 5,
       "title": "A nyní s rekurzí",
       "tags": [
+        "Core",
         "Tricky"
       ],
       "diff": "basics",
@@ -77,7 +77,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Ukončení rekurze</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jelikož rekurze se musí někdy zarazit, nemá-li býti nekonečná, náš program se kapku zesložití o ukončovací podmínku (tou může být třebas jako zde vykreslovaná délka větví nebo počet zanoření do rekurze). Zároveň jsem přesunul spočítání délky nových větví do vlastní proměnné:\r\n    </p>\r\n    <img src=\"_files/stromecek_3.png\" width=\"365\" height=\"266\" alt=\"\" title=\"Fraktální stromeček\">\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nimport turtle\n\n# otočení na sever\nturtle.left(90)\n\n# minimální vykreslovaná délka větví\nMIN = 10\n\ndef strom(délka):\n    # ukončovací podmínka rekurze (tzv. kotva)\n    if délka &lt; MIN: return\n    # jinak kreslíme další iteraci\n    turtle.forward(délka)\n    turtle.left(60)\n    délka_větví = délka * 0.7   # nová délka větví z tohoto místa\n    strom(délka_větví)          # levá část větví\n    turtle.right(120)\n    strom(délka_větví)          # pravá část větví\n    turtle.left(60)\n    turtle.backward(délka)\n\n# spuštění vykreslování stromu\nstrom(100)\n\n# počkání na zavření okna uživatelem\nturtle.done()</pre>\r\n\r\n</div>"
     },
@@ -97,10 +97,9 @@
       "idx": 8,
       "title": "Reálněji vypadající strom II",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Reálněji vypadající strom II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Když už jsme v tom, přihodíme ještě i barvu. Jen nesmíme zapomenout dodržovat invarianci i pro ni:\r\n    </p>\r\n    <img src=\"_files/stromecek_4c.png\" width=\"206\" height=\"261\" alt=\"\" title=\"Fraktální stromeček barevně\">\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nimport turtle\n\n# otočení na sever\nturtle.left(90)\n\n# minimální vykreslovaná délka větví\nMIN = 10\n\ndef strom(délka):\n    # ukončovací podmínka rekurze (tzv. kotva)\n    if délka &lt; MIN: return\n    # výběr barvy pro tento krok\n    aktuální = turtle.pencolor()\n    if délka &lt; 20: barva = 'green'\n    else: barva = 'brown'\n    turtle.pencolor(barva)\n    # jinak kreslíme další iteraci\n    turtle.forward(délka/3)\n    turtle.left(30)\n    strom(délka*2/3)\n    turtle.right(30)\n    turtle.forward(délka/6)\n    turtle.right(25)\n    strom(délka/2)\n    turtle.left(25)\n    turtle.forward(délka/6)\n    turtle.left(20)\n    strom(délka/2)\n    turtle.right(20)\n    turtle.forward(délka/6)\n    turtle.right(20)\n    strom(délka/3)\n    turtle.left(35)\n    strom(délka/3)\n    # návrat na začátek\n    turtle.right(15)\n    turtle.backward(délka*5/6)\n    turtle.pencolor(aktuální)\n\n# spuštění vykreslování stromu\nturtle.tracer(100)\nstrom(200)\n\n# počkání na zavření okna uživatelem\nturtle.done()</pre>\r\n\r\n</div>"
     },
@@ -111,7 +110,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "paradigm",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">L-systémy – simulace (nejen) růstu organismů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Po posledním příkladě asi nepřekvapí, že už dávno někoho napadlo použít želví grafiku, rekurzi a fraktály k simulaci skutečných rostlin, respektive obecně k simulaci růstu organismů. Konkrétně to byl Aristid Lindenmayer v roce 1968, který vymyslel tzv. <strong>L-systémy</strong> (aka <em>Lindenmayerovy systémy</em>). O těch ale <a href=\"/materialy/techs/L-systems/overview.xml\">až jinde</a>.\r\n    </p>\r\n\r\n</div>"
     }
