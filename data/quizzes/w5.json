@@ -1,4 +1,162 @@
 {
+  "iterators": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co se stane při pokusu použít instanci `MojIter` v cyklu `for` v níže uvedeném kódu?",
+      "options": [
+        "A) Vypíše hodnotu None, protože chybějící metoda __iter__() automaticky inicializuje prázdný iterátor.",
+        "B) Vyvolá AttributeError, protože metoda __next__() musí být vždy zadekorována dekorátorem @iterator.",
+        "C) Vyvolá TypeError, protože cyklus for vyžaduje implementaci metody __iter__() pro vytvoření iterátoru.",
+        "D) Vypíše hodnotu 1 a skončí, protože metoda __next__() je plně postačující pro provádění cyklu for."
+      ],
+      "answer": 2,
+      "explanation": "Cyklus `for` na začátku volá funkci `iter(obj)`, která vyžaduje přítomnost metody `__iter__()`. Pouhá existence metody `__next__()` bez `__iter__()` nestačí a vyvolá `TypeError: 'MojIter' object is not iterable`.",
+      "code": "class MojIter:\n    def __next__(self):\n        return 1\n\nfor x in MojIter():\n    print(x)\n    break"
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký bude výstup po vyčerpání prvků z instance `Odpocet`?",
+      "options": [
+        "A) Vypíše '2 1 0' bez vyhození výjimky, protože hodnota 0 se vyhodnotí jako platný poslední prvek sekvence.",
+        "B) Vypíše '2 1 None', protože po vyčerpání hodnot vrací funkce next() implicitní prázdnou hodnotu None.",
+        "C) Vyvolá IndexError, protože ruční volání funkce next() na vyčerpaném iterátoru vyvolá chybový stav pole.",
+        "D) Vypíše '2 1' a následně 'Konec', protože po dosažení nulové hodnoty vyvolá metoda __next__ StopIteration."
+      ],
+      "answer": 3,
+      "explanation": "První dvě volání `next(it)` vrátí hodnoty `2` a `1`. Třetí volání narazí na `self.val <= 0`, což vyvolá výjimku `StopIteration`, kterou blok `except` zachytí a vypíše `'Konec'`.",
+      "code": "class Odpocet:\n    def __init__(self, start):\n        self.val = start\n    def __iter__(self):\n        return self\n    def __next__(self):\n        if self.val <= 0:\n            raise StopIteration\n        self.val -= 1\n        return self.val + 1\n\nit = Odpocet(2)\nprint(next(it), next(it))\ntry:\n    print(next(it))\nexcept StopIteration:\n    print(\"Konec\")"
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Doplňte návratovou hodnotu metody __iter__() pro splnění iterátorového protokolu:",
+      "options": [
+        "self",
+        "iter(self)",
+        "next(self)",
+        "self.__next__()"
+      ],
+      "answer": 0,
+      "explanation": "Objekt implementující __next__() musí ve své metodě __iter__() vracet sám sebe (self), aby vyhověl iterátorovému protokolu.",
+      "code": "class CountdownIterator:\n    def __init__(self, count):\n        self.count = count\n\n    def __iter__(self):\n        return ________\n\n    def __next__(self):\n        if self.count <= 0:\n            raise StopIteration\n        self.count -= 1\n        return self.count + 1",
+      "expected": "self"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaké podmínky musí objekt splňovat, aby mohl být předán do vestavěné funkce `reversed()`?",
+      "options": [
+        "A) Musí definovat výhradně metodu __reversed__(), protože jiné záložní protokoly Python při reverzování nepodporuje.",
+        "B) Musí definovat metodu __reversed__(), nebo implementovat metody __len__() a __getitem__() sekvenčního protokolu.",
+        "C) Musí dědit ze třídy ReversibleIterator a přetěžovat metodu __backward__() určenou pro zpětnou iteraci prvků.",
+        "D) Musí definovat metody __iter__() a __next__() běžného dopředného iterátoru s příznakem reverse=True v hlavičce."
+      ],
+      "answer": 1,
+      "explanation": "Funkce `reversed()` nejprve hledá metodu `__reversed__()`. Pokud chybí, pokusí se použít sekvenční protokol vyžadující metody `__len__()` a `__getitem__()` pro přístup přes celočíselné indexy od konce.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení: Každý iterovatelný objekt (iterable) v Pythonu musí sám přímo definovat metodu `__next__()`.",
+      "options": [
+        "A) Nepravda – Iterovatelný objekt vyžaduje pouze metodu __iter__() vracející samostatný objekt iterátoru s metodu __next__().",
+        "B) Pravda – Každý objekt, po kterém lze v Pythonu iterovat pomocí cyklu for, musí sám přímo obsahovat plnou metodu __next__()."
+      ],
+      "answer": 0,
+      "explanation": "Iterovatelný objekt (`iterable`, např. seznam `list`) nemusí mít metodu `__next__()`. Stačí, když jeho metoda `__iter__()` vrátí nový objekt iterátoru (`iterator`), který metodu `__next__()` obsahuje.",
+      "code": null
+    }
+  ],
+  "_comprehensions": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Jaký typ objektu vytvoří výraz g = (x**2 for x in range(5)) a kdy dojde k výpočtu prvků?",
+      "options": [
+        "A) Vytvoří iterovatelnou množinu (set) a zamezí duplicitním výsledkům před započetím cyklu.",
+        "B) Vytvoří generátorový objekt a hodnoty se počítají lenivě postupně až během procházení.",
+        "C) Vytvoří zkrácený seznam (list) s vyhodnocením všech prvků v okamžiku zpracování příkazu.",
+        "D) Vytvoří neměnnou n-tici (tuple) obsahující všech 5 spočtených hodnot okamžitě při definici."
+      ],
+      "answer": 1,
+      "explanation": "Generátorový výraz (zapsaný v kulatých závorkách) nevytváří tuple, ale vrátí lenivý generator object, jehož prvky se počítají až na vyžádání.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jaký výstup vytvoří vícenásobná generátorová notace se dvěma klauzulemi for?",
+      "options": [
+        "A) ['A1', 'B2', 'B1']",
+        "B) ['A1', 'B1', 'A2', 'B2']",
+        "C) ['A1', 'A2', 'B1', 'B2']",
+        "D) ['A1', 'A2', 'B1']"
+      ],
+      "answer": 2,
+      "explanation": "Pořadí for klauzulí v comprehension odpovídá zanořeným cyklům: vnější cyklus pro a iteruje 'A', pak 'B', a pro každý prvek se kompletně proiteruje vnitřní cyklus pro b ('1', '2').",
+      "code": "res = [a + b for a in ['A', 'B'] for b in ['1', '2']]\nprint(res)"
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Doplňte výraz slovníkové komprehence (dict comprehension) pro vytvoření mapování čísla na jeho druhou mocninu:",
+      "options": [
+        "x = x**2",
+        "x -> x**2",
+        "(x, x**2)",
+        "x: x**2"
+      ],
+      "answer": 3,
+      "explanation": "Slovníková komprehence vyžaduje zápis klic: hodnota uvnitř složených závorek před klauzulí for.",
+      "code": "# Vytvoření slovníku mocnin pro čísla 0 až 3:\npowers = {________ for x in range(4)}\n# Výstup: {0: 0, 1: 1, 2: 4, 3: 9}",
+      "expected": "x: x**2"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Kolik prvků bude mít výsledný objekt vytvořený generátorovou notací {x.lower() for x in 'AbraKaDabra'}?",
+      "options": [
+        "A) 5 prvků, protože množinová notace automaticky odstraní duplicitní převzatá písmena.",
+        "B) 1 prvek, protože při převodu na malá písmena se zachová pouze poslední přečtený znak.",
+        "C) 7 prvků, protože velká a malá písmena se v množině považují za různé klíče.",
+        "D) 11 prvků, protože vstupní řetězec obsahuje celkem 11 jednotlivých znaků v sekvenci."
+      ],
+      "answer": 0,
+      "explanation": "Generátorová notace s použitím složených závorek bez dvoutečky vytváří množinu (set), která automaticky eliminuje duplicity. Znaky 'a', 'b', 'r', 'k', 'd' po převodu na malá písmena dají přesně 5 unikátních prvků.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Který z následujících zápisů v Pythonu přesně odpovídá kombinaci map(f, filter(p, xs))?",
+      "options": [
+        "A) [filter(p, f(x)) for x in xs]",
+        "B) [f(x) for x in xs if p(x)]",
+        "C) [f(x) if p(x) for x in xs]",
+        "D) [map(f, x) for x in xs if p(x)]"
+      ],
+      "answer": 1,
+      "explanation": "Skladba map(f, filter(p, xs)) se v generátorové notaci zapíše jako [f(x) for x in xs if p(x)], kde if filtruje prvky podle predikátu p a f transformuje vybrané prvky.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí generátorová notace kombinující ternární operátor s iterací?",
+      "options": [
+        "A) [2, 0, 2, 0]",
+        "B) [0, 2, 0, 2]",
+        "C) [0, 0, 2, 0]",
+        "D) [0, 1, 2, 3]"
+      ],
+      "answer": 2,
+      "explanation": "Ternární výraz x if x % 2 == 0 else 0 stojí před for a vyhodnocuje se pro každý prvek: pro 0 dává 0, pro 1 dává 0, pro 2 dává 2, pro 3 dává 0. Výsledek je [0, 0, 2, 0].",
+      "code": "res = [x if x % 2 == 0 else 0 for x in range(4)]\nprint(res)"
+    }
+  ],
   "generators": [
     {
       "id": "q1",
@@ -101,177 +259,105 @@
       "expected": "yield from"
     }
   ],
-  "_comprehensions": [
+  "coroutines": [
     {
       "id": "q1",
-      "type": "predict_output",
-      "question": "Jaký typ objektu vytvoří výraz g = (x**2 for x in range(5)) a kdy dojde k výpočtu prvků?",
-      "options": [
-        "A) Vytvoří iterovatelnou množinu (set) a zamezí duplicitním výsledkům před započetím cyklu.",
-        "B) Vytvoří generátorový objekt a hodnoty se počítají lenivě postupně až během procházení.",
-        "C) Vytvoří zkrácený seznam (list) s vyhodnocením všech prvků v okamžiku zpracování příkazu.",
-        "D) Vytvoří neměnnou n-tici (tuple) obsahující všech 5 spočtených hodnot okamžitě při definici."
-      ],
-      "answer": 1,
-      "explanation": "Generátorový výraz (zapsaný v kulatých závorkách) nevytváří tuple, ale vrátí lenivý generator object, jehož prvky se počítají až na vyžádání.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "predict_output",
-      "question": "Jaký výstup vytvoří vícenásobná generátorová notace se dvěma klauzulemi for?",
-      "options": [
-        "A) ['A1', 'B2', 'B1']",
-        "B) ['A1', 'B1', 'A2', 'B2']",
-        "C) ['A1', 'A2', 'B1', 'B2']",
-        "D) ['A1', 'A2', 'B1']"
-      ],
-      "answer": 2,
-      "explanation": "Pořadí for klauzulí v comprehension odpovídá zanořeným cyklům: vnější cyklus pro a iteruje 'A', pak 'B', a pro každý prvek se kompletně proiteruje vnitřní cyklus pro b ('1', '2').",
-      "code": "res = [a + b for a in ['A', 'B'] for b in ['1', '2']]\nprint(res)"
-    },
-    {
-      "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte výraz slovníkové komprehence (dict comprehension) pro vytvoření mapování čísla na jeho druhou mocninu:",
-      "options": [
-        "x = x**2",
-        "x -> x**2",
-        "(x, x**2)",
-        "x: x**2"
-      ],
-      "answer": 3,
-      "explanation": "Slovníková komprehence vyžaduje zápis klic: hodnota uvnitř složených závorek před klauzulí for.",
-      "code": "# Vytvoření slovníku mocnin pro čísla 0 až 3:\npowers = {________ for x in range(4)}\n# Výstup: {0: 0, 1: 1, 2: 4, 3: 9}",
-      "expected": "x: x**2"
-    },
-    {
-      "id": "q4",
       "type": "multiple_choice",
-      "question": "Kolik prvků bude mít výsledný objekt vytvořený generátorovou notací {x.lower() for x in 'AbraKaDabra'}?",
+      "question": "Co se stane při pokusu o spuštění následujícího výrazu uvnitř generátoru?",
       "options": [
-        "A) 5 prvků, protože množinová notace automaticky odstraní duplicitní převzatá písmena.",
-        "B) 1 prvek, protože při převodu na malá písmena se zachová pouze poslední přečtený znak.",
-        "C) 7 prvků, protože velká a malá písmena se v množině považují za různé klíče.",
-        "D) 11 prvků, protože vstupní řetězec obsahuje celkem 11 jednotlivých znaků v sekvenci."
+        "A) Python vyvolá SyntaxError, protože yield v aritmetickém výrazu vyžaduje nákres závorek: 10 + (yield 5).",
+        "B) Výraz se úspěšně vyhodnotí na hodnotu 15 při prvním zavolání metody next() na vytvořeném objektu generátoru.",
+        "C) Python vyvolá TypeError, protože operátor sčítání nelze aplikovat na klíčové slovo yield bez předchozí konverze.",
+        "D) Funkce vrátí součet hodnoty 10 a předaného argumentu, jakmile korutina obdrží novou hodnotu z volání send()."
       ],
       "answer": 0,
-      "explanation": "Generátorová notace s použitím složených závorek bez dvoutečky vytváří množinu (set), která automaticky eliminuje duplicity. Znaky 'a', 'b', 'r', 'k', 'd' po převodu na malá písmena dají přesně 5 unikátních prvků.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Který z následujících zápisů v Pythonu přesně odpovídá kombinaci map(f, filter(p, xs))?",
-      "options": [
-        "A) [filter(p, f(x)) for x in xs]",
-        "B) [f(x) for x in xs if p(x)]",
-        "C) [f(x) if p(x) for x in xs]",
-        "D) [map(f, x) for x in xs if p(x)]"
-      ],
-      "answer": 1,
-      "explanation": "Skladba map(f, filter(p, xs)) se v generátorové notaci zapíše jako [f(x) for x in xs if p(x)], kde if filtruje prvky podle predikátu p a f transformuje vybrané prvky.",
-      "code": null
-    },
-    {
-      "id": "q6",
-      "type": "predict_output",
-      "question": "Jaký výstup vrátí generátorová notace kombinující ternární operátor s iterací?",
-      "options": [
-        "A) [2, 0, 2, 0]",
-        "B) [0, 2, 0, 2]",
-        "C) [0, 0, 2, 0]",
-        "D) [0, 1, 2, 3]"
-      ],
-      "answer": 2,
-      "explanation": "Ternární výraz x if x % 2 == 0 else 0 stojí před for a vyhodnocuje se pro každý prvek: pro 0 dává 0, pro 1 dává 0, pro 2 dává 2, pro 3 dává 0. Výsledek je [0, 0, 2, 0].",
-      "code": "res = [x if x % 2 == 0 else 0 for x in range(4)]\nprint(res)"
-    }
-  ],
-  "advanced-1": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Co přesně v Pythonu označuje pojem uzávěr (closure)?",
-      "options": [
-        "A) Způsob uzavření souboru nebo síťového rozhraní v kontextovém manažeru za použití příkazu with.",
-        "B) Speciální třídu, jejíž metody mohou přistupovat k privátním atributům jiných instancí téže třídy.",
-        "C) Anonymní jednorázovou lambda-funkci, která nemá vlastní název v tabulce globálních symbolů programu.",
-        "D) Funkci vrácenou z vnitřního rozsahu viditelnosti, která si uchovává přístup k proměnným vnější funkce."
-      ],
-      "answer": 3,
-      "explanation": "Uzávěr je funkce definovaná uvnitř vnější funkce, která si po svém vrácení nese odkaz na proměnné z rozsahu viditelnosti vnější funkce (enclosing scope).",
-      "code": null
+      "explanation": "V Pythonu je yield výrazem s nízkou prioritou operátorů. Pokud se nachází uvnitř složitějšího výrazu (jako je sčítání), musí být explicitně uzavřen do závorek x = 10 + (yield 5). V opačném případě interpret vyvolá SyntaxError.",
+      "code": "def f():\n    x = 10 + yield 5"
     },
     {
       "id": "q2",
       "type": "multiple_choice",
-      "question": "Jaký výsledek vrátí zřetězené volání vnější a vnitřní funkce vytvor_nasobic(3)(4)?",
+      "question": "Jaký bude výsledek vykonání následujícího kódu?",
       "options": [
-        "A) Vrátí hodnotu 12, protože první volání vrátí vnitřní funkci uzávěru a druhé ji aplikuje na číslo 4.",
-        "B) Vrátí n-tici (3, 4), protože interpret zřetězená volání automaticky spojí do seznamu argumentů.",
-        "C) Vyvolá výjimku TypeError, protože funkce vytvor_nasobic přijímá pouze jeden vstupní argument.",
-        "D) Vrátí odkaz na funkci nasob bez provedení výpočtu násobení pro zadaná vstupní čísla v závorkách."
+        "A) Vytiskne hodnotu 42, protože metoda send(42) automaticky inicializuje generátor a předá mu hodnotu v jediném kroku.",
+        "B) Vyvolá TypeError, protože čerstvě vytvořené korutině nelze poslat ne-None hodnotu před jejím nastartováním na prvním yield.",
+        "C) Vyvolá StopIteration, protože generátor obdrží hodnotu 42 a ihned ukončí svoje vykonávání bez projití prvního yield.",
+        "D) Vytiskne hodnotu None, protože první volání send() vždy ignoruje předaný argument a vrátí pouze výchozí hodnotu."
       ],
-      "answer": 0,
-      "explanation": "Zavolání vytvor_nasobic(3) vrátí uzávěr funkce nasob s navázaným argumentem kategorie=3. Druhá část (4) tento uzávěr okamžitě zavolá a vrátí 3 * 4 = 12.",
-      "code": "def vytvor_nasobic(kategorie):\n    def nasob(cislo):\n        return kategorie * cislo\n    return nasob"
+      "answer": 1,
+      "explanation": "Čerstvě vytvořený generátorový objekt ještě nebyl nastartován (primed). Metoda send() s ne-None argumentem vyžaduje, aby generátor již čekal na svém prvním výrazu yield. Nástup na první yield se musí provést zavoláním next(k) nebo k.send(None). V opačném případě Python vyvolá TypeError: can't send non-None value to a just-started generator.",
+      "code": "def g():\n    x = (yield)\n    print(x)\n\nk = g()\nk.send(42)"
     },
     {
       "id": "q3",
-      "type": "multiple_choice",
-      "question": "Co vrátí volání anonymní lambda-funkce f = lambda x, y: x + y při předání dvou čísel f(3, 4)?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte syntaxi pro obousměrnou delegaci hodnot, výjimek a volání send() do vnitřního generátoru / korutiny:",
       "options": [
-        "A) Vrátí hodnotu None, protože v těle lambda-funkce nebylo použito klíčové slovo return.",
-        "B) Vrátí hodnotu 7, protože hodnota jediného výrazu těla lambda-funkce se vrací automaticky.",
-        "C) Vyvolá výjimku NameError, protože anonymní funkce vyžadují explicitní název při přiřazení.",
-        "D) Vyvolá výjimku SyntaxError, protože tělo lambda-funkce musí být uzavřeno v závorkách."
+        "delegate to",
+        "return from",
+        "yield from",
+        "yield send"
       ],
-      "answer": 1,
-      "explanation": "Lambda-funkce v Pythonu se skládají z jediného výrazu, jehož hodnota se vyhodnotí a automaticky vrátí bez potřeby klíčového slova return.",
-      "code": null
+      "answer": 2,
+      "explanation": "Konstrukce yield from zajišťuje plnou obousměrnou delegaci iterace, včetně předávání hodnot z metody send() a výjimek přímo do podgenerátoru.",
+      "code": "def subgenerator():\n    yield \"start\"\n    yield \"data\"\n\ndef outer_wrapper():\n    # Transparentní delegace na podgenerátor:\n    ________ subgenerator()",
+      "expected": "yield from"
     },
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Doplňte lambda funkci do parametru `key`, která zajistí seřazení chemických prvků podle jejich protonového čísla (druhé položky n-tice).",
+      "question": "Doplňte volání do dekorátoru pro automatické nastartování (priming) korutiny k prvnímu výrazu yield:",
       "options": [
-        "x[1]",
-        "def(x): return x[1]",
-        "lambda x: x[1]",
-        "lambda x[1]"
+        "gen.init()",
+        "gen.start()",
+        "gen.run()",
+        "next(gen)"
       ],
-      "answer": 2,
-      "explanation": "Výraz `lambda x: x[1]` definuje anonymní funkci přijímající n-tici `x` a vracející její druhý prvek na indexu 1 jako klíč pro řazení.",
-      "code": "# Seznam prvků ve formátu (značka, protonové_číslo)\nelements = [(\"O\", 8), (\"H\", 1), (\"C\", 6), (\"N\", 7)]\n\nsorted_by_z = sorted(elements, key=________)\n# Výstup: [('H', 1), ('C', 6), ('N', 7), ('O', 8)]",
-      "expected": "lambda x: x[1]"
+      "answer": 3,
+      "explanation": "Volání next(gen) (nebo gen.send(None)) posune provádění kódu nově vytvořené korutiny k prvnímu příkazu yield, takže je ihned připravena přijímat data.",
+      "code": "def coroutine_primer(func):\n    def wrapper(*args, **kwargs):\n        gen = func(*args, **kwargs)\n        # Posun generátoru k prvnímu výrazu (yield):\n        ________\n        return gen\n    return wrapper",
+      "expected": "next(gen)"
     },
     {
       "id": "q5",
       "type": "multiple_choice",
-      "question": "Co vrátí přístup k dosud neexistujícímu klíči v defaultdict, definovaném pomocí lambda-funkce?",
+      "question": "Jaký bude výstup následujícího programu při odeslání výjimky do korutiny?",
       "options": [
-        "A) Vrátí hodnotu None a klíč 'test' do slovníku uopště neuloží ani nevytvoří v paměti.",
-        "B) Vyvolá výjimku KeyError, protože lambda-funkce neumí dynamicky generovat výchozí klíče.",
-        "C) Vrátí samotný objekt <function <lambda>> bez jeho automatického spuštění a vyhodnocení.",
-        "D) Vrátí nový seznam [0, 'novy'] a současně jej uloží do slovníku pod klíčem 'test'."
+        "A) Vypíše hodnotu 1 a následně hodnotu 2, protože zachycená výjimka způsobí pokračování běhu k dalšímu yield 2.",
+        "B) Vyvolá výjimku StopIteration ihned po prvním volání next(g), protože try blok uvnitř korutiny vyžaduje odchycení.",
+        "C) Vypíše hodnotu 1 a poté hodnotu None, protože výjimka zruší návratovou hodnotu následujícího výrazu yield.",
+        "D) Vyvolá neovládanou výjimku ValueError, protože metoda throw() okamžitě ukončí celý generátor bez ohledu na try-except."
       ],
-      "answer": 3,
-      "explanation": "Při dotazu na chybějící klíč zavolá defaultdict svou tovární funkci (zde anonymní lambda-funkci) bez argumentů, získá její návratovou hodnotu [0, 'novy'], uloží ji k danému klíči a vrátí.",
-      "code": "from collections import defaultdict\nd = defaultdict(lambda: [0, 'novy'])\nprint(d['test'])"
+      "answer": 0,
+      "explanation": "Zavolání `g.throw(ValueError)` vyvolá výjimku `ValueError` uvnitř generátoru přesně v místě, kde čeká na svém prvním `yield 1`. Blok `except ValueError` tuto výjimku zachytí a vykonávání pokračuje k `yield 2`, jehož hodnota (2) je vrácena jako výsledek metody `throw()`.",
+      "code": "def demo():\n    try:\n        yield 1\n    except ValueError:\n        yield 2\n\ng = demo()\nprint(next(g))\nprint(g.throw(ValueError))"
     },
     {
       "id": "q6",
-      "type": "true_false_tricky",
-      "question": "Posuďte pravdivost tvrzení: Tělo lambda-funkce v Pythonu může obsahovat více samostatných příkazů.",
+      "type": "multiple_choice",
+      "question": "Jaký výstup vytvoří následující kód ukazující úskalí obousměrné komunikace v generátoru?",
       "options": [
-        "A) Nepravda – lambda-funkce v Pythonu je syntakticky omezena pouze na jediný vyhodnotitelný výraz.",
-        "B) Pravda – více příkazů je povoleno, pokud jsou všechny uzavřeny v bloku složených závorek {}.",
-        "C) Pravda – lambda-funkce v Pythonu podporuje více příkazů spojených středníkem stejně jako běžné funkce.",
-        "D) Nepravda – lambda-funkce nesmí obsahovat žádné matematické výrazy ani volání jiných funkcí."
+        "A) Vypíše 'A' 'B', protože každé zavolání metody send() korektně načte vstup a okamžitě vrátí zpracovaný výsledek.",
+        "B) Vypíše 'A' None, protože druhý send('b') pouze posune korutinu zpět na první yield bez vygenerování nové hodnoty.",
+        "C) Vyvolá výjimku StopIteration, protože po druhém volání send() dojde k narušení interního stavu generátoru.",
+        "D) Vyvolá výjimku TypeError, protože metody send() a yield nelze v jedné smyčce generátoru kombinačně řetězit."
       ],
-      "answer": 0,
-      "explanation": "V Pythonu jsou lambda-funkce zjednodušeny a syntakticky omezeny výhradně na jediný výraz. Nemohou obsahovat více příkazů ani příkazy jako return, pass či assert.",
+      "answer": 1,
+      "explanation": "Po `k.send('a')` korutina vrátí `'A'` a zamrzne u druhého výrazu `yield val.upper()`. Následující volání `k.send('b')` předá `'b'` tomuto druhému yield (který ho nepřiřazuje), kód skočí na začátek cyklu k `val = (yield)` a zamrzne. Jelikož cestou neprošel žádným yield s hodnotou, vrátil `None`. Výstupem je tedy `'A' None`.",
+      "code": "def mix():\n    while True:\n        val = (yield)\n        yield val.upper()\n\nk = mix()\nnext(k)\nres1 = k.send('a')\nres2 = k.send('b')\nprint(res1, res2)"
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Které tři samostatné koncepty využití výrazu yield definuje David Beazley?",
+      "options": [
+        "A) Vyhodnocování výrazů (evaluátor), parsování kódu (parser) a garbage collection (správce neplatných odkazů).",
+        "B) Alokace paměti (alokátor), správa vláken (worker) a synchronizace zámků (mutex pro paratelní výpočty).",
+        "C) Producent dat (iterace), konzument údajů (příjem zpráv) a přerušení (trap pro kooperativní multitasking).",
+        "D) Načítání ze souboru (I/O stream), zápis do sítě (socket writer) a transformace datových struktur (mapper)."
+      ],
+      "answer": 2,
+      "explanation": "David Beazley uvádí, že `yield` má v Pythonu tři zásadní a nezávislé role, které by se neměly míchat: 1. producent dat (běžné generátory), 2. konzument zpráv (korutiny) a 3. trap/přerušení (kooperativní multitasking).",
       "code": null
     }
   ],
@@ -433,249 +519,90 @@
       "code": "def fib(n):\n    if n <= 1: return n\n    n2, n1 = 0, 1\n    for _ in range(n-1):\n        n1, n2 = n1 + n2, n1\n    return n1\n\nprint(fib(4))"
     }
   ],
-  "coroutines": [
+  "fp": [
     {
-      "id": "q1",
+      "id": "fp_q1",
       "type": "multiple_choice",
-      "question": "Co se stane při pokusu o spuštění následujícího výrazu uvnitř generátoru?",
+      "question": "Jakou hodnotu vrátí anonymní funkce parita(7) sestavená pomocí zkratkového vyhodnocování pravdivostních operátorů?",
       "options": [
-        "A) Python vyvolá SyntaxError, protože yield v aritmetickém výrazu vyžaduje nákres závorek: 10 + (yield 5).",
-        "B) Výraz se úspěšně vyhodnotí na hodnotu 15 při prvním zavolání metody next() na vytvořeném objektu generátoru.",
-        "C) Python vyvolá TypeError, protože operátor sčítání nelze aplikovat na klíčové slovo yield bez předchozí konverze.",
-        "D) Funkce vrátí součet hodnoty 10 a předaného argumentu, jakmile korutina obdrží novou hodnotu z volání send()."
-      ],
-      "answer": 0,
-      "explanation": "V Pythonu je yield výrazem s nízkou prioritou operátorů. Pokud se nachází uvnitř složitějšího výrazu (jako je sčítání), musí být explicitně uzavřen do závorek x = 10 + (yield 5). V opačném případě interpret vyvolá SyntaxError.",
-      "code": "def f():\n    x = 10 + yield 5"
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký bude výsledek vykonání následujícího kódu?",
-      "options": [
-        "A) Vytiskne hodnotu 42, protože metoda send(42) automaticky inicializuje generátor a předá mu hodnotu v jediném kroku.",
-        "B) Vyvolá TypeError, protože čerstvě vytvořené korutině nelze poslat ne-None hodnotu před jejím nastartováním na prvním yield.",
-        "C) Vyvolá StopIteration, protože generátor obdrží hodnotu 42 a ihned ukončí svoje vykonávání bez projití prvního yield.",
-        "D) Vytiskne hodnotu None, protože první volání send() vždy ignoruje předaný argument a vrátí pouze výchozí hodnotu."
-      ],
-      "answer": 1,
-      "explanation": "Čerstvě vytvořený generátorový objekt ještě nebyl nastartován (primed). Metoda send() s ne-None argumentem vyžaduje, aby generátor již čekal na svém prvním výrazu yield. Nástup na první yield se musí provést zavoláním next(k) nebo k.send(None). V opačném případě Python vyvolá TypeError: can't send non-None value to a just-started generator.",
-      "code": "def g():\n    x = (yield)\n    print(x)\n\nk = g()\nk.send(42)"
-    },
-    {
-      "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte syntaxi pro obousměrnou delegaci hodnot, výjimek a volání send() do vnitřního generátoru / korutiny:",
-      "options": [
-        "delegate to",
-        "return from",
-        "yield from",
-        "yield send"
+        "A) True (protože řetězec 'liché' se automaticky přetypuje na pravdivostní hodnotu True)",
+        "B) False (protože výraz 7 % 2 == 0 vrací pravdivostní hodnotu a or se dál neaplikuje)",
+        "C) 'liché' (protože 7 % 2 == 0 je False, vyhodnocování přeskočí and a vrátí pravou část or)",
+        "D) 'sudé' (protože první výraz v závorce se vyhodnotí prioritně bez ohledu na podmínku)"
       ],
       "answer": 2,
-      "explanation": "Konstrukce yield from zajišťuje plnou obousměrnou delegaci iterace, včetně předávání hodnot z metody send() a výjimek přímo do podgenerátoru.",
-      "code": "def subgenerator():\n    yield \"start\"\n    yield \"data\"\n\ndef outer_wrapper():\n    # Transparentní delegace na podgenerátor:\n    ________ subgenerator()",
-      "expected": "yield from"
+      "explanation": "Ve výrazu (7 % 2 == 0 and 'sudé') or 'liché' je levý člen and (False and 'sudé') vyhodnocen jako False. Následně operátor or přejde k druhému operandu a vrátí hodnotu 'liché'.",
+      "code": null
     },
     {
-      "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Doplňte volání do dekorátoru pro automatické nastartování (priming) korutiny k prvnímu výrazu yield:",
+      "id": "fp_q2",
+      "type": "multiple_choice",
+      "question": "Co způsobí nahrazení nekonečné smyčky while rekurzí v čistém Pythonu bez optimalizace koncového volání (tail-call optimization)?",
       "options": [
-        "gen.init()",
-        "gen.start()",
-        "gen.run()",
-        "next(gen)"
+        "A) 0 (rekurze se z důvodu úspory paměti automaticky převede na iterativní smyčku for).",
+        "B) 2001 (funkce úspěšně dospěje ke kaskádovému návratu z 2000 zanořených rámců).",
+        "C) None (protože rekurzivní funkce bez explicitního return vrací prázdnou hodnotu).",
+        "D) RecursionError (protože Python neobsahuje tail-call optimalizaci a překročí limit zásobníku)."
       ],
       "answer": 3,
-      "explanation": "Volání next(gen) (nebo gen.send(None)) posune provádění kódu nově vytvořené korutiny k prvnímu příkazu yield, takže je ihned připravena přijímat data.",
-      "code": "def coroutine_primer(func):\n    def wrapper(*args, **kwargs):\n        gen = func(*args, **kwargs)\n        # Posun generátoru k prvnímu výrazu (yield):\n        ________\n        return gen\n    return wrapper",
-      "expected": "next(gen)"
+      "explanation": "Python neprovádí optimalizaci koncového volání rekurze (tail call optimization). Při hlubším zanoření (typicky nad cca 1000 volání) dojde k vyčerpání paměti zásobníku a vyvolání vyjímky RecursionError.",
+      "code": null
     },
     {
-      "id": "q5",
+      "id": "fp_q3",
       "type": "multiple_choice",
-      "question": "Jaký bude výstup následujícího programu při odeslání výjimky do korutiny?",
+      "question": "Co znamená pojem referenční transparentnost (referential transparency) ve funkcionálním programování?",
       "options": [
-        "A) Vypíše hodnotu 1 a následně hodnotu 2, protože zachycená výjimka způsobí pokračování běhu k dalšímu yield 2.",
-        "B) Vyvolá výjimku StopIteration ihned po prvním volání next(g), protože try blok uvnitř korutiny vyžaduje odchycení.",
-        "C) Vypíše hodnotu 1 a poté hodnotu None, protože výjimka zruší návratovou hodnotu následujícího výrazu yield.",
-        "D) Vyvolá neovládanou výjimku ValueError, protože metoda throw() okamžitě ukončí celý generátor bez ohledu na try-except."
+        "A) Návratová hodnota funkce závisí výhradně na jejích vstupních parametrech a nemá žádné vedlejší efekty.",
+        "B) Kód funkce je automaticky kompilován do strojového kódu s přímými odkazy na paměť procesoru.",
+        "C) Funkce může transparentně přistupovat ke všem globálním proměnným a modifikovat je bez omezení.",
+        "D) Názvy parametrů funkce musí přesně odpovídat názvům proměnných předávaným z volajícího modulu."
       ],
       "answer": 0,
-      "explanation": "Zavolání `g.throw(ValueError)` vyvolá výjimku `ValueError` uvnitř generátoru přesně v místě, kde čeká na svém prvním `yield 1`. Blok `except ValueError` tuto výjimku zachytí a vykonávání pokračuje k `yield 2`, jehož hodnota (2) je vrácena jako výsledek metody `throw()`.",
-      "code": "def demo():\n    try:\n        yield 1\n    except ValueError:\n        yield 2\n\ng = demo()\nprint(next(g))\nprint(g.throw(ValueError))"
+      "explanation": "Referenční transparentnost znamená, že volání funkce lze v programu kdykoliv nahradit její výslednou hodnotou, aniž by se změnilo chování programu. Výstup závisí pouze na předaných argumentech a nevyvolává vedlejší efekty.",
+      "code": null
     },
     {
-      "id": "q6",
+      "id": "fp_q4",
       "type": "multiple_choice",
-      "question": "Jaký výstup vytvoří následující kód ukazující úskalí obousměrné komunikace v generátoru?",
+      "question": "Jak se vyhodnotí logický výraz (False and f1()) or f2() zapsaný pomocí pravdivostních operátorů and a or?",
       "options": [
-        "A) Vypíše 'A' 'B', protože každé zavolání metody send() korektně načte vstup a okamžitě vrátí zpracovaný výsledek.",
-        "B) Vypíše 'A' None, protože druhý send('b') pouze posune korutinu zpět na první yield bez vygenerování nové hodnoty.",
-        "C) Vyvolá výjimku StopIteration, protože po druhém volání send() dojde k narušení interního stavu generátoru.",
-        "D) Vyvolá výjimku TypeError, protože metody send() a yield nelze v jedné smyčce generátoru kombinačně řetězit."
+        "A) OK (protože výraz v závorce má absolutní přednost a vynutí spuštění funkce f1)",
+        "B) FAIL (protože False zkrátí vyhodnocení f1 a výraz or přejde k vykonání a vrácení výsledku f2)",
+        "C) TypeError (protože operátory and a or vyžadují na obou stranách výhradně booleovské typy)",
+        "D) False (protože první prvek určuje celkový pravdivostní stav celého složeného výrazu)"
       ],
       "answer": 1,
-      "explanation": "Po `k.send('a')` korutina vrátí `'A'` a zamrzne u druhého výrazu `yield val.upper()`. Následující volání `k.send('b')` předá `'b'` tomuto druhému yield (který ho nepřiřazuje), kód skočí na začátek cyklu k `val = (yield)` a zamrzne. Jelikož cestou neprošel žádným yield s hodnotou, vrátil `None`. Výstupem je tedy `'A' None`.",
-      "code": "def mix():\n    while True:\n        val = (yield)\n        yield val.upper()\n\nk = mix()\nnext(k)\nres1 = k.send('a')\nres2 = k.send('b')\nprint(res1, res2)"
-    },
-    {
-      "id": "q7",
-      "type": "multiple_choice",
-      "question": "Které tři samostatné koncepty využití výrazu yield definuje David Beazley?",
-      "options": [
-        "A) Vyhodnocování výrazů (evaluátor), parsování kódu (parser) a garbage collection (správce neplatných odkazů).",
-        "B) Alokace paměti (alokátor), správa vláken (worker) a synchronizace zámků (mutex pro paratelní výpočty).",
-        "C) Producent dat (iterace), konzument údajů (příjem zpráv) a přerušení (trap pro kooperativní multitasking).",
-        "D) Načítání ze souboru (I/O stream), zápis do sítě (socket writer) a transformace datových struktur (mapper)."
-      ],
-      "answer": 2,
-      "explanation": "David Beazley uvádí, že `yield` má v Pythonu tři zásadní a nezávislé role, které by se neměly míchat: 1. producent dat (běžné generátory), 2. konzument zpráv (korutiny) a 3. trap/přerušení (kooperativní multitasking).",
-      "code": null
-    }
-  ],
-  "os": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Co bude výsledkem následujícího spojení cest pomocí os.path.join v POSIX systému?",
-      "options": [
-        "A) Vyvolá výjimku ValueError, protože absolutní cesty nelze podle specifikace předávat doprostřed seznamu argumentů.",
-        "B) Vrátí 'data/projects//etc/config.txt', protože metoda zachová dvě lomítka vedle sebe bez jakékoli úpravy řetězce.",
-        "C) Vrátí 'data/projects/etc/config.txt', protože funkce automaticky odstraní úvodní lomítka ze všech vnitřních částí.",
-        "D) Vrátí '/etc/config.txt', protože výskyt absolutní cesty způsobený počátečním lomítkem zahodí všechny předchozí části."
-      ],
-      "answer": 3,
-      "explanation": "Funkce `os.path.join()` spojuje argumenty do cesty. Pokud však některý z argumentů představuje absolutní cestu (začíná lomítkem `/`), všechny předcházející spočítané části se okamžitě zahodí a spojování pokračuje od tohoto absolutního prvku.",
-      "code": "import os\nprint(os.path.join('data', 'projects', '/etc', 'config.txt'))"
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký je hlavní rozdíl mezi os.scandir() a os.listdir() zavedený v Pythonu 3.5?",
-      "options": [
-        "A) os.scandir() vrací iterátor objektů DirEntry s kešovanými atributy, zatímco os.listdir() vrací prostý seznam řetězců.",
-        "B) os.scandir() vrací seznam obsahující i položky . a .., zatímco os.listdir() tyto speciální adresáře vždy ignoruje.",
-        "C) os.scandir() je určen pouze pro systém Windows, zatímco os.listdir() je univerzální POSIX rozhraní pro všechny OS.",
-        "D) os.listdir() provádí rekurzivní prohledávání celého stromu, zatímco os.scandir() prochází pouze aktuální adresář."
-      ],
-      "answer": 0,
-      "explanation": "`os.scandir()` vrací iterátor objektů `DirEntry`, které v sobě již uchovávají typ a vlastnosti souboru získané přímo při výpisu adresáře. To eliminuje potřebu dodatečných systémových volání (jako `os.path.isdir()`) a činí `os.scandir()` výrazně rychlejším než `os.listdir()`, jež vrací jen seznam textových jmen.",
+      "explanation": "V (False and f1()) se funkce f1() z důvodu zkráceného vyhodnocování (short-circuit) vůbec nezavolá. Výraz v závorce vrátí False. Výraz or následně spustí druhou funkci f2(), která vrátí řetězec 'FAIL'.",
       "code": null
     },
     {
-      "id": "q3",
+      "id": "fp_q5",
       "type": "fill_blank_choice",
-      "question": "Doplňte funkci modulu `os`, která rekurzivně vytvoří celou cestu k adresáři včetně všech chybějících mezilehlých složek.",
+      "question": "Doplňte funkci z modulu sys pro získání aktuálního rámce volání na zásobníku (stack frame):",
       "options": [
-        "mkpath",
-        "makedirs",
-        "mkdir",
-        "create_dirs"
-      ],
-      "answer": 1,
-      "explanation": "Funkce `os.makedirs(path, exist_ok=True)` vytvoří koncový adresář i všechny chybějící nadřazené adresáře podél cesty (obdoba příkazu `mkdir -p`).",
-      "code": "import os\n\n# Rekurzivní vytvoření stromu složek pro ukládání exportů\noutput_dir = \"vysledky/mereni_2026/spektra\"\nos.________(output_dir, exist_ok=True)\n\nprint(os.path.isdir(output_dir))  # True",
-      "expected": "makedirs"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Který modul a funkce se v Pythonu používají pro zkopírování souboru včetně zachování jeho metadat?",
-      "options": [
-        "A) Funkce shutil.move(), protože při přesunu souboru dochází ke kaskádovému kopírování metadat bez ztráty dat.",
-        "B) Funkce os.path.copy(), protože modul os.path přímo manipuluje s objektovými strukturami souborového systému.",
-        "C) Funkce shutil.copy2(), protože na rozdíl od základního os či shutil.copy() uchovává i časová razítka a atributy.",
-        "D) Funkce os.copyfile(), protože nízkoúrovňový modul os jako jediný garantuje přímý nízkoúrovňový přenos metadat."
+        "current_frame",
+        "fetch_frame",
+        "_getframe",
+        "get_stack"
       ],
       "answer": 2,
-      "explanation": "Základní modul `os` neobsahuje funkce pro kopírování souborů. K tomuto účelu slouží modul `shutil`. Zatímco `shutil.copy()` kopíruje pouze obsah a práva, `shutil.copy2()` navíc kopíruje i všechna ostatní dostupná metadata (např. čas posledního přístupu a modifikace).",
-      "code": null
+      "explanation": "Funkce sys._getframe(depth) vrací stack frame objekt na zadané hloubce volání zásobníku (0 je aktuální funkce, 1 je volající).",
+      "code": "import sys\n\ndef inspect_caller():\n    # Získání stack frame předchozího volajícího (úroveň 1):\n    frame = sys.________(1)\n    return frame.f_code.co_name",
+      "expected": "_getframe"
     },
     {
-      "id": "q5",
-      "type": "fill_blank_choice",
-      "question": "Doplňte rozbalení n-tice z generátoru os.walk() pro iteraci přes adresářový strom:",
+      "id": "fp_q6",
+      "type": "multiple_choice",
+      "question": "Co vytiskne na standardní výstup volání monadic_print(42), kde funkce vrací zadaný argument x i po jeho vytištění?",
       "options": [
-        "dirs, root, files",
-        "path, subdirs, files",
-        "root, files, dirs",
-        "root, dirs, files"
+        "A) Vytiskne 42 a následně None, protože funkce s vedlejším efektem tisku nemohou vracet int.",
+        "B) Vyvolá AttributeError, protože print nelze použít uvnitř výrazů vracejících hodnotu.",
+        "C) Vytiskne 42 pouze jednou, protože return x zamezí druhému volání funkce print.",
+        "D) Vytiskne 42 dvakrát (nejprve v těle funkce monadic_print a následně z příkazu print(val))."
       ],
       "answer": 3,
-      "explanation": "Generátor os.walk() v každém kroku vrací trojici (cesta_k_adresáři, seznam_podadresářů, seznam_souborů).",
-      "code": "import os\n\nfor ________ in os.walk('.'):\n    print(f\"Složka {root} obsahuje {len(files)} souborů.\")",
-      "expected": "root, dirs, files"
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Co se stane při volání funkce os.remove() na cestu, která ukazuje na neprázdný adresář?",
-      "options": [
-        "A) Python vyvolá výjimku (např. IsADirectoryError či OSError), protože os.remove() slouží výhradně k mazání souborů.",
-        "B) Python automaticky přesune adresář do dočasné systémové složky a vyvolá varování typu DeprecationWarning.",
-        "C) Funkce smaže pouze prázdný adresář, ale pokud obsahuje soubory, ticho vrací hodnotu False bez vyvolání výjimky.",
-        "D) Adresář se bez varování smazá včetně veškerého obsahu, protože os.remove() funguje rekurzivně pro všechny cesty."
-      ],
-      "answer": 0,
-      "explanation": "`os.remove()` (rovněž přístupný jako `os.unlink()`) odstraňuje výhradně soubory. Pokud je předaná cesta adresářem, operační systém / Python vyvolá výjimku `IsADirectoryError` (na POSIXu) nebo `PermissionError`/`OSError` (na Windows). Pro odstranění adresáře je nutné použít `os.rmdir()` (pro prázdný) nebo `shutil.rmtree()` (pro celý strom).",
-      "code": null
-    },
-    {
-      "id": "q7",
-      "type": "multiple_choice",
-      "question": "Jak se chová objekt os.environ s proměnnými prostředí během běhu Python skriptu?",
-      "options": [
-        "A) Dynamicky dotazuje operační systém při každém čtení klíče, takže ihned reflektuje změny externích procesů.",
-        "B) Načte proměnné prostředí při prvním importu modulu os a přímou modifikací os.environ zapsané změny promítne.",
-        "C) Je to pouze neproměnný objekt typu tuple, do kterého nelze během běhu skriptu přidávat ani měnit klíče.",
-        "D) Vytváří izolovanou kopii pro každou funkci ve skriptu, takže změny provedené v jedné funkci se nešíří dál."
-      ],
-      "answer": 1,
-      "explanation": "`os.environ` je slovníku podobný objekt (mapování), který se naplní hodnotami proměnných prostředí v momentě prvního importu modulu `os`. Úpravy provedené přímo v `os.environ` se uplatní v běžícím skriptu i v podprocesech vytvářených z Pythonu.",
-      "code": null
-    },
-    {
-      "id": "q8",
-      "type": "multiple_choice",
-      "question": "Proč je v Pythonu preferováno otevírat soubor v bloku try-except místo předchozí kontroly přes os.access()?",
-      "options": [
-        "A) Metoda os.access() funguje pouze na operačním systému Windows a na Unixu způsobuje neplatné selhání přístupu.",
-        "B) Volání funkce os.access() je v Pythonu zastaralé a vyvolá při použití v novějších verzích DeprecationWarning.",
-        "C) Předchází se tím souběhu (TOCTOU) mezi kontrolou a otevřením a kód lépe odpovídá pythonímu principu EAFP.",
-        "D) Blok try-except automaticky uzamkne soubor na úrovni operačního systému proti zápisu ostatními procesy."
-      ],
-      "answer": 2,
-      "explanation": "Kontrola přístupových práv předem pomocí `os.access()` trpí problémem zvaným TOCTOU (Time-of-Check to Time-of-Use): mezi kontrolou a samotným otevřením souboru se stav souborového systému může změnit. Python proto prosazuje přístup EAFP (Easier to ask for forgiveness than permission) – rovnou se pokusit soubor otevřít a případnou chybu zachytit.",
-      "code": null
-    },
-    {
-      "id": "q9",
-      "type": "multiple_choice",
-      "question": "Jaký výstup vytvoří volání os.path.split v níže uvedeném příkladu?",
-      "options": [
-        "A) Vypíše '/var' a 'log/syslog', protože rozdělení probíhá podle prvního nalezeného lomítka zleva zadané cesty.",
-        "B) Vypíše '/var/log/syslog' a '', protože při absenci přípony souboru se celá cesta vrátí jako prvek head.",
-        "C) Vypíše '/var/log/' a 'syslog', protože head si dle specifikace vřele ponechává koncové dělicí lomítko cesty.",
-        "D) Vypíše '/var/log' a 'syslog', protože tail představuje poslední prvek cesty a head zbývající nadřazenou cestu."
-      ],
-      "answer": 3,
-      "explanation": "Funkce `os.path.split(path)` roz dělí cestu na dvojici `(head, tail)`. `tail` je poslední komponent cesty (jméno souboru nebo podadresáře, nikdy neobsahuje lomítko) a `head` je vše, co mu předchází. Pro `/var/log/syslog` je to `('/var/log', 'syslog')`.",
-      "code": "import os\nhead, tail = os.path.split('/var/log/syslog')\nprint(head, tail)"
-    },
-    {
-      "id": "q10",
-      "type": "multiple_choice",
-      "question": "Čím se liší funkce os.renames() od základní funkce os.rename()?",
-      "options": [
-        "A) Vytvoří chybějící nadřazené adresáře pro novou cestu a po přesunu promaže i uvolněné prázdné staré adresáře.",
-        "B) Funguje výhradně pro přejmenovávání adresářů, zatímco os.rename() slouží pouze pro běžné datové soubory.",
-        "C) Provádí přejmenování asynchronně na pozadí bez blokování hlavního vlákna běžícího Python interpreta.",
-        "D) Umožňuje přejmenovávat více souborů najednou pomocí zástupných znaků (wildcards) typu *.txt v jediném kroku."
-      ],
-      "answer": 0,
-      "explanation": "`os.renames(old, new)` před přejmenováním / přesunem vytvoří chybějící nadřazené adresáře v cílí (pomocí `os.makedirs`) a po dokončení se pokusí odstranit prázdné nadřazené adresáře ve zdroji (pomocí `os.removedirs`).",
+      "explanation": "Metoda monadic_print(42) nejprve vytiskne 42 a vrátí 42. Hodnota 42 se uloží do proměnné val. Druhý příkaz print(val) vytiskne hodnotu 42 podruhé.",
       "code": null
     }
   ]

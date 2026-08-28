@@ -1,4 +1,232 @@
 {
+  "CherryPy": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaká je hlavní architektura a úkol knihovny CherryPy při zpracování webových požadavků?",
+      "options": [
+        "A) Spravovat na klientské straně prohlížeče DOM strom a spouštět asynchronní JavaScript kód.",
+        "B) Přijmout HTTP požadavek a podle URL ho přemapovat na odpovídající metodu třídy serveru.",
+        "C) Zabezpečit šifrování TCP síťových paketů a řídit routování IP adres na úrovni systému.",
+        "D) Automaticky vygenerovat kompletní databázový ORM model a HTML šablony pro celou aplikaci."
+      ],
+      "answer": 1,
+      "explanation": "CherryPy je minimalistický Python web framework, jehož hlavním úkolem je přijmout HTTP požadavek, najít podle URL příslušnou vystavenou metodu a vrátit její odpovídající textový či HTML výstup.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Na jakou URL adresu bude reagovat níže uvedená metoda webového serveru CherryPy?",
+      "options": [
+        "A) Na adresu http://localhost:8080/vystava/exponaty včetně názvu obslužné třídy.",
+        "B) Výhradně na kořenovou adresu http://localhost:8080/ jako výchozí úvodní stránka.",
+        "C) Na adresu http://localhost:8080/exponaty po odeslání HTTP požadavku GET nebo POST.",
+        "D) Na adresu http://localhost:8080/api/exponaty s automaticky přidaným prefiksem."
+      ],
+      "answer": 2,
+      "explanation": "CherryPy mapuje název metody přímo na URL pod kořenovým mountpointem (/). Metoda exponaty se tak automaticky zpřístupní na adrese /exponaty.",
+      "code": "import cherrypy\n\nclass Vystava:\n    @cherrypy.expose\n    def exponaty(self):\n        return \"Seznam exponátů\"\n\ncherrypy.quickstart(Vystava())"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jak CherryPy předává parametry z HTTP dotazu (metodou GET i POST) do obslužné metody v Pythonu?",
+      "options": [
+        "A) Předává všechny parametry jako jediný slovník do prvního argumentu metody.",
+        "B) Vyžaduje manuální rozparsování řetězce dotazu pomocí modulu urllib v metodě.",
+        "C) Ukládá přicházející parametry výhradně do slovníku v objektu request.params.",
+        "D) Mapuje parametry dotazu přímo na pojmenované argumenty příslušné obslužné metody."
+      ],
+      "answer": 3,
+      "explanation": "Bez ohledu na to, zda byly parametry předány v URL (GET) nebo v těle (POST), CherryPy je automaticky namapuje na pojmenované argumenty metody (např. def info(self, jmeno, vek)).",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "fill_blank_choice",
+      "question": "Doplňte konfigurační klíč pro aktivaci nástroje obsluhy statických souborů ve frameworku CherryPy:",
+      "options": [
+        "on",
+        "enable",
+        "active",
+        "enabled"
+      ],
+      "answer": 0,
+      "explanation": "CherryPy používá konvenci tools.<název_nástroje>.on: True pro zapnutí jednotlivých vestavěných modulů a nástrojů.",
+      "code": "config = {\n    \"/static\": {\n        \"tools.staticdir.________\": True,\n        \"tools.staticdir.dir\": \"/var/www/public\"\n    }\n}",
+      "expected": "on"
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o cestách v konfiguraci pro servírování statických souborů v CherryPy:\n\nVšechny cesty k adresářům předávané do nastavení tools.staticdir.dir musí být z bezpečnostních důvodů uvedeny zásadně jako absolutní cesty.",
+      "options": [
+        "A) Pravda – CherryPy vyžaduje v konfiguraci tools.staticdir.dir výhradně absolutní cestu v souborovém systému.",
+        "B) Nepravda – CherryPy preferuje z důvodu přenositelnosti relativní cesty vztažené k aktuálnímu pracovnímu adresáři."
+      ],
+      "answer": 0,
+      "explanation": "CherryPy z bezpečnostních důvodů (vyhnutí se neoprávněnému procházení adresářů) striktně vyžaduje, aby cesty v konfiguraci statických adresářů byly absolutní (lze použít např. os.path.abspath()).",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jak se po zpracování dekorátorem @cherrypy.popargs namapují části URL /art/nirvana/nevermind?",
+      "options": [
+        "A) Hodnotou artist bude 'art' a příslušnou hodnotou album bude 'nirvana'.",
+        "B) Hodnotou artist bude 'nirvana' a příslušnou hodnotou album bude 'nevermind'.",
+        "C) Hodnotou artist bude 'nevermind' a příslušnou hodnotou album bude 'nirvana'.",
+        "D) Vyvolá 404 Not Found, protože dekorátor popargs nepodporuje více argumentů."
+      ],
+      "answer": 1,
+      "explanation": "Dekorátor @cherrypy.popargs('artist', 'album') postupně odebere (popne) z cesty URL následující dvě části a předá je metodě index jako pojmenované argumenty artist='nirvana' a album='nevermind'.",
+      "code": "import cherrypy\n\n@cherrypy.popargs('artist', 'album')\nclass Music:\n    @cherrypy.expose\n    def index(self, artist, album):\n        return f\"{artist} - {album}\"\n\ncherrypy.quickstart(Music(), '/art')"
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Jak správně spustit webový server CherryPy s více navzájem nezávislými aplikacemi pripojenými na různé cesty URL?",
+      "options": [
+        "A) Opakovaným sekvenčním voláním metody cherrypy.quickstart() v cyklu pro každou jednotlivou aplikaci zvlášť.",
+        "B) Sloučením všech tříd aplikací do jedné společné třídy předané jako argument do cherrypy.quickstart().",
+        "C) Připojením aplikací pomocí cherrypy.tree.mount() a spuštěním engine přes engine.start() a engine.block().",
+        "D) Vytvořením více samostatných systémových vláken, kde každé vlákno zavolá metodu cherrypy.quickstart()."
+      ],
+      "answer": 2,
+      "explanation": "Metoda quickstart() slouží pouze jako zkratka pro jedinou aplikaci. Pro více aplikací se použije tree.mount(App1(), '/app1'), tree.mount(App2(), '/app2') a server se spustí přes cherrypy.engine.start() a cherrypy.engine.block().",
+      "code": null
+    },
+    {
+      "id": "q8",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu frameworku CherryPy pro zápis zprávy do systémového logu:",
+      "options": [
+        "logger",
+        "write_log",
+        "error",
+        "log"
+      ],
+      "answer": 3,
+      "explanation": "Funkce cherrypy.log(msg) zapíše předanou zprávu do standardního aplikačního logu CherryPy serveru.",
+      "code": "import cherrypy\n\nclass WebService:\n    @cherrypy.expose\n    def process_data(self):\n        cherrypy.________(\"Zpracování požadavku dokončeno\")\n        return \"Hotovo\"",
+      "expected": "log"
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "Jak vyřešit kolizi složených závorek {} při generování HTML obsahu obsahujícího CSS styly přes metodu str.format()?",
+      "options": [
+        "A) Zdvojením složených závorek {{ a }} ve zbylém neformátovaném obsahu šablony.",
+        "B) Přechodem na nepodporovaný tvar složených závorek s dolarem ${ a } v celém kódu.",
+        "C) Předsazením zpětného lomítka \\{ a \\} před každou složenou závorku v CSS stylu.",
+        "D) Obalením celého CSS bloku do HTML značky <raw> zabraňující interpretaci závorek."
+      ],
+      "answer": 0,
+      "explanation": "V Pythonním řetězcové metodě format() se literal složená závorka zapisuje zdvojeně {{ a }}. To zabrání chybě KeyError nebo ValueError při formátování šablony obsahující CSS či JS kód.",
+      "code": null
+    }
+  ],
+  "forms": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Která hodnota atributu enctype u elementu <form> je vyžadována pro nahrávání souborů na server?",
+      "options": [
+        "A) application/json — převede všechny formulářové prvky na objekt ve formátu JSON před odesláním.",
+        "B) text/plain — odešle data formuláře jako čistý nekódovaný text s mezerami nahrazenými plusy.",
+        "C) application/x-www-form-urlencoded — zakóduje všechny znaky do hexadecimálních kódů ASCII.",
+        "D) multipart/form-data — zabrání kódování znaků a přenáší binární data souborů v částech."
+      ],
+      "answer": 3,
+      "explanation": "Pro nahrávání souborů (prvky <input type=\"file\">) je nutné nastavit enctype=\"multipart/form-data\". Defaultní hodnota application/x-www-form-urlencoded přenese pouze název souboru jako řetězec bez jeho binárního obsahu.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Doplňte HTML atribut tagu <label> pro jeho provázání s jednoznačným identifikátorem příslušného vstupního pole.",
+      "code": "<label ________=\"user_email\">E-mailová adresa:</label>\n<input id=\"user_email\" type=\"email\" name=\"email\" />",
+      "options": [
+        "for",
+        "target",
+        "form",
+        "name"
+      ],
+      "answer": 0,
+      "explanation": "Atribut for u elementu <label> odkazuje na hodnotu atributu id cílového vstupu, což zajistí správné provázání a aktivaci pole při kliknutí.",
+      "expected": "for"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi atributy id a name u formulářových prvků HTML5?",
+      "options": [
+        "A) id určuje název proměnné odesílané na server, zatímco name jednoznačně identifikuje prvek v DOM stromu.",
+        "B) id jednoznačně identifikuje prvek v DOM dokumentu, zatímco name určuje klíč odesílaný na server.",
+        "C) id slouží ke stylování v CSS skriptech, zatímco name je vyžadován pro spouštění JavaScriptu.",
+        "D) id je povinný pro všechny textové prvky, zatímco name se používá výhradně u skupin přepínačů."
+      ],
+      "answer": 1,
+      "explanation": "Atribut id musí být v rámci celého HTML dokumentu unikátní (využívá ho CSS, JS i <label for=\"...\">). Atribut name definuje název klíče při odeslání formulářových dat na server (více prvků, např. radio buttonů, může sdílet stejný name).",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Posouzení možnosti vnořování formulářových elementů <form> podle specifikace HTML:",
+      "options": [
+        "A) Vnořování elementů <form> je plně podporováno za podmínky použití odlišných atributů action.",
+        "B) Vnořování elementu <form> do jiného elementu <form> je specifikací HTML přísně zakázáno."
+      ],
+      "answer": 1,
+      "explanation": "Specifikace HTML výslovně zakazuje vnořovat jeden element <form> do druhého. Prohlížeče při naražení na vnořený formulář chování nepředvídatelně mění nebo vnitřní tag zcela ignorují.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Který HTML5 atribut umožňuje propojit prvek <input> s formulářem, i když se nachází v kódu mimo tag <form>?",
+      "code": "<form id=\"measurement_form\" action=\"/api/save\" method=\"post\">\n    <button type=\"submit\">Odeslat</button>\n</form>\n\n<!-- Vstupní pole umístěné v DOM mimo tag form -->\n<input type=\"text\" name=\"sample_name\" ________=\"measurement_form\" />",
+      "options": [
+        "target",
+        "action",
+        "form",
+        "for"
+      ],
+      "answer": 2,
+      "explanation": "HTML5 atribut form u vstupních prvků umožňuje jejich přiřazení k formuláři se shodným id, i když leží mimo tělo tagu <form>.",
+      "expected": "form"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaká je hlavní výhoda použití párového elementu <button> oproti nepárovému <input type=\"button\">?",
+      "options": [
+        "A) Element <button> automaticky šifruje všechna odesílaná data pomocí kryptografického certifikátu.",
+        "B) Element <button> se jako jediný formulářový prvek dokáže automaticky přizpůsobit mobilním obrazovkám.",
+        "C) Element <button> nevyžaduje k obsluze kliknutí žádný obslužný kód v JavaScriptu ani atribut type.",
+        "D) Element <button> může uvnitř obsahovat další HTML prvky jako obrázky nebo formátovaný text."
+      ],
+      "answer": 3,
+      "explanation": "Do párového tagu <button>...</button> lze vložit libovolné vnořené HTML prvky (např. <img>, <i>, <span>), což umožňuje vytvářet bohatě vyhlížející tlačítka, zatímco <input type=\"button\"> zobrazuje pouze prostý text z atributu value.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Co způsobí nastavení boolean atributu disabled na elementu <fieldset>?",
+      "options": [
+        "A) Znepřístupní pro úpravy i odeslání všechny formulářové prvky umístěné uvnitř tohoto fieldsetu.",
+        "B) Zruší grafické ohraničení kolem skupiny formulářových prvků, ale ponechá jim funkčnost.",
+        "C) Skryje celý rámeček i s jeho nadpisem z vizuálního zobrazení přímo na webové stránce.",
+        "D) Převede všechny textové vstupy uvnitř fieldsetu na pole pouze pro čtení bez změny vzhledu."
+      ],
+      "answer": 0,
+      "explanation": "Nastavení disabled u skupiny <fieldset> hromadně zakáže všechny formulářové prvky v něm obsažené — uživatel v nich nemůže měnit hodnoty a jejich data se neodesílají při submission.",
+      "code": null
+    }
+  ],
   "forms-input": [
     {
       "id": "q1",
@@ -115,6 +343,119 @@
       "code": null
     }
   ],
+  "dvcs_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaký je zásadní rozdíl v přístupu k historii mezi distribuovanými (DVCS) a centralizovanými (VCS) systémy?",
+      "options": [
+        "A) V centralizovaných VCS operují příkazy vždy globálně na celý projekt bez ohledu na adresář.",
+        "B) V centralizovaných VCS lze běžně provádět potvrzení změn (commit) zcela bez připojení k síti.",
+        "C) V DVCS má každý vývojář kompletní lokální kopii celého repozitáře včetně veškeré historie.",
+        "D) V DVCS existuje pouze jeden centrální server, ze kterého se stahuje vždy aktuální stav."
+      ],
+      "answer": 2,
+      "explanation": "U distribuovaných systémů (Git, Mercurial) má každý uživatel u sebe plnohodnotný repozitář s kompletní historií. Může tak komitovat a prohlížet historii offline, zatímco u centralizovaných systémů (SVN) existuje historie jen na centrálním serveru.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Doplňte příkaz nástroje Git pro přesunutí připravených změn z pracovního adresáře do odkládací plochy (staging area).",
+      "code": "git ________ soubor.py\ngit commit -m \"Úprava souboru\"",
+      "options": [
+        "save  # uloží stávající pracovní změny do lokálního archivu",
+        "push  # nahraje modifikovaný soubor přímo do vzdáleného repozitáře na servery GitHubu.",
+        "stage  # vytvoří záložní kopii souboru v dočasné mezipaměti lokálního operačního systému.",
+        "add  # přidá zadané soubory do indexu (staging area) před samotným komitem do historie."
+      ],
+      "answer": 3,
+      "explanation": "Git vyžaduje dvoukrokový proces komitování — příkaz git add přesune změny do tzv. indexu (staging area) a teprve git commit vytvoří trvalý záznam v historii repozitáře.",
+      "expected": "add"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jak se liší výchozí chování příkazu pro odeslání změn na vzdálený server (push) v systémech Git a Mercurial?",
+      "options": [
+        "A) Git ve výchozím stavu odesílá pouze aktuální větev, zatímco Mercurial odesílá všechny větve.",
+        "B) Mercurial odesílá pouze označené tagy, zatímco Git odesílá automaticky celý pracovní strom.",
+        "C) Oba systémy ve výchozím nastavení odesílají výhradně změny proveditelné bez sloučení větví.",
+        "D) Git odesílá kompletní historii všech větví, zatímco Mercurial pouze hlavní větev označenou jako master."
+      ],
+      "answer": 0,
+      "explanation": "V Gitu jsou větve chápány jako lokální pracovní směry vývojáře, takže git push posílá standardně pouze aktivní větev. V Mercurialu představují větve dlouhodobé verze projektu a hg push propaguje všechny větve naráz.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Posouzení dostupnosti a filozofie příkazu rebase v systémech Git a Mercurial:",
+      "options": [
+        "A) V Mercurialu je rebase základním vestavěným příkazem, zatímco v Gitu vyžaduje instalaci externího skriptu.",
+        "B) V Gitu je rebase základním vestavěným příkazem, zatímco v Mercurialu vyžaduje instalaci a povolení rozšíření."
+      ],
+      "answer": 1,
+      "explanation": "Git přistupuje k historii jako k upravitelné struktuře a nabízí rebase přímo v základu pro narovnání vývojových větví. Mercurial považuje historii za neměnnou a pro rebase vyžaduje povolit explicitní rozšíření (extension).",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "K čemu slouží soubory jako .gitignore nebo .hgignore v kořenovém adresáři repozitáře?",
+      "options": [
+        "A) Ukládají kompletní historii smazaných souborů pro jejich případné obnovení v budoucích verzích.",
+        "B) Definují pravidla pro soubory, které nemá verzovací systém sledovat ani nabízet ke komitu.",
+        "C) Seznamují překladač se soubory, které mají být vyloučeny ze závěrečného sestavení projektu.",
+        "D) Šifrují citlivá přístupová hesla a klíče před jejich automatickým odesláním na vzdálený server."
+      ],
+      "answer": 1,
+      "explanation": "Ignore listy obsahují masky souborů (např. kompilovaný kód, dočasné soubory editorů, .pyc), které verzovací systém ignoruje. Zamezuje se tak jejich nechtěnému zanesení do repozitáře při generických příkazech.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jak reagují verzovací příkazy v DVCS na umístění v podadresáři projektu ve srovnání s centralizovaným SVN?",
+      "options": [
+        "A) Příkazy v DVCS automaticky vytvoří samostatný pod-repozitář pro každý podadresář projektu.",
+        "B) Příkazy v DVCS selžou s chybou, pokud nejste spuštěni přímo v kořenovém adresáři repozitáře.",
+        "C) Příkazy v DVCS fungují globálně pro celý repozitář bez ohledu na aktuální podadresář.",
+        "D) Příkazy v DVCS operují výhradně na podstromu složky, ve které se zrovna uživatel nachází."
+      ],
+      "answer": 2,
+      "explanation": "V DVCS (Git, Mercurial) se pracovní strom a jeho historie spravuje jako celek. Spuštění příkazu (např. git status nebo git commit) uvnitř podadresáře ovlivňuje celý projekt, zatímco v SVN fungovaly příkazy lokálně pro danou složku.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Co se stane v Gitu po smazání větve pomocí příkazu git branch -d nova-funkce?",
+      "code": "git checkout master\ngit branch -d nova-funkce",
+      "options": [
+        "A) Git vyvolá fatalní chybové hlášení a zablokuje lokální repozitář pro jakékoli další úpravy.",
+        "B) Větev se automaticky převede na vzdálený označený tag na serveru GitHub pro archivní účely.",
+        "C) Smažou se všechny soubory a komity, které byly v rámci této větvě kdykoli v minulosti vytvořeny.",
+        "D) Odstraní se pouze ukazatel na větev, přičemž začleněné komity v historii masteru zůstanou zachovány."
+      ],
+      "answer": 3,
+      "explanation": "Větve v Gitu jsou pouhými lehkými ukazateli na konkrétní komity. Smazání sloučené větve smaže jen tento ukazatel (metainformaci), zatímco samotná historie zůstává neporušena."
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Proč je pro udržení vysoké rychlosti a malých nároků na disk u velkých Git repozitářů vhodné občas spustit git gc?",
+      "options": [
+        "A) Provádí úklid a kompresi objektové databáze repozitáře (garbage collection) a odstraňuje nedosažitelné objekty.",
+        "B) Odstraňuje z celého pracovního adresáře projekty všechny nezpracované soubory s koncovkami .py a .txt.",
+        "C) Promaže starší historii zpráv komitů starších než jeden rok pro zrychlení zpracování výstupů.",
+        "D) Automaticky stahuje a aktualizuje nejnovější verze závislostí definovaných v souboru requirements.txt."
+      ],
+      "answer": 0,
+      "explanation": "Příkaz git gc (garbage collection) komprimuje voľné objekty repozitáře do tzv. packfiles, odstraňuje nedosažitelné komity a optimalizuje indexy, což dramaticky zrychluje operace nad velkými repozitáři.",
+      "code": null
+    }
+  ],
   "hg": [
     {
       "id": "q1",
@@ -213,584 +554,6 @@
       ],
       "answer": 0,
       "explanation": "Příkaz hg serve se zkrácenými přepínači -d (--daemon) a -p (--port) spustí lokální webové rozhraní repozitáře jako službu na pozadí.",
-      "code": null
-    }
-  ],
-  "pandas_example_2": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jak se změní datový typ celočíselného sloupce v Pandas DataFrame, pokud obsahuje chybějící hodnoty načtené jako np.nan?",
-      "options": [
-        "A) Celý sloupec zůstane nezměněn jako np.int64 a np.nan se nahradí nulou bez upozornění vývojáře.",
-        "B) Vyvolá se runtime výjimka ValueError, protože standardní číselné pole v Pandas nedovoluje np.nan.",
-        "C) Celý sloupec se automaticky přetypuje na plovoucí řádkovou čárku np.float64 nebo obecný typ object.",
-        "D) Sloupec se automaticky převede na textový řetězec str, přičemž všechny nuly se vymažou z dat."
-      ],
-      "answer": 2,
-      "explanation": "Standardní NumPy typ np.int64 neumí reprezentovat chybějící hodnotu NaN. Přítomnost np.nan v celočíselném poli proto v Pandas vynutí přetypování celého sloupce na np.float64.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jak zabránit přetypování celočíselného sloupce s chybějícími hodnotami na float64 při načítání dat v Pandas?",
-      "options": [
-        "A) Nastavením globálního parametru pd.options.mode.use_inf_as_na = True před načtením excelovského souboru.",
-        "B) Přetypováním všech chybějících hodnot na řetězec 'null' pomocí metody replace() po importu tabulky.",
-        "C) Použitím standardního typu int v Pythonu, který na rozdíl od np.int64 nativně podporuje np.nan.",
-        "D) Předepsáním rozšiřujícího typu 'Int64' (alias pro pd.Int64Dtype()) v parametru dtype při importu dat."
-      ],
-      "answer": 3,
-      "explanation": "Pandas nabízí nullable celočíselné datové typy (např. 'Int64' s velkým 'I'), které udržují celá čísla a pro chybějící pozice používají speciální konstantu <NA> bez přetypování na float.",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Kterou metodou nahradíte všechny chybějící hodnoty (NaN / <NA>) ve sloupci df['DOSPELCI'] hodnotou 0?",
-      "options": [
-        "df['DOSPELCI'].fillna(0)",
-        "df['DOSPELCI'].dropna(value=0)",
-        "df['DOSPELCI'].replace_na(0)",
-        "df['DOSPELCI'].null_to_zero()"
-      ],
-      "answer": 0,
-      "explanation": "Metoda fillna(value) nahrazuje všechny chybějící hodnoty (np.nan, pd.NA) v Series nebo DataFrame zadanou náhradní hodnotou.",
-      "expected": "df['DOSPELCI'].fillna(0)",
-      "code": "vysledek = ________"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jaký je hlavní rozdíl mezi voláním df['DRUH_CZ'].unique() a df['DRUH_CZ'].nunique() v Pandas?",
-      "options": [
-        "A) nunique() vrací pole (ndarray) s unikátními prvky sloupce, zatímco unique() vrací celkový počet těchto unikátních prvků.",
-        "B) unique() vrací pole (ndarray) s unikátními prvky sloupce, zatímco nunique() vrací celkový počet těchto unikátních prvků.",
-        "C) unique() automaticky zahrnuje chybějící hodnoty NaN, zatímco nunique() vždy vyvolá chybu paměti.",
-        "D) unique() seřadí hodnoty podle abecedy, zatímco nunique() je ponechá v původním pořadí výskytu v datatframu."
-      ],
-      "answer": 1,
-      "explanation": "Metoda unique() vrací pole unikátních hodnot (včetně případných NaN), kdežto nunique() vrací celé číslo udávající počet unikátních neprázdných prvků.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Jaký účinek má kód out_df.loc[len(out_df)] = [druh, pocet_ptaku, pocet_rybniku] na existujícím DataFrame out_df s číselným indexem?",
-      "options": [
-        "A) Přepíše první řádek v DataFrame pod indexem 0 a vymaže veškerá dříve uložená data v datatframu.",
-        "B) Vyvolá výjimku IndexError, protože index len(out_df) leží mimo rozsah existujících řádků v paměti.",
-        "C) Přidá nový řádek s danými hodnotami na konec DataFrame pod index rovnající se aktuálnímu počtu řádků.",
-        "D) Vytvoří nový sloupec s názvem odpovídajícím hodnotě proměnné druh na konci tabulky DataFrame."
-      ],
-      "answer": 2,
-      "explanation": "Jelikož v nula odvozeném indexu je len(out_df) přesně následující volný index, zápis do out_df.loc[len(out_df)] efektivně připojí nový řádek na konec tabulky.",
-      "code": null
-    },
-    {
-      "id": "q6",
-      "type": "fill_blank_choice",
-      "question": "Který parametr metody to_excel() zamezí zbytečnému ukládání číselného indexu řádků do nového Excel souboru output.to_excel('vysledek.xlsx', ________)?",
-      "options": [
-        "row_names=False",
-        "header=False",
-        "no_index=True",
-        "index=False"
-      ],
-      "answer": 3,
-      "explanation": "Parametr index=False potlačí export nultého sloupce s řádkovým indexem DataFrame do výsledného souboru Excel nebo CSV.",
-      "expected": "index=False",
-      "code": "vysledek = ________"
-    }
-  ],
-  "textwrap": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jaký je hlavní rozdíl v návratové hodnotě funkcí textwrap.wrap() a textwrap.fill()?",
-      "options": [
-        "A) wrap() zkracuje text podle slov s výpustkou, zatímco fill() odstraňuje ze začátku společné mezery.",
-        "B) fill() vrací seznam jednotlivých řádků jako řetězců, zatímco wrap() vrací jeden řetězec spojený znaky \\n.",
-        "C) wrap() funguje pouze pro jednobajtové řetězce z ASCII, zatímco fill() podporuje i Unicode znaky.",
-        "D) wrap() vrací seznam jednotlivých řádků jako řetězců, zatímco fill() vrací jeden řetězec spojený znaky \\n."
-      ],
-      "answer": 3,
-      "explanation": "textwrap.wrap() zalamuje text a vrací Python list řádků. textwrap.fill() je zkratka pro '\\n'.join(wrap(...)) a vrací zalamovaný víceřádkový řetězec.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "predict_output",
-      "question": "Jaký bude výstup výrazu textwrap.shorten(\"příliš žluťoučký kůň\", width=12) při výchozím nastavení placeholder=' [...]'?",
-      "options": [
-        "A) 'příliš [...]'",
-        "B) 'příliš ž [...]'",
-        "C) 'příliš žluť'",
-        "D) 'příliš žluťoučký'"
-      ],
-      "answer": 0,
-      "explanation": "shorten() zkracuje text po celých slovech tak, aby se do zadané šířky width vlezl i zástupný symbol (zde 8 znaků '[...]'). 'příliš žluťoučký [...]' má 22 znaků, proto zůstane jen 'příliš [...]' (12 znaků).",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jakým způsobem funguje funkce textwrap.dedent(text) při úpravě víceřádkového řetězce?",
-      "options": [
-        "A) Odstraní ze všech řádků pouze první znak bez ohledu na to, zda se jedná o mezeru nebo písmeno.",
-        "B) Odstraní ze všech řádků textu maximální počet společných úvodních bílých znaků (mezer a tabulátorů).",
-        "C) Odstraní veškeré bílé znaky na konci všech řádků a nahradí je jedním odřádkováním \\n.",
-        "D) Nahradí všechny tabulátory na začátku řádků přesně čtyřmi mezerami bez ohledu na ostatní řádky."
-      ],
-      "answer": 1,
-      "explanation": "dedent() zkoumá úvodní odsazení neprázdných řádků a odebere z každého řádku prefix z bílých znaků, který sdílejí všechny řádky v textu.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Doplňte predikát funkce textwrap.indent() pro vynucení odsazení všech řádků včetně prázdných:",
-      "options": [
-        "lambda line: line.strip()",
-        "lambda line: bool(line)",
-        "lambda line: True",
-        "lambda line: False"
-      ],
-      "answer": 2,
-      "explanation": "Výchozí predikát vynechává prázdné řádky; předáním lambda line: True se prefix vloží před každý řádek bez výjimky.",
-      "code": "import textwrap\n\ntext = \"první\\n\\ndruhý\"\n# Odsadit všechny řádky včetně prázdných:\nresult = textwrap.indent(text, \"    \", predicate=________)",
-      "expected": "lambda line: True"
-    },
-    {
-      "id": "q5",
-      "type": "true_false_tricky",
-      "question": "Proč je při opakovaném zalamování tisíců textů výhodnější vytvořit vlastní instanci TextWrapper než dokola volat textwrap.fill()?",
-      "options": [
-        "A) Funkce textwrap.fill() nepodporuje pojmenované argumenty width a subsequent_indent při přímém volání.",
-        "B) Samostatná instance TextWrapper automaticky běží v paralelních vláknech a zrychluje výpočet.",
-        "C) Funkce textwrap.fill() modifikuje globální nastavení Pythonu, zatímco instance TextWrapper je izolovaná.",
-        "D) Volání textwrap.fill() při každém spuštění zbytečně instancuje a zahazuje novou instanci třídy TextWrapper."
-      ],
-      "answer": 3,
-      "explanation": "Pomocné funkce wrap, fill i shorten vytvářejí uvnitř při každém volání nový objekt TextWrapper. Pro masivní zalamování je proto z hlediska výkonu efektivnější reusovat jednu instanci.",
-      "code": null
-    },
-    {
-      "id": "q6",
-      "type": "fill_blank_choice",
-      "question": "Který parametr třídy TextWrapper zabrání rozdělení dlouhých slov přesahujících zadanou šířku řádku?",
-      "options": [
-        "break_long_words",
-        "break_on_hyphens",
-        "drop_whitespace",
-        "replace_whitespace"
-      ],
-      "answer": 0,
-      "explanation": "Parametr break_long_words=False v třídě TextWrapper způsobí, že slova přesahující šířku width nebudou násilně roztržena na více řádků.",
-      "code": "import textwrap\n\nwrapper = textwrap.TextWrapper(width=20, ________=False)\ntext = \"Supercalifragilisticexpialidocious je velmi dlouhe slovo\"\nlines = wrapper.wrap(text)\n# Dlouhe slovo zustane v celku na samostatnem radku",
-      "expected": "break_long_words"
-    }
-  ],
-  "wsgi": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jakou signaturu (poziční parametry) musí mít volatelný objekt WSGI aplikace podle standardu PEP 3333?",
-      "options": [
-        "A) application(headers, body_stream)",
-        "B) application(environ, start_response)",
-        "C) application(request, response)",
-        "D) application(server, client_socket)"
-      ],
-      "answer": 1,
-      "explanation": "WSGI standard stanovuje, že aplikace je callable se dvěma pozičními argumenty: environ (slovník proměnných prostředí) a start_response (funkce pro zahájení HTTP hlaviček).",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "V jakém datovém typu a struktuře musí WSGI aplikace vracet tělo HTTP odpovědi?",
-      "options": [
-        "A) Jako otevřený souborový objekt připravený pro čtení v textovém režimu 'r'.",
-        "B) Jako slovník (dict) obsahující klíče 'headers' a 'body' s bajtovými daty.",
-        "C) Jako iterovatelný objekt (např. list), jehož prvky jsou bajtové řetězce (bytes).",
-        "D) Jako prostý textový řetězec (str) zakódovaný do UTF-8 bez použití iterátoru."
-      ],
-      "answer": 2,
-      "explanation": "WSGI vyžaduje vrácení iterable vracejícího bajty (b'bytes'). Samotný bajtový řetězec b'...' sice je iterable, ale iteroval by se po jednotlivých bajtech (což je neefektivní/chybové), proto se balí do např. [b'data'].",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Která proměnná prostředí ve slovníku environ obsahuje cestu HTTP dotazu začínající znakem /?",
-      "options": [
-        "A) QUERY_STRING",
-        "B) HTTP_HOST",
-        "C) REQUEST_URI",
-        "D) PATH_INFO"
-      ],
-      "answer": 3,
-      "explanation": "PATH_INFO obsahuje cestu v aplikaci požadovanou klientem (začíná lomítkem '/'). QUERY_STRING obsahuje parametry za otazníkem '?'.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jakým způsobem se z objektu environ['wsgi.input'] správně načítají data zaslaná v těle POST dotazu?",
-      "options": [
-        "A) Přečtením přesného počtu bajtů získávaných z environ['CONTENT_LENGTH'] pomocí metody read(length).",
-        "B) Převedením objektu wsgi.input na standardní slovník pomocí funkce dict(environ['wsgi.input']).",
-        "C) Neomezeným voláním metody read() bez parametrů, dokud stream nevátí prázdný řetězec \"\".",
-        "D) Iterací přes řádky pomocí for line in environ['wsgi.input'] a jejich následným spojením."
-      ],
-      "answer": 0,
-      "explanation": "WSGI stream wsgi.input nevyžaduje EOF na konci dotazu. Pro správné přečtení těla POST je nutné převést environ['CONTENT_LENGTH'] na celé číslo a zavolat read(length).",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "fill_blank_choice",
-      "question": "Která funkce ze standardní knihovny rozparsuje parametry z URL dotazu (QUERY_STRING) do slovníku seznamů hodnot?",
-      "options": [
-        "urllib.parse.unquote",
-        "urllib.parse.parse_qs",
-        "urllib.parse.urlsplit",
-        "urllib.parse.urlencode"
-      ],
-      "answer": 1,
-      "explanation": "Funkce urllib.parse.parse_qs() parsuje URL kódovaný řetězec v QUERY_STRING a vrací slovník, kde hodnotami jsou seznamy řetězců.",
-      "code": "import urllib.parse\n\ndef application(environ, start_response):\n    query_string = environ.get(\"QUERY_STRING\", \"\")\n    params = ________(query_string)\n    # Pro \"sample=benzene&temp=25\" vrati {'sample': ['benzene'], 'temp': ['25']}",
-      "expected": "urllib.parse.parse_qs"
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Jaký je vztah mezi oddělovacím řetězcem z hlavičky boundary a oddělovači v samotném těle multipart/form-data zprávy?",
-      "options": [
-        "A) Hodnota v těle zprávy je identická s atributem boundary bez jakýchkoliv přídavných znaků.",
-        "B) Oddělovače v těle zprávy mají na konci navíc dvě mínuska (--) oproti hodnotě z atributu boundary.",
-        "C) Oddělovače v těle zprávy mají na začátku navíc dvě mínuska (--) oproti hodnotě z atributu boundary.",
-        "D) Atribut boundary obsahuje md5 hash, zatímco v těle zprávy se používá pouze znak odřádkování."
-      ],
-      "answer": 2,
-      "explanation": "MIME specifikace (RFC 1341) určuje, že zapouzdřovací hranice (encapsulation boundary) v těle zprávy začínají dvěma pomlčkami '--' následovanými řetězcem z hlavičky Content-Type: boundary=...",
-      "code": null
-    },
-    {
-      "id": "q7",
-      "type": "fill_blank_choice",
-      "question": "Který výraz se v rozhraní WSGI předává jako volitelný třetí argument exc_info funkci start_response při zpracování výjimky?",
-      "options": [
-        "traceback.format_exc()",
-        "traceback.print_exc()",
-        "sys.last_traceback",
-        "sys.exc_info()"
-      ],
-      "answer": 3,
-      "explanation": "Třetí parametr exc_info přijímá n-tici vrácenou funkcí sys.exc_info(), což serveru umožňuje správně ošetřit chybu a přepsat hlavičky odpovědi.",
-      "code": "import sys\n\ndef application(environ, start_response):\n    try:\n        data = calculate_concentrations()\n        start_response(\"200 OK\", [(\"Content-Type\", \"text/plain\")])\n        return [data.encode(\"utf-8\")]\n    except Exception:\n        start_response(\"500 Internal Server Error\", [(\"Content-Type\", \"text/plain\")], ________)\n        return [b\"Chyba vypoctu\"]",
-      "expected": "sys.exc_info()"
-    }
-  ],
-  "png": [
-    {
-      "id": "png_q1",
-      "type": "multiple_choice",
-      "question": "Jaká je minimální platná sekvence chunků pro vytvoření validního bezpaletového PNG obrázku?",
-      "options": [
-        "A) Pouze chunky IHDR, IDAT a IEND v tomto přesném pořadí.",
-        "B) Pouze chunky PNGH, DATA a PNGE v tomto přesném pořadí.",
-        "C) Pouze chunky HEAD, BODY a TAIL v tomto přesném pořadí.",
-        "D) Pouze chunky IHDR, PLTE, IDAT a IEND v tomto pořadí."
-      ],
-      "answer": 0,
-      "explanation": "Nejjednodušší platný PNG soubor bez palety vyžaduje hlavičkový chunk IHDR (obsahuje rozměry a typ), alespoň jeden datový chunk IDAT a ukončovací chunk IEND. Chunk PLTE je vyžadován pouze u paletových obrázků.",
-      "code": null
-    },
-    {
-      "id": "png_q2",
-      "type": "predict_output",
-      "question": "Jakou zrekonstruovanou hodnotu bajtu vrátí rekonstrukční filtr typu 1 (Sub) pro zafiltrovaný bajt Filt(x) = 15, je-li zrekonstruovaná hodnota předchozího bajtu Recon(a) = 40?",
-      "options": [
-        "A) 25 (rozdíl mezi hodnotou Recon(a) a filtrovanou hodnotou bajtu Filt(x))",
-        "B) 55 (součet hodnoty Filt(x) a předchozího zrekonstruovaného bajtu Recon(a))",
-        "C) 15 (původní zafiltrovaná hodnota Filt(x) bez přičtení okolních pixelů)",
-        "D) 40 (hodnota předchozího sousedního bajtu Recon(a) bez přičtení Filt(x))"
-      ],
-      "answer": 1,
-      "explanation": "Rekonstrukční filtr Sub (typ 1) přičítá k zafiltrované hodnotě Filt(x) odfiltrovanou hodnotu předchozího bajtu na stejném řádku Recon(a): Recon(x) = (15 + 40) % 256 = 55.",
-      "code": null
-    },
-    {
-      "id": "png_q3",
-      "type": "true_false_tricky",
-      "question": "Nad kterými částmi chunku se v PNG souboru počítá kontrolní součet CRC32?",
-      "options": [
-        "A) Nad typem chunku a datovou částí chunku; délka chunku a samotné CRC se nezahrnují.",
-        "B) Pouze nad datovou částí chunku (data); délka a typ chunku se do výpočtu nezahrnují."
-      ],
-      "answer": 0,
-      "explanation": "Podle specifikace PNG se kontrolní součet CRC32 v jednotlivých chuncích počítá ze sekvence vytvořené ze 4 bajtů typu chunku a vlastní datové části. Pole udávající délku dat na začátku chunku se do CRC nezahrnuje.",
-      "code": null
-    },
-    {
-      "id": "png_q4",
-      "type": "fill_blank_choice",
-      "question": "Doplňte funkci knihovny zlib pro dekompresi sloučených binárních dat z datových bloků IDAT v PNG souboru.",
-      "options": [
-        "zlib.unpack",
-        "zlib.inflate",
-        "zlib.decompress",
-        "zlib.decode"
-      ],
-      "answer": 2,
-      "explanation": "Pro dekompresi dat komprimovaných algoritmem DEFLATE se v modulu zlib používá standardní funkce zlib.decompress().",
-      "code": "import zlib\n\ncompressed_idat_stream = b\"x\\x9c\\xcbH\\xcd\\xc9\\xc9W(\\xcf/\\xcaI\\x01\\x00\\x1a\\x0b\\x04]\"\ndecompressed_bytes = ________(compressed_idat_stream)\n# Vystup: bajty nekomprimovanych pixelovych radek",
-      "expected": "zlib.decompress"
-    },
-    {
-      "id": "png_q5",
-      "type": "multiple_choice",
-      "question": "Jaký relativní význam mají bajty a, b a c při výpočtu řádkových filtrů v PNG specifikaci?",
-      "options": [
-        "A) a je červená složka, b je zelená složka a c je modrá složka.",
-        "B) a je pixel vpravo, b je pixel dole a c je pixel vpravo dole.",
-        "C) a je aktuální pixel, b je předchozí pixel a c je následující.",
-        "D) a je pixel vlevo, b je pixel nahoře a c je pixel vlevo nahoře."
-      ],
-      "answer": 3,
-      "explanation": "Ve schématu filtrů PNG představuje x zpracovávaný bajt, a bajt předcházející na stejném řádku (vlevo), b odpovídající bajt na předchozím řádku (nahoře) a c předcházející bajt na předchozím řádku (vlevo nahoře).",
-      "code": null
-    },
-    {
-      "id": "png_q6",
-      "type": "multiple_choice",
-      "question": "Jaké pořadí bajtů (endianness) předepisuje specifikace PNG pro všechna vícebajtová celá čísla?",
-      "options": [
-        "A) Big Endian, kde nejvýznamnější bajt je uložen v paměti na nejnižší adrese.",
-        "B) Little Endian, kde nejméně významný bajt je uložen na nejnižší adrese.",
-        "C) Network Endian, který střídá bajty podle pořadí barevných kanálů RGB.",
-        "D) Native Endian, který závisí výhradně na architektuře procesoru počítače."
-      ],
-      "answer": 0,
-      "explanation": "PNG specifikace striktně vyžaduje ukládání vícebajtových celých čísel (např. délka chunku, šířka a výška obrázku) v pořadí Big Endian (nejvýznamnější bajt vlevo / jako první).",
-      "code": null
-    },
-    {
-      "id": "png_q7",
-      "type": "multiple_choice",
-      "question": "Jakou hodnotu vrátí Paethův prediktor paeth(a, b, c) pro vstupy a = 100, b = 105, c = 100?",
-      "options": [
-        "A) 205 (protože výsledek je součtem hodnot a a b bez odečtení prvku c)",
-        "B) 105 (protože vzdálenost pb je 0, což je nejmenší hodnota ze všech tří odchylek)",
-        "C) 5 (protože výsledek odpovídá absolutnímu rozdílu hodnot p a proměnné a)",
-        "D) 100 (protože hodnota a má přednost před b při rovnosti odchylek pa a pc)"
-      ],
-      "answer": 1,
-      "explanation": "V Paethově prediktoru spočteme p = 100 + 105 - 100 = 105. Odchylky jsou pa = abs(105-100) = 5, pb = abs(105-105) = 0, pc = abs(105-100) = 5. Nejměnší je pb = 0 (podmínka pb <= pc je splněna), takže prediktor vrátí b = 105.",
-      "code": null
-    }
-  ],
-  "advanced_3": [
-    {
-      "id": "adv3_q1",
-      "type": "fill_blank_choice",
-      "question": "Doplňte dekorátor ________(func) ze modulu functools pro zachování jména a docstringu obalené funkce.",
-      "options": [
-        "@wraps",
-        "@keep",
-        "@copy",
-        "@bind"
-      ],
-      "answer": 0,
-      "explanation": "Dekorátor @functools.wraps(func) zkopíruje atributy původní funkce (např. __name__, __doc__, __annotations__) na obalující funkci (wrapper), čímž zamezí ztrátě identifikace dekorované funkce.",
-      "expected": "@wraps",
-      "code": "vysledek = ________"
-    },
-    {
-      "id": "adv3_q2",
-      "type": "predict_output",
-      "question": "Jaký bude výstup výpočtu kumulativní operace při použití functools.reduce s počáteční hodnotou 10?",
-      "options": [
-        "A) 24 (postupným násobením prvků seznamu 2 * 3 * 4 bez započtení 10)",
-        "B) 240 (postupným násobením 10 * 2 * 3 * 4 s počáteční hodnotou 10)",
-        "C) 2400 (vynásobením konečného součinu 240 ještě jednou hodnotou 10)",
-        "D) 10 (vrácením pouze počáteční hodnoty bez provedení násobení prvků)"
-      ],
-      "answer": 1,
-      "explanation": "Funkce reduce(lambda x, y: x * y, [2, 3, 4], 10) začíná s inicializační hodnotou 10: ((((10 * 2) * 3) * 4) = 240. Počáteční hodnota vstupuje do první operace na levé straně.",
-      "code": null
-    },
-    {
-      "id": "adv3_q3",
-      "type": "multiple_choice",
-      "question": "Jaký je hlavní practicalní rozdíl mezi dekorátory @functools.cache a @functools.lru_cache(maxsize=128)?",
-      "options": [
-        "A) @cache funguje výhradně na generátory, zatímco @lru_cache na funkce.",
-        "B) @cache ukládá výsledky na disk, zatímco @lru_cache je uplatňuje v RAM.",
-        "C) @cache nemá žádný limit velikosti a vynechává logiku odstraňování prvků.",
-        "D) @cache vyžaduje pouze nehešovatelné argumenty na rozdíl od @lru_cache."
-      ],
-      "answer": 2,
-      "explanation": "Zkratka @functools.cache zavedená v Pythonu 3.9 je ekvivalentem @lru_cache(maxsize=None). Je o něco rychlejší a paměťově úspornější než standardní LRU mezipaměť, protože nemusí sledovat a promazávat nejstarší nepoužité položky.",
-      "code": null
-    },
-    {
-      "id": "adv3_q4",
-      "type": "multiple_choice",
-      "question": "Kterou kombinaci magických metod je nutné ručně nadefinovat pro správné fungování dekorátoru @total_ordering?",
-      "options": [
-        "A) Pouze metody __hash__ a __cmp__, z nichž dekorátor odvodí veškeré zbývající operátory.",
-        "B) Výhradně metody __eq__ a __ne__, přičemž nerovnosti jsou automaticky nahrazeny.",
-        "C) Všechny čtyři porovnávací metody __lt__, __le__, __gt__ a __ge__ bez nutnosti definovat __eq__.",
-        "D) Metodu __eq__ a alespoň jednu z porovnávacích metod __lt__, __le__, __gt__ nebo __ge__."
-      ],
-      "answer": 3,
-      "explanation": "Třídní dekorátor @functools.total_ordering vyžaduje, aby třída definovala metodu __eq__() a alespoň jednu ze čtyř relačních metod (__lt__, __le__, __gt__, __ge__). Zbývající porovnávací metody dopopočítá automaticky.",
-      "code": null
-    },
-    {
-      "id": "adv3_q5",
-      "type": "multiple_choice",
-      "question": "Jaký bude výstup volání funkce vytvořené pomocí functools.partial s přednastaveným argumentem exponent=2?",
-      "options": [
-        "A) 25 (vypočte 5 ** 2 s využitím přednastaveného pojmenovaného argumentu exponent=2)",
-        "B) TypeError (protože partial neumožňuje fixovat pojmenované argumenty funkcí)",
-        "C) 32 (vypočte 2 ** 5 prohozením pořadí prvního a předaného argumentu zaklad)",
-        "D) 10 (vypočte součin 5 * 2 namísto umocňování zadaného základu exponentem)"
-      ],
-      "answer": 0,
-      "explanation": "Volání partial(mocnina, exponent=2)(5) zafixuje pojmenovaný argument exponent=2 a předaný argument 5 použije jako prvotní poziční argument zaklad. Vypočítá tedy 5 ** 2 = 25.",
-      "code": null
-    },
-    {
-      "id": "adv3_q6",
-      "type": "true_false_tricky",
-      "question": "Lze dekorátor @functools.lru_cache bezpečně použít pro kešování návratových hodnot asynchronních funkcí nebo generátorů?",
-      "options": [
-        "A) Ne; kešování generátorů či async funkcí nefunguje správně, protože vrací vyčerpané iterátory či coroutiny.",
-        "B) Ano; dekorátor automaticky obnovuje stav generátoru a znova spouští asynchronní coroutine při každém volání."
-      ],
-      "answer": 0,
-      "explanation": "Kešování generátorových nebo asynchronních funkcí pomocí lru_cache vrátí při druhém volání stejný vyčerpaný generátor nebo již vyhodnocený objekt coroutine, což vede k chybám. Kešovat má smysl pouze čisté funkce bez vedlejších efektů vracející datové hodnoty.",
-      "code": null
-    }
-  ],
-  "objects_basics": [
-    {
-      "id": "basics_q1",
-      "type": "multiple_choice",
-      "question": "Jak se změní hodnoty atributů u instancí po in-place modifikaci seznamu definovaného v těle třídy?",
-      "options": [
-        "A) [] (protože každá instance automaticky dostává vlastní kopii seznamu)",
-        "B) AttributeError (protože k items nelze přistupovat přes instanci a2)",
-        "C) [1] (protože items je sdílený třídní atribut modifikovaný v místě)",
-        "D) None (protože metoda append nevrací žádnou hodnotu při modifikaci)"
-      ],
-      "answer": 2,
-      "explanation": "Atribut items definovaný v těle třídy je třídní proměnná sdílená všemi instancemi. Volání a1.items.append(1) modifikuje tento sdílený seznam přímo v paměti, takže změna je viditelná i přes ostatní instance (a2.items vrátí [1]).",
-      "code": null
-    },
-    {
-      "id": "basics_q2",
-      "type": "multiple_choice",
-      "question": "Jaký bude výstup při přístupu ke třídnímu a instančnímu atributu po přiřazení w.color = 'blue'?",
-      "options": [
-        "A) blue blue (přiřazení na instanci změní hodnotu přímo v samotné třídě Widget)",
-        "B) red red (přiřazení je ignorováno, protože třídní atribut color je konstantní)",
-        "C) TypeError (protože atribut color nelze takto přepsat bez metody __setattr__)",
-        "D) red blue (na instanci w vznikne nový atribut shadowující třídní atribut)"
-      ],
-      "answer": 3,
-      "explanation": "Přiřazení do w.color zápisem nevytváří ani nemění atribut na třídě Widget, ale vytvoří nový instanční atribut na objektu w, který překryje (shadowuje) původní třídní atribut. Widget.color zůstává 'red'.",
-      "code": null
-    },
-    {
-      "id": "basics_q3",
-      "type": "multiple_choice",
-      "question": "Jaký bude výstup při volání funkce nadefinované v těle třídy C bez dekorátoru přímo přes jmenný prostor třídy C.info(5)?",
-      "options": [
-        "A) 5 (při volání přímo na třídě se předá přesně jeden argument bez automatického self)",
-        "B) TypeError (protože funkce v těle třídy musí mít vždy definovaný parametr self)",
-        "C) <bound method C.info> (vrátí se svázaná metoda místo vyhodnocení výsledku)",
-        "D) None (protože funkce v třídě bez dekorátoru nevracejí žádnou konkrétní hodnotu)"
-      ],
-      "answer": 0,
-      "explanation": "Při volání nedekorované funkce přímo přes třídu (C.info(5)) funguje objekt jako obyčejný jmenný prostor. Funkce nedostává žádný implicitní parametr self a argument 5 se naváže na parametr x.",
-      "code": null
-    },
-    {
-      "id": "basics_q4",
-      "type": "predict_output",
-      "question": "Jaká chyba nastane při volání nedekorované jednoplánové funkce def info(x): z instance třídy c.info(5)?",
-      "options": [
-        "A) AttributeError: 'C' object has no attribute 'info' v rámci instance",
-        "B) TypeError: C.info() takes 1 positional argument but 2 were given",
-        "C) <C object> (metoda vrací referenci na instanci c uloženou v parametru x)",
-        "D) 5 (metoda úspěšně vrátí předanou hodnotu 5 bez ohledu na instanci c)"
-      ],
-      "answer": 1,
-      "explanation": "Volání na instanci (c.info(5)) automaticky vkládá instanci c jako prvotní poziční argument (self). Jelikož definice info(x) přijímá pouze 1 argument, předání instance c i čísla 5 vyvolá TypeError o předání 2 argumentů.",
-      "code": null
-    },
-    {
-      "id": "basics_q5",
-      "type": "fill_blank_choice",
-      "question": "Doplňte správný dekorátor ________ před def increment(cls): pro metodu třídy s prvním implicitním argumentem cls.",
-      "options": [
-        "@staticmethod",
-        "@instancemethod",
-        "@classmethod",
-        "@classproperty"
-      ],
-      "answer": 2,
-      "explanation": "Dekorátor @classmethod způsobí, že dekorovaná metoda dostane při volání na třídě i na instanci jako první implicitní parametr referenci na objekt třídy (konvenčně pojmenovaný cls).",
-      "expected": "@classmethod",
-      "code": "vysledek = ________"
-    },
-    {
-      "id": "basics_q6",
-      "type": "multiple_choice",
-      "question": "Jakým způsobem Python provádí tzv. name mangling u atributů začínajících dvěma podtržítky (např. __b)?",
-      "options": [
-        "A) Zablokuje zápis i čtení daného atributu na úrovni paměťového interpreteru.",
-        "B) Odstraní atribut z objektu a uloží jej do soukromého modulu __private__.",
-        "C) Přejmenuje atribut na __b_private a znemožní k němu jakýkoliv přístup.",
-        "D) Přejmenuje atribut v interním slovníku na tvar _NázevTřídy__b."
-      ],
-      "answer": 3,
-      "explanation": "Atributy začínající dvěma podtržítky (bez zakončení 2 podtržítky) jsou Pythonem transformovány na tvar _JménoTřídy__atribut (přičemž začáteční podtržítka názvu třídy se odstraňují). Jde o ochranu proti přepsání atributů v potomcích, nikoliv o neprolomitelnou privátnost.",
-      "code": null
-    },
-    {
-      "id": "basics_q7",
-      "type": "fill_blank_choice",
-      "question": "Doplňte správný výraz ________.__init__(name) pro volání konstruktoru rodičovské třídy v Python 3.",
-      "options": [
-        "super()",
-        "parent()",
-        "self()",
-        "base()"
-      ],
-      "answer": 0,
-      "explanation": "V Pythonu 3 nahrazuje volání super().__init__(...) starší bezargumentový i explicitní zápis super(AktuálníTřída, self).__init__(...). Zjišťuje rodičovské třídy automaticky z MRO.",
-      "expected": "super()",
-      "code": "vysledek = ________"
-    },
-    {
-      "id": "basics_q8",
-      "type": "multiple_choice",
-      "question": "Jaký bude výstup volání statické metody dekorované @staticmethod přes instanci třídy m.add(3, 4)?",
-      "options": [
-        "A) 10 (protože prvním implicitním argumentem je instance m reprezentující hodnotu 3)",
-        "B) 7 (statická metoda nedostává implicitní self ani cls a bere přesně zadané argumenty)",
-        "C) TypeError (protože statickou metodu lze volat výhradně přes název třídy Math)",
-        "D) None (protože statické metody slouží pouze k úpravě třídních proměnných bez návratu)"
-      ],
-      "answer": 1,
-      "explanation": "Metoda označená @staticmethod nedostává žádné implicitní prvotní parametry (ani self, ani cls). Při volání m.add(3, 4) se předají přesně 2 argumenty a výsledek je 3 + 4 = 7.",
       "code": null
     }
   ],
@@ -910,74 +673,250 @@
       "code": null
     }
   ],
-  "PhotoImage": [
+  "files_overview": [
     {
       "id": "q1",
-      "type": "predict_output",
-      "question": "Jaký datový typ je vyžadován pro parametr data při přímém předání bajtových dat do PhotoImage?",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní důvod pro použití konstrukce with open(...) při práci se soubory?",
       "options": [
-        "A) Libovolný textový řetězec str v kódování UTF-8 s bajty.",
-        "B) Objekt typu io.BytesIO zabalující paměťový binární proud.",
-        "C) Modifikovatelná sekvence typu bytearray podporující změny.",
-        "D) Striktně nezaměnitelný typ bytes reprezentující binární data."
+        "A) Automaticky převádí všechny načtené bajty na velká písmena bez nutnosti volání metody upper().",
+        "B) Garantuje automatické uzavření souborového streamu při opuštění bloku i při výskytu výjimky.",
+        "C) Zamyká soubor na úrovni operačního systému proti zápisu ze strany ostatních běžících procesů.",
+        "D) Zrychluje čtení ze souboru tím, že automaticky načte celý jeho obsah do vyrovnávací paměti RAM."
       ],
-      "answer": 3,
-      "explanation": "Metoda PhotoImage vyžaduje pro parametr data striktně immutable typ bytes. Použití typu bytearray nebo jiných sekvencí způsobuje selhání vnitřního Tcl/Tk rozhraní.",
+      "answer": 1,
+      "explanation": "Konstrukce with vystupuje jako kontextový manažer. Při opuštění bloku kódu (ať už standardním dokončením nebo v důsledku neošetřené výjimky) zajistí bezpečné uzavření souboru a uvolnění systémových zdrojů.",
       "code": null
     },
     {
       "id": "q2",
       "type": "fill_blank_choice",
-      "question": "Který pojmenovaný parametr konstruktoru PhotoImage v Tkinteru slouží k načtení grafických dat ze souboru na disku?",
+      "question": "Doplňte klíčový parametr funkce open() zaručující správný převod bajtů na textové znaky.",
+      "code_snippet": "with open('data.txt', mode='r', ________='utf-8') as f:\n    content = f.read()",
       "options": [
-        "file",
-        "filename",
-        "src",
-        "path"
+        "format  # parametr předepisující požadované formátování textového souboru na systémové úrovni.",
+        "codec  # parametr předávající šifrovací klíč",
+        "encoding  # parametr definující znakové kódování použité",
+        "charset  # parametr určující znakovou sadu"
       ],
-      "answer": 0,
-      "explanation": "Třída tkinter.PhotoImage přijímá pro cestu k souboru na disku pojmenovaný parametr file.",
-      "code": "import tkinter as tk\n\nroot = tk.Tk()\nlogo_img = tk.PhotoImage(________=\"assets/vscht_logo.png\")\nlabel = tk.Label(root, image=logo_img)\nlabel.pack()",
-      "expected": "file"
+      "answer": 2,
+      "explanation": "Parametr encoding='utf-8' explicitně stanovuje kódování pro čtení nebo zápis textových souborů. Nespoléhání se na výchozí kódování systému je zásadní pro přenositelnost kódu mezi různorodými operačními systémy.",
+      "expected": "encoding",
+      "code": "with open('data.txt', mode='r', ________='utf-8') as f:\n    content = f.read()"
     },
     {
       "id": "q3",
-      "type": "predict_output",
-      "question": "V jakém formátu vrací metoda photo.get(x, y) informace o barvě konkrétního pixelu?",
+      "type": "multiple_choice",
+      "question": "Jak se liší výstup metody soubor.write(data) od volání print(data, file=soubor)?",
       "options": [
-        "A) Jediné 32bitové celé číslo reprezentující sbalenou hexadecimální barvu.",
-        "B) Jeden textový řetězec složený z dekadických čísel R, G a B oddělených mezerou.",
-        "C) Standardní pythoní n-tice triády celých čísel v pořadí (red, green, blue).",
-        "D) Slovník s klíči 'red', 'green' a 'blue' a celočíselnými hodnotami."
+        "A) write() automaticky přidává nový řádek \\n na konec textu, zatímco print() zapisuje text bez úprav.",
+        "B) write() přijímá libovolný objekt a převede jej na str, zatímco print() vyžaduje výhradně typ bytes.",
+        "C) write() zapisuje data do souboru synchronně, zatímco print() odkládá zápis až na zavření souboru.",
+        "D) write() zapíše pouze předaný řetězec, zatímco print() navíc automaticky přidá znak odřádkování \\n."
       ],
-      "answer": 1,
-      "explanation": "Metoda get() vrací výstup Tcl/Tk rozhraní jako jediný řetězec s mezerou oddělenými desítkovými složkami (např. '255 0 128'), nikoli jako n-tici čísel.",
+      "answer": 3,
+      "explanation": "Metoda f.write(string) zapíše přesně zadaný řetězec bez jakýchkoliv úprav či přidaných znaků. Oproti tomu funkce print(string, file=f) se chová standardně – mezi argumenty vkládá mezeru (sep=' ') a na konec přidává znak nového řádku (end='\\n').",
       "code": null
     },
     {
       "id": "q4",
       "type": "multiple_choice",
-      "question": "Které grafické formáty jsou natively podporovány základní třídou PhotoImage bez doplňkových knihoven?",
+      "question": "Jaký je paměťový rozdíl mezi procházením souboru pomocí for line in soubor: a použitím soubor.readlines()?",
       "options": [
-        "A) Výhradně vektorové formáty EPS a SVG spolu se skriptovatelným Tcl GIF.",
-        "B) Libovolné obrázky ve formátech PNG, JPEG, GIF, BMP a komprimované SVG.",
-        "C) Formát GIF a binární podformáty P5 (odstíny šedé) a P6 (RGB) formátu PNM.",
-        "D) Všechny podformáty P1 až P6 rodiny PNM a nekomprimované BMP soubory."
+        "A) for line in soubor načítá řádky postupně po jedné (O(1) paměť), kdežto readlines() načte vše do seznamu (O(N) paměť).",
+        "B) Obě metody mají zcela totožnou paměťovou náročnost a vnitřně načítají kompletní obsah souboru do systémové RAM.",
+        "C) for line in soubor načte celý soubor do paměti najednou (O(N) paměť), zatímco readlines() vytvoří lenivý generátor.",
+        "D) for line in soubor funguje výhradně pro binární soubory v operačním systému, zatímco readlines() je pro textové."
       ],
-      "answer": 2,
-      "explanation": "Základní PhotoImage v distribuci Tkinteru bez použití Pillow podporuje výhradně formát GIF a binární podformáty P5 a P6 rodiny PNM (PBM/PGM/PPM).",
+      "answer": 0,
+      "explanation": "Otevřený soubor je iterovatelný objekt. Cyklus for line in soubor: načítá z disku vždy jen právě zpracovávanou řádku, což vyžaduje minimální paměť O(1). Metoda soubor.readlines() načte okamžitě všechny řádky souboru do paměti jako seznam řetězců (O(N) paměť), což u velkých souborů může způsobit vyčerpání RAM.",
       "code": null
     },
     {
       "id": "q5",
-      "type": "true_false_tricky",
-      "question": "Porovnejte možnosti metody copy() třídy PhotoImage v Pythonu oproti příkazům v čistém Tcl/Tk.",
+      "type": "multiple_choice",
+      "question": "Co bude v proměnné data po spuštění níže uvedeného kódu nad souborem o dvou řádcích?",
+      "code_snippet": "# soubor data.txt obsahuje:\n# Ahoj\n# Světe\nwith open('data.txt', encoding='utf-8') as f:\n    data = f.read()\nprint(repr(data))",
       "options": [
-        "A) Pravda: Tkinterová metoda copy() zvládá vytvořit pouze přesnou kopii celého obrázku bez změny velikosti.",
-        "B) Nepravda: Tkinterová metoda copy() umožňuje výřezy a změnu měřítka, zatímco čisté Tcl/Tk umí jen kopii."
+        "A) 'Světe' — metoda read() vrací pouze poslední přečtenou řádku ze zadaného otevřeného textového souboru.",
+        "B) 'Ahoj\\nSvěte' — metoda read() načte celý obsah souboru jako jeden řetězec včetně odřádkování.",
+        "C) ['Ahoj\\n', 'Světe'] — metoda read() automaticky rozdělí všechny načtené řádky do prvkového seznamu.",
+        "D) 'AhojSvěte' — metoda read() při načítání automaticky odstraní všechny bílé znaky a odřádkování."
+      ],
+      "answer": 1,
+      "explanation": "Metoda soubor.read() bez argumentu přečte celý obsah souboru najednou a vrátí jej jako jeden jediný řetězec typu str, v němž jsou zachovány všechny původní znaky nového řádku (\\n).",
+      "code": "# soubor data.txt obsahuje:\n# Ahoj\n# Světe\nwith open('data.txt', encoding='utf-8') as f:\n    data = f.read()\nprint(repr(data))"
+    }
+  ],
+  "serialization_overview": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Proč je nebezpečné načítat neznámá data pomocí modulu pickle (pickle.load)?",
+      "options": [
+        "A) pickle dokáže při deserializaci spustit libovolný kód zabudovaný v datovém toku.",
+        "B) pickle trvale smaže otevřený soubor, pokud narazí na neznámou datovou třídu.",
+        "C) pickle automaticky přepisuje systémové proměnné prostředí daného uživatele OS.",
+        "D) pickle nepodporuje znakové kódování UTF-8 a způsobí přetečení v paměti RAM."
       ],
       "answer": 0,
-      "explanation": "V rozhraní Tkinteru provádí metoda copy() pouze přesnou kopii obrázku 1:1. Pro ořezy, výřezy a změnu měřítka při kopírování je v Tcl/Tk nutné použít příslušné nízkoúrovňové volání.",
+      "explanation": "Formát pickle není bezpečný vůči neznámým datům. Proces deserializace dokáže zkonstruovat objekty a zavolat jejich metody/konstruktory, což umožňuje útočníkovi spustit v systému libovolný kód (Arbitrary Code Execution).",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "K čemu slouží standardní modul shelve v Pythonu?",
+      "options": [
+        "A) Umožňuje šifrování datových struktur za pomoci symetrického tajného klíče.",
+        "B) Poskytuje perzistentní slovník uložený na disku s využitím modulu pickle.",
+        "C) Slouží k rychlému generování bajtkódu .pyc pro moduly spouštěné v paměti.",
+        "D) Zajišťuje kompresi binárních dat před jejich odesláním po síťovém spojení."
+      ],
+      "answer": 1,
+      "explanation": "Modul shelve funguje jako perzistentní slovník na disku. Klíče jsou řetězce a hodnoty jsou libovolné pythoní objekty serializované pomocí modulu pickle.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jaké je hlavní určení modulu marshal ve standardní knihovně Pythonu?",
+      "options": [
+        "A) Serializace běžných datových struktur do lidsky čitelného formátu JSON a XML.",
+        "B) Ukládání kompletních grafických objektů a uživatelského rozhraní aplikací.",
+        "C) Čtení a zápis internalizovaného pseudozkompilovaného bajtkódu souborů .pyc.",
+        "D) Bezpečná serializace datových struktur pro přenos mezi různými verzemi jazyka."
+      ],
+      "answer": 2,
+      "explanation": "Modul marshal slouží především interním potřebám Pythonu pro čtení a zápis .pyc souborů (zkompilovaný bajtkód). Není určen pro obecnou serializaci.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Data uložená pomocí modulu pickle jsou standardně v lidsky čitelném textovém formátu.",
+      "options": [
+        "A) Pravda – pickle vytváří přenosný textový soubor ve formátu JSON.",
+        "B) Nepravda – pickle používá binární formát určený pouze pro Python."
+      ],
+      "answer": 1,
+      "explanation": "Modul pickle ukládá objekty v binárním formátu specifickém pro Python. Není lidsky čitelný ani přímo kompatibilní s jinými jazyky.",
+      "code": null
+    }
+  ],
+  "objects_basics": [
+    {
+      "id": "basics_q1",
+      "type": "multiple_choice",
+      "question": "Jak se změní hodnoty atributů u instancí po in-place modifikaci seznamu definovaného v těle třídy?",
+      "options": [
+        "A) [] (protože každá instance automaticky dostává vlastní kopii seznamu)",
+        "B) AttributeError (protože k items nelze přistupovat přes instanci a2)",
+        "C) [1] (protože items je sdílený třídní atribut modifikovaný v místě)",
+        "D) None (protože metoda append nevrací žádnou hodnotu při modifikaci)"
+      ],
+      "answer": 2,
+      "explanation": "Atribut items definovaný v těle třídy je třídní proměnná sdílená všemi instancemi. Volání a1.items.append(1) modifikuje tento sdílený seznam přímo v paměti, takže změna je viditelná i přes ostatní instance (a2.items vrátí [1]).",
+      "code": null
+    },
+    {
+      "id": "basics_q2",
+      "type": "multiple_choice",
+      "question": "Jaký bude výstup při přístupu ke třídnímu a instančnímu atributu po přiřazení w.color = 'blue'?",
+      "options": [
+        "A) blue blue (přiřazení na instanci změní hodnotu přímo v samotné třídě Widget)",
+        "B) red red (přiřazení je ignorováno, protože třídní atribut color je konstantní)",
+        "C) TypeError (protože atribut color nelze takto přepsat bez metody __setattr__)",
+        "D) red blue (na instanci w vznikne nový atribut shadowující třídní atribut)"
+      ],
+      "answer": 3,
+      "explanation": "Přiřazení do w.color zápisem nevytváří ani nemění atribut na třídě Widget, ale vytvoří nový instanční atribut na objektu w, který překryje (shadowuje) původní třídní atribut. Widget.color zůstává 'red'.",
+      "code": null
+    },
+    {
+      "id": "basics_q3",
+      "type": "multiple_choice",
+      "question": "Jaký bude výstup při volání funkce nadefinované v těle třídy C bez dekorátoru přímo přes jmenný prostor třídy C.info(5)?",
+      "options": [
+        "A) 5 (při volání přímo na třídě se předá přesně jeden argument bez automatického self)",
+        "B) TypeError (protože funkce v těle třídy musí mít vždy definovaný parametr self)",
+        "C) <bound method C.info> (vrátí se svázaná metoda místo vyhodnocení výsledku)",
+        "D) None (protože funkce v třídě bez dekorátoru nevracejí žádnou konkrétní hodnotu)"
+      ],
+      "answer": 0,
+      "explanation": "Při volání nedekorované funkce přímo přes třídu (C.info(5)) funguje objekt jako obyčejný jmenný prostor. Funkce nedostává žádný implicitní parametr self a argument 5 se naváže na parametr x.",
+      "code": null
+    },
+    {
+      "id": "basics_q4",
+      "type": "predict_output",
+      "question": "Jaká chyba nastane při volání nedekorované jednoplánové funkce def info(x): z instance třídy c.info(5)?",
+      "options": [
+        "A) AttributeError: 'C' object has no attribute 'info' v rámci instance",
+        "B) TypeError: C.info() takes 1 positional argument but 2 were given",
+        "C) <C object> (metoda vrací referenci na instanci c uloženou v parametru x)",
+        "D) 5 (metoda úspěšně vrátí předanou hodnotu 5 bez ohledu na instanci c)"
+      ],
+      "answer": 1,
+      "explanation": "Volání na instanci (c.info(5)) automaticky vkládá instanci c jako prvotní poziční argument (self). Jelikož definice info(x) přijímá pouze 1 argument, předání instance c i čísla 5 vyvolá TypeError o předání 2 argumentů.",
+      "code": null
+    },
+    {
+      "id": "basics_q5",
+      "type": "fill_blank_choice",
+      "question": "Doplňte správný dekorátor ________ před def increment(cls): pro metodu třídy s prvním implicitním argumentem cls.",
+      "options": [
+        "@staticmethod",
+        "@instancemethod",
+        "@classmethod",
+        "@classproperty"
+      ],
+      "answer": 2,
+      "explanation": "Dekorátor @classmethod způsobí, že dekorovaná metoda dostane při volání na třídě i na instanci jako první implicitní parametr referenci na objekt třídy (konvenčně pojmenovaný cls).",
+      "expected": "@classmethod",
+      "code": "vysledek = ________"
+    },
+    {
+      "id": "basics_q6",
+      "type": "multiple_choice",
+      "question": "Jakým způsobem Python provádí tzv. name mangling u atributů začínajících dvěma podtržítky (např. __b)?",
+      "options": [
+        "A) Zablokuje zápis i čtení daného atributu na úrovni paměťového interpreteru.",
+        "B) Odstraní atribut z objektu a uloží jej do soukromého modulu __private__.",
+        "C) Přejmenuje atribut na __b_private a znemožní k němu jakýkoliv přístup.",
+        "D) Přejmenuje atribut v interním slovníku na tvar _NázevTřídy__b."
+      ],
+      "answer": 3,
+      "explanation": "Atributy začínající dvěma podtržítky (bez zakončení 2 podtržítky) jsou Pythonem transformovány na tvar _JménoTřídy__atribut (přičemž začáteční podtržítka názvu třídy se odstraňují). Jde o ochranu proti přepsání atributů v potomcích, nikoliv o neprolomitelnou privátnost.",
+      "code": null
+    },
+    {
+      "id": "basics_q7",
+      "type": "fill_blank_choice",
+      "question": "Doplňte správný výraz ________.__init__(name) pro volání konstruktoru rodičovské třídy v Python 3.",
+      "options": [
+        "super()",
+        "parent()",
+        "self()",
+        "base()"
+      ],
+      "answer": 0,
+      "explanation": "V Pythonu 3 nahrazuje volání super().__init__(...) starší bezargumentový i explicitní zápis super(AktuálníTřída, self).__init__(...). Zjišťuje rodičovské třídy automaticky z MRO.",
+      "expected": "super()",
+      "code": "vysledek = ________"
+    },
+    {
+      "id": "basics_q8",
+      "type": "multiple_choice",
+      "question": "Jaký bude výstup volání statické metody dekorované @staticmethod přes instanci třídy m.add(3, 4)?",
+      "options": [
+        "A) 10 (protože prvním implicitním argumentem je instance m reprezentující hodnotu 3)",
+        "B) 7 (statická metoda nedostává implicitní self ani cls a bere přesně zadané argumenty)",
+        "C) TypeError (protože statickou metodu lze volat výhradně přes název třídy Math)",
+        "D) None (protože statické metody slouží pouze k úpravě třídních proměnných bez návratu)"
+      ],
+      "answer": 1,
+      "explanation": "Metoda označená @staticmethod nedostává žádné implicitní prvotní parametry (ani self, ani cls). Při volání m.add(3, 4) se předají přesně 2 argumenty a výsledek je 3 + 4 = 7.",
       "code": null
     }
   ],
@@ -1066,174 +1005,92 @@
       "code": null
     }
   ],
-  "pnm": [
+  "textwrap": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Které magické číslo v hlavičce souboru PNM označuje binární formát pro RGB obrázek (PPM)?",
+      "question": "Jaký je hlavní rozdíl v návratové hodnotě funkcí textwrap.wrap() a textwrap.fill()?",
       "options": [
-        "A) P6",
-        "B) P5",
-        "C) P4",
-        "D) P3"
+        "A) wrap() zkracuje text podle slov s výpustkou, zatímco fill() odstraňuje ze začátku společné mezery.",
+        "B) fill() vrací seznam jednotlivých řádků jako řetězců, zatímco wrap() vrací jeden řetězec spojený znaky \\n.",
+        "C) wrap() funguje pouze pro jednobajtové řetězce z ASCII, zatímco fill() podporuje i Unicode znaky.",
+        "D) wrap() vrací seznam jednotlivých řádků jako řetězců, zatímco fill() vrací jeden řetězec spojený znaky \\n."
       ],
-      "answer": 0,
-      "explanation": "Magická čísla P1/P4 patří PBM, P2/P5 patří PGM a P3/P6 patří PPM. Sudá čísla označují binární kódování, tudíž binární RGB obrázek je P6.",
+      "answer": 3,
+      "explanation": "textwrap.wrap() zalamuje text a vrací Python list řádků. textwrap.fill() je zkratka pro '\\n'.join(wrap(...)) a vrací zalamovaný víceřádkový řetězec.",
       "code": null
     },
     {
       "id": "q2",
       "type": "predict_output",
-      "question": "Co v monochromatických formátech PBM (P1 a P4) představují bity či čísla 0 a 1?",
+      "question": "Jaký bude výstup výrazu textwrap.shorten(\"příliš žluťoučký kůň\", width=12) při výchozím nastavení placeholder=' [...]'?",
       "options": [
-        "A) Hodnoty 0 a 1 jsou závislé výhradně na zvoleném nastavení palety v hlavičce.",
-        "B) 0 představuje bílou barvu (pozadí) a 1 představuje černou barvu (popředí).",
-        "C) 0 představuje průhlednost a 1 představuje maximální nastavenou barvu.",
-        "D) 0 představuje černou barvu (popředí) a 1 představuje bílou barvu (pozadí)."
+        "A) 'příliš [...]'",
+        "B) 'příliš ž [...]'",
+        "C) 'příliš žluť'",
+        "D) 'příliš žluťoučký'"
       ],
-      "answer": 1,
-      "explanation": "V formátu PBM označuje hodnota 0 bílé pozadí a hodnota 1 černou barvu. To je opacně oproti šedotónovým formátům PGM, kde 0 znamená nejtmavší (černou).",
+      "answer": 0,
+      "explanation": "shorten() zkracuje text po celých slovech tak, aby se do zadané šířky width vlezl i zástupný symbol (zde 8 znaků '[...]'). 'příliš žluťoučký [...]' má 22 znaků, proto zůstane jen 'příliš [...]' (12 znaků).",
       "code": null
     },
     {
       "id": "q3",
       "type": "multiple_choice",
-      "question": "Jak jsou uložena grafická data pixelů v binární variantě P4 formátu PBM?",
+      "question": "Jakým způsobem funguje funkce textwrap.dedent(text) při úpravě víceřádkového řetězce?",
       "options": [
-        "A) Pixely jsou komprimovány jednoduchým během opakovaných hodnot RLE do bajtů.",
-        "B) Každé dva pixely jsou sloučeny do jednoho bajtu v podobě čtyřbitových nibblů.",
-        "C) Každý bajt obsahuje přesně 8 pixelů, kde jednotlivé bity odpovídají černobílým pixelům.",
-        "D) Každému pixelu odpovídá právě jeden celý bajt obsahující hodnotu 0x00 nebo 0xFF."
-      ],
-      "answer": 2,
-      "explanation": "V binárním PBM (P4) je pro úsporu 8 pixelů sloučeno do 1 bajtu. Pokud šířka obrázku není násobkem 8, přebytečné bity v posledním bajtu se doplňují nulami.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "predict_output",
-      "question": "Jaký problém nastává při zapsání binárního formátu P5 nebo P6 na systému Windows s koncem řádek \\r\\n?",
-      "options": [
-        "A) Hlavička souboru je parserem odmítnuta jako neplatná z důvodu nálezu nepovolených znaků.",
-        "B) Zpracovávající aplikace zkonvertuje dvoubajtový konec řádky na jediný mezerní bajt.",
-        "C) Soubor se sice otevře, ale barevná data všech pixelů se posunou o 8 bitů v barevné paletě.",
-        "D) Znak \\r poslouží jako oddělovač hlavičky a znak \\n je chybě interpretován jako první bajt dat."
-      ],
-      "answer": 3,
-      "explanation": "Binární data v PNM musí začínat těsně za jediným whitespace bajtem. Při Windows konci řádek \\r\\n ukončí znak \\r (CR) hlavičku a znak \\n (LF, 0x0A) přečte dekodér jako první datový bajt.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "fill_blank_choice",
-      "question": "Doplňte rozbalení trojice barevných kanálů v binárním formátu PPM (P6), kde jsou pixely uloženy v pořadí červená, zelená, modrá.",
-      "options": [
-        "r, g, b",
-        "r, g, b, a",
-        "b, g, r",
-        "g, r, b"
-      ],
-      "answer": 0,
-      "explanation": "Binární formát PPM (P6) ukládá pro každý pixel právě 3 bajty v pevném pořadí složek R (červená), G (zelená) a B (modrá).",
-      "code": "import struct\n\ndef parse_p6_pixel(pixel_bytes: bytes) -> tuple[int, int, int]:\n    # Formát P6 ukládá 3 bajty na pixel v kanálovém pořadí:\n    ________ = struct.unpack(\"3B\", pixel_bytes[:3])\n    return (r, g, b)",
-      "expected": "r, g, b"
-    },
-    {
-      "id": "q6",
-      "type": "true_false_tricky",
-      "question": "Posuďte způsob zápisu hlavičky u binárních variant PNM (P4, P5, P6).",
-      "options": [
-        "A) Pravda: Hlavička binárních variant je zapsána v ASCII textu úplně stejně jako u ASCII variant.",
-        "B) Nepravda: Hlavička binárních variant je uložena v binární struktuře s pevnou délkou bajtů."
-      ],
-      "answer": 0,
-      "explanation": "Všechny formáty PNM (ASCII i binární P4-P6) mají hlavičku (identifikátor, rozměry, max hodnota) uloženu v kódování ASCII. Změna na binární uložení se týká výhradně samotných dát za hlavičkou.",
-      "code": null
-    }
-  ],
-  "shelve": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Který datový typ je v modulu shelve vyžadován pro klíče perzistentního slovníku?",
-      "options": [
-        "A) Jakýkoliv piklitelný objekt.",
-        "B) Výhradně textové řetězce str.",
-        "C) Libovolný immutable typ s hash().",
-        "D) Pouze celá čísla int a str."
+        "A) Odstraní ze všech řádků pouze první znak bez ohledu na to, zda se jedná o mezeru nebo písmeno.",
+        "B) Odstraní ze všech řádků textu maximální počet společných úvodních bílých znaků (mezer a tabulátorů).",
+        "C) Odstraní veškeré bílé znaky na konci všech řádků a nahradí je jedním odřádkováním \\n.",
+        "D) Nahradí všechny tabulátory na začátku řádků přesně čtyřmi mezerami bez ohledu na ostatní řádky."
       ],
       "answer": 1,
-      "explanation": "Backend dbm pod modulem shelve vyžaduje striktně řetězcové klíče (str). Hodnotami v perzistentním slovníku mohou být libovolné serializovatelné pythoní objekty.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký účinek má příkaz db['seznam'].append(99) v databázi shelve při výchozím nastavení writeback=False?",
-      "options": [
-        "A) Kód selže a vyvolá výjimku PermissionError kvůli zápisu do neotevřené vyrovnávací paměti.",
-        "B) Změna se uloží do paměťové cache a provede se její zapsání až při volání metody db.close().",
-        "C) Seznam v databázi zůstane nezměněn, protože modifikace mutable objektu se bez přiřazení nezapsala.",
-        "D) Změna se okamžitě zapíše na disk do souboru databáze bez nutnosti jakéhokoliv dalšího zásahu."
-      ],
-      "answer": 2,
-      "explanation": "Při výchozím writeback=False vrací db['seznam'] odpicklovaný dočasný objekt. Příkaz .append(99) modifikuje tuto kopii. Pro uložení na disk je nutné znovupřiřazení db['seznam'] = temp.",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "true_false_tricky",
-      "question": "Posuďte výhody a nevýhody otevření databáze shelve s parametrem writeback=True.",
-      "options": [
-        "A) Nepravda: Zrychluje zavírání databáze, ale zakazuje použití in-place mutable operací na slovníku.",
-        "B) Pravda: Umožňuje přímé modifikace mutable objektů, ale udržuje v paměti cache všech načtených položek."
-      ],
-      "answer": 1,
-      "explanation": "Nastavení writeback=True uchovává všechny načtené i upravené položky v paměťovém cache slovníku. To umožňuje in-place úpravy, ale dramaticky zvyšuje spotřebu paměti a zpomaluje sync/close.",
+      "explanation": "dedent() zkoumá úvodní odsazení neprázdných řádků a odebere z každého řádku prefix z bílých znaků, který sdílejí všechny řádky v textu.",
       "code": null
     },
     {
       "id": "q4",
       "type": "fill_blank_choice",
-      "question": "Která hodnota parametru flag ve funkci shelve.open() vynutí vytvoření nové prázdné databáze s přepsáním existujícího souboru?",
+      "question": "Doplňte predikát funkce textwrap.indent() pro vynucení odsazení všech řádků včetně prázdných:",
       "options": [
-        "'c'",
-        "'w'",
-        "'r'",
-        "'n'"
+        "lambda line: line.strip()",
+        "lambda line: bool(line)",
+        "lambda line: True",
+        "lambda line: False"
       ],
-      "answer": 3,
-      "explanation": "Příznak flag='n' (new) otevře databázi pro čtení i zápis a vždy vytvoří novou prázdnou databázi s přepsáním původního souboru.",
-      "code": "import shelve\n\n# Otevření databáze pro zápis s vynuceným vytvořením nového souboru\nwith shelve.open(\"lab_results.db\", flag=________) as db:\n    db[\"experiment_1\"] = {\"yield\": 0.85, \"purity\": 0.99}",
-      "expected": "'n'"
+      "answer": 2,
+      "explanation": "Výchozí predikát vynechává prázdné řádky; předáním lambda line: True se prefix vloží před každý řádek bez výjimky.",
+      "code": "import textwrap\n\ntext = \"první\\n\\ndruhý\"\n# Odsadit všechny řádky včetně prázdných:\nresult = textwrap.indent(text, \"    \", predicate=________)",
+      "expected": "lambda line: True"
     },
     {
       "id": "q5",
-      "type": "multiple_choice",
-      "question": "Jaká omezení platí pro přístup více procesů či skriptů k téže databázi modulu shelve?",
+      "type": "true_false_tricky",
+      "question": "Proč je při opakovaném zalamování tisíců textů výhodnější vytvořit vlastní instanci TextWrapper než dokola volat textwrap.fill()?",
       "options": [
-        "A) Pro zápis může mít databázi otevřenou současně pouze jediný proces; pro čtení více procesů.",
-        "B) Konkurentní čtení i zápis jsou podporovány výhradně v případě použití backendu dbm.dumb.",
-        "C) Databázi může mít současně otevřenou právě jeden proces bez ohledu na čtení či zápis.",
-        "D) Databáze plně podporuje paralelní zápis z více procesů díky zámkům na úrovni backendu."
+        "A) Funkce textwrap.fill() nepodporuje pojmenované argumenty width a subsequent_indent při přímém volání.",
+        "B) Samostatná instance TextWrapper automaticky běží v paralelních vláknech a zrychluje výpočet.",
+        "C) Funkce textwrap.fill() modifikuje globální nastavení Pythonu, zatímco instance TextWrapper je izolovaná.",
+        "D) Volání textwrap.fill() při každém spuštění zbytečně instancuje a zahazuje novou instanci třídy TextWrapper."
       ],
-      "answer": 0,
-      "explanation": "Modul shelve nezajišťuje zamykání pro paratelní zápis. Zápis z více procesů naráz může poškodit databázi. Paralelní čtení z více procesů je bezpečné.",
+      "answer": 3,
+      "explanation": "Pomocné funkce wrap, fill i shorten vytvářejí uvnitř při každém volání nový objekt TextWrapper. Pro masivní zalamování je proto z hlediska výkonu efektivnější reusovat jednu instanci.",
       "code": null
     },
     {
       "id": "q6",
-      "type": "predict_output",
-      "question": "Které soubory vytvoří záložní backend dbm.dumb na disku při práci s databází pojmenovanou mojedata?",
+      "type": "fill_blank_choice",
+      "question": "Který parametr třídy TextWrapper zabrání rozdělení dlouhých slov přesahujících zadanou šířku řádku?",
       "options": [
-        "A) Pouze jediný binární soubor s příponou mojedata.db vytvořený ve složce projektu.",
-        "B) Soubory mojedata.dat a mojedata.dir (případně mojedata.bak při spuštěném provozu).",
-        "C) Dvojici souborů mojedata.sqlite a mojedata.log pro podporu transakčního logování.",
-        "D) Trojici souborů mojedata.txt, mojedata.json a mojedata.bin v cache adresáři."
+        "break_long_words",
+        "break_on_hyphens",
+        "drop_whitespace",
+        "replace_whitespace"
       ],
-      "answer": 1,
-      "explanation": "Čistě pythoní backend dbm.dumb vytváří dvojici souborů .dat a .dir (plus .bak během manipulace), které uchovávají indexy klíčů a samotná bajtová data.",
-      "code": null
+      "answer": 0,
+      "explanation": "Parametr break_long_words=False v třídě TextWrapper způsobí, že slova přesahující šířku width nebudou násilně roztržena na více řádků.",
+      "code": "import textwrap\n\nwrapper = textwrap.TextWrapper(width=20, ________=False)\ntext = \"Supercalifragilisticexpialidocious je velmi dlouhe slovo\"\nlines = wrapper.wrap(text)\n# Dlouhe slovo zustane v celku na samostatnem radku",
+      "expected": "break_long_words"
     }
   ],
   "index": [
@@ -1321,59 +1178,346 @@
       "code": null
     }
   ],
-  "serialization_overview": [
+  "PhotoImage": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Jaký datový typ je vyžadován pro parametr data při přímém předání bajtových dat do PhotoImage?",
+      "options": [
+        "A) Libovolný textový řetězec str v kódování UTF-8 s bajty.",
+        "B) Objekt typu io.BytesIO zabalující paměťový binární proud.",
+        "C) Modifikovatelná sekvence typu bytearray podporující změny.",
+        "D) Striktně nezaměnitelný typ bytes reprezentující binární data."
+      ],
+      "answer": 3,
+      "explanation": "Metoda PhotoImage vyžaduje pro parametr data striktně immutable typ bytes. Použití typu bytearray nebo jiných sekvencí způsobuje selhání vnitřního Tcl/Tk rozhraní.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Který pojmenovaný parametr konstruktoru PhotoImage v Tkinteru slouží k načtení grafických dat ze souboru na disku?",
+      "options": [
+        "file",
+        "filename",
+        "src",
+        "path"
+      ],
+      "answer": 0,
+      "explanation": "Třída tkinter.PhotoImage přijímá pro cestu k souboru na disku pojmenovaný parametr file.",
+      "code": "import tkinter as tk\n\nroot = tk.Tk()\nlogo_img = tk.PhotoImage(________=\"assets/vscht_logo.png\")\nlabel = tk.Label(root, image=logo_img)\nlabel.pack()",
+      "expected": "file"
+    },
+    {
+      "id": "q3",
+      "type": "predict_output",
+      "question": "V jakém formátu vrací metoda photo.get(x, y) informace o barvě konkrétního pixelu?",
+      "options": [
+        "A) Jediné 32bitové celé číslo reprezentující sbalenou hexadecimální barvu.",
+        "B) Jeden textový řetězec složený z dekadických čísel R, G a B oddělených mezerou.",
+        "C) Standardní pythoní n-tice triády celých čísel v pořadí (red, green, blue).",
+        "D) Slovník s klíči 'red', 'green' a 'blue' a celočíselnými hodnotami."
+      ],
+      "answer": 1,
+      "explanation": "Metoda get() vrací výstup Tcl/Tk rozhraní jako jediný řetězec s mezerou oddělenými desítkovými složkami (např. '255 0 128'), nikoli jako n-tici čísel.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Které grafické formáty jsou natively podporovány základní třídou PhotoImage bez doplňkových knihoven?",
+      "options": [
+        "A) Výhradně vektorové formáty EPS a SVG spolu se skriptovatelným Tcl GIF.",
+        "B) Libovolné obrázky ve formátech PNG, JPEG, GIF, BMP a komprimované SVG.",
+        "C) Formát GIF a binární podformáty P5 (odstíny šedé) a P6 (RGB) formátu PNM.",
+        "D) Všechny podformáty P1 až P6 rodiny PNM a nekomprimované BMP soubory."
+      ],
+      "answer": 2,
+      "explanation": "Základní PhotoImage v distribuci Tkinteru bez použití Pillow podporuje výhradně formát GIF a binární podformáty P5 a P6 rodiny PNM (PBM/PGM/PPM).",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Porovnejte možnosti metody copy() třídy PhotoImage v Pythonu oproti příkazům v čistém Tcl/Tk.",
+      "options": [
+        "A) Pravda: Tkinterová metoda copy() zvládá vytvořit pouze přesnou kopii celého obrázku bez změny velikosti.",
+        "B) Nepravda: Tkinterová metoda copy() umožňuje výřezy a změnu měřítka, zatímco čisté Tcl/Tk umí jen kopii."
+      ],
+      "answer": 0,
+      "explanation": "V rozhraní Tkinteru provádí metoda copy() pouze přesnou kopii obrázku 1:1. Pro ořezy, výřezy a změnu měřítka při kopírování je v Tcl/Tk nutné použít příslušné nízkoúrovňové volání.",
+      "code": null
+    }
+  ],
+  "png": [
+    {
+      "id": "png_q1",
+      "type": "multiple_choice",
+      "question": "Jaká je minimální platná sekvence chunků pro vytvoření validního bezpaletového PNG obrázku?",
+      "options": [
+        "A) Pouze chunky IHDR, IDAT a IEND v tomto přesném pořadí.",
+        "B) Pouze chunky PNGH, DATA a PNGE v tomto přesném pořadí.",
+        "C) Pouze chunky HEAD, BODY a TAIL v tomto přesném pořadí.",
+        "D) Pouze chunky IHDR, PLTE, IDAT a IEND v tomto pořadí."
+      ],
+      "answer": 0,
+      "explanation": "Nejjednodušší platný PNG soubor bez palety vyžaduje hlavičkový chunk IHDR (obsahuje rozměry a typ), alespoň jeden datový chunk IDAT a ukončovací chunk IEND. Chunk PLTE je vyžadován pouze u paletových obrázků.",
+      "code": null
+    },
+    {
+      "id": "png_q2",
+      "type": "predict_output",
+      "question": "Jakou zrekonstruovanou hodnotu bajtu vrátí rekonstrukční filtr typu 1 (Sub) pro zafiltrovaný bajt Filt(x) = 15, je-li zrekonstruovaná hodnota předchozího bajtu Recon(a) = 40?",
+      "options": [
+        "A) 25 (rozdíl mezi hodnotou Recon(a) a filtrovanou hodnotou bajtu Filt(x))",
+        "B) 55 (součet hodnoty Filt(x) a předchozího zrekonstruovaného bajtu Recon(a))",
+        "C) 15 (původní zafiltrovaná hodnota Filt(x) bez přičtení okolních pixelů)",
+        "D) 40 (hodnota předchozího sousedního bajtu Recon(a) bez přičtení Filt(x))"
+      ],
+      "answer": 1,
+      "explanation": "Rekonstrukční filtr Sub (typ 1) přičítá k zafiltrované hodnotě Filt(x) odfiltrovanou hodnotu předchozího bajtu na stejném řádku Recon(a): Recon(x) = (15 + 40) % 256 = 55.",
+      "code": null
+    },
+    {
+      "id": "png_q3",
+      "type": "true_false_tricky",
+      "question": "Nad kterými částmi chunku se v PNG souboru počítá kontrolní součet CRC32?",
+      "options": [
+        "A) Nad typem chunku a datovou částí chunku; délka chunku a samotné CRC se nezahrnují.",
+        "B) Pouze nad datovou částí chunku (data); délka a typ chunku se do výpočtu nezahrnují."
+      ],
+      "answer": 0,
+      "explanation": "Podle specifikace PNG se kontrolní součet CRC32 v jednotlivých chuncích počítá ze sekvence vytvořené ze 4 bajtů typu chunku a vlastní datové části. Pole udávající délku dat na začátku chunku se do CRC nezahrnuje.",
+      "code": null
+    },
+    {
+      "id": "png_q4",
+      "type": "fill_blank_choice",
+      "question": "Doplňte funkci knihovny zlib pro dekompresi sloučených binárních dat z datových bloků IDAT v PNG souboru.",
+      "options": [
+        "zlib.unpack",
+        "zlib.inflate",
+        "zlib.decompress",
+        "zlib.decode"
+      ],
+      "answer": 2,
+      "explanation": "Pro dekompresi dat komprimovaných algoritmem DEFLATE se v modulu zlib používá standardní funkce zlib.decompress().",
+      "code": "import zlib\n\ncompressed_idat_stream = b\"x\\x9c\\xcbH\\xcd\\xc9\\xc9W(\\xcf/\\xcaI\\x01\\x00\\x1a\\x0b\\x04]\"\ndecompressed_bytes = ________(compressed_idat_stream)\n# Vystup: bajty nekomprimovanych pixelovych radek",
+      "expected": "zlib.decompress"
+    },
+    {
+      "id": "png_q5",
+      "type": "multiple_choice",
+      "question": "Jaký relativní význam mají bajty a, b a c při výpočtu řádkových filtrů v PNG specifikaci?",
+      "options": [
+        "A) a je červená složka, b je zelená složka a c je modrá složka.",
+        "B) a je pixel vpravo, b je pixel dole a c je pixel vpravo dole.",
+        "C) a je aktuální pixel, b je předchozí pixel a c je následující.",
+        "D) a je pixel vlevo, b je pixel nahoře a c je pixel vlevo nahoře."
+      ],
+      "answer": 3,
+      "explanation": "Ve schématu filtrů PNG představuje x zpracovávaný bajt, a bajt předcházející na stejném řádku (vlevo), b odpovídající bajt na předchozím řádku (nahoře) a c předcházející bajt na předchozím řádku (vlevo nahoře).",
+      "code": null
+    },
+    {
+      "id": "png_q6",
+      "type": "multiple_choice",
+      "question": "Jaké pořadí bajtů (endianness) předepisuje specifikace PNG pro všechna vícebajtová celá čísla?",
+      "options": [
+        "A) Big Endian, kde nejvýznamnější bajt je uložen v paměti na nejnižší adrese.",
+        "B) Little Endian, kde nejméně významný bajt je uložen na nejnižší adrese.",
+        "C) Network Endian, který střídá bajty podle pořadí barevných kanálů RGB.",
+        "D) Native Endian, který závisí výhradně na architektuře procesoru počítače."
+      ],
+      "answer": 0,
+      "explanation": "PNG specifikace striktně vyžaduje ukládání vícebajtových celých čísel (např. délka chunku, šířka a výška obrázku) v pořadí Big Endian (nejvýznamnější bajt vlevo / jako první).",
+      "code": null
+    },
+    {
+      "id": "png_q7",
+      "type": "multiple_choice",
+      "question": "Jakou hodnotu vrátí Paethův prediktor paeth(a, b, c) pro vstupy a = 100, b = 105, c = 100?",
+      "options": [
+        "A) 205 (protože výsledek je součtem hodnot a a b bez odečtení prvku c)",
+        "B) 105 (protože vzdálenost pb je 0, což je nejmenší hodnota ze všech tří odchylek)",
+        "C) 5 (protože výsledek odpovídá absolutnímu rozdílu hodnot p a proměnné a)",
+        "D) 100 (protože hodnota a má přednost před b při rovnosti odchylek pa a pc)"
+      ],
+      "answer": 1,
+      "explanation": "V Paethově prediktoru spočteme p = 100 + 105 - 100 = 105. Odchylky jsou pa = abs(105-100) = 5, pb = abs(105-105) = 0, pc = abs(105-100) = 5. Nejměnší je pb = 0 (podmínka pb <= pc je splněna), takže prediktor vrátí b = 105.",
+      "code": null
+    }
+  ],
+  "wsgi": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Proč je nebezpečné načítat neznámá data pomocí modulu pickle (pickle.load)?",
+      "question": "Jakou signaturu (poziční parametry) musí mít volatelný objekt WSGI aplikace podle standardu PEP 3333?",
       "options": [
-        "A) pickle dokáže při deserializaci spustit libovolný kód zabudovaný v datovém toku.",
-        "B) pickle trvale smaže otevřený soubor, pokud narazí na neznámou datovou třídu.",
-        "C) pickle automaticky přepisuje systémové proměnné prostředí daného uživatele OS.",
-        "D) pickle nepodporuje znakové kódování UTF-8 a způsobí přetečení v paměti RAM."
+        "A) application(headers, body_stream)",
+        "B) application(environ, start_response)",
+        "C) application(request, response)",
+        "D) application(server, client_socket)"
       ],
-      "answer": 0,
-      "explanation": "Formát pickle není bezpečný vůči neznámým datům. Proces deserializace dokáže zkonstruovat objekty a zavolat jejich metody/konstruktory, což umožňuje útočníkovi spustit v systému libovolný kód (Arbitrary Code Execution).",
+      "answer": 1,
+      "explanation": "WSGI standard stanovuje, že aplikace je callable se dvěma pozičními argumenty: environ (slovník proměnných prostředí) a start_response (funkce pro zahájení HTTP hlaviček).",
       "code": null
     },
     {
       "id": "q2",
       "type": "multiple_choice",
-      "question": "K čemu slouží standardní modul shelve v Pythonu?",
+      "question": "V jakém datovém typu a struktuře musí WSGI aplikace vracet tělo HTTP odpovědi?",
       "options": [
-        "A) Umožňuje šifrování datových struktur za pomoci symetrického tajného klíče.",
-        "B) Poskytuje perzistentní slovník uložený na disku s využitím modulu pickle.",
-        "C) Slouží k rychlému generování bajtkódu .pyc pro moduly spouštěné v paměti.",
-        "D) Zajišťuje kompresi binárních dat před jejich odesláním po síťovém spojení."
+        "A) Jako otevřený souborový objekt připravený pro čtení v textovém režimu 'r'.",
+        "B) Jako slovník (dict) obsahující klíče 'headers' a 'body' s bajtovými daty.",
+        "C) Jako iterovatelný objekt (např. list), jehož prvky jsou bajtové řetězce (bytes).",
+        "D) Jako prostý textový řetězec (str) zakódovaný do UTF-8 bez použití iterátoru."
       ],
-      "answer": 1,
-      "explanation": "Modul shelve funguje jako perzistentní slovník na disku. Klíče jsou řetězce a hodnoty jsou libovolné pythoní objekty serializované pomocí modulu pickle.",
+      "answer": 2,
+      "explanation": "WSGI vyžaduje vrácení iterable vracejícího bajty (b'bytes'). Samotný bajtový řetězec b'...' sice je iterable, ale iteroval by se po jednotlivých bajtech (což je neefektivní/chybové), proto se balí do např. [b'data'].",
       "code": null
     },
     {
       "id": "q3",
       "type": "multiple_choice",
-      "question": "Jaké je hlavní určení modulu marshal ve standardní knihovně Pythonu?",
+      "question": "Která proměnná prostředí ve slovníku environ obsahuje cestu HTTP dotazu začínající znakem /?",
       "options": [
-        "A) Serializace běžných datových struktur do lidsky čitelného formátu JSON a XML.",
-        "B) Ukládání kompletních grafických objektů a uživatelského rozhraní aplikací.",
-        "C) Čtení a zápis internalizovaného pseudozkompilovaného bajtkódu souborů .pyc.",
-        "D) Bezpečná serializace datových struktur pro přenos mezi různými verzemi jazyka."
+        "A) QUERY_STRING",
+        "B) HTTP_HOST",
+        "C) REQUEST_URI",
+        "D) PATH_INFO"
       ],
-      "answer": 2,
-      "explanation": "Modul marshal slouží především interním potřebám Pythonu pro čtení a zápis .pyc souborů (zkompilovaný bajtkód). Není určen pro obecnou serializaci.",
+      "answer": 3,
+      "explanation": "PATH_INFO obsahuje cestu v aplikaci požadovanou klientem (začíná lomítkem '/'). QUERY_STRING obsahuje parametry za otazníkem '?'.",
       "code": null
     },
     {
       "id": "q4",
-      "type": "true_false_tricky",
-      "question": "Data uložená pomocí modulu pickle jsou standardně v lidsky čitelném textovém formátu.",
+      "type": "multiple_choice",
+      "question": "Jakým způsobem se z objektu environ['wsgi.input'] správně načítají data zaslaná v těle POST dotazu?",
       "options": [
-        "A) Pravda – pickle vytváří přenosný textový soubor ve formátu JSON.",
-        "B) Nepravda – pickle používá binární formát určený pouze pro Python."
+        "A) Přečtením přesného počtu bajtů získávaných z environ['CONTENT_LENGTH'] pomocí metody read(length).",
+        "B) Převedením objektu wsgi.input na standardní slovník pomocí funkce dict(environ['wsgi.input']).",
+        "C) Neomezeným voláním metody read() bez parametrů, dokud stream nevátí prázdný řetězec \"\".",
+        "D) Iterací přes řádky pomocí for line in environ['wsgi.input'] a jejich následným spojením."
+      ],
+      "answer": 0,
+      "explanation": "WSGI stream wsgi.input nevyžaduje EOF na konci dotazu. Pro správné přečtení těla POST je nutné převést environ['CONTENT_LENGTH'] na celé číslo a zavolat read(length).",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Která funkce ze standardní knihovny rozparsuje parametry z URL dotazu (QUERY_STRING) do slovníku seznamů hodnot?",
+      "options": [
+        "urllib.parse.unquote",
+        "urllib.parse.parse_qs",
+        "urllib.parse.urlsplit",
+        "urllib.parse.urlencode"
       ],
       "answer": 1,
-      "explanation": "Modul pickle ukládá objekty v binárním formátu specifickém pro Python. Není lidsky čitelný ani přímo kompatibilní s jinými jazyky.",
+      "explanation": "Funkce urllib.parse.parse_qs() parsuje URL kódovaný řetězec v QUERY_STRING a vrací slovník, kde hodnotami jsou seznamy řetězců.",
+      "code": "import urllib.parse\n\ndef application(environ, start_response):\n    query_string = environ.get(\"QUERY_STRING\", \"\")\n    params = ________(query_string)\n    # Pro \"sample=benzene&temp=25\" vrati {'sample': ['benzene'], 'temp': ['25']}",
+      "expected": "urllib.parse.parse_qs"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaký je vztah mezi oddělovacím řetězcem z hlavičky boundary a oddělovači v samotném těle multipart/form-data zprávy?",
+      "options": [
+        "A) Hodnota v těle zprávy je identická s atributem boundary bez jakýchkoliv přídavných znaků.",
+        "B) Oddělovače v těle zprávy mají na konci navíc dvě mínuska (--) oproti hodnotě z atributu boundary.",
+        "C) Oddělovače v těle zprávy mají na začátku navíc dvě mínuska (--) oproti hodnotě z atributu boundary.",
+        "D) Atribut boundary obsahuje md5 hash, zatímco v těle zprávy se používá pouze znak odřádkování."
+      ],
+      "answer": 2,
+      "explanation": "MIME specifikace (RFC 1341) určuje, že zapouzdřovací hranice (encapsulation boundary) v těle zprávy začínají dvěma pomlčkami '--' následovanými řetězcem z hlavičky Content-Type: boundary=...",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "fill_blank_choice",
+      "question": "Který výraz se v rozhraní WSGI předává jako volitelný třetí argument exc_info funkci start_response při zpracování výjimky?",
+      "options": [
+        "traceback.format_exc()",
+        "traceback.print_exc()",
+        "sys.last_traceback",
+        "sys.exc_info()"
+      ],
+      "answer": 3,
+      "explanation": "Třetí parametr exc_info přijímá n-tici vrácenou funkcí sys.exc_info(), což serveru umožňuje správně ošetřit chybu a přepsat hlavičky odpovědi.",
+      "code": "import sys\n\ndef application(environ, start_response):\n    try:\n        data = calculate_concentrations()\n        start_response(\"200 OK\", [(\"Content-Type\", \"text/plain\")])\n        return [data.encode(\"utf-8\")]\n    except Exception:\n        start_response(\"500 Internal Server Error\", [(\"Content-Type\", \"text/plain\")], ________)\n        return [b\"Chyba vypoctu\"]",
+      "expected": "sys.exc_info()"
+    }
+  ],
+  "overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
       "code": null
     }
   ],
@@ -1476,106 +1620,6 @@
       "code": null
     }
   ],
-  "forms": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Která hodnota atributu enctype u elementu <form> je vyžadována pro nahrávání souborů na server?",
-      "options": [
-        "A) application/json — převede všechny formulářové prvky na objekt ve formátu JSON před odesláním.",
-        "B) text/plain — odešle data formuláře jako čistý nekódovaný text s mezerami nahrazenými plusy.",
-        "C) application/x-www-form-urlencoded — zakóduje všechny znaky do hexadecimálních kódů ASCII.",
-        "D) multipart/form-data — zabrání kódování znaků a přenáší binární data souborů v částech."
-      ],
-      "answer": 3,
-      "explanation": "Pro nahrávání souborů (prvky <input type=\"file\">) je nutné nastavit enctype=\"multipart/form-data\". Defaultní hodnota application/x-www-form-urlencoded přenese pouze název souboru jako řetězec bez jeho binárního obsahu.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Doplňte HTML atribut tagu <label> pro jeho provázání s jednoznačným identifikátorem příslušného vstupního pole.",
-      "code": "<label ________=\"user_email\">E-mailová adresa:</label>\n<input id=\"user_email\" type=\"email\" name=\"email\" />",
-      "options": [
-        "for",
-        "target",
-        "form",
-        "name"
-      ],
-      "answer": 0,
-      "explanation": "Atribut for u elementu <label> odkazuje na hodnotu atributu id cílového vstupu, což zajistí správné provázání a aktivaci pole při kliknutí.",
-      "expected": "for"
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jaký je hlavní rozdíl mezi atributy id a name u formulářových prvků HTML5?",
-      "options": [
-        "A) id určuje název proměnné odesílané na server, zatímco name jednoznačně identifikuje prvek v DOM stromu.",
-        "B) id jednoznačně identifikuje prvek v DOM dokumentu, zatímco name určuje klíč odesílaný na server.",
-        "C) id slouží ke stylování v CSS skriptech, zatímco name je vyžadován pro spouštění JavaScriptu.",
-        "D) id je povinný pro všechny textové prvky, zatímco name se používá výhradně u skupin přepínačů."
-      ],
-      "answer": 1,
-      "explanation": "Atribut id musí být v rámci celého HTML dokumentu unikátní (využívá ho CSS, JS i <label for=\"...\">). Atribut name definuje název klíče při odeslání formulářových dat na server (více prvků, např. radio buttonů, může sdílet stejný name).",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "true_false_tricky",
-      "question": "Posouzení možnosti vnořování formulářových elementů <form> podle specifikace HTML:",
-      "options": [
-        "A) Vnořování elementů <form> je plně podporováno za podmínky použití odlišných atributů action.",
-        "B) Vnořování elementu <form> do jiného elementu <form> je specifikací HTML přísně zakázáno."
-      ],
-      "answer": 1,
-      "explanation": "Specifikace HTML výslovně zakazuje vnořovat jeden element <form> do druhého. Prohlížeče při naražení na vnořený formulář chování nepředvídatelně mění nebo vnitřní tag zcela ignorují.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "fill_blank_choice",
-      "question": "Který HTML5 atribut umožňuje propojit prvek <input> s formulářem, i když se nachází v kódu mimo tag <form>?",
-      "code": "<form id=\"measurement_form\" action=\"/api/save\" method=\"post\">\n    <button type=\"submit\">Odeslat</button>\n</form>\n\n<!-- Vstupní pole umístěné v DOM mimo tag form -->\n<input type=\"text\" name=\"sample_name\" ________=\"measurement_form\" />",
-      "options": [
-        "target",
-        "action",
-        "form",
-        "for"
-      ],
-      "answer": 2,
-      "explanation": "HTML5 atribut form u vstupních prvků umožňuje jejich přiřazení k formuláři se shodným id, i když leží mimo tělo tagu <form>.",
-      "expected": "form"
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Jaká je hlavní výhoda použití párového elementu <button> oproti nepárovému <input type=\"button\">?",
-      "options": [
-        "A) Element <button> automaticky šifruje všechna odesílaná data pomocí kryptografického certifikátu.",
-        "B) Element <button> se jako jediný formulářový prvek dokáže automaticky přizpůsobit mobilním obrazovkám.",
-        "C) Element <button> nevyžaduje k obsluze kliknutí žádný obslužný kód v JavaScriptu ani atribut type.",
-        "D) Element <button> může uvnitř obsahovat další HTML prvky jako obrázky nebo formátovaný text."
-      ],
-      "answer": 3,
-      "explanation": "Do párového tagu <button>...</button> lze vložit libovolné vnořené HTML prvky (např. <img>, <i>, <span>), což umožňuje vytvářet bohatě vyhlížející tlačítka, zatímco <input type=\"button\"> zobrazuje pouze prostý text z atributu value.",
-      "code": null
-    },
-    {
-      "id": "q7",
-      "type": "multiple_choice",
-      "question": "Co způsobí nastavení boolean atributu disabled na elementu <fieldset>?",
-      "options": [
-        "A) Znepřístupní pro úpravy i odeslání všechny formulářové prvky umístěné uvnitř tohoto fieldsetu.",
-        "B) Zruší grafické ohraničení kolem skupiny formulářových prvků, ale ponechá jim funkčnost.",
-        "C) Skryje celý rámeček i s jeho nadpisem z vizuálního zobrazení přímo na webové stránce.",
-        "D) Převede všechny textové vstupy uvnitř fieldsetu na pole pouze pro čtení bez změny vzhledu."
-      ],
-      "answer": 0,
-      "explanation": "Nastavení disabled u skupiny <fieldset> hromadně zakáže všechny formulářové prvky v něm obsažené — uživatel v nich nemůže měnit hodnoty a jejich data se neodesílají při submission.",
-      "code": null
-    }
-  ],
   "MatPlotLib_animace": [
     {
       "id": "q1",
@@ -1659,119 +1703,6 @@
       ],
       "answer": 1,
       "explanation": "ArtistAnimation projde seznam frames a v zadaném časovém intervalu (zde 200 ms) zobrazuje pouze artisty přiřazené k danému snímku (v tomto případě příslušnou čáru line)."
-    }
-  ],
-  "dvcs_overview": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jaký je zásadní rozdíl v přístupu k historii mezi distribuovanými (DVCS) a centralizovanými (VCS) systémy?",
-      "options": [
-        "A) V centralizovaných VCS operují příkazy vždy globálně na celý projekt bez ohledu na adresář.",
-        "B) V centralizovaných VCS lze běžně provádět potvrzení změn (commit) zcela bez připojení k síti.",
-        "C) V DVCS má každý vývojář kompletní lokální kopii celého repozitáře včetně veškeré historie.",
-        "D) V DVCS existuje pouze jeden centrální server, ze kterého se stahuje vždy aktuální stav."
-      ],
-      "answer": 2,
-      "explanation": "U distribuovaných systémů (Git, Mercurial) má každý uživatel u sebe plnohodnotný repozitář s kompletní historií. Může tak komitovat a prohlížet historii offline, zatímco u centralizovaných systémů (SVN) existuje historie jen na centrálním serveru.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Doplňte příkaz nástroje Git pro přesunutí připravených změn z pracovního adresáře do odkládací plochy (staging area).",
-      "code": "git ________ soubor.py\ngit commit -m \"Úprava souboru\"",
-      "options": [
-        "save  # uloží stávající pracovní změny do lokálního archivu",
-        "push  # nahraje modifikovaný soubor přímo do vzdáleného repozitáře na servery GitHubu.",
-        "stage  # vytvoří záložní kopii souboru v dočasné mezipaměti lokálního operačního systému.",
-        "add  # přidá zadané soubory do indexu (staging area) před samotným komitem do historie."
-      ],
-      "answer": 3,
-      "explanation": "Git vyžaduje dvoukrokový proces komitování — příkaz git add přesune změny do tzv. indexu (staging area) a teprve git commit vytvoří trvalý záznam v historii repozitáře.",
-      "expected": "add"
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jak se liší výchozí chování příkazu pro odeslání změn na vzdálený server (push) v systémech Git a Mercurial?",
-      "options": [
-        "A) Git ve výchozím stavu odesílá pouze aktuální větev, zatímco Mercurial odesílá všechny větve.",
-        "B) Mercurial odesílá pouze označené tagy, zatímco Git odesílá automaticky celý pracovní strom.",
-        "C) Oba systémy ve výchozím nastavení odesílají výhradně změny proveditelné bez sloučení větví.",
-        "D) Git odesílá kompletní historii všech větví, zatímco Mercurial pouze hlavní větev označenou jako master."
-      ],
-      "answer": 0,
-      "explanation": "V Gitu jsou větve chápány jako lokální pracovní směry vývojáře, takže git push posílá standardně pouze aktivní větev. V Mercurialu představují větve dlouhodobé verze projektu a hg push propaguje všechny větve naráz.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "true_false_tricky",
-      "question": "Posouzení dostupnosti a filozofie příkazu rebase v systémech Git a Mercurial:",
-      "options": [
-        "A) V Mercurialu je rebase základním vestavěným příkazem, zatímco v Gitu vyžaduje instalaci externího skriptu.",
-        "B) V Gitu je rebase základním vestavěným příkazem, zatímco v Mercurialu vyžaduje instalaci a povolení rozšíření."
-      ],
-      "answer": 1,
-      "explanation": "Git přistupuje k historii jako k upravitelné struktuře a nabízí rebase přímo v základu pro narovnání vývojových větví. Mercurial považuje historii za neměnnou a pro rebase vyžaduje povolit explicitní rozšíření (extension).",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "K čemu slouží soubory jako .gitignore nebo .hgignore v kořenovém adresáři repozitáře?",
-      "options": [
-        "A) Ukládají kompletní historii smazaných souborů pro jejich případné obnovení v budoucích verzích.",
-        "B) Definují pravidla pro soubory, které nemá verzovací systém sledovat ani nabízet ke komitu.",
-        "C) Seznamují překladač se soubory, které mají být vyloučeny ze závěrečného sestavení projektu.",
-        "D) Šifrují citlivá přístupová hesla a klíče před jejich automatickým odesláním na vzdálený server."
-      ],
-      "answer": 1,
-      "explanation": "Ignore listy obsahují masky souborů (např. kompilovaný kód, dočasné soubory editorů, .pyc), které verzovací systém ignoruje. Zamezuje se tak jejich nechtěnému zanesení do repozitáře při generických příkazech.",
-      "code": null
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Jak reagují verzovací příkazy v DVCS na umístění v podadresáři projektu ve srovnání s centralizovaným SVN?",
-      "options": [
-        "A) Příkazy v DVCS automaticky vytvoří samostatný pod-repozitář pro každý podadresář projektu.",
-        "B) Příkazy v DVCS selžou s chybou, pokud nejste spuštěni přímo v kořenovém adresáři repozitáře.",
-        "C) Příkazy v DVCS fungují globálně pro celý repozitář bez ohledu na aktuální podadresář.",
-        "D) Příkazy v DVCS operují výhradně na podstromu složky, ve které se zrovna uživatel nachází."
-      ],
-      "answer": 2,
-      "explanation": "V DVCS (Git, Mercurial) se pracovní strom a jeho historie spravuje jako celek. Spuštění příkazu (např. git status nebo git commit) uvnitř podadresáře ovlivňuje celý projekt, zatímco v SVN fungovaly příkazy lokálně pro danou složku.",
-      "code": null
-    },
-    {
-      "id": "q7",
-      "type": "multiple_choice",
-      "question": "Co se stane v Gitu po smazání větve pomocí příkazu git branch -d nova-funkce?",
-      "code": "git checkout master\ngit branch -d nova-funkce",
-      "options": [
-        "A) Git vyvolá fatalní chybové hlášení a zablokuje lokální repozitář pro jakékoli další úpravy.",
-        "B) Větev se automaticky převede na vzdálený označený tag na serveru GitHub pro archivní účely.",
-        "C) Smažou se všechny soubory a komity, které byly v rámci této větvě kdykoli v minulosti vytvořeny.",
-        "D) Odstraní se pouze ukazatel na větev, přičemž začleněné komity v historii masteru zůstanou zachovány."
-      ],
-      "answer": 3,
-      "explanation": "Větve v Gitu jsou pouhými lehkými ukazateli na konkrétní komity. Smazání sloučené větve smaže jen tento ukazatel (metainformaci), zatímco samotná historie zůstává neporušena."
-    },
-    {
-      "id": "q8",
-      "type": "multiple_choice",
-      "question": "Proč je pro udržení vysoké rychlosti a malých nároků na disk u velkých Git repozitářů vhodné občas spustit git gc?",
-      "options": [
-        "A) Provádí úklid a kompresi objektové databáze repozitáře (garbage collection) a odstraňuje nedosažitelné objekty.",
-        "B) Odstraňuje z celého pracovního adresáře projekty všechny nezpracované soubory s koncovkami .py a .txt.",
-        "C) Promaže starší historii zpráv komitů starších než jeden rok pro zrychlení zpracování výstupů.",
-        "D) Automaticky stahuje a aktualizuje nejnovější verze závislostí definovaných v souboru requirements.txt."
-      ],
-      "answer": 0,
-      "explanation": "Příkaz git gc (garbage collection) komprimuje voľné objekty repozitáře do tzv. packfiles, odstraňuje nedosažitelné komity a optimalizuje indexy, což dramaticky zrychluje operace nad velkými repozitáři.",
-      "code": null
     }
   ]
 }

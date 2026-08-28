@@ -1,104 +1,121 @@
 {
-  "functions_overview": [
+  "_functions": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Co se stane při pokusu o definici prázdné funkce s pouhým komentářem?",
+      "question": "Co vrátí volání funkce fn() v následujícím kódu?",
+      "code_snippet": "def fn():\n    return 1, \"a\", [2, 3]\n\nres = fn()\nprint(type(res), res)",
       "options": [
-        "A) Python vyvolá SyntaxError, protože tělo funkce vyžaduje alespoň příkaz pass nebo docstring.",
-        "B) Funkce vytvoří prázdný objekt bez těla a při prvním zavolání vyvolá výjimku NotImplementedError.",
-        "C) Funkce se v pořádku nadefinuje a při volání automaticky vrací hodnotu None bez jakékoli chyby.",
-        "D) Python vyvolá IndentationError, protože komentář se ignoruje a blok zůstane z pohledu parseru prázdný."
+        "A) <class 'list'> [1, 'a', [2, 3]] — návratová hodnota složená z více prvků vytvoří měnitelný seznam se všemi položkami.",
+        "B) <class 'tuple'> (1, 'a', [2, 3]) — čárkami oddělené hodnoty za return jsou automaticky zabaleny do objektu typu n-tice.",
+        "C) <class 'int'> 1 — návratové slovo return vrací v tomto zápisu pouze první zadanou hodnotu a ostatní ignoruje.",
+        "D) <class 'dict'> {0: 1, 1: 'a', 2: [2, 3]} — Python převede vrácené hodnoty na slovník s číselnými klíči podle pořadí."
       ],
-      "answer": 3,
-      "explanation": "Komentáře jsou parserem zcela ignorovány. Jelikož hlavička def f(): vyžaduje odsazený blok kódu, absence jakéholi příkazu (např. pass nebo dokumentačního řetězce) vede k chybě IndentationError: expected an indented block.",
-      "code": "def f():\n    # prázdná funkce"
+      "answer": 1,
+      "explanation": "V Pythonu zápis return a, b, c nevytváří samostatné návratové hodnoty, ale konstruuje jediný objekt typu tuple (n-tice). Závorky jsou u n-tice volitelné, klíčovým prvkem pro její vytvoření je čárka.",
+      "code": null
     },
     {
       "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jakou hodnotu vrátí funkce f() v níže uvedeném kódu?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte token do definice funkce pro výpočet pH, který vynutí zadání parametru `temperature` výhradně jako pojmenovaného argumentu.",
+      "code_snippet": "def fn(a, b, ________, c=10):\n    return a + b + c",
       "options": [
-        "A) Vrátí hodnotu None, protože příkaz return bez výrazu v Pythonu implicitně vrací hodnotu None.",
-        "B) Vrátí prázdnou n-tici (), protože samotný příkaz return bez argumentů vytváří prázdnou sekvenci.",
-        "C) Vrátí proměnnou a s hodnotou 10, protože jde o poslední vyhodnocenou lokální proměnnou bloku.",
-        "D) Vyvolá výjimku SyntaxError, protože příkaz return vyžaduje alespoň jeden návratový výraz."
+        "/",
+        "*args",
+        "*",
+        "**"
       ],
-      "answer": 0,
-      "explanation": "V Pythonu všechny funkce, které nerealizují return výraz (včetně samotného prázdného return), automaticky vrací objekt None.",
-      "code": "def f():\n    a = 10\n    return\n\nprint(f())"
+      "answer": 2,
+      "explanation": "Samostatná hvězdička `*` v hlavičce funkce označuje hranici keyword-only parametrů — všechny parametry uvedené za ní musí být volány s názvem argumentu.",
+      "code": "def calculate_ph(h_concentration, ________, temperature=298.15):\n    import math\n    return -math.log10(h_concentration)\n\n# Platné volání: calculate_ph(1e-7, temperature=300)\n# Neplatné volání: calculate_ph(1e-7, 300) -> TypeError",
+      "expected": "*"
     },
     {
       "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte chybějící výraz tak, aby funkce vracela n-tici s výsledkem celočíselného dělení a zbytku po dělení:\n\ndef divmod_custom(a, b):\n    return ________:",
+      "type": "predict_output",
+      "question": "Co vypíše druhý volací příkaz fn() v níže uvedeném kódu?",
+      "code_snippet": "val = 100\n\ndef fn(x=val):\n    print(x)\n\nval = 500\nfn()",
       "options": [
-        "a / b, a % b",
-        "a // b, a % b",
-        "(a // b): (a % b)",
-        "a // b; a % b"
+        "A) None — po změně globální proměnné se zruší propojení výchozího parametru a funkce vrátí prázdnou hodnotu.",
+        "B) TypeError — změna hodnoty proměnné použité v hlavičce funkce způsobí chybu typu při spuštění definice.",
+        "C) 500 — parametr si udržuje dynamický odkaz na globální proměnnou a načte její aktuální hodnotu při spuštění.",
+        "D) 100 — výchozí hodnota parametru se vyhodnotí jednorázově při definici funkce, nikoli při jejím pozdějším volání."
       ],
-      "answer": 1,
-      "explanation": "Operátor // provádí celočíselné dělení a % vrací zbytek po dělení. Vrácení více výrazů oddělených čárkou automaticky zjednoduší výstup do n-tice (tuple).",
-      "expected": "a // b, a % b",
-      "code": "def divmod_custom(a, b):\n    return ________"
+      "answer": 3,
+      "explanation": "Výrazy pro výchozí hodnoty parametrů se vyhodnocují v okamžiku provádění příkazu def. Proměnná x se tak sváže s objektem 100. Následná změna proměnné val na 500 již nemá na dříve vytvořenou výchozí hodnotu parametru žádný vliv.",
+      "code": null
     },
     {
       "id": "q4",
       "type": "multiple_choice",
-      "question": "Jaký výstup vytvoří následující kód při předání pojmenovaných argumentů v obráceném pořadí?",
+      "question": "Co vypíše druhý volací příkaz fn(2) bez zadaného druhého argumentu?",
+      "code_snippet": "def fn(x, y=[]):\n    y.append(x)\n    return y\n\nfn(1)\nres = fn(2)\nprint(res)",
       "options": [
-        "A) Vyvolá výjimku TypeError, protože pojmenované argumenty musí respektovat pořadí z definice.",
-        "B) Vyvolá výjimku SyntaxError, protože pojmenované argumenty nelze předávat v obráceném pořadí.",
-        "C) Vypíše hodnotu 8, protože při použití jmen argumentů nezáleží na jejich pořadí při volání.",
-        "D) Vypíše hodnotu 9, protože první předaný argument se bez ohledu na jméno přiřadí parametru cislo."
+        "A) [1, 2] — výchozí seznam se vytvoří pouze jednou při definici funkce a jeho modifikace přetrvávají mezi voláními.",
+        "B) [2] — při každém volání bez druhého argumentu se inicializuje nový prázdný seznam a starý je smazán z paměti.",
+        "C) AttributeError — metoda append vyvolá výjimku, protože výchozí parametr je vyhodnocen jako neměnná n-tice.",
+        "D) [1] — funkce vrací předchozí stav seznamu před přidáním nového prvku z důvodu nesynchronizovaného zápisu."
       ],
-      "answer": 2,
-      "explanation": "Při předávání argumentů pomocí jmen (keyword=value) na jejich pořadí v příkazu volání nezáleží; Python je spáruje přímo s příslušnými parametry definice (zde cislo=2 a exponent=3, což dá 2 ** 3 = 8).",
-      "code": "def mocneni(cislo, exponent=2):\n    return cislo ** exponent\n\nprint(mocneni(exponent=3, cislo=2))"
+      "answer": 0,
+      "explanation": "Seznam [] ve výchozím parametru je vytvořen pouze jednou při definici funkce def. Všechna volání fn() bez druhého argumentu sdílejí stejný objekt v paměti. Volání fn(1) do něj přidá 1 a volání fn(2) přidá 2, takže výsledek je [1, 2].",
+      "code": null
     },
     {
       "id": "q5",
       "type": "multiple_choice",
-      "question": "Jaký bude výsledek vykonání následujícího kódu v Pythonu?",
+      "question": "Které z následujících volání funkce def fn(a, b, /, c): pass vyvolá chybu TypeError?",
       "options": [
-        "A) Vrátí hodnotu 27, protože interpret automaticky spáruje volný poziční argument 3 s exponentem.",
-        "B) Vrátí hodnotu 9, protože poziční argument 3 přepíše dříve předanou hodnotu pro parametr cislo.",
-        "C) Vyvolá TypeError, protože parametr cislo obdrží dvě hodnoty současně a exponent nezíská žádnou.",
-        "D) Vyvolá SyntaxError, protože poziční argument nesmí v zápisu volání následovat za pojmenovaným."
+        "A) fn(1, 2, c=3) — parametr c za lomítkem vyžaduje povinné předání jménem a nelze mu předat poziční hodnotu.",
+        "B) fn(a=1, b=2, c=3) — parametry před lomítkem / jsou definovány jako výhradně poziční a nelze je volat jménem.",
+        "C) fn(1, 2, 3) — hodnota pro parametr c nesmí být předána pozičně, pokud jsou předchozí parametry odděleny lomítkem.",
+        "D) fn(a=1, 2, 3) — poziční argumenty nesmí předcházet pojmenovaným argumentům při jakémkoliv volání funkce."
       ],
-      "answer": 3,
-      "explanation": "V Pythonu platí přísná syntaktická pravidla pro volání funkcí: jakmile použijete jakýkoliv pojmenovaný argument (keyword=value), nesmí za ním již následovat žádný poziční argument bez jména (non-keyword arg after keyword arg).",
-      "code": "def mocneni(cislo, exponent=2):\n    return cislo ** exponent\n\nmocneni(cislo=3, 3)"
+      "answer": 1,
+      "explanation": "Lomítko / v definici parametrů označuje, že všechny parametry stojící před ním (a a b) jsou positional-only. Zkuste-li je předat pomocí jména (a=1, b=2), Python vyvolá TypeError. Parametr c za lomítkem lze předat jak pozičně (fn(1, 2, 3)), tak pojmenovaně (fn(1, 2, c=3)).",
+      "code": null
     },
     {
       "id": "q6",
       "type": "multiple_choice",
-      "question": "Kdy se vyhodnocují výchozí hodnoty pojmenovaných parametrů funkce v Pythonu?",
+      "question": "Jakou hodnotu vypíše následující kód s vnořenou funkcí?",
+      "code_snippet": "def make_multiplier(factor):\n    def multiply(number):\n        return number * factor\n    return multiply\n\ndouble = make_multiplier(2)\nprint(double(5))",
       "options": [
-        "A) Vyhodnocují se pouze jednou v okamžiku definice funkce v daném rozsahu viditelnosti.",
-        "B) Vyhodnocují se dynamicky až ve chvíli, kdy se na daný parametr v těle poprvé odkáže.",
-        "C) Vyhodnocují se znovu při každém zavolání funkce, kdykoliv parametr není zadaný.",
-        "D) Vyhodnocují se při importu modulu a při každém vytvoření nové instance dané třídy."
+        "A) 25 — vnitřní funkce vynásobí předaný argument sám sebou a ignoruje proměnnou zapsanou ve vnějším rozsahu.",
+        "B) NameError — proměnná factor z vnější funkce již po návratu neexistuje a vnitřní funkce k ní nemá přístup.",
+        "C) 10 — vnitřní funkce si uchovává přístup k proměnné factor z vnějšího rozsahu i po skončení vnější funkce.",
+        "D) TypeError — vrácená vnitřní funkce vyžaduje při spuštění dva argumenty včetně původního parametru factor."
       ],
-      "answer": 0,
-      "explanation": "Výchozí hodnoty parametrů se v Pythonu vyhodnocují v okamžiku, kdy interpret zpracovává definici funkce (def), a to v aktuálním defining scope. Nehodnotí se znovu při jednotlivých voláních.",
+      "answer": 2,
+      "explanation": "Jde o princip uzávěru (closure). Vnitřní funkce multiply si při svém vzniku zapamatuje lexikální kontext vnější funkce, v tomto případě hodnotu factor = 2. Volání double(5) tedy spočítá 5 * 2 = 10.",
       "code": null
     },
     {
       "id": "q7",
-      "type": "fill_blank_choice",
-      "question": "Doplňte chybějící výraz tak, aby kód vytiskl dokumentační řetězec funkce f:\n\ndef f():\n    \"\"\"Tato funkce slouží k testování.\"\"\"\n    pass\n\nprint(________):",
+      "type": "true_false_tricky",
+      "question": "Do jakých datových typů zabalují operátory *args a **kwargs proměnný počet vstupních parametrů ve funkci?",
       "options": [
-        "f.__help__",
-        "f.__doc__",
-        "f.get_docstring()",
-        "f.doc()"
+        "A) Nepravda: *args vytvoří měnitelný seznam list pro parametry a **kwargs vytvoří n-tice tuple složenou ze dvojic klíč-hodnota.",
+        "B) Pravda: *args přetváří poziční parametry do objektu typu tuple (n-tice) a **kwargs přetváří pojmenované parametry do slovníku dict."
       ],
       "answer": 1,
-      "explanation": "Dokumentační řetězec umístěný na prvním řádku těla funkce je v Pythonu uložen do speciálního atributu __doc__ daného objektu funkce.",
-      "expected": "f.__doc__",
-      "code": "def f():\n    \"\"\"Tato funkce slouží k testování.\"\"\"\n    pass\n\nprint(________)"
+      "explanation": "Operátor * před parametrem sjednotí všechny přebývající poziční argumenty do neměnné n-tice tuple. Operátor ** sjednotí všechny pojmenované argumenty do slovníku dict.",
+      "code": null
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Co se stane při pokusu o spuštění následujícího kódu?",
+      "code_snippet": "def fn(x, y=3):\n    return x ** y\n\nres = fn(x=2, 4)",
+      "options": [
+        "A) Proběhne výpočet s výsledkem 16, protože Python automaticky přiřadí druhý argument 4 zbývajícímu parametru y.",
+        "B) Proběhne výpočet s výsledkem 8, protože první pojmenovaný argument vyruší platnost druhého zadaného argumentu.",
+        "C) Nastane TypeError, protože parametr x obdrží dvě různé hodnoty a parametr y zůstane bez zadané výchozí hodnoty.",
+        "D) Nastane SyntaxError, protože v definici volání funkce nesmí žádný poziční argument následovat za pojmenovaným argumentem."
+      ],
+      "answer": 3,
+      "explanation": "V Pythonu platí přísné syntaktické pravidlo: při volání funkce se nesmí za pojmenovaným argumentem (zde x=2) objevit čistě poziční argument (4). Python takový kód odmítne zkompilovat a vyvolá SyntaxError: positional argument follows keyword argument.",
+      "code": null
     }
   ],
   "parameters": [
@@ -303,78 +320,6 @@
       "code": "def f():\n    nonlocal y\n    y = 1"
     }
   ],
-  "advanced-2": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jaký výstup vytvoří následující kód využívající funkce uložené ve slovníku?",
-      "options": [
-        "A) Vypíše řetězec '20', protože návratové hodnoty lambda funkcí ze slovníků se automaticky převádí na str.",
-        "B) Vyvolá výjimku TypeError, protože anonymní lambda funkce nelze ukládat jako hodnoty do slovníku.",
-        "C) Vypíše číslo 20, protože nejprve zavolá funkci add s argumenty 2 a 3 (výsledek 5) a výsledek vynásobí 4.",
-        "D) Vypíše číslo 24, protože operace mul má v matematickém vyhodnocování vyšší prioritu než operace add."
-      ],
-      "answer": 2,
-      "explanation": "Funkce jsou v Pythonu objekty první kategorie (first-class citizens), takže je lze ukládat do datových struktur jako hodnoty. op['add'](2, 3) vrátí 5 a op['mul'](5, 4) následně vrátí 20.",
-      "code": "op = {\n    'add': lambda a, b: a + b,\n    'mul': lambda a, b: a * b\n}\n\nprint(op['mul'](op['add'](2, 3), 4))"
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký výstup vytvoří generování seznamu umocňovacích funkcí pomocí tovární funkce (uzávěru)?",
-      "options": [
-        "A) Vyvolá výjimku NameError, protože proměnná n z vnější funkce není uvnitř lambda výrazu přístupná.",
-        "B) Vypíše 8 8, protože parametrem x se stává hodnota n předaná při vytváření funkce v make_pow.",
-        "C) Vypíše 16 16, protože poslední vytvořená hodnota n=3 přepíše proměnnou n pro všechny dřívější uzávěry.",
-        "D) Vypíše 16 8, protože funkce make_pow vrací uzávěr (closure), který si pamatuje příslušnou hodnotu n."
-      ],
-      "answer": 3,
-      "explanation": "Funkce vnořená uvnitř make_pow tvoří uzávěr (closure), který si zachovává vnější stav prostředí (n). Pro square je n=2 (4 ** 2 = 16) a pro cube je n=3 (2 ** 3 = 8).",
-      "code": "def make_pow(n):\n    return lambda x: x ** n\n\nsquare = make_pow(2)\ncube = make_pow(3)\n\nprint(square(4), cube(2))"
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jaký výstup vytvoří přidání vlastního atributu k objektu funkce v Pythonu?",
-      "options": [
-        "A) Vypíše číslo 5, protože funkce jsou v Pythonu objekty a lze jim za běhu přidávat libovolné uživatelské atributy.",
-        "B) Vypíše hodnotu None, protože přiřazení do atributu funkce proběhne bez chyby, ale hodnota se neuloží.",
-        "C) Vyvolá výjimku TypeError, protože atributy lze přidávat pouze instancím uživatelsky definovaných tříd.",
-        "D) Vyvolá výjimku AttributeError, protože funkce jsou neproměnné objekty a neumožňují přidávat vlastní atributy."
-      ],
-      "answer": 0,
-      "explanation": "Jelikož jsou funkce plnohodnotnými objekty, disponují vlastním atributovým slovníkem (__dict__), což umožňuje dynamicky k objektům funkcí přihlašovat vlastní atributy.",
-      "code": "def greet():\n    print('Ahoj')\n\ngreet.count = 5\nprint(greet.count)"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jaká magická metoda objektu zajišťuje, že je funkci (nebo jakýkoliv jiný callable objekt) možné zavolat pomocí závorek ()?",
-      "options": [
-        "A) Vypíše None, protože hasattr vrátí prázdnou hodnotu pro všechny vestavěné i uživatelské funkce v Pythonu.",
-        "B) Vypíše True, protože každá funkce je objekt disponující magickou metodou __call__, která zpracuje její volání.",
-        "C) Vyvolá výjimku AttributeError, protože prověřování metody __call__ je povolené pouze u tříd, nikoli u funkcí.",
-        "D) Vypíše False, protože funkce používají interní C-API volání a magickou metodu __call__ nemají definovanou."
-      ],
-      "answer": 1,
-      "explanation": "Schopnost objektu spouštět kód po přidání závorek () je v Pythonu garantována přítomností metody __call__(). Každý objekt funkce v Pythonu tuto metodu obsahuje.",
-      "code": "def f():\n    pass\n\nprint(hasattr(f, '__call__'))"
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Jaký výstup vyprodukuje kód využívající vlastní implementaci vyšší funkce apply_twice?",
-      "options": [
-        "A) Vypíše číslo 6, protože lambda funkce se provede pouze jednou a druhé volání se z optimalizačních důvodů vynechá.",
-        "B) Vypíše číslo 36, protože druhá aplikace funkce mocní celý předchozí výsledek na druhou (6 ** 2 = 36).",
-        "C) Vypíše číslo 12, protože funkce lambda vynásobí 3 na 6 a při druhém aplikování vynásobí 6 na výsledek 12.",
-        "D) Vyvolá TypeError, protože předávání lambda funkcí jako první argument do jiné funkce není v Pythonu povoleno."
-      ],
-      "answer": 2,
-      "explanation": "První zavolání func(3) vrací 3 * 2 = 6. Druhé vnější zavolání func(6) spočítá 6 * 2 = 12. Jelikož jsou funkce argumentem první třídy, lze je předávat a vyhodnocovat opakovaně.",
-      "code": "def apply_twice(func, val):\n    return func(func(val))\n\nprint(apply_twice(lambda x: x * 2, 3))"
-    }
-  ],
   "annotations": [
     {
       "id": "q1",
@@ -445,6 +390,77 @@
       "answer": 3,
       "explanation": "Každý objekt funkce disponuje atributem __annotations__. Pokud žádné anotace zadané nebyly, tímto atributem je prázdný slovník {}.",
       "code": "def f(a, b):\n    return a + b\n\nprint(f.__annotations__)"
+    }
+  ],
+  "functional": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jaké hodnoty vrátí výrazy `all([])` a `any([])` v Pythonu?",
+      "options": [
+        "A) all([]) vrátí True, zatímco any([]) vrátí False.",
+        "B) Obě funkce vrátí hodnotu True, protože chybí False.",
+        "C) Obě funkce vrátí hodnotu False, protože je prázdný.",
+        "D) all([]) vrátí False, zatímco any([]) vrátí True."
+      ],
+      "answer": 0,
+      "explanation": "all([]) je prázdně pravdivé (vacuously true) a vrací True, protože neobsahuje žádný prvek vyhodnocený jako nepravdivý. any([]) vrací False, protože neobsahuje žádný pravdivý prvek.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Co bude výstupem výrazu `list(zip('abc', [1, 2, 3, 4]))`?",
+      "options": [
+        "A) [('a', 1), ('b', 2), ('c', 3), (None, 4)] (doplní chybějící prvek).",
+        "B) [('a', 1), ('b', 2), ('c', 3)] (zkrátí se dle nejkratšího vstupu).",
+        "C) [('a', 1), ('b', 2), ('c', 3), ('', 4)] (doplní prázdný řetězec).",
+        "D) Vyvolá se výjimka ValueError z důvodu rozdílných délek vstupů."
+      ],
+      "answer": 1,
+      "explanation": "Funkce zip() ukončí generování n-tic jakmile se vyčerpá nejkratší ze zadaných sekvencí. Pro doplnění chybějících hodnot je nutné použít itertools.zip_longest().",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi funkcí `map(f, xs)` a generátorovým výrazem `[f(x) for x in xs]` v Pythonu 3?",
+      "options": [
+        "A) map() vytvoří ihned celý seznam v paměti, zatímco [f(x) for x in xs] vrací lenivý iterátor pro prodekorování.",
+        "B) map() je schopna zpracovat pouze číselná data, zatímco seznamová komprese funguje s libovolnými typy.",
+        "C) map() vrací lenivě vyhodnocovaný iterátor, zatímco [f(x) for x in xs] vytvoří ihned celý seznam v paměti.",
+        "D) map() modifikuje původní seznam xs přímo na místě, zatímco seznamová komprese vždy alokuje nový objekt."
+      ],
+      "answer": 2,
+      "explanation": "V Pythonu 3 vracejí map() i filter() lenivě vyhodnocované iterátory. Naproti tomu seznamová komprese v hranatých závorkách [...] ihned zkonstruuje kompletní seznam v paměti.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "fill_blank_choice",
+      "question": "Doplňte klíčové slovo pro vytvoření anonymní jednořádkové funkce převádějící teplotu ze stupňů Celsia na Kelviny.",
+      "options": [
+        "function",
+        "def",
+        "fn",
+        "lambda"
+      ],
+      "answer": 3,
+      "explanation": "Klíčové slovo `lambda` slouží k definici anonymních jednořádkových funkcí, jejichž tělo tvoří jediný výraz, jehož hodnota je automaticky vrácena.",
+      "code": "# Anonymní funkce pro převod Celsia na Kelviny (T_K = T_C + 273.15)\nto_kelvin = ________ celsius: celsius + 273.15\n\nprint(to_kelvin(25.0))  # 298.15",
+      "expected": "lambda"
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Posuďte pravdivost tvrzení: Lambda funkce v Pythonu mohou obsahovat víceřádkové bloky kódů s příkazy jako `if`, `for` nebo `return`.",
+      "options": [
+        "A) Pravda: Lambda funkce v Pythonu podporují libovolně složité víceřádkové bloky kódu stejně jako funkce definované pomocí def.",
+        "B) Nepravda: Lambda funkce smí obsahovat pouze jediný výraz a nemohou v sobě mít víceřádkové příkazy ani explicitní return."
+      ],
+      "answer": 1,
+      "explanation": "Pythonovské lambda funkce jsou syntakticky omezeny na jeden jediný výraz. Výraz je vyhodnocen a vrácen, příkaz return ani víceřádkové bloky s jinými příkazy nelze použít.",
+      "code": null
     }
   ],
   "_modules": [
@@ -557,209 +573,6 @@
       ],
       "answer": 0,
       "explanation": "V Pythonu 3 se .pyc v __pycache__ nenaimportují bez existujícího .py souboru v nadřazeném adresáři. Pro samostatné spuštění bez zdrojového kódu je nutné .pyc přesunout do nadřazeného adresáře a odstranit ze jména označení cpython-3x.",
-      "code": null
-    }
-  ],
-  "random": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Který nástroj je v Pythonu určen pro generování kryptograficky bezpečných náhodných dat?",
-      "options": [
-        "A) Základní modul random s nastavením řetězcové násady seed().",
-        "B) Funkce random.getrandbits() s počtem bitů rovným 256.",
-        "C) Funkce random.randrange() s nastavenou verzí algoritmu 2.",
-        "D) Funkce os.urandom() nebo třída random.SystemRandom."
-      ],
-      "answer": 3,
-      "explanation": "Modul random používá deterministický generátor Mersenne Twister, který není kryptograficky bezpečný. Pro bezpečnostní účely slouží os.urandom() nebo random.SystemRandom.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "predict_output",
-      "question": "Který z následujících výrazů vrací celé číslo z uzavřeného intervalu [1, 10] (včetně obou hranic)?",
-      "options": [
-        "A) random.randint(1, 10)",
-        "B) random.randrange(1, 10)",
-        "C) random.choice(range(10))",
-        "D) random.uniform(1, 10)"
-      ],
-      "answer": 0,
-      "explanation": "randint(a, b) generuje celé číslo v uzavřeném intervalu [a, b] (včetně obou konců), zatímco randrange(1, 10) generuje čísla z polootevřeného intervalu [1, 10) (tedy pouze 1 až 9).",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte funkci modulu `random` pro náhodný výběr `k` unikátních (neopakujících se) vzorků z populace bez vracení.",
-      "options": [
-        "shuffle",
-        "sample",
-        "choices",
-        "choice"
-      ],
-      "answer": 1,
-      "explanation": "Funkce `random.sample(population, k)` vybere k unikátních prvků bez vracení. Oproti tomu `random.choices()` provádí výběr s opakováním.",
-      "code": "import random\n\nall_samples = [f\"Vzorek_{i:02d}\" for i in range(1, 21)]\n\n# Náhodný výběr 4 unikátních vzorků pro kontrolní měření\nselected = random.________(all_samples, k=4)\nprint(len(set(selected)))  # 4",
-      "expected": "sample"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jakým způsobem lze v modulu random uložit a opětovně obnovit vnitřní stav generátoru pseudonáhodných čísel?",
-      "options": [
-        "A) Pomocí st = random.seed() pro uložení stavu a random.seed(st) pro opětovné načtení stavu.",
-        "B) Pomocí st = random.save() pro uložení stavu a random.restore(st) pro opětné načtení stavu.",
-        "C) Pomocí st = random.getstate() pro uložení stavu a random.setstate(st) pro obnovení stavu.",
-        "D) Pomocí st = random.getrandbits(32) pro uložení stavu a random.seed(st) pro obnovení stavu."
-      ],
-      "answer": 2,
-      "explanation": "Metody random.getstate() a random.setstate() slouží k přesnému uložení a obnovení deterministického stavu Mersenne Twister generátoru.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co se stane při spuštění příkazu `random.sample([1, 2, 3], 5)`?",
-      "options": [
-        "A) Funkce vrátí původní tříprvkový seznam [1, 2, 3] a zbývající dvě pozice doplní hodnotou None.",
-        "B) Funkce vrátí pětiprvkový seznam, ve kterém se některé prvky z původního seznamu opakují.",
-        "C) Funkce automaticky rozšíří populaci nulami na požadovanou délku 5 a vrátí promíchaný seznam.",
-        "D) Vyvolá se výjimka ValueError, protože požadovaný počet prvků k překračuje velikost populace."
-      ],
-      "answer": 3,
-      "explanation": "Funkce sample vybírá prvky ze sekvence bez opakování. Pokud je požadovaný počet k větší než velikost populace, vyhodí výjimku ValueError.",
-      "code": null
-    }
-  ],
-  "fileinput": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Odkud čte kód `fileinput.input()`, pokud skriptu nebyly při spuštění předány žádné argumenty souborů?",
-      "options": [
-        "A) Ze standardního vstupu (sys.stdin), takže může zpracovávat data předaná přes pipeline.",
-        "B) Vyvolá výjimku FileNotFoundError, protože nebyl zadán žádný název vstupního souboru.",
-        "C) Vrátí prázdný iterátor, který okamžitě ukončí cyklus for bez načtení jakéhokoliv řádku.",
-        "D) Automaticky prohledá aktuální adresář a otevře první nalezený soubor s příponou .txt."
-      ],
-      "answer": 0,
-      "explanation": "Pokud v sys.argv[1:] nejsou předány žádné soubory (nebo je předán argument '-'), fileinput.input() transparentně čte ze standardního vstupu sys.stdin.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "predict_output",
-      "question": "Jaký účinek má nastavení parametru `inplace=True` při volání `fileinput.input()`?",
-      "options": [
-        "A) Uzamkne všechny právě zpracovávané soubory na disku proti zápisu ze strany ostatních procesů.",
-        "B) Přesměruje standardní výstup (sys.stdout) do právě zpracovávaného souboru, čímž jej přepíše.",
-        "C) Otevře všechny soubory v režimu pro připsání na konec (append) bez modifikace stávajících řádků.",
-        "D) Načte celý obsah všech zadaných souborů do paměti RAM ještě před zahájením samotné iterace."
-      ],
-      "answer": 1,
-      "explanation": "Parametr inplace=True přesměruje standardní výstup print() přímo do právě čteného souboru. Původní soubor je zálohován/přesunut a jeho obsah je nahrazen tištěným výstupem.",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte funkci modulu `fileinput`, která vrací pořadové číslo řádku v rámci právě otevřeného souboru (resetované na 1 pro každý soubor).",
-      "options": [
-        "lineno",
-        "line_number",
-        "filelineno",
-        "fileno"
-      ],
-      "answer": 2,
-      "explanation": "`fileinput.filelineno()` vrací číslo řádku v aktuálním souboru (od 1), zatímco `fileinput.lineno()` vrací kumulativní celkový počet řádků přes všechny soubory.",
-      "code": "import fileinput\n\n# Zpracování souborů mereni_1.log a mereni_2.log\nfor line in fileinput.input(files=(\"mereni_1.log\", \"mereni_2.log\")):\n    # Získání čísla řádku v rámci aktuálního souboru\n    current_line = fileinput.________()\n    print(f\"{fileinput.filename()}:{current_line} -> {line.strip()}\")",
-      "expected": "filelineno"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Které komprimované formáty souborů dokáže automaticky otevírat předpřipravená hook funkce `fileinput.hook_compressed`?",
-      "options": [
-        "A) Komprimované archivní soubory s příponami .zip, .tar a .7z.",
-        "B) Jakékoliv komprimované soubory s příponami jako .xz a .rar.",
-        "C) Pouze komprimované archivní soubory s jedinou příponou .zip.",
-        "D) Soubory s komprimovanými příponami .gz (gzip) a .bz2 (bzip2)."
-      ],
-      "answer": 3,
-      "explanation": "fileinput.hook_compressed detekuje soubory podle přípony .gz nebo .bz2 a automaticky je otevře s využitím modulů gzip nebo bz2.",
-      "code": null
-    }
-  ],
-  "functional": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jaké hodnoty vrátí výrazy `all([])` a `any([])` v Pythonu?",
-      "options": [
-        "A) all([]) vrátí True, zatímco any([]) vrátí False.",
-        "B) Obě funkce vrátí hodnotu True, protože chybí False.",
-        "C) Obě funkce vrátí hodnotu False, protože je prázdný.",
-        "D) all([]) vrátí False, zatímco any([]) vrátí True."
-      ],
-      "answer": 0,
-      "explanation": "all([]) je prázdně pravdivé (vacuously true) a vrací True, protože neobsahuje žádný prvek vyhodnocený jako nepravdivý. any([]) vrací False, protože neobsahuje žádný pravdivý prvek.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "predict_output",
-      "question": "Co bude výstupem výrazu `list(zip('abc', [1, 2, 3, 4]))`?",
-      "options": [
-        "A) [('a', 1), ('b', 2), ('c', 3), (None, 4)] (doplní chybějící prvek).",
-        "B) [('a', 1), ('b', 2), ('c', 3)] (zkrátí se dle nejkratšího vstupu).",
-        "C) [('a', 1), ('b', 2), ('c', 3), ('', 4)] (doplní prázdný řetězec).",
-        "D) Vyvolá se výjimka ValueError z důvodu rozdílných délek vstupů."
-      ],
-      "answer": 1,
-      "explanation": "Funkce zip() ukončí generování n-tic jakmile se vyčerpá nejkratší ze zadaných sekvencí. Pro doplnění chybějících hodnot je nutné použít itertools.zip_longest().",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jaký je hlavní rozdíl mezi funkcí `map(f, xs)` a generátorovým výrazem `[f(x) for x in xs]` v Pythonu 3?",
-      "options": [
-        "A) map() vytvoří ihned celý seznam v paměti, zatímco [f(x) for x in xs] vrací lenivý iterátor pro prodekorování.",
-        "B) map() je schopna zpracovat pouze číselná data, zatímco seznamová komprese funguje s libovolnými typy.",
-        "C) map() vrací lenivě vyhodnocovaný iterátor, zatímco [f(x) for x in xs] vytvoří ihned celý seznam v paměti.",
-        "D) map() modifikuje původní seznam xs přímo na místě, zatímco seznamová komprese vždy alokuje nový objekt."
-      ],
-      "answer": 2,
-      "explanation": "V Pythonu 3 vracejí map() i filter() lenivě vyhodnocované iterátory. Naproti tomu seznamová komprese v hranatých závorkách [...] ihned zkonstruuje kompletní seznam v paměti.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Doplňte klíčové slovo pro vytvoření anonymní jednořádkové funkce převádějící teplotu ze stupňů Celsia na Kelviny.",
-      "options": [
-        "function",
-        "def",
-        "fn",
-        "lambda"
-      ],
-      "answer": 3,
-      "explanation": "Klíčové slovo `lambda` slouží k definici anonymních jednořádkových funkcí, jejichž tělo tvoří jediný výraz, jehož hodnota je automaticky vrácena.",
-      "code": "# Anonymní funkce pro převod Celsia na Kelviny (T_K = T_C + 273.15)\nto_kelvin = ________ celsius: celsius + 273.15\n\nprint(to_kelvin(25.0))  # 298.15",
-      "expected": "lambda"
-    },
-    {
-      "id": "q5",
-      "type": "true_false_tricky",
-      "question": "Posuďte pravdivost tvrzení: Lambda funkce v Pythonu mohou obsahovat víceřádkové bloky kódů s příkazy jako `if`, `for` nebo `return`.",
-      "options": [
-        "A) Pravda: Lambda funkce v Pythonu podporují libovolně složité víceřádkové bloky kódu stejně jako funkce definované pomocí def.",
-        "B) Nepravda: Lambda funkce smí obsahovat pouze jediný výraz a nemohou v sobě mít víceřádkové příkazy ani explicitní return."
-      ],
-      "answer": 1,
-      "explanation": "Pythonovské lambda funkce jsou syntakticky omezeny na jeden jediný výraz. Výraz je vyhodnocen a vrácen, příkaz return ani víceřádkové bloky s jinými příkazy nelze použít.",
       "code": null
     }
   ]
