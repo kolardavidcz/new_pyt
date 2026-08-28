@@ -1,514 +1,392 @@
 {
-  "oop": [
+  "iterators": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Co se stane při pokusu o přístup k atributu `__tajne` zvenčí třídy `Ucet`?",
+      "question": "Co se stane při pokusu použít instanci `MojIter` v cyklu `for` v níže uvedeném kódu?",
       "options": [
-        "A) Python vyvolá NameError, protože privátní atributy jsou zvenčí kódu zcela nepřístupné.",
-        "B) Python vyvolá AttributeError, protože název se vnitřně zmrzačil na _Ucet__tajne.",
-        "C) Kód vypíše hodnotu 100, protože dvojité podtržítko představuje pouze slabou konvenci.",
-        "D) Python vyvolá TypeError, protože přímý přístup k privátním atributům objektu je zakázán."
+        "A) Vypíše hodnotu None, protože chybějící metoda __iter__() automaticky inicializuje prázdný iterátor.",
+        "B) Vyvolá AttributeError, protože metoda __next__() musí být vždy zadekorována dekorátorem @iterator.",
+        "C) Vyvolá TypeError, protože cyklus for vyžaduje implementaci metody __iter__() pro vytvoření iterátoru.",
+        "D) Vypíše hodnotu 1 a skončí, protože metoda __next__() je plně postačující pro provádění cyklu for."
       ],
-      "answer": 1,
-      "explanation": "Atributy začínající dvěma podtržítky (a končící nejvýše jedním) podléhají v Pythonu tzv. name manglingu. Přejmenují se na `_NázevTřídy__atribut` (zde `_Ucet__tajne`), takže přístup pod původním jménem `__tajne` selže s chybou `AttributeError`.",
-      "code": "class Ucet:\n    def __init__(self, stav):\n        self.__tajne = stav\n\nu = Ucet(100)\nprint(u.__tajne)"
+      "answer": 2,
+      "explanation": "Cyklus `for` na začátku volá funkci `iter(obj)`, která vyžaduje přítomnost metody `__iter__()`. Pouhá existence metody `__next__()` bez `__iter__()` nestačí a vyvolá `TypeError: 'MojIter' object is not iterable`.",
+      "code": "class MojIter:\n    def __next__(self):\n        return 1\n\nfor x in MojIter():\n    print(x)\n    break"
     },
     {
       "id": "q2",
       "type": "multiple_choice",
-      "question": "Jaký bude výsledek vykonání následujícího kódu při přístupu k atributu `p.a`?",
+      "question": "Jaký bude výstup po vyčerpání prvků z instance `Odpocet`?",
       "options": [
-        "A) Vypíše hodnotu None, protože atribut 'a' existuje na rodiči, ale nebyl inicializován.",
-        "B) Vypíše hodnotu 10, protože konstruktor rodiče se v Pythonu volá automaticky jako první.",
-        "C) Vyvolá AttributeError, protože konstruktor rodiče nebyl v potomkovi explicitně zavolán.",
-        "D) Vyvolá TypeError, protože třída Potomek musí povinně zavolat super().__init__() v těle."
+        "A) Vypíše '2 1 0' bez vyhození výjimky, protože hodnota 0 se vyhodnotí jako platný poslední prvek sekvence.",
+        "B) Vypíše '2 1 None', protože po vyčerpání hodnot vrací funkce next() implicitní prázdnou hodnotu None.",
+        "C) Vyvolá IndexError, protože ruční volání funkce next() na vyčerpaném iterátoru vyvolá chybový stav pole.",
+        "D) Vypíše '2 1' a následně 'Konec', protože po dosažení nulové hodnoty vyvolá metoda __next__ StopIteration."
       ],
-      "answer": 2,
-      "explanation": "V Pythonu se při definici vlastní metody `__init__()` v potomkovi automaticky nezavolá konstruktor rodičovské třídy (na rozdíl od C++ či Javy). Jelikož `Potomek.__init__` neobsahuje volání `super().__init__()` ani `Rodic.__init__(self)`, atribut `a` na instanci vůbec nevznikne.",
-      "code": "class Rodic:\n    def __init__(self):\n        self.a = 10\n\nclass Potomek(Rodic):\n    def __init__(self):\n        self.b = 20\n\np = Potomek()\nprint(p.a)"
+      "answer": 3,
+      "explanation": "První dvě volání `next(it)` vrátí hodnoty `2` a `1`. Třetí volání narazí na `self.val <= 0`, což vyvolá výjimku `StopIteration`, kterou blok `except` zachytí a vypíše `'Konec'`.",
+      "code": "class Odpocet:\n    def __init__(self, start):\n        self.val = start\n    def __iter__(self):\n        return self\n    def __next__(self):\n        if self.val <= 0:\n            raise StopIteration\n        self.val -= 1\n        return self.val + 1\n\nit = Odpocet(2)\nprint(next(it), next(it))\ntry:\n    print(next(it))\nexcept StopIteration:\n    print(\"Konec\")"
     },
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte dekorátor pro vytvoření třídní metody předávající třídu cls jako první argument:",
+      "question": "Doplňte návratovou hodnotu metody __iter__() pro splnění iterátorového protokolu:",
       "options": [
-        "@property",
-        "@staticmethod",
-        "@instancemethod",
-        "@classmethod"
-      ],
-      "answer": 3,
-      "explanation": "Dekorátor @classmethod předává metodě jako první argument samotnou třídu (obvykle cls) namísto instance self.",
-      "code": "class Student:\n    total_students = 0\n\n    ________\n    def increment_count(cls):\n        cls.total_students += 1",
-      "expected": "@classmethod"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Co se stane při zavolání metody `tisk()` přes instanci `p` v níže uvedeném kódu?",
-      "options": [
-        "A) Vyvolá TypeError, protože instance předá sebe jako první argument nezadekorované metodě.",
-        "B) Vyvolá AttributeError, protože metody bez parametru self nelze v Pythonu na třídě definovat.",
-        "C) Vypíše řetězec 'Ahoj', protože Python automaticky rozpozná metodu bez parametrů jako statickou.",
-        "D) Vypíše hodnotu None, protože funkce nemá návratovou hodnotu a neobsahuje parametr self."
-      ],
-      "answer": 0,
-      "explanation": "Bez dekorátoru `@staticmethod` se každá běžná metoda na třídě chová jako instanční. Při volání přes instanci `p.tisk()` předá Python automaticky objekt `p` jako první argument (`Pomocnik.tisk(p)`), což selže na `TypeError: Pomocnik.tisk() takes 0 positional arguments but 1 was given`.",
-      "code": "class Pomocnik:\n    def tisk():\n        print(\"Ahoj\")\n\np = Pomocnik()\np.tisk()"
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Jaký bude výsledek vykonání následujícího kódu při práci se seznamem v atributu třídy?",
-      "options": [
-        "A) Vyvolá AttributeError, protože seznam polozky nebyl inicializován v metodě __init__().",
-        "B) Vypíše ['jablko'], protože polozky je třídní atribut sdílený všemi instancemi třídy Kosik.",
-        "C) Vypíše prázdný seznam [], protože k1 a k2 mají přiřazeny své vlastní nezávislé instance.",
-        "D) Vyvolá TypeError, protože seznamy nelze v definici třídy používat jako výchozí hodnoty."
-      ],
-      "answer": 1,
-      "explanation": "Proměnná `polozky` definovaná přímo v těle třídy je třídním atributem. Je sdílena mezi všemi instancemi třídy `Kosik`, takže modifikace obsahu seznamu přes `k1` se projeví i při čtení přes `k2`.",
-      "code": "class Kosik:\n    polozky = []\n\nk1 = Kosik()\nk2 = Kosik()\nk1.polozky.append(\"jablko\")\nprint(k2.polozky)"
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Která dvojice dekorátorů je potřeba pro vytvoření vlastnosti `barva` umožňující čtení i zápis?",
-      "options": [
-        "A) Obě metody se zadekorují `@property` a liší se pouze počtem přijímaných argumentů self.",
-        "B) První metoda se zadekoruje `@getter` a druhá metoda se zadekoruje dekorátorem `@setter`.",
-        "C) První metoda se zadekoruje `@property` a druhá metoda se stejným názvem `@barva.setter`.",
-        "D) První metoda se zadekoruje `@property` a druhá metoda se stejným názvem `@property.set`."
-      ],
-      "answer": 2,
-      "explanation": "V Pythonu přístup pro čtení zavedete dekorátorem `@property` nad metodou `barva(self)`. Pro vytvoření setteru se použije dekorátor pojmenovaný podle dané vlastnosti: `@barva.setter` nad druhou metodou `barva(self, val)`.",
-      "code": null
-    },
-    {
-      "id": "q7",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení: Dekorátor `@dataclass` automaticky generuje metody `__init__()`, `__repr__()` a `__eq__()`, ale řadicí porovnávací operátory jako `__lt__()` vyžadují parametr `order=True`.",
-      "options": [
-        "A) Nepravda – `@dataclass` automaticky generuje všechny porovnávací metody včetně `__lt__()` a `__gt__()` bez nutnosti nastavovat jakékoli parametry.",
-        "B) Pravda – `@dataclass` standardně vygeneruje inicializaci, reprezentaci a rovnost, zatímco řadicí operátory je nutné zapnout parametrem order=True."
-      ],
-      "answer": 1,
-      "explanation": "Ve výchozím nastavení nageneruje `@dataclass` metody `__init__()`, `__repr__()` a `__eq__()`. Pokud chcete automaticky vygenerovat i zbylé porovnávací a řadicí operátory (`__lt__()`, `__le__()`, `__gt__()`, `__ge__()`), musíte explicitně uvést `@dataclass(order=True)`.",
-      "code": null
-    }
-  ],
-  "super": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Co vypíše následující kód při zavolání metody `c.test()`?",
-      "options": [
-        "A) Vyvolá TypeError, protože prvním argumentem funkce super() musí být instance objektu.",
-        "B) Vyvolá AttributeError, protože třída A nedědí z třídy B a nemá přístup k jejím metodám.",
-        "C) Vypíše řetězec 'A', protože super(A, self) odkazuje přímo na rodičovskou třídu A.",
-        "D) Vypíše řetězec 'B', protože hledání v MRO třídy C pokračuje po třídě A dalším rodičem B."
-      ],
-      "answer": 3,
-      "explanation": "První parametr `type` ve `super(A, self)` určuje třídu v MRO rodokmenu instance `c` (`C -> A -> B -> object`), od jejíhož NÁSLEDUJÍCÍHO prvku se začne metoda vyhledávat. Za třídou `A` v MRO třídy `C` následuje třída `B`, proto se zavolá `B.test()`.",
-      "code": "class A:\n    def test(self):\n        return \"A\"\n\nclass B:\n    def test(self):\n        return \"B\"\n\nclass C(A, B):\n    def test(self):\n        return super(A, self).test()\n\nc = C()\nprint(c.test())"
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký bude výsledek vykonání kódu při volání `b.greet()` s vnořenou funkcí?",
-      "options": [
-        "A) Vyvolá RuntimeError, protože bezargumentový super() nefunguje uvnitř vnořené funkce bez self.",
-        "B) Vypíše řetězec 'Hello World', protože super() automaticky vyhledá instanci v nadřazeném rozsahu.",
-        "C) Vypíše hodnotu None, protože vnořená funkce inner nepředává argumenty do nadřazené metody.",
-        "D) Vyvolá AttributeError, protože vnořená funkce inner nemá přístup k metodám rodičovské třídy."
-      ],
-      "answer": 0,
-      "explanation": "Bezargumentové volání `super()` spoléhá na kompilátorem vkládanou proměnnou `__class__` a první argument metody (`self`). Uvnitř vnořené funkce `inner()`, která nemá parametr `self`, toto automatické doplnění selže a vyvolá `RuntimeError: super(): __class__ cell not found` (případně `TypeError`).",
-      "code": "class A:\n    def greet(self):\n        return \"Hello\"\n\nclass B(A):\n    def greet(self):\n        def inner():\n            return super().greet() + \" World\"\n        return inner()\n\nb = B()\nprint(b.greet())"
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jaké bude pořadí výpisů při vytvoření instance `c = C()` v diamantové dědičnosti?",
-      "options": [
-        "A) Vypíše postupně C, A, Base, protože třída A zavolá přímo konstruktor Base.",
-        "B) Vypíše postupně C, A, B, Base díky kooperativnímu řetězení v MRO pořadí.",
-        "C) Vypíše postupně C, A, Base, B, Base kvůli dvojímu volání rodiče Base.",
-        "D) Vyvolá TypeError, protože třídy A a B dědí ze stejné základní třídy Base."
-      ],
-      "answer": 1,
-      "explanation": "MRO pro třídu `C` je `[C, A, B, Base, object]`. Volání `super().__init__()` uvnitř `A.__init__` nevyvolá přímo `Base.__init__`, ale předá řízení dalšímu prvku v MRO rodokmenu třídy `C`, což je `B.__init__`. Až `B.__init__` zavolá `Base.__init__`, takže každý konstruktor se zavolá právě jednou.",
-      "code": "class Base:\n    def __init__(self):\n        print(\"Base\")\n\nclass A(Base):\n    def __init__(self):\n        print(\"A\")\n        super().__init__()\n\nclass B(Base):\n    def __init__(self):\n        print(\"B\")\n        super().__init__()\n\nclass C(A, B):\n    def __init__(self):\n        print(\"C\")\n        super().__init__()\n\nc = C()"
-    },
-    {
-      "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Doplňte název atributu třídy obsahujícího n-tici s pořadím prohledávání metod (MRO):",
-      "options": [
-        "__bases__",
-        "__hierarchy__",
-        "__mro__",
-        "__order__"
-      ],
-      "answer": 2,
-      "explanation": "Speciální atribut __mro__ (Method Resolution Order) obsahuje n-tici tříd určující prioritu vyhledávání metod a atributů.",
-      "code": "class Base: pass\nclass Derived(Base): pass\n\nresolution_order = Derived.________\n# Výstup: (<class '__main__.Derived'>, <class '__main__.Base'>, <class 'object'>)",
-      "expected": "__mro__"
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co přesně specifikuje prvotní argument `type` ve volání `super(type, object)`?",
-      "options": [
-        "A) Cílovou rodičovskou třídu, jejíž metoda se má přímo spustit s vynecháním ostatních předků.",
-        "B) Typ objektu, na kterém se má vyhledávání zastavit při dosažení vrchní úrovně dědičnosti.",
-        "C) Výchozí třídu, která se použije jako záložní řešení v případě nenalezení metody v potomcích.",
-        "D) Třídu v MRO řetězci, od jejíž následující pozice se započne vyhledávání požadované metody."
-      ],
-      "answer": 3,
-      "explanation": "První parametr `type` nenařizuje spuštění metody přímo z dané třídy; určuje bod v MRO rodokmenu druhého argumentu, od jehož následujícího souseda se začne hledat.",
-      "code": null
-    },
-    {
-      "id": "q6",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení: Volání `super()` s oběma explicitními parametry `super(Třída, objekt)` lze použít výhradně uvnitř instančních metod dané třídy.",
-      "options": [
-        "A) Nepravda – `super(Třída, objekt)` s oběma parametry lze použít kdekoli v kódu, protože oba parametry plně určují MRO i prohledávanou instanci.",
-        "B) Pravda – `super()` vyžaduje vazbu na kontext třídy a při použití mimo její metody vyvolá chybu SyntaxError bez ohledu na předané argumenty."
-      ],
-      "answer": 0,
-      "explanation": "Při předání obou argumentů `super(Třída, objekt)` má funkce vše potřebné (MRO i objekt) a lze ji zavolat kdekoli v kódu mimo těla metod. Pouze bezargumentová varianta `super()` vyžaduje běhový kontext metody.",
-      "code": null
-    }
-  ],
-  "magic": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Co vypíše následující kód při vyhodnocení výrazu `5 + v`?",
-      "options": [
-        "A) Vypíše hodnotu 15, protože při selhání levostranné metody int zavolá Python pravostrannou __radd__.",
-        "B) Vyvolá AttributeError, protože pro operaci 5 + v musíme definovat výhradně levostrannou metodu __add__.",
-        "C) Vyvolá TypeError, protože celé číslo 5 stojí vlevo a nepodporuje sčítání s uživatelským objektem.",
-        "D) Vypíše hodnotu 10, protože pravostranné metody ignorují levý operand a vracejí pouze vnitřní hodnotu."
-      ],
-      "answer": 0,
-      "explanation": "Při výrazu `5 + v` se nejprve zavolá levostranná metoda `(5).__add__(v)`. Jelikož vestavěný typ `int` objekt typu `Vector` nezná, vrátí `NotImplemented`. Python následně vyzkouší pravostrannou metodu `v.__radd__(5)`, která vrátí `10 + 5 = 15`.",
-      "code": "class Vector:\n    def __init__(self, val):\n        self.val = val\n    def __radd__(self, other):\n        return self.val + other\n\nv = Vector(10)\nprint(5 + v)"
-    },
-    {
-      "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Doplňte magickou metodu umožňující bezeztrátový převod objektu na celé číslo pro indexování sekvencí:",
-      "options": [
-        "__getitem__",
-        "__index__",
-        "__slice__",
-        "__int__"
-      ],
-      "answer": 1,
-      "explanation": "Metoda __index__() slouží k převodu objektu na celočíselný index pro krájení (slicing) a indexaci sekvencí v Pythonu.",
-      "code": "class CustomIndex:\n    def __init__(self, pos):\n        self.pos = pos\n\n    def ________(self):\n        return self.pos\n\nitems = [\"A\", \"B\", \"C\", \"D\"]\nprint(items[CustomIndex(2)])  # Vypíše: C",
-      "expected": "__index__"
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jaký bude výsledek zavolání instance `trojnasobek(5)` v následujícím kódu?",
-      "options": [
-        "A) Vypíše hodnotu 3, protože zavolání instance vrátí pouze hodnotu atributu n předanou v konstruktoru.",
-        "B) Vyvolá TypeError, protože instance třídy nelze volat pomocí závorek jako běžné pythoní funkce.",
-        "C) Vypíše hodnotu 15, protože definice metody __call__ činí instanci třídy přímo volatelnou jako funkci.",
-        "D) Vyvolá AttributeError, protože metoda __call__ vyžaduje ještě explicitní zadekorování @callable."
-      ],
-      "answer": 2,
-      "explanation": "Definice magické metody `__call__(self, ...)` způsobuje, že se instance třídy chová jako callable objekt. Zavolání `trojnasobek(5)` se přeloží na `trojnasobek.__call__(5)`, což vrátí `3 * 5 = 15`.",
-      "code": "class Nasobek:\n    def __init__(self, n):\n        self.n = n\n    def __call__(self, x):\n        return self.n * x\n\ntrojnasobek = Nasobek(3)\nprint(trojnasobek(5))"
-    },
-    {
-      "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Doplňte magickou metodu pro přetížení infixového operátoru maticového násobení (@):",
-      "options": [
-        "__mul__",
-        "__dot__",
-        "__matrix__",
-        "__matmul__"
-      ],
-      "answer": 3,
-      "explanation": "Operátor @ volá magickou metodu __matmul__(self, other) definovanou v PEP 465 pro maticové násobení.",
-      "code": "class Matrix:\n    def __init__(self, data):\n        self.data = data\n\n    def ________(self, other):\n        # Implementace maticového násobení pro operátor @\n        pass",
-      "expected": "__matmul__"
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co vypíše následující kód při přístupu k neexistujícímu klíči `d['b']`?",
-      "options": [
-        "A) Vypíše řetězec 'B', protože metoda __missing__ se zavolá automaticky při nenalezení klíče v slovníku.",
-        "B) Vyvolá KeyError, protože __missing__ je pouze dekorativní metoda a nezabraňuje vyhození výjimky.",
-        "C) Vypíše hodnotu None, protože neexistující klíče v odvozených slovnících automaticky vrací prázdný objekt.",
-        "D) Vyvolá AttributeError, protože přístup přes hranaté závorky vyžaduje přetížení metody __getitem__."
-      ],
-      "answer": 0,
-      "explanation": "V podtřídách slovníku `dict` zavolá metoda `__getitem__()` při nenalezení požadovaného klíče metodu `__missing__(key)`. Její návratová hodnota se pak vrátí jako výsledek vyhledávání.",
-      "code": "class MojeSlovnik(dict):\n    def __missing__(self, key):\n        return key.upper()\n\nd = MojeSlovnik({'a': 'apple'})\nprint(d['b'])"
-    },
-    {
-      "id": "q6",
-      "type": "multiple_choice",
-      "question": "Jaký je hlavní rozdíl v určení magických metod `__repr__()` a `__str__()`?",
-      "options": [
-        "A) __repr__ se volá automaticky funkcí print(), zatímco __str__ se volá výhradně v diagnostickém debuggeru.",
-        "B) __repr__ slouží pro oficiální technickou reprezentaci objektu, zatímco __str__ pro čitelný textový výstup.",
-        "C) Obě metody vracejí výhradně bajtové sekvence a liší se pouze možností přijímat formátovací specifikátory.",
-        "D) __str__ slouží pro oficiální technickou reprezentaci objektu, zatímco __repr__ pro čitelný textový výstup."
-      ],
-      "answer": 1,
-      "explanation": "Metoda `__repr__()` má vracet jednoznačnou, pokud možno validní pythonní reprezentaci objektu (vhodnou pro vývojáře/debugger), zatímco `__str__()` poskytuje uživatelsky přívětivý textový výstup (využívaný např. funkcí `print()`).",
-      "code": null
-    },
-    {
-      "id": "q7",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení: Pokud třída nedefinuje in-place metodu `__iadd__()`, výraz `x += y` vyvolá chybu TypeError a operace sčítání selže.",
-      "options": [
-        "A) Pravda – Zkrácený operátor += vyžaduje výhradně in-place metodu __iadd__() a nelze jej nahradit běžnou metodou __add__().",
-        "B) Nepravda – Při absenci __iadd__() vyhodnotí Python výraz x += y jako x = x + y a pokusí se zavolat metodu __add__()."
-      ],
-      "answer": 1,
-      "explanation": "Pokud objekt nedefinuje in-place metodu `__iadd__()`, použije Python jako záložní řešení standardní binární operaci sčítání `x = x + y` s metodou `__add__()`.",
-      "code": null
-    }
-  ],
-  "with": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jaká hodnota vrácená z metody __exit__() způsobí potlačení výjimky vzniklé uvnitř bloku with?",
-      "options": [
-        "A) Nepravdivá hodnota False (nebo None), která interpretu sdělí, že byla výjimka úspěšně zpracována.",
-        "B) Řetězec s názvem zachycené výjimky, který se předá nadřazenému bloku try-except k logování.",
-        "C) Pravdivá hodnota True (nebo jakýkoliv pravdivý objekt), která interpretu sdělí, že byla výjimka zpracována.",
-        "D) Objekt výjimky typu BaseException, který nahradí původně vyvolanou výjimku v aktuálním kontextu."
-      ],
-      "answer": 2,
-      "explanation": "Pokud __exit__() vrátí True (pravdivou hodnotu), Python výjimku potlačí a kód pokračuje za blokem with. Pokud vrátí False nebo None, výjimka se propaguje výše.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký bude výstup následujícího kódu využívajícího generátorový kontextový manažer?",
-      "options": [
-        "A) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku StopIteration kvůli vyčerpání generátoru.",
-        "B) Vypíše START, DATA, END dvakrát za sebou, protože generátor se při dalším vstupu automaticky restartuje.",
-        "C) Vypíše START, DATA, END a při druhém vstupu neprovede nic, protože proměnná val již obsahuje řetězec DATA.",
-        "D) Vypíše START, DATA, END a při druhém bloku with vyvolá výjimku RuntimeError: generator didn't yield."
-      ],
-      "answer": 3,
-      "explanation": "Generátor vytvořený pomocí @contextmanager je jednorázový. Jednou vyčerpaný generátorový objekt uložený do proměnné cm nelze znovu použít v dalším bloku with; pokus o to vyvolá RuntimeError: generator didn't yield.",
-      "code": "from contextlib import contextmanager\n\n@contextmanager\ndef my_ctx():\n    print(\"START\")\n    yield \"DATA\"\n    print(\"END\")\n\ncm = my_ctx()\nwith cm as val:\n    print(val)\nwith cm as val:\n    print(val)"
-    },
-    {
-      "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte klíčové slovo pro předání spravovaného prostředku z kontextového manažeru @contextmanager:",
-      "options": [
-        "yield",
-        "pass",
-        "return",
-        "send"
-      ],
-      "answer": 0,
-      "explanation": "Generátorový kontextový manažer předává spravovaný objekt do bloku with pomocí klíčového slova yield.",
-      "code": "from contextlib import contextmanager\n\n@contextmanager\ndef open_database(host):\n    conn = connect(host)\n    try:\n        ________ conn\n    finally:\n        conn.close()",
-      "expected": "yield"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Jaké argumenty obdrží metoda __exit__(self, exc_type, exc_val, exc_tb) při normálním ukončení bloku with bez výjimky?",
-      "options": [
-        "A) Argument exc_type bude StopIteration, zatímco zbývající dva budou None.",
-        "B) Všechny tři argumenty exc_type, exc_val a exc_tb budou mít hodnotu None.",
-        "C) Argumenty obdrží instanci třídy SuccessState s informací o bezchybném průběhu.",
-        "D) Metoda __exit__() se při bezchybném doběhu bloku with vůbec nevolá."
-      ],
-      "answer": 1,
-      "explanation": "Dokončí-li se blok with bez vyvolání výjimky, Python zavolá __exit__ s argumenty (None, None, None).",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co bude vytištěno při spuštění následujícího kódu s vlastní třídou kontextového manažeru?",
-      "options": [
-        "A) Vypíše False None, protože výstup z __enter__() se zahodí a proměnná res se inicializuje na None.",
-        "B) Vypíše True RESOURCE, protože proměnná res v příkazu as vždy odkazuje přímo na kontextový manažer m.",
-        "C) Vypíše False RESOURCE, protože res dostane návratovou hodnotu z __enter__(), nikoliv objekt m.",
-        "D) Vyvolá výjimku AttributeError, protože metoda __enter__() musí vracet výhradně samotný objekt self."
-      ],
-      "answer": 2,
-      "explanation": "Proměnná za klíčovým slovem as přebírá návratovou hodnotu metody __enter__(). Jelikož ta vrátila řetězec \"RESOURCE\", proměnná res drží tento řetězec a nikoliv objekt m (res is m je tedy False).",
-      "code": "class Manager:\n    def __enter__(self):\n        return \"RESOURCE\"\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        return False\n\nm = Manager()\nwith m as res:\n    print(res is m, res)"
-    },
-    {
-      "id": "q6",
-      "type": "fill_blank_choice",
-      "question": "Doplňte návratovou hodnotu metody __exit__, která potlačí vzniklou výjimku a zabrání jejímu dalšímu šíření:",
-      "options": [
-        "None",
-        "False",
         "self",
-        "True"
+        "iter(self)",
+        "next(self)",
+        "self.__next__()"
       ],
-      "answer": 3,
-      "explanation": "Pokud metoda __exit__() vrátí pravdivou hodnotu (True), Python výjimku potlačí a nepokračuje v jejím šíření.",
-      "code": "class SuppressErrors:\n    def __enter__(self):\n        return self\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        if exc_type is not None:\n            print(f\"Zachycena výjimka: {exc_val}\")\n            return ________",
-      "expected": "True"
+      "answer": 0,
+      "explanation": "Objekt implementující __next__() musí ve své metodě __iter__() vracet sám sebe (self), aby vyhověl iterátorovému protokolu.",
+      "code": "class CountdownIterator:\n    def __init__(self, count):\n        self.count = count\n\n    def __iter__(self):\n        return ________\n\n    def __next__(self):\n        if self.count <= 0:\n            raise StopIteration\n        self.count -= 1\n        return self.count + 1",
+      "expected": "self"
     },
     {
-      "id": "q7",
-      "type": "true_false_tricky",
-      "question": "Zápis with A() as a, B() as b: v Pythonu 3.10+ odpovídá zanořenému with A() as a: with B() as b: a volání metod __enter__ a __exit__ probíhá ve stejném lexikálním pořadí (nejprve A, potom B u obou kroků).",
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaké podmínky musí objekt splňovat, aby mohl být předán do vestavěné funkce `reversed()`?",
       "options": [
-        "A) Tvrzení je pravdivé; oba kontexty se otevírají i zavírají ve stejném lexikálním pořadí shora dolů (nejprve A a potom B u vstupů i ukončení).",
-        "B) Tvrzení je nepravdivé; metody __enter__ probíhají v pořadí A a pak B, ale čistící metody __exit__ probíhají v opačném pořadí (nejprve B a až poté A)."
+        "A) Musí definovat výhradně metodu __reversed__(), protože jiné záložní protokoly Python při reverzování nepodporuje.",
+        "B) Musí definovat metodu __reversed__(), nebo implementovat metody __len__() a __getitem__() sekvenčního protokolu.",
+        "C) Musí dědit ze třídy ReversibleIterator a přetěžovat metodu __backward__() určenou pro zpětnou iteraci prvků.",
+        "D) Musí definovat metody __iter__() a __next__() běžného dopředného iterátoru s příznakem reverse=True v hlavičce."
       ],
       "answer": 1,
-      "explanation": "Kontextové manažery při vícenásobném zápisu fungují jako zanořené bloky: vstupní metody __enter__ se volají v pořadí zápisu (zleva doprava: A, pak B), ale čistící metody __exit__ se volají v opačném pořadí (nejprve vnitřní B, potom vnější A).",
+      "explanation": "Funkce `reversed()` nejprve hledá metodu `__reversed__()`. Pokud chybí, pokusí se použít sekvenční protokol vyžadující metody `__len__()` a `__getitem__()` pro přístup přes celočíselné indexy od konce.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení: Každý iterovatelný objekt (iterable) v Pythonu musí sám přímo definovat metodu `__next__()`.",
+      "options": [
+        "A) Nepravda – Iterovatelný objekt vyžaduje pouze metodu __iter__() vracející samostatný objekt iterátoru s metodu __next__().",
+        "B) Pravda – Každý objekt, po kterém lze v Pythonu iterovat pomocí cyklu for, musí sám přímo obsahovat plnou metodu __next__()."
+      ],
+      "answer": 0,
+      "explanation": "Iterovatelný objekt (`iterable`, např. seznam `list`) nemusí mít metodu `__next__()`. Stačí, když jeho metoda `__iter__()` vrátí nový objekt iterátoru (`iterator`), který metodu `__next__()` obsahuje.",
       "code": null
     }
   ],
-  "descriptors": [
+  "generators": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Jaký je hlavní rozdíl mezi datovým deskriptorem (data descriptor) a nedatovým deskriptorem (non-data descriptor) při vyhledávání atributů na instanci?",
+      "question": "Kdy se poprvé vykoná kód před prvním příkazem yield v generátorové funkci?",
       "options": [
-        "A) Datový definuje metodu __set__ nebo __delete__ a má přednost před __dict__ instance, nedatový definuje jen __get__.",
-        "B) Nedatový definuje metodu __set__ a má přednost před __dict__ instance, zatímco datový definuje výhradně __get__.",
-        "C) Datový deskriptor se ukládá přímo do __dict__ instance, zatímco nedatový deskriptor se ukládá do __dict__ třídy.",
-        "D) Nedatový deskriptor nelze na instanci vůbec přepsat novou hodnotou, kdežto datový deskriptor lze snadno nahradit."
+        "A) Až při prvním zavolání vestavěné funkce next() nad vytvořenou instancí generátoru.",
+        "B) Až po úplném proiterování celého generátoru nebo při jeho prvním explicitním uzavření.",
+        "C) Ihned při zavolání funkce generátoru, kdy se vytvoří a inicializuje jeho pracovní kontext.",
+        "D) Při použití deklarativního klíčového slova yield během definice a kompilace dané funkce."
       ],
       "answer": 0,
-      "explanation": "Datový deskriptor implementuje __set__ (nebo __delete__), což způsobuje, že přístup i zápis k tomuto atributu má vždy přednost před slovníkem __dict__ instance. Nedatový deskriptor implementuje pouze __get__ (např. metody), takže uložení atributu do __dict__ instance nedatový deskriptor překryje.",
+      "explanation": "Zavolání generátorové funkce (konstruktoru) pouze vytvoří objekt generátoru, ale nespustí žádný kód v jeho těle. Kód až po první yield se vykoná teprve při prvním volání next().",
       "code": null
     },
     {
       "id": "q2",
       "type": "multiple_choice",
-      "question": "Jak se liší chování metod __getattr__ a __getattribute__ při přístupu k atributu instance?",
+      "question": "Co vypíše následující kód při protnutí manuální a automatické iterace?",
       "options": [
-        "A) Vyvolá RecursionError, protože implementace __getattribute__ bez použití super() vyvolá nekonečnou rekurzi přístupu.",
-        "B) Vypíše ALWAYS, protože __getattribute__ se volá bezpodmínečně při každém přístupu k atributu a __getattr__ se nezavolá.",
-        "C) Vypíše FALLBACK, protože atribut anything není v __dict__ definován a __getattr__ má při vyhledávání vyšší prioritu.",
-        "D) Vypíše ALWAYS FALLBACK, protože Python při neexistenci atributu postupně zavolá obě obslužné metody v definovaném pořadí."
+        "A) Vyvolá výjimku TypeError, protože rozpracovaný generátor již nelze předat do smyčky for.",
+        "B) Vypíše postupně čísla 1, 2 a 3, protože cyklus for naváže na aktuální vnitřní stav generátoru g.",
+        "C) Vypíše pouze číslo 1 a následně vyvolá výjimku StopIteration při pokusu o vstup do cyklu for.",
+        "D) Vypíše postupně čísla 1, 1, 2 a 3, protože cyklus for automaticky restartuje iteraci od začátku."
       ],
       "answer": 1,
-      "explanation": "Metoda __getattribute__ se volá vždy při jakémkoliv přístupu k atributu. Protože v kódu vrátil návratovou hodnotu ihned bez AttributeError, k volání __getattr__ (které se spouští až po selhání běžného hledání) vůbec nedojde.",
-      "code": "class Demo:\n    def __getattribute__(self, item):\n        return \"ALWAYS\"\n    def __getattr__(self, item):\n        return \"FALLBACK\"\n\nd = Demo()\nprint(d.anything)"
+      "explanation": "Generátor si udržuje svůj interní stav. Volání next(g) spotřebuje první hodnotu (1), a následný cyklus for pokračuje v iteraci od druhého prvku (2 a 3).",
+      "code": "def gen():\n    yield 1\n    yield 2\n    yield 3\n\ng = gen()\nprint(next(g))\nfor x in g:\n    print(x)"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jaký výstup vytvoří dvojí zavolání next(gen()) bez uložení instance generátoru do proměnné?",
+      "options": [
+        "A) Vypíše řetězec 'A' a při druhém volání vyvolá výjimku StopIteration kvůli vyčerpání generátoru.",
+        "B) Vyvolá výjimku RuntimeError, protože nelze volat next() přímo nad konstruktorem bez přiřazení.",
+        "C) Vypíše dvakrát řetězec 'A', protože každé volání gen() vytvoří zcela novou nezávislou instanci.",
+        "D) Vypíše postupně řetězce 'A' a 'B', protože Python si udržuje globální odkaz na funkci gen()."
+      ],
+      "answer": 2,
+      "explanation": "Zavoláním gen() vznikne pokaždé nový generátorový objekt na začátku svého běhu, takže první next() nad ním vrátí vždy první prvek ('A').",
+      "code": "def gen():\n    yield 'A'\n    yield 'B'\n\nprint(next(gen()))\nprint(next(gen()))"
+    },
+    {
+      "id": "q4",
+      "type": "fill_blank_choice",
+      "question": "Doplňte výchozí návratovou hodnotu do volání funkce `next()`, která zabrání vyvolání výjimky `StopIteration` při vyčerpání generátoru spektra.",
+      "options": [
+        "False",
+        "StopIteration",
+        "default=None",
+        "None"
+      ],
+      "answer": 3,
+      "explanation": "Funkce `next(iterator, default)` přijímá volitelný druhý poziční argument, který se vrátí místo vyvolání výjimky `StopIteration`, pokud je iterátor vyčerpán.",
+      "code": "peaks = (val for val in [120.5, 340.2])\n\nfirst_peak = next(peaks)\nsecond_peak = next(peaks)\n# Třetí volání na prázdném generátoru vrátí zadanou výchozí hodnotu\nthird_peak = next(peaks, ________)\n\nprint(third_peak)  # None",
+      "expected": "None"
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Kam se uloží hodnota vrácená příkazem return v těle generátorové funkce při vyvolání StopIteration?",
+      "options": [
+        "A) Uloží se do atributu value vyvolané instance výjimky StopIteration.",
+        "B) Ztratí se bez náhrady, protože generátory nesmí obsahovat příkaz return.",
+        "C) Uloží se do globální proměnné __return__ propojené s příslušným objektem.",
+        "D) Vrátí se běžným způsobem jako standardní návratová hodnota volání next()."
+      ],
+      "answer": 0,
+      "explanation": "Příkaz return HODNOTA v generátoru ukončí jeho vykonávání a předanou hodnotu přibalí do atributu value výjimky StopIteration.",
+      "code": "def gen():\n    yield 1\n    return 'konec'\n\ng = gen()\nnext(g)\ntry:\n    next(g)\nexcept StopIteration as e:\n    print(e.value)"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jak se zachová generátor g po zavolání metody g.close() při dalším pokusu o zavolání next(g)?",
+      "options": [
+        "A) Ignoruje požadavek na zavření a vrátí následující hodnotu předepsanou v pořadí prvků yield.",
+        "B) Ihned vyvolá výjimku StopIteration, protože generátor je explicitně převeden do ukončeného stavu.",
+        "C) Vrátí zadanou hodnotu None a pokračuje v iteraci od prvního příkazu yield v definici funkce.",
+        "D) Vyvolá výjimku RuntimeError s oznámením, že s uzavřeným generátorem nelze dále pracovat."
+      ],
+      "answer": 1,
+      "explanation": "Metoda close() okamžitě ukončí generátor. Jakékoli další zavolání next() nad tímto generátorem vyvolá výjimku StopIteration.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "fill_blank_choice",
+      "question": "Doplňte klíčová slova pro delegování generování hodnot na vnořený generátor naměřených dat ze subroutiny.",
+      "options": [
+        "yield for",
+        "yield in",
+        "yield from",
+        "delegate yield"
+      ],
+      "answer": 2,
+      "explanation": "Konstrukce `yield from` deleguje generování hodnot na jiný iterovatelný objekt nebo generátor a zároveň zprostředkovává obousměrnou komunikaci.",
+      "code": "def load_sensor_batch():\n    yield 10.1\n    yield 10.4\n\ndef stream_all_sensors():\n    # Delegování iterace na podřízený generátor\n    ________ load_sensor_batch()\n    yield 0.0  # Koncová značka kalibrace\n\nprint(list(stream_all_sensors()))  # [10.1, 10.4, 0.0]",
+      "expected": "yield from"
+    }
+  ],
+  "_comprehensions": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Jaký typ objektu vytvoří výraz g = (x**2 for x in range(5)) a kdy dojde k výpočtu prvků?",
+      "options": [
+        "A) Vytvoří iterovatelnou množinu (set) a zamezí duplicitním výsledkům před započetím cyklu.",
+        "B) Vytvoří generátorový objekt a hodnoty se počítají lenivě postupně až během procházení.",
+        "C) Vytvoří zkrácený seznam (list) s vyhodnocením všech prvků v okamžiku zpracování příkazu.",
+        "D) Vytvoří neměnnou n-tici (tuple) obsahující všech 5 spočtených hodnot okamžitě při definici."
+      ],
+      "answer": 1,
+      "explanation": "Generátorový výraz (zapsaný v kulatých závorkách) nevytváří tuple, ale vrátí lenivý generator object, jehož prvky se počítají až na vyžádání.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jaký výstup vytvoří vícenásobná generátorová notace se dvěma klauzulemi for?",
+      "options": [
+        "A) ['A1', 'B2', 'B1']",
+        "B) ['A1', 'B1', 'A2', 'B2']",
+        "C) ['A1', 'A2', 'B1', 'B2']",
+        "D) ['A1', 'A2', 'B1']"
+      ],
+      "answer": 2,
+      "explanation": "Pořadí for klauzulí v comprehension odpovídá zanořeným cyklům: vnější cyklus pro a iteruje 'A', pak 'B', a pro každý prvek se kompletně proiteruje vnitřní cyklus pro b ('1', '2').",
+      "code": "res = [a + b for a in ['A', 'B'] for b in ['1', '2']]\nprint(res)"
     },
     {
       "id": "q3",
       "type": "fill_blank_choice",
-      "question": "Doplňte metodu protokolu deskriptorů volanou při čtení hodnoty atributu z instance:",
+      "question": "Doplňte výraz slovníkové komprehence (dict comprehension) pro vytvoření mapování čísla na jeho druhou mocninu:",
       "options": [
-        "__getitem__",
-        "__getattribute__",
-        "__get__",
-        "__getattr__"
+        "x = x**2",
+        "x -> x**2",
+        "(x, x**2)",
+        "x: x**2"
       ],
-      "answer": 2,
-      "explanation": "Deskriptorový protokol definuje metodu __get__(self, instance, owner) pro čtení hodnoty spravovaného atributu.",
-      "code": "class ReadOnlyField:\n    def __init__(self, value):\n        self._value = value\n\n    def ________(self, instance, owner=None):\n        return self._value",
-      "expected": "__get__"
+      "answer": 3,
+      "explanation": "Slovníková komprehence vyžaduje zápis klic: hodnota uvnitř složených závorek před klauzulí for.",
+      "code": "# Vytvoření slovníku mocnin pro čísla 0 až 3:\npowers = {________ for x in range(4)}\n# Výstup: {0: 0, 1: 1, 2: 4, 3: 9}",
+      "expected": "x: x**2"
     },
     {
       "id": "q4",
       "type": "multiple_choice",
-      "question": "Jak Python vnitřně přeloží zápis p.barva = \"zelená\", je-li barva datovým deskriptorem definovaným na třídě Plocha?",
+      "question": "Kolik prvků bude mít výsledný objekt vytvořený generátorovou notací {x.lower() for x in 'AbraKaDabra'}?",
       "options": [
-        "A) p.__dict__['barva'].__set__(type(p), \"zelená\")",
-        "B) Plocha.__setattr__(p, 'barva', \"zelená\")",
-        "C) p.__set__(type(p).__dict__['barva'], \"zelená\")",
-        "D) type(p).__dict__['barva'].__set__(p, \"zelená\")"
+        "A) 5 prvků, protože množinová notace automaticky odstraní duplicitní převzatá písmena.",
+        "B) 1 prvek, protože při převodu na malá písmena se zachová pouze poslední přečtený znak.",
+        "C) 7 prvků, protože velká a malá písmena se v množině považují za různé klíče.",
+        "D) 11 prvků, protože vstupní řetězec obsahuje celkem 11 jednotlivých znaků v sekvenci."
       ],
-      "answer": 3,
-      "explanation": "Přístup k datovému deskriptoru z instance se přeloží vyhledáním objektu deskriptoru v __dict__ třídy dané instance a zavoláním jeho metody __set__(instance, value).",
+      "answer": 0,
+      "explanation": "Generátorová notace s použitím složených závorek bez dvoutečky vytváří množinu (set), která automaticky eliminuje duplicity. Znaky 'a', 'b', 'r', 'k', 'd' po převodu na malá písmena dají přesně 5 unikátních prvků.",
       "code": null
     },
     {
       "id": "q5",
       "type": "multiple_choice",
-      "question": "Co se stane při pokusu o spuštění následujícího kódu vytvářejícího vlastnost s dekorátory?",
+      "question": "Který z následujících zápisů v Pythonu přesně odpovídá kombinaci map(f, filter(p, xs))?",
       "options": [
-        "A) Vyvolá výjimku ValueError, protože přiřazení do s.size spustí metodu označenou dekorátorem @size.setter.",
-        "B) Atribut s.size se změní na -5, protože dekorátor @size.setter se uplatní pouze u instancí třídy object.",
-        "C) Kód selže již při definici třídy s výjimkou NameError, neboť dekorátor @size.setter neodkazuje na existující proměnnou.",
-        "D) Vyvolá výjimku AttributeError, protože metody pro getter a setter musí mít odlišné názvy (např. get_size)."
+        "A) [filter(p, f(x)) for x in xs]",
+        "B) [f(x) for x in xs if p(x)]",
+        "C) [f(x) if p(x) for x in xs]",
+        "D) [map(f, x) for x in xs if p(x)]"
+      ],
+      "answer": 1,
+      "explanation": "Skladba map(f, filter(p, xs)) se v generátorové notaci zapíše jako [f(x) for x in xs if p(x)], kde if filtruje prvky podle predikátu p a f transformuje vybrané prvky.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí generátorová notace kombinující ternární operátor s iterací?",
+      "options": [
+        "A) [2, 0, 2, 0]",
+        "B) [0, 2, 0, 2]",
+        "C) [0, 0, 2, 0]",
+        "D) [0, 1, 2, 3]"
+      ],
+      "answer": 2,
+      "explanation": "Ternární výraz x if x % 2 == 0 else 0 stojí před for a vyhodnocuje se pro každý prvek: pro 0 dává 0, pro 1 dává 0, pro 2 dává 2, pro 3 dává 0. Výsledek je [0, 0, 2, 0].",
+      "code": "res = [x if x % 2 == 0 else 0 for x in range(4)]\nprint(res)"
+    }
+  ],
+  "advanced-1": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co přesně v Pythonu označuje pojem uzávěr (closure)?",
+      "options": [
+        "A) Způsob uzavření souboru nebo síťového rozhraní v kontextovém manažeru za použití příkazu with.",
+        "B) Speciální třídu, jejíž metody mohou přistupovat k privátním atributům jiných instancí téže třídy.",
+        "C) Anonymní jednorázovou lambda-funkci, která nemá vlastní název v tabulce globálních symbolů programu.",
+        "D) Funkci vrácenou z vnitřního rozsahu viditelnosti, která si uchovává přístup k proměnným vnější funkce."
+      ],
+      "answer": 3,
+      "explanation": "Uzávěr je funkce definovaná uvnitř vnější funkce, která si po svém vrácení nese odkaz na proměnné z rozsahu viditelnosti vnější funkce (enclosing scope).",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký výsledek vrátí zřetězené volání vnější a vnitřní funkce vytvor_nasobic(3)(4)?",
+      "options": [
+        "A) Vrátí hodnotu 12, protože první volání vrátí vnitřní funkci uzávěru a druhé ji aplikuje na číslo 4.",
+        "B) Vrátí n-tici (3, 4), protože interpret zřetězená volání automaticky spojí do seznamu argumentů.",
+        "C) Vyvolá výjimku TypeError, protože funkce vytvor_nasobic přijímá pouze jeden vstupní argument.",
+        "D) Vrátí odkaz na funkci nasob bez provedení výpočtu násobení pro zadaná vstupní čísla v závorkách."
       ],
       "answer": 0,
-      "explanation": "Zápis @size.setter navazuje na dříve definovanou property size. Při uložení s.size = -5 se zavolá setter metoda, která ověří podmínku a vyvolá ValueError(\"Velikost musí být nezáporná\").",
-      "code": "class Square:\n    def __init__(self, size):\n        self._size = size\n    \n    @property\n    def size(self):\n        return self._size\n    \n    @size.setter\n    def size(self, value):\n        if value < 0:\n            raise ValueError(\"Velikost musí být nezáporná\")\n        self._size = value\n\ns = Square(10)\ns.size = -5"
+      "explanation": "Zavolání vytvor_nasobic(3) vrátí uzávěr funkce nasob s navázaným argumentem kategorie=3. Druhá část (4) tento uzávěr okamžitě zavolá a vrátí 3 * 4 = 12.",
+      "code": "def vytvor_nasobic(kategorie):\n    def nasob(cislo):\n        return kategorie * cislo\n    return nasob"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Co vrátí volání anonymní lambda-funkce f = lambda x, y: x + y při předání dvou čísel f(3, 4)?",
+      "options": [
+        "A) Vrátí hodnotu None, protože v těle lambda-funkce nebylo použito klíčové slovo return.",
+        "B) Vrátí hodnotu 7, protože hodnota jediného výrazu těla lambda-funkce se vrací automaticky.",
+        "C) Vyvolá výjimku NameError, protože anonymní funkce vyžadují explicitní název při přiřazení.",
+        "D) Vyvolá výjimku SyntaxError, protože tělo lambda-funkce musí být uzavřeno v závorkách."
+      ],
+      "answer": 1,
+      "explanation": "Lambda-funkce v Pythonu se skládají z jediného výrazu, jehož hodnota se vyhodnotí a automaticky vrátí bez potřeby klíčového slova return.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "fill_blank_choice",
+      "question": "Doplňte lambda funkci do parametru `key`, která zajistí seřazení chemických prvků podle jejich protonového čísla (druhé položky n-tice).",
+      "options": [
+        "x[1]",
+        "def(x): return x[1]",
+        "lambda x: x[1]",
+        "lambda x[1]"
+      ],
+      "answer": 2,
+      "explanation": "Výraz `lambda x: x[1]` definuje anonymní funkci přijímající n-tici `x` a vracející její druhý prvek na indexu 1 jako klíč pro řazení.",
+      "code": "# Seznam prvků ve formátu (značka, protonové_číslo)\nelements = [(\"O\", 8), (\"H\", 1), (\"C\", 6), (\"N\", 7)]\n\nsorted_by_z = sorted(elements, key=________)\n# Výstup: [('H', 1), ('C', 6), ('N', 7), ('O', 8)]",
+      "expected": "lambda x: x[1]"
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co vrátí přístup k dosud neexistujícímu klíči v defaultdict, definovaném pomocí lambda-funkce?",
+      "options": [
+        "A) Vrátí hodnotu None a klíč 'test' do slovníku uopště neuloží ani nevytvoří v paměti.",
+        "B) Vyvolá výjimku KeyError, protože lambda-funkce neumí dynamicky generovat výchozí klíče.",
+        "C) Vrátí samotný objekt <function <lambda>> bez jeho automatického spuštění a vyhodnocení.",
+        "D) Vrátí nový seznam [0, 'novy'] a současně jej uloží do slovníku pod klíčem 'test'."
+      ],
+      "answer": 3,
+      "explanation": "Při dotazu na chybějící klíč zavolá defaultdict svou tovární funkci (zde anonymní lambda-funkci) bez argumentů, získá její návratovou hodnotu [0, 'novy'], uloží ji k danému klíči a vrátí.",
+      "code": "from collections import defaultdict\nd = defaultdict(lambda: [0, 'novy'])\nprint(d['test'])"
     },
     {
       "id": "q6",
       "type": "true_false_tricky",
-      "question": "Běžné instanční metody, třídní metody @classmethod i statické metody @staticmethod jsou v Pythonu implementovány jako datové deskriptory (data descriptors).",
+      "question": "Posuďte pravdivost tvrzení: Tělo lambda-funkce v Pythonu může obsahovat více samostatných příkazů.",
       "options": [
-        "A) Tvrzení je nepravdivé; metody v Pythonu jsou nedatové deskriptory (definují pouze __get__), díky čemuž je lze na instanci přepsat uložením do jejího __dict__.",
-        "B) Tvrzení je pravdivé; všechny druhy metod implementují __set__ i __get__, což znemožňuje jakékoliv dynamické nahrazení metod přímo na úrovni jediné instance."
+        "A) Nepravda – lambda-funkce v Pythonu je syntakticky omezena pouze na jediný vyhodnotitelný výraz.",
+        "B) Pravda – více příkazů je povoleno, pokud jsou všechny uzavřeny v bloku složených závorek {}.",
+        "C) Pravda – lambda-funkce v Pythonu podporuje více příkazů spojených středníkem stejně jako běžné funkce.",
+        "D) Nepravda – lambda-funkce nesmí obsahovat žádné matematické výrazy ani volání jiných funkcí."
       ],
       "answer": 0,
-      "explanation": "Metody jsou nedatové deskriptory (non-data descriptors), protože definují pouze metodu __get__. Protože nedefinují __set__, lze název metody na konkrétní instanci snadno přepsat přiřazením nové hodnoty do instance.__dict__.",
+      "explanation": "V Pythonu jsou lambda-funkce zjednodušeny a syntakticky omezeny výhradně na jediný výraz. Nemohou obsahovat více příkazů ani příkazy jako return, pass či assert.",
       "code": null
     }
   ],
-  "class_decorators": [
+  "decorators": [
     {
       "id": "q_decor_1",
       "type": "multiple_choice",
       "question": "Kdy přesně dochází k vyhodnocení a aplikaci dekorátoru třídy?",
       "options": [
-        "A) Při prvním vytvoření instance dané třídy během běhu aplikace.",
-        "B) Až po ukončení vykonávání bloku if __name__ == '__main__':.",
-        "C) Okamžitě po vyhodnocení těla třídy při definici (v čase importu).",
-        "D) Při zavolání jakékoliv metody vytvořené instance dané třídy."
+        "A) Až po ukončení vykonávání bloku if __name__ == '__main__':.",
+        "B) Okamžitě po vyhodnocení těla třídy při definici (v čase importu).",
+        "C) Při zavolání jakékoliv metody vytvořené instance dané třídy.",
+        "D) Při prvním vytvoření instance dané třídy během běhu aplikace."
       ],
-      "answer": 2,
+      "answer": 1,
       "explanation": "Dekorátor třídy se vykoná ihned po zpracování definice třídy interpretem. Výraz `@dec class A: pass` je ekvivalentní zápisu `A = dec(A)`. Aplikace dekorátoru je posledním krokem vytváření objektu třídy a nečeká na tvorbu konkrétních instancí.",
       "code": null
     },
     {
       "id": "q_decor_2",
       "type": "fill_blank_choice",
-      "question": "Doplňte dekorátor ze standardní knihovny pro automatické dopočítání porovnávacích metod:",
+      "question": "Doplňte název třídního dekorátoru z modulu `functools`, který z definovaných metod `__eq__` a `__lt__` automaticky dopočítá zbývající porovnávací metody (`<=`, `>`, `>=`).",
       "options": [
         "rich_comparisons",
-        "auto_comparisons",
         "order_derivation",
-        "total_ordering"
+        "total_ordering",
+        "auto_ordering"
       ],
-      "answer": 3,
-      "explanation": "Dekorátor `@functools.total_ordering` vezme třídu, která definuje metodu `__eq__` a jednu z porovnávacích metod (`__lt__`, `__le__`, `__gt__`, `__ge__`), a zbývající porovnávací operátory dopočítá a doplní jako atributy objektu třídy.",
-      "expected": "total_ordering",
-      "code": "from functools import ________\n\n@total_ordering\nclass Bod:\n    def __eq__(self, other): return self.x == other.x\n    def __lt__(self, other): return self.x < other.x"
+      "answer": 2,
+      "explanation": "Dekorátor `@functools.total_ordering` doplňuje zbývající bohaté porovnávací metody (`__le__`, `__gt__`, `__ge__`) za předpokladu, že třída definuje `__eq__` a alespoň jednu z nerovností (`__lt__`, `__le__`, `__gt__`, `__ge__`).",
+      "code": "from functools import ________\n\n@total_ordering\nclass Molecule:\n    def __init__(self, formula, weight):\n        self.formula = formula\n        self.weight = weight\n\n    def __eq__(self, other):\n        return self.weight == other.weight\n\n    def __lt__(self, other):\n        return self.weight < other.weight",
+      "expected": "total_ordering"
     },
     {
       "id": "q_decor_3",
       "type": "multiple_choice",
       "question": "Jaký požadavek musí třída splňovat, aby na ni šel úspěšně aplikovat dekorátor `@functools.total_ordering`?",
       "options": [
-        "A) Musí definovat metodu __eq__ a současně alespoň jednu z metod __lt__, __le__, __gt__ nebo __ge__.",
-        "B) Musí definovat metody __hash__ a __eq__ a současně implementovat rozhraní pro řazení v C/Java.",
-        "C) Musí definovat všechny čtyři nerovnostní metody a současně alespoň jednu z metod __eq__ nebo __ne__.",
-        "D) Musí dědit z abstrakce functools.Comparable a současně přetížit rozhraní magické metody __cmp__."
+        "A) Musí definovat metody __hash__ a __eq__ a současně implementovat rozhraní pro řazení v C/Java.",
+        "B) Musí definovat všechny čtyři nerovnostní metody a současně alespoň jednu z metod __eq__ nebo __ne__.",
+        "C) Musí dědit z abstrakce functools.Comparable a současně přetížit rozhraní magické metody __cmp__.",
+        "D) Musí definovat metodu __eq__ a současně alespoň jednu z metod __lt__, __le__, __gt__ nebo __ge__."
       ],
-      "answer": 0,
+      "answer": 3,
       "explanation": "Dekorátor `@total_ordering` vyžaduje definici rovnosti (`__eq__`) a alespoň jednoho základního vztahu uspořádání (např. `__lt__`). Ze znalosti rovnosti a jedné relace dokáže matematicky doplňkově generovat zbývající operátory (jako `__gt__` nebo `__ge__`).",
       "code": null
     },
@@ -529,319 +407,290 @@
       "type": "multiple_choice",
       "question": "Jaký bude výstup tohoto kódu při porovnání objektů dekorované třídy pomocí operátoru `>`?",
       "options": [
-        "A) Způsobí chybovou výjimku TypeError, protože operátor > nebyl ve třídě explicitně nadefinován.",
-        "B) Vrátí hodnotu False, protože @total_ordering automaticky odvodil metodu __gt__ z __eq__ a __lt__.",
-        "C) Vrátí objekt typu NotImplemented, protože porovnávání dvou instancí vyžaduje definici metody __cmp__.",
-        "D) Vrátí hodnotu True, protože dekorátor @total_ordering při spuštění automaticky obrací pořadí operandů."
+        "A) Vrátí hodnotu False, protože @total_ordering automaticky odvodil metodu __gt__ z __eq__ a __lt__.",
+        "B) Způsobí chybovou výjimku TypeError, protože operátor > nebyl ve třídě explicitně nadefinován.",
+        "C) Vrátí hodnotu True, protože dekorátor @total_ordering při spuštění automaticky obrací pořadí operandů.",
+        "D) Vrátí objekt typu NotImplemented, protože porovnávání dvou instancí vyžaduje definici metody __cmp__."
       ],
-      "answer": 1,
+      "answer": 0,
       "explanation": "Třída definuje `__eq__` a `__lt__`. Dekorátor `@total_ordering` automaticky doplní `__gt__`. Výraz `p1 > p2` porovná ceny (10 > 20), což vyhodnotí jako `False`. Bez použití `@total_ordering` by kód vyvolal `TypeError`.",
       "code": "from functools import total_ordering\n\n@total_ordering\nclass Polozka:\n    def __init__(self, cena):\n        self.cena = cena\n    def __eq__(self, jiná):\n        return self.cena == jiná.cena\n    def __lt__(self, jiná):\n        return self.cena < jiná.cena\n\np1 = Polozka(10)\np2 = Polozka(20)\nprint(p1 > p2)"
     }
   ],
-  "advanced": [
+  "memoization": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Co se stane při pokusu o setřídění seznamu `items` pomocí `sorted(items)` v níže uvedeném kódu?",
+      "question": "Jaký je hlavní rozdíl mezi přístupem shora dolů (memoizace) a zdola nahoru (dynamické programování)?",
       "options": [
-        "A) Vypíše nesetříděný seznam v původním pořadí, protože chybějící porovnávací metoda se potichu ignoruje.",
-        "B) Setřídí objekty podle jejich paměťových adres získaných pomocí vestavěné funkce id() bez vyhození chyby.",
-        "C) Vyvolá TypeError, protože třída Item nedefinuje magickou metodu __lt__() potřebnou pro řazení prvků.",
-        "D) Vyvolá AttributeError, protože funkce sorted() vyžaduje existenci metody __cmp__() pro srovnání."
-      ],
-      "answer": 2,
-      "explanation": "Funkce `sorted()` vyžaduje pro porovnávání prvků relaci menší než (`<`), realizovanou magickou metodou `__lt__()`. Bez jejím definice selže volání na `TypeError: '<' not supported between instances of 'Item' and 'Item'`.",
-      "code": "class Item:\n    def __init__(self, val):\n        self.val = val\n\nitems = [Item(3), Item(1)]\nsorted(items)"
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký bude výsledek výrazu `a > b`, pokud třída `Cislo` definuje pouze metodu `__lt__()`?",
-      "options": [
-        "A) Vyvolá TypeError, protože operátor > vyžaduje explicitní definici magické metody __gt__.",
-        "B) Vyvolá AttributeError, protože doplňkové porovnávání funguje pouze pro dvojici == a !=.",
-        "C) Vypíše False, protože neexistující metoda __gt__ vrátí implicitní pravdivostní hodnotu False.",
-        "D) Vypíše True, protože Python při absenci __gt__ zamění pořadí operandů a zavolá b.__lt__(a)."
-      ],
-      "answer": 3,
-      "explanation": "Metody `__lt__` a `__gt__` jsou doplňkové. Při vyhodnocení `a > b` hledá Python nejprve `a.__gt__(b)`. Pokud neexistuje, zamění operandy a zavolá `b.__lt__(a)` (`3 < 5`), což vrátí `True`.",
-      "code": "class Cislo:\n    def __init__(self, val):\n        self.val = val\n    def __lt__(self, other):\n        return self.val < other.val\n\na = Cislo(5)\nb = Cislo(3)\nprint(a > b)"
-    },
-    {
-      "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte dekorátor z modulu functools pro automatické dopočítání všech relačních operátorů:",
-      "options": [
-        "total_ordering",
-        "full_ordering",
-        "ordering",
-        "auto_ordering"
-      ],
-      "answer": 0,
-      "explanation": "Dekorátor @total_ordering doplní zbývající relační operátory (__le__, __gt__, __ge__), pokud je definováno __eq__ a alespoň jeden z operátorů nerovnosti.",
-      "code": "from functools import total_ordering\n\n@________\nclass Point:\n    def __init__(self, x, y):\n        self.x, self.y = x, y\n\n    def __eq__(self, other):\n        return (self.x, self.y) == (other.x, other.y)\n\n    def __lt__(self, other):\n        return (self.x, self.y) < (other.x, other.y)",
-      "expected": "total_ordering"
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "Které metody je nutné ve třídě minimálně definovat, aby dekorátor `@total_ordering` správně doplnil ostatní porovnávací operátory?",
-      "options": [
-        "A) Všechny dvě základní metody __eq__() a __lt__(), ostatní čtyři porovnávací metody nelze jako základ použít.",
-        "B) Metodu __eq__() a současně alespoň jednu z porovnávacích metod __lt__(), __le__(), __gt__() nebo __ge__().",
-        "C) Pouze metodu __lt__(), přičemž metodu pro rovnost __eq__() si dekorátor odvodí z porovnání automaticky.",
-        "D) Jakoukoli jednu libovolnou porovnávací metodu ze všech šesti dostupných bez ohledu na metodu __eq__()."
+        "A) Memoizace eliminuje paměťové nároky výpočtu, zatímco přístup zdola nahoru eliminuje časové nároky.",
+        "B) Memoizace vychází z původního zadání ke kotvám rekurze, zatímco přístup zdola nahoru staví od kotev k cíli.",
+        "C) Memoizace vyžaduje výhradně pole (seznamy), zatímco přístup zdola nahoru využívá výhradně slovníky.",
+        "D) Memoizace počítá všechny mezistavy dopředu, zatímco přístup zdola nahoru počítá pouze vyžádané stavy."
       ],
       "answer": 1,
-      "explanation": "Podle dokumentace vyžaduje `@total_ordering` implementaci metody `__eq__()` plus alespoň jedné ze čtyř neekvivalentních porovnávacích metod (`__lt__`, `__le__`, `__gt__`, `__ge__`).",
+      "explanation": "Memoizace postupuje shora dolů (od požadovaného kotevního zadání rekurzivně větví k základním případům a kešíuje výsledky), zatímco přístup zdola nahoru iterativně skládá výpočet od základních případů (listů) nahoru k cíli.",
       "code": null
-    }
-  ],
-  "introspection": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jaký bude výstup spuštění následujícího kódu demonstrujícího chování funkce id() u dočasných objektů v cyklu?",
-      "options": [
-        "A) Vypíše False, protože funkce id() garantuje unikátní identifikátor pro každý nově alokovaný objekt v programu.",
-        "B) Vypíše True, protože dočasně vytvořené seznamy jsou ihned zrušeny a paměťová adresa z id() se znova použije.",
-        "C) Vyvolá výjimku TypeError, protože funkce id() neakceptuje měnitelné datové typy jako je prázdný seznam [].",
-        "D) Vypíše False, protože seznam ids udrží reference na všechny vytvořené objekty a zabrání jejich smazání."
-      ],
-      "answer": 1,
-      "explanation": "Výraz [] vytvoří anonymní seznam, jehož adresa se předá do id() a objekt se okamžitě zahodí. V dalším průchodu cyklu Python alokuje nový objekt na stejné uvolněné adrese, takže seznam ids obsahuje duplicitní adresy a len(set(ids)) < 3 je True.",
-      "code": "ids = []\nfor i in range(3):\n    ids.append(id([]))\nprint(len(set(ids)) < 3)"
     },
     {
       "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaký je zásadní rozdíl mezi testem isinstance(obj, Trida) a porovnáním type(obj) == Trida?",
+      "type": "predict_output",
+      "question": "Který vestavěný dekorátor z modulu functools poskytuje automatickou memoizaci výsledků funkce?",
       "options": [
-        "A) isinstance pracuje výhradně s vestavěnými typy Pythonu, zatímco porovnání pomocí type() funguje pouze pro uživatelské třídy.",
-        "B) type(obj) == Trida zohledňuje kompletní řetězec dědičnosti, zatímco isinstance ověřuje pouze nejbližšího rodiče.",
-        "C) isinstance zohledňuje dědičnost v celém stromu předků, zatímco type(obj) == Trida vyžaduje přesnou shodu třídy.",
-        "D) Obě varianty jsou v Pythonu 3 naprosto identické a mají identické chování i v přítomnosti vícenásobné dědičnosti."
+        "A) @functools.remember",
+        "B) @functools.memoize",
+        "C) @functools.cache",
+        "D) @functools.lru_store"
       ],
       "answer": 2,
-      "explanation": "isinstance(obj, Trida) vrátí True i v případě, kdy obj je instancí jakékoliv podtřídy třídy Trida. Naproti tomu type(obj) == Trida zjišťuje pouze to, zda byl objekt vytvořen přímo touto konkrétní třídou.",
+      "explanation": "Dekorátor @functools.cache (přidaný v Pythonu 3.9 jako zkratka pro lru_cache(maxsize=None)) slouží k bezpracné memoizaci volání funkcí na základě jejich argumentů.",
       "code": null
     },
     {
       "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte vestavěnou funkci pro bezpečné ověření přítomnosti atributu v instanci podle jeho názvu:",
+      "type": "multiple_choice",
+      "question": "Jaký požadavek musí splňovat argumenty funkce, aby mohly být použity jako klíče memoizačního slovníku?",
       "options": [
-        "callable",
-        "isinstance",
-        "getattr",
-        "hasattr"
+        "A) Musí to být měnitelné (mutable) dynamické sekvence, například běžné seznamy nebo slovníky.",
+        "B) Musí to být výhradně celá kladná čísla typu int v rozsahu indexů souvislého paměťového pole.",
+        "C) Musí to být objekty implementující výhradně speciální metodu __len__() pro zjištění délky.",
+        "D) Musí to být hašovatelné (hashable) a neměnné (immutable) objekty, například n-tice nebo čísla."
       ],
       "answer": 3,
-      "explanation": "Funkce hasattr(object, name) vrací True, pokud objekt obsahuje atribut zadaného textového jména.",
-      "code": "class Sample:\n    def __init__(self, value):\n        self.value = value\n\ns = Sample(42)\nif ________(s, \"value\"):\n    print(\"Atribut existuje\")",
-      "expected": "hasattr"
+      "explanation": "Slovník v Pythonu vyžaduje jako klíče hašovatelné objekty (hashable). Proto nelze přímo kešíovat argumenty typu list či dict, ale je třeba použít např. tuple nebo int.",
+      "code": null
     },
     {
       "id": "q4",
       "type": "multiple_choice",
-      "question": "Jaký dopad má zavedení __slots__ v definici třídy na její instance z hlediska introspekce a paměti?",
+      "question": "Na jakou časovou složitost se sníží výpočet Fibonacciho čísla při použití memoizace oproti čisté rekurzi?",
       "options": [
-        "A) Šetří paměť zamezením vytvoření slovníku __dict__, čímž současně znemožňuje dynamické pridávání libovolných atributů.",
-        "B) Automaticky zakazuje dědičnost od této třídy a znemožňuje použití introspekčních funkcí jako dir() nebo getattr().",
-        "C) Slouží jako bezplatný mechanizmus pro vytváření neprolomitelných soukromých atributů (private attributes) v CPythonu.",
-        "D) Zrychluje přístup k atributům vytvořením přídavného slovníku __dict__, který uchovává pouze statické typy atributů."
+        "A) Sníží se na lineární složitost O(n), protože každý člen posloupnosti se počítá právě jednou.",
+        "B) Zůstane na exponenciální složitosti O(2^n), protože režie rekurzivního volání zůstává stejná.",
+        "C) Sníží se na kvadratickou složitost O(n^2), protože vyhledávání ve slovníku trvá čas O(n).",
+        "D) Sníží se na konstantní složitost O(1), protože všechny výsledky jsou předpočítány při definici."
       ],
       "answer": 0,
-      "explanation": "__slots__ alokuje pro atributy pevný prostor namísto dynamického slovníku __dict__ na každé instanci. Tím výrazně šetří paměť u milionů instancí, ale znemožňuje instancím přidávat libovolné nové atributy mimo ty uvedené v __slots__.",
+      "explanation": "Díky ukládání již spočtených hodnot do slovníku se vyhnete opakovanému exponenciálnímu rozvíjení stejných podstromů rekurze a složitost klesne z O(2^n) na O(n).",
       "code": null
     },
     {
       "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co vrátí volání introspekční funkce issubclass(Base, Base) pro libovolnou třídu Base v Pythonu?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte typ výjimky, která vznikne při pokusu o čtení neexistujícího klíče ze slovníku a zachytává se při ruční implementaci memoizace.",
       "options": [
-        "A) Vyvolá výjimku TypeError, protože funkce issubclass vyžaduje dvě různé třídy v argumentech.",
-        "B) Vrátí True, protože v Pythonu je každá třída považována za podtřídu (subclass) sama sebe.",
-        "C) Vrátí False, protože třída nemůže být svým vlastním potomkem bez přímé definice dědičnosti.",
-        "D) Vrátí None, neboť operace vyhodnocuje pouze striktní (vlastní) podtřídy v hiearchii objektů."
+        "ValueError",
+        "KeyError",
+        "LookupError",
+        "IndexError"
       ],
       "answer": 1,
-      "explanation": "Podle specifikace objektového modelu Pythonu platí issubclass(C, C) == True pro jakoukoliv platnou třídu C.",
-      "code": null
+      "explanation": "Při přístupu ke klíči, který se ve standardním slovníku `dict` nenachází, vyvolá Python výjimku `KeyError`.",
+      "code": "memo = {}\n\ndef compute_fibonacci(n):\n    try:\n        return memo[n]\n    except ________:\n        if n < 2:\n            memo[n] = n\n        else:\n            memo[n] = compute_fibonacci(n - 1) + compute_fibonacci(n - 2)\n        return memo[n]",
+      "expected": "KeyError"
     },
     {
       "id": "q6",
       "type": "multiple_choice",
-      "question": "Jaký bude výsledek vyhodnocení funkcí callable() na datovém atributu a metodě objektu?",
+      "question": "Jaký bude výsledek vykonání iterativního výpočtu Fibonacciho čísla pro n = 4 zdola nahoru?",
       "options": [
-        "A) Vypíše True True, protože v Pythonu je úplně všechno objekt a všechny atributy třídy lze spustit.",
-        "B) Vypíše False False, protože předáním atributů přes tečku se vyhodnotí jejich hodnoty a ne funkce.",
-        "C) Vypíše False True, protože celočíselný atribut age nelze volat, zatímco navázanou metodu work ano.",
-        "D) Vyvolá výjimku AttributeError, protože metoda callable() přijímá pouze samotné názvy atributů v řetězci."
+        "A) Vyvolá výjimku UnboundLocalError při paralelním přepsání n-tice n1 a n2.",
+        "B) Vrátí hodnotu 2, protože smyčka for se v algoritmu provede pouze dvakrát.",
+        "C) Vrátí hodnotu 3, protože posloupnost prvků postupuje jako 0, 1, 1, 2, 3.",
+        "D) Vrátí hodnotu 5, protože posloupnost prvků začíná počítat od 1, 2, 3, 5."
       ],
       "answer": 2,
-      "explanation": "callable(obj) zjišťuje, zda má objekt definovanou metodu __call__. Pro číslo w.age (30) vrátí False, pro svázanou metodu w.work vrátí True.",
-      "code": "class Worker:\n    def __init__(self):\n        self.age = 30\n    def work(self):\n        pass\n\nw = Worker()\nprint(callable(w.age), callable(w.work))"
+      "explanation": "Pro n=4 smyčka proběhne (4-1)=3krát: 1. krok: n1=1, n2=1; 2. krok: n1=2, n2=1; 3. krok: n1=3, n2=2. Funkce vrátí n1 = 3.",
+      "code": "def fib(n):\n    if n <= 1: return n\n    n2, n1 = 0, 1\n    for _ in range(n-1):\n        n1, n2 = n1 + n2, n1\n    return n1\n\nprint(fib(4))"
     }
   ],
-  "ABCs": [
+  "fp": [
+    {
+      "id": "fp_q1",
+      "type": "multiple_choice",
+      "question": "Jakou hodnotu vrátí anonymní funkce parita(7) sestavená pomocí zkratkového vyhodnocování pravdivostních operátorů?",
+      "options": [
+        "A) True (protože řetězec 'liché' se automaticky přetypuje na pravdivostní hodnotu True)",
+        "B) False (protože výraz 7 % 2 == 0 vrací pravdivostní hodnotu a or se dál neaplikuje)",
+        "C) 'liché' (protože 7 % 2 == 0 je False, vyhodnocování přeskočí and a vrátí pravou část or)",
+        "D) 'sudé' (protože první výraz v závorce se vyhodnotí prioritně bez ohledu na podmínku)"
+      ],
+      "answer": 2,
+      "explanation": "Ve výrazu (7 % 2 == 0 and 'sudé') or 'liché' je levý člen and (False and 'sudé') vyhodnocen jako False. Následně operátor or přejde k druhému operandu a vrátí hodnotu 'liché'.",
+      "code": null
+    },
+    {
+      "id": "fp_q2",
+      "type": "multiple_choice",
+      "question": "Co způsobí nahrazení nekonečné smyčky while rekurzí v čistém Pythonu bez optimalizace koncového volání (tail-call optimization)?",
+      "options": [
+        "A) 0 (rekurze se z důvodu úspory paměti automaticky převede na iterativní smyčku for).",
+        "B) 2001 (funkce úspěšně dospěje ke kaskádovému návratu z 2000 zanořených rámců).",
+        "C) None (protože rekurzivní funkce bez explicitního return vrací prázdnou hodnotu).",
+        "D) RecursionError (protože Python neobsahuje tail-call optimalizaci a překročí limit zásobníku)."
+      ],
+      "answer": 3,
+      "explanation": "Python neprovádí optimalizaci koncového volání rekurze (tail call optimization). Při hlubším zanoření (typicky nad cca 1000 volání) dojde k vyčerpání paměti zásobníku a vyvolání vyjímky RecursionError.",
+      "code": null
+    },
+    {
+      "id": "fp_q3",
+      "type": "multiple_choice",
+      "question": "Co znamená pojem referenční transparentnost (referential transparency) ve funkcionálním programování?",
+      "options": [
+        "A) Návratová hodnota funkce závisí výhradně na jejích vstupních parametrech a nemá žádné vedlejší efekty.",
+        "B) Kód funkce je automaticky kompilován do strojového kódu s přímými odkazy na paměť procesoru.",
+        "C) Funkce může transparentně přistupovat ke všem globálním proměnným a modifikovat je bez omezení.",
+        "D) Názvy parametrů funkce musí přesně odpovídat názvům proměnných předávaným z volajícího modulu."
+      ],
+      "answer": 0,
+      "explanation": "Referenční transparentnost znamená, že volání funkce lze v programu kdykoliv nahradit její výslednou hodnotou, aniž by se změnilo chování programu. Výstup závisí pouze na předaných argumentech a nevyvolává vedlejší efekty.",
+      "code": null
+    },
+    {
+      "id": "fp_q4",
+      "type": "multiple_choice",
+      "question": "Jak se vyhodnotí logický výraz (False and f1()) or f2() zapsaný pomocí pravdivostních operátorů and a or?",
+      "options": [
+        "A) OK (protože výraz v závorce má absolutní přednost a vynutí spuštění funkce f1)",
+        "B) FAIL (protože False zkrátí vyhodnocení f1 a výraz or přejde k vykonání a vrácení výsledku f2)",
+        "C) TypeError (protože operátory and a or vyžadují na obou stranách výhradně booleovské typy)",
+        "D) False (protože první prvek určuje celkový pravdivostní stav celého složeného výrazu)"
+      ],
+      "answer": 1,
+      "explanation": "V (False and f1()) se funkce f1() z důvodu zkráceného vyhodnocování (short-circuit) vůbec nezavolá. Výraz v závorce vrátí False. Výraz or následně spustí druhou funkci f2(), která vrátí řetězec 'FAIL'.",
+      "code": null
+    },
+    {
+      "id": "fp_q5",
+      "type": "fill_blank_choice",
+      "question": "Doplňte funkci z modulu sys pro získání aktuálního rámce volání na zásobníku (stack frame):",
+      "options": [
+        "current_frame",
+        "fetch_frame",
+        "_getframe",
+        "get_stack"
+      ],
+      "answer": 2,
+      "explanation": "Funkce sys._getframe(depth) vrací stack frame objekt na zadané hloubce volání zásobníku (0 je aktuální funkce, 1 je volající).",
+      "code": "import sys\n\ndef inspect_caller():\n    # Získání stack frame předchozího volajícího (úroveň 1):\n    frame = sys.________(1)\n    return frame.f_code.co_name",
+      "expected": "_getframe"
+    },
+    {
+      "id": "fp_q6",
+      "type": "multiple_choice",
+      "question": "Co vytiskne na standardní výstup volání monadic_print(42), kde funkce vrací zadaný argument x i po jeho vytištění?",
+      "options": [
+        "A) Vytiskne 42 a následně None, protože funkce s vedlejším efektem tisku nemohou vracet int.",
+        "B) Vyvolá AttributeError, protože print nelze použít uvnitř výrazů vracejících hodnotu.",
+        "C) Vytiskne 42 pouze jednou, protože return x zamezí druhému volání funkce print.",
+        "D) Vytiskne 42 dvakrát (nejprve v těle funkce monadic_print a následně z příkazu print(val))."
+      ],
+      "answer": 3,
+      "explanation": "Metoda monadic_print(42) nejprve vytiskne 42 a vrátí 42. Hodnota 42 se uloží do proměnné val. Druhý příkaz print(val) vytiskne hodnotu 42 podruhé.",
+      "code": null
+    }
+  ],
+  "coroutines": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "V jakém okamžiku vyvolá Python výjimku TypeError, pokud podtřída neodvozená od ABC neobsahuje implementaci abstraktní metody rodiče?",
+      "question": "Co se stane při pokusu o spuštění následujícího výrazu uvnitř generátoru?",
       "options": [
-        "A) Až při pokusu o přímé zavolání chybějící metody s.compute(), podobně jako u výjimky NotImplementedError.",
-        "B) K žádné výjimce nedojde, protože podtřída automaticky podědí prázdnou implementaci metody compute od Base.",
-        "C) Již při samotné definici třídy class Sub(Base):, kdy interpret prochází a překládá kód tridy.",
-        "D) Při pokusu o vytvoření instance s = Sub(), kde Python ověří kompletnost abstraktních metod v rozhraní."
+        "A) Python vyvolá SyntaxError, protože yield v aritmetickém výrazu vyžaduje nákres závorek: 10 + (yield 5).",
+        "B) Výraz se úspěšně vyhodnotí na hodnotu 15 při prvním zavolání metody next() na vytvořeném objektu generátoru.",
+        "C) Python vyvolá TypeError, protože operátor sčítání nelze aplikovat na klíčové slovo yield bez předchozí konverze.",
+        "D) Funkce vrátí součet hodnoty 10 a předaného argumentu, jakmile korutina obdrží novou hodnotu z volání send()."
       ],
-      "answer": 3,
-      "explanation": "Použití ABCMeta a @abstractmethod způsobí, že kontrola rozhraní proběhne již u instanciace třídy Sub(). Pokus o vytvoření instance vyvolá TypeError: Can't instantiate abstract class Sub with abstract method compute.",
-      "code": "from abc import ABCMeta, abstractmethod\n\nclass Base(metaclass=ABCMeta):\n    @abstractmethod\n    def compute(self):\n        pass\n\nclass Sub(Base):\n    pass"
+      "answer": 0,
+      "explanation": "V Pythonu je yield výrazem s nízkou prioritou operátorů. Pokud se nachází uvnitř složitějšího výrazu (jako je sčítání), musí být explicitně uzavřen do závorek x = 10 + (yield 5). V opačném případě interpret vyvolá SyntaxError.",
+      "code": "def f():\n    x = 10 + yield 5"
     },
     {
       "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Doplňte metatřídu z modulu abc pro vynucení implementace abstraktních metod v odvozených třídách:",
+      "type": "multiple_choice",
+      "question": "Jaký bude výsledek vykonání následujícího kódu?",
       "options": [
-        "ABCMeta",
-        "TypeMeta",
-        "AbstractMeta",
-        "ABC"
+        "A) Vytiskne hodnotu 42, protože metoda send(42) automaticky inicializuje generátor a předá mu hodnotu v jediném kroku.",
+        "B) Vyvolá TypeError, protože čerstvě vytvořené korutině nelze poslat ne-None hodnotu před jejím nastartováním na prvním yield.",
+        "C) Vyvolá StopIteration, protože generátor obdrží hodnotu 42 a ihned ukončí svoje vykonávání bez projití prvního yield.",
+        "D) Vytiskne hodnotu None, protože první volání send() vždy ignoruje předaný argument a vrátí pouze výchozí hodnotu."
       ],
-      "answer": 0,
-      "explanation": "ABCMeta je metatřída z modulu abc, která zabraňuje instanciaci tříd s neimplementovanými abstraktními metodami.",
-      "code": "from abc import ABCMeta, abstractmethod\n\nclass BasePlugin(metaclass=________):\n    @abstractmethod\n    def execute(self):\n        pass",
-      "expected": "ABCMeta"
+      "answer": 1,
+      "explanation": "Čerstvě vytvořený generátorový objekt ještě nebyl nastartován (primed). Metoda send() s ne-None argumentem vyžaduje, aby generátor již čekal na svém prvním výrazu yield. Nástup na první yield se musí provést zavoláním next(k) nebo k.send(None). V opačném případě Python vyvolá TypeError: can't send non-None value to a just-started generator.",
+      "code": "def g():\n    x = (yield)\n    print(x)\n\nk = g()\nk.send(42)"
     },
     {
       "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jaké je správné pořadí vrstvení dekorátorů při definici abstraktní třídní metody (@classmethod)?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte syntaxi pro obousměrnou delegaci hodnot, výjimek a volání send() do vnitřního generátoru / korutiny:",
       "options": [
-        "A) Dekorační funkce @classmethod a @abstractmethod nelze u jedné metody v Pythonu vůbec kombinoat.",
-        "B) @classmethod musí být jako vnější dekorátor a @abstractmethod jako vnitřní dekorátor přímo nad def.",
-        "C) Pořadí obou dekorátorů je libovolné, protože dekorátor @abstractmethod automaticky detekuje okolní metody.",
-        "D) @abstractmethod musí být jako vnější dekorátor a @classmethod jako vnitřní dekorátor přímo nad def."
+        "delegate to",
+        "return from",
+        "yield from",
+        "yield send"
       ],
-      "answer": 1,
-      "explanation": "Podle dokumentace Pythonu musí být @abstractmethod aplikován jako poslední (tzn. nejblíže k samotné funkci u příkazu def), zatímco @classmethod (nebo @staticmethod či @property) balí až takto označenou abstraktní metodu.",
-      "code": null
+      "answer": 2,
+      "explanation": "Konstrukce yield from zajišťuje plnou obousměrnou delegaci iterace, včetně předávání hodnot z metody send() a výjimek přímo do podgenerátoru.",
+      "code": "def subgenerator():\n    yield \"start\"\n    yield \"data\"\n\ndef outer_wrapper():\n    # Transparentní delegace na podgenerátor:\n    ________ subgenerator()",
+      "expected": "yield from"
     },
     {
       "id": "q4",
-      "type": "true_false_tricky",
-      "question": "Zaregistrování třídy jako virtuální podtřídy pomocí ABC.register(CustomClass) způsobí, že CustomClass zdědí všechny metody a atributy definované v ABC.",
+      "type": "fill_blank_choice",
+      "question": "Doplňte volání do dekorátoru pro automatické nastartování (priming) korutiny k prvnímu výrazu yield:",
       "options": [
-        "A) Tvrzení je pravdivé; dynamická registrace přes register() vloží objekt ABC do proměnné __bases__ třídy CustomClass a zpřístupní její metody.",
-        "B) Tvrzení je nepravdivé; metoda register() ovlivní pouze kontrolu přes isinstance a issubclass, ale nezajišťuje žádnou dědičnost kódových metod."
+        "gen.init()",
+        "gen.start()",
+        "gen.run()",
+        "next(gen)"
       ],
-      "answer": 1,
-      "explanation": "Funkce register() slouží pouze k registraci virtuálních podtříd. Ovlivňuje introspekci (isinstance(CustomClass(), ABC) bude True), ale neodvodí třídu v MRO a nepředá žádné metody z ABC do CustomClass.",
-      "code": null
+      "answer": 3,
+      "explanation": "Volání next(gen) (nebo gen.send(None)) posune provádění kódu nově vytvořené korutiny k prvnímu příkazu yield, takže je ihned připravena přijímat data.",
+      "code": "def coroutine_primer(func):\n    def wrapper(*args, **kwargs):\n        gen = func(*args, **kwargs)\n        # Posun generátoru k prvnímu výrazu (yield):\n        ________\n        return gen\n    return wrapper",
+      "expected": "next(gen)"
     },
     {
       "id": "q5",
       "type": "multiple_choice",
-      "question": "Proč je použití ABCMeta a @abstractmethod pedagogicky i architektonicky výhodnější než pouhé vyvolávání raise NotImplementedError() v těle metod rodiče?",
+      "question": "Jaký bude výstup následujícího programu při odeslání výjimky do korutiny?",
       "options": [
-        "A) Zajišťuje výrazné zrychlení běhu kódu zkompilováním abstraktních metod do nativních instrukcí CPythonu.",
-        "B) Automaticky vygeneruje výchozí prázdné implementace pro všechny abstraktní metody přímo u odvozené třídy.",
-        "C) Odhalí neúplnou implementaci API již při tvorbě instance, nikoliv až v momentu zavolání neimplementované metody.",
-        "D) Umožňuje spouštět neimplementované metody bez vyvolání jakékoliv výjimky s výchozí návratovou hodnotou None."
-      ],
-      "answer": 2,
-      "explanation": "Použití raise NotImplementedError() v těle metody selže až ve chvíli, kdy kód v produkci danou metodu zavolá. Použití ABCMeta zabrání samotné instanciaci objektu, čímž chybu neúplného rozhraní odhalí ihned.",
-      "code": null
-    }
-  ],
-  "meta": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Co se stane při instanciaci objektu, pokud přepsaná metoda __new__() ve třídě nevrátí instanci dané třídy?",
-      "options": [
-        "A) Vyvolá výjimku TypeError, neboť metoda __new__() má striktně předepsáno vracet platný paměťový ukazatel na instanci.",
-        "B) Vypíše NEW i INIT, protože Python volá metodu __init__() vždy bezpodmínečně po dokončení metody __new__().",
-        "C) Vypíše pouze INIT, protože vrácením hodnoty None metoda __new__() deleguje vytvoření objektu na konstruktor __init__().",
-        "D) Vypíše pouze NEW a proměnná c bude obsahovat None, protože metoda __init__() se zavolá pouze při vrácení správné instance."
-      ],
-      "answer": 3,
-      "explanation": "Python zavolá __init__(self, ...) pouze tehdy, pokud __new__(cls, ...) vrátí instanci třídy cls (nebo její podtřídy). Pokud __new__ vrátí None (nebo objekt jiného typu), __init__ se nezavolá.",
-      "code": "class Creator:\n    def __new__(cls):\n        print(\"NEW\")\n        return None\n    def __init__(self):\n        print(\"INIT\")\n\nc = Creator()"
-    },
-    {
-      "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jaká je klíčová výhoda použití metatříd oproti třídním dekorátorům (@decorator) při objektovém návrhu?",
-      "options": [
-        "A) Chování definované metatřídou se automaticky dědí na všechny podtřídy, zatímco dekorátor upraví pouze konkrétní třídu.",
-        "B) Použití metatříd úplně odstraňuje potřebu psát metody __init__() u všech vytvořených instancí dané podtřídy.",
-        "C) Třídní dekorátory pracují pouze při instanciaci objektů, zatímco metatřídy mohou modifikovat i lokální proměnné funkcí.",
-        "D) Metatřídy nevyžadují použití dědičnosti od třídy type, což umožňuje jejich snadnější kombinování v programu."
+        "A) Vypíše hodnotu 1 a následně hodnotu 2, protože zachycená výjimka způsobí pokračování běhu k dalšímu yield 2.",
+        "B) Vyvolá výjimku StopIteration ihned po prvním volání next(g), protože try blok uvnitř korutiny vyžaduje odchycení.",
+        "C) Vypíše hodnotu 1 a poté hodnotu None, protože výjimka zruší návratovou hodnotu následujícího výrazu yield.",
+        "D) Vyvolá neovládanou výjimku ValueError, protože metoda throw() okamžitě ukončí celý generátor bez ohledu na try-except."
       ],
       "answer": 0,
-      "explanation": "Dekorátor upraví pouze tu třídu, nad kterou je napsán. Metatřída definuje způsob tvorby třídy a tento mechanismus automaticky podědí všechny podtřídy dané třídy.",
-      "code": null
-    },
-    {
-      "id": "q3",
-      "type": "fill_blank_choice",
-      "question": "Doplňte první argument pro dynamické vytvoření třídy pomocí metatřídy type():",
-      "options": [
-        "{\"x\": 10}",
-        "\"DynamicClass\"",
-        "object",
-        "DynamicClass"
-      ],
-      "answer": 1,
-      "explanation": "Tříargumentové volání type(name, bases, dict) přebírá jako první parametr název třídy jako řetězec (str).",
-      "code": "# Dynamické vytvoření třídy s atributem x=10:\nDynamicClass = type(________, (object,), {\"x\": 10})\nprint(DynamicClass.__name__)  # Výstup: DynamicClass",
-      "expected": "\"DynamicClass\""
-    },
-    {
-      "id": "q4",
-      "type": "multiple_choice",
-      "question": "K čemu slouží magická metoda __prepare__(metacls, name, bases, **kwargs) při procesu vytváření třídy metatřídou?",
-      "options": [
-        "A) Spouští se až po dokončení metody __init__ metatřídy pro závěrečnou registraci třídy do globálního jmenného prostoru.",
-        "B) Slouží k automatickému promazání nepoužívaných metod v rodičovských třídách před zahájením kompilace těla.",
-        "C) Vytváří a vrací mapovací objekt (slovník), který se použije jako jmenný prostor třídy během vykonávání jejího těla.",
-        "D) Kontroluje datové typy všech definovaných atributů a vyvolá výjimku TypeError při nalezení neznámé vlastnosti."
-      ],
-      "answer": 2,
-      "explanation": "Metoda __prepare__ se volá jako první krok při definici třídy. Vrací slovník (např. OrderedDict nebo custom dict), který slouží k zachycení atributů definovaných v těle třídy v pořadí, v jakém byly zapsány.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "multiple_choice",
-      "question": "Jaký bude výstup při opakované instanciaci třídy spravované metatřídou implementující vzor Singleton pomocí __call__?",
-      "options": [
-        "A) Vypíše False Second, protože metoda __call__ vytvoří dvě odlišné instance třídy Logger se stejnými atributy.",
-        "B) Vyvolá výjimku KeyError, protože slovník _instances nepodporuje ukládání objektů tříd jako klíčů vyhledávání.",
-        "C) Vypíše True Second, protože metoda __init__ třídy Logger se zavolá znovu a přepíše atribut name na Second.",
-        "D) Vypíše True First, protože druhá instanciace vrátí již existující objekt a bez opětovného přepsání atributu."
-      ],
-      "answer": 3,
-      "explanation": "Při prvním volání Logger(\"First\") vrátí Singleton.__call__ novou instanci a uloží ji do _instances. Při druhém volání Logger(\"Second\") podmínka cls not in cls._instances selže, super().__call__ (a tedy i Logger.__init__) se už podruhé nezavolá a vrátí se původní instance a. Proto a is b je True a b.name zůstává \"First\".",
-      "code": "class Singleton(type):\n    _instances = {}\n    def __call__(cls, *args, **kwargs):\n        if cls not in cls._instances:\n            cls._instances[cls] = super().__call__(*args, **kwargs)\n        return cls._instances[cls]\n\nclass Logger(metaclass=Singleton):\n    def __init__(self, name):\n        self.name = name\n\na = Logger(\"First\")\nb = Logger(\"Second\")\nprint(a is b, b.name)"
+      "explanation": "Zavolání `g.throw(ValueError)` vyvolá výjimku `ValueError` uvnitř generátoru přesně v místě, kde čeká na svém prvním `yield 1`. Blok `except ValueError` tuto výjimku zachytí a vykonávání pokračuje k `yield 2`, jehož hodnota (2) je vrácena jako výsledek metody `throw()`.",
+      "code": "def demo():\n    try:\n        yield 1\n    except ValueError:\n        yield 2\n\ng = demo()\nprint(next(g))\nprint(g.throw(ValueError))"
     },
     {
       "id": "q6",
-      "type": "fill_blank_choice",
-      "question": "Doplňte klíčový parametr v hlavičce třídy pro určení vlastní metatřídy:",
+      "type": "multiple_choice",
+      "question": "Jaký výstup vytvoří následující kód ukazující úskalí obousměrné komunikace v generátoru?",
       "options": [
-        "metaclass",
-        "type",
-        "base",
-        "meta"
+        "A) Vypíše 'A' 'B', protože každé zavolání metody send() korektně načte vstup a okamžitě vrátí zpracovaný výsledek.",
+        "B) Vypíše 'A' None, protože druhý send('b') pouze posune korutinu zpět na první yield bez vygenerování nové hodnoty.",
+        "C) Vyvolá výjimku StopIteration, protože po druhém volání send() dojde k narušení interního stavu generátoru.",
+        "D) Vyvolá výjimku TypeError, protože metody send() a yield nelze v jedné smyčce generátoru kombinačně řetězit."
       ],
-      "answer": 0,
-      "explanation": "V Pythonu 3 se metatřída specifikuje jako pojmenovaný parametr metaclass v závorce za názvem třídy.",
-      "code": "class Meta(type):\n    pass\n\nclass CustomService(________=Meta):\n    pass",
-      "expected": "metaclass"
+      "answer": 1,
+      "explanation": "Po `k.send('a')` korutina vrátí `'A'` a zamrzne u druhého výrazu `yield val.upper()`. Následující volání `k.send('b')` předá `'b'` tomuto druhému yield (který ho nepřiřazuje), kód skočí na začátek cyklu k `val = (yield)` a zamrzne. Jelikož cestou neprošel žádným yield s hodnotou, vrátil `None`. Výstupem je tedy `'A' None`.",
+      "code": "def mix():\n    while True:\n        val = (yield)\n        yield val.upper()\n\nk = mix()\nnext(k)\nres1 = k.send('a')\nres2 = k.send('b')\nprint(res1, res2)"
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Které tři samostatné koncepty využití výrazu yield definuje David Beazley?",
+      "options": [
+        "A) Vyhodnocování výrazů (evaluátor), parsování kódu (parser) a garbage collection (správce neplatných odkazů).",
+        "B) Alokace paměti (alokátor), správa vláken (worker) a synchronizace zámků (mutex pro paratelní výpočty).",
+        "C) Producent dat (iterace), konzument údajů (příjem zpráv) a přerušení (trap pro kooperativní multitasking).",
+        "D) Načítání ze souboru (I/O stream), zápis do sítě (socket writer) a transformace datových struktur (mapper)."
+      ],
+      "answer": 2,
+      "explanation": "David Beazley uvádí, že `yield` má v Pythonu tři zásadní a nezávislé role, které by se neměly míchat: 1. producent dat (běžné generátory), 2. konzument zpráv (korutiny) a 3. trap/přerušení (kooperativní multitasking).",
+      "code": null
     }
   ]
 }

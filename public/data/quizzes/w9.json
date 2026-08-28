@@ -1,333 +1,562 @@
 {
-  "doctests": [
+  "files_basics": [
     {
       "id": "q1",
-      "type": "fill_blank_choice",
-      "question": "Doplňte funkci modulu doctest, která prohledá docstringy aktuálního modulu a automaticky spustí všechny nalezené interaktivní testy.",
+      "type": "multiple_choice",
+      "question": "Proč je volání open('data.txt') bez parametru encoding v Pythonu nepřenositelné?",
       "options": [
-        "testfile",
-        "testmod",
-        "main",
-        "run_all"
+        "A) Soubor se otevře v binárním režimu a čtení vrátí bajtový objekt místo řetězce.",
+        "B) Výchozí kódování závisí na operačním systému a jeho lokálním nastavení prostředí.",
+        "C) Výchozí kódování je vždy ASCII a neumí automaticky dekódovat české znaky UTF-8.",
+        "D) Funkce vyžaduje parametr encoding povinně, jinak vyhodí výjimku TypeError."
       ],
       "answer": 1,
-      "explanation": "Funkce doctest.testmod() prozkoumá docstringy všech funkcí a tříd v modulu a ověří, zda jejich návratové hodnoty odpovídají zapsaným testům.",
-      "code": "import doctest\n\ndef calculate_ph(h_concentration: float) -> float:\n    \"\"\"\n    Výpočet pH z koncentrace oxoniových iontů.\n    >>> calculate_ph(1e-7)\n    7.0\n    \"\"\"\n    import math\n    return round(-math.log10(h_concentration), 2)\n\nif __name__ == \"__main__\":\n    doctest.________()",
-      "expected": "testmod"
+      "explanation": "Bez parametru encoding použije Python locale.getpreferredencoding(False), což se liší mezi OS (např. Windows používá cp1250 a Linux UTF-8). Výchozí kódování není pevný ASCII (B) ani binární režim (D) a parametr není syntakticky povinný (C).",
+      "code": null
     },
     {
       "id": "q2",
-      "type": "multiple_choice",
-      "question": "Jak se z příkazové řádky spustí doctesty pro modul moje_logika.py s podrobným výpisem (verbose)?",
+      "type": "predict_output",
+      "question": "Jaký výstup vypíše kód při čtení vícebajtového znaku UTF-8?",
       "options": [
-        "A) python -m unittest -v moje_logika.py",
-        "B) python moje_logika.py --doctest-verbose",
-        "C) python -m doctest -v moje_logika.py",
-        "D) python doctest --verbose moje_logika.py"
+        "A) 1",
+        "B) 4",
+        "C) 3",
+        "D) 6"
       ],
       "answer": 2,
-      "explanation": "Přepínač -m doctest spustí modul doctest jako skript a předá mu parametr -v pro podrobný výstup. unittest by spustil testovací třídy unittest, nikoli docstringy.",
-      "code": null
+      "explanation": "Znak '狼' zabírá v UTF-8 přesně 3 bajty. Metoda read(1) přečte 1 znak, ale tell() vrací aktuální offset v souboru vyjádřený v bajtech (3). Hodnota 1 představuje mýtus, že tell() počítá přečtené znaky.",
+      "code": "with open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('狼.cz')\n\nwith open('data.txt', 'r', encoding='utf-8') as f:\n    char = f.read(1)\n    print(f.tell())"
     },
     {
       "id": "q3",
-      "type": "predict_output",
-      "question": "Jaký výstup vytvoří spuštění python -m doctest moje_logika.py, pokud všechny testy v docstringách projdu bez chyb?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte klíčové slovo pro bezpečné správcování kontextu souboru:",
+      "code_snippet": "________ open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('test')",
       "options": [
-        "A) Vypíše se textový řetězec \"OK (tests=3, failures=0)\" na stdout.",
-        "B) Vypíše se hlášení \"SUCCESS\" spolu s celkovým časem vykonání v ms.",
-        "C) Zobrazí se kompletní seznam otestovaných dokumentačních funkcí.",
-        "D) Neprodlevně se nevypíše vůbec žádný textový výstup na konzoli."
+        "try",
+        "context",
+        "using",
+        "with"
       ],
       "answer": 3,
-      "explanation": "Doctest je navržen podle principu 'no news is good news' – pokud všechny testy uspějí, nevypisuje do konzole žádný výstup (pokud nebyl zadán příznak -v).",
-      "code": null
+      "explanation": "Příkaz with v Pythonu aktivuje kontextový manažer, který automaticky zavolá __enter__() při vstupu a __exit__() při opuštění bloku, čímž spolehlivě uzavře soubor. Slovo using pochází z C#.",
+      "expected": "with",
+      "code": "vysledek = ________"
     },
     {
       "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Doplňte direktivu doctestu, která přikáže přeskočit testování výstupu na daném řádku docstringu.",
+      "type": "multiple_choice",
+      "question": "Jak se liší režim otevření souboru 'x' od režimu 'w'?",
       "options": [
-        "+SKIP",
-        "PASS",
-        "NO_TEST",
-        "IGNORE"
+        "A) Režim 'x' selže s výjimkou FileExistsError, pokud cíl již existuje.",
+        "B) Režim 'x' slouží výhradně k otvírání binárních souborů na systém Windows.",
+        "C) Režim 'x' vytváří dočasný soubor, který se po zavření sám vymaže.",
+        "D) Režim 'x' otevře soubor pro čtení i zápis bez smazání jeho obsahu."
       ],
       "answer": 0,
-      "explanation": "Direktiva # doctest: +SKIP instruuje modul doctest, aby ignoroval a netestoval výstup daného řádku (např. u náhodných nebo nedeterministických výsledků).",
-      "code": "def generate_random_spectrum():\n    \"\"\"\n    Generuje náhodná spektrometrická data.\n\n    >>> generate_random_spectrum()  # doctest: ________\n    [0.124, 0.985, 0.432]\n    \"\"\"\n    import random\n    return [round(random.random(), 3) for _ in range(3)]",
-      "expected": "+SKIP"
+      "explanation": "Režim 'x' (exkluzivní vytvoření) selže s FileExistsError, pokud soubor již existuje, což brání nechtěnému přepsání dat. Režim 'w' naopak existující soubor okamžitě smaže a přepíše.",
+      "code": null
     },
     {
       "id": "q5",
       "type": "multiple_choice",
-      "question": "Jakým způsobem lze začlenit doctesty modulu logika do standardního běhu unittest sady?",
+      "question": "Co se stane při nastavení pozice ukazatele seek(1) na vícebajtový znak UTF-8?",
       "options": [
-        "A) Nastavením globální proměnné prostředí PYTHON_DOCTEST_ENABLE=1 před spuštěním sady testů.",
-        "B) Definováním funkce load_tests vracející tests.addTests(doctest.DocTestSuite(logika)).",
-        "C) Zavoláním metody unittest.register_doctest(logika) přímo uvnitř testovací metody setUp().",
-        "D) Importováním balíčku logika přímo do konstruktoru hlavní testovací třídy unittest.TestCase."
+        "A) Kód vyhodí výjimku IndexError, protože pozice 1 neodpovídá hranici znaků.",
+        "B) Kód vyhodí výjimku UnicodeDecodeError, protože pozice 1 je uprostřed znaku.",
+        "C) Kód přečte druhý bajt znaku a vrátí odpovídající jednobajtový znak ASCII.",
+        "D) Metoda seek(1) úspěšně přeskočí celý znak '狼' a metoda read(1) vrátí tečku '.'."
       ],
       "answer": 1,
-      "explanation": "Unittest rozhraní vyhledává funkci load_tests(loader, tests, pattern), do které lze přidat testovací sadu vytvořenou pomocí doctest.DocTestSuite(modul).",
-      "code": null
+      "explanation": "Znak '狼' má v UTF-8 délku 3 bajty. Přesun na offset 1 skočí do středu bajtové sekvence tohoto znaku. Následné čtení read(1) selže s UnicodeDecodeError, protože dekodér narazí na neplatný počáteční bajt.",
+      "code": "with open('data.txt', 'w', encoding='utf-8') as f:\n    f.write('狼.cz')\n\nwith open('data.txt', 'r', encoding='utf-8') as f:\n    f.seek(1)\n    f.read(1)"
     },
     {
       "id": "q6",
-      "type": "multiple_choice",
-      "question": "K čemu slouží direktiva doctest.FAIL_FAST (resp. příkazový přepínač -o FAIL_FAST nebo -f)?",
+      "type": "true_false_tricky",
+      "question": "Rozhodněte o pravdivosti tvrzení: V Pythonu 3 lze u textového souboru zcela vypnout bafrování nastavením argumentu buffering=0.",
       "options": [
-        "A) Přesměruje chybové zprávy ze standardního chybového výstupu přímo do souboru logu.",
-        "B) Zapne optimalizovaný JIT kompilátor pro zrychlení celkového porovnávání řetězců.",
-        "C) Zastaví vykonávání doctestů ihned při výskytu první selhané kontrolní podmínky.",
-        "D) Přeskočí všechny časově náročné testy a spustí pouze jednoduché aritmetické operace."
+        "A) Tvrzení je pravdivé. Nastavení buffering=0 plně vypíná mezipaměť jak u binárních, tak u všech textových souborů.",
+        "B) Tvrzení je nepravdivé. Nastavení buffering=0 je povoleno pouze v binárním režimu; v textovém vyhodí výjimku ValueError."
       ],
-      "answer": 2,
-      "explanation": "Příznak FAIL_FAST ukončí testování hned po první chybě, což šetří čas při ladění dlouhých sad docstring testů.",
+      "answer": 1,
+      "explanation": "V textovém režimu Python nepodporuje unbuffered I/O (buffering=0 vyhodí ValueError). Textové soubory podporují pouze buffering=1 (řádkové bafrování) nebo celočíselnou velikost mezipaměti > 1.",
       "code": null
     }
   ],
-  "unittests": [
+  "pathlib": [
     {
       "id": "q1",
-      "type": "multiple_choice",
-      "question": "Jaké pravidlo musí splňovat metody v třídě odvozené od unittest.TestCase, aby byly automaticky spuštěny?",
+      "type": "predict_output",
+      "question": "Jaký bude výstup z následujícího spojování cest v modulu pathlib?",
       "options": [
-        "A) Metoda musí být deklarována jako statická dekorátorem @staticmethod.",
-        "B) Jméno metody musí končit příponou _test a vracet hodnotu True.",
-        "C) Metoda musí mít dekorátor @unittest.test a nesmí přijímat self.",
-        "D) Jméno metody musí začínat předponou test, např. test_vypocet()."
+        "A) /tmp/data.txt",
+        "B) /pokus/data.txt",
+        "C) /tmp/pokus/data.txt",
+        "D) /tmp//pokus/data.txt"
       ],
-      "answer": 3,
-      "explanation": "Test runner v unittest vyhledává ve třídách TestCase všechny metody, jejichž název začíná řetězcem test.",
-      "code": null
+      "answer": 1,
+      "explanation": "Při spojování cest operátorem / způsobení absolutní cesty (začínající /) resetuje předchozí nahromaděnou cestu. Proto se '/tmp' ignoruje a vznikne '/pokus/data.txt'.",
+      "code": "from pathlib import PurePath\np = PurePath('/tmp') / '/pokus' / 'data.txt'\nprint(p)"
     },
     {
       "id": "q2",
       "type": "multiple_choice",
-      "question": "Jaký je přesný rozdíl v okamžiku spuštění metod setUp() a tearDown() při běhu testovací třídy?",
+      "question": "Co vrátí atribut p.stem pro cestu p = Path('/var/log/app.tar.gz')?",
       "options": [
-        "A) setUp() se spouští před každou testovací metodou a tearDown() po každé testovací metodě.",
-        "B) setUp() se volá výhradně při selhání testu a tearDown() proběhne u úspěšných testů.",
-        "C) setUp() se spouští pouze před celou třídou a tearDown() až po dokončení všech testů.",
-        "D) setUp() inicializuje globální proměnné modulu a tearDown() uvolňuje paměť C rozšíření."
+        "A) app",
+        "B) .tar.gz",
+        "C) app.tar",
+        "D) app.tar.gz"
       ],
-      "answer": 0,
-      "explanation": "Metody setUp() a tearDown() slouží jako test fixtures spouštěné individuálně před a po každé jednotlivé testovací metodě, čímž zajišťují izolaci testů.",
+      "answer": 2,
+      "explanation": "Atribut .stem odsekne pouze poslední příponu (.gz), takže vrátí 'app.tar'. Celé jméno je 'app.tar.gz' (.name) a seznam všech přípon je ['.tar', '.gz'] (.suffixes).",
       "code": null
     },
     {
       "id": "q3",
       "type": "multiple_choice",
-      "question": "Která assertion metoda v unittest ověřuje vyvolání očekávané výjimky při zavolání funkce?",
+      "question": "Jaký datový typ mají prvky vrácené generátorem p.iterdir()?",
       "options": [
-        "A) assertCatch(ExceptionType, func, *args)",
-        "B) assertRaises(ExceptionType, func, *args)",
-        "C) assertExcept(ExceptionType, func, *args)",
-        "D) assertThrow(ExceptionType, func, *args)"
+        "A) Prosté řetězce (str) obsahující relativní cesty k jednotlivým souborům a složkám.",
+        "B) N-tice (tuple) obsahující název souboru a jeho metadata vrácená ze systémového stat.",
+        "C) Souborové popisovače (file descriptors) otevřené pro čtení obsahu adresáře.",
+        "D) Objekty typu Path (PosixPath nebo WindowsPath) reprezentující příslušné položky."
       ],
-      "answer": 1,
-      "explanation": "assertRaises(exc, callable, *args) kontroluje, zda zavolání callable(*args) vyvolá výjimku typu exc.",
+      "answer": 3,
+      "explanation": "Generátor iterdir() vrací objekty Path (resp. PosixPath/WindowsPath), nikoli prosté řetězce str. To umožňuje přímo volat metody jako .is_file() nebo .stat() na navrácených prvcích.",
       "code": null
     },
     {
       "id": "q4",
       "type": "multiple_choice",
-      "question": "Jaký je přesný rozdíl mezi assertEqual(a, b) a assertIs(a, b) v knihovně unittest?",
+      "question": "Jaký je hlavní rozdíl mezi třídami PurePath a Path v modulu pathlib?",
       "options": [
-        "A) assertEqual funguje výhradně pro čísla, zatímco assertIs slouží ke kontrole řetězců.",
-        "B) assertEqual vyvolá výjimku TypeError, zatímco assertIs vyvolá varování UserWarning.",
-        "C) assertEqual porovnává hodnoty přes a == b, zatímco assertIs porovnává identitu přes a is b.",
-        "D) assertEqual porovnává identitu v paměti, zatímco assertIs porovnává datové typy proměnných."
+        "A) PurePath provádí pouze řetězcové operace bez přístupu k souborovému systému.",
+        "B) PurePath slouží k načítání textových souborů, zatímco Path spravuje binární soubory.",
+        "C) PurePath je starší zastaralá třída určená pro zpětnou kompatibilitu s Pythonem 2.",
+        "D) PurePath podporuje výhradně operační systém Linux, zatímco Path funguje i na Windows."
       ],
-      "answer": 2,
-      "explanation": "assertEqual testuje rovnost obsahu/hodnoty (==), kdežto assertIs testuje identitu v paměti (id(a) == id(b) resp. a is b).",
+      "answer": 0,
+      "explanation": "PurePath a její podtřídy provádí pouze syntaktické úpravy cest v paměti bez přímého I/O volání OS. Třída Path dědí z PurePath a přidává reálné operace se souborovým systémem.",
       "code": null
     },
     {
       "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co ověřuje metoda assertCountEqual(a, b) při porovnání dvou sekvencí v unittest?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu objektu Path pro rekurzivní vyhledání souborů odpovídajících vzoru ve všech podsložkách:",
+      "code_snippet": "from pathlib import Path\np = Path('/projekty')\npy_files = list(p.________('*.py'))",
       "options": [
-        "A) Zda mají sekvence a a b pouze stejný celkový počet prvků navrácený vestavěnou funkcí len().",
-        "B) Zda sekvence a a b začínají i končí stejným prvkem a mají shodnou celkovou délku typu.",
-        "C) Zda součet číselných hodnot prvků v sekvenci a odpovídá součtu hodnot prvků v sekvenci b.",
-        "D) Zda sekvence a a b obsahují stejné prvky se stejnými četnostmi, bez ohledu na jejich pořadí."
+        "find",
+        "rglob",
+        "glob_all",
+        "iterdir"
       ],
-      "answer": 3,
-      "explanation": "assertCountEqual nekontroluje pouze délku (len), ale ověřuje, že obě kolekce obsahují přesně stejné prvky ve stejných počtech (četnostech), přičemž pořadí prvků ignoruje.",
-      "code": null
+      "answer": 1,
+      "explanation": "Metoda Path.rglob(pattern) rekurzivně prochází adresář i všechny jeho podsložky a vyhledává shody s daným vzorem.",
+      "code": "from pathlib import Path\n\nproject_root = Path(\".\")\n# Rekurzivní vyhledání všech Python skriptů v podadresářích:\npy_files = list(project_root.________(\"*.py\"))",
+      "expected": "rglob"
     },
     {
       "id": "q6",
       "type": "multiple_choice",
-      "question": "Jaký je výchozí počet desetinných míst při porovnání reálných čísel pomocí assertAlmostEqual(a, b)?",
+      "question": "Co provede metoda p.resolve() na objektu Path?",
       "options": [
-        "A) 7 desetinných míst",
-        "B) 9 desetinných míst",
-        "C) 5 desetinných míst",
-        "D) 2 desetinná místa"
+        "A) Pouze připojí aktuální pracovní adresář před relativní cestu bez řešení symlinků.",
+        "B) Vytvoří nový soubor na zadané cestě, pokud daný soubor na disku dosud neexistuje.",
+        "C) Převede cestu na kanonickou, odstraní symbolické odkazy a eliminujeme sekvence ..",
+        "D) Změní přístupová práva souboru tak, aby odpovídala absolutním právům vlastníka."
       ],
-      "answer": 0,
-      "explanation": "Metoda assertAlmostEqual(a, b) ve výchozím nastavení ověřuje round(a - b, 7) == 0, tedy zaokrouhluje na 7 desetinných míst.",
+      "answer": 2,
+      "explanation": "Metoda resolve() vytvoří absolutní kanonickou cestu – nahradí symbolické odkazy jejich cílem a odstraní relativní složky jako '.' a '..'. Metoda absolute() pouze připojí cwd bez řešení symlinků.",
       "code": null
     },
     {
       "id": "q7",
       "type": "true_false_tricky",
-      "question": "Pokud testovací metoda v unittestu neobsahuje žádný assert ani vyvolanou výjimku, jak dopadne test?",
+      "question": "Rozhodněte o pravdivosti tvrzení: Třída pathlib.Path obsahuje vestavěnou metodu p.copy(), která slouží k přímému kopírování souborů.",
       "options": [
-        "A) Test runner přeruší vykonávání celého souboru a vyžaduje doplnění typu v docstringu.",
-        "B) Test bude vyhodnocen jako úspěšný (passed), i když kód neověřil vůbec žádné podmínky.",
-        "C) Test selže s chybou AssertionError, protože chybí explicitní výrok ke kontrole stavu.",
-        "D) Test skončí ve stavu Error z důvodu nepřítomnosti návratové hodnoty typu boolean."
+        "A) Tvrzení je pravdivé. Metoda p.copy() je standardní součástí Path od Pythonu 3.4.",
+        "B) Tvrzení je nepravdivé. Path metodu pro kopírování nemá; je nutné použít modul shutil."
       ],
       "answer": 1,
-      "explanation": "V unittest test projde, pokud během jeho běhu nenastane žádná nezachycená výjimka (včetně AssertionError). Pokud test neobsahuje žádné tvrzení a nehodí výjimku, vyhodnotí se jako úspěšný.",
+      "explanation": "Třída Path v modulu pathlib kupodivu neposkytuje metodu pro kopírování. Pro kopírování souborů je nutné importovat modul shutil a použít např. shutil.copy2(src, dst).",
       "code": null
     }
   ],
-  "timeit": [
+  "sqlite": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Proč modul timeit při měření doby vykonávání kódu standardně vypíná garbage collector (GC)?",
+      "question": "Proč se změny v databázi SQLite (INSERT, UPDATE) neprojeví v souboru ihned po zavolání cursor.execute()?",
       "options": [
-        "A) GC v Pythonu nelze spustit uvnitř vedlejšího vlákna, ve kterém modul měření provádí.",
-        "B) Vypnutí GC je nutné pro převod pythonního kódu do rychlých instrukcí C v paměti.",
-        "C) Zajišťuje tím stabilnější a reprodukovatelnější výsledky neovlivněné úklidem paměti.",
-        "D) Zabraňuje havárii interpreteru při opakovaném vytváření proměnných v globálním prostoru."
+        "A) Změny se zapíší až v okamžiku, kdy velikost vyrovnávací paměti přesáhne velikost RAM.",
+        "B) SQLite vyžaduje ruční uvolnění databázového zámku zavoláním sqlite3.flush_buffers().",
+        "C) Všechny zápisové operace probíhají ve vedlejším vlákně až po uzavření objektu kurzoru.",
+        "D) Změny jsou drženy v transakci a pro jejich uložení je nutné zavolat connection.commit()."
       ],
-      "answer": 2,
-      "explanation": "Běh garbage collectoru zanáší do měření nahodilé časové odchylky. Proto jej timeit ve výchozím stavu vypíná, aby poskytl konzistentnější výsledky.",
+      "answer": 3,
+      "explanation": "V ovladači sqlite3 probíhají úpravy v transakci. Bez zavolání connection.commit() na objektu připojení se provedené změny při ukončení zruší.",
       "code": null
     },
     {
       "id": "q2",
       "type": "multiple_choice",
-      "question": "K čemu slouží parametr setup při vytváření instance timeit.Timer(stmt, setup)?",
+      "question": "Jaký je správný způsob předávání proměnných do SQL dotazu pro ochranu před SQL injection v sqlite3?",
       "options": [
-        "A) Nastavuje časový limit v sekundách, po jehož překročení je měření skriptu stornováno.",
-        "B) Definuje seznam C knihoven, které mají mít přednost před čistou implementací Pythonu.",
-        "C) Určuje cestu k profilovacímu souboru, do kterého se uloží kompletní výstup cProfile.",
-        "D) Obsahuje kód pro inicializaci proměnných, který se provede, ale nezapočítává do měření."
+        "A) Použitím symbolů ? a předáním hodnot jako n-tice v druhém argumentu cursor.execute().",
+        "B) Spojením řetězců operátorem + a ošetřením uvozovek metodou str.replace(\"'\", \"''\").",
+        "C) Formátováním řetězců pomocí f-stringů přímo v textu SQL příkazu před jeho odesláním.",
+        "D) Převodem všech vstupních proměnných na bajtový typ bytes před jejich vložením do SQL."
       ],
-      "answer": 3,
-      "explanation": "setup se vykoná před spuštěním měřeného příkazu stmt, aby připravil potřebné proměnné/objekty bez zkreslení vlastního měřeného času.",
+      "answer": 0,
+      "explanation": "Použití zástupných symbolů ? (nebo pojmenovaných :name) zajišťuje, že databázový ovladač vstupy bezpečně escapuje a znemožní útoky SQL Injection. F-stringy či spájení řetězců jsou hrubá chyba.",
       "code": null
     },
     {
       "id": "q3",
       "type": "multiple_choice",
-      "question": "Podle jaké hodnoty ze seznamu časů z Timer.repeat() je správné vyhodnocovat nejrychlejší běh?",
+      "question": "Která metoda objektu Cursor je nejvhodnější pro efektivní vložení velkého množství řádků z kolekce parametrů?",
       "options": [
-        "A) Minimální hodnota, protože nejlépe vystihuje reálný čas bez vnějších ruchů OS.",
-        "B) Medián naměřených časů, protože eliminuje extrémní odchylky na začátku a konci.",
-        "C) Směrodatná odchylka měření, která vyjadřuje míru využití vyrovnávací paměti CPU.",
-        "D) Aritmetický průměr všech hodnot, jelikož vyrovnává výkyvy způsobené plánovačem OS."
+        "A) cursor.execute_bulk(sql, data)",
+        "B) cursor.executemany(sql, data)",
+        "C) cursor.executescript(sql, data)",
+        "D) cursor.fetchmany(sql, data)"
       ],
-      "answer": 0,
-      "explanation": "Dokumentace timeit zdůrazňuje, že jediným reprezentativním údajem je minimum (min()), protože jakýkoliv jiný vliv OS (context switch, I/O, paging) čas jedině prodlouží.",
+      "answer": 1,
+      "explanation": "Metoda executemany() přijímá SQL šablonu se zástupnými symboly a sekvenci parametrů, které efektivně vykoná v rámci jednoho volání.",
       "code": null
     },
     {
       "id": "q4",
-      "type": "fill_blank_choice",
-      "question": "Kterým přepínačem předáte modulu timeit v příkazové řádce inicializační kód (setup), který se provede pouze jednou před měřením?",
+      "type": "multiple_choice",
+      "question": "Jak se liší metoda cursor.executescript() od standardní metody cursor.execute()?",
       "options": [
-        "-n",
-        "-s",
-        "-i",
-        "-t"
+        "A) Spouští SQL příkazy v externím procesu SQLite CLI místo vnitřní C knihovny Pythonu.",
+        "B) Automaticky volá commit() po každém řádku a ignoruje veškeré syntaktické chyby.",
+        "C) Umožňuje vykonat více SQL příkazů oddělených středníkem předaných v jediném řetězci.",
+        "D) Převádí SQL dotaz do Python bajtkódu pro zrychlení opakovaných databázových dotazů."
       ],
-      "answer": 1,
-      "explanation": "Přepínač -s (zkratka pro --setup) v modulu timeit definuje kód, který se provede pouze jednou při inicializaci před měřicí smyčkou.",
-      "code": "# Změření rychlosti výpočtu molární hmotnosti s jednorázovým importem knihovny\npython -m timeit ________ \"import math; val = 12.011\" \"math.sqrt(val)\"",
-      "expected": "-s"
+      "answer": 2,
+      "explanation": "Metoda execute() vykoná pouze jeden SQL dotaz, zatímco executescript() dokáže zpracovat celý skript složený z více SQL příkazů oddělených středníky.",
+      "code": null
     },
     {
       "id": "q5",
-      "type": "multiple_choice",
-      "question": "Co se stane, pokud při měření přes CLI python -m timeit nespecifikujeme počet opakování přepínačem -n?",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu kurzoru z rozhraní Python DB-API 2.0 (např. sqlite3), která načte z výsledku SQL dotazu právě jeden následující řádek.",
       "options": [
-        "A) Kód se spustí pouze jednou a naměřený čas se vynásobí konstanta frekvence procesoru.",
-        "B) Vykoná se přesně 1 000 000 opakování bez ohledu na to, jak dlouho výpočet kódu trvá.",
-        "C) Modul automaticky zvyšuje počet opakování, dokud celková doba nedosáhne alespoň 0,2 s.",
-        "D) Měření selže s chybou ValueError, protože počet opakování je povinný argument CLI."
+        "readline",
+        "get_one",
+        "fetchrow",
+        "fetchone"
       ],
-      "answer": 2,
-      "explanation": "Pokud -n není zadáno, timeit automaticky zkouší sekvence 1, 2, 5, 10, 20, 50... opakování, dokud celková doba celého běhu nepřesáhne 0,2 sekundy.",
+      "answer": 3,
+      "explanation": "Metoda cursor.fetchone() vrátí jeden následující řádek z výsledku SQL dotazu jako n-tici (tuple), nebo None, pokud již žádný další záznam neexistuje.",
+      "code": "import sqlite3\n\nconn = sqlite3.connect(\"laborator.db\")\ncursor = conn.cursor()\n\ncursor.execute(\"SELECT vzorek_id, koncentrace FROM mereni WHERE id = ?\", (42,))\n# Načtení jediného nalezeného záznamu jako tuple\nrow = cursor.________()\n# Výstup: ('VZ-42', 0.015) nebo None",
+      "expected": "fetchone"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaké zkratky (shortcuts) nabízejí objekty připojení Connection podle standardu DB API 2 v sqlite3?",
+      "options": [
+        "A) Metody execute(), executemany() a executescript() lze volat přímo na objektu Connection.",
+        "B) Při výskytu chyb v SQL dotazu se automaticky spouští opravný skript v prostředí SQLite.",
+        "C) Připojení k databázi se automaticky uzavře po 60 sekundách bez volání connection.close().",
+        "D) Tabulky vytvořené v SQLite se v Pythonu automaticky namapují na datové třídy dataclass."
+      ],
+      "answer": 0,
+      "explanation": "Objekty Connection v modulu sqlite3 nabízejí zkratky connection.execute(...) apod., které si samy interně vytvoří dočasný kurzor a zavolají požadovanou operaci.",
       "code": null
     }
   ],
-  "speed_overview": [
+  "os": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Jakým způsobem probíhá vývoj a překlad samotného interpretu PyPy?",
+      "question": "Co bude výsledkem následujícího spojení cest pomocí os.path.join v POSIX systému?",
       "options": [
-        "A) Zdrojový kód PyPy se kompiluje přímo do systémového assembleru procesoru přes LLVM bez mezikroku v C.",
-        "B) PyPy je napsán v C++ a využívá rozhraní Java Virtual Machine pro dynamický překlad bytekódu v paměti.",
-        "C) Kód napsaný v RPythonu se přeloží do jazyka C a následně zkompiluje do spustitelné binárky interpretu.",
-        "D) PyPy funguje jako skript v čistém Pythonu, který dynamicky upravuje bytecode CPythonu před spuštěním."
+        "A) Vyvolá výjimku ValueError, protože absolutní cesty nelze podle specifikace předávat doprostřed seznamu argumentů.",
+        "B) Vrátí 'data/projects//etc/config.txt', protože metoda zachová dvě lomítka vedle sebe bez jakékoli úpravy řetězce.",
+        "C) Vrátí 'data/projects/etc/config.txt', protože funkce automaticky odstraní úvodní lomítka ze všech vnitřních částí.",
+        "D) Vrátí '/etc/config.txt', protože výskyt absolutní cesty způsobený počátečním lomítkem zahodí všechny předchozí části."
+      ],
+      "answer": 3,
+      "explanation": "Funkce `os.path.join()` spojuje argumenty do cesty. Pokud však některý z argumentů představuje absolutní cestu (začíná lomítkem `/`), všechny předcházející spočítané části se okamžitě zahodí a spojování pokračuje od tohoto absolutního prvku.",
+      "code": "import os\nprint(os.path.join('data', 'projects', '/etc', 'config.txt'))"
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi os.scandir() a os.listdir() zavedený v Pythonu 3.5?",
+      "options": [
+        "A) os.scandir() vrací iterátor objektů DirEntry s kešovanými atributy, zatímco os.listdir() vrací prostý seznam řetězců.",
+        "B) os.scandir() vrací seznam obsahující i položky . a .., zatímco os.listdir() tyto speciální adresáře vždy ignoruje.",
+        "C) os.scandir() je určen pouze pro systém Windows, zatímco os.listdir() je univerzální POSIX rozhraní pro všechny OS.",
+        "D) os.listdir() provádí rekurzivní prohledávání celého stromu, zatímco os.scandir() prochází pouze aktuální adresář."
+      ],
+      "answer": 0,
+      "explanation": "`os.scandir()` vrací iterátor objektů `DirEntry`, které v sobě již uchovávají typ a vlastnosti souboru získané přímo při výpisu adresáře. To eliminuje potřebu dodatečných systémových volání (jako `os.path.isdir()`) a činí `os.scandir()` výrazně rychlejším než `os.listdir()`, jež vrací jen seznam textových jmen.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Doplňte funkci modulu `os`, která rekurzivně vytvoří celou cestu k adresáři včetně všech chybějících mezilehlých složek.",
+      "options": [
+        "mkpath",
+        "makedirs",
+        "mkdir",
+        "create_dirs"
+      ],
+      "answer": 1,
+      "explanation": "Funkce `os.makedirs(path, exist_ok=True)` vytvoří koncový adresář i všechny chybějící nadřazené adresáře podél cesty (obdoba příkazu `mkdir -p`).",
+      "code": "import os\n\n# Rekurzivní vytvoření stromu složek pro ukládání exportů\noutput_dir = \"vysledky/mereni_2026/spektra\"\nos.________(output_dir, exist_ok=True)\n\nprint(os.path.isdir(output_dir))  # True",
+      "expected": "makedirs"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Který modul a funkce se v Pythonu používají pro zkopírování souboru včetně zachování jeho metadat?",
+      "options": [
+        "A) Funkce shutil.move(), protože při přesunu souboru dochází ke kaskádovému kopírování metadat bez ztráty dat.",
+        "B) Funkce os.path.copy(), protože modul os.path přímo manipuluje s objektovými strukturami souborového systému.",
+        "C) Funkce shutil.copy2(), protože na rozdíl od základního os či shutil.copy() uchovává i časová razítka a atributy.",
+        "D) Funkce os.copyfile(), protože nízkoúrovňový modul os jako jediný garantuje přímý nízkoúrovňový přenos metadat."
       ],
       "answer": 2,
-      "explanation": "Vývoj PyPy probíhá tak, že je napsán v omezené podmnožině Pythonu zvané RPython (Restricted Python). RPython je přeložen do C a následně zkompilován běžným C kompilátorem.",
+      "explanation": "Základní modul `os` neobsahuje funkce pro kopírování souborů. K tomuto účelu slouží modul `shutil`. Zatímco `shutil.copy()` kopíruje pouze obsah a práva, `shutil.copy2()` navíc kopíruje i všechna ostatní dostupná metadata (např. čas posledního přístupu a modifikace).",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Doplňte rozbalení n-tice z generátoru os.walk() pro iteraci přes adresářový strom:",
+      "options": [
+        "dirs, root, files",
+        "path, subdirs, files",
+        "root, files, dirs",
+        "root, dirs, files"
+      ],
+      "answer": 3,
+      "explanation": "Generátor os.walk() v každém kroku vrací trojici (cesta_k_adresáři, seznam_podadresářů, seznam_souborů).",
+      "code": "import os\n\nfor ________ in os.walk('.'):\n    print(f\"Složka {root} obsahuje {len(files)} souborů.\")",
+      "expected": "root, dirs, files"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Co se stane při volání funkce os.remove() na cestu, která ukazuje na neprázdný adresář?",
+      "options": [
+        "A) Python vyvolá výjimku (např. IsADirectoryError či OSError), protože os.remove() slouží výhradně k mazání souborů.",
+        "B) Python automaticky přesune adresář do dočasné systémové složky a vyvolá varování typu DeprecationWarning.",
+        "C) Funkce smaže pouze prázdný adresář, ale pokud obsahuje soubory, ticho vrací hodnotu False bez vyvolání výjimky.",
+        "D) Adresář se bez varování smazá včetně veškerého obsahu, protože os.remove() funguje rekurzivně pro všechny cesty."
+      ],
+      "answer": 0,
+      "explanation": "`os.remove()` (rovněž přístupný jako `os.unlink()`) odstraňuje výhradně soubory. Pokud je předaná cesta adresářem, operační systém / Python vyvolá výjimku `IsADirectoryError` (na POSIXu) nebo `PermissionError`/`OSError` (na Windows). Pro odstranění adresáře je nutné použít `os.rmdir()` (pro prázdný) nebo `shutil.rmtree()` (pro celý strom).",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "multiple_choice",
+      "question": "Jak se chová objekt os.environ s proměnnými prostředí během běhu Python skriptu?",
+      "options": [
+        "A) Dynamicky dotazuje operační systém při každém čtení klíče, takže ihned reflektuje změny externích procesů.",
+        "B) Načte proměnné prostředí při prvním importu modulu os a přímou modifikací os.environ zapsané změny promítne.",
+        "C) Je to pouze neproměnný objekt typu tuple, do kterého nelze během běhu skriptu přidávat ani měnit klíče.",
+        "D) Vytváří izolovanou kopii pro každou funkci ve skriptu, takže změny provedené v jedné funkci se nešíří dál."
+      ],
+      "answer": 1,
+      "explanation": "`os.environ` je slovníku podobný objekt (mapování), který se naplní hodnotami proměnných prostředí v momentě prvního importu modulu `os`. Úpravy provedené přímo v `os.environ` se uplatní v běžícím skriptu i v podprocesech vytvářených z Pythonu.",
+      "code": null
+    },
+    {
+      "id": "q8",
+      "type": "multiple_choice",
+      "question": "Proč je v Pythonu preferováno otevírat soubor v bloku try-except místo předchozí kontroly přes os.access()?",
+      "options": [
+        "A) Metoda os.access() funguje pouze na operačním systému Windows a na Unixu způsobuje neplatné selhání přístupu.",
+        "B) Volání funkce os.access() je v Pythonu zastaralé a vyvolá při použití v novějších verzích DeprecationWarning.",
+        "C) Předchází se tím souběhu (TOCTOU) mezi kontrolou a otevřením a kód lépe odpovídá pythonímu principu EAFP.",
+        "D) Blok try-except automaticky uzamkne soubor na úrovni operačního systému proti zápisu ostatními procesy."
+      ],
+      "answer": 2,
+      "explanation": "Kontrola přístupových práv předem pomocí `os.access()` trpí problémem zvaným TOCTOU (Time-of-Check to Time-of-Use): mezi kontrolou a samotným otevřením souboru se stav souborového systému může změnit. Python proto prosazuje přístup EAFP (Easier to ask for forgiveness than permission) – rovnou se pokusit soubor otevřít a případnou chybu zachytit.",
+      "code": null
+    },
+    {
+      "id": "q9",
+      "type": "multiple_choice",
+      "question": "Jaký výstup vytvoří volání os.path.split v níže uvedeném příkladu?",
+      "options": [
+        "A) Vypíše '/var' a 'log/syslog', protože rozdělení probíhá podle prvního nalezeného lomítka zleva zadané cesty.",
+        "B) Vypíše '/var/log/syslog' a '', protože při absenci přípony souboru se celá cesta vrátí jako prvek head.",
+        "C) Vypíše '/var/log/' a 'syslog', protože head si dle specifikace vřele ponechává koncové dělicí lomítko cesty.",
+        "D) Vypíše '/var/log' a 'syslog', protože tail představuje poslední prvek cesty a head zbývající nadřazenou cestu."
+      ],
+      "answer": 3,
+      "explanation": "Funkce `os.path.split(path)` roz dělí cestu na dvojici `(head, tail)`. `tail` je poslední komponent cesty (jméno souboru nebo podadresáře, nikdy neobsahuje lomítko) a `head` je vše, co mu předchází. Pro `/var/log/syslog` je to `('/var/log', 'syslog')`.",
+      "code": "import os\nhead, tail = os.path.split('/var/log/syslog')\nprint(head, tail)"
+    },
+    {
+      "id": "q10",
+      "type": "multiple_choice",
+      "question": "Čím se liší funkce os.renames() od základní funkce os.rename()?",
+      "options": [
+        "A) Vytvoří chybějící nadřazené adresáře pro novou cestu a po přesunu promaže i uvolněné prázdné staré adresáře.",
+        "B) Funguje výhradně pro přejmenovávání adresářů, zatímco os.rename() slouží pouze pro běžné datové soubory.",
+        "C) Provádí přejmenování asynchronně na pozadí bez blokování hlavního vlákna běžícího Python interpreta.",
+        "D) Umožňuje přejmenovávat více souborů najednou pomocí zástupných znaků (wildcards) typu *.txt v jediném kroku."
+      ],
+      "answer": 0,
+      "explanation": "`os.renames(old, new)` před přejmenováním / přesunem vytvoří chybějící nadřazené adresáře v cílí (pomocí `os.makedirs`) a po dokončení se pokusí odstranit prázdné nadřazené adresáře ve zdroji (pomocí `os.removedirs`).",
+      "code": null
+    }
+  ],
+  "fileinput": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Odkud čte kód `fileinput.input()`, pokud skriptu nebyly při spuštění předány žádné argumenty souborů?",
+      "options": [
+        "A) Ze standardního vstupu (sys.stdin), takže může zpracovávat data předaná přes pipeline.",
+        "B) Vyvolá výjimku FileNotFoundError, protože nebyl zadán žádný název vstupního souboru.",
+        "C) Vrátí prázdný iterátor, který okamžitě ukončí cyklus for bez načtení jakéhokoliv řádku.",
+        "D) Automaticky prohledá aktuální adresář a otevře první nalezený soubor s příponou .txt."
+      ],
+      "answer": 0,
+      "explanation": "Pokud v sys.argv[1:] nejsou předány žádné soubory (nebo je předán argument '-'), fileinput.input() transparentně čte ze standardního vstupu sys.stdin.",
       "code": null
     },
     {
       "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Doplňte parametr dekorátoru @jit, který zaručí vyhození výjimky při neschopnosti zkompilovat kód bez Python C-API:",
-      "options": [
-        "strict",
-        "fastmath",
-        "pure_c",
-        "nopython"
-      ],
-      "answer": 3,
-      "explanation": "Parametr nopython=True (nebo samostatný dekorátor @njit) zakáže fallback do pomalého object mode. Pokud Numba nemůže kód přeložit do čistého nativního kódu bez Python C-API, vyvolá výjimku.",
-      "expected": "nopython",
-      "code": "from numba import jit\n\n@jit(________=True)\ndef vypocet(x):\n    return x.sum()"
-    },
-    {
-      "id": "q3",
-      "type": "multiple_choice",
-      "question": "Jaký je hlavní účel dekorátoru @vectorize v knihovně Numba oproti standardnímu @jit?",
-      "options": [
-        "A) Vytvoří ze skalární funkce univerzální funkce (ufunc) schopnou pracovat nad vícerozměrnými poli.",
-        "B) Zabezpečí automatickou konverzi Python objektů na C-struktury bez nutnosti instalace knihovny LLVM.",
-        "C) Přeloží Python kód dopředu (AOT) do samostatného dynamického knihovního souboru .so nebo .dll na disku.",
-        "D) Uvolní Globální zámek interpretu (GIL) a automaticky rozloží výpočet mezi více samostatných OS procesů."
-      ],
-      "answer": 0,
-      "explanation": "Dekorátor @vectorize umožňuje napsat funkci pro skalární hodnoty a automaticky z ní vygeneruje NumPy ufunc, která podporuje broadcasting a operace nad vícerozměrnými n-dimenzionálními poli.",
-      "code": null
-    },
-    {
-      "id": "q4",
       "type": "predict_output",
-      "question": "Co umožní nastavení parametru nogil=True u dekorátoru @jit v Numbě během provádění zkompilované funkce?",
+      "question": "Jaký účinek má nastavení parametru `inplace=True` při volání `fileinput.input()`?",
       "options": [
-        "A) Vypne kontrolu přetečení paměti u polí NumPy a zrychlí indexaci prvků vynecháním platnostních testů.",
-        "B) Uvolní Globální zámek interpretu (GIL), takže zkompilovaná funkce může běžet souběžně ve více vláknech.",
-        "C) Přesune provádění výpočtu z procesoru CPU přímo na grafický akcelerátor GPU s využitím rozhraní CUDA.",
-        "D) Zaručí, že funkce bude moci přistupovat k dynamickým objektům typu dict a list bez použití zámku."
+        "A) Uzamkne všechny právě zpracovávané soubory na disku proti zápisu ze strany ostatních procesů.",
+        "B) Přesměruje standardní výstup (sys.stdout) do právě zpracovávaného souboru, čímž jej přepíše.",
+        "C) Otevře všechny soubory v režimu pro připsání na konec (append) bez modifikace stávajících řádků.",
+        "D) Načte celý obsah všech zadaných souborů do paměti RAM ještě před zahájením samotné iterace."
       ],
       "answer": 1,
-      "explanation": "Parametr nogil=True instruuje Numbu, aby během vykonávání zkompilovaného nativního kódu uvolnila GIL (Global Interpreter Lock). Díky tomu mohou jiná Python vlákna běžet současně na jiných CPU jádrech.",
+      "explanation": "Parametr inplace=True přesměruje standardní výstup print() přímo do právě čteného souboru. Původní soubor je zálohován/přesunut a jeho obsah je nahrazen tištěným výstupem.",
       "code": null
     },
     {
-      "id": "q5",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení o kompilačním modelu Cythonu a Numby:\n\nCython typicky využívá AOT kompilaci skrze překlad do C a C kompilátor před spuštěním skriptu, zatímco Numba primárně využívá JIT kompilaci přes LLVM za běhu.",
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Doplňte funkci modulu `fileinput`, která vrací pořadové číslo řádku v rámci právě otevřeného souboru (resetované na 1 pro každý soubor).",
       "options": [
-        "A) Nepravda – Numba vyžaduje ruční překlad přes C kompilátor před během skriptu, zatímco Cython provádí JIT kompilaci v paměti.",
-        "B) Pravda – Cython vyžaduje předpřeklad C souboru a vytvoření rozšíření (setup.py), zatímco Numba kompiluje kód při spuštění."
+        "lineno",
+        "line_number",
+        "filelineno",
+        "fileno"
+      ],
+      "answer": 2,
+      "explanation": "`fileinput.filelineno()` vrací číslo řádku v aktuálním souboru (od 1), zatímco `fileinput.lineno()` vrací kumulativní celkový počet řádků přes všechny soubory.",
+      "code": "import fileinput\n\n# Zpracování souborů mereni_1.log a mereni_2.log\nfor line in fileinput.input(files=(\"mereni_1.log\", \"mereni_2.log\")):\n    # Získání čísla řádku v rámci aktuálního souboru\n    current_line = fileinput.________()\n    print(f\"{fileinput.filename()}:{current_line} -> {line.strip()}\")",
+      "expected": "filelineno"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Které komprimované formáty souborů dokáže automaticky otevírat předpřipravená hook funkce `fileinput.hook_compressed`?",
+      "options": [
+        "A) Komprimované archivní soubory s příponami .zip, .tar a .7z.",
+        "B) Jakékoliv komprimované soubory s příponami jako .xz a .rar.",
+        "C) Pouze komprimované archivní soubory s jedinou příponou .zip.",
+        "D) Soubory s komprimovanými příponami .gz (gzip) a .bz2 (bzip2)."
+      ],
+      "answer": 3,
+      "explanation": "fileinput.hook_compressed detekuje soubory podle přípony .gz nebo .bz2 a automaticky je otevře s využitím modulů gzip nebo bz2.",
+      "code": null
+    }
+  ],
+  "shelve": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Který datový typ je v modulu shelve vyžadován pro klíče perzistentního slovníku?",
+      "options": [
+        "A) Jakýkoliv piklitelný objekt.",
+        "B) Výhradně textové řetězce str.",
+        "C) Libovolný immutable typ s hash().",
+        "D) Pouze celá čísla int a str."
       ],
       "answer": 1,
-      "explanation": "Cython překládá .pyx soubory do C/C++ předem (AOT) a kompiluje je do sdílené knihovny. Numba analyzuje Python kód za běhu a při prvním spuštění generuje strojový kód pomocí JIT (LLVM).",
+      "explanation": "Backend dbm pod modulem shelve vyžaduje striktně řetězcové klíče (str). Hodnotami v perzistentním slovníku mohou být libovolné serializovatelné pythoní objekty.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jaký účinek má příkaz db['seznam'].append(99) v databázi shelve při výchozím nastavení writeback=False?",
+      "options": [
+        "A) Kód selže a vyvolá výjimku PermissionError kvůli zápisu do neotevřené vyrovnávací paměti.",
+        "B) Změna se uloží do paměťové cache a provede se její zapsání až při volání metody db.close().",
+        "C) Seznam v databázi zůstane nezměněn, protože modifikace mutable objektu se bez přiřazení nezapsala.",
+        "D) Změna se okamžitě zapíše na disk do souboru databáze bez nutnosti jakéhokoliv dalšího zásahu."
+      ],
+      "answer": 2,
+      "explanation": "Při výchozím writeback=False vrací db['seznam'] odpicklovaný dočasný objekt. Příkaz .append(99) modifikuje tuto kopii. Pro uložení na disk je nutné znovupřiřazení db['seznam'] = temp.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "true_false_tricky",
+      "question": "Posuďte výhody a nevýhody otevření databáze shelve s parametrem writeback=True.",
+      "options": [
+        "A) Nepravda: Zrychluje zavírání databáze, ale zakazuje použití in-place mutable operací na slovníku.",
+        "B) Pravda: Umožňuje přímé modifikace mutable objektů, ale udržuje v paměti cache všech načtených položek."
+      ],
+      "answer": 1,
+      "explanation": "Nastavení writeback=True uchovává všechny načtené i upravené položky v paměťovém cache slovníku. To umožňuje in-place úpravy, ale dramaticky zvyšuje spotřebu paměti a zpomaluje sync/close.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "fill_blank_choice",
+      "question": "Která hodnota parametru flag ve funkci shelve.open() vynutí vytvoření nové prázdné databáze s přepsáním existujícího souboru?",
+      "options": [
+        "'c'",
+        "'w'",
+        "'r'",
+        "'n'"
+      ],
+      "answer": 3,
+      "explanation": "Příznak flag='n' (new) otevře databázi pro čtení i zápis a vždy vytvoří novou prázdnou databázi s přepsáním původního souboru.",
+      "code": "import shelve\n\n# Otevření databáze pro zápis s vynuceným vytvořením nového souboru\nwith shelve.open(\"lab_results.db\", flag=________) as db:\n    db[\"experiment_1\"] = {\"yield\": 0.85, \"purity\": 0.99}",
+      "expected": "'n'"
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jaká omezení platí pro přístup více procesů či skriptů k téže databázi modulu shelve?",
+      "options": [
+        "A) Pro zápis může mít databázi otevřenou současně pouze jediný proces; pro čtení více procesů.",
+        "B) Konkurentní čtení i zápis jsou podporovány výhradně v případě použití backendu dbm.dumb.",
+        "C) Databázi může mít současně otevřenou právě jeden proces bez ohledu na čtení či zápis.",
+        "D) Databáze plně podporuje paralelní zápis z více procesů díky zámkům na úrovni backendu."
+      ],
+      "answer": 0,
+      "explanation": "Modul shelve nezajišťuje zamykání pro paratelní zápis. Zápis z více procesů naráz může poškodit databázi. Paralelní čtení z více procesů je bezpečné.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "predict_output",
+      "question": "Které soubory vytvoří záložní backend dbm.dumb na disku při práci s databází pojmenovanou mojedata?",
+      "options": [
+        "A) Pouze jediný binární soubor s příponou mojedata.db vytvořený ve složce projektu.",
+        "B) Soubory mojedata.dat a mojedata.dir (případně mojedata.bak při spuštěném provozu).",
+        "C) Dvojici souborů mojedata.sqlite a mojedata.log pro podporu transakčního logování.",
+        "D) Trojici souborů mojedata.txt, mojedata.json a mojedata.bin v cache adresáři."
+      ],
+      "answer": 1,
+      "explanation": "Čistě pythoní backend dbm.dumb vytváří dvojici souborů .dat a .dir (plus .bak během manipulace), které uchovávají indexy klíčů a samotná bajtová data.",
       "code": null
     }
   ]

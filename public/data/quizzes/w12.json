@@ -1,4 +1,120 @@
 {
+  "argparse": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Jaká hodnota se uloží do args.v při volání bez argumentů?",
+      "options": [
+        "A) None",
+        "B) SILENT",
+        "C) VERBOSE",
+        "D) True"
+      ],
+      "answer": 1,
+      "explanation": "U přepínače s nargs='?' se hodnota const použije v případě, že je přepínač -v na příkazové řádce přítomen bez hodnoty. Pokud přepínač není zadán vůbec, použije se hodnota default ('SILENT').",
+      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-v', nargs='?', const='VERBOSE', default='SILENT')\nargs = parser.parse_args([])\nprint(args.v)"
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jakou výchozí hodnotu má přepínač s nastavením action='store_true'?",
+      "options": [
+        "A) None",
+        "B) True",
+        "C) False",
+        "D) AttributeError"
+      ],
+      "answer": 2,
+      "explanation": "Akce store_true automaticky nastavuje výchozí hodnotu na boolovské False. Pokud uživatel přepínač na příkazové řádce použije, hodnota v atributu force se změní na True.",
+      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-f', '--force', action='store_true')\nargs = parser.parse_args([])\nprint(args.force)"
+    },
+    {
+      "id": "q3",
+      "type": "predict_output",
+      "question": "Jaký bude výstup parseru při opakovaném použití přepínače s action='append'?",
+      "options": [
+        "A) ('a.py', 'b.py')",
+        "B) ['b.py']",
+        "C) 'b.py'",
+        "D) ['a.py', 'b.py']"
+      ],
+      "answer": 3,
+      "explanation": "Akce action='append' nezapříčiní přepsání hodnoty poslední zadanou, ale každou novou hodnotu postupně přidá jako nový prvek do jednoho kumulativního seznamu.",
+      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-i', '--include', action='append')\nargs = parser.parse_args(['-i', 'a.py', '-i', 'b.py'])\nprint(args.include)"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Co vrací metoda parse_known_args() modulu argparse?",
+      "options": [
+        "A) Dvojici (Namespace s rozpoznanými argumenty, seznam nerozpoznaných argumentů).",
+        "B) Pouze slovník s rozpoznanými argumenty, přičemž neznámé argumenty zcela ignoruje.",
+        "C) Výjimku UnrecognizedArgumentError, pokud se v příkazu objeví neznámý přepínač.",
+        "D) Objekt typu Namespace obsahující jak rozpoznané, tak neznámé argumenty dohromady."
+      ],
+      "answer": 0,
+      "explanation": "Metoda parse_known_args() při výskytu neznámých argumentů neselže, ale vrátí n-tici: první prvek je Namespace s parsovanými argumenty a druhý je seznam zbylých nerozpoznaných řetězců.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Doplňte speciální výjimku modulu argparse pro signalizaci neplatné hodnoty z vlastní konverzní funkce:",
+      "code_snippet": "from argparse import ArgumentParser, ________\n\ndef positive_int(val):\n    n = int(val)\n    if n <= 0:\n        raise ________('Číslo musí být kladné!')\n    return n",
+      "options": [
+        "ParseError",
+        "ArgumentTypeError",
+        "ArgumentValueError",
+        "InvalidOptionError"
+      ],
+      "answer": 1,
+      "explanation": "Vlastní validační funkce v type= modulu argparse vyhazují argparse.ArgumentTypeError, kterou parser zpracuje a zobrazí chybovou hlášku CLI.",
+      "code": "import argparse\n\ndef positive_int(val):\n    num = int(val)\n    if num <= 0:\n        raise argparse.________(\"Číslo musí být kladné\")\n    return num",
+      "expected": "ArgumentTypeError"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaké chování zajistí kód group = parser.add_mutually_exclusive_group(required=True)?",
+      "options": [
+        "A) Skupina automaticky skryje nápovědu pro všechny obsažené přepínače z výpisu -h.",
+        "B) Přepínače ze skupiny se stanou povinné všechny současně při spuštění skriptu.",
+        "C) Uživatel musí zadat právě jeden argument z dané skupiny, jinak parser selže.",
+        "D) Uživatel může zadat všechny přepínače ze zadané skupiny naráz v libovolném pořadí."
+      ],
+      "answer": 2,
+      "explanation": "add_mutually_exclusive_group() vynucuje, že lze vybrat nejvýše jeden argument ze skupiny. Parametr required=True navíc zaručuje, že alespoň jeden z nich musí být povinně zadán.",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "predict_output",
+      "question": "Jaká hodnota převáží při spuštění skriptu bez argumentů?",
+      "options": [
+        "A) ['alpha', 'beta']",
+        "B) None",
+        "C) alpha",
+        "D) beta"
+      ],
+      "answer": 3,
+      "explanation": "Metoda parser.set_defaults(...) má vyšší prioritu než parametr default= v add_argument(), takže přepíše původní výchozí hodnotu 'alpha' na 'beta'.",
+      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('-x', default='alpha')\nparser.set_defaults(x='beta')\nargs = parser.parse_args([])\nprint(args.x)"
+    },
+    {
+      "id": "q8",
+      "type": "predict_output",
+      "question": "Co se stane při spuštění skriptu s nargs='+' bez předání jakéhokoliv argumentu?",
+      "options": [
+        "A) Skript ukončí běh se zprávou o chybě z důvodu nedostatečného počtu argumentů.",
+        "B) Skript vrátí objekt Namespace s prázdným seznamem uloženým v atributu files.",
+        "C) Skript vytvoří objekt Namespace, kde má atribut files uloženou hodnotu None.",
+        "D) Skript se pozastaví a bude čekat na zadání názvů souborů ze standardního vstupu."
+      ],
+      "answer": 0,
+      "explanation": "Násobnost nargs='+' vyžaduje alespoň 1 zadanou hodnotu. Nezadá-li uživatel žádnou, parse_args() vypíše usage, zobrazí chybu 'too few arguments' a okamžitě skript ukončí.",
+      "code": "import argparse\nparser = argparse.ArgumentParser()\nparser.add_argument('files', nargs='+')\nargs = parser.parse_args([])"
+    }
+  ],
   "execution_subprocess": [
     {
       "id": "q1",
@@ -99,144 +215,75 @@
       "code": null
     }
   ],
-  "speed_overview": [
+  "mmap": [
     {
       "id": "q1",
       "type": "multiple_choice",
-      "question": "Jakým způsobem probíhá vývoj a překlad samotného interpretu PyPy?",
+      "question": "Jak se chová objekt vytvořený pomocí modulu mmap?",
       "options": [
-        "A) Zdrojový kód PyPy se kompiluje přímo do systémového assembleru procesoru přes LLVM bez mezikroku v C.",
-        "B) PyPy je napsán v C++ a využívá rozhraní Java Virtual Machine pro dynamický překlad bytekódu v paměti.",
-        "C) Kód napsaný v RPythonu se přeloží do jazyka C a následně zkompiluje do spustitelné binárky interpretu.",
-        "D) PyPy funguje jako skript v čistém Pythonu, který dynamicky upravuje bytecode CPythonu před spuštěním."
+        "A) Funguje výhradně jako klasický textový řetězec str uložený v operační paměti.",
+        "B) Kombinuje rozhraní souborového proudu (read/seek) a měnitelného bajtového pole.",
+        "C) Automaticky šifruje a komprimuje souborová data zapsaná na pevný disk.",
+        "D) Slouží jako databázový index pro rychlé vyhledávání v relacích na disku."
       ],
-      "answer": 2,
-      "explanation": "Vývoj PyPy probíhá tak, že je napsán v omezené podmnožině Pythonu zvané RPython (Restricted Python). RPython je přeložen do C a následně zkompilován běžným C kompilátorem.",
+      "answer": 1,
+      "explanation": "Objekt mmap namapuje soubor přímo do paměti a poskytuje hybridní rozhraní – podporuje souborové metody (read, readline, seek) i přístup přes indexy a výřezy jako bytearray.",
       "code": null
     },
     {
       "id": "q2",
-      "type": "fill_blank_choice",
-      "question": "Doplňte parametr dekorátoru @jit, který zaručí vyhození výjimky při neschopnosti zkompilovat kód bez Python C-API:",
-      "options": [
-        "strict",
-        "fastmath",
-        "pure_c",
-        "nopython"
-      ],
-      "answer": 3,
-      "explanation": "Parametr nopython=True (nebo samostatný dekorátor @njit) zakáže fallback do pomalého object mode. Pokud Numba nemůže kód přeložit do čistého nativního kódu bez Python C-API, vyvolá výjimku.",
-      "expected": "nopython",
-      "code": "from numba import jit\n\n@jit(________=True)\ndef vypocet(x):\n    return x.sum()"
-    },
-    {
-      "id": "q3",
       "type": "multiple_choice",
-      "question": "Jaký je hlavní účel dekorátoru @vectorize v knihovně Numba oproti standardnímu @jit?",
+      "question": "Jaké omezení platí pro parametr offset při alokaci mmap.mmap()?",
       "options": [
-        "A) Vytvoří ze skalární funkce univerzální funkce (ufunc) schopnou pracovat nad vícerozměrnými poli.",
-        "B) Zabezpečí automatickou konverzi Python objektů na C-struktury bez nutnosti instalace knihovny LLVM.",
-        "C) Přeloží Python kód dopředu (AOT) do samostatného dynamického knihovního souboru .so nebo .dll na disku.",
-        "D) Uvolní Globální zámek interpretu (GIL) a automaticky rozloží výpočet mezi více samostatných OS procesů."
-      ],
-      "answer": 0,
-      "explanation": "Dekorátor @vectorize umožňuje napsat funkci pro skalární hodnoty a automaticky z ní vygeneruje NumPy ufunc, která podporuje broadcasting a operace nad vícerozměrnými n-dimenzionálními poli.",
-      "code": null
-    },
-    {
-      "id": "q4",
-      "type": "predict_output",
-      "question": "Co umožní nastavení parametru nogil=True u dekorátoru @jit v Numbě během provádění zkompilované funkce?",
-      "options": [
-        "A) Vypne kontrolu přetečení paměti u polí NumPy a zrychlí indexaci prvků vynecháním platnostních testů.",
-        "B) Uvolní Globální zámek interpretu (GIL), takže zkompilovaná funkce může běžet souběžně ve více vláknech.",
-        "C) Přesune provádění výpočtu z procesoru CPU přímo na grafický akcelerátor GPU s využitím rozhraní CUDA.",
-        "D) Zaručí, že funkce bude moci přistupovat k dynamickým objektům typu dict a list bez použití zámku."
-      ],
-      "answer": 1,
-      "explanation": "Parametr nogil=True instruuje Numbu, aby během vykonávání zkompilovaného nativního kódu uvolnila GIL (Global Interpreter Lock). Díky tomu mohou jiná Python vlákna běžet současně na jiných CPU jádrech.",
-      "code": null
-    },
-    {
-      "id": "q5",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení o kompilačním modelu Cythonu a Numby:\n\nCython typicky využívá AOT kompilaci skrze překlad do C a C kompilátor před spuštěním skriptu, zatímco Numba primárně využívá JIT kompilaci přes LLVM za běhu.",
-      "options": [
-        "A) Nepravda – Numba vyžaduje ruční překlad přes C kompilátor před během skriptu, zatímco Cython provádí JIT kompilaci v paměti.",
-        "B) Pravda – Cython vyžaduje předpřeklad C souboru a vytvoření rozšíření (setup.py), zatímco Numba kompiluje kód při spuštění."
-      ],
-      "answer": 1,
-      "explanation": "Cython překládá .pyx soubory do C/C++ předem (AOT) a kompiluje je do sdílené knihovny. Numba analyzuje Python kód za běhu a při prvním spuštění generuje strojový kód pomocí JIT (LLVM).",
-      "code": null
-    }
-  ],
-  "speed_example_1": [
-    {
-      "id": "q1",
-      "type": "multiple_choice",
-      "question": "Proč dosáhl prvotní pokus o cythonizaci s výrazem (vyrez * maska).sum() horšího času (3,1 s) než čistý Python (1,8 s)?",
-      "options": [
-        "A) Knihovna Pillow zablokovala přístup k paměťovému bufferu obrázku, takže Cython musel kopírovat celou matici.",
-        "B) Výraz vyvolal vnitřní přetečení paměti typu float, což přinutilo CPython přejít do záložního režimu interpretace.",
-        "C) Načítání výřezů alokovalo v každém kroku smyčky nové objekty a volalo pomalé C-API (žluté řádky v cython -a).",
-        "D) Cython zkompiloval maticové násobení do jednovláknového C kódu bez využití vektorových instrukcí SSE a AVX."
+        "A) Parametr offset musí vždy začínat od nuly, posun uvnitř souboru není podporován.",
+        "B) Parametr offset udává přesný počet textových řádků přeskočených při mapování.",
+        "C) Parametr offset musí být celočíselným násobkem mmap.ALLOCATIONGRANULARITY.",
+        "D) Offset může být libovolné číslo v rozsahu od 0 do celkové velikosti souboru."
       ],
       "answer": 2,
-      "explanation": "V prvotním Cython kódu vytvářel výraz np.array(vyrez) v každé iteraci zanořené smyčky nový Python objekt. Nástroj cython -a označil řádek sytě žlutou barvou, což signalizuje intenzivní volání C-API CPythonu uvnitř smyčky.",
-      "code": null
-    },
-    {
-      "id": "q2",
-      "type": "predict_output",
-      "question": "Jaká úprava kódu v Cythonu snížila čas vykonání filtru obrázku z 3,1 s na špičkových 0,14 s?",
-      "options": [
-        "A) Použití dekorátoru @jit(nopython=True) nad původní cythoní funkcí a vypnutí kontroly mezí indexace polí.",
-        "B) Převod celého 3D pole RGB obrázku na jednorozměrný Python seznam objektů typu float před voláním filtru.",
-        "C) Zvýšení počtu vláken v modulu threading a rozdělení jednotlivých barevných kanálů obrázku do skriptů.",
-        "D) Nahrazení jednořádkového maticového násobení (vyrez * maska).sum() zanořenou C smyčkou přes jednotlivé prvky."
-      ],
-      "answer": 3,
-      "explanation": "Odstraněním NumPy operací nad výřezy a přepsáním násobení matice na přímou zanořenou C smyčku se kód zcela zbavil volání Python C-API uvnitř smyček, což snížilo čas na 0,14 s.",
+      "explanation": "Operační systém vyžaduje Zarovnání offsetu paměťových stránek. V Pythonu musí být offset v mmap celočíselným násobkem mmap.ALLOCATIONGRANULARITY (obvykle 64 KiB / 65536 B).",
       "code": null
     },
     {
       "id": "q3",
-      "type": "multiple_choice",
-      "question": "Na čem je založen princip vektorizace konvolučního filtru v čistém NumPy bez použití smyček for?",
+      "type": "predict_output",
+      "question": "Jaký typ a hodnotu vrátí metoda read_byte() nad objektem mmap?",
       "options": [
-        "A) Na součtu 9 posunutých 2D výřezů (views) původní matice s odpovídajícími koeficienty v jediném výrazu.",
-        "B) Na paralelním zpracování jednotlivých bajtů obrázku pomocí grafické karty přes externí modul CUDA.",
-        "C) Na automatickém převodu 2D matice obrázku do frekvenční domény pomocí rychlé Fourierovy transformace (FFT).",
-        "D) Na použití funkce np.vectorize() nad původní nevektorizovanou pythonní funkcí se zanořenou smyčkou."
+        "A) b'A' <class 'bytes'>",
+        "B) 'A' <class 'str'>",
+        "C) 0 <class 'int'>",
+        "D) 65 <class 'int'>"
       ],
-      "answer": 0,
-      "explanation": "Vektorizace nahradila smyčku tím, že vytvořila 9 stejně velkých posunutých výřezů matice (např. M[0:-2, 0:-2], M[1:-1, 1:-1]), vynásobila je koeficienty masky a sečetla je najednou kompilovanou C operací NumPy.",
-      "code": null
+      "answer": 3,
+      "explanation": "Metoda read_byte() přečte 1 bajt a vrátí ho jako celé číslo (int, ASCII 65 pro 'A') a posune ukazatel o 1. Metoda read(1) by naopak vrátila bajtový objekt b'A' (bytes).",
+      "code": "import mmap\nwith mmap.mmap(-1, 10) as m:\n    m.write(b'ABC')\n    m.seek(0)\n    val = m.read_byte()\n    print(val, type(val))"
     },
     {
       "id": "q4",
-      "type": "predict_output",
-      "question": "Která dvojice metod dosáhla v ukázkovém srovnání filtru obrázku nejvyššího zrychlení (kolem 11x až 13x)?",
+      "type": "multiple_choice",
+      "question": "Jakým způsobem je nutné předat regulární výraz při vyhledávání v objektu mmap?",
       "options": [
-        "A) Numba s nastavením nopython=False a Cython s použitím volání np.array().",
-        "B) Optimalizovaný Cython s C smyčkami a vektorizované řešení v čistém NumPy.",
-        "C) Naivní Python smyčka a funkce np.vectorize() aplikovaná na skalární funkci.",
-        "D) Naivní nevektorizovaný Python s NumPy a Numba bez použití mezipaměti."
+        "A) Vzor musí být definován jako bajtový řetězec s předponou rb (např. rb'pattern').",
+        "B) Regulární výrazy nelze nad objektem mmap z důvodu paměťových omezení použít.",
+        "C) Vzor musí být předán jako běžný textový Unicode řetězec str v kódování UTF-8.",
+        "D) Vzor je nutné nejprve převést na celočíselné pole ASCII hodnot jednotlivých znaků."
       ],
-      "answer": 1,
-      "explanation": "Optimalizovaný Cython (s manuální C smyčkou) dosáhl času 0,14 s (13x zrychlení) a vektorizovaný NumPy dosáhl 0,16 s (11x zrychlení). Naivní smyčka trvala 1,8 s.",
+      "answer": 0,
+      "explanation": "Jelikož mmap reprezentuje neopracovaná bajtová data v paměti, operace a regexpy nad mmap vyžadují bajtový vzor (byte regex pattern) s předponou rb''.",
       "code": null
     },
     {
       "id": "q5",
-      "type": "true_false_tricky",
-      "question": "Vyhodnoťte pravdivost tvrzení o mezipaměti v Numbě:\n\nPři opakovaném spouštění skriptu s Numba dekorátorem s parametrem cache=True odpadá režie prvotní JIT kompilace, protože Numba načte předkompilovaný nativní kód přímo z disku.",
+      "type": "multiple_choice",
+      "question": "Co znamená předání hodnoty -1 jako prvního argumentu (fileno) do mmap.mmap(-1, length)?",
       "options": [
-        "A) Pravda – Uložení kompilátu na disk snížilo čas běhu z 0,54 s (první spuštění) na 0,35 s při dalších spuštěních.",
-        "B) Nepravda – Parametr cache=True udrží data obrázku v L1 paměti, ale kód se musí při každém spuštění kompilovat znovu."
+        "A) Soubor se otevře v neomezeném režimu paměti, kde jeho délka může dynamicky rost.",
+        "B) Vytvoří se anonymní paměťový blok neprovázaný se žádným konkrétním souborem.",
+        "C) Funkce vyhodí výjimku ValueError z důvodu neplatného souborového popisovače.",
+        "D) Otevře se v režimu pro čtení naposledy modifikovaný soubor z pevného disku."
       ],
-      "answer": 0,
-      "explanation": "Numba při cache=True uloží vygenerovaný nativní kód na disk (do __pycache__). Při dalším spuštění načte již zkompilovaný kód a vyhne se režii kompilátoru LLVM.",
+      "answer": 1,
+      "explanation": "Hodnota fileno = -1 slouží k vytvoření anonymního alokovaného paměťového bloku (anonymous memory mapping) v RAM, který není vázán na žádný fyzický soubor na disku.",
       "code": null
     }
   ],
@@ -312,6 +359,94 @@
       "code": "import ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.vypocti_prumer.________ = ctypes.c_double"
     }
   ],
+  "bytes": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Jaký typ mají výstupy při přístupu k prvkům bajtového řetězce?",
+      "options": [
+        "A) <class 'int'> <class 'str'>",
+        "B) <class 'str'> <class 'bytes'>",
+        "C) <class 'bytes'> <class 'bytes'>",
+        "D) <class 'int'> <class 'bytes'>"
+      ],
+      "answer": 3,
+      "explanation": "Přístup k celému jednomu prvku b[0] vrací celočíselnou ASCII hodnotu (int, zde 80 pro 'P'). Výřez b[0:1] vrací nový bajtový řetězec (bytes, b'P'). U textových str vrací obojí typ str.",
+      "code": "b = b'Python'\nprint(type(b[0]), type(b[0:1]))"
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jaký je rozdíl mezi konstruktorem bytes(3) a bytes([3])?",
+      "options": [
+        "A) b'\\x00\\x00\\x00' b'\\x03'",
+        "B) b'\\x00' b'\\x03\\x03\\x03'",
+        "C) b'\\x03\\x03\\x03' b'\\x03'",
+        "D) b'\\x03' b'\\x03'"
+      ],
+      "answer": 0,
+      "explanation": "Volání bytes(N) s celým číslem alokuje N nulových bajtů (b'\\x00\\x00\\x00'). Konstruktor s iterovatelem bytes([3]) převede čísla v rozmezí 0-255 na odpovídající bajty (b'\\x03').",
+      "code": "b1 = bytes(3)\nb2 = bytes([3])\nprint(b1, b2)"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Co se stane při pokusu o úpravu prvku v bajtovém řetězci bytes?",
+      "options": [
+        "A) Vyhodí výjimku ValueError, protože zadaná hodnota 65 neodpovídá typu str.",
+        "B) Vyhodí výjimku TypeError, protože objekt typu bytes je neměnný (immutable).",
+        "C) Kód automaticky zkonvertuje objekt proměnné data na nový typ bytearray.",
+        "D) Hodnota prvního bajtu se v objektu úspěšně přepíše z 97 na novou hodnotu 65."
+      ],
+      "answer": 1,
+      "explanation": "Typ bytes je neměnná sekvence (immutable). Při pokusu o úpravu b[0] vyhodí TypeError: 'bytes' object does not support item assignment. Pro modifikovatelné bajty je nutné použít bytearray.",
+      "code": "data = b'ahoj'\ndata[0] = 65"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Který způsob formátování je podporován pro bajtové řetězce bytes v Pythonu 3?",
+      "options": [
+        "A) Formátované řetězce s novým prefiksem fb (například zápis fb'{data}').",
+        "B) Standardní metoda .format() (například zápis b'{}'.format(b'data')).",
+        "C) Interpolace textu pomocí operátoru % (například zápis b'%b' % b'data').",
+        "D) Bajtové řetězce v Pythonu 3 neposkytují vůbec žádné formátovací mechanizmy."
+      ],
+      "answer": 2,
+      "explanation": "Pro bajtové řetězce byla v Pythonu 3.5 zpětně přidána interpolace pomocí operátoru %. Metoda .format() ani f-řetězce s prefiksem fb pro typ bytes neexistují.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu pro dekódování bajtového řetězce bytes na textový řetězec str:",
+      "code_snippet": "raw_bytes = b'\\xc5\\x99etezec'\ntext = raw_bytes.________('utf-8')",
+      "options": [
+        "encode",
+        "parse",
+        "to_str",
+        "decode"
+      ],
+      "answer": 3,
+      "explanation": "Metoda bytes.decode() převádí binární bajty na textový řetězec str pomocí specifikovaného kódování.",
+      "code": "raw_bytes = b\"V\\xc5\\xa0CHT Praha\"\ntext = raw_bytes.________(\"utf-8\")\n# Výstup: 'VŠCHT Praha'",
+      "expected": "decode"
+    },
+    {
+      "id": "q6",
+      "type": "predict_output",
+      "question": "Jaké hodnoty vrací cyklus for při iteraci přes bajtový řetězec bytes?",
+      "options": [
+        "A) 65 66",
+        "B) 0 1",
+        "C) A B",
+        "D) b'A' b'B'"
+      ],
+      "answer": 0,
+      "explanation": "Iterace přes bytes vrací jednotlivé celočíselné hodnoty bajtů (int 0-255). ASCII hodnota 'A' je 65 a 'B' je 66. Znaky nebo podřetězce b'A' se při iteraci nevytváří.",
+      "code": "for item in b'AB':\n    print(item, end=' ')"
+    }
+  ],
   "cython_overview": [
     {
       "id": "q1",
@@ -380,6 +515,76 @@
       ],
       "answer": 0,
       "explanation": "Kód vygenerovaný Cythonem úzce spolupracuje s hlavním interpretem CPythonu a volá jeho C-API (rozhraní Python.h). Proto zkompilovaný modul .so/.pyd vyžaduje CPython pro svůj běh.",
+      "code": null
+    }
+  ],
+  "speed_example_1": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Proč dosáhl prvotní pokus o cythonizaci s výrazem (vyrez * maska).sum() horšího času (3,1 s) než čistý Python (1,8 s)?",
+      "options": [
+        "A) Knihovna Pillow zablokovala přístup k paměťovému bufferu obrázku, takže Cython musel kopírovat celou matici.",
+        "B) Výraz vyvolal vnitřní přetečení paměti typu float, což přinutilo CPython přejít do záložního režimu interpretace.",
+        "C) Načítání výřezů alokovalo v každém kroku smyčky nové objekty a volalo pomalé C-API (žluté řádky v cython -a).",
+        "D) Cython zkompiloval maticové násobení do jednovláknového C kódu bez využití vektorových instrukcí SSE a AVX."
+      ],
+      "answer": 2,
+      "explanation": "V prvotním Cython kódu vytvářel výraz np.array(vyrez) v každé iteraci zanořené smyčky nový Python objekt. Nástroj cython -a označil řádek sytě žlutou barvou, což signalizuje intenzivní volání C-API CPythonu uvnitř smyčky.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Jaká úprava kódu v Cythonu snížila čas vykonání filtru obrázku z 3,1 s na špičkových 0,14 s?",
+      "options": [
+        "A) Použití dekorátoru @jit(nopython=True) nad původní cythoní funkcí a vypnutí kontroly mezí indexace polí.",
+        "B) Převod celého 3D pole RGB obrázku na jednorozměrný Python seznam objektů typu float před voláním filtru.",
+        "C) Zvýšení počtu vláken v modulu threading a rozdělení jednotlivých barevných kanálů obrázku do skriptů.",
+        "D) Nahrazení jednořádkového maticového násobení (vyrez * maska).sum() zanořenou C smyčkou přes jednotlivé prvky."
+      ],
+      "answer": 3,
+      "explanation": "Odstraněním NumPy operací nad výřezy a přepsáním násobení matice na přímou zanořenou C smyčku se kód zcela zbavil volání Python C-API uvnitř smyček, což snížilo čas na 0,14 s.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Na čem je založen princip vektorizace konvolučního filtru v čistém NumPy bez použití smyček for?",
+      "options": [
+        "A) Na součtu 9 posunutých 2D výřezů (views) původní matice s odpovídajícími koeficienty v jediném výrazu.",
+        "B) Na paralelním zpracování jednotlivých bajtů obrázku pomocí grafické karty přes externí modul CUDA.",
+        "C) Na automatickém převodu 2D matice obrázku do frekvenční domény pomocí rychlé Fourierovy transformace (FFT).",
+        "D) Na použití funkce np.vectorize() nad původní nevektorizovanou pythonní funkcí se zanořenou smyčkou."
+      ],
+      "answer": 0,
+      "explanation": "Vektorizace nahradila smyčku tím, že vytvořila 9 stejně velkých posunutých výřezů matice (např. M[0:-2, 0:-2], M[1:-1, 1:-1]), vynásobila je koeficienty masky a sečetla je najednou kompilovanou C operací NumPy.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "Která dvojice metod dosáhla v ukázkovém srovnání filtru obrázku nejvyššího zrychlení (kolem 11x až 13x)?",
+      "options": [
+        "A) Numba s nastavením nopython=False a Cython s použitím volání np.array().",
+        "B) Optimalizovaný Cython s C smyčkami a vektorizované řešení v čistém NumPy.",
+        "C) Naivní Python smyčka a funkce np.vectorize() aplikovaná na skalární funkci.",
+        "D) Naivní nevektorizovaný Python s NumPy a Numba bez použití mezipaměti."
+      ],
+      "answer": 1,
+      "explanation": "Optimalizovaný Cython (s manuální C smyčkou) dosáhl času 0,14 s (13x zrychlení) a vektorizovaný NumPy dosáhl 0,16 s (11x zrychlení). Naivní smyčka trvala 1,8 s.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení o mezipaměti v Numbě:\n\nPři opakovaném spouštění skriptu s Numba dekorátorem s parametrem cache=True odpadá režie prvotní JIT kompilace, protože Numba načte předkompilovaný nativní kód přímo z disku.",
+      "options": [
+        "A) Pravda – Uložení kompilátu na disk snížilo čas běhu z 0,54 s (první spuštění) na 0,35 s při dalších spuštěních.",
+        "B) Nepravda – Parametr cache=True udrží data obrázku v L1 paměti, ale kód se musí při každém spuštění kompilovat znovu."
+      ],
+      "answer": 0,
+      "explanation": "Numba při cache=True uloží vygenerovaný nativní kód na disk (do __pycache__). Při dalším spuštění načte již zkompilovaný kód a vyhne se režii kompilátoru LLVM.",
       "code": null
     }
   ]
