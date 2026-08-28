@@ -18,7 +18,7 @@
       "idx": 1,
       "title": "„os“ &amp; „os.path“ – platformně nezávislé cesty",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -29,9 +29,10 @@
       "idx": 2,
       "title": "„os.path“ – příprava cesty",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">„os.path“ – příprava cesty</h2></div><div class=\"section-body\">\n\n  <ul>\n    <li>\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">os.path.normpath(CESTA)</pre>\n        Vrátí cestu v normalizovaném tvaru vhodném pro zadávání do jiných metod.\n        <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n            Na Windows to ještě nemusí stačit a může být třeba použít <code>os.path.normcase(CESTA)</code> (týká se zvláště velikosti písmene svazku např. při porovnávání cest).\n        </div></div>\n    </li>\n    <li>\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">os.path.abspath(CESTA)</pre>\n        Jako předchozí, ale vrací absolutní cestu.\n    </li>\n    <li>\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">os.path.join(path1, path2, ...)</pre>\n        Vyrobí výslednou cestu z uvedených částí (narozdíl od „ručního“ lepení řetězců správně pro každou platformu).\n        <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n            Pokud je ale některá ze „slepovaných“ částí vyhodnocena jako absolutní, všechny části před ní budou zahozeny. (A týká se to i cest typu <code>/cesta</code> na Windows.)\n        </div></div>\n    </li>\n    <li>\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">os.path.split(CESTA)</pre>\n        Podle možností rozdělí cestu na <em>head</em> a <em>tail</em>, přičemž <em>tail</em> nikdy neobsahuje / (typicky bude <em>tail</em> soubor a <em>head</em> cesta k němu). Viz též <code>os.splitext(path)</code>.\n    </li>\n  </ul>\n\n</div>"
     },
@@ -76,7 +77,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Adresáře a soubory – výroba</h2></div><div class=\"section-body\">\n\n  <ul>\n    <li>\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">os.mkdir(CESTA, mode=0o777, *, dir_fd=None)</pre>\n        Vyrobí adresář (v uvedeném módu, je-li aplikovatelný) na uvedené cestě.\n    </li>\n    <li>\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">os.makedirs(CESTA, mode=0o777, exist_ok=False)</pre>\n        Jako předchozí, navíc doplní i případné neexistující nadřazené adresáře (pro kterýžto případ by předchozí příkaz selhal). Přes existující ovšem v základním nastavení neprojde také.\n    </li>\n  </ul>\n  <p>\n    PS: Výchozí hodnotou módu je <code>0o777</code>, tedy oktalově adresář s právy pro čtení, zápis a výpis.\n  </p>\n\n</div>"
     },
@@ -85,8 +86,7 @@
       "idx": 7,
       "title": "Adresáře a soubory – mazání",
       "tags": [
-        "Core",
-        "Tricky"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -108,7 +108,8 @@
       "idx": 9,
       "title": "Adresáře a soubory – kopírování",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -131,10 +132,9 @@
       "idx": 11,
       "title": "„os.environ“ – proměnné prostředí",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">„os.environ“ – proměnné prostředí</h2></div><div class=\"section-body\">\n\n  <p>\n    Objekt <code>os.environ</code> obsahuje v podobě slovníku proměnné prostředí (jako klíče) a jejich hodnoty. Slovník je naplněn při prvním importu modulu <em>os</em> a následné změny se v něm již neprojeví. Pokud ovšem nezeditujete jeho hodnoty přímo (což je ostatně doporučený postup práce).\n  </p>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    K prvnímu importu modulu <em>os</em> ovšem může v závislosti na nastavení aktuálního pracovního prostředí dojít také ihned při startu interpretru Python'u, proto se skutečně nemůžete spolehnout, že <em>os.environ</em> bude odrážet aktuální stav proměnných prostředí. \n  </div></div>\n  <p>\n    K hodnotám prostředí se přistupuje klasicky slovníkově, tj. např:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; os.environ['OS']\n'Windows_NT'</pre>\n  \n  <p>\n    PS: Struktura objektu <em>os.environ</em> je následující:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; import os\n&gt;&gt;&gt; dir(os.environ)\n['_MutableMapping__marker', '__abstractmethods__', '__class__', '__contains__',\n '__delattr__', '__delitem__', '__dict__', '__doc__', '__eq__', '__format__',\n '__ge__', '__getattribute__', '__getitem__', '__gt__', '__hash__', '__init__',\n '__iter__', '__le__', '__len__', '__lt__', '__module__', '__ne__', '__new__',\n '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setitem__',\n '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_abc_cache',\n '_abc_negative_cache', '_abc_negative_cache_version', '_abc_registry', '_data',\n 'clear', 'copy', 'decodekey', 'decodevalue', 'encodekey', 'encodevalue', 'get',\n 'items', 'keys', 'pop', 'popitem', 'putenv', 'setdefault', 'unsetenv',\n 'update', 'values']</pre>\n\n</div>"
     },

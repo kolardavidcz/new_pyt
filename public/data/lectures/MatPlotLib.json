@@ -7,7 +7,7 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -42,7 +42,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Ia – „pyplot()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Modul <a href=\"http://matplotlib.org/api/pyplot_summary.html\" class=\"external\"><em>matplotlib.pyplot</em></a> je kandidátem na asi nejpoužívanější část knihovny. Bez jakéhokoli nastavení vytvoří spojitý graf pro zadané <em>y</em>-hodnoty veliký tak akorát pro ně a s osou <em>x</em> číslovanou podle počtu zadaných hodnot:\r\n    </p>\r\n    <img src=\"_files/matplotlib/plot-01.png\" width=\"50%\" height=\"50%\" alt=\"plot-01.py\">\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nimport matplotlib.pyplot as plt\n\nplt.plot([2, 3, 5, 7, 11, 13, 17])\nplt.show()</pre>\r\n\r\n</div>"
     },
@@ -53,7 +53,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Ib – styl grafu, osy</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Stejný příklad s poněkud užitečnějšími nastaveními (řetězcový parametr funkce <em>plot()</em> je mocný):\r\n    </p>\r\n    <img src=\"_files/matplotlib/plot-02.png\" width=\"50%\" height=\"50%\" alt=\"plot-02.py\">\r\n    \r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nimport matplotlib.pyplot as plt\n\nplt.plot([1, 2, 3, 4, 5, 6, 7], [2, 3, 5, 7, 11, 13, 17], 'ro')\nplt.axis([0, 8, 0, 20])\nplt.xlabel('pořadí')\nplt.ylabel('přirozená čísla')\nplt.show()</pre>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Pro dvě vstupní sekvence hodnot je již chování zcela očekávané – první je osa <em>x</em>, druhá osa <em>y</em>. Ale pozor – obě sekvence musí být stejně dlouhé!\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Třetí řetězcový parametr je tuším namodelovaný podle MatLabu – zde říká, že uvedené body se mají zobrazit jako červené (<em>r</em>) kroužky (<em>o</em>).\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Rozsahy os se dají nastavit pochopitelně i nezávisle na zadaných hodnotách pro osy. Metoda <em>axis()</em> je pouze jedním z mnoha možných způsobů.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Názvy os se zadávají pomocí <em>xlabel()</em> a <em>ylabel()</em>.\r\n        </div></div></div>\r\n\r\n</div>"
     },
@@ -62,8 +62,7 @@
       "idx": 5,
       "title": "Ic – popisky",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -76,7 +75,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">IIa – více grafů v jednom</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        V jednom grafu můžeme zobrazit libovolné množství podgrafů. Varianta na předchozí příklad zobrazení prvočísel:\r\n    </p>\r\n    <img src=\"_files/matplotlib/plot-04a.png\" width=\"50%\" height=\"50%\" alt=\"plot-04a.py\">\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nimport matplotlib.pyplot as plt\n\n# prvočísla\nax, ay = [2, 3, 5, 7, 11, 13, 17, 19], [2, 3, 5, 7, 11, 13, 17, 19]\nplt.plot(ax, ay, 'ro')\nfor x, y in zip(ax, ay):\n    plt.annotate(y, xy=(y,y), xytext=(y-0.5, y+0.2))\n\n# 0,1 a složená čísla\nplt.plot(\n    [0, 1, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18],\n    [0, 1, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18],\n    'g+'\n)\n\n# nastavení a popis os\nplt.axis([0, 20, 0, 20])\nplt.xlabel('pořadí')\nplt.ylabel('(prvo)čísla')\n\n# vykreslení grafu\nplt.show()</pre>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Nebo jinak řečeno – sám od sebe „plotí“ <em>matplotlib</em> vždy do stejného výstupního obrázku, takže výstup každého volání funkce <em>plot()</em> skončí ve stejném grafu. Dá se to samozřejmě změnit.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Funkci <em>annotate()</em> jsem zde doplnil o posun zobrazeného popisku vůči výchozímu místu pomocí atributu <code>xytext</code> – výsledek je (snad) čitelnější. Obecně to ale zjevně nepůjde napočítat pro všechny popisky stejně. (A <em>zip()</em> vás už pak nebude zachraňovat. Na druhou stranu málokdy budete popisovat všechno a ještě stejným způsobem.)\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Druhý graf používá pro zobrazení bodů zelené křížky (<em>g+</em>), ať si vyzkoušíme také něco jiného.\r\n        </div></div></div>\r\n\r\n</div>"
     },
@@ -87,7 +86,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">IIb – legenda</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Když už máme v jednom grafu vyneseno vícero různých věcí, sluší se je popsat:\r\n    </p>\r\n    <img src=\"_files/matplotlib/plot-04b.png\" width=\"50%\" height=\"50%\" alt=\"plot-04b.py\">\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nimport matplotlib.pyplot as plt\n\n# prvočísla\nax, ay = [2, 3, 5, 7, 11, 13, 17, 19], [2, 3, 5, 7, 11, 13, 17, 19]\nplt.plot(ax, ay, 'ro', label='prvočísla')\nfor x, y in zip(ax, ay):\n    plt.annotate(y, xy=(y,y), xytext=(y-0.5, y+0.2))\n\n# 0,1 a složená čísla\nplt.plot(\n    [0, 1, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18],\n    [0, 1, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18],\n    'g+',\n    label='složená čísla a 0 s 1'\n)\n\n# nastavení a popis os\nplt.axis([0, 20, 0, 20])\nplt.xlabel('pořadí')\nplt.ylabel('(prvo)čísla')\n\n# vykreslení grafu\nplt.legend()\nplt.show()</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Popis jednotlivých grafů zajistí parametr <em>label</em> příslušné funkce <code>plt.plot()</code>. Nicméně teprve volání <code>plt.legend()</code> způsobí jejich zobrazení.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -98,7 +97,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">IIc – popisky os a mřížka</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ještě upravíme popisky hodnot na osách a přidáme mřížku pro snažsí orientaci v grafu (ne že by to tedy tento jednoduchý potřeboval):\r\n    </p>\r\n    <img src=\"_files/matplotlib/plot-04c.png\" width=\"50%\" height=\"50%\" alt=\"plot-04c.py\">\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nimport matplotlib.pyplot as plt\n\n# prvočísla\nax, ay = [2, 3, 5, 7, 11, 13, 17, 19], [2, 3, 5, 7, 11, 13, 17, 19]\nplt.plot(ax, ay, 'ro', label='prvočísla')\nfor x, y in zip(ax, ay):\n    plt.annotate(y, xy=(y,y), xytext=(y-0.5, y+0.2))\n\n# 0,1 a složená čísla\nplt.plot(\n    [0, 1, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18],\n    [0, 1, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18],\n    'g+',\n    label='složená čísla a 0 s 1'\n)\n\n# nastavení a popis os\nplt.axis([0, 20, 0, 20])\nplt.xticks(range(21))\nplt.yticks(range(21))\nplt.grid(linestyle='dotted')\nplt.xlabel('pořadí')\nplt.ylabel('(prvo)čísla')\n\n# vykreslení grafu\nplt.legend()\nplt.show()</pre>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Rozumnější popisky hodnot zajistily metody <code>plt.xticks()</code> a <code>plt.yticks()</code> ve spolupráci s uvedením rozsahů os <code>plt.axis()</code> – spočítejte si uvedené <em>range</em>, abyste viděli proč.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Mřížku v grafu nastavuje metoda <code>plt.grid()</code>. Její parametr <em>linestyle</em> je pouze jeden z mnoha.\r\n        </div></div></div>\r\n\r\n</div>"
     },
@@ -107,9 +106,9 @@
       "idx": 9,
       "title": "IId – vlastnosti textů",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">IId – vlastnosti textů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        V případě potřeby (typicky třebas u datumů) je možno (nejen) popisky os zarotovat či jim vůbec změnit písmo. Ne že by to byl vždycky dobrý nápad ^_~\r\n    </p>\r\n    <img src=\"_files/matplotlib/plot-04d.png\" width=\"50%\" height=\"50%\" alt=\"plot-04d.py\">\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nimport matplotlib.pyplot as plt\n\n# prvočísla\nax, ay = [2, 3, 5, 7, 11, 13, 17, 19], [2, 3, 5, 7, 11, 13, 17, 19]\nplt.plot(ax, ay, 'ro', label='prvočísla')\nfor x, y in zip(ax, ay):\n    plt.annotate(y, xy=(y,y), xytext=(y-0.5, y+0.2), color='blue', rotation=30)\n\n# 0,1 a složená čísla\nplt.plot(\n    [0, 1, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18],\n    [0, 1, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18],\n    'g+',\n    label='složená čísla a 0 s 1'\n)\n\n# nastavení a popis os\nplt.axis([0, 20, 0, 20])\nplt.xticks(range(21), rotation=-60)\nplt.yticks(range(21))\nplt.grid(linestyle='dotted')\nplt.xlabel('pořadí', color='gray')\nplt.ylabel('(prvo)čísla', fontsize='x-large', color='gray')\n\n# vykreslení grafu\nplt.legend()\nplt.show()</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        U rotace kromě číselné hodnoty úhlu otočení můžete též použít řetězce <code>\"horizontal\"</code> (neboli 0; výchozí nastavení) a <code>\"vertical\"</code>. U velikosti fontu zase kromě čísel typicky CSSkové řetězcové hodnoty. Blíže viz <a href=\"https://matplotlib.org/stable/tutorials/text/text_props.html\" class=\"external\">dokumentace</a>.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -121,7 +120,7 @@
         "Core",
         "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">III – více obrázků v jednom</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jednotlivé výstupní obrázky je také možno rozdělit na (obdélníkovou) síť a umísťovat grafy na konkrétní místo metodou <em>subplot(ŘÁDKŮ, SLOUPCŮ, ČísloBuňky)</em>, jak ukazuje následující příklad mírně upravený <a href=\"http://matplotlib.org/examples/subplots_axes_and_figures/subplot_demo.html\" class=\"external\">podle dokumentace</a>:\r\n    </p>\r\n    <img src=\"_files/matplotlib/example_subplot.png\" width=\"50%\" height=\"50%\" alt=\"example_subplot.py\">\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\n\"\"\"\nSimple demo with multiple subplots.\n\"\"\"\nimport numpy as np\nimport matplotlib.pyplot as plt\n\n# 1. tlumené kmitání\nx1 = np.linspace(0.0, 5.0)\ny1 = np.cos(2 * np.pi * x1) * np.exp(-x1)\nplt.subplot(2, 1, 1)\nplt.plot(x1, y1, 'yo-')\nplt.title('A tale of 2 subplots')\nplt.ylabel('Damped oscillation')\n\n# 2. netlumené kmitání\nx2 = np.linspace(0.0, 2.0)\ny2 = np.cos(2 * np.pi * x2)\nplt.subplot(2, 1, 2)\nplt.plot(x2, y2, 'r.-')\nplt.xlabel('time (s)')\nplt.ylabel('Undamped')\n\n# vykreslení grafu\nplt.show()</pre>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Nejzajímavější novinkou v tomto kódu je umístění dvou grafů do jednoho výstupního obrázku pomocí metody <em>subplot()</em>. K ní jedno upozornění – dá se zavolat i poněkud šíleným zkráceným způsobem bez čárek mezi parametry, zde tedy jako <em>subplot(211)</em> a <em>subplot(212)</em> 0_o\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Další novinkou je doplnění grafu o spojnicovou čáru mezi body použitím parametrů plotu <code>yo-</code>, resp. <code>r.-</code>.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Jinak uvedený graf používá pro výpočet požadovaných hodnot knihovnu <a href=\"/materialy/python/numpy/overview.xml\">NumPy</a> (která zjevně zvládá mimo jiné i výpočet celé množiny hodnot najednou jedním příkazem), ale to je další obrovská kapitola sama pro sebe.\r\n        </div></div></div>\r\n\r\n</div>"
     },
@@ -132,7 +131,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">IVa – více os (kopie)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Někdy se může hodit zopakovat osu s popiskami i na druhé straně grafu. Je pak ale třeba příslušné dvě osy řešit přímo na podčásti grafu věnované osám, proto ono volání <code>plt.subplots()</code> v následujícím kódu:\r\n    </p>\r\n    <img src=\"_files/matplotlib/plot-05a.png\" width=\"50%\" height=\"50%\" alt=\"plot-05a.py\">\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nimport matplotlib.pyplot as plt\n\n# (implementační) podčásti grafu\nfig, osy = plt.subplots(constrained_layout=True)\n\n# prvočísla\nax, ay = [2, 3, 5, 7, 11, 13, 17, 19], [2, 3, 5, 7, 11, 13, 17, 19]\nosy.plot(ax, ay, 'ro', label='prvočísla')\nfor x, y in zip(ax, ay):\n    osy.annotate(y, xy=(y,y), xytext=(y-0.5, y+0.2))\n\n# 0,1 a složená čísla\nosy.plot(\n    [0, 1, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18],\n    [0, 1, 4, 6, 8, 9, 10, 12, 14, 15, 16, 18],\n    'g+',\n    label='složená čísla a 0 s 1'\n)\n\n# nastavení a popis os\nosy.axis([0, 20, 0, 20])\nosy.set_xticks(range(21))\nosy.set_yticks(range(21))\nosy.grid(linestyle='dotted')\nosy.set_xlabel('pořadí')\nosy.set_ylabel('(prvo)čísla')\n\n# druhá osa X nahoře\nosax2 = osy.secondary_xaxis('top')\nosax2.set_xticks(range(21))\nosax2.set_xlabel('pořadí')\n\n# vykreslení grafu\nosy.legend()\nplt.show()</pre>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Čistě teoreticky stačí na zobrazení osy jen samotné volání <code>secondary_xaxis()</code>, ale popisky jsou pak <a href=\"?slajd=8\">nevyhovující</a>.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Kdo ví proč mají všechny metody pro nastavení popisek u sebe předponu <em>set_</em>, ačkoli se jinak jmenují stejně (a dělají prakticky totéž) jako metody přímo na grafu.\r\n        </div></div></div>\r\n\r\n</div>"
     },
@@ -141,9 +140,10 @@
       "idx": 12,
       "title": "IVb – více os (změna měřítka)",
       "tags": [
-        "Skip"
+        "Core",
+        "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">IVb – více os (změna měřítka)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        A ještě jindy má zopakovaná osa význam v tom, že na ní můžeme třeba uvést údaje v jiných jednotkách:\r\n    </p>\r\n    <img src=\"_files/matplotlib/plot-05b.png\" width=\"50%\" height=\"50%\" alt=\"plot-05b.py\">\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nimport numpy as np\nimport matplotlib.pyplot as plt\n\n# (implementační) podčásti grafu\nfig, osy = plt.subplots(constrained_layout=True)\n\n# graf funkce cosinus\nPOINTS = 50\nx = np.linspace(0.0, 2 * np.pi, num=POINTS)\ny = np.cos(x)\nosy.plot(x, y, 'r.-')\n\n# osa y a první osa x dole\nosy.set_xlim(0, 2 * np.pi)\nosy.set_ylim(-1, 1)\nosy.set_xticks(ticks=[0, np.pi/2, np.pi, 3*np.pi/2, 2*np.pi], labels=['0', 'π/2', 'π', '3π/2', '2π'])\nosy.set_xlabel('úhel (rad)')\nosy.set_ylabel('amplituda')\n\n# druhá osa X nahoře\nosax2 = osy.secondary_xaxis('top')\nosax2.set_xticks(ticks=osy.get_xticks(), labels=[0, 90, 180, 270, 360])\nosax2.set_xlabel('úhel (°)')\n\n# vykreslení grafu\nosy.grid(linestyle='dotted')\nplt.show()</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Čistě teoreticky by to mělo jít i pomocí druhého konverzního parametru <em>functions</em>, nějak jako..\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">def deg2rad(x):\n    return x * np.pi / 180\n\ndef rad2deg(x):\n    return x * 180 / np.pi\n\nosax2 = osy.secondary_xaxis('top', functions=(rad2deg, deg2rad))</pre>\r\n        ..nicméně s pozměněnými popiskami prvotní osy jsem chování této úpravy ve svém věku již jaksi nelousknul… (A <a href=\"https://matplotlib.org/stable/gallery/subplots_axes_and_figures/secondary_axis.html\" class=\"external\">oficiální příklad</a> nepomohl.)\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -152,7 +152,8 @@
       "idx": 13,
       "title": "V – časová osa",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -175,9 +176,10 @@
       "idx": 15,
       "title": "VII – pokročilé funkce",
       "tags": [
-        "Skip"
+        "Core",
+        "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">VII – pokročilé funkce</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ukažme si ještě jeden (upravený) <a href=\"http://matplotlib.org/examples/showcase/integral_demo.html\" class=\"external\">demo-příklad z dokumentace</a>:\r\n    </p>\r\n    <img src=\"_files/matplotlib/showcase_integral.png\" width=\"50%\" height=\"50%\" alt=\"showcase_integral.py\">\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\n\"\"\"\nPlot demonstrating the integral as the area under a curve.\n\nAlthough this is a simple example, it demonstrates some important tweaks:\n\n    * A simple line plot with custom color and line width.\n    * A shaded region created using a Polygon patch.\n    * A text label with mathtext rendering.\n    * figtext calls to label the x- and y-axes.\n    * Use of axis spines to hide the top and right spines.\n    * Custom tick placement and labels.\n\"\"\"\nimport numpy as np\nimport matplotlib.pyplot as plt\nfrom matplotlib.patches import Polygon\n\ndef func(x):\n    return (x - 3) * (x - 5) * (x - 7) + 85\n\na, b = 2, 9 # integral limits\nx = np.linspace(0, 10)\ny = func(x)\n\nfig, ax = plt.subplots()\nplt.plot(x, y, 'r', linewidth=2)\nplt.ylim(bottom=0)\n\n# Make the shaded region\nix = np.linspace(a, b)\niy = func(ix)\nverts = [(a, 0)] + list(zip(ix, iy)) + [(b, 0)]\npoly = Polygon(verts, facecolor='0.9', edgecolor='0.5')\nax.add_patch(poly)\n\nplt.text(0.5 * (a + b), 30, r\"$\\int_a^b f(x)\\mathrm{d}x$\",\n        horizontalalignment='center', fontsize=20)\n\nplt.figtext(0.9, 0.05, '$x$')\nplt.figtext(0.1, 0.9, '$y$')\n\nax.spines['right'].set_visible(False)\nax.spines['top'].set_visible(False)\nax.xaxis.set_ticks_position('bottom')\n\nax.set_xticks((a, b))\nax.set_xticklabels(('$a$', '$b$'))\nax.set_yticks([])\n\nplt.show()</pre>\r\n\r\n</div>"
     },

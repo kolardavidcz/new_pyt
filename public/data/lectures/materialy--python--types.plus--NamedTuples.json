@@ -30,9 +30,9 @@
       "idx": 2,
       "title": "Jména prvků",
       "tags": [
-        "Tricky"
+        "Skip"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Jména prvků</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Z předchozího příkladu je vidět, že:\r\n    </p>\r\n    <blockquote>\r\n        K prvkům pojmenované n-tice se podle jména přistupuje stejně jako u atributů tříd přes tečkovou notaci, tzn. že <strong>jméno prvku musí být validní pythoní identifikátor s výjimkou těch, jejichž jméno začíná na podtržítko</strong>.\r\n    </blockquote>\r\n    <p>\r\n        Omezení na jména bez podtržítka je založené na tom, že podtržítkovaná jména jsou typicky vyhrazena pro pracovní či skryté vlastnosti objektů, a právě proto všechny pomocné metody objektu <em>namedtuple</em> začínají na podtržítka.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Dvě metody toto omezení nesplňují – <em>count()</em> a <em>index()</em>. Jsou to pochopitelně právě <a href=\"/materialy/python/types/tuples.xml?slajd=7\">jediné dvě metody</a> vlastní typu <em>n-tice</em>.\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Z prakticky stejného důvodu musí být pochopitelně <strong>jednotlivá jména jedinečná</strong> (bez duplikátů).\r\n    </p>\r\n\r\n</div>"
     },
@@ -41,9 +41,10 @@
       "idx": 3,
       "title": "Jména prvků – parametr „_fields“",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Jména prvků – parametr „_fields“</h2></div><div class=\"section-body\">\r\n\r\n    <p data-diff=\"newconcept\">\r\n        Jména jednotlivých prvků je možno jak z konstruktoru pojmenované n-tice, tak přímo z konkrétní instance vytáhnout pomocí parametru <strong><code>_fields</code></strong>:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; Bod = namedtuple('Bod3D', 'x y z')\n&gt;&gt;&gt; Bod._fields\n('x', 'y', 'z')\n\n&gt;&gt;&gt; bod = Bod(x=1, y=2, z=3)\n&gt;&gt;&gt; bod\nBod3D(x=1, y=2, z=3)\n&gt;&gt;&gt; bod._fields\n('x', 'y', 'z')</pre>\r\n    <p>\r\n        Vrácený objekt je n-tice, což umožňuje se jmény dále snadno pracovat.\r\n    </p>\r\n\r\n</div>"
     },
@@ -52,10 +53,9 @@
       "idx": 4,
       "title": "Zavedení I",
       "tags": [
-        "Core",
-        "WOW"
+        "Skip"
       ],
-      "diff": "pythonic",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Zavedení I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zavést novou pojmenovanou n-tici znamená určit jméno jejího typu a jména jejích prvků:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">nt = collections.namedtuple('JménoTypu', 'jména jednotlivých prvků')</pre>\r\n    <p>\r\n        Přitom jména prvků lze zadat několika různými způsoby:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \"># řetězec jmen oddělených mezerami\n&gt;&gt;&gt; NT = namedtuple('Bod3D', 'x y z')\n&gt;&gt;&gt; NT._fields\n('x', 'y', 'z')\n\n# řetězec jmen oddělených čárkou\n&gt;&gt;&gt; NT = namedtuple('Bod3D', 'x,y,z')\n&gt;&gt;&gt; NT._fields\n('x', 'y', 'z')\n&gt;&gt;&gt; NT = namedtuple('Bod3D', 'x, y, z')\n&gt;&gt;&gt; NT._fields\n('x', 'y', 'z')\n\n# ze sekvence řetězců\n&gt;&gt;&gt; NT = namedtuple('Bod3D', ['x', 'y', 'z'])\n&gt;&gt;&gt; NT._fields\n('x', 'y', 'z')\n&gt;&gt;&gt; NT = namedtuple('Bod3D', ('x', 'y', 'z'))\n&gt;&gt;&gt; NT._fields\n('x', 'y', 'z')</pre>\r\n\r\n</div>"
     },
@@ -77,7 +77,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "basics",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Zavedení II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Konstruktor pojmenované n-tice může dostat ještě jeden (pojmenovaný) parametr – <strong>rename</strong>. Jeho výchozí nastavení je <code>False</code> a nijak se neprojevuje, ale při přepnutí na <code>True</code> způsobí, že nevyhovující jména prvků budou automaticky přejmenována:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            a) nepovolená jména\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; student = namedtuple('Student', 'name class age gender')\nTraceback (most recent call last):\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\n  File \"/usr/lib/python3.4/collections/__init__.py\", line 341, in namedtuple\n    'keyword: %r' % name)\nValueError: Type names and field names cannot be a keyword: 'class'\n\n&gt;&gt;&gt; student = namedtuple('Student', 'name class age gender', rename=True)\n&gt;&gt;&gt; student._fields\n('name', '_1', 'age', 'gender')</pre>\r\n        </li>\r\n        <li>\r\n            b) duplikace jmen\r\n            <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; student = namedtuple('Student', 'name age gender age')\nTraceback (most recent call last):\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\n  File \"/usr/lib/python3.4/collections/__init__.py\", line 348, in namedtuple\n    raise ValueError('Encountered duplicate field name: %r' % name)\nValueError: Encountered duplicate field name: 'age'\n\n&gt;&gt;&gt; student = namedtuple('Student', 'name age gender age', rename=True)\n&gt;&gt;&gt; student._fields\n('name', 'age', 'gender', '_3')</pre>\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Podle <a href=\"http://pymotw.com/2/collections/namedtuple.html\" class=\"external\">PyMOTW</a>.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -86,8 +86,7 @@
       "idx": 7,
       "title": "Přiřazení hodnot",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -111,7 +110,7 @@
       "title": "„_replace()“ – záměna hodnot",
       "tags": [
         "Core",
-        "Tricky"
+        "WOW"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -122,9 +121,10 @@
       "idx": 10,
       "title": "Další příklady",
       "tags": [
-        "Skip"
+        "Core",
+        "WOW"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Další příklady</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Výpisu jmen prvků pomocí <em>_fields</em> jde použít k „subklásování“:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; Bod2D = namedtuple('Bod2D', 'x y')\n&gt;&gt;&gt; Bod2D._fields\n('x', 'y')\n\n&gt;&gt;&gt; Bod3D = namedtuple('Bod3D', Bod2D._fields + ('z',))\n&gt;&gt;&gt; Bod3D._fields\n('x', 'y', 'z')</pre>\r\n    \r\n    <p class=\"enumerate\">\r\n        Pomocí <em>_replace()</em> zase můžete simulovat výchozí hodnoty:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; Account = namedtuple('Account', 'owner balance transaction_count')\n\n# výchozí pojmenovaná n-tice s předpřipravenými hodnotami\n&gt;&gt;&gt; default_account = Account('&lt;owner name&gt;', 0.0, 0)\n&gt;&gt;&gt; default_account\nAccount(owner='&lt;owner name&gt;', balance=0.0, transaction_count=0)\n\n# výroba nového objektu – část hodnot výchozí, část nová\n&gt;&gt;&gt; johns_account = default_account._replace(owner='John')\n&gt;&gt;&gt; johns_account\nAccount(owner='John', balance=0.0, transaction_count=0)</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Podle dokumentace.\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        A konečně můžete pojmenovanou n-tici natvrdo podědit a upravit její funkcionalitu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class Point(namedtuple('Point', 'x y')):\n...     __slots__ = ()\n...     @property\n...     def hypot(self):\n...         return (self.x ** 2 + self.y ** 2) ** 0.5\n...     def __str__(self):\n...         return 'Point: x=%6.3f  y=%6.3f  hypot=%6.3f' % (self.x, self.y, self.hypot)\n...\n&gt;&gt;&gt; for p in Point(3, 4), Point(14, 5/7):\n...     print(p)\n...\nPoint: x= 3.000  y= 4.000  hypot= 5.000\nPoint: x=14.000  y= 0.714  hypot=14.018</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Přímo z dokumentace.\r\n    </div></div>\r\n\r\n</div>"
     }

@@ -7,9 +7,9 @@
       "idx": 0,
       "title": "Výhody a nevýhody DOMu",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "paradigm",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Výhody a nevýhody DOMu</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    DOM má jednu ohromnou nevýhodu a zároveň i výhodu – zpracovávaný dokument musí být celý načten do paměti (byť třeba poodkládané na disk). Jakákoliv část dokumentu totiž musí být při zpracování dostupná.\r\n  </p>\r\n  <p>\r\n    To na jedné straně umožňuje provozovat operace, které by jinak nešly (XPath-dotazy nad strukturou, XSLT-transformace, aplikace na struktuře závislých CSS-pravidel…), na druhé straně se však může vyznačovat až prohibitivními nároky na paměť.\r\n  </p>\r\n\r\n</div>"
     },
@@ -18,9 +18,9 @@
       "idx": 1,
       "title": "Enter SAX",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "paradigm",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Enter SAX</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    V případech, kdy nepotřebujeme přístup k celé struktuře dokumentu najednou (např. získání zapsaných údajů z XML nebo výměna přesně určených elementů/atributů za předem známé jiné), můžeme s výhodou použít paměťově méně náročný (a nejen díky tomu často i mnohem rychlejší) <strong>lineární přístup ke XML-dokumentu</strong> pomocí (skoro)standardu <strong>SAX</strong> (<em>Simple API for XML</em>).\r\n  </p>\r\n\r\n</div>"
     },
@@ -31,7 +31,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Princip</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    Princip SAXu spočívá v tom, že SAX-parser načítá dokument po (malých) částech a signalizuje, pokud narazí na XML-významnou strukturu:\r\n  </p>\r\n  <ul>\r\n    <li>textové listy</li>\r\n    <li>elementy včetně jejich atributů</li>\r\n    <li>komentáře</li>\r\n    <li>procesní instrukce</li>\r\n  </ul>\r\n  <p>\r\n    Vy jako uživatel pak můžete SAX-parseru předepsat, co má při daných událostech vykonat.\r\n  </p>\r\n\r\n</div>"
     },
@@ -42,7 +42,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Načítání XML v Python'u</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    V Pythonu v typických případech stačí vytvořit potomka třídy <code>xml.sax.ContentHandler</code>, kterého vybavíte metodami pro ošetření začátku a konce elementu a textového obsahu:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">class MyHandler(xml.sax.ContentHandler):\n\n    def startElement(self, name, attrs):\n        ...\n\n    def endElement(self, name):\n        ...\n\n    def characters(self, data):\n        ...</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Přitom nemusíte vždy implementovat všechny metody, stačí pouze ty, které se vám zrovna hodí. Zajímá-li vás tudíž například zrovna pouze hodnota nějakého atributu, stačí nadefinovat pouze metodu <code>startElement()</code>.\r\n  </div></div>\r\n  \r\n  <p>\r\n    Zatímco <code>name</code> a <code>data</code> jsou řetězce (název elementu a jeho textový obsah), objekt <code>attrs</code> představující atributy daného elementu se na oko tváří jako slovník, ale není to tak úplně pravda, viz seznam jeho vlastností:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false;\">[ '__contains__', '__doc__', '__getitem__', '__init__', '__len__', '__module__', '_attrs', 'copy', 'get', 'getLength', 'getNameByQName', 'getNames', 'getQNameByName', 'getQNames', 'getType', 'getValue', 'getValueByQName', 'has_key', 'items', 'keys', 'values' ]</pre>\r\n  <p>\r\n    Typický cyklus přes atributy a jejich hodnoty tak bude nejspíše v této podobě:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">for key, item in attrs.items():</pre>\r\n\r\n</div>"
     },
@@ -53,7 +53,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Ukázka</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Konkrétní použití vámi napsaného SAX-handleru pak může vypadat například takto:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">import xml.sax\n\nclass MyHandler(xml.sax.ContentHandler):\n\n    def startElement(self, name, attrs):\n        print( 'START:', name )\n\n    def endElement(self, name):\n        print( 'END:', name )\n\n    def characters(self, data):\n        print( data )\n\nfilename = \"soubor.xml\"\nhandler = MyHandler()\nxml.sax.parse( filename, handler )</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Uvedený kód uvodí na výpise každý počáteční element nápisem <em>START</em>, každý koncový <em>END</em> a texty uvnitř elementů jednoduše přetiskne.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -65,7 +65,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "paradigm",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Poznámky</h2></div><div class=\"section-body\">\r\n  \r\n  <ul>\r\n    <li>Z principu věci je ale SAX zřejmě jednosměrný – pokud cestou zjistíte, že potřebujete nějakou předchozí informaci a nezapamatovali jste si ji, máte smůlu a musíte začít dokument parsovat znovu od začátku.</li>\r\n    <li>Navíc SAX nemá ani nejmenší tušení o kontextu – jestli chcete sledovat třeba úroveň aktuálního zanoření (v rámci stromečku elementů), musíte se o to postarat sami.</li>\r\n  </ul>\r\n  \r\n  <p>\r\n    PS: Rozhraní SAX v Python'u podporuje i jmenné prostory nebo tvorbu výstupních XML-dokumentů.\r\n  </p>\r\n\r\n</div>"
     },
@@ -74,10 +74,10 @@
       "idx": 6,
       "title": "Příklad – reprodukce stromečkové struktury",
       "tags": [
-        "Skip",
+        "Core",
         "Already Studied"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": {
         "lecture_id": "lecture:materialy--web--xml--overview",
         "lecture_title": "materialy--web--xml--overview",

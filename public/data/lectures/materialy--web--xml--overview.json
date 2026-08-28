@@ -20,7 +20,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Struktura XML-souboru I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Strukturu XML-souboru, kerý je jinak v podstatě <strong>zakořeněným stromem elementů</strong>, asi nejlépe vystihuje následující přirovnání Míly Niče:\r\n    </p>\r\n    <blockquote>\r\n        „XML-soubor je tvořen různě oštítkovanými (<em>atributy</em>) krabicemi (<em>elementy</em>) zanořenými navzájem do sebe bez proboření stěn (<em>well-formed</em>), přičemž vnější krabice je právě jedna (<em>kořenový element</em>).”\r\n    </blockquote>\r\n    <p>\r\n        Pokud navíc tyto „krabice“ odpovídají nějaké předem nadefinované struktuře, říkáme navíc, že uvedené XML je <em>validní</em> (<em>valid</em>).\r\n    </p>\r\n\r\n</div>"
     },
@@ -40,9 +40,10 @@
       "idx": 3,
       "title": "Struktura XML-souboru III",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": "basics",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Struktura XML-souboru III</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Požadavek „neprobořených stěn krabic“ – tedy <strong>nepřekřížených elementů</strong> – ústící v tzv. <strong>dobře naformátovaný XML-dokument</strong> (<em>well-formed document</em>) je vlastně základem pro to, aby struktura XML-souboru byla vůbec rozumně reprezentovatelná jako strom. Pro příklad <a href=\"?slajd=3\">z předchozího slajdu</a>:\r\n    </p>\r\n    <img src=\"../_files/xml-stromecek.smaller.png\" width=\"580\" height=\"304\" alt=\"\" title=\"\">\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Hranaté obdélníky jsou elementy („krabice“), elipsy atributy těchto elementů („štítky“) a zakulacené obdélníky jsou koncové textové listy stromu.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -73,9 +74,10 @@
       "idx": 6,
       "title": "Bílé znaky a smíšený obsah I",
       "tags": [
+        "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Bílé znaky a smíšený obsah I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ač to na první pohled může být překvapivé, následující dvě ukázky XML-souboru nejsou stejné:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">&lt;kořen&gt;&lt;jméno&gt;Pirát&lt;/jméno&gt;&lt;příjmení&gt;Pirátovič&lt;/příjmení&gt;&lt;/kořen&gt;\n\n&lt;kořen&gt;\n    &lt;jméno&gt;Pirát&lt;/jméno&gt;\n    &lt;příjmení&gt;Pirátovič&lt;/příjmení&gt;\n&lt;/kořen&gt;</pre>\r\n    <p>\r\n        Ve druhé z nich je totiž navíc kolem elementů <code>&lt;jméno&gt;</code> a <code>&lt;příjmení&gt;</code> ještě několik odřádkování a mezer (případně též tabulátorů). Těmto znakům se souhrnně říká <strong>bílé znaky</strong> (<em>white spaces</em>) a chování XML-parserů vůči nim je jednou z nejsložitějších částí zpracování XML-dokumentů.\r\n    </p>\r\n\r\n</div>"
     },
@@ -84,9 +86,10 @@
       "idx": 7,
       "title": "Bílé znaky a smíšený obsah II",
       "tags": [
+        "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Bílé znaky a smíšený obsah II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Člověku je na první pohled jasné, že v našem ukázkovém příkladu jsou všechny přebytečné mezery a nové řádky jen pro usnadnění čtení (člověku). Ale z následujícího fragmentu HTML, který obsahuje tzv. <strong>smíšený obsah</strong> (<em>mixed content</em>; elementy a textové listy na stejné úrovni zanoření v rámci stromu a hned vedle sebe)..\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">&lt;p&gt;\n    Tohle je &lt;em&gt;zvýrazněný&lt;/em&gt; text a &lt;a href=\"/\"&gt;tohle je odkaz&lt;/a&gt;.\n&lt;/p&gt;</pre>\r\n    <p>\r\n        ..je vidět, že někdy (a poměrně často :-) jsou bílé znaky důležité.\r\n    </p>\r\n    <p>\r\n        Zpracování smíšeného obsahu a bílých znaků je obecně velmi složité a problematické, ale z praktického hlediska pro běžné použití se dá shrnout do celkem jednoduché zásady:\r\n    </p>\r\n    <blockquote>\r\n        Není-li někde (ve schématu pro daný XML-dokument, v přepínači DOM-stroje zpracovávajícího daný XML-dokument…) řečeno jinak, <strong>všechny bílé znaky ve zdrojovém XML-dokumentu jsou významné</strong>.\r\n    </blockquote>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        V praxi (a podle příslušného schématu) jsou pak často bílé znaky na některých místech zcela zahozeny (jako zjevně v našem ukázkovém příkladu), jinde zase naopak „scucnuty“ do mezery jediné a ještě jinde jsou ponechány zcela beze změny.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -97,7 +100,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Atributy</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Uvozovací elementy párových nebo elementy nepárové mohou být doplněny o tzv. <strong>atributy</strong>:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">&lt;element atribut=\"hodnota atributu\"&gt;\n    …\n&lt;/element&gt;\n\n&lt;element atribut='hodnota atributu' /&gt;</pre>\r\n    <p>\r\n        Pro jejich použití platí následující pravidla:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Pro jména atributů platí stejná omezení jako pro jména elementů – povoleny jsou pouze písmena, číslice, pomlčky (mínus), podtržítka a tečky, dvojtečka pouze při označení jmenného prostoru, jméno může začínat pouze na písmeno a nesmí začínat sekvencí <em>xml</em> (v libovolné kombinaci velikostí písmen).\r\n        </li>\r\n        <li>\r\n            Atribut je od své hodnoty oddělen znakem <code>=</code> (rovnítko).\r\n        </li>\r\n        <li>\r\n            Hodnota atributu je uzavřena v jednoduchých (<code>'</code>) nebo dvojtých (<code>\"</code>) uvozovkách. (Obsahuje-li sama uvozovky, musí pro uzavření hodnoty atributu býti použity ty druhé.)\r\n        </li>\r\n        <li>\r\n            Počet atributů na elementu není nijak omezen.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Co se bílých znaků v hodnotách atributů týká, není situace o moc jednodušší než u elementů. Stručně se dá říci, že čím jednodušší hodnoty atributů budete mít (pokud atributy vůbec použijete), tím lépe pro vás.\r\n    </p>\r\n\r\n</div>"
     },
@@ -117,7 +120,7 @@
       "idx": 10,
       "title": "Komentáře",
       "tags": [
-        "Tricky"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -141,7 +144,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">XML jako metajazyk</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zatím jsme v ukázkách viděli jakási nepravděpodobná uskupení elementů (a atributů), která se však řídila jistými pravidly zápisu. A o tom XML právě je:\r\n    </p>\r\n    <blockquote>\r\n        XML není přímo jeden konkrétní jazyk – je to tak zvaný <strong>metajazyk</strong>, tedy jazyk sloužící k navrhování jiných jazyků (které pak už jsou přímo těmi XML-jazyky).\r\n    </blockquote>\r\n    <p>\r\n        Příkladem konkrétních jazyků postavených na základech XML budiž třeba:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <em>SVG</em> – jazyk sloužící k deklarativnímu zápisu vektorové grafiky;\r\n        </li>\r\n        <li>\r\n            <em>MathML</em> – jazyk určený pro zápis matematických rovnic;\r\n        </li>\r\n        <li>\r\n            <em>XHTML</em> – striktní varianta HTML postavená na pravidlech parsování XML;\r\n        </li>\r\n        <li>\r\n            …\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -172,6 +175,7 @@
       "idx": 15,
       "title": "„Řídicí“ sekvence",
       "tags": [
+        "Core",
         "Tricky"
       ],
       "diff": "newconcept",
@@ -185,7 +189,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Struktura dokumentu a jeho validace</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Je zjevné, že abychom mohli XML-jazyky více využívat (a třeba je vyměňovat mezi aplikacemi), tak musíme vědět, jakou strukturu ten který jazyk má, tedy jaké elementy a atributy a s jakým obsahem jsou kde povolené. K tomu potřebujeme dvě věci:\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Za prvé způsob, jak popsat strukturu dokumentu. Prakticky se to řeší několika dalšími standardními jazyky:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <a href=\"/materialy/web/xml/dtd.xml\">DTD</a> – historicky nejstarší, v jistých ohledech nejjednodušší, ne příliš mocný a stále ještě možná nejpoužívanější způsob;\r\n        </li>\r\n        <li>\r\n            <a href=\"/materialy/web/xml/xmlschema.xml\">XMLSchema</a> – oficiální moderní standard; neuvěřitelně komplikovaný a zbytečně rozsáhlý – jeho snad jedinou užitečnou vlastností je výčet mnoha různých datových typů;\r\n        </li>\r\n        <li>\r\n            <a href=\"/materialy/web/xml/relaxng.xml\">RelaxNG</a> – alternativní způsob popisu struktury XML-dokumentů, který ovšem díky své jednoduchosti, eleganci a rozšiřitelnosti strčí všechny ostatní do kapsy;\r\n        </li>\r\n        <li>\r\n            <a href=\"/materialy/web/xml/schematron.xml\">Schematron</a> – zcela odlišný (a také velice elegantní) způsob popisu struktury dokumentu; díky svému přístupu dokáže popsat řádově větší množinu vlastností dokumentů než všechny ostatní.\r\n        </li>\r\n    </ul>\r\n    \r\n    <p class=\"enumerate\">\r\n        A za druhé pak nástroje, které jsou schopné zkontrolovat, zda se vytvořený XML-dokument drží struktury mu předepsané (takovýto dokument se pak nazývá <strong>validní</strong>):\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            existují nástroje, které na vyžádání provedou zvolený způsob validace (např. <em>xmllint</em>);\r\n        </li>\r\n        <li>\r\n            některé dedikované XML-editory (např. <em>Oxygen</em>) mají validaci zabudovanou.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -207,7 +211,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Vzhled a transformace dokumentu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        XML-dokumenty v prostředí webu nemají obecně předepsáno, jak by se měly zobrazit (pokud se samozřejmě nedíváte na konkrétní formát odpovídajícím programem, např. SVG-obrázek v prohlížeči). Záleží samozřejmě na cílovém použití daného dokumentu (často vůbec nemusí být určen k přímému „dívání“), ale v principu jsou k dispozici dvě metody:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            přiřazení vzhledu pro daný zobrazovač některým z jazyků k tomu určeným (např. <a href=\"/materialy/web/css/overview.xml\">CSS</a>);\r\n        </li>\r\n        <li>\r\n            transformací XML-dokumentu do jiného formátu (např. pomocí <a href=\"/materialy/web/xml/xslt.xml\">XSL</a> – zatímco jeho podmnožina <em>XSLT</em> dokáže vytvořit mimo jiné i HTML, <em>XSL-FO</em> je specificky určeno pro tvorbu PDF).\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        PS: Obecný XML-dokument bez přiložené informace o zobrazení by se měl na webu zobrazit pouze v podobě textového obsahu svých elementů. V praxi však skoro všechny prohlížeče místo toho zobrazí pěkně přehledně naformátovanou stromovou strukturu. Důvod je asi ten, že pokud se člověk dívá na nějaké XML, tak chce skutečně spíše vidět jeho strukturu než jen texty bez sémantiky.\r\n    </p>\r\n\r\n</div>"
     }

@@ -84,7 +84,8 @@
       "idx": 7,
       "title": "Kódování",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -118,10 +119,9 @@
       "idx": 10,
       "title": "Příklad (čeština)",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Příklad (čeština)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Podívejme se na zoubek českému slovu <code>svět</code> v kódování UTF-8:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; 'svět'.encode('utf-8')\nb'sv\\xc4\\x9bt'</pre>\r\n    <p>\r\n        Písmenu <code>ě</code> tedy odpovídá sekvence bajtů <code>\\xc4\\x9b</code>, zatímco písmena <code>s</code>, <code>v</code> a <code>t</code> jakožto členy spodní části ASCII-tabulky jsou reprezentována sama sebou. V tomto případě můžeme toto rozdělení vykoukat snadno přímo (pouze jeden znak je zaznamenán dvoubajtově), ale správně ho zjistíme až z odpovídající binární podoby:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \"># s (skutečně začíná na 0, zobrazeno je jenom 7 bitů)\n&gt;&gt;&gt; bin(ord('s'))\n'0b1110011'\n\n# v (skutečně začíná na 0, zobrazeno je jenom 7 bitů)\n&gt;&gt;&gt; bin(ord('v'))\n'0b1110110'\n\n# ě\n&gt;&gt;&gt; bin(int('c4', 16))\n'0b11000100'\n&gt;&gt;&gt; bin(int('9b', 16))\n'0b10011011'\n\n# t (skutečně začíná na 0, zobrazeno je jenom 7 bitů)\n&gt;&gt;&gt; bin(ord('t'))\n'0b1110100'</pre>\r\n    <p>\r\n        Podle algoritmu pro kódování UTF-8 získáme pro jednotlivé znaky odpovídající číslo do unicodové tabulky:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \"># s = '0b01110011'\n&gt;&gt;&gt; int('01110011', 2)\n115\n\n# v = '0b01110110'\n&gt;&gt;&gt; int('01110110', 2)\n118\n\n# ě = '0b11000100' '0b10011011'\n&gt;&gt;&gt; int('00000001', 2) * 256 + int('00011011', 2)\n283\n\n# t = '0b01110100'\n&gt;&gt;&gt; int('01110100', 2)\n116</pre>\r\n    <p>\r\n        Aniž bychom koukali do standardu, jaké znaky těmto unicodovým <em>codepointům</em> odpovídají, můžeme daná čísla přímo použít pro <a href=\"xML.encoding.xml?slajd=5\">znakové HTML-entity</a> <code>&amp;#115; &amp;#118; &amp;#283; &amp;#116;</code>: „svět“\r\n    </p>\r\n\r\n</div>"
     },
@@ -132,7 +132,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Příklad (japonština)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Podívejme se na zoubek japonskému znaku <code>狼</code> (<em>ookami</em> = vlk) v kódování UTF-8:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; '狼'.encode('utf-8')\nb'\\xe7\\x8b\\xbc'</pre>\r\n    <p>\r\n        Jednotlivé bajty mají následující binární podobu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; bin(int('e7', 16))\n'0b11100111'\n&gt;&gt;&gt; bin(int('8b', 16))\n'0b10001011'\n&gt;&gt;&gt; bin(int('bc', 16))\n'0b10111100'</pre>\r\n    <p>\r\n        Podle algoritmu pro kódování UTF-8 získáme odpovídající číslo do unicodové tabulky:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; int('01110010', 2) * 256 + int('11111100', 2)\n29436</pre>\r\n    <p>\r\n        A decimální <code>29436</code> je skutečně <em>codepoint</em> odpovídající v Unicode'u znaku <code>狼</code>.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        O čemž se i bez náhledu do standardu snadno přesvědčíme například použitím daného čísla pro <a href=\"xML.encoding.xml?slajd=5\">znakovou HTML-entitu</a> <code>&amp;#29436;</code>: „狼“\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -152,9 +152,10 @@
       "idx": 13,
       "title": "A co na to Python?",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
-      "diff": "resyntax",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">A co na to Python?</h2></div><div class=\"section-body\">\r\n  \r\n  <p>\r\n    Odpověď je dvojí a nehezká:\r\n  </p>\r\n  <ul>\r\n    <li class=\"py3k\">\r\n      Python 3 – pokud není řečeno jinak, je vše pokládáno za UTF-8. <em>*nirvána*</em>\r\n      <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        I když díky BOMu bohužel zdaleka ne tak úplná, jak by mohla být – viz <a href=\"/materialy/python/pitfalls.xml?slajd=6\">rozdíl mezi kódováními <code>utf-8</code> a <code>utf-8-sig</code></a> 0_o\r\n      </div></div>\r\n    </li>\r\n    <li class=\"py2k\">\r\n      Python 2 – vše je pokládáno za sekvence bajtů v případě potřeby interpretované jako řetězce v aktuálním kódování (to jako vážně!) a pokud vám to nestačí, připravte se na škrábání levou rukou za pravým uchem s nohama svázanýma do kozelce.\r\n      <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        U Python'u 2 vás budou zajímat metody takovéhoto „řetězce“ <em>decode()</em> a <em>encode()</em> plus velmi často systémová knihovna <em>codecs</em>.\r\n      </div></div>\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
     }

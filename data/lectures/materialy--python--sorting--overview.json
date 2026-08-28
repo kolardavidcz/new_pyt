@@ -18,8 +18,7 @@
       "idx": 1,
       "title": "Třídění vestavěných typů – „sorted()“",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -42,7 +41,7 @@
       "idx": 3,
       "title": "Parametr „reverse“",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -64,8 +63,7 @@
       "idx": 5,
       "title": "Třídění je lexikografické II",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -76,9 +74,10 @@
       "idx": 6,
       "title": "Třídění je lexikografické III",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
-      "diff": "resyntax",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Třídění je lexikografické III</h2></div><div class=\"section-body\">\n\n  <p>\n    <strong>Lexikografické třídění</strong> tedy znamená, že např. čísla se seřadí podle velikosti a řetězce podle abecedy plus to, že sekvence se porovnávají postupně „po složkách“ (pokud jsou ovšem typy příslušných složek navzájem porovnatelné). Přitom o výsledku řazení rozhodne první dvojce (libovolně hluboko zanořených) prvků, která není stejná, jak ukazuje následující příklad:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; [1, 2] &lt; [1, 2, 3]\nTrue\n\n&gt;&gt;&gt; [1, ['a', 'b']] &lt; [1, ['a', 'b'], 3]\nTrue\n\n&gt;&gt;&gt; [1, ['a', 'c']] &lt; [1, ['a', 'b'], 3]\nFalse</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Jelikož <code>'c' &gt; 'b'</code>, tak se Python skutečně nedívá na to, že druhá sekvence je delší – první sekvence zvítězila, protože řazení natrefilo na první dvojci porovnatelných prvků, která už rozhodla o výsledku.\n  </div></div>\n\n</div>"
     },
@@ -90,7 +89,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Porovnávání různých typů</h2></div><div class=\"section-body\">\n\n  <p>\n    Typy musejí být porovnatelné, jinak obdržíte výjimku <em>TypeError</em>:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; 3.5 &lt; 4\nTrue\n\n&gt;&gt;&gt; 'a' &lt; 'c'\nTrue\n\n&gt;&gt;&gt; 'a' &lt; 5\nTraceback (most recent call last):\n  File \"&lt;pyshell#51&gt;\", line 1, in &lt;module&gt;\n'a' &lt; 5\nTypeError: unorderable types: str() &lt; int()</pre>\n  <p>\n    A zdůrazňuji – <strong>ne nutně stejné, ale pouze porovnatelné</strong>! Pokud poskytují podporu pro porovnávání se i s jiným typem, tak se bez řečí porovnají.\n  </p>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Jak ukazují třebas výše celá a reálná čísla – to jsou také různé typy, ale má smysl je porovnávat.\n  </div></div>\n\n</div>"
     },
@@ -101,7 +100,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Další příklady</h2></div><div class=\"section-body\">\n\n  <p>\n    Ještě několik příkladů z dokumentace pro zmatení nepřítele:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># protože 3 &lt; 4:\n&gt;&gt;&gt; (1, 2, 3, 4) &lt; (1, 2, 4)\nTrue\n\n# protože první sekvence je počáteční podsekvencí druhé:\n&gt;&gt;&gt; (1, 2) &lt; (1, 2, -1)\nTrue</pre>\n\n</div>"
     },
@@ -148,7 +147,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Poznámka</h2></div><div class=\"section-body\">\n\n  <p>\n    Jelikož pro řazení můžeme použít odkaz na libovolnou funkci, přepišme si poslední příklad tak, aby bylo lépe vidět, co se při řazení uvnitř děje:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; names = [ \"John\", \"Wendy\", \"Pete\", \"Jane\", \"David\", \"Amanda\", \"Ix\"]\n\n# Nejdřív to samé pomocí voastní funkce:\n&gt;&gt;&gt; def porovnej(x):\n...     return len(x), x\n...\n&gt;&gt;&gt; sorted(names, key=porovnej)\n['Ix', 'Jane', 'John', 'Pete', 'David', 'Wendy', 'Amanda']\n\n# Nyní si přidáme výpis parametrů:\n&gt;&gt;&gt; def porovnej(x):\n...     print(x)\n...     return len(x), x\n...\n&gt;&gt;&gt; sorted(names, key=porovnej)\nJohn\nWendy\nPete\nJane\nDavid\nAmanda\nIx\n['Ix', 'Jane', 'John', 'Pete', 'David', 'Wendy', 'Amanda']</pre>\n  <p>\n    Python tedy za pomoci funkce <em>porovnej()</em> převedl každý prvek vstupní sekvence na dvojci <em>(len(x), x)</em>, kterou použil pro lexikografické setřídění původních dat.\n  </p>\n\n</div>"
     },
@@ -169,9 +168,9 @@
       "idx": 14,
       "title": "Stabilita třídění I",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "basics",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Stabilita třídění I</h2></div><div class=\"section-body\">\n\n  <p>\n    Všimněme si ještě jednou příkladu:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; names = [ \"John\", \"Wendy\", \"Pete\", \"Jane\", \"David\", \"Amanda\", \"Ix\"]\n&gt;&gt;&gt; sorted( names, key=len )\n['Ix', 'John', 'Pete', 'Jane', 'Wendy', 'David', 'Amanda']</pre>\n  <p>\n    Jelikož porovnávací funkcí je <code>len()</code>, tedy délka řetězce, provede Python na vstupním objektu jen tolik změn, kolik je nezbytně nutné. Ve výsledku si čtyřpísmenná ('John', 'Pete', 'Jane') i pětipísmenná ('Wendy', 'David') slova zachovají stejné pořadí jako na vstupu.\n  </p>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Nezapomeňte – provedli jsme srovnání podle délky, nikoli abecedy!\n  </div></div>\n\n</div>"
     },
@@ -180,8 +179,7 @@
       "idx": 15,
       "title": "Stabilita třídění II",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -192,8 +190,7 @@
       "idx": 16,
       "title": "Poznámky",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "paradigm",
       "already_studied_in": null,
@@ -204,7 +201,7 @@
       "idx": 17,
       "title": "Poznámky k národním zvyklostem",
       "tags": [
-        "Skip",
+        "Core",
         "Tricky"
       ],
       "diff": "newconcept",

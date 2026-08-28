@@ -7,9 +7,10 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zatímco snad všechny ostatní běžně používané schematové jazyky (DTD, XMLSchema, RelaxNG) prakticky definují gramatiku XML-jazyka, Schematron na to jde úplně jinak – za pomoci (mocných) vyjadřovacích prostředků <a href=\"xpath.xml\">XPath</a>'u (resp. <a href=\"xpath2.xml\">XPath'u 2.0</a>) umožňuje vyjádřit (xpathová) tvrzení o různých částech XML-dokumentu. Stručně řečeno:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Co není v DTD, XMLSchema a RelaxNG explicitně povoleno, to není validní.\r\n        </li>\r\n        <li>\r\n            Co není ve Schematronu explicitně zakázáno, to je validní.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Nepřekvapivě se v praxi oba přístupy spojují – struktura dokumentu a základní omezení na hodnoty uzlů se zapíše pomocí schematu orientovaného na gramatiku (XMLSchema, RelaxNG) a dodatečná – jinak nevyjádřitelná – omezení a pravidla se zapíší pomocí Schematronu.\r\n    </p>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Jak XMLSchema, tak RelaxNG umožňují zahrnout Schematron pod sebe do jednoho dokumentu, takže výsledkem může být to nejlepší z obou světů.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Teoreticky vzato může být ve Schematronu použit jiný dotazovací jazyk než právě XPath, ale v praxi jsem to nikde neviděl.\r\n        </div></div></div>\r\n\r\n</div>"
     },
@@ -20,7 +21,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Plusy a mínusy</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Praktická závislost na XPath'u znamená, že Schematron:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Je tak mocný, jak mocná je použitá verze XPath'u.\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\"> Což konkrétně pro <em>XPath 2.0</em> znamená, že je kupříkladu schopen kontrolovat vlastnosti uzlů proti vlastnostem uzlů v úplně jiných XML-dokumentech nebo třeba ověřovat platnosti matematických výrazů nad celými skupinami uzlů. </div></div>\r\n        </li>\r\n        <li>\r\n            Není moc vhodný na detailní popis struktury nějakého XML-jazyka.\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -29,7 +30,7 @@
       "idx": 2,
       "title": "Princip validace",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -42,7 +43,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Struktura schematu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Schematronový dokument je velmi jednoduchý – v nejjednodušším případě může být tvořen pouze skupinami (<em>pattern</em>) pravidel (<em>rule</em>), která jsou na předložených XML-dokumentech ověřována. Skupiny přitom seskupují pravidla, která patří logicky k sobě, zatímco pravidla slouží k samotnému ověřování xpathových tvrzení:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">&lt;schema xmlns=\"http://purl.oclc.org/dsdl/schematron\" queryBinding=\"xslt2\"&gt;\n\n    &lt;title&gt;Titulek schematu&lt;/title&gt;\n\n    &lt;pattern&gt;\n        &lt;title&gt;Titulek skupiny 1&lt;/title&gt;\n        &lt;rule context=\"\"&gt; … &lt;/rule&gt;\n        &lt;rule context=\"\"&gt; … &lt;/rule&gt;\n        …\n    &lt;/pattern&gt;\n\n    &lt;pattern&gt;\n        &lt;title&gt;Titulek skupiny 2&lt;/title&gt;\n        &lt;rule context=\"\"&gt; … &lt;/rule&gt;\n        &lt;rule context=\"\"&gt; … &lt;/rule&gt;\n        …\n    &lt;/pattern&gt;\n\n    …\n\n&lt;/schema&gt;</pre>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Atribut <code>queryBinding</code> s hodnotou <em>xslt2</em> určuje, že uvedené schéma se bude zpracovávat podle pravidel XSLT2, což zahrnuje jak jeho funkce, tak samozřejmě – a především – i funkce z XPath2. Teoreticky je ale možné použít i jiné jazyky, byť ISO-specifikace je napsaná pomocí XSLT2.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Pokud více pravidel <code>rule</code> ve stejné skupině cílí na stejný kontext, vyhodnoceno bude pouze první z nich! (Tedy podobné chování jako u šablon v XSLT.)\r\n        </div></div></div>\r\n\r\n</div>"
     },
@@ -51,7 +52,8 @@
       "idx": 4,
       "title": "Struktura pravidel",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -62,9 +64,10 @@
       "idx": 5,
       "title": "Validační hlášení",
       "tags": [
+        "Core",
         "WOW"
       ],
-      "diff": "resyntax",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Validační hlášení</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ve validačních zprávách je možno s výhodou použít následující dva elementy:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong>&lt;value-of select=\"CESTA\" /&gt;</strong> – vrací hodnotu uzlů nalezených <em>CESTOU</em> relativně k aktuálnímu ověřovanému kontextu;\r\n        </li>\r\n        <li>\r\n            <strong>&lt;name [path=\"CESTA\"] /&gt;</strong> – bez atributu <em>path</em> vrací jméno uzlu aktuálního ověřovaného kontextu, s atributem <em>path</em> jméno uzlu nalezeného relativní <em>CESTOU</em> vůči němu.\r\n        </li>\r\n    </ul>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        V podstatě je <code>&lt;name/&gt;</code> pouze zkratka za mnohem univerzálnější <code>&lt;value-of select=\"name()\"/&gt;</code>.\r\n    </div></div>\r\n    <p>\r\n        <strong>Pozor:</strong> Kontextem obou těchto elementů je kontext definovaný na elementu <code>rule</code> pomocí jeho atrributu <code>context</code>, nikoli kontext právě probíhajícího testu uvnitř atributu <code>test</code>!\r\n    </p>\r\n\r\n</div>"
     },
@@ -73,9 +76,10 @@
       "idx": 6,
       "title": "Proměnné",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Proměnné</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Mnoho výrazů lze zpřehlednit zavedením pomocných (xpathových) proměnných pomocí elementu <strong>let</strong>:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">&lt;let name=\"NÁZEV\" value=\"DOTAZ\" /&gt;</pre>\r\n    <ul>\r\n        <li>\r\n            Proměnná bude ve své oblasti viditelnosti dostupná pod jménem <em>NÁZEV</em>.\r\n        </li>\r\n        <li>\r\n            Hodnotou proměnné je výsledek xpathového <em>DOTAZ</em>u.\r\n        </li>\r\n        <li>\r\n            Přitom jak oblast viditelnosti proměnné, tak kontext vyhodnocení příslušného xpathového dotazu jsou určeny místem jejího zavedení:\r\n            <ul>\r\n                <li>\r\n                    Proměnné zavedené uvnitř pravidla (<em>rule</em>) přebírají jeho kontext a jsou viditelné pouze uvnitř něj (tedy pro všechny jeho aserce).\r\n                </li>\r\n                <li>\r\n                    Proměnné zavedené kdekoliv jinde jsou globální (tedy viditelné všude) a kontextem jejich vyhodnocení je celý dokument.\r\n                </li>\r\n            </ul>\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -95,9 +99,10 @@
       "idx": 8,
       "title": "Příklad – možné řešení",
       "tags": [
-        "Skip"
+        "Core",
+        "WOW"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Příklad – možné řešení</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Podle vybraných pravidel <a href=\"_files/schematron/planets_valid.xml\">validní dokument</a> může být popsán například <a href=\"_files/schematron/planets.sch\">tímto</a> schematronovým schematem.\r\n    </p>\r\n    \r\n    <p class=\"enumerate\">\r\n        Z tohoto schematu je třeba nejdříve vytvořit validační XSLT-program, nazvěme ho <em>validator.xslt</em>:\r\n    </p>\r\n    <pre class=\"brush: shell; gutter: false; toolbar: false; \">saxon9-xslt -s:planets.sch\n            -xsl:iso_schematron_skeleton_for_saxon.xsl\n            -o:validator.xsl</pre>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Soubor <code>iso_schematron_skeleton_for_saxon.xsl</code> je k dispozici v distribuci ISO-Schematronu. Jeho úkolem je vzít schema a ztransformovat ho na výsledný validační XSLT-program.\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Příkaz je samozřejmě jednořádkový, jen byl zalámán pro lepší čitelnost.\r\n        </div></div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Nyní je možné pomocí takto vytvořeného validačního XSLT-programu <em>validator.xslt</em> zvalidovat příslušný XML-dokument:\r\n    </p>\r\n    <pre class=\"brush: shell; gutter: false; toolbar: false; \">saxon9-xslt -s:planets_valid.xml -xsl:validator.xsl</pre>\r\n    <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Jelikož není určen výstup do souboru (např. pomocí <code>-o:report.xml</code>), případné validační zprávy se objeví přímo na konzoli (nenechte se zaskočit XML-hlavičkou, je v ISO-transformaci „zadrátovaná“).\r\n        </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n            Je-li potřeba chyby dále (nejen) strojově zpracovávat, často se pro výstup používá další XML-jazyk <strong>SVRL</strong> (<em>Schematron Validation Report Language</em>).\r\n        </div></div></div>\r\n    \r\n    <p>\r\n        PS: Pro ukázkový <a href=\"_files/schematron/planets_nonvalid.xml\"><b>ne</b>validní dokument</a> bychom při validaci pomocí <em>validator.xslt</em> obdrželi následující zprávy (XML-hlavička vynechána):\r\n    </p>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">Atribut {@name baf} není na kořenovém elementu {planets} povolen.\nElement {planeta planetka} není jako potomek kořenového elementu {planets}\n    povolen, těmi mohou být pouze elementy {planet}.\nElementů {planet} pro Sluneční soustavu nemůže být více jak osm –\n    v dokumentu se jich nachází 9.\nElement {původ} není jako potomek elementu {planet[name='Venus']} dovolen.\nElement {původ historie} není jako potomek elementu {planet[name='Earth']}\n    dovolen.\nElement {planet[name='Earth']/name} může obsahovat pouze text,\n    obsahuje však element {i}.\nElement {planet[name='Saturn']/radius} může obsahovat pouze text,\n    obsahuje však element {b}.\nElement {planet[name='Saturn']/gravity} může obsahovat pouze text,\n    obsahuje však element {i}.\nElement {Uranus/year} musí obsahovat atribut {@unit}, i kdyby jeho hodnota\n    byla prázdná (signalizuje tak totiž výchozí jednotku definovanou\n    na kořenovém elementu).\nElement {Uranus/radius} musí obsahovat atribut {@unit}, i kdyby jeho\n    hodnota byla prázdná (signalizuje tak totiž výchozí jednotku\n    definovanou na kořenovém elementu).\nElement {Neptune/mass} musí obsahovat atribut {@unit}, i kdyby jeho\n    hodnota byla prázdná (signalizuje tak totiž výchozí jednotku\n    definovanou na kořenovém elementu).</pre>\r\n\r\n</div>"
     },
@@ -106,7 +111,7 @@
       "idx": 9,
       "title": "Příklad – komentáře",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -119,7 +124,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Hlavní oblasti použití</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Schematron se používá především pro následující oblasti validace (či reportování) XML-dokumentu:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            Ověřování struktury dokumentu:\r\n            <ul>\r\n                <li> přítomnost/absence elementů; </li>\r\n                <li> umístění elementů. </li>\r\n            </ul>\r\n        </li>\r\n        <li>\r\n            Ověřování obsahu dokumentu:\r\n            <ul>\r\n                <li> test přítomnosti obsahu; </li>\r\n                <li> test přítomnosti obsahu vyhovujícího nějakým pravidlům či výčtu. </li>\r\n            </ul>\r\n        </li>\r\n        <li>\r\n            Ověřování atributů:\r\n            <ul>\r\n                <li> přítomnost/absence atributů; </li>\r\n                <li> obsah atributů. </li>\r\n            </ul>\r\n        </li>\r\n        <li>\r\n            Ověřování křížových závislostí:\r\n            <ul>\r\n                <li> „Je-li pravda toto, musí být pravda také toto.“; </li>\r\n                <li> „Je-li v tomto elementu/atributu toto, může být v tomto elementu/atributu již pouze toto.“; </li>\r\n                <li> … </li>\r\n            </ul>\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Plus navíc tohle všechno nejen v rámci jednoho dokumentu, ale klidně přes více dokumentů najednou.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Podle <a href=\"http://www.mulberrytech.com/papers/schematron-Philly.pdf%E2%80%8E\" class=\"external\">Introduction to Schematron</a>.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -150,7 +155,8 @@
       "idx": 13,
       "title": "Další vlastnosti",
       "tags": [
-        "Skip"
+        "Core",
+        "WOW"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -163,7 +169,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Poznámka k vícekrokové validaci</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Jak jsme <a href=\"?slajd=9\">již viděli</a>, jednoduché, na žádných dalších zdrojích závislé schema se překládá přímo do výsledného validačního programu v jednom kroku (pro případ použití XSLT-procesoru <a href=\"http://saxonica.com\" class=\"external\">Saxon</a>):\r\n    </p>\r\n    <pre class=\"brush: shell; gutter: false; toolbar: false; \">saxon9-xslt -s:planets.sch\n            -xsl:iso_schematron_skeleton_for_saxon.xsl\n            -o:validator.xsl</pre>\r\n    \r\n    <p class=\"enumerate\">\r\n        Pro složitější, vícesouborové a abstraktní vzory obsahující schema se může postup prodloužit o další dva kroky:\r\n    </p>\r\n    <pre class=\"brush: shell; gutter: false; toolbar: false; \"># 1. spojení schematu rozepsaného do více souborů\nsaxon9-xslt -s:zamestnanci.sch\n            -xsl:iso_dsdl_include.xsl\n            -o:temp1.sch\n\n# 2. převedení abstraktních vzorů na vzory skutečné\nsaxon9-xslt -s:temp1.sch\n            -xsl:iso_abstract_expand.xsl\n            -o:temp2.sch\n\n# 3. vlastní vygenerování validačního programu (zde pro SVRL-výstup)\nsaxon9-xslt -s:temp2.sch\n            -xsl:iso_svrl_for_xslt2.xsl\n            -o:validator.xslt</pre>\r\n\r\n</div>"
     },
@@ -172,9 +178,10 @@
       "idx": 15,
       "title": "Poznámka ke jmenným prostorům",
       "tags": [
+        "Core",
         "Tricky"
       ],
-      "diff": "resyntax",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Poznámka ke jmenným prostorům</h2></div><div class=\"section-body\">\r\n\r\n    \r\n    <p class=\"enumerate\">\r\n        Potřebujete-li ve schematronových pravidlech určit jmenné prostory dokumentu (či dokonce dokumentů), zavádí se pro ně prefixy poněkud netradičním způsobem za pomoci vlastního elementu <strong>ns</strong> (typicky se umísťují za hlavní název schematu):\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">&lt;ns prefix=\"PREFIX\" uri=\"URI\" /&gt;</pre>\r\n    <p>\r\n        Takto zavedené jmenné prostory pak můžete používat uvnitř pravidel, například:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">&lt;ns prefix=\"xlink\" uri=\"http://www.w3.org/1999/xlink\"/&gt;\n…\n&lt;assert test=\"@xlink:href\"&gt;…&lt;/assert&gt;</pre>\r\n    \r\n    <p class=\"enumerate\">\r\n        V jednoduchých případech, kdy nemícháme schematroní schema s jinými XML-jazyky, není důvodu prefixovat vlastní elementy Schematronu a používá se tak výše uvedená deklarace:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">&lt;schema xmlns=\"http://purl.oclc.org/dsdl/schematron\"&gt;</pre>\r\n    <p>\r\n        Ve složitějších případech se pak tradičně prefixuje pomocí prefixu <strong>sch</strong>:\r\n    </p>\r\n    <pre class=\"brush: xml; gutter: false; toolbar: false; \">&lt;sch:schema xmlns:sch=\"http://purl.oclc.org/dsdl/schematron\"&gt;</pre>\r\n    <p>\r\n        V takovém případě samozřejmě musí mít všechny elementy Schematronu (a že jich je mnohem víc, než jsme si ukázali :-) tento prefix.\r\n    </p>\r\n\r\n</div>"
     },

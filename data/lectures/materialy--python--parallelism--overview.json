@@ -43,7 +43,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">„subprocess“</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Jak <a href=\"/materialy/python/cmd/execution_subprocess.xml\">už víme</a>, modul <code>subprocess</code> (konkrétně přes konstruktor <em>Popen</em>) umožňuje spuštění externího příkazu systému paralelně k běžícímu kódu v Python'u.\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Kromě toho <em>Popen</em> umožňuje i jednoduchou synchronizaci:\r\n  </p>\r\n  \r\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/subprocess.ex1.py\"><em>subprocess.ex1.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import subprocess\n\n# vyvolání operací náročných na čas\npr5 = subprocess.Popen([\"sleep\", \"5\"])\npr100 = subprocess.Popen([\"sleep\", \"100\"])\n\n# a) spuštění dalšího paralelního procesu\nsubprocess.Popen([\"echo\", \"Ahoj, já jsem paralelní echo!\"])\nprint()\n\n# b) čekání na ukončení prvního procesu\nprint(\"Čekám na\", pr5)\npr5.wait()\nprint(pr5, \"už doběhl!\")\nprint()\n\n# c) násilné ukončení druhého procesu\nprint(\"Na\", pr100, \"nebudeme čekat tak dlouho a zabijeme ho!\")\npr100.send_signal(9)</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\"># Runtime Error:\nTraceback (most recent call last):\n    File \"B:\\_solved\\python_overview\\.old\\vyuka_downloaded\\materialy\\python\\parallelism\\_files\\subprocess.ex1.py\", line 4, in &lt;module&gt;\n    pr5 = subprocess.Popen([\"sleep\", \"5\"])\n    File \"C:\\Users\\kolar\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\subprocess.py\", line 1039, in __init__\n    self._execute_child(args, executable, preexec_fn, close_fds,\n    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n                        pass_fds, cwd, env,\n                        ^^^^^^^^^^^^^^^^^^^\n    ...&lt;5 lines&gt;...\n                        gid, gids, uid, umask,\n                        ^^^^^^^^^^^^^^^^^^^^^^\n                        start_new_session, process_group)\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    File \"C:\\Users\\kolar\\AppData\\Local\\Python\\pythoncore-3.14-64\\Lib\\subprocess.py\", line 1553, in _execute_child\n    hp, ht, pid, tid = _winapi.CreateProcess(executable, args,\n                        ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n                            # no special security\n                            ^^^^^^^^^^^^^^^^^^^^^\n    ...&lt;4 lines&gt;...\n                            cwd,\n                            ^^^^\n                            startupinfo)\n                            ^^^^^^^^^^^^\nFileNotFoundError: [WinError 2] The system cannot find the file specified</pre></div></div>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Místo <em>send_signal(9)</em>, které zabere pouze na unixových systémech, můžeme zavolat například <em>terminate()</em>.\r\n  </div></div>\r\n  <p>\r\n    V krajním případě by takto šel spustit i další pythonovský script, ale existují i lepší metody.\r\n  </p>\r\n\r\n</div>"
     },
@@ -63,9 +63,10 @@
       "idx": 5,
       "title": "„threading“",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">„threading“</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Paralelismus <strong>pomocí vláken</strong> zajišťuje modul <code>threading</code>. Jsou v něm implementovány POSIXové synchronizační nástroje jako <em>semafory</em>, <em>mutexy</em>, <em>bariéry</em> a další. Má v podstatě stejné API jako modul <a href=\"?slajd=7\"><code>multiprocessing</code></a>.\r\n  </p>\r\n  <p>\r\n    V rámci interpretru CPython ovšem zatím stále (květen 2012) nemá smysl a neočekává se, že by v blízké budoucnosti nějaký smysl měl (viz <a href=\"?slajd=3\">GIL</a>).\r\n  </p>\r\n  \r\n\r\n</div>"
     },
@@ -88,7 +89,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">„multiprocessing“ II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Konstruktor <code>Process</code> opravdu vytváří nový proces (v rámci OS), tzn. že spustí další interpret Python'u:\r\n  </p>\r\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/multiprocessing.ex2.py\"><em>multiprocessing.ex2.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import os\nfrom multiprocessing import Process\n\ndef info(title):\n    print(title)\n    print('module name:', __name__)\n    print('parent process:', os.getppid())\n    print('process id:', os.getpid())\n    print()\n\ndef f(name):\n    info('&gt; function f')\n    print('hello', name)\n\nif __name__ == '__main__':\n    info('&gt; main line')\n    p = Process(target=f, args=('bob',))\n    p.start()\n    p.join()</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">&gt; main line\nmodule name: __main__\nparent process: 9393\nprocess id: 9465\n\n&gt; function f\nmodule name: __mp_main__\nparent process: 9467\nprocess id: 9468\n\nhello bob</pre></div></div>\r\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Identifikátor rodičovského procesu (<em>getppid()</em>) funkce <em>f()</em> je stejný jako identifikátor procesu (<em>getpid()</em>) hlavního skriptu.\r\n      </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: Přímo podle dokumentace.\r\n      </div></div></div>\r\n\r\n</div>"
     },
@@ -97,10 +98,9 @@
       "idx": 8,
       "title": "„multiprocessing“ III",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">„multiprocessing“ III</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Něco zajímavějšího – ukázka, že se procesy skutečně vykonávají paralelně…\r\n  </p>\r\n  \r\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/multiprocessing.ex3.py\"><em>multiprocessing.ex3.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import os\nfrom multiprocessing import Process\nimport time\n\ndef f():\n    print(os.getpid(), \": právě jsem se spustil, začínám pracovat...\")\n    time.sleep(os.getpid() % 7) #generická náročná operace...\n    print(os.getpid(), \": trvalo mi to\", (os.getpid() % 7), \"s.\")\n\nif __name__ == '__main__':\n    for i in range(7):\n        Process(target=f, args=()).start()</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">11228 12812 8260 7652 2596 13044 11316</pre></div></div>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Spustíme sedm procesů, přičemž doba jejich vykonávání je náhodná (zajišťuje <em>time.sleep(os.getpid() % 7)</em>). Vídíme, že již běžící procesy se ukončují dříve (stihnou-li to), než jsou další procesy spuštěny.\r\n  </div></div>\r\n  \r\n  <p class=\"enumerate\">\r\n    …na rozdíl od možnosti, kdy tentokrát <em>sleep</em> bude simulovat kritickou sekci a uzamkneme ho zámkem:\r\n  </p>\r\n  \r\n  <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/multiprocessing.ex4.py\"><em>multiprocessing.ex4.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">import os\nfrom multiprocessing import Process, Lock\nimport time\n\ndef f(l):\n    print(os.getpid(), \": právě jsem se spustil, začínám pracovat...\")\n    l.acquire() #zamknutí\n    time.sleep(os.getpid() % 7) #generická náročná operace...\n    l.release() #odemčení\n    print(os.getpid(), \": trvalo mi to\", (os.getpid() % 7), \"s.\")\n\nif __name__ == '__main__':\n    lock = Lock()\n    for i in range(7):\n        Process(target=f, args=(lock,)).start()</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">2284 14516 15888 11664 15168 2320 12916</pre></div></div>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Stejně jako u předchozího, procesy si však sdílí zámek (<em>Lock</em>), a tak každý následující může být vykonán (a ukončen) až poté, co předchozí proces doběhne (a uvolní při tom zámek).\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -110,7 +110,7 @@
       "title": "„multiprocessing“ IV",
       "tags": [
         "Core",
-        "Tricky"
+        "WOW"
       ],
       "diff": "newconcept",
       "already_studied_in": null,

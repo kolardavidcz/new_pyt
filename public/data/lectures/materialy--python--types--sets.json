@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\n\n  <p>\n    Množina je neuspořádaná kolekce jedinečných a neměnných (<em>immutable</em>) hodnot. Tak trochu se o nich dá uvažovat jako o „slovnících bez hodnot“ – klíče ve slovníku jsou také jedinečné, musí být neměnné a jejich pořadí není určené<sup>*</sup>.\n  </p>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    <sup>*</sup> Respektive nebylo určené až do Python'u 3.7, od té doby tohle srovnání trochu pokulhává.\n  </div></div>\n  \n  <p>\n    Množiny v Python'u jsou jinak množinami v matematickém smyslu slova, takže na nich můžeme provádět standardní množinové operace, jako je například sjednocení, průnik nebo rozdíl.\n  </p>\n\n</div>"
     },
@@ -18,10 +18,9 @@
       "idx": 1,
       "title": "Zavedení – „set()“",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Zavedení – „set()“</h2></div><div class=\"section-body\">\n\n  <p class=\"enumerate\">\n    Množina je neuspořádaná kolekce jedinečných a neměnných (<em>immutable</em>) hodnot. K jejímu vytvoření slouží konstruktor <code>set()</code> nebo přímá notace za pomoci složených závorek:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = { 1, 2, 'ahoj', 3, 'b', }\n\n&gt;&gt;&gt; xs\n{3, 1, 2, 'b', 'ahoj'}\n\n&gt;&gt;&gt; type(xs)\n&lt;class 'set'&gt;</pre>\n  \n  <p class=\"enumerate\">\n    Stejně tak je možné vytvořit množinu z jiných datových typů, např. seznamu (který obsahuje pouze neměnné datové typy):\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = [ 1, 2, 'ahoj', 3, 'b', ]\n&gt;&gt;&gt; set(xs)\n{1, 2, 3, 'ahoj', 'b'}</pre>\n  \n</div>"
     },
@@ -33,7 +32,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "resyntax",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Prázná množina (Pozor!)</h2></div><div class=\"section-body\">\n  \n  <p>\n    Při pokusu o vytvoření <strong>prázdné množiny</strong> narazíme na historický pozůstatek (množiny se v Python'u objevily mnohem později než slovníky), který měl být podle mého vyřešen s příchodem Python'u 3.x, leč bohužel nebyl:\n  <p>\n  <blockquote>\n    Jelikož sekvence symbolů <code>{}</code> se z historických důvodů používá pro vytvoření prázdného slovníku (místo logičtějšího <code>{:}</code>), na množinu nám jaksi nic nezbylo (T_T)\n  </blockquote>\n  </p>\n    Musíme tedy chtě nechtě použít jen a pouze variantu s pomocí vytvořujicí funkce <code>set()</code>:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = set()\n&gt;&gt;&gt; xs\nset()\n\n&gt;&gt;&gt; type(xs)\n&lt;class 'set'&gt;</pre>\n\n</div>"
     },
@@ -42,10 +41,9 @@
       "idx": 3,
       "title": "Základní vlastnosti",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Základní vlastnosti</h2></div><div class=\"section-body\">\n\n  <p class=\"enumerate\">\n    Ačkoli množiny nepatří mezi sekvence, některé z vlastností mají – díky své struktuře „balíků na hodnoty“ – společné:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = { 1, 2, 'ahoj', 3, 'b', }\n\n# dotaz na počet prvků\n&gt;&gt;&gt; len(xs)\n5\n\n# dotaz na výskyt prvku\n&gt;&gt;&gt; 'b' in xs\nTrue\n&gt;&gt;&gt; 5 in xs\nFalse</pre>\n  \n  <p class=\"enumerate\">\n    Podoba se vztahuje dokonce i na procházení prvků množiny smyčkou <em>for-in</em>, jen je příslušné procházení – podobně jako u slovníků – „náhodné“:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = { 1, 2, 'ahoj', 3, 'b', }\n\n&gt;&gt;&gt; for x in xs:\n...     print(x)\n...\n1\n2\n3\nahoj\nb</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Varianta s <em>enumerate()</em> funguje také, ale jelikož pořadí výpisu prvků je v podstatě „náhodné“, tak má poněkud omezenější použití, než u sekvenčních typů. Stejně tak samotný cyklus <em>for-in</em> najde využití spíše pro „množinové“ operace, kde nás zajímají vlastnosti či funkce prvků a nikoli jejich pořadí.\n  </div></div>\n\n</div>"
     },
@@ -100,7 +98,7 @@
       "idx": 8,
       "title": "Poznámky k operacím a metodám",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -111,9 +109,9 @@
       "idx": 9,
       "title": "Kopie množiny – „copy()“",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Kopie množiny – „copy()“</h2></div><div class=\"section-body\">\n\n  <p>\n    Jako jedna z mála datových struktur nabízí množina i vlastní metodu pro tvorbu kopie – <code>copy()</code>. Narozdíl od slovníku však prvky množiny mohou být pouze <a href=\"_remarks.xml?slajd=7\">hešovatelné</a>, tedy <em>neproměnné</em> (<em>immutable</em>) typy, takže při kopírování nenarazíme na problém s <em>mělkou vs hlubokou kopií</em>:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = { 1, 2, 'ahoj', 3, 'b', }\n\n&gt;&gt;&gt; xs\n{3, 1, 2, 'b', 'ahoj'}\n\n&gt;&gt;&gt; ys = xs.copy()\n&gt;&gt;&gt; ys\n{'ahoj', 1, 2, 3, 'b'}\n\n&gt;&gt;&gt; xs.clear()\n&gt;&gt;&gt; ys\n{'ahoj', 1, 2, 3, 'b'}</pre>\n\n</div>"
     },

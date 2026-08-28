@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <em>Abstract Base Classes</em> (zkráceně a velmi často <em>ABC</em>) je speciální druh tříd (a také <a href=\"?slajd=8\">skupina specifických tříd</a> ve standardní knihovně), které se vyznačují mimo jiné následujícím:\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <a href=\"?slajd=4\">není je možno přímo instanciovat</a>, ale je z nich možno normálně dědit;\r\n        </li>\r\n        <li>\r\n            lze na nich definovat tzv. <strong>abstraktní atributy</strong>, které třídy, jež jsou jejich potomky, musí implementovat, jinak při pokusu o jejich instanciaci obdržíme výjimku;\r\n        </li>\r\n        <li>\r\n            umožňují <a href=\"?slajd=6\">se označit za předky</a> i tříd, které nevznikly jejich poděděním.\r\n        </li>\r\n    </ul>\r\n    <p>\r\n        Jejich nejprůhlednějším použitím bude asi bod dvě – díky němu totiž <em>ABC</em>s umožňují přesunout kontrolu úplnosti API již do chvíle instanciace a nikoli až do chvíle pokusu o zavolání nenaimplementovaného atributu. (Příklad na dalším slajdu toto snad osvětlí.) Ovšem to není ten <a href=\"?slajd=8\">hlavní důvod</a>, proč byly do jazyka zavedeny.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: Z jiných jazyků konceptu <em>ABC</em> odpovídají pojmy <em>interface</em> nebo <em>trate</em>. Podědit z <em>ABC</em> pak znamená <strong>přijmout (a implementovat) daný kontrakt</strong>.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -30,10 +30,9 @@
       "idx": 2,
       "title": "Jak na to bez ABC II",
       "tags": [
-        "Core",
-        "Tricky"
+        "Skip"
       ],
-      "diff": "paradigm",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Jak na to bez ABC II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ba co víc, můžeme si pochopitelně instanciovat přímo <em>Rodiče</em>, jako by se nechumelilo, byť samozřejmě nemá chudák co dělat, protože právě to byl koneckonců i jeho účel:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class Rodič:\n...     def metoda1(self):\n...         raise NotImplementedError()\n...     def metoda2(self):\n...         raise NotImplementedError()\n\n&gt;&gt;&gt; r = Rodič()\n\n&gt;&gt;&gt; r.metoda1()\nTraceback (most recent call last):\n  File \"&lt;pyshell#20&gt;\", line 1, in &lt;module&gt;\nr.metoda1()\n  File \"&lt;pyshell#10&gt;\", line 4, in metoda1\nraise NotImplementedError()\nNotImplementedError</pre>\r\n\r\n</div>"
     },
@@ -45,7 +44,7 @@
         "Core",
         "WOW"
       ],
-      "diff": "resyntax",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Metatřída „ABCMeta“ a dekorátor „@abstractmethod“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Ale díky <em>ABC</em>s to jde snadno zařídit i jinak:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; from abc import ABCMeta, abstractmethod\n&gt;&gt;&gt; class Rodič(metaclass=ABCMeta):\n... \n...     @abstractmethod\n...     def metoda1(self):\n...         raise NotImplementedError()\n... \n...     @abstractmethod\n...     def metoda2(self):\n...         raise NotImplementedError()</pre>\r\n    <p>\r\n        Nyní už nejen že nenainstancujeme <em>Rodiče</em>..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; r = Rodič()\nTraceback (most recent call last):\n  File \"&lt;pyshell#23&gt;\", line 1, in &lt;module&gt;\nr = Rodič()\nTypeError: Can't instantiate abstract class Rodič with abstract methods metoda1, metoda2</pre>\r\n    <p>\r\n        ..ale dokonce ani potomka, pokud bude v API chybět implementace vyžadovaných metod:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; class Potomek(Rodič):\n... \n...     def metoda1(self):\n...         print('Ahoj!')\n\n&gt;&gt;&gt; p = Potomek()\nTraceback (most recent call last):\n  File \"&lt;pyshell#25&gt;\", line 1, in &lt;module&gt;\np = Potomek()\nTypeError: Can't instantiate abstract class Potomek with abstract methods metoda2</pre>\r\n\r\n</div>"
     },
@@ -77,9 +76,10 @@
       "idx": 6,
       "title": "Poznámka – „register()“",
       "tags": [
-        "Skip"
+        "Core",
+        "WOW"
       ],
-      "diff": "paradigm",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Poznámka – „register()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <em>ABC</em>s můžete využít ještě jedním způsobem – v případě potřeby je můžete zaregistrovat jako předka pro libovolnou jinou třídu. Tím se sice dostanou do jejích předků z hlediska introspekčních funkcí <em>issubclass()</em> a <em>isinstance()</em>, ale příslušné abstraktní metody nejsou ani dostupné, ani vyžadované:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nfrom abc import ABCMeta, abstractmethod\n\nclass ABCTřída(metaclass=ABCMeta):\n    @abstractmethod\n    def metoda(self):\n        raise NotImplementedError()\n\n\nclass Třída():\n    def m(self):\n        print('Metoda m.')\n\nprint( issubclass(Třída, ABCTřída) )    # False\n\nt = Třída()\nprint( isinstance(t, Třída) )           # True\nprint( hasattr(t, 'm') )                # True\nprint( hasattr(t, 'metoda') )           # False\n\nABCTřída.register(Třída)\nprint( issubclass(Třída, ABCTřída) )    # True\nprint( isinstance(t, ABCTřída) )        # True\nprint( hasattr(t, 'm') )                # True\nprint( hasattr(t, 'metoda') )           # False\n\nt2 = Třída()                            # žádná výjimka\nprint( hasattr(t2, 'm') )               # True\nprint( hasattr(t2, 'metoda') )          # False</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Podobnou funkcionalitu na úrovni třídy bez potřeby registrace zajistí i metoda <em>__subclasshook__()</em>, ale to už se podívejte <a href=\"https://docs.python.org/3/library/abc.html\" class=\"external\">do dokumentace</a>.\r\n    </div></div>\r\n    <p>\r\n        Kdy se to hodí? Třeba když váš objekt splňuje API nějaké <em>ABC</em>, ale přitom sám není napsán v Python'u (což je mimo jiné případ většiny základních pythoních typů). \r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Ostatně stačí se podívat do modulu <em>_collections_abc.py</em> ve standardní knihovně.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -88,9 +88,9 @@
       "idx": 7,
       "title": "Užití ABC I",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "paradigm",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Užití ABC I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        <em>ABC</em>s tedy pomáhají vyrábět API, kterého se všichni musí držet – „zpola upečená“ implementace se totiž prozradí hned při prvním pokusu o instanciaci dané třídy.\r\n    </p>\r\n    <p>\r\n        Tuto vlastnost využijete nejspíše při práci na velkém projektu a v týmu, případně když váš program budou používat jiní jako knihovnu nebo když budete třeba vyrábět typy dynamicky za běhu programu.\r\n    </p>\r\n\r\n</div>"
     },
@@ -99,8 +99,7 @@
       "idx": 8,
       "title": "Užití ABC II",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,

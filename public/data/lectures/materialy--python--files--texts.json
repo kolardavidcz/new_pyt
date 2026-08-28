@@ -7,11 +7,10 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Core",
-        "WOW",
-        "Already Studied"
+        "Already Studied",
+        "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": {
         "lecture_id": "lecture:materialy/python/files/overview.html",
         "lecture_title": "Čtení a zápis ze/do souborů",
@@ -62,8 +61,7 @@
       "idx": 4,
       "title": "„readlines()“ a „readline()“",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -74,8 +72,8 @@
       "idx": 5,
       "title": "Zápis do souboru – „write()“",
       "tags": [
-        "Core",
-        "Already Studied"
+        "Already Studied",
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": {
@@ -97,7 +95,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Zápis do souboru – „writelines()“</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Podobně jako u čtení však můžeme použít i několik dalších způsobů jak data do proudu zapsat:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><div class=\"example-label\">→ Input: <a href=\"_files/cestina.2.txt\"><em>cestina.2.txt</em></a></div><pre class=\"brush: plain; gutter: false; toolbar: false;\">Třistatřiatřicet stříbrných stříkaček\nstříkalo\npřes třistatřiatřicet stříbrných střech.</pre></div><div class=\"example-col\"><div class=\"example-label\">📄 Program: <a href=\"_files/writelines.py\"><em>writelines.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">lines = []\n\nwith open('cestina.2.txt', mode='r', encoding='utf-8') as f:\n    lines = f.readlines()\n\nwith open('cestina.3.out', mode='w', encoding='utf-8') as f:\n    f.writelines( lines )\n\nwith open('cestina.3.out', mode='r', encoding='utf-8') as f:\n    print( f.readlines() )</pre></div><div class=\"example-col\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">Třistatřiatřicet stříbrných stříkaček\nstříkalo\npřes třistatřiatřicet stříbrných střech.</pre></div></div>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jak vidno, <code>writelines()</code> vezme na vstupu seznam a prvek po prvku ho překopíruje na výstup (takže žádné přebytečné <code>\\n</code> na konec nepřidává).\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -118,9 +116,10 @@
       "idx": 8,
       "title": "Poznámky",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Poznámky</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Mějte na paměti, že:\r\n    </p>\r\n    <ol>\r\n        <li>\r\n            Pokud <a href=\"?slajd=12\">neřeknete jinak</a>, je v <em>textových souborech</em> automaticky prováděna (obousměrná) <strong>konverze konců řádků</strong> různých platforem na jednotné pracovní <code>\\n</code>!\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                 Konrétně se především převádí <code>\\n</code> na Unixu a MacOS X+, <code>\\r\\n</code> na Windows a <code>\\r</code> na MacOS 9-.\r\n            </div></div>\r\n        </li>\r\n        <li>\r\n            <em>Textové soubory</em> jsou zpracovávány <strong>po znacích</strong>!\r\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n                Podle použitého kódování pak jeden znak zabírá místo jednoho či několika bajtů, takže míchat dohromady znakové a bajtové operace se těžce nevyplácí.\r\n            </div></div>\r\n        </li>\r\n    </ol>\r\n\r\n</div>"
     },
@@ -143,7 +142,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Řešení chyb při dekódování</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    U textových souborů máte nastavením parametru <strong><em>errors</em></strong> možnost zadat způsob řešení chyb vyskytnuvších se při dekódování vstupních binárních dat. Mezi dostupné patří kupříkladu..\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      <em>'strict'</em> (ekvivalentní výchozímu zadání <em>None</em>) vyhodí při sebemenším zaškobrtnutí výjimku <code>ValueError</code>;\r\n    </li>\r\n    <li>\r\n      <em>'ignore'</em> naopak jakékoliv chybi ignoruje a jednoduše přeskakuje (takže se připravte na ztrátu dat);\r\n    </li>\r\n    <li>\r\n      <em>'replace'</em> nahradí problematická data zástupným znakem (typicky <code>'?'</code>);\r\n    </li>\r\n    <li>\r\n      <em>'surrogateescape'</em> přemapuje problematická místa do tzv. „Unicode Private Use Area“ (pozice <em>code-point</em>ů U+DC80 až U+DCFF), odkud je při zápisu se stejným nastavením zapíše nazpátek v původní podobě;\r\n      <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Velmi šikovné pro práci se soubory v neznámém kódování.\r\n      </div></div>\r\n    </li>\r\n    <li>\r\n      <em>'backslashreplace'</em> nahrazuje závadná data pythoními eskejpovacími sekvencemi (za pomoci zpětného lomítka);\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    ..případně následující použitelné pouze při zápisu:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n      <em>'xmlcharrefreplace'</em> způsobí při zápisu nahrazení znaků nepodporovaných daným kódováním jejich <a href=\"/materialy/text/encoding_xML.xml?slajd=6\">znakovými XML-referencemi</a> (<code>&amp;#nnn;</code>);\r\n    </li>\r\n    <li>\r\n      <em>'namereplace'</em> podobně při zápisu nahradí nepodporované znaky jejich iskejp-sekvencemi ve tvaru <code>\\N{...}</code>.\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    Kromě toho je pro rodinu kódování <em>UTF-*</em> k dispozici i hodnota <em>'surrogatepass'</em>, díky které nezhavarují soubory obsahující tzv. <a href=\"https://en.wikipedia.org/wiki/Universal_Character_Set_characters#Surrogates\" class=\"external\"><em>surrogate pairs</em></a>, a navíc si můžete přidat vlastní zaregistrováním pomocí <code>codecs.register_error(name, error_handler)</code>.\r\n  </p>\r\n\r\n</div>"
     },
@@ -152,10 +151,10 @@
       "idx": 11,
       "title": "Zpracování konců řádek",
       "tags": [
-        "Tricky",
-        "Skip"
+        "Core",
+        "Tricky"
       ],
-      "diff": "basics",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Zpracování konců řádek</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jak už jsem několikrát zdůrazňoval, při práci s textovými soubory Python ve výchozím nastavení převádí konce řádek z různých systémů (konkrétně <code>\\n</code> na Unixu a MacOS X+, <code>\\r\\n</code> na Windows a <code>\\r</code> na MacOS 9-) na jednotné pracovní <code>\\n</code>, což je velmi příjemné.\r\n    </p>\r\n    <p>\r\n        Nicméně si můžete vynutit úplně jiné chování <strong>nastavením parametru <em>newline</em> na funkci <a href=\"/materialy/python/files/basics.xml?slajd=4\"><em>open()</em></a></strong>, a to následujícím způsobem:\r\n    </p>\r\n    \r\n    \r\n    <p class=\"enumerate\">\r\n        Při výchozím nastavení <em>newline=None</em> dochází k výše uvedené automatické konverzi konců řádek při čtení a zápise textových souborů.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        PS: Hodnota aktuálního konce řádku se bere z <code>os.linesep</code> .\r\n    </div></div>\r\n    \r\n    <p class=\"enumerate\">\r\n        Při nastavení na prázdný řetězec <code>''</code> (a v případě zápisu též případně ještě i <code>'\\n'</code>) k žádnému automatickému překladu nedochází a konce řádek jsou posílány oběma směry beze změn:\r\n    </p>\r\n    <div class=\"example-block example-vertical\"><div class=\"example-part\"><div class=\"example-label\">\r\n            📄 Program: <a href=\"_files/soubory_win.py\"><em>soubory_win.py</em></a></div><pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nwith open('soubory_win.py', newline='') as f:\n    for line in f:\n        print(bytes(line, encoding='utf-8'))</pre></div><div class=\"example-part\"><div class=\"example-label\">▶ Output</div><pre class=\"brush: plain; gutter: false; toolbar: false;\">b'#!/usr/bin/env python3\\r\\n'\nb'\\r\\n'\nb\"with open('soubory_win.py', newline='') as f:\\r\\n\"\nb'    for line in f:\\r\\n'\nb\"        print(bytes(line, encoding='utf-8'))\\r\\n\"</pre></div></div>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Nicméně <a href=\"https://www.python.org/dev/peps/pep-3116/\" class=\"external\">PEP-3116</a> tvrdí něco jiného…\r\n    </div></div>\r\n\r\n    <p class=\"enumerate\">\r\n        V nejzajímavější variantě můžete předepsat, jaký znak má být pokládán za konec řádku. Ovšem pouze z povolených – <code>None</code>, <code>''</code>, <code>'\\n'</code>, <code>'\\r'</code>, <code>'\\r\\n'</code>. Při čtení pak dojde k rozdělení řádek pouze na určeném znaku a navíc bude tento znak vrácen, při zápise pak zase <code>\\n</code> bude na tento znak přeloženo.\r\n    </p>\r\n\r\n</div>"
     }

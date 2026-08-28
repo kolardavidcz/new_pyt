@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\n\n  <p>\n    Slovníky jsou nejdůležitějším (a po dlouhou dobu také jediným) zástupcem tzv. <em>mapovacích typů</em>. Jejich struktura je následující:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">        slovník = {\n            KLÍČ1: HODNOTA1,\n            KLÍČ2: HODNOTA2,\n...\n        }</pre>\n  <p>\n    Přitom – jak je v Python'u zvykem – jak hodnoty, tak klíče mohou být najednou nejrůznějších typů. Přesněji <em>hodnotou</em> může být cokoliv, <em>klíč</em> však musí být <strong>neměnný</strong> datový typ (<em>immutable</em>). Navíc pochopitelně <strong>klíč musí být v rámci slovníku jedinečný</strong>!\n  </p>\n  <p>\n    Typicky se indexuje řetězcem nebo číslem, ale stejně tak dobře můžete použít například právě n-tici, pokud se sama skládá z neměnných typů:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds = { 'a': 'ahoj', 123: 'svět', (12, 'fokus'): 666, }\n\n&gt;&gt;&gt; ds\n{'a': 'ahoj', (12, 'fokus'): 666, 123: 'svět'}\n\n&gt;&gt;&gt; ds['a']\n'ahoj'\n&gt;&gt;&gt; ds[123]\n'svět'\n&gt;&gt;&gt; ds[ (12, 'fokus') ]\n666</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Slovníky jsou v podstatě hash-tabulky optimalizované na vyhledávání hodnot podle klíčů.\n  </div></div>\n\n</div>"
     },
@@ -20,7 +20,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "pythonic",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Zavedení – „{}“ a „dict()“</h2></div><div class=\"section-body\">\n\n  <p class=\"enumerate\">\n    Nejsnadněji (bez využití jiné datové struktury a speciálních metod) slovník vytvoříme přímou notací:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds = { 'a': 1, 'b': [1,2,3], 'c': \"ahoj\", }\n\n&gt;&gt;&gt; type(ds)\n&lt;class 'dict'&gt;\n\n&gt;&gt;&gt; ds\n{'a': 1, 'c': 'ahoj', 'b': [1, 2, 3]}</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Už vidíme, proč (mimo jiné) slovníky nepatří mezi sekvence – není u nich zaručeno pořadí prvků.\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n      PS: Přesněji řečeno nebylo do Python'u 3.7.\n    </div></div>\n  </div></div>\n  \n  <p class=\"enumerate\">\n    Druhou možností je za pomoci funkce <code>dict()</code> převést na slovník vhodnou vstupní datovou strukturu:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds = dict( [('a', 1), ('b', [1, 2, 3]), ('c', 'ahoj')] )\n\n&gt;&gt;&gt; ds\n{'a': 1, 'c': 'ahoj', 'b': [1, 2, 3]}</pre>\n\n</div>"
     },
@@ -29,9 +29,9 @@
       "idx": 2,
       "title": "Prázdný slovník",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "resyntax",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Prázdný slovník</h2></div><div class=\"section-body\">\n\n  <p>\n    <strong>Prázdný slovník</strong> zavedeme buď pomocí funkce <code>dict()</code> nebo přímou notací:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds = dict()\n&gt;&gt;&gt; ds\n{}\n\n&gt;&gt;&gt; ds = {}\n&gt;&gt;&gt; ds\n{}\n\n&gt;&gt;&gt; type(ds)\n&lt;class 'dict'&gt;</pre>\n\n</div>"
     },
@@ -40,6 +40,7 @@
       "idx": 3,
       "title": "Zavedení – „fromkeys()“",
       "tags": [
+        "Core",
         "Tricky"
       ],
       "diff": "pythonic",
@@ -52,9 +53,9 @@
       "title": "Základní vlastnosti",
       "tags": [
         "Core",
-        "WOW"
+        "Tricky"
       ],
-      "diff": "pythonic",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Základní vlastnosti</h2></div><div class=\"section-body\">\n\n  <p class=\"enumerate\">\n    Ačkoli slovníky nepatří mezi sekvence, některé z vlastností mají – díky své struktuře „balíků na hodnoty“ – společné:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds = { 'a': 1, 'b': [1,2,3], 'c': \"ahoj\", }\n\n# dotaz na počet dvojic klíč-hodnota\n&gt;&gt;&gt; len(ds)\n3\n\n# dotaz na výskyt klíče\n&gt;&gt;&gt; 'a' in ds\nTrue\n&gt;&gt;&gt; 123 in ds\nFalse\n\n# dotaz na hodnotu odpovídající klíči 'b'\n&gt;&gt;&gt; ds['b']\n[1, 2, 3]</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Všimněte si obzvláště, že slovník je struktura zařízená na přístup podle klíčů – základní „přirozené“ operace se slovníkem se odehrávají na úrovni klíčů, nikoli hodnot.\n  </div></div>\n  \n  <p class=\"enumerate\">\n    Podoba se vztahuje dokonce i na procházení prvků slovníku smyčkou <em>for-in</em>. Je však zřejmé, že když slovníky obsahují <em>dvojce</em> závislých hodnot (<em>klíč—hodnota</em>), musí si smyčka „vybrat“, jakým způsobem je zobrazí. Nepřekvapivě základní volbou je zobrazení přes klíče:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># přirozený cyklus přes klíče slovníku\n&gt;&gt;&gt; for key in ds:\n...     print(key)\n...\na\nc\nb</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Varianta s <em>enumerate()</em> funguje také, ale jelikož pořadí výpisu prvků je v podstatě „náhodné“, tak má poněkud omezenější použití, než u sekvenčních typů.\n  </div></div>\n  <p>\n    Chcete-li zároveň s klíči vypsat i odpovídající hodnoty, řešení je jednoduché:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; for key in ds:\n...     print(key, ds[key])\n...\na 1\nc ahoj\nb [1, 2, 3]</pre>\n\n</div>"
     },
@@ -63,9 +64,10 @@
       "idx": 5,
       "title": "Přístup k prvkům",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Přístup k prvkům</h2></div><div class=\"section-body\">\n\n  <p class=\"enumerate\">\n    Existují dva základní způsoby jak přistupovat k prvkům slovníku:\n  </p>\n  <ul>\n    <li>\n        známe-li klíč, můžeme pomocí něj získat odpovídající hodnotu (viz <code>slovník[klíč]</code> z předchozího slajdu)\n    </li>\n    <li>\n        pomocí smyčky přes vybraný „pohled“ na slovník probrat prvky slovníku jeden po druhém (ovšem s víceméně náhodným pořadím)\n    </li>\n  </ul>\n  \n  <p class=\"enumerate\">\n    Co se „pohledů“ (<em>views</em>) na slovník (označme ho <em>ds</em>) týká, jsou tři různé:\n  </p>\n  <ol>\n    <li>\n        <code>ds.keys()</code> – pohled přes klíče\n    </li>\n    <li>\n        <code>ds.values()</code> – pohled přes hodnoty\n    </li>\n    <li>\n        <code>ds.items()</code> – pohled přes n-tice <em>(klíč, hodnota)</em>\n    </li>\n  </ol>\n  <p>\n    ...a sdílejí stejné vlastnosti:\n  </p>\n  <ul>\n    <li>\n        každého pohledu se můžeme zeptat na počet jeho členů pomocí funkce <code>len()</code>\n    </li>\n    <li>\n        přes každý pohled můžeme iterovat (např. pomocí smyčky <code>for in</code>)\n    </li>\n    <li>\n        každý pohled můžeme testovat na přítomnost prvků pomocí operátoru <code>in</code>\n    </li>\n  </ul>\n  \n  <p class=\"enumerate\">\n    Pořadí uložení (a následně vypisování) prvků ve slovníku záleží na konkrétní implementaci Python'u a historii vkládání a odstraňování prvků slovníku. Pokud ale během přístupu neprovedeme ve slovníku žádné změny, budou všechny tři pohledy vracet prvky ve stejném pořadí.\n  </p>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    PS: Od verze Python'u 3.7 je po implementacích požadováno, aby si pamatovaly pořadí klíčů v pořadí jejich zanesení do slovníku.\n  </div></div>\n\n</div>"
     },
@@ -74,7 +76,7 @@
       "idx": 6,
       "title": "Přístup k prvkům – „keys()“",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -85,7 +87,7 @@
       "idx": 7,
       "title": "Přístup k prvkům – „values()“",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -96,8 +98,7 @@
       "idx": 8,
       "title": "Přístup k prvkům – „items()“",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -120,9 +121,9 @@
       "idx": 10,
       "title": "Přidávání prvků – „[]=“, „update()“",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "pythonic",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Přidávání prvků – „[]=“, „update()“</h2></div><div class=\"section-body\">\n\n  <p class=\"enumerate\">\n    Novou dvojici klíč-hodnota přidáme do slovníku velmi podobným způsobem, jako se ptáme na existující:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds\n{'a': 1, 'c': 'ahoj', 'b': [1, 2, 3]}\n\n&gt;&gt;&gt; ds['d'] = (1, 2,)\n&gt;&gt;&gt; ds\n{'a': 1, 'c': 'ahoj', 'b': [1, 2, 3], 'd': (1, 2)}</pre>\n  \n  <p class=\"enumerate\">\n    Pokud provedeme totéž pro již existující klíč, dojde k nahrazení jeho hodnoty:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds\n{'a': 1, 'c': 'ahoj', 'b': [1, 2, 3], 'd': (1, 2)}\n\n&gt;&gt;&gt; ds['d'] = 'svět'\n&gt;&gt;&gt; ds\n{'a': 1, 'c': 'ahoj', 'b': [1, 2, 3], 'd': 'svět'}</pre>\n  \n  <p class=\"enumerate\">\n    Do slovníku můžeme přidat více dvojic klíč-hodnota najednou pomocí metody <code>update(SLOVNÍK)</code>:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds = {}\n&gt;&gt;&gt; ds\n{}\n\n&gt;&gt;&gt; ds.update( {'a': 1, 'b': [1, 2, 3]} )\n&gt;&gt;&gt; ds\n{'a': 1, 'b': [1, 2, 3]}</pre>\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        Podobně jako u tvorby slovníku však parametrem může být i jiná vhodná datová struktura:\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds.update( [('c', 'ahoj'), (666, 'lokus')] )\n&gt;&gt;&gt; ds\n{'a': 1, 'c': 'ahoj', 'b': [1, 2, 3], 666: 'lokus'}</pre>\n      </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        Pokud některé z přidávaných klíčů ve slovníků již existují, dojde (nepřekvapivě) k nahrazení jejich hodnot novými.\n      </div></div></div>\n\n</div>"
     },
@@ -131,9 +132,10 @@
       "idx": 11,
       "title": "Odstraňování prvků – „del“, „popitem()“, „pop()“, „clear()“",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": "pythonic",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Odstraňování prvků – „del“, „popitem()“, „pop()“, „clear()“</h2></div><div class=\"section-body\">\n\n  <p class=\"enumerate\">\n    Již nepotřebné dvojce klíč-hodnota se zbavíme snadno pomocí univerzálního <code>del</code>:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds\n{'a': 1, 'c': 'ahoj', 'b': [1, 2, 3], 'd': 'svět'}\n\n&gt;&gt;&gt; del ds['d']\n&gt;&gt;&gt; ds\n{'a': 1, 'c': 'ahoj', 'b': [1, 2, 3]}</pre>\n  \n  <p class=\"enumerate\">\n    Slovník můžeme také prvek po prvku „zničit“ metodou <code>popitem()</code>, která vrací dvojici <em>(klíč, hodnota)</em> (a to samozřejmě v „náhodném“ pořadí):\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds = { 'a': 'ahoj', 123: 'svět', (12, 'fokus'): 666, }\n&gt;&gt;&gt; ds\n{'a': 'ahoj', (12, 'fokus'): 666, 123: 'svět'}\n\n&gt;&gt;&gt; ds.popitem()\n('a', 'ahoj')</pre>\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n      Pokus o zavolání <code>popitem()</code> na prázdném slovníku vrátí <em>KeyError</em>.\n    </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n      Od verze Python'u 3.7 se prvky vrazí v pořadí LIFO („poslední dovnitř, první ven“).\n    </div></div></div>\n  \n  <p class=\"enumerate\">\n     V podobném duchu operuje metoda <code>pop(key, default=None)</code>, která odstraní prvek s klíčem <em>key</em> a vrátí jeho hodnotu (nebo <em>default</em>):\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds = { 'a': 'ahoj', 123: 'svět', (12, 'fokus'): 666, }\n&gt;&gt;&gt; ds\n{'a': 'ahoj', (12, 'fokus'): 666, 123: 'svět'}\n\n&gt;&gt;&gt; ds.pop('a')\n'ahoj'\n&gt;&gt;&gt; ds\n{(12, 'fokus'): 666, 123: 'svět'}</pre>\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        Pokud <em>default</em> neuvedete a <em>key</em> není platným klíčem, dočkáte se výjimky <em>KeyError</em>.\n      </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n        Proč nemají metody <em>pop()</em> a <em>popitem()</em> prohozené názvy, aby se svým chováním víc podobaly metodě <em>pop()</em> na seznamu, je mi záhadou.\n      </div></div></div>\n  \n  <p class=\"enumerate\">\n    Celý slovník pak můžeme smazat pomocí jeho metody <code>clear()</code>:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds.clear()\n&gt;&gt;&gt; ds\n{}</pre>\n\n</div>"
     },
@@ -145,7 +147,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Kopie slovníku – „copy()“</h2></div><div class=\"section-body\">\n\n  <p>\n    Jako jedna z mála datových struktur nabízí slovník i vlastní metodu pro tvorbu kopie – <code>copy()</code>. Jde ovšem o <strong>kopii mělkou</strong>, tzn. že <em>proměnné</em> (<em>mutable</em>) datové typy jsou pouze odkazovány, tudíž jakákoliv změna v nich se projeví i v kopii:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># pomocný seznam, tedy proměnná datová struktura\n&gt;&gt;&gt; xs = ['a', 'b', 'c']\n\n# a) Zaveďme slovník, který obsahuje podseznam..\n&gt;&gt;&gt; zs = { 1: xs }\n# ..a mělce jej zkopírujme:\n&gt;&gt;&gt; zs2 = zs.copy()\n# Výsledek je zatím nepřekvapivý:\n&gt;&gt;&gt; zs\n{1: ['a', 'b', 'c']}\n&gt;&gt;&gt; zs2\n{1: ['a', 'b', 'c']}\n\n# b) Odstraňme nyní z podseznamu poslední prvek:\n&gt;&gt;&gt; xs.pop()\n'c'\n&gt;&gt;&gt; xs\n['a', 'b']\n# Nyní už se děje něco, co ne každý asi očekával:\n&gt;&gt;&gt; zs\n{1: ['a', 'b']}\n&gt;&gt;&gt; zs2\n{1: ['a', 'b']}</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    Pro zájemce: Chcete-li zkopírovat všechny odkazované objekty nikoli odkazem, ale hodnotou, podívejte se po knihovním modulu <code>copy</code> a jeho metodě <code>copy.deepcopy()</code>.\n  </div></div>\n\n</div>"
     },
@@ -154,9 +156,10 @@
       "idx": 13,
       "title": "„Řazení“",
       "tags": [
-        "Core"
+        "Core",
+        "WOW"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">„Řazení“</h2></div><div class=\"section-body\">\n\n  <p>\n    Ve výchozím stavu prochází cyklus prvky slovníku v „náhodném“<sup>*</sup> pořadí:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds = { 'a': 1, 'b': [1,2,3], 'c': \"ahoj\", }\n\n&gt;&gt;&gt; for key in ds:\n...     print(key)\n...\na\nc\nb</pre>\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n    <sup>*</sup> Od Python'u verze 3.7 je pořadí podle pořadí zaznamenání do slovníku.\n  </div></div>\n  <p>\n    Pomocí zabudované funkce <code>sorted()</code> si ale můžeme <em>aktuální</em> průchod pro <em>navzájem porovnatelné</em> klíče vynutit seřazený:\n  </p>\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ds = { 'a': 1, 'b': [1,2,3], 'c': \"ahoj\", }\n\n&gt;&gt;&gt; for key in sorted(ds):\n...     print(key)\n...\na\nb\nc</pre>\n\n</div>"
     },

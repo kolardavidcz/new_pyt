@@ -7,7 +7,7 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -31,7 +31,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Vytvoření okna aplikace</h2></div><div class=\"section-body\">\r\n\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\n# naimportuj základní modul pro práci s GUI\nimport tkinter\n\n# a) založ nové okno\nroot = tkinter.Tk()\n# b) spusť hlavní smyčku zpracovávající události\nroot.mainloop()</pre>\r\n    <br>\r\n    <img src=\"_files/okno.png\" width=\"208\" height=\"227\" alt=\"screenshot okna\">\r\n    <p>\r\n        Založení okna aplikace je standardní – vytvoříme příslušný objekt (potomek <code>Tk</code>) a spustíme hlavní zpracovávací smyčku GUI-aplikací (tzv. <em>event loop</em>). Tato smyčka stále běží až do ukončení aplikace (ať už korektním uzavřením nebo havárií) a stará se o zpracování událostí, ke kterým v aplikaci dojde.\r\n    </p>\r\n\r\n</div>"
     },
@@ -53,7 +53,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Manažery vzhledu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Aby okno také něco dělalo, je třeba naplnit ho nějakými výkonnovými komponentami, jako jsou například tlačítka, menu, texty či obrázky. A tyto komponenty je třeba v rámci okna nějak uspořádat. <em>Tkinter</em> k tomuto účelu poskytuje tři různé (neviditelné) objekty (tzv. <em>layout managers</em>):\r\n    </p>\r\n    <ul>\r\n        <li>\r\n            <strong>pack</strong> – skládá komponenty za sebou do vertikálních a horizontálních boxů, které poté připojuje do okna na vyhovující pozici (nepřekvapivě asi nejvhodnější pro všechna jednodušší rozvržení obsahu okna);\r\n        </li>\r\n        <li>\r\n            <strong>grid</strong> – pozicuje komponenty v ploše do „oken mříže“ (typickým příkladem budiž kalkulačka :-);\r\n        </li>\r\n        <li>\r\n            <strong>place</strong> – pozicuje komponenty podle absolutních souřadnic (nepřekvapivě je těžko přenositelný, jeho použití je tudíž velmi speciální).\r\n        </li>\r\n    </ul>\r\n\r\n</div>"
     },
@@ -62,9 +62,9 @@
       "idx": 5,
       "title": "Příklad – obrázek v okně",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "resyntax",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Příklad – obrázek v okně</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Bez podrobností si ukažme rovnou, jak v okně aplikace zobrazit obrázek ve formátu GIF:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nimport tkinter\n\nroot = tkinter.Tk()\nroot.title('GIF soubor')\n\n# a) zavedení kanvasu daného rozměru jako potomka hlavního okna\ncanvas = tkinter.Canvas(root, width=256, height=256)\n# b) načtení obrázku a jeho vložení do kanvasu s příslušným relativním umístěním\nphoto = tkinter.PhotoImage(file='duha.gif')\nimage = canvas.create_image((256, 256), image=photo, anchor=tkinter.SE)\n# c) přidání kanvasu do zobrazeného boxu\ncanvas.pack()\n\nroot.mainloop()</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Části b) a c) mohou být prohozeny.\r\n    </div></div>\r\n    <img src=\"_files/duha.png\" width=\"268\" height=\"287\" alt=\"screenshot okna se zelenou duhou\">\r\n    <p>\r\n        PS: Pokud se nebudete hrabat v <em>geometry()</em>, vlastní okno aplikace se v rámci možností svou velikostí přizpůsobí obsahu.\r\n    </p>\r\n\r\n</div>"
     },
@@ -73,9 +73,10 @@
       "idx": 6,
       "title": "Poznámka – vlastnosti objektů",
       "tags": [
-        "Tricky"
+        "Core",
+        "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Poznámka – vlastnosti objektů</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Všimněte si, že zařazení kanvasu do hierarchie elementů a jeho zobrazení zařídilo zavolání metody <em>pack()</em> přímo na něm. Ve skutečnosti je tato metoda definována na úplně samostatné třídě a všechny jednotlivé komponenty GUI ji díky pythoní vícenásobné dědičnosti sdílejí.\r\n    </p>\r\n    <p>\r\n        Takovýchto tříd, ze kterých komponenty GUI dědí, je více. Výsledkem je, že volání všech potřebných věcí je díky této <em>delegaci</em> (volání metody z komponenty je přesměrováno na příslušný objekt) k dispozici pohodlně na každé komponentě.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Ovšem za cenu řádného znepřehlednění nejen nápovědy – každá GUI-komponenta má průměrně 150 metod, z nichž ovšem naprostá většina je výše uvedeným způsobem poděděná ze sdílených tříd (kterým se většinou říká <em>mixin</em>, protože jejich jediným úkolem je být předky mnoha jiných tříd; často se tak ovšem říká naopak i jejich potomkům).\r\n    </div></div>\r\n    <p>\r\n        Budete-li se chtít podívat, co všechno daný objekt umí, nejlepší je nápověda na příkazové řádce (případně rovnou <a href=\"http://tcl.tk/doc/\" class=\"external\">stránky dokumentace pro Tk</a>…). Někdy však postačí nechat si pro příslušný libovolný objekt GUI vypsat jeho <code>TkObjekt.config()</code> a/nebo <code>TkObjekt.keys()</code>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -95,9 +96,10 @@
       "idx": 8,
       "title": "Příklad – složitější aplikace (kód)",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Příklad – složitější aplikace (kód)</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Složitější GUI-aplikaci je zvykem (i z praktických důvodů) zavést spíše jako samostatnou třídu:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3\n\nfrom tkinter import *\n\nclass App:\n\n    def __init__(self, master):\n        # a) rámeček pro rozvržení plochy\n        master_frame = Frame(master)\n        master_frame.pack()\n        # b) rámeček pro umístění obrázku\n        img_frame = LabelFrame(master_frame, text=\"obrázek\")\n        img_frame.pack(fill=BOTH, expand=1)\n        # b1) obrázek\n        photo = PhotoImage(file='duha.gif')\n        img = Label(img_frame, image=photo)\n        img.photo = photo   # (aby nebyl obrázek zrušen při GC)\n        img.pack()\n        # c) rámeček pro umístění tlačítek\n        btn_frame = Frame(master_frame, relief=RAISED, borderwidth=1)\n        btn_frame.pack(fill=BOTH, expand=1)\n        # c1) tlačítko pro zavření aplikace\n        self.button_close = Button(\n            btn_frame, text=\"ZAVŘÍT\", fg=\"red\", command=btn_frame.quit\n        )\n        self.button_close.pack(side=LEFT, padx=5, pady=5)\n        # c2) tlačítko pro výpis na konzoli\n        self.button_print = Button(btn_frame, text=\"print\", command=self.print)\n        self.button_print.pack(side=RIGHT, padx=5, pady=5)\n\n    def print(self):\n        print(\"zpráva z GUI do konzole\")\n\ndef main():\n    root = Tk()\n    root.title('Aplikace s tlačítky')\n    app = App(root)\n    root.mainloop()\n\nif __name__ == '__main__':\n    main()</pre>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Volně podle <a href=\"http://effbot.org/tkinterbook/tkinter-hello-again.htm\" class=\"external\">http://effbot.org/tkinterbook/tkinter-hello-again.htm</a> a <a href=\"zetcode.com/gui/tkinter/layout/index.html\" class=\"external\">zetcode.com/gui/tkinter/layout/index.html</a>.\r\n    </div></div>\r\n\r\n</div>"
     },
@@ -106,7 +108,7 @@
       "idx": 9,
       "title": "Vlastnosti GUI-komponent",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "basics",
       "already_studied_in": null,

@@ -7,7 +7,8 @@
       "idx": 0,
       "title": "Základní datové typy – konstruktory",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
       "diff": "paradigm",
       "already_studied_in": null,
@@ -65,8 +66,7 @@
       "idx": 5,
       "title": "Kopírování objektů II",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -77,7 +77,8 @@
       "idx": 6,
       "title": "Poznámka",
       "tags": [
-        "Skip"
+        "Core",
+        "Tricky"
       ],
       "diff": "paradigm",
       "already_studied_in": null,
@@ -90,7 +91,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Hešovatelnost I</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Proměnné (<em>mutable</em>) a neproměnné (<em>immutable</em>) datové typy se od sebe liší tím, že druhé z nich představují objekty s fixní hodnotou (nemohou být tedy změněny), zatímco prvé nikoli. Prakticky to znamená, že <strong>neproměnné typy jsou hešovatelné</strong> (<em>hashable</em>), což obnáší:\r\n  </p>\r\n  <ol>\r\n    <li>\r\n        dají se převést na svoji heš-hodnotu, která se během jejich existence nikdy nezmění\r\n        <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n          Tuto hodnotu můžeme zjistit pomocí funkce <code>hash(OBJEKT)</code>. Tu na pozadí zajišťuje „magická“ metoda <code>__hash__()</code>.\r\n        </div></div>\r\n    </li>\r\n    <li>\r\n        dají se porovnávat s dalšími objekty\r\n        <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n          Porovnatelnost zjišťují porovnávací operátory, přičemž na pozadí stojí „magická“ metoda <code>__eq__()</code>.\r\n        </div></div>\r\n    </li>\r\n  </ol>\r\n  <p>\r\n    Hešovatelnost tak umožňuje použít neproměnné typy jako prvky <em>množin</em> a klíče <em>slovníků</em>. \r\n  </p>\r\n\r\n</div>"
     },
@@ -102,7 +103,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Hešovatelnost II</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Několik poznámek:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        Heš-hodnoty jsou celá čísla.\r\n    </li>\r\n    <li>\r\n        Rozdílné číselné typy stejné hodnoty mají samozřejmě stejnou heš (aby se porovnávaly stejně):\r\n    </li>\r\n  </ul>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; x, y = 1, 1.0\n&gt;&gt;&gt; type(x)\n&lt;class 'int'&gt;\n&gt;&gt;&gt; type(y)\n&lt;class 'float'&gt;\n&gt;&gt;&gt; hash(x) == hash(y)\nTrue</pre>\r\n  <ul>\r\n    <li>\r\n        Zdánlivě velmi podobná funkce <code>id(OBJEKT)</code> vrací „identifikátor“ objektu. Ten je po dobu života objektu jedinečný a konstantní, ale dva různé objekty existující v navzájem se nepřekrývajícím čase ho mohou mít stejný.\r\n    </li>\r\n    <li>\r\n        Instance uživatelem definovaných tříd jsou z principu hešovatelné – porovnávají se jako nerovné a jejich heš-hodnotou je jejich <em>id()</em>.\r\n    </li>\r\n  </ul>\r\n\r\n</div>"
     },
@@ -113,7 +114,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "basics",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Náročnost operací</h2></div><div class=\"section-body\">\r\n\r\n  \r\n  <p>\r\n    Vzhledem k interní stavbě základních datových struktur Python'u platí pro náročnost operací následující:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        seznamy, n-tice, řetězce:\r\n        <ol>\r\n          <li>náhodný přístup: O(1)</li>\r\n          <li>dotaz na prvek (<code>in</code>): O(n)</li>\r\n          <li>vložení/smazání prvku (pouze pro seznamy): O(n)</li>\r\n        </ol>\r\n    </li>\r\n    <li>\r\n        slovníky, množiny:\r\n        <ol>\r\n          <li>náhodný přístup: O(1)</li>\r\n          <li>dotaz na prvek (<code>in</code>): O(1)</li>\r\n          <li>vložení/smazání prvku: O(1)</li>\r\n        </ol>\r\n    </li>\r\n  </ul>\r\n  <p>\r\n    Kromě toho u slovníků (a množin) neexistuje lineární uspořádání prvků.\r\n  </p>\r\n  <div class=\"notes-block\"><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <a href=\"http://www.cis.upenn.edu/~lhuang3/cse399-python/\" class=\"external\">http://www.cis.upenn.edu/~lhuang3/cse399-python/</a>\r\n      </div></div><div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        <cite>Rance D. Necaise: „Data Structures and Algorithms Using Python“. John Wiley &amp; Sons, 2011.</cite>\r\n      </div></div></div>\r\n  \r\n\r\n</div>"
     },
@@ -122,10 +123,9 @@
       "idx": 10,
       "title": "Čísla",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Čísla</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Vynecháme-li rozšiřující moduly, máme v základním Python'u k dispozici tři číselné typy s odpovídajícími konverzními funkcemi:\r\n  </p>\r\n  <ul>\r\n    <li>\r\n        <code>int()</code> – celá čísla (s libovolnou přesností)\r\n    </li>\r\n    <li>\r\n        <code>float()</code> – reálná čísla (s přesností aktuální implementace)\r\n    </li>\r\n    <li>\r\n        <code>complex()</code> – komplexní čísla (jako dvojice reálných čísel)\r\n    </li>\r\n  </ul>\r\n  \r\n  <p class=\"enumerate\">\r\n    Uvedené v podstatě konstruktory neproměnných číselných typů mají jednu šikovnou vlastnost – zavolány bez argumentů vrací nulu v odpovídajícím typu:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; int()\n0\n\n&gt;&gt;&gt; float()\n0.0\n\n&gt;&gt;&gt; complex()\n0j</pre>\r\n\r\n</div>"
     },
@@ -134,7 +134,7 @@
       "idx": 11,
       "title": "Čísla – zápis",
       "tags": [
-        "Skip"
+        "Core"
       ],
       "diff": "resyntax",
       "already_studied_in": null,
@@ -148,7 +148,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "basics",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Čísla – převody</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Celá a reálná čísla na sebe můžeme převádět, stejně jako se můžeme pokusit vyextrahovat číslo z řetězce:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; float(1)\n1.0\n&gt;&gt;&gt; int(1.2)\n1\n\n&gt;&gt;&gt; float('1.23')\n1.23\n&gt;&gt;&gt; int('23')\n23</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Ale celé číslo z „reálného řetězce“ neuděláte:\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; int('1.23')\nTraceback (most recent call last):\n  File \"&lt;pyshell#72&gt;\", line 1, in &lt;module&gt;\nint('1.23')\nValueError: invalid literal for int() with base 10: '1.23'</pre>\r\n  </div></div>\r\n  <p>\r\n    PS: S komplexními čísly to takhle z pochopitelných důvodů nejde.\r\n  </p>\r\n  \r\n  <p class=\"enumerate\">\r\n    Funkce <em>int()</em> dokáže zpracovat čísla v nejrůznějších základech:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; int(\"f\", base=16)\n15\n&gt;&gt;&gt; int(\"10\", base=16)\n16\n\n&gt;&gt;&gt; int(\"7\", base=8)\n7\n&gt;&gt;&gt; int(\"10\", base=8)\n8\n\n&gt;&gt;&gt; int(\"2\", base=3)\n2\n&gt;&gt;&gt; int(\"10\", base=3)\n3</pre>\r\n\r\n</div>"
     },
@@ -157,8 +157,7 @@
       "idx": 13,
       "title": "Řetězce vs bajtové objekty",
       "tags": [
-        "Core",
-        "Tricky"
+        "Core"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
@@ -171,7 +170,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "pythonic",
+      "diff": "newconcept",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Řetězce vs bajtové objekty – vzájemné převody</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    Znakové a bajtové řetězce mezi sebou můžeme pomocí zvolených kódování navzájem převádět:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = '狼.cz'\n&gt;&gt;&gt; len(xs)\n4\n\n# ukázka tří různých způsobů bajtového zakódování téhož řetězce\n&gt;&gt;&gt; xs.encode('utf-8')\nb'\\xe7\\x8b\\xbc.cz'\n&gt;&gt;&gt; len( xs.encode('utf-8') )\n6\n&gt;&gt;&gt; xs.encode('gb18030')\nb'\\xc0\\xc7.cz'\n&gt;&gt;&gt; len( xs.encode('gb18030') )\n5\n&gt;&gt;&gt; xs.encode('big5')\nb'\\xafT.cz'\n&gt;&gt;&gt; len( xs.encode('big5') )\n5\n\n# řetězec → bajtový řetězec → řetězec\n&gt;&gt;&gt; xs.encode('big5').decode('big5')\n'狼.cz'</pre>\r\n\r\n</div>"
     },
@@ -207,7 +206,7 @@
         "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Hešovatelnost n-tic</h2></div><div class=\"section-body\">\r\n\r\n  <p>\r\n    N-tice jsou narozdíl od seznamů neměnné a tudíž hešovatelné (a tudíž použitelné jako prvky množin či jako klíče slovníků):\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; ts = (1, 2, 3)\n&gt;&gt;&gt; hash(ts)\n-378539185\n\n&gt;&gt;&gt; xs = [1, 2, 3]\n&gt;&gt;&gt; hash(xs)\nTraceback (most recent call last):\n  File \"&lt;pyshell#3&gt;\", line 1, in &lt;module&gt;\nhash(xs)\nTypeError: unhashable type: 'list'</pre>\r\n  <p>\r\n    Nesmíme to ovšem smíchat dohromady:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; xs = [1, 2, 3]\n&gt;&gt;&gt; ts = (1, 2, xs)\n&gt;&gt;&gt; ts\n(1, 2, [1, 2, 3])\n&gt;&gt;&gt; type(ts)\n&lt;class 'tuple'&gt;\n&gt;&gt;&gt; hash(ts)\nTraceback (most recent call last):\n  File \"&lt;pyshell#6&gt;\", line 1, in &lt;module&gt;\nhash(ts)\nTypeError: unhashable type: 'list'</pre>\r\n  <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n    Algoritmus pro „výrobu“ heše jednoduše „cestou“ narazil ve třetí položce n-tice na nehešovatelný typ.\r\n  </div></div>\r\n\r\n</div>"
     },
@@ -216,9 +215,9 @@
       "idx": 18,
       "title": "N-tice jako vstupní parametry funkcí",
       "tags": [
-        "Skip"
+        "Core"
       ],
-      "diff": "basics",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">N-tice jako vstupní parametry funkcí</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Zatímco skoro všude jsou následující dva zápisy n-tice ekvivalentní..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">prvek1, prvek2, prvek3\n(prvek1, prvek2, prvek3)</pre>\r\n    <p>\r\n        ..uvnitř závorek při volání funkcí to už není pravda:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">funkce(  prvek1, prvek2, prvek3  )      # zavolej funkci se třemi parametry\nfunkce( (prvek1, prvek2, prvek3) )      # zavolej funkci s jedním parametrem</pre>\r\n\r\n</div>"
     },
@@ -239,10 +238,9 @@
       "idx": 20,
       "title": "Množiny a slovníky – hešovatelnost",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Množiny a slovníky – hešovatelnost</h2></div><div class=\"section-body\">\r\n\r\n  <p class=\"enumerate\">\r\n    Narozdíl od dychotomie mezi n-ticemi a seznamy, kde souvislost „neměnná n-tice – proměnný seznam“ není zcela košer, u množin je to jednoduché: Potřebujeme-li neproměnnou množinu (a tudíž i hešovatelnou), využijeme konstrukturu <code>frozenset()</code>. Tuto „zamrzlou“ množinu je pak samozřejmě možné používat jako prvek jiných množin nebo klíč do slovníků.\r\n  </p>\r\n\r\n  <p class=\"enumerate\">\r\n    Slovníky a množiny jako proměnné typy hešovatelné nejsou, zmražené množiny jako typ neproměnný pak ano:\r\n  </p>\r\n  <pre class=\"brush: python; gutter: false; toolbar: false; \"># zmražená množina\n&gt;&gt;&gt; hash( frozenset({1,}) )\n593349751\n\n# množina\n&gt;&gt;&gt; hash( {1,} )\nTraceback (most recent call last):\n  File \"&lt;pyshell#58&gt;\", line 1, in &lt;module&gt;\nhash( {1,} )\nTypeError: unhashable type: 'set'\n\n# slovník\n&gt;&gt;&gt; hash( {1: 1,} )\nTraceback (most recent call last):\n  File \"&lt;pyshell#57&gt;\", line 1, in &lt;module&gt;\nhash( {1: 1,} )\nTypeError: unhashable type: 'dict'</pre>\r\n\r\n</div>"
     },
@@ -275,8 +273,7 @@
       "idx": 23,
       "title": "Vzájemné konverze typů",
       "tags": [
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": null,

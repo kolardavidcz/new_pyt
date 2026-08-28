@@ -9,7 +9,7 @@
       "tags": [
         "Core"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\n\n    <p>\n        <strong><code>print()</code></strong> – pravděpodobně nejpoužívanější funkce Python'u. A to nejen pro výstup na konzoli. Její syntaxe jest:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">        print(\n            [object, ...]\n            sep=' ', end='\n', file=sys.stdout, flush=False\n        )</pre>\n    <ul>\n        <li>\n            Libovolný počet objektů <em>object</em> je převeden na řetězec (pokud se to podaří) a..\n        </li>\n        <li>\n            ..poslán na aktuální výstup (<em>file=</em>), kterým je ve výchozím nastavení <em>sys.stdout</em>, tedy standardní výstup konzole (není-li sám tento odkaz předefinován na něco jiného).\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\"> Jinak to musí být objekt obsahující metodou <em>write(string)</em>. </div></div>\n        </li>\n        <li>\n            Přitom mezi jednotlivými objekty je při výchozím nastavení přidána mezera (<em>sep=' '</em>)..\n        </li>\n        <li>\n            ..a za posledním z nich je odřádkováno (<em>end='\\n'</em>).\n        </li>\n        <li>\n            Navíc při výchozím nastavení je výstup bafrován (<em>flush=False</em>), tedy uložen do (řádkové) mezipaměti (<em>cash'e</em>) a vypsán až na vyžádání (typicky pomocí <code>sys.stdout.flush()</code>).\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\"> Velmi příjemná novinka Python'u 3.3. </div></div>\n        </li>\n    </ul>\n\n</div>"
     },
@@ -31,7 +31,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "basics",
+      "diff": "resyntax",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">(Ne)tisknutelné hodnoty</h2></div><div class=\"section-body\">\n    \n    <p>\n        <em>print()</em> se pokusí vyhodnotit jako tisknutelný řetězec prakticky cokoliv, co mu předhodíte (podobně jako <em>str()</em>). Mimo jiné to znamená, že pokud není vstupní řetězec označen jako <em>raw</em> (tedy <code>r\"\"</code>), budou v něm vyhodnoceny všechny tzv. <strong><em>escape characters</em></strong>, včetně číselných referencí na znaky:\n    </p>\n    <table border=\"1\" class=\"center\">\n        <tr>\n            <th> hexadecimálně </th>\n            <th> speciální \\-notace </th>\n            <th> význam </th>\n        </tr>\n        <tr>\n            <td> 0x07 </td>\n            <td> <code>\\a</code> </td>\n            <td> zvonek, <em>bell</em>, <em>alert</em> </td>\n        </tr>\n        <tr>\n            <td> 0x08 </td>\n            <td> <code>\\b</code> </td>\n            <td> <em>backspace</em> </td>\n        </tr>\n        <tr>\n            <td> 0x09 </td>\n            <td> <code>\\t</code> </td>\n            <td> tabulátor (horizontální) </td>\n        </tr>\n        <tr>\n            <td> 0x0a </td>\n            <td> <code>\\n</code> </td>\n            <td> odřádkování, <em>newline</em> </td>\n        </tr>\n        <tr>\n            <td> 0x0b </td>\n            <td> <code>\\v</code> </td>\n            <td> vertikální tabulátor </td>\n        </tr>\n        <tr>\n            <td> 0x0c </td>\n            <td> <code>\\f</code> </td>\n            <td> <em>formfeed</em> </td>\n        </tr>\n        <tr>\n            <td> 0x0d </td>\n            <td> <code>\\r</code> </td>\n            <td> <em>carriage return</em> </td>\n        </tr>\n        <tr>\n            <td></td>\n            <td> <code>\\\\</code> </td>\n            <td> zpětné lomítko, <em>backslash</em> </td>\n        </tr>\n        <tr>\n            <td></td>\n            <td> <code>\\'</code> </td>\n            <td> jednoduchá uvozovka </td>\n        </tr>\n        <tr>\n            <td></td>\n            <td> <code>\\\"</code> </td>\n            <td> dvojtá uvozovka </td>\n        </tr>\n        <tr>\n            <td></td>\n            <td> <code>\\nnn</code> </td>\n            <td> oktalová notace, <code>n ∈ {0..7}</code> </td>\n        </tr>\n        <tr>\n            <td></td>\n            <td> <code>\\xnn</code> </td>\n            <td> hexadecimální notace, <code>n ∈ {0..9, a..f, A..F}</code> </td>\n        </tr>\n        <tr>\n            <td></td>\n            <td> <code>\\N{alias}</code> </td>\n            <td> unicodový znak <a href=\"http://www.unicode.org/Public/6.1.0/ucd/NameAliases.txt\" class=\"external\">jména</a> <em>alias</em> </td>\n        </tr>\n        <tr>\n            <td></td>\n            <td> <code>\\uxxxx</code> </td>\n            <td> unicodový znak s 16ti bitovou hodnotou <em>xxxx</em> </td>\n        </tr>\n        <tr>\n            <td></td>\n            <td> <code>\\Uxxxxxxxx</code> </td>\n            <td> unicodový znak s 32ti bitovou hodnotou <em>xxxxxxxx</em> </td>\n        </tr>\n        \n    </table>\n    <p>\n        PS: Prakticky to znamená, že na terminálech, které to podporují, můžete třeba zapípat pomocí <code>print(chr(7))</code> nebo mazat předchozí napsaný text pomocí <code>print(chr(8))</code> ^_~\n    </p>\n    \n</div>"
     },
@@ -41,8 +41,7 @@
       "title": "Formátování výstupu",
       "tags": [
         "Already Studied",
-        "Core",
-        "WOW"
+        "Core"
       ],
       "diff": "pythonic",
       "already_studied_in": {
@@ -62,9 +61,9 @@
       "title": "„Format Specification Mini-Language“",
       "tags": [
         "Core",
-        "WOW"
+        "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "pythonic",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">„Format Specification Mini-Language“</h2></div><div class=\"section-body\">\n\n    \n    <p>\n        V principu tento nový formátovací minijazyk říká:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false;\">{CO:JAK}</pre>\n    <p>\n        Část <em>CO</em> je jednoduchá – odkazovaný (ať už pořadím nebo jménem) objekt, který bude převeden na řetězec. Část <em>JAK</em> je složitá (byť by měla hodně odpovídat starší céčkovské konvenci), obsluhuje především výpis čísel a radši uvedu rovnou definici z dokumentace:\n    </p>\n    <pre>format_spec     ::=  [[fill]align][sign][#][0][width][grouping_option][.precision][type]\nfill            ::=  &lt;any character&gt;\nalign           ::=  \"&lt;\" | \"&gt;\" | \"=\" | \"^\"\nsign            ::=  \"+\" | \"-\" | \" \"\nwidth           ::=  digit+\ngrouping_option ::=  \"_\" | \",\"\nprecision       ::=  digit+\ntype            ::=  \"b\"|\"c\"|\"d\"|\"e\"|\"E\"|\"f\"|\"F\"|\"g\"|\"G\"|\"n\"|\"o\"|\"s\"|\"x\"|\"X\"|\"%\"</pre>\n    <p>\n        Zleva doprava se tedy mohou vyskytnout následující formátovací a zobrazovací prvky:\n    </p>\n    <ol>\n        <li>\n            <strong>vyplňovací znak</strong> následovaný <strong>zarovnáním tisknutého řetězce</strong> (<code>&lt;</code> pro zarovnání doleva, <code>&gt;</code> doprava, <code>^</code> na střed a <code>=</code> pro výplň mezi znaménkem čísla a vlastním číslem);\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n                Zarovnání bez vyplňovacího znaku je možné uvést (zarovnává se pak tradičně mezerou), opačně však pochopitelně nikoli.\n            </div></div>\n        </li>\n        <li>\n            <strong>zobrazení znaménka čísla</strong> (<code>+</code> tiskne vždy plus i mínus, <code>-</code> pouze mínus, mezera tiskne mínus a místo plusu mezeru);\n        </li>\n        <li>\n            znak <code>#</code> způsobí konverzi čísla plus zobrazení identifikátoru číselné soustavy<sup>*</sup>, znak <code>0</code> na tomto místě v podstatě odpovídá zarovnání nulou <code>0=</code> na začátku;\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n                <sup>*</sup> Záleží na typu zobrazovaného čísla.\n            </div></div>\n        </li>\n        <li>\n            požadovaná <strong>šířka výstupu</strong> (resp. pro čísla počet zobrazených číslic);\n        </li>\n        <li>\n            <strong>oddělovač</strong> tisíců resp. čtveřic čísel (buď <code>,</code> nebo <code>_</code>);\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n                Záleží na typu zobrazovaného čísla.\n            </div></div>\n        </li>\n        <li>\n            po tečce <strong>přesnost zobrazení čísel</strong>;\n        </li>\n        <li>\n            <strong>typ tisknuté hodnoty</strong>.\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n                Vlastně ovlivňuje všechno ostatní, takže pozor na něj. Obzvláště pro reálná čísla (<code>eEfFgG%</code>) je to solidní masakr. Pro řetězce tam nemusíte psát nic (nebo <code>s</code>).\n            </div></div>\n        </li>\n    </ol>\n    <p>\n        PS: Pro podrobnosti se podívejte na originální <a href=\"https://docs.python.org/3/library/string.html#format-specification-mini-language\" class=\"external\">specifikaci</a> a <a href=\"https://docs.python.org/3/library/string.html#format-examples\" class=\"external\">příklady</a>.\n    </p>\n\n</div>"
     },
@@ -73,7 +72,7 @@
       "idx": 5,
       "title": "Formátování formátování",
       "tags": [
-        "Skip"
+        "WOW"
       ],
       "diff": "pythonic",
       "already_studied_in": null,
@@ -150,10 +149,9 @@
       "idx": 12,
       "title": "Velikost terminálu",
       "tags": [
-        "Core",
-        "WOW"
+        "Skip"
       ],
-      "diff": "pythonic",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Velikost terminálu</h2></div><div class=\"section-body\">\n\n    <p>\n        Na závěr ještě jedna třešnička na dortu. Funkce <strong><em>get_terminal_size()</em></strong> vrací velikost aktuálního terminálového okna, ve kterém jste spustili příslušný skript, a to v podobě podtřídy n-tice, takže příslušné údaje můžete snadno vytáhnout následujícím způsobem:\n    </p>\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; import shutil\n\n&gt;&gt;&gt; shutil.get_terminal_size()\nos.terminal_size(columns=80, lines=24)\n\n&gt;&gt;&gt; cols, rows = shutil.get_terminal_size()\n&gt;&gt;&gt; cols, rows\n(80, 24)</pre>\n    <p>\n        Tato funkce ve skutečnosti způsobí následující posloupnost kroků:\n    </p>\n    <ol>\n        <li>\n            pokus o zjištění hodnot proměnných prostředí <em>COLUMNS</em> a <em>LINES</em>;\n        </li>\n        <li>\n            když selže předchozí bod, zavolá funkci <em>os.get_terminal_size()</em>, která se pokusí zjistit rozměry terminálu připojeného na <em>sys.__stdout__</em>;\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n                Což je ve většině případů stav terminálu po spuštění prostředí (týká se i <em>sys.__stdin__</em> a <em>sys.__stderr__</em>).\n            </div></div>\n        </li>\n        <li>\n            když i to selže, vrátí výchozí hodnotu <code>(80, 24)</code>.\n            <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\n                Kterou můžete tedy při volání přespecifikovat: <code>shutil.get_terminal_size(fallback=(columns, lines))</code>\n            </div></div>\n        </li>\n    </ol>\n    <p>\n        Většinou to funguje docela dobře, ale terminály a vůbec jednotlivá prostředí se tak liší, že úplně se na to spoléhat nedá.\n    </p>\n\n</div>"
     }

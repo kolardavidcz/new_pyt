@@ -7,9 +7,9 @@
       "idx": 0,
       "title": "Úvod",
       "tags": [
-        "Core"
+        "Skip"
       ],
-      "diff": "newconcept",
+      "diff": "basics",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        V <a href=\"oop.xml?slajd=11\">úvodní přednášce o OOP v Python'u</a> jsem zmiňoval, že volání příslušných rodičovských metod z jejich redefinice na potomcích obstarává funkce <code>super()</code>.\r\n    </p>\r\n    <p>\r\n        Jelikož funkce <code>super()</code> toho ale umí mnohem víc, podíváme se jí v této přednášce na zoubek.\r\n    </p>\r\n\r\n</div>"
     },
@@ -18,7 +18,7 @@
       "idx": 1,
       "title": "Možnosti dědění",
       "tags": [
-        "Core"
+        "Skip"
       ],
       "diff": "basics",
       "already_studied_in": null,
@@ -40,6 +40,7 @@
       "idx": 3,
       "title": "Dlouhý řetězec předků II",
       "tags": [
+        "Core",
         "Tricky"
       ],
       "diff": "newconcept",
@@ -62,10 +63,10 @@
       "idx": 5,
       "title": "Více rodičů II",
       "tags": [
-        "Tricky",
-        "WOW"
+        "Core",
+        "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Více rodičů II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Dokud se do toho zase nenaveze <code>super()</code>:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A:\n    def mtd(self):\n        print('A')\n\nclass B:\n    def mtd(self):\n        print('B')\n\nclass C:\n    def mtd(self):\n        print('C')\n\nclass D(A, B, C):\n    def mtd(self):\n        super().mtd()\n\np = D()\np.mtd() # A</pre></div><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A:\n    def mtd(self):\n        print('A')\n\nclass B:\n    def mtd(self):\n        print('B')\n\nclass C:\n    def mtd(self):\n        print('C')\n\nclass D(A, B, C):\n    def mtd(self):\n        super(B, self).mtd()\n\np = D()\np.mtd() # C</pre></div></div>\r\n    <p>\r\n        Tady už vysvětlení, proč <code>super(B, self)</code> vrátí metodu z třídy <em>C</em>, vyžaduje trochu kreativního přemýšlení – při čtení zleva doprava je prostě po třídě <em>B</em> dalším předkem třída <em>C</em>. Abychom si v tom udělali pořádek – dojdou-li předci přímí, dalšími jsou <em>sourozenci</em>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -75,9 +76,9 @@
       "title": "„MRO“ (Method Resolution Order) I",
       "tags": [
         "Core",
-        "Tricky"
+        "WOW"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">„MRO“ (Method Resolution Order) I</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Smícháme-li oba přístupy dohromady, projeví se naplno <a href=\"/materialy/python/modules/inspect.xml?slajd=8\">algoritmus <em>MRO</em></a> v akci:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A1:\n    def mtd(self):\n        print('A1')\n\nclass A2(A1):\n    def mtd(self):\n        print('A2')\n\nclass B1:\n    def mtd(self):\n        print('B1')\n\nclass B2(B1):\n    def mtd(self):\n        print('B2')\n\nclass D(A2, B2):\n    def mtd(self):\n        super().mtd()\n\np = D()\np.mtd() # A2</pre></div><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A1:\n    def mtd(self):\n        print('A1')\n\nclass A2(A1):\n    ...\n\nclass B1:\n    def mtd(self):\n        print('B1')\n\nclass B2(B1):\n    def mtd(self):\n        print('B2')\n\nclass D(A2, B2):\n    def mtd(self):\n        super().mtd()\n\np = D()\np.mtd() # A1</pre></div></div>\r\n    <p>\r\n        Ve zkratce: <strong>Zleva doprava, ale pro každou pozici nejdříve prozkoumat její předky.</strong> (Neboli: Prozkoumávají se sourozenci v pořadí zápisu v hlavičce třídy, ale než se přejde k dalšímu, prozkoumá se celý rodokmen aktuálního sourozence.)\r\n    </p>\r\n\r\n</div>"
     },
@@ -86,9 +87,10 @@
       "idx": 7,
       "title": "„MRO“ (Method Resolution Order) II",
       "tags": [
+        "Core",
         "Tricky"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">„MRO“ (Method Resolution Order) II</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pořadí prohledávání je zachováno i při použití <code>super()</code> s parametry:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A1:\n    def mtd(self):\n        print('A1')\n\nclass A2(A1):\n    def mtd(self):\n        print('A2')\n\nclass B1:\n    def mtd(self):\n        print('B1')\n\nclass B2(B1):\n    def mtd(self):\n        print('B2')\n\nclass D(A2, B2):\n    def mtd(self):\n        super().mtd()\n\np = D()\np.mtd() # A2</pre></div><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A1:\n    def mtd(self):\n        print('A1')\n\nclass A2(A1):\n    def mtd(self):\n        print('A2')\n\nclass B1:\n    def mtd(self):\n        print('B1')\n\nclass B2(B1):\n    def mtd(self):\n        print('B2')\n\nclass D(A2, B2):\n    def mtd(self):\n        super(B2, self).mtd()\n\np = D()\np.mtd() # B1</pre></div></div>\r\n    <p>\r\n        Jen jsme prostě vnutili začátek hledání v rámci řetězce <em>MRO</em> do jiného místa (zde do předka třídy <em>B2</em>).\r\n    </p>\r\n\r\n</div>"
     },
@@ -99,7 +101,7 @@
       "tags": [
         "Skip"
       ],
-      "diff": "newconcept",
+      "diff": "paradigm",
       "already_studied_in": null,
       "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">„MRO“ (Method Resolution Order) III</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Kdo by tomu nevěřil, zde je trošku zašmodrchanější příklad:\r\n    </p>\r\n    <div class=\"example-block example-horizontal\"><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A1:\n    ...\n\nclass A2(A1):\n    ...\n\nclass B1:\n    def mtd(self):\n        print('B1')\n\nclass B2(B1):\n    ...\n\nclass C1:\n    def mtd(self):\n        print('C1')\n\nclass C2(C1):\n    def mtd(self):\n        print('C2')\n\nclass D(A2, B2, C2):\n    def mtd(self):\n        super().mtd()\n\np = D()\np.mtd() # B1</pre></div><div class=\"example-col\"><pre class=\"brush: python; gutter: false; toolbar: false;\">class A1:\n    ...\n\nclass A2(A1):\n    ...\n\nclass B1:\n    def mtd(self):\n        print('B1')\n\nclass B2(B1):\n    ...\n\nclass C1:\n    def mtd(self):\n        print('C1')\n\nclass C2(C1):\n    def mtd(self):\n        print('C2')\n\nclass D(A2, B2, C2):\n    def mtd(self):\n        super(B1, self).mtd()\n\np = D()\np.mtd() # C2</pre></div></div>\r\n    <p>\r\n        Bez parametrů najde <code>super()</code> metodu <em>mtd()</em> postupným prohledáváním podle <em>MRO</em> až na třídě <em>B1</em>. Když však přes <code>super(B1, self)</code> předepíšeme, aby začal prohledávání v rámci <em>MRO</em> až od prvku předcházejícího třídě <em>B1</em>, prvním vyhovujícím předkem bude třída <em>C2</em>.\r\n    </p>\r\n\r\n</div>"
     },
@@ -108,7 +110,8 @@
       "idx": 9,
       "title": "Souhrn",
       "tags": [
-        "Core"
+        "Core",
+        "Tricky"
       ],
       "diff": "newconcept",
       "already_studied_in": null,
