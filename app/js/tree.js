@@ -103,9 +103,10 @@ function buildWeekNode(week, items) {
   row.dataset.id = week.id;
   if (state.focusedTreeKey === week.id) row.classList.add("active");
 
+  const milestoneBadge = week.milestone ? `<span title="Semestrální projektový milník ${week.milestone.number}" style="margin-left:4px;color:#f59e0b;font-size:11px;">🏆</span>` : "";
   const weekLabel = isGrayShelf
-    ? `🗑️ ${escape(week.title)}`
-    : `W${week.week} · ${escape(week.title)}`;
+    ? `📚 Regál doplňků (Self-Study)`
+    : `W${week.week}${milestoneBadge} · ${escape(week.title)}`;
 
   row.innerHTML = `
     <span class="tree-twistie">${svgChevron()}</span>
