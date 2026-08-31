@@ -1428,33 +1428,50 @@ const TIERS = [
   },
 ];
 
-function getTierItems(level) {
-  const tier = TIERS.find((t) => t.level === level) || TIERS[3];
-  return state.items.filter(tier.filter);
-}
+export function printCoursePlan() {
+  const isDone = (id) => isCompleted(id);
+  const allWeeks = state.course?.weeks || [];
 
-function printTier(level) {
-  const tier = TIERS.find((t) => t.level === level) || TIERS[3];
-  const items = getTierItems(level);
-  const done = (id) => state.studied.has(id);
+  // 1. W1..W12 sorted numerically
+  const semesterWeeks = allWeeks
+    .filter((w) => w.week >= 1 && w.week <= 12)
+    .sort((a, b) => a.week - b.week);
+
+  // 2. W0 placed at the very end
+  const week0 = allWeeks.find((w) => w.week === 0);
+
+  // 3. Complete ordered list (excluding W99)
+  const orderedWeeks = [...semesterWeeks, ...(week0 ? [week0] : [])];
 
   const weekMap = new Map();
-  for (const week of state.course?.weeks || []) {
-    const weekItems = [...(week.lectures || []), ...(week.exercises || [])]
-      .map((it) => state.itemsById.get(it.id) || it)
-      .filter((it) => items.some((i) => i.id === it.id));
+  let totalLecs = 0;
+  let totalExs = 0;
+  let totalStudied = 0;
+
+  for (const week of orderedWeeks) {
+    const weekItems = [
+      ...(week.lectures || []).filter((l) => !l.tags?.includes("Skip")),
+      ...(week.exercises || []),
+    ].map((it) => state.itemsById.get(it.id) || it);
+
     if (weekItems.length) {
       weekMap.set(week, weekItems);
+      totalLecs += weekItems.filter((i) => i.kind === "lecture").length;
+      totalExs += weekItems.filter((i) => i.kind === "exercise").length;
+      totalStudied += weekItems.filter((i) => isDone(i.id)).length;
     }
   }
+
+  const totalItems = totalLecs + totalExs;
+  const pct = totalItems > 0 ? Math.round((totalStudied / totalItems) * 100) : 0;
 
   const output = el("div", { className: "print-tier-output", id: "printTierOutput" });
 
   const header = el("div", { className: "print-tier-header" });
   header.innerHTML = `
-    <h1>Python Study Plan — ${escapeHtml(tier.label)}</h1>
-    <p class="tier-subtitle">${escapeHtml(tier.desc)}</p>
-    <p class="tier-stats">${items.length} items · ${items.filter(i => done(i.id)).length} studied · Generated ${new Date().toLocaleDateString("cs-CZ")}</p>
+    <h1>Python Study Plan — Kompletní kurikulum (W1–W12 + W0)</h1>
+    <p class="tier-subtitle">Strukturovaný přehled přednášek a praktických cvičení pro studenty VŠCHT Praha</p>
+    <p class="tier-stats">${totalLecs} přednášek · ${totalExs} cvičení · ${totalStudied}/${totalItems} hotovo (${pct}%) · Vygenerováno ${new Date().toLocaleDateString("cs-CZ")}</p>
   `;
   output.appendChild(header);
 
@@ -1464,15 +1481,16 @@ function printTier(level) {
 
     const section = el("div", { className: "print-tier-week" });
     const head = el("div", { className: "print-tier-week-head" });
-    head.textContent = `W${week.week} · ${week.title}`;
+    const weekLabel = week.week === 0 ? "W0 (Nástroje)" : `W${week.week}`;
+    head.textContent = `${weekLabel} · ${week.title}`;
     section.appendChild(head);
 
     const cols = el("div", { className: "print-tier-cols" });
 
     function renderRow(item) {
-      const isDone = done(item.id);
+      const done = isDone(item.id);
       const exData = item.kind === "exercise" ? state.exercises[item.path] : null;
-      const tagBadges = (item.tags || []).map(t => `<span class="ptr-badge ptr-badge-${escapeHtml(t)}">${escapeHtml(t)}</span>`).join("");
+      const tagBadges = (item.tags || []).map((t) => `<span class="ptr-badge ptr-badge-${escapeHtml(t)}">${escapeHtml(t)}</span>`).join("");
       const relBar = starsHtml(item.relevance || 5, 10, "compact");
       let scoreBars = "";
       if (exData?.tasks?.length) {
@@ -1483,10 +1501,10 @@ function printTier(level) {
 
       return `
         <div class="print-tier-row">
-          <div class="ptr-chk${isDone ? " done" : ""}"></div>
+          <div class="ptr-chk${done ? " done" : ""}"></div>
           <span class="ptr-title" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</span>
           <span class="ptr-badges">${tagBadges}</span>
-          <span class="ptr-bars">${relBar}${scoreBars ? ' ' + scoreBars : ''}</span>
+          <span class="ptr-bars">${relBar}${scoreBars ? " " + scoreBars : ""}</span>
         </div>
       `;
     }
@@ -1506,7 +1524,7 @@ function printTier(level) {
   document.body.classList.add("printing-tier");
 
   const prevTitle = document.title;
-  document.title = `Python Study Plan — ${tier.label}`;
+  document.title = "Python Study Plan — Kompletní kurikulum (W1–W12, W0)";
 
   window.addEventListener("afterprint", function cleanup() {
     document.body.classList.remove("printing-tier");
@@ -1517,8 +1535,10 @@ function printTier(level) {
 
   window.print();
 }
+
 if (typeof window !== "undefined") {
-  window.printTier = printTier;
+  window.printCoursePlan = printCoursePlan;
+  window.printTier = printCoursePlan;
 }
 
 function progressVibe(pct, studiedN, total) {
@@ -1712,17 +1732,15 @@ export function showProgress() {
     </div>
   `;
 
-  // 4 Cumulative Tier Print Buttons
+  // Single Print Button for W1..W12 + W0
   const printGroup = el("div", { className: "print-tier-buttons" });
-  for (const t of TIERS) {
-    const btn = el("button", {
-      type: "button",
-      className: `btn ${t.level === 1 ? "primary" : "secondary"}`,
-      title: `${t.desc} (Print PDF)`,
-      onClick: () => printTier(t.level),
-    }, `Print: ${t.label} 🖨`);
-    printGroup.appendChild(btn);
-  }
+  const btn = el("button", {
+    type: "button",
+    className: "btn primary",
+    title: "Vytisknout kompletní studijní plán (W1–W12 + W0)",
+    onClick: () => printCoursePlan(),
+  }, "Vytisknout studijní plán (W1–W12, W0) 🖨");
+  printGroup.appendChild(btn);
   heroText.appendChild(printGroup);
 
   hero.append(ring, heroText);

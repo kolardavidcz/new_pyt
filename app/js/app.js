@@ -624,8 +624,10 @@ function initSash() {
 
 function triggerPrint() {
   const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
-  if (window.printTier && (!activeTab || activeTab.kind === "progress" || activeTab.kind === "home")) {
-    window.printTier(4);
+  if (window.printCoursePlan && (!activeTab || activeTab.kind === "progress" || activeTab.kind === "home")) {
+    window.printCoursePlan();
+  } else if (window.printTier && (!activeTab || activeTab.kind === "progress" || activeTab.kind === "home")) {
+    window.printTier();
   } else {
     window.print();
   }
