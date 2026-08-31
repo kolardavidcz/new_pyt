@@ -1086,9 +1086,10 @@ export async function fetchAndExtract(path) {
       const res = await fetch(`/data/lectures/${s}.json`);
       if (res.ok) {
         const data = await res.json();
-        if (data && Array.isArray(data.slides) && data.slides.length > 0) {
-          cache.set(path, data.slides);
-          return data.slides;
+        const slides = Array.isArray(data) ? data : (data?.slides && Array.isArray(data.slides) ? data.slides : null);
+        if (slides && slides.length > 0) {
+          cache.set(path, slides);
+          return slides;
         }
       }
     } catch { /* ignore */ }
