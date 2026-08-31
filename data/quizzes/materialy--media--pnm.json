@@ -1,0 +1,85 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Které magické číslo v hlavičce souboru PNM označuje binární formát pro RGB obrázek (PPM)?",
+    "options": [
+      "A) P6",
+      "B) P5",
+      "C) P4",
+      "D) P3"
+    ],
+    "answer": 0,
+    "explanation": "Magická čísla P1/P4 patří PBM, P2/P5 patří PGM a P3/P6 patří PPM. Sudá čísla označují binární kódování, tudíž binární RGB obrázek je P6.",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "predict_output",
+    "question": "Co v monochromatických formátech PBM (P1 a P4) představují bity či čísla 0 a 1?",
+    "options": [
+      "A) Hodnoty 0 a 1 jsou závislé výhradně na zvoleném nastavení palety v hlavičce.",
+      "B) 0 představuje bílou barvu (pozadí) a 1 představuje černou barvu (popředí).",
+      "C) 0 představuje průhlednost a 1 představuje maximální nastavenou barvu.",
+      "D) 0 představuje černou barvu (popředí) a 1 představuje bílou barvu (pozadí)."
+    ],
+    "answer": 1,
+    "explanation": "V formátu PBM označuje hodnota 0 bílé pozadí a hodnota 1 černou barvu. To je opacně oproti šedotónovým formátům PGM, kde 0 znamená nejtmavší (černou).",
+    "code": null
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jak jsou uložena grafická data pixelů v binární variantě P4 formátu PBM?",
+    "options": [
+      "A) Pixely jsou komprimovány jednoduchým během opakovaných hodnot RLE do bajtů.",
+      "B) Každé dva pixely jsou sloučeny do jednoho bajtu v podobě čtyřbitových nibblů.",
+      "C) Každý bajt obsahuje přesně 8 pixelů, kde jednotlivé bity odpovídají černobílým pixelům.",
+      "D) Každému pixelu odpovídá právě jeden celý bajt obsahující hodnotu 0x00 nebo 0xFF."
+    ],
+    "answer": 2,
+    "explanation": "V binárním PBM (P4) je pro úsporu 8 pixelů sloučeno do 1 bajtu. Pokud šířka obrázku není násobkem 8, přebytečné bity v posledním bajtu se doplňují nulami.",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "predict_output",
+    "question": "Jaký problém nastává při zapsání binárního formátu P5 nebo P6 na systému Windows s koncem řádek \\r\\n?",
+    "options": [
+      "A) Hlavička souboru je parserem odmítnuta jako neplatná z důvodu nálezu nepovolených znaků.",
+      "B) Zpracovávající aplikace zkonvertuje dvoubajtový konec řádky na jediný mezerní bajt.",
+      "C) Soubor se sice otevře, ale barevná data všech pixelů se posunou o 8 bitů v barevné paletě.",
+      "D) Znak \\r poslouží jako oddělovač hlavičky a znak \\n je chybě interpretován jako první bajt dat."
+    ],
+    "answer": 3,
+    "explanation": "Binární data v PNM musí začínat těsně za jediným whitespace bajtem. Při Windows konci řádek \\r\\n ukončí znak \\r (CR) hlavičku a znak \\n (LF, 0x0A) přečte dekodér jako první datový bajt.",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "fill_blank_choice",
+    "question": "Doplňte rozbalení trojice barevných kanálů v binárním formátu PPM (P6), kde jsou pixely uloženy v pořadí červená, zelená, modrá.",
+    "options": [
+      "r, g, b",
+      "r, g, b, a",
+      "b, g, r",
+      "g, r, b"
+    ],
+    "answer": 0,
+    "explanation": "Binární formát PPM (P6) ukládá pro každý pixel právě 3 bajty v pevném pořadí složek R (červená), G (zelená) a B (modrá).",
+    "code": "import struct\n\ndef parse_p6_pixel(pixel_bytes: bytes) -> tuple[int, int, int]:\n    # Formát P6 ukládá 3 bajty na pixel v kanálovém pořadí:\n    ________ = struct.unpack(\"3B\", pixel_bytes[:3])\n    return (r, g, b)",
+    "expected": "r, g, b"
+  },
+  {
+    "id": "q6",
+    "type": "true_false_tricky",
+    "question": "Posuďte způsob zápisu hlavičky u binárních variant PNM (P4, P5, P6).",
+    "options": [
+      "A) Pravda: Hlavička binárních variant je zapsána v ASCII textu úplně stejně jako u ASCII variant.",
+      "B) Nepravda: Hlavička binárních variant je uložena v binární struktuře s pevnou délkou bajtů."
+    ],
+    "answer": 0,
+    "explanation": "Všechny formáty PNM (ASCII i binární P4-P6) mají hlavičku (identifikátor, rozměry, max hodnota) uloženu v kódování ASCII. Změna na binární uložení se týká výhradně samotných dát za hlavičkou.",
+    "code": null
+  }
+]

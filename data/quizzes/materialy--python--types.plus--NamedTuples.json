@@ -1,0 +1,85 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Co se stane při pokusu o zavedení pojmenované n-tice `namedtuple('Point', 'x class y')`?",
+    "options": [
+      "A) Vyvolá se `ValueError`, protože `'class'` je vyhrazené klíčové slovo Pythonu.",
+      "B) Vytvoří se typ `Point`, ale k atributu `'class'` lze přistupovat jen indexem.",
+      "C) Vytvoří se typ `Point`, kde se nepovolené jméno automaticky nahradí za `_1`.",
+      "D) Vyvolá se `SyntaxError`, protože jména prvků musí být zadána v seznamu."
+    ],
+    "answer": 0,
+    "explanation": "Výchozí nastavení rename=False vyvolá ValueError, pokud název pole obsahuje vyhrazené klíčové slovo.",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte metodu pojmenované n-tice (namedtuple) pro vytvoření nové kopie s upravenou hodnotou vybraného atributu:",
+    "options": [
+      "replace",
+      "_replace",
+      "_update",
+      "_make"
+    ],
+    "answer": 1,
+    "explanation": "Metoda _replace(**kwargs) vytvoří novou instanci namedtuple se změněnými hodnotami zadaných polí, protože pojmenované n-tice jsou neměnné (immutable).",
+    "code": "from collections import namedtuple\n\nPoint = namedtuple(\"Point\", [\"x\", \"y\"])\np = Point(1, 2)\n\n# Vytvoření nové instance se změněnou souřadnicí x:\nnew_p = p.________(x=10)\n# Výstup: Point(x=10, y=2)",
+    "expected": "_replace"
+  },
+  {
+    "id": "q3",
+    "type": "predict_output",
+    "question": "Jaké pole bude vytvořeno na čtvrtém místě při spuštění příkazu `namedtuple('Item', 'name price qty price', rename=True)`?",
+    "options": [
+      "A) Název `_4` vzniklý nahrazením duplikátu podtržítkem s pořadím prvku.",
+      "B) Název `price_1` vzniklý automatickým přidáním pořadového čísla.",
+      "C) Název `_3` vzniklý nahrazením duplikátu podtržítkem s indexem pole.",
+      "D) Název `_price` vzniklý přidáním úvodního podtržítka před název."
+    ],
+    "answer": 2,
+    "explanation": "Při zapnutí rename=True se duplicitní jméno nahradí podtržítkem a jeho číselným indexem pole (index 3), tedy _3.",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "predict_output",
+    "question": "Jaký bude výstup příkazu `p = Person._make(['Alice', 30]); print(p.name, p[1])` pro `Person = namedtuple('Person', 'name age')`?",
+    "options": [
+      "A) Chybová výjimka `TypeError` vyvolaná předáním seznamu místo n-tice do `_make()`.",
+      "B) Textový výstup `Alice Alice` způsobený načtením stejného prvku v obou případech.",
+      "C) Textový výstup `30 30` způsobený přečtením druhé hodnoty ze vstupního seznamu.",
+      "D) Textový výstup `Alice 30` získaný kombinačním přístupem přes jméno i index."
+    ],
+    "answer": 3,
+    "explanation": "Metoda _make() vytvoří instanci z iterovatelného objektu. Prvky jsou přístupné přes atribut p.name ('Alice') i index p[1] (30).",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Proč vestavěné pomocné metody a atributy třídy `namedtuple` (např. `_fields`, `_make`, `_asdict`, `_replace`) začínají podtržítkem?",
+    "options": [
+      "A) Aby se zabránilo kolizi s názvy uživatelských polí a atributů dané n-tice (např. pokud se pole jmenuje 'fields' nebo 'make').",
+      "B) Aby se odlišily instanční metody od statických metod rodičovské třídy tuple.",
+      "C) Podtržítko signalizuje kompilátoru Cythonu přímé volání nativní C funkce v CPythonu.",
+      "D) Jde o striktní interní privátní metody, které standardní uživatelský kód nesmí nikdy volat."
+    ],
+    "answer": 0,
+    "explanation": "Tvůrci standardní knihovny použili úvodní podtržítko u metod pojmenované n-tice záměrně, aby umožnili pojmenovat uživatelská pole jakkoliv (např. 'make', 'fields', 'replace') bez rizika kolize s metodami n-tice.",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "true_false_tricky",
+    "question": "Příkaz `p.x = 5` uspěje a změní souřadnici `x` u vytvořené instance `p = Point(1, 2)`.",
+    "options": [
+      "A) Tvrzení je nepravdivé, protože pojmenované n-tice jsou neproměnné (`immutable`) stejně jako běžné n-tice.",
+      "B) Tvrzení je pravdivé, protože pojmenovaná n-tice funguje jako standardní třída s měnitelnými atributy."
+    ],
+    "answer": 0,
+    "explanation": "Instance namedtuple je neproměnná (immutable), takže pokus o zapsání nového atributu vyvolá AttributeError.",
+    "code": null
+  }
+]

@@ -1,0 +1,87 @@
+[
+  {
+    "id": "q1",
+    "type": "predict_output",
+    "question": "Jaký typ objektu vytvoří výraz g = (x**2 for x in range(5)) a kdy dojde k výpočtu prvků?",
+    "options": [
+      "A) Vytvoří iterovatelnou množinu (set) a zamezí duplicitním výsledkům před započetím cyklu.",
+      "B) Vytvoří generátorový objekt a hodnoty se počítají lenivě postupně až během procházení.",
+      "C) Vytvoří zkrácený seznam (list) s vyhodnocením všech prvků v okamžiku zpracování příkazu.",
+      "D) Vytvoří neměnnou n-tici (tuple) obsahující všech 5 spočtených hodnot okamžitě při definici."
+    ],
+    "answer": 1,
+    "explanation": "Generátorový výraz (zapsaný v kulatých závorkách) nevytváří tuple, ale vrátí lenivý generator object, jehož prvky se počítají až na vyžádání.",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "predict_output",
+    "question": "Jaký výstup vytvoří vícenásobná generátorová notace se dvěma klauzulemi for?",
+    "options": [
+      "A) ['A1', 'B2', 'B1']",
+      "B) ['A1', 'B1', 'A2', 'B2']",
+      "C) ['A1', 'A2', 'B1', 'B2']",
+      "D) ['A1', 'A2', 'B1']"
+    ],
+    "answer": 2,
+    "explanation": "Pořadí for klauzulí v comprehension odpovídá zanořeným cyklům: vnější cyklus pro a iteruje 'A', pak 'B', a pro každý prvek se kompletně proiteruje vnitřní cyklus pro b ('1', '2').",
+    "code": "res = [a + b for a in ['A', 'B'] for b in ['1', '2']]\nprint(res)"
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte výraz slovníkové komprehence (dict comprehension) pro vytvoření mapování čísla na jeho druhou mocninu:",
+    "options": [
+      "x = x**2",
+      "x -> x**2",
+      "(x, x**2)",
+      "x: x**2"
+    ],
+    "answer": 3,
+    "explanation": "Slovníková komprehence vyžaduje zápis klic: hodnota uvnitř složených závorek před klauzulí for.",
+    "code": "# Vytvoření slovníku mocnin pro čísla 0 až 3:\npowers = {________ for x in range(4)}\n# Výstup: {0: 0, 1: 1, 2: 4, 3: 9}",
+    "expected": "x: x**2"
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Kolik prvků bude mít výsledný objekt vytvořený generátorovou notací {x.lower() for x in 'AbraKaDabra'}?",
+    "options": [
+      "A) 5 prvků, protože množinová notace automaticky odstraní duplicitní převzatá písmena.",
+      "B) 1 prvek, protože při převodu na malá písmena se zachová pouze poslední přečtený znak.",
+      "C) 7 prvků, protože velká a malá písmena se v množině považují za různé klíče.",
+      "D) 11 prvků, protože vstupní řetězec obsahuje celkem 11 jednotlivých znaků v sekvenci."
+    ],
+    "answer": 0,
+    "explanation": "Generátorová notace s použitím složených závorek bez dvoutečky vytváří množinu (set), která automaticky eliminuje duplicity. Znaky 'a', 'b', 'r', 'k', 'd' po převodu na malá písmena dají přesně 5 unikátních prvků.",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Který z následujících zápisů v Pythonu přesně odpovídá kombinaci map(f, filter(p, xs))?",
+    "options": [
+      "A) [filter(p, f(x)) for x in xs]",
+      "B) [f(x) for x in xs if p(x)]",
+      "C) [f(x) if p(x) for x in xs]",
+      "D) [map(f, x) for x in xs if p(x)]"
+    ],
+    "answer": 1,
+    "explanation": "Skladba map(f, filter(p, xs)) se v generátorové notaci zapíše jako [f(x) for x in xs if p(x)], kde if filtruje prvky podle predikátu p a f transformuje vybrané prvky.",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "predict_output",
+    "question": "Jaký výstup vrátí generátorová notace kombinující ternární operátor s iterací?",
+    "options": [
+      "A) [2, 0, 2, 0]",
+      "B) [0, 2, 0, 2]",
+      "C) [0, 0, 2, 0]",
+      "D) [0, 1, 2, 3]"
+    ],
+    "answer": 2,
+    "explanation": "Ternární výraz x if x % 2 == 0 else 0 stojí před for a vyhodnocuje se pro každý prvek: pro 0 dává 0, pro 1 dává 0, pro 2 dává 2, pro 3 dává 0. Výsledek je [0, 0, 2, 0].",
+    "code": "res = [x if x % 2 == 0 else 0 for x in range(4)]\nprint(res)"
+  }
+]

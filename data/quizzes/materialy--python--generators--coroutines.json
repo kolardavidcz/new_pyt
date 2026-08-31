@@ -1,0 +1,102 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Co se stane při pokusu o spuštění následujícího výrazu uvnitř generátoru?",
+    "options": [
+      "A) Python vyvolá SyntaxError, protože yield v aritmetickém výrazu vyžaduje nákres závorek: 10 + (yield 5).",
+      "B) Výraz se úspěšně vyhodnotí na hodnotu 15 při prvním zavolání metody next() na vytvořeném objektu generátoru.",
+      "C) Python vyvolá TypeError, protože operátor sčítání nelze aplikovat na klíčové slovo yield bez předchozí konverze.",
+      "D) Funkce vrátí součet hodnoty 10 a předaného argumentu, jakmile korutina obdrží novou hodnotu z volání send()."
+    ],
+    "answer": 0,
+    "explanation": "V Pythonu je yield výrazem s nízkou prioritou operátorů. Pokud se nachází uvnitř složitějšího výrazu (jako je sčítání), musí být explicitně uzavřen do závorek x = 10 + (yield 5). V opačném případě interpret vyvolá SyntaxError.",
+    "code": "def f():\n    x = 10 + yield 5"
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jaký bude výsledek vykonání následujícího kódu?",
+    "options": [
+      "A) Vytiskne hodnotu 42, protože metoda send(42) automaticky inicializuje generátor a předá mu hodnotu v jediném kroku.",
+      "B) Vyvolá TypeError, protože čerstvě vytvořené korutině nelze poslat ne-None hodnotu před jejím nastartováním na prvním yield.",
+      "C) Vyvolá StopIteration, protože generátor obdrží hodnotu 42 a ihned ukončí svoje vykonávání bez projití prvního yield.",
+      "D) Vytiskne hodnotu None, protože první volání send() vždy ignoruje předaný argument a vrátí pouze výchozí hodnotu."
+    ],
+    "answer": 1,
+    "explanation": "Čerstvě vytvořený generátorový objekt ještě nebyl nastartován (primed). Metoda send() s ne-None argumentem vyžaduje, aby generátor již čekal na svém prvním výrazu yield. Nástup na první yield se musí provést zavoláním next(k) nebo k.send(None). V opačném případě Python vyvolá TypeError: can't send non-None value to a just-started generator.",
+    "code": "def g():\n    x = (yield)\n    print(x)\n\nk = g()\nk.send(42)"
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte syntaxi pro obousměrnou delegaci hodnot, výjimek a volání send() do vnitřního generátoru / korutiny:",
+    "options": [
+      "delegate to",
+      "return from",
+      "yield from",
+      "yield send"
+    ],
+    "answer": 2,
+    "explanation": "Konstrukce yield from zajišťuje plnou obousměrnou delegaci iterace, včetně předávání hodnot z metody send() a výjimek přímo do podgenerátoru.",
+    "code": "def subgenerator():\n    yield \"start\"\n    yield \"data\"\n\ndef outer_wrapper():\n    # Transparentní delegace na podgenerátor:\n    ________ subgenerator()",
+    "expected": "yield from"
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Doplňte volání do dekorátoru pro automatické nastartování (priming) korutiny k prvnímu výrazu yield:",
+    "options": [
+      "gen.init()",
+      "gen.start()",
+      "gen.run()",
+      "next(gen)"
+    ],
+    "answer": 3,
+    "explanation": "Volání next(gen) (nebo gen.send(None)) posune provádění kódu nově vytvořené korutiny k prvnímu příkazu yield, takže je ihned připravena přijímat data.",
+    "code": "def coroutine_primer(func):\n    def wrapper(*args, **kwargs):\n        gen = func(*args, **kwargs)\n        # Posun generátoru k prvnímu výrazu (yield):\n        ________\n        return gen\n    return wrapper",
+    "expected": "next(gen)"
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Jaký bude výstup následujícího programu při odeslání výjimky do korutiny?",
+    "options": [
+      "A) Vypíše hodnotu 1 a následně hodnotu 2, protože zachycená výjimka způsobí pokračování běhu k dalšímu yield 2.",
+      "B) Vyvolá výjimku StopIteration ihned po prvním volání next(g), protože try blok uvnitř korutiny vyžaduje odchycení.",
+      "C) Vypíše hodnotu 1 a poté hodnotu None, protože výjimka zruší návratovou hodnotu následujícího výrazu yield.",
+      "D) Vyvolá neovládanou výjimku ValueError, protože metoda throw() okamžitě ukončí celý generátor bez ohledu na try-except."
+    ],
+    "answer": 0,
+    "explanation": "Zavolání `g.throw(ValueError)` vyvolá výjimku `ValueError` uvnitř generátoru přesně v místě, kde čeká na svém prvním `yield 1`. Blok `except ValueError` tuto výjimku zachytí a vykonávání pokračuje k `yield 2`, jehož hodnota (2) je vrácena jako výsledek metody `throw()`.",
+    "code": "def demo():\n    try:\n        yield 1\n    except ValueError:\n        yield 2\n\ng = demo()\nprint(next(g))\nprint(g.throw(ValueError))"
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaký výstup vytvoří následující kód ukazující úskalí obousměrné komunikace v generátoru?",
+    "options": [
+      "A) Vypíše 'A' 'B', protože každé zavolání metody send() korektně načte vstup a okamžitě vrátí zpracovaný výsledek.",
+      "B) Vypíše 'A' None, protože druhý send('b') pouze posune korutinu zpět na první yield bez vygenerování nové hodnoty.",
+      "C) Vyvolá výjimku StopIteration, protože po druhém volání send() dojde k narušení interního stavu generátoru.",
+      "D) Vyvolá výjimku TypeError, protože metody send() a yield nelze v jedné smyčce generátoru kombinačně řetězit."
+    ],
+    "answer": 1,
+    "explanation": "Po `k.send('a')` korutina vrátí `'A'` a zamrzne u druhého výrazu `yield val.upper()`. Následující volání `k.send('b')` předá `'b'` tomuto druhému yield (který ho nepřiřazuje), kód skočí na začátek cyklu k `val = (yield)` a zamrzne. Jelikož cestou neprošel žádným yield s hodnotou, vrátil `None`. Výstupem je tedy `'A' None`.",
+    "code": "def mix():\n    while True:\n        val = (yield)\n        yield val.upper()\n\nk = mix()\nnext(k)\nres1 = k.send('a')\nres2 = k.send('b')\nprint(res1, res2)"
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Které tři samostatné koncepty využití výrazu yield definuje David Beazley?",
+    "options": [
+      "A) Vyhodnocování výrazů (evaluátor), parsování kódu (parser) a garbage collection (správce neplatných odkazů).",
+      "B) Alokace paměti (alokátor), správa vláken (worker) a synchronizace zámků (mutex pro paratelní výpočty).",
+      "C) Producent dat (iterace), konzument údajů (příjem zpráv) a přerušení (trap pro kooperativní multitasking).",
+      "D) Načítání ze souboru (I/O stream), zápis do sítě (socket writer) a transformace datových struktur (mapper)."
+    ],
+    "answer": 2,
+    "explanation": "David Beazley uvádí, že `yield` má v Pythonu tři zásadní a nezávislé role, které by se neměly míchat: 1. producent dat (běžné generátory), 2. konzument zpráv (korutiny) a 3. trap/přerušení (kooperativní multitasking).",
+    "code": null
+  }
+]

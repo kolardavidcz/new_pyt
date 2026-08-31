@@ -666,8 +666,18 @@ function updateChrome(tab) {
   if (sbPath) sbPath.textContent = path;
 }
 
+function decodeHtml(s) {
+  if (s == null) return "";
+  return String(s)
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&nbsp;/g, " ");
+}
 function escape(s) {
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return decodeHtml(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 function escapeAttr(s) {
   return escape(s).replace(/"/g, "&quot;");

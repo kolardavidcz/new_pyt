@@ -1,0 +1,88 @@
+[
+  {
+    "id": "q1",
+    "type": "fill_blank_choice",
+    "question": "Doplňte funkci modulu doctest, která prohledá docstringy aktuálního modulu a automaticky spustí všechny nalezené interaktivní testy.",
+    "options": [
+      "testfile",
+      "testmod",
+      "main",
+      "run_all"
+    ],
+    "answer": 1,
+    "explanation": "Funkce doctest.testmod() prozkoumá docstringy všech funkcí a tříd v modulu a ověří, zda jejich návratové hodnoty odpovídají zapsaným testům.",
+    "code": "import doctest\n\ndef calculate_ph(h_concentration: float) -> float:\n    \"\"\"\n    Výpočet pH z koncentrace oxoniových iontů.\n    >>> calculate_ph(1e-7)\n    7.0\n    \"\"\"\n    import math\n    return round(-math.log10(h_concentration), 2)\n\nif __name__ == \"__main__\":\n    doctest.________()",
+    "expected": "testmod"
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jak se z příkazové řádky spustí doctesty pro modul moje_logika.py s podrobným výpisem (verbose)?",
+    "options": [
+      "A) python -m unittest -v moje_logika.py",
+      "B) python moje_logika.py --doctest-verbose",
+      "C) python -m doctest -v moje_logika.py",
+      "D) python doctest --verbose moje_logika.py"
+    ],
+    "answer": 2,
+    "explanation": "Přepínač -m doctest spustí modul doctest jako skript a předá mu parametr -v pro podrobný výstup. unittest by spustil testovací třídy unittest, nikoli docstringy.",
+    "code": null
+  },
+  {
+    "id": "q3",
+    "type": "predict_output",
+    "question": "Jaký výstup vytvoří spuštění python -m doctest moje_logika.py, pokud všechny testy v docstringách projdu bez chyb?",
+    "options": [
+      "A) Vypíše se textový řetězec \"OK (tests=3, failures=0)\" na stdout.",
+      "B) Vypíše se hlášení \"SUCCESS\" spolu s celkovým časem vykonání v ms.",
+      "C) Zobrazí se kompletní seznam otestovaných dokumentačních funkcí.",
+      "D) Neprodlevně se nevypíše vůbec žádný textový výstup na konzoli."
+    ],
+    "answer": 3,
+    "explanation": "Doctest je navržen podle principu 'no news is good news' – pokud všechny testy uspějí, nevypisuje do konzole žádný výstup (pokud nebyl zadán příznak -v).",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Doplňte direktivu doctestu, která přikáže přeskočit testování výstupu na daném řádku docstringu.",
+    "options": [
+      "+SKIP",
+      "PASS",
+      "NO_TEST",
+      "IGNORE"
+    ],
+    "answer": 0,
+    "explanation": "Direktiva # doctest: +SKIP instruuje modul doctest, aby ignoroval a netestoval výstup daného řádku (např. u náhodných nebo nedeterministických výsledků).",
+    "code": "def generate_random_spectrum():\n    \"\"\"\n    Generuje náhodná spektrometrická data.\n\n    >>> generate_random_spectrum()  # doctest: ________\n    [0.124, 0.985, 0.432]\n    \"\"\"\n    import random\n    return [round(random.random(), 3) for _ in range(3)]",
+    "expected": "+SKIP"
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Jakým způsobem lze začlenit doctesty modulu logika do standardního běhu unittest sady?",
+    "options": [
+      "A) Nastavením globální proměnné prostředí PYTHON_DOCTEST_ENABLE=1 před spuštěním sady testů.",
+      "B) Definováním funkce load_tests vracející tests.addTests(doctest.DocTestSuite(logika)).",
+      "C) Zavoláním metody unittest.register_doctest(logika) přímo uvnitř testovací metody setUp().",
+      "D) Importováním balíčku logika přímo do konstruktoru hlavní testovací třídy unittest.TestCase."
+    ],
+    "answer": 1,
+    "explanation": "Unittest rozhraní vyhledává funkci load_tests(loader, tests, pattern), do které lze přidat testovací sadu vytvořenou pomocí doctest.DocTestSuite(modul).",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "K čemu slouží direktiva doctest.FAIL_FAST (resp. příkazový přepínač -o FAIL_FAST nebo -f)?",
+    "options": [
+      "A) Přesměruje chybové zprávy ze standardního chybového výstupu přímo do souboru logu.",
+      "B) Zapne optimalizovaný JIT kompilátor pro zrychlení celkového porovnávání řetězců.",
+      "C) Zastaví vykonávání doctestů ihned při výskytu první selhané kontrolní podmínky.",
+      "D) Přeskočí všechny časově náročné testy a spustí pouze jednoduché aritmetické operace."
+    ],
+    "answer": 2,
+    "explanation": "Příznak FAIL_FAST ukončí testování hned po první chybě, což šetří čas při ladění dlouhých sad docstring testů.",
+    "code": null
+  }
+]

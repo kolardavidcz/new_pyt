@@ -1,0 +1,101 @@
+[
+  {
+    "id": "q1",
+    "type": "predict_output",
+    "question": "Jaký datový typ navrací funkce struct.unpack() po rozbalení jediného čtyřbajtového celého čísla?",
+    "options": [
+      "A) Objekt bajtů (bytes) s vyčištěným bajtovým pořadím přeloženým na danou architekturu procesoru.",
+      "B) Samotné celé číslo (int) reprezentující dekódovanou hodnotu z načteného bajtového řetězce.",
+      "C) N-tici (tuple) obsahující rozbalenou hodnotu jako svůj jediný prvek pro zachování konzistence.",
+      "D) Slovník (dict) s klíčem odpovídajícím použitému formátovacímu znaku a vyhodnocenou hodnotou."
+    ],
+    "answer": 2,
+    "explanation": "Funkce `struct.unpack()` vždy navrací n-tici (tuple), a to i v případě, že se rozbaluje pouze jediná hodnota (např. `(333,)`). Toto sjednocené chování zajišťuje konzistentní rozhraní bez ohledu na počet rozbalovaných prvků.",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Co vrátí volání struct.unpack('>I', b'\\x00\\x00\\x01\\x00')?",
+    "options": [
+      "A) struct.error — vyvolá výjimku, protože daný bajtový řetězec b'\\x00\\x00\\x01\\x00' nemá platný prefix.",
+      "B) (1,) — rozbalí 4bajtové celé číslo v řazení little-endian, kde se bajty načítají zprava do leva.",
+      "C) 256 — rozbalí skalární celé číslo bez n-tice, protože byl v řetězci použit jediný formátovací znak.",
+      "D) (256,) — rozbalí 4bajtové celé číslo v řazení big-endian, kde hodnota 0x0100 odpovídá číslu 256."
+    ],
+    "answer": 3,
+    "explanation": "Znak `>` specifikuje pořadí bajtů big-endian a znak `I` odpovídá 4bajtovému unsigned int. Bajty `b'\\x00\\x00\\x01\\x00'` představují v big-endian hodnotu `0x00000100` = 256. Výsledek je vrácen jako jednoprvková n-tice `(256,)`.",
+    "code": null
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jaký je rozdíl mezi formátovacími znaky 10s a 10c v modulu struct?",
+    "options": [
+      "A) 10s reprezentuje jeden 10bajtový objekt bytes, zatímco 10c znamená 10 samostatných 1bajtových hodnot.",
+      "B) 10s vyžaduje ukončovací nulový bajt \\x00, zatímco 10c načítá přesně 10 bajtů bez jakéhokoliv ukončení.",
+      "C) 10s funguje pouze s big-endian pořadím bajtů, zatímco 10c vyžaduje little-endian pořadí bajtů paměti.",
+      "D) 10s reprezentuje řetězec typu str v kódování UTF-8, zatímco 10c představuje pole C-style znaků char."
+    ],
+    "answer": 0,
+    "explanation": "V modulu `struct` označuje zápis `10s` jeden souvislý 10bajtový objekt typu `bytes`. Naproti tomu `10c` označuje opakovací činitel pro 10 samostatných jednobajtových hodnot `bytes` (v rozbalené n-tici tedy vznikne 10 samostatných prvků).",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Která třída z modulu struct slouží k předkompilování binárního formátovacího řetězce pro efektivní opakované balení a rozbalování dat?",
+    "options": [
+      "Format",
+      "Struct",
+      "Pattern",
+      "Packer"
+    ],
+    "answer": 1,
+    "explanation": "Třída struct.Struct(fmt) vytvoří předkompilovaný objekt formátu, jehož metody pack() a unpack() jsou výrazně rychlejší při opakovaném volání.",
+    "code": "import struct\n\n# Předkompilování formátu pro 32bitové celé číslo (big-endian)\nunpacker = struct.________(\">i\")\nvalue, = unpacker.unpack(b\"\\x00\\x00\\x00\\x2a\")\n# Vystup: 42",
+    "expected": "Struct"
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Který znak na začátku formátovacího řetězce v modulu struct nastavuje síťové (network) pořadí bajtů?",
+    "options": [
+      "A) < — určuje little-endian pořadí bajtů v paměti se standardní velikostí datových typů a bez zarovnání.",
+      "B) = — určuje přirozené pořadí bajtů v platformě se standardní velikostí datových typů a bez zarovnání.",
+      "C) ! — určuje síťové pořadí bajtů (big-endian) se standardní velikostí datových typů a bez zarovnání.",
+      "D) @ — určuje přirozené pořadí bajtů z platformy s přirozenou velikostí datových typů a zarovnáním."
+    ],
+    "answer": 2,
+    "explanation": "Znak `!` na začátku formátovacího řetězce nastavuje síťové pořadí bajtů (network byte order), což je v binárních síťových protokolech alias pro big-endian se standardní velikostí C typů bez paměťového zarovnávání.",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jak se liší výstup metody calcsize() u formátů '@' a '<' na 64bitovém systému pro řetězec 'cl' (char, long)?",
+    "options": [
+      "A) @ vrátí 9 bajtů bez zarovnání, zatímco < automaticky doplní nulové bajty na nejbližší násobek osmi (16 B).",
+      "B) @ i < vrátí shodně 9 bajtů, protože zarovnávání bajtů se u standardních typů C vyžaduje výhradně pro float.",
+      "C) Oba formáty vyvolají výjimku struct.error, protože kombinace znakového a dlouhého typu je v Pythonu neplatná.",
+      "D) @ použije přirozené zarovnání C-struktur (16 B), zatímco < vypne zarovnávání a vrátí součet velikostí (9 B)."
+    ],
+    "answer": 3,
+    "explanation": "Formát `@` aktivuje přirozené zarovnání architektury kompilátoru C (na 64bitovém systému vyžaduje typ long zarovnání na 8 B), takže rozvržení `cl` vytvoří 1 B char + 7 B výplň + 8 B long = 16 B. Formát `<` zarovnání vypíná a vrátí přesný součet 1 B + 8 B = 9 B.",
+    "code": null
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní důvod pro použití metody struct.pack_into() namísto klasické metody struct.pack()?",
+    "options": [
+      "A) Umožňuje zapsat zabalená binární data přímo do existujícího zapisovatelného bajtového bufferu na daný offset.",
+      "B) Poskytuje šifrování binárních dat pomocí symetrického klíče před jejich okamžitým uložením na fyzický disk.",
+      "C) Zrychluje kompilaci formátovacího řetězce uvolněním globálního zámku interpretu GIL během celého balení dat.",
+      "D) Automaticky převádí všechny řetězce Pythonu z kódování UTF-8 do C-style pole bajtů zakončeného nulovým bajtem."
+    ],
+    "answer": 0,
+    "explanation": "Metoda `struct.pack_into(fmt, buffer, offset, v1, ...)` zapisuje zabalené bajty přímo do předem alokovaného měnitelného paměťového bufferu (jako je `bytearray`) od zadaného offsetu, čímž eliminuje potřebu vytvářet nové dočasné objekty typu `bytes`.",
+    "code": null
+  }
+]

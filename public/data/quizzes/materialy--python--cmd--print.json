@@ -1,0 +1,106 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Které parametry funkce print() řídí oddělovač mezi argumenty a zakončení výstupu?",
+    "options": [
+      "A) Parametr end určuje řetězec vkládaný mezi objekty a parametr sep určuje řetězec na konci výpisu.",
+      "B) Parametr space určuje řetězec vkládaný mezi objekty a parametr newline řetězec na konci výpisu.",
+      "C) Parametr sep určuje řetězec vkládaný mezi objekty a parametr end určuje řetězec na konci výpisu.",
+      "D) Parametr delimiter určuje řetězec vkládaný mezi objekty a parametr finish řetězec na konci."
+    ],
+    "answer": 2,
+    "explanation": "Výchozí hodnoty ve funkci print() jsou sep=' ' (mezera mezi argumenty) a end='\\n' (odřádkování na konci).",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte parametr funkce print(), kterým přesměrujete výpis do standardního chybového proudu (sys.stderr):",
+    "code_snippet": "print(\"Chyba aplikace\", ________=sys.stderr)",
+    "options": [
+      "target",
+      "stream",
+      "output",
+      "file"
+    ],
+    "answer": 3,
+    "explanation": "Parametr file funkce print() přijímá jakýkoliv objekt s metodou write(string), výchozí hodnotou je sys.stdout.",
+    "code": "import sys\n\n# Vypsání chybového hlášení do proudu stderr:\nprint(\"Chyba: Soubor nebyl nalezen!\", ________=sys.stderr)",
+    "expected": "file"
+  },
+  {
+    "id": "q3",
+    "type": "predict_output",
+    "question": "Co vypíše následující kód při formátování čísla s plovoucí řádovou čárkou?",
+    "code_snippet": "val = 1 / 3\nprint(f\"{val:.3f}\")",
+    "options": [
+      "A) 0.333 — f-řetězec zaokrouhlí číslo na přesně 3 desetinná místa v pevné řádové čárce.",
+      "B) 1/3 — f-řetězec v tomto specifikátoru zachová původní neshodnocený matematický výraz.",
+      "C) 0.33 — f-řetězec ořízne výstupní řetězec na maximálně dvě platné desetinné číslice.",
+      "D) 0.333333 — f-řetězec zdvojnásobí výchozí zadanou přesnost zobrazeného reálného čísla."
+    ],
+    "answer": 0,
+    "explanation": "Specifikátor `.3f` v f-řetězci formátuje číslo typu float na pevný počet tří desetinných míst (`f` = fixed point).",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Proč selže starší formátování '%s' % msg, je-li msg víceprvková n-tice (tuple)?",
+    "options": [
+      "A) N-tice je v Pythonu neměnná (immutable), takže ji nelze zkonvertovat na řetězec bez str().",
+      "B) Operátor % rozbalí n-tici na samostatné prvky, které neodpovídají jedinému specifikátoru %s.",
+      "C) Operátor % podporuje u složených objektů výhradně datový typ slovník s řetězcovými klíči.",
+      "D) Specifikátor %s vyžaduje na pravé straně výhradně jednoprvkový seznam číselných hodnot."
+    ],
+    "answer": 1,
+    "explanation": "Při použití `%` se n-tice rozbaluje jako seznam argumentů. Pokud má řetězec 1 specifikátor `%s` a n-tice má 2 prvky, vyvolá se TypeError. Pro předání samotné n-tice je nutné použít jednoprvkovou n-tici `'%s' % (msg, )`.",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Co se stane při spuštění následujícího kódu využívajícího třídu string.Template?",
+    "code_snippet": "from string import Template\n\nt = Template(\"$who vyhrál $count-krát\")\nprint(t.substitute(who=\"Tým\", count=3))",
+    "options": [
+      "A) Vypíše Tým vyhrál None-krát, protože nenalezený identifikátor se nahradí prázdnou hodnotou None.",
+      "B) Vypíše Tým vyhrál $count-krát, protože metoda substitute bez složených závorek ${count} nesubstituuje.",
+      "C) Vypíše Tým vyhrál 3-krát, protože pomlčka nepatří do identifikátoru a ukončí název proměnné $count.",
+      "D) Vyvolá výjimku KeyError, protože identifikátor $count-krát se vyhodnotí jako celé neplatné slovo."
+    ],
+    "answer": 2,
+    "explanation": "Znak `-` není platný v pythonním identifikátoru, takže ukončuje jméno proměnné `$count`. Pro splynutí s dalším textem bez mezery je nutné použít zápis `${count}-krát`.",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaká je posloupnost kroků funkce shutil.get_terminal_size() při zjišťování rozměrů terminálu?",
+    "options": [
+      "A) Přečíst konfiguraci z .bashrc, zkontrolovat registr OS, vyvolat výjimku RuntimeError.",
+      "B) Zavolat os.get_terminal_size(sys.__stdout__), zkontrolovat COLUMNS/LINES, použít fallback.",
+      "C) Vrátit vždy pevně hodnotu (80, 24) bez kontroly proměnných prostředí nebo systémového výstupu.",
+      "D) Zkontrolovat COLUMNS/LINES, zavolat os.get_terminal_size(sys.__stdout__), použít fallback."
+    ],
+    "answer": 3,
+    "explanation": "Postup `shutil.get_terminal_size()`: 1. proměnné prostředí COLUMNS a LINES, 2. `os.get_terminal_size(sys.__stdout__)`, 3. při selhání fallback hodnota (výchozí 80, 24).",
+    "code": null
+  },
+  {
+    "id": "q7",
+    "type": "fill_blank_choice",
+    "question": "Doplňte znak zarovnání ve formátovacím specifikátoru f-stringu pro vycentrování textu na šířku 10 znaků:",
+    "code_snippet": "text = \"Python\"\nprint(f\"{text:________10}\")",
+    "options": [
+      "^",
+      ">",
+      "<",
+      "="
+    ],
+    "answer": 0,
+    "explanation": "Ve formátovacím minijazyku Pythonu znak ^ zarovnává na střed, < doleva a > doprava.",
+    "code": "title = \"VŠCHT\"\n\n# Zarovnání textu na střed s celkovou šířkou pole 10 znaků:\nformatted = f\"{title:________10}\"\n# Výstup: '  VŠCHT   '",
+    "expected": "^"
+  }
+]

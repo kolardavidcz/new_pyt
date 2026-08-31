@@ -1,0 +1,171 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Co přesně v architekturách systému Git představuje vývojová větev (branch)?",
+    "options": [
+      "A) Pouhý pohyblivý ukazatel na konkrétní komit (SHA-1 hash) ve stromové historii projektu.",
+      "B) Záznam v databázi vzdáleného serveru určující oprávnění uživatele k zápisu kódu.",
+      "C) Komprimovaný ZIP archiv obsahující veškeré rozdíly mezi dvěma vybranými milníky.",
+      "D) Samostatnou kompletní fyzickou kopii celého adresáře v souborovém systému operačního systému."
+    ],
+    "answer": 0,
+    "explanation": "Větve v Gitu jsou odlehčené a představují pouze ukazatel (pointer) na SHA identifikátor komitu. Při novém komitu se tento ukazatel posune vpřed.",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Co se stane se stavem pracovní složky po zadaní příkazů git branch testing a následně git commit?",
+    "code": "$ git branch testing\n$ git commit -m \"Změna\"",
+    "options": [
+      "A) Změna se zapsá do nové větve testing, protože vytvoření větve ji automaticky aktivuje.",
+      "B) Změna se uloží do aktuální původní větve master, protože příkaz branch na novou větev nepřepne.",
+      "C) Git vypíše chybu, protože před vytvořením komitu je nutné novou větev nejdříve publikovat.",
+      "D) Změna se paralelně uloží do obou větví master i testing v rámci jednoho kroku."
+    ],
+    "answer": 1,
+    "explanation": "Příkaz git branch VĚTEV pouze vytvoří nový ukazatel, ale nepřepne na něj pointer HEAD. Pro přepnutí je nutné zavolat git checkout VĚTEV nebo git switch VĚTEV."
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl ve výsledné historii vývoje při použití git rebase master oproti git merge master?",
+    "options": [
+      "A) Rebase trvale smaže původní komity z historie, zatímco merge je schová do záložního archivu repozitáře.",
+      "B) Rebase zachovává původní stromečkovou strukturu větví, zatímco merge vytvoří rovnou historii bez větví.",
+      "C) Rebase lineárně přesune komity aktuální větve na konec větve master, zatímco merge vytvoří slučovací komit.",
+      "D) Rebase funguje pouze pro vzdálené repozitáře, zatímco merge lze spouštět výhradně nad lokální větví."
+    ],
+    "answer": 2,
+    "explanation": "git rebase master vezme komity z aktuální větve a znovu je aplikuje (\"přesadí bázi\") na konec větve master, čímž vyrovná historii do jedné přímky. git merge vytvoří nový merge commit se dvěma rodiči.",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Který parametr příkazu git branch vypíše pouze ty větve, jejichž změny už byly kompletně sloučeny do aktuální větve?",
+    "code": "# Zjištění lokálních větví již začleněných do větve 'main'\ngit branch ________",
+    "options": [
+      "--remote",
+      "--all",
+      "--delete",
+      "--merged"
+    ],
+    "answer": 3,
+    "explanation": "Příkaz git branch --merged filtruje větve, které již byly plně začleněny do aktuálního commitu (HEAD), takže je bezpečné je smazat.",
+    "expected": "--merged"
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Čím se zásadně vyznačuje tzv. bare repozitář vytvořený příkazem git init --bare?",
+    "options": [
+      "A) Neobsahuje pracovní strom s vysázenými soubory a slouží jako centrální sdílený server pro push.",
+      "B) Vyžaduje pro jakoukoliv operaci trvalé připojení k internetu a přístup k účtu GitHub.",
+      "C) Obsahuje pouze komprimované zápisy zpráv komitů bez skutečného obsahu zdrojových souborů.",
+      "D) Neumožňuje vytváření nových vývojových větví ani použití označených verzí pomocí tagů."
+    ],
+    "answer": 0,
+    "explanation": "Bare repozitář nemá žádný pracovní adresář (working directory) a žádné checkoutnuté soubory. Slouží výhradně jako centrální bod pro pushování a pullkování změn více vývojáři.",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Co vyvolá stav zvaný detached HEAD při práci s verzovacím systémem Git?",
+    "code": "$ git checkout v1.0",
+    "options": [
+      "A) Repozitář ztratí spojení se vzdáleným serverem origin a přepne se do offline režimu.",
+      "B) Ukazatel HEAD míří přímo na konkrétní komit či tag namísto pojmenované vývojové větve.",
+      "C) Dojde k okamžitému smazání všech nekomitovaných změn z pracovní složky i indexu.",
+      "D) Git automaticky zablokuje vytváření nových komitů až do provedení příkazu pull."
+    ],
+    "answer": 1,
+    "explanation": "Detached HEAD nastane, když přepnete (checkout) pracovní adresář na konkrétní komit nebo tag namísto větve. Nově vytvořené komity nebudou patřit do žádné větve a po přepnutí jinam mohou být ztraceny."
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl mezi lehkou (lightweight) a anotovanou (annotated) značkou (tagem) v Gitu?",
+    "options": [
+      "A) Anotovanou značku lze vytvořit pouze k master větvi, zatímco lehkou značku k jakémukoliv komitu.",
+      "B) Lehká značka se automaticky přenáší při git push, zatímco anotovaná zůstává vždy pouze lokálně.",
+      "C) Anotovaná značka je plnohodnotný objekt s autorem, datem a zprávou, zatímco lehká je jen nálepka komitu.",
+      "D) Lehká značka vyžaduje kryptografický GPG podpis, zatímco anotovaná značka se neověřuje."
+    ],
+    "answer": 2,
+    "explanation": "Anotovaný tag (git tag -a) vytváří samostatný objekt v databázi Gitu s metadaty (autor, datum, zpráva, volitelně podpis). Lightweight tag (git tag NAME) je pouze prosté pojmenování/ukazatel na hash komitu.",
+    "code": null
+  },
+  {
+    "id": "q8",
+    "type": "fill_blank_choice",
+    "question": "Který podpříkaz git stash aplikuje naposledy odložené změny zpět do pracovního stromu a současně je odstraní ze zásobníku?",
+    "code": "# Obnovení odložených úprav skriptu a jejich odstranění ze stash zásobníku\ngit stash ________",
+    "options": [
+      "drop",
+      "save",
+      "list",
+      "pop"
+    ],
+    "answer": 3,
+    "explanation": "Příkaz git stash pop aplikuje uložený stav na aktuální pracovní adresář a zároveň daný záznam vyjme ze zásobníku stash (na rozdíl od apply, který ho ponechá).",
+    "expected": "pop"
+  },
+  {
+    "id": "q9",
+    "type": "multiple_choice",
+    "question": "Jakým způsobem přenesete lokálně vytvořené značky (tagy) na vzdálený repozitář origin?",
+    "options": [
+      "A) Spuštěním příkazu git push origin --tags nebo zadáním konkrétního názvu značky git push origin v1.0.",
+      "B) Použitím příkazu git tag --export origin, který zabalí značky do samostatného archivu.",
+      "C) Nastavením konfigurační proměnné git config --global tags.sync true v globálním profilu.",
+      "D) Příkaz git push přenáší všechna tagy automaticky při každém nahrání nových komitů do větve."
+    ],
+    "answer": 0,
+    "explanation": "Ve výchozím nastavení git push značky na vzdálený zdroj neposílá. Je nutné je explicitně uvést (git push origin v1.0) nebo použít přepínač git push origin --tags.",
+    "code": null
+  },
+  {
+    "id": "q10",
+    "type": "true_false_tricky",
+    "question": "Operace git pull provede v jediném kroku stáhnutí změn ze serveru a jejich následné sloučení do pracovní větve.",
+    "options": [
+      "A) Nepravda – git pull pouze stahuje historické zápisy ze serveru, ale soubory na disku nemění.",
+      "B) Pravda – git pull funguje jako kombinace samostatných příkazů git fetch a následného git merge."
+    ],
+    "answer": 1,
+    "explanation": "git pull je v podstatě zkratkový příkaz, který nejprve zavolá git fetch (stažení dat ze vzdáleného repozitáře) a ihned poté git merge (sloučení vzdálené sledovací větve do aktuální lokální větve).",
+    "code": null
+  },
+  {
+    "id": "q11",
+    "type": "fill_blank_choice",
+    "question": "Ve kterém skrytém adresáři repozitáře vyhledává Git automatické spouštěcí skripty událostí (hooks jako pre-commit)?",
+    "code": "# Umístění validačního skriptu spouštěného před commitem\nchmod +x /projekty/analyza_mereni/________/hooks/pre-commit",
+    "options": [
+      "src",
+      ".git",
+      "bin",
+      "config"
+    ],
+    "answer": 1,
+    "explanation": "Skripty pro hooky (např. automatická kontrola linteru před commitem) se nacházejí v adresáři .git/hooks/ v kořeni lokálního repozitáře.",
+    "expected": ".git"
+  },
+  {
+    "id": "q12",
+    "type": "multiple_choice",
+    "question": "K čemu slouží konfigurační soubor .gitmodules uložený v kořenovém adresáři projekčního repozitáře?",
+    "options": [
+      "A) Určuje pravidla pro ignorování souborů a adresářů, které se nemají komitovat do historie.",
+      "B) Ukládá seznam závislých balíčků z PyPI pro automatickou instalaci pomocí balíčkovače pip.",
+      "C) Mapuje cestu k vnořeným submodulům na adresy jejich externích vzdálených repozitářů v Gitu.",
+      "D) Definice přístupových práv jednotlivých vývojářů k zápisu do vybraných vývojových větví."
+    ],
+    "answer": 2,
+    "explanation": "Soubor .gitmodules je verzovaný konfigurační soubor, který uchovává zmapování cesty k podadresářům submodulů na URL jejich původních repozitářů.",
+    "code": null
+  }
+]

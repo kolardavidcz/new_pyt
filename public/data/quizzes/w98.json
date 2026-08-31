@@ -1,0 +1,1141 @@
+{
+  "materialy--python--functions--advanced-3": [
+    {
+      "id": "adv3_q1",
+      "type": "fill_blank_choice",
+      "question": "Který dekorátor z modulu functools se aplikuje na vnitřní obalující funkci (wrapper), aby zůstala zachována původní metadata dekorované funkce?",
+      "options": [
+        "@keep_meta",
+        "@preserve",
+        "@wraps",
+        "@delegate"
+      ],
+      "answer": 2,
+      "explanation": "Dekorátor @functools.wraps(func) zkopíruje atributy původní funkce (__name__, __doc__, __annotations__) na obalující funkci.",
+      "code": "from functools import wraps\n\ndef log_experiment(func):\n    ________(func)\n    def wrapper(*args, **kwargs):\n        print(f\"Spoustim experiment: {func.__name__}\")\n        return func(*args, **kwargs)\n    return wrapper",
+      "expected": "@wraps"
+    },
+    {
+      "id": "adv3_q2",
+      "type": "predict_output",
+      "question": "Jaký bude výstup výpočtu kumulativní operace při použití functools.reduce s počáteční hodnotou 10?",
+      "options": [
+        "A) 24 (postupným násobením prvků seznamu 2 * 3 * 4 bez započtení 10)",
+        "B) 10 (vrácením pouze počáteční hodnoty bez provedení násobení prvků)",
+        "C) 2400 (vynásobením konečného součinu 240 ještě jednou hodnotou 10)",
+        "D) 240 (postupným násobením 10 * 2 * 3 * 4 s počáteční hodnotou 10)"
+      ],
+      "answer": 3,
+      "explanation": "Funkce reduce(lambda x, y: x * y, [2, 3, 4], 10) začíná s inicializační hodnotou 10: ((((10 * 2) * 3) * 4) = 240. Počáteční hodnota vstupuje do první operace na levé straně.",
+      "code": null
+    },
+    {
+      "id": "adv3_q3",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní practicalní rozdíl mezi dekorátory @functools.cache a @functools.lru_cache(maxsize=128)?",
+      "options": [
+        "A) @cache nemá žádný limit velikosti a vynechává logiku odstraňování prvků.",
+        "B) @cache funguje výhradně na generátory, zatímco @lru_cache na funkce.",
+        "C) @cache ukládá výsledky na disk, zatímco @lru_cache je uplatňuje v RAM.",
+        "D) @cache vyžaduje pouze nehešovatelné argumenty na rozdíl od @lru_cache."
+      ],
+      "answer": 0,
+      "explanation": "Zkratka @functools.cache zavedená v Pythonu 3.9 je ekvivalentem @lru_cache(maxsize=None). Je o něco rychlejší a paměťově úspornější než standardní LRU mezipaměť, protože nemusí sledovat a promazávat nejstarší nepoužité položky.",
+      "code": null
+    },
+    {
+      "id": "adv3_q4",
+      "type": "multiple_choice",
+      "question": "Kterou kombinaci magických metod je nutné ručně nadefinovat pro správné fungování dekorátoru @total_ordering?",
+      "options": [
+        "A) Všechny čtyři porovnávací metody __lt__, __le__, __gt__ a __ge__ bez nutnosti definovat __eq__.",
+        "B) Metodu __eq__ a alespoň jednu z porovnávacích metod __lt__, __le__, __gt__ nebo __ge__.",
+        "C) Výhradně metody __eq__ a __ne__, přičemž nerovnosti jsou automaticky nahrazeny.",
+        "D) Pouze metody __hash__ a __cmp__, z nichž dekorátor odvodí veškeré zbývající operátory."
+      ],
+      "answer": 1,
+      "explanation": "Třídní dekorátor @functools.total_ordering vyžaduje, aby třída definovala metodu __eq__() a alespoň jednu ze čtyř relačních metod (__lt__, __le__, __gt__, __ge__). Zbývající porovnávací metody dopopočítá automaticky.",
+      "code": null
+    },
+    {
+      "id": "adv3_q5",
+      "type": "multiple_choice",
+      "question": "Jaký bude výstup volání funkce vytvořené pomocí functools.partial s přednastaveným argumentem exponent=2?",
+      "options": [
+        "A) 10 (vypočte součin 5 * 2 namísto umocňování zadaného základu exponentem)",
+        "B) 32 (vypočte 2 ** 5 prohozením pořadí prvního a předaného argumentu zaklad)",
+        "C) 25 (vypočte 5 ** 2 s využitím přednastaveného pojmenovaného argumentu exponent=2)",
+        "D) TypeError (protože partial neumožňuje fixovat pojmenované argumenty funkcí)"
+      ],
+      "answer": 2,
+      "explanation": "Volání partial(mocnina, exponent=2)(5) zafixuje pojmenovaný argument exponent=2 a předaný argument 5 použije jako prvotní poziční argument zaklad. Vypočítá tedy 5 ** 2 = 25.",
+      "code": null
+    },
+    {
+      "id": "adv3_q6",
+      "type": "true_false_tricky",
+      "question": "Lze dekorátor @functools.lru_cache bezpečně použít pro kešování návratových hodnot asynchronních funkcí nebo generátorů?",
+      "options": [
+        "A) Ano; dekorátor automaticky obnovuje stav generátoru a znova spouští asynchronní coroutine při každém volání.",
+        "B) Ne; kešování generátorů či async funkcí nefunguje správně, protože vrací vyčerpané iterátory či coroutiny."
+      ],
+      "answer": 1,
+      "explanation": "Kešování generátorových nebo asynchronních funkcí pomocí lru_cache vrátí při druhém volání stejný vyčerpaný generátor nebo již vyhodnocený objekt coroutine, což vede k chybám. Kešovat má smysl pouze čisté funkce bez vedlejších efektů vracející datové hodnoty.",
+      "code": null
+    }
+  ],
+  "materialy--python--objects--magic": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Co vypíše následující kód při vyhodnocení výrazu `5 + v`?",
+      "options": [
+        "A) Vypíše hodnotu 15, protože při selhání levostranné metody int zavolá Python pravostrannou __radd__.",
+        "B) Vyvolá AttributeError, protože pro operaci 5 + v musíme definovat výhradně levostrannou metodu __add__.",
+        "C) Vyvolá TypeError, protože celé číslo 5 stojí vlevo a nepodporuje sčítání s uživatelským objektem.",
+        "D) Vypíše hodnotu 10, protože pravostranné metody ignorují levý operand a vracejí pouze vnitřní hodnotu."
+      ],
+      "answer": 0,
+      "explanation": "Při výrazu `5 + v` se nejprve zavolá levostranná metoda `(5).__add__(v)`. Jelikož vestavěný typ `int` objekt typu `Vector` nezná, vrátí `NotImplemented`. Python následně vyzkouší pravostrannou metodu `v.__radd__(5)`, která vrátí `10 + 5 = 15`.",
+      "code": "class Vector:\n    def __init__(self, val):\n        self.val = val\n    def __radd__(self, other):\n        return self.val + other\n\nv = Vector(10)\nprint(5 + v)"
+    },
+    {
+      "id": "q2",
+      "type": "fill_blank_choice",
+      "question": "Doplňte magickou metodu umožňující bezeztrátový převod objektu na celé číslo pro indexování sekvencí:",
+      "options": [
+        "__getitem__",
+        "__index__",
+        "__slice__",
+        "__int__"
+      ],
+      "answer": 1,
+      "explanation": "Metoda __index__() slouží k převodu objektu na celočíselný index pro krájení (slicing) a indexaci sekvencí v Pythonu.",
+      "code": "class CustomIndex:\n    def __init__(self, pos):\n        self.pos = pos\n\n    def ________(self):\n        return self.pos\n\nitems = [\"A\", \"B\", \"C\", \"D\"]\nprint(items[CustomIndex(2)])  # Vypíše: C",
+      "expected": "__index__"
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jaký bude výsledek zavolání instance `trojnasobek(5)` v následujícím kódu?",
+      "options": [
+        "A) Vypíše hodnotu 3, protože zavolání instance vrátí pouze hodnotu atributu n předanou v konstruktoru.",
+        "B) Vyvolá TypeError, protože instance třídy nelze volat pomocí závorek jako běžné pythoní funkce.",
+        "C) Vypíše hodnotu 15, protože definice metody __call__ činí instanci třídy přímo volatelnou jako funkci.",
+        "D) Vyvolá AttributeError, protože metoda __call__ vyžaduje ještě explicitní zadekorování @callable."
+      ],
+      "answer": 2,
+      "explanation": "Definice magické metody `__call__(self, ...)` způsobuje, že se instance třídy chová jako callable objekt. Zavolání `trojnasobek(5)` se přeloží na `trojnasobek.__call__(5)`, což vrátí `3 * 5 = 15`.",
+      "code": "class Nasobek:\n    def __init__(self, n):\n        self.n = n\n    def __call__(self, x):\n        return self.n * x\n\ntrojnasobek = Nasobek(3)\nprint(trojnasobek(5))"
+    },
+    {
+      "id": "q4",
+      "type": "fill_blank_choice",
+      "question": "Doplňte magickou metodu pro přetížení infixového operátoru maticového násobení (@):",
+      "options": [
+        "__mul__",
+        "__dot__",
+        "__matrix__",
+        "__matmul__"
+      ],
+      "answer": 3,
+      "explanation": "Operátor @ volá magickou metodu __matmul__(self, other) definovanou v PEP 465 pro maticové násobení.",
+      "code": "class Matrix:\n    def __init__(self, data):\n        self.data = data\n\n    def ________(self, other):\n        # Implementace maticového násobení pro operátor @\n        pass",
+      "expected": "__matmul__"
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Co vypíše následující kód při přístupu k neexistujícímu klíči `d['b']`?",
+      "options": [
+        "A) Vypíše řetězec 'B', protože metoda __missing__ se zavolá automaticky při nenalezení klíče v slovníku.",
+        "B) Vyvolá KeyError, protože __missing__ je pouze dekorativní metoda a nezabraňuje vyhození výjimky.",
+        "C) Vypíše hodnotu None, protože neexistující klíče v odvozených slovnících automaticky vrací prázdný objekt.",
+        "D) Vyvolá AttributeError, protože přístup přes hranaté závorky vyžaduje přetížení metody __getitem__."
+      ],
+      "answer": 0,
+      "explanation": "V podtřídách slovníku `dict` zavolá metoda `__getitem__()` při nenalezení požadovaného klíče metodu `__missing__(key)`. Její návratová hodnota se pak vrátí jako výsledek vyhledávání.",
+      "code": "class MojeSlovnik(dict):\n    def __missing__(self, key):\n        return key.upper()\n\nd = MojeSlovnik({'a': 'apple'})\nprint(d['b'])"
+    },
+    {
+      "id": "q6",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl v určení magických metod `__repr__()` a `__str__()`?",
+      "options": [
+        "A) __repr__ se volá automaticky funkcí print(), zatímco __str__ se volá výhradně v diagnostickém debuggeru.",
+        "B) __repr__ slouží pro oficiální technickou reprezentaci objektu, zatímco __str__ pro čitelný textový výstup.",
+        "C) Obě metody vracejí výhradně bajtové sekvence a liší se pouze možností přijímat formátovací specifikátory.",
+        "D) __str__ slouží pro oficiální technickou reprezentaci objektu, zatímco __repr__ pro čitelný textový výstup."
+      ],
+      "answer": 1,
+      "explanation": "Metoda `__repr__()` má vracet jednoznačnou, pokud možno validní pythonní reprezentaci objektu (vhodnou pro vývojáře/debugger), zatímco `__str__()` poskytuje uživatelsky přívětivý textový výstup (využívaný např. funkcí `print()`).",
+      "code": null
+    },
+    {
+      "id": "q7",
+      "type": "true_false_tricky",
+      "question": "Vyhodnoťte pravdivost tvrzení: Pokud třída nedefinuje in-place metodu `__iadd__()`, výraz `x += y` vyvolá chybu TypeError a operace sčítání selže.",
+      "options": [
+        "A) Pravda – Zkrácený operátor += vyžaduje výhradně in-place metodu __iadd__() a nelze jej nahradit běžnou metodou __add__().",
+        "B) Nepravda – Při absenci __iadd__() vyhodnotí Python výraz x += y jako x = x + y a pokusí se zavolat metodu __add__()."
+      ],
+      "answer": 1,
+      "explanation": "Pokud objekt nedefinuje in-place metodu `__iadd__()`, použije Python jako záložní řešení standardní binární operaci sčítání `x = x + y` s metodou `__add__()`.",
+      "code": null
+    }
+  ],
+  "materialy--python--objects--overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
+      "code": null
+    }
+  ],
+  "materialy--python--pandas--example-2": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Jak se změní datový typ celočíselného sloupce v Pandas DataFrame, pokud obsahuje chybějící hodnoty načtené jako np.nan?",
+      "options": [
+        "A) Sloupec se automaticky převede na textový řetězec str, přičemž všechny nuly se vymažou z dat.",
+        "B) Celý sloupec se automaticky přetypuje na plovoucí řádkovou čárku np.float64 nebo obecný typ object.",
+        "C) Celý sloupec zůstane nezměněn jako np.int64 a np.nan se nahradí nulou bez upozornění vývojáře.",
+        "D) Vyvolá se runtime výjimka ValueError, protože standardní číselné pole v Pandas nedovoluje np.nan."
+      ],
+      "answer": 1,
+      "explanation": "Standardní NumPy typ np.int64 neumí reprezentovat chybějící hodnotu NaN. Přítomnost np.nan v celočíselném poli proto v Pandas vynutí přetypování celého sloupce na np.float64.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak zabránit přetypování celočíselného sloupce s chybějícími hodnotami na float64 při načítání dat v Pandas?",
+      "options": [
+        "A) Použitím standardního typu int v Pythonu, který na rozdíl od np.int64 nativně podporuje np.nan.",
+        "B) Přetypováním všech chybějících hodnot na řetězec 'null' pomocí metody replace() po importu tabulky.",
+        "C) Předepsáním rozšiřujícího typu 'Int64' (alias pro pd.Int64Dtype()) v parametru dtype při importu dat.",
+        "D) Nastavením globálního parametru pd.options.mode.use_inf_as_na = True před načtením excelovského souboru."
+      ],
+      "answer": 2,
+      "explanation": "Pandas nabízí nullable celočíselné datové typy (např. 'Int64' s velkým 'I'), které udržují celá čísla a pro chybějící pozice používají speciální konstantu <NA> bez přetypování na float.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Doplňte metodu pandas Series pro nahrazení chybějících hodnot (NaN) nulou:",
+      "options": [
+        "dropna",
+        "replace_na",
+        "set_na",
+        "fillna"
+      ],
+      "answer": 3,
+      "explanation": "Metoda fillna(0) v pandas nahrazuje všechny chybějící hodnoty (NaN, NA) ve sloupci zadanou hodnotou.",
+      "code": "import pandas as pd\n\ndf = pd.DataFrame({\"DOSPELCI\": [2, None, 1, None]})\ndf[\"DOSPELCI\"] = df[\"DOSPELCI\"].________(0)\n# Výstup: [2.0, 0.0, 1.0, 0.0]",
+      "expected": "fillna"
+    },
+    {
+      "id": "q4",
+      "type": "multiple_choice",
+      "question": "Jaký je hlavní rozdíl mezi voláním df['DRUH_CZ'].unique() a df['DRUH_CZ'].nunique() v Pandas?",
+      "options": [
+        "A) unique() vrací pole (ndarray) s unikátními prvky sloupce, zatímco nunique() vrací celkový počet těchto unikátních prvků.",
+        "B) unique() automaticky zahrnuje chybějící hodnoty NaN, zatímco nunique() vždy vyvolá chybu paměti.",
+        "C) unique() seřadí hodnoty podle abecedy, zatímco nunique() je ponechá v původním pořadí výskytu v datatframu.",
+        "D) nunique() vrací pole (ndarray) s unikátními prvky sloupce, zatímco unique() vrací celkový počet těchto unikátních prvků."
+      ],
+      "answer": 0,
+      "explanation": "Metoda unique() vrací pole unikátních hodnot (včetně případných NaN), kdežto nunique() vrací celé číslo udávající počet unikátních neprázdných prvků.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "multiple_choice",
+      "question": "Jaký účinek má kód out_df.loc[len(out_df)] = [druh, pocet_ptaku, pocet_rybniku] na existujícím DataFrame out_df s číselným indexem?",
+      "options": [
+        "A) Vyvolá výjimku IndexError, protože index len(out_df) leží mimo rozsah existujících řádků v paměti.",
+        "B) Přidá nový řádek s danými hodnotami na konec DataFrame pod index rovnající se aktuálnímu počtu řádků.",
+        "C) Vytvoří nový sloupec s názvem odpovídajícím hodnotě proměnné druh na konci tabulky DataFrame.",
+        "D) Přepíše první řádek v DataFrame pod indexem 0 a vymaže veškerá dříve uložená data v datatframu."
+      ],
+      "answer": 1,
+      "explanation": "Jelikož v nula odvozeném indexu je len(out_df) přesně následující volný index, zápis do out_df.loc[len(out_df)] efektivně připojí nový řádek na konec tabulky.",
+      "code": null
+    },
+    {
+      "id": "q6",
+      "type": "fill_blank_choice",
+      "question": "Doplňte argument metody to_excel() pro potlačení zápisu číselného indexu řádků do nového souboru:",
+      "options": [
+        "row_index=False",
+        "no_index=True",
+        "index=False",
+        "header=False"
+      ],
+      "answer": 2,
+      "explanation": "Parametr index=False v metodě to_excel() zabrání exportu numerických řádkových indexů do samostatného sloupce.",
+      "code": "import pandas as pd\n\ndf = pd.DataFrame({\"Mereni\": [10.2, 12.5, 14.1]})\n# Uložení do Excelu bez sloupce s řádkovými indexy:\ndf.to_excel(\"vystup.xlsx\", ________)",
+      "expected": "index=False"
+    }
+  ],
+  "materialy--python--testing--overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
+      "code": null
+    }
+  ],
+  "materialy--python--parallelism--overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
+      "code": null
+    }
+  ],
+  "materialy--media--pnm": [
+    {
+      "id": "q1",
+      "type": "multiple_choice",
+      "question": "Které magické číslo v hlavičce souboru PNM označuje binární formát pro RGB obrázek (PPM)?",
+      "options": [
+        "A) P6",
+        "B) P5",
+        "C) P4",
+        "D) P3"
+      ],
+      "answer": 0,
+      "explanation": "Magická čísla P1/P4 patří PBM, P2/P5 patří PGM a P3/P6 patří PPM. Sudá čísla označují binární kódování, tudíž binární RGB obrázek je P6.",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "predict_output",
+      "question": "Co v monochromatických formátech PBM (P1 a P4) představují bity či čísla 0 a 1?",
+      "options": [
+        "A) Hodnoty 0 a 1 jsou závislé výhradně na zvoleném nastavení palety v hlavičce.",
+        "B) 0 představuje bílou barvu (pozadí) a 1 představuje černou barvu (popředí).",
+        "C) 0 představuje průhlednost a 1 představuje maximální nastavenou barvu.",
+        "D) 0 představuje černou barvu (popředí) a 1 představuje bílou barvu (pozadí)."
+      ],
+      "answer": 1,
+      "explanation": "V formátu PBM označuje hodnota 0 bílé pozadí a hodnota 1 černou barvu. To je opacně oproti šedotónovým formátům PGM, kde 0 znamená nejtmavší (černou).",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "multiple_choice",
+      "question": "Jak jsou uložena grafická data pixelů v binární variantě P4 formátu PBM?",
+      "options": [
+        "A) Pixely jsou komprimovány jednoduchým během opakovaných hodnot RLE do bajtů.",
+        "B) Každé dva pixely jsou sloučeny do jednoho bajtu v podobě čtyřbitových nibblů.",
+        "C) Každý bajt obsahuje přesně 8 pixelů, kde jednotlivé bity odpovídají černobílým pixelům.",
+        "D) Každému pixelu odpovídá právě jeden celý bajt obsahující hodnotu 0x00 nebo 0xFF."
+      ],
+      "answer": 2,
+      "explanation": "V binárním PBM (P4) je pro úsporu 8 pixelů sloučeno do 1 bajtu. Pokud šířka obrázku není násobkem 8, přebytečné bity v posledním bajtu se doplňují nulami.",
+      "code": null
+    },
+    {
+      "id": "q4",
+      "type": "predict_output",
+      "question": "Jaký problém nastává při zapsání binárního formátu P5 nebo P6 na systému Windows s koncem řádek \\r\\n?",
+      "options": [
+        "A) Hlavička souboru je parserem odmítnuta jako neplatná z důvodu nálezu nepovolených znaků.",
+        "B) Zpracovávající aplikace zkonvertuje dvoubajtový konec řádky na jediný mezerní bajt.",
+        "C) Soubor se sice otevře, ale barevná data všech pixelů se posunou o 8 bitů v barevné paletě.",
+        "D) Znak \\r poslouží jako oddělovač hlavičky a znak \\n je chybě interpretován jako první bajt dat."
+      ],
+      "answer": 3,
+      "explanation": "Binární data v PNM musí začínat těsně za jediným whitespace bajtem. Při Windows konci řádek \\r\\n ukončí znak \\r (CR) hlavičku a znak \\n (LF, 0x0A) přečte dekodér jako první datový bajt.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "fill_blank_choice",
+      "question": "Doplňte rozbalení trojice barevných kanálů v binárním formátu PPM (P6), kde jsou pixely uloženy v pořadí červená, zelená, modrá.",
+      "options": [
+        "r, g, b",
+        "r, g, b, a",
+        "b, g, r",
+        "g, r, b"
+      ],
+      "answer": 0,
+      "explanation": "Binární formát PPM (P6) ukládá pro každý pixel právě 3 bajty v pevném pořadí složek R (červená), G (zelená) a B (modrá).",
+      "code": "import struct\n\ndef parse_p6_pixel(pixel_bytes: bytes) -> tuple[int, int, int]:\n    # Formát P6 ukládá 3 bajty na pixel v kanálovém pořadí:\n    ________ = struct.unpack(\"3B\", pixel_bytes[:3])\n    return (r, g, b)",
+      "expected": "r, g, b"
+    },
+    {
+      "id": "q6",
+      "type": "true_false_tricky",
+      "question": "Posuďte způsob zápisu hlavičky u binárních variant PNM (P4, P5, P6).",
+      "options": [
+        "A) Pravda: Hlavička binárních variant je zapsána v ASCII textu úplně stejně jako u ASCII variant.",
+        "B) Nepravda: Hlavička binárních variant je uložena v binární struktuře s pevnou délkou bajtů."
+      ],
+      "answer": 0,
+      "explanation": "Všechny formáty PNM (ASCII i binární P4-P6) mají hlavičku (identifikátor, rozměry, max hodnota) uloženu v kódování ASCII. Změna na binární uložení se týká výhradně samotných dát za hlavičkou.",
+      "code": null
+    }
+  ],
+  "materialy--net--overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
+      "code": null
+    }
+  ],
+  "materialy--python--gui--turtle--overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
+      "code": null
+    }
+  ],
+  "materialy--python--net--overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
+      "code": null
+    }
+  ],
+  "materialy--regexp--overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
+      "code": null
+    }
+  ],
+  "materialy--techs--L-systems--overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
+      "code": null
+    }
+  ],
+  "materialy--web--css--overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
+      "code": null
+    }
+  ],
+  "materialy--web--html--overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
+      "code": null
+    }
+  ],
+  "materialy--web--xml--overview": [
+    {
+      "id": "q1",
+      "type": "predict_output",
+      "question": "Co je výsledkem výrazu np.array([1, 2]) * np.array([3, 4]) v NumPy?",
+      "options": [
+        "A) Dvourozměrný tenzor array([[3, 4], [3, 4]]) roztažením.",
+        "B) Skalární hodnota 11 získaná skalárním součinem vektorů.",
+        "C) Výjimka ValueError kvůli nedefinovanému skládání vektorů.",
+        "D) Vektor array([3, 8]) získaný násobením po složkách."
+      ],
+      "answer": 3,
+      "explanation": "Běžné operátory (*, +, -) provádějí v NumPy operace nad objekty ndarray striktně po složkách (Hadamardův součin). Maticové násobení vyžaduje operátor @ nebo metodu dot().",
+      "code": null
+    },
+    {
+      "id": "q2",
+      "type": "multiple_choice",
+      "question": "Jak se liší násobení operátorem * u typu np.ndarray a typu np.matrix?",
+      "options": [
+        "A) ndarray provádí násobení po složkách, zatímco matrix provádí algebraické maticové násobení.",
+        "B) Obě struktury provádějí algebraické maticové násobení, pokud mají vstupy shodné rozměry matic.",
+        "C) Obě struktury provádějí násobení po složkách, pro maticové násobení slouží výhradně np.dot().",
+        "D) ndarray provádí algebraické maticové násobení, zatímco matrix provádí násobení po složkách."
+      ],
+      "answer": 0,
+      "explanation": "Třída np.matrix přetěžuje operátor * na algebraické maticové násobení, avšak její použití je v moderním NumPy silně nedoporučováno a nahrazeno operátorem @ na ndarray.",
+      "code": null
+    },
+    {
+      "id": "q3",
+      "type": "fill_blank_choice",
+      "question": "Který operátor provádí v moderním Pythonu a knihovně NumPy algebraické maticové násobení dvou polí?",
+      "options": [
+        "*",
+        "@",
+        "&",
+        "%"
+      ],
+      "answer": 1,
+      "explanation": "Operátor @ byl zaveden v Pythonu 3.5 pro algebraické maticové násobení (zatímco * provádí v NumPy násobení prvek po prvku).",
+      "code": "import numpy as np\n\nmatrix_a = np.array([[1.0, 2.0], [3.0, 4.0]])\nmatrix_b = np.array([[2.0, 0.0], [1.0, 3.0]])\n\n# Algebraický součin matic (maticové násobení)\nresult = matrix_a ________ matrix_b\n# Výstup: array([[ 4.,  6.],\n#                [10., 12.]])",
+      "expected": "@"
+    },
+    {
+      "id": "q4",
+      "type": "true_false_tricky",
+      "question": "Porovnejte vlastnosti vestavěného modulu array z distribuční knihovny Pythonu a modulu numpy.ndarray.",
+      "options": [
+        "A) Modul array podporuje vícerozměrné matice, zatímco ndarray je omezen pouze na jednorozměrné vektory.",
+        "B) Modul array podporuje pouze jednorozměrná pole základních typů C, zatímco ndarray je vícerozměrný."
+      ],
+      "answer": 1,
+      "explanation": "Vestavěný modul array v Pythonu je lightweight 1D sekvence obsahující stejnorodé C typy. Nemá podpoře pro vícerozměrné výpočty ani broadcasting, které poskytuje numpy.ndarray.",
+      "code": null
+    },
+    {
+      "id": "q5",
+      "type": "predict_output",
+      "question": "Jaký výstup vrátí operace np.arange(3) + [1, 1, 1]?",
+      "options": [
+        "A) array([1, 1, 1])",
+        "B) array([0, 1, 2])",
+        "C) array([1, 2, 3])",
+        "D) array([0, 0, 0])"
+      ],
+      "answer": 2,
+      "explanation": "NumPy automaticky konvertuje kompatibilní Python sekvenci (např. seznam [1, 1, 1]) na ndarray a provede sčítání po složkách s np.arange(3), což dá [0+1, 1+1, 2+1] = [1, 2, 3].",
+      "code": null
+    }
+  ]
+}

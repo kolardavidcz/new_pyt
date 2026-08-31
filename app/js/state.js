@@ -6,6 +6,7 @@ export const FLAVORS = ["basics", "resyntax", "newconcept", "pythonic", "paradig
 
 const SEEN_KEY = "pcs-seen-v1";
 const STUDIED_KEY = "pcs-studied-v1";
+const SKIPPED_KEY = "pcs-skipped-v1";
 const CHECKLIST_KEY = "pcs-checklist-v1";
 const SIDEBAR_W_KEY = "pcs-sidebar-w";
 const USER_KEY = "pcs-user-v1";
@@ -20,6 +21,11 @@ export const defaultUser = {
 export function getStudiedKey() {
   const u = state.user?.username;
   return u ? syncEngine.getKey(u, "studied") : STUDIED_KEY;
+}
+
+export function getSkippedKey() {
+  const u = state.user?.username;
+  return u ? syncEngine.getKey(u, "skipped") : SKIPPED_KEY;
 }
 
 export function getSeenKey() {
@@ -74,6 +80,9 @@ export const state = {
 
   /** Manually marked “studied” item ids (progress source of truth) */
   studied: new Set(),
+
+  /** Manually marked “skipped / already known” item ids (counts as completed) */
+  skipped: new Set(),
 
   /** Checked items in the 4-level checklist */
   checklist: new Set(),
@@ -670,6 +679,7 @@ export function logoutUser() {
     localStorage.removeItem(USER_KEY);
   } catch { /* ignore */ }
   state.studied = new Set();
+  state.skipped = new Set();
   state.seen = new Set();
   state.checklist = new Set();
   notifyStateChange("user", { user: null });
@@ -678,10 +688,12 @@ export function logoutUser() {
 export function loadPersisted() {
   loadUser();
   const sKey = getStudiedKey();
+  const skKey = getSkippedKey();
   const seKey = getSeenKey();
   const chKey = getChecklistKey();
 
   state.studied = new Set();
+  state.skipped = new Set();
   state.seen = new Set();
   state.checklist = new Set();
 
@@ -697,6 +709,13 @@ export function loadPersisted() {
     if (raw) {
       const arr = JSON.parse(raw);
       if (Array.isArray(arr)) state.studied = new Set(arr);
+    }
+  } catch { /* ignore */ }
+  try {
+    const raw = localStorage.getItem(skKey);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) state.skipped = new Set(arr);
     }
   } catch { /* ignore */ }
   try {
@@ -914,9 +933,10 @@ export async function getQuizFor(item) {
 
   let found = checkMemory();
   if (!found) {
-    // 1. Try per-deck chunk
-    const targetKey = quiz_deck || slug || lastTwo || idClean || "";
-    if (targetKey) {
+    // 1. Try per-deck chunks across all candidate keys (e.g. slug, base, etc.)
+    const tryKeys = [quiz_deck, slug, base, lastTwo, idClean].filter(Boolean);
+    for (const targetKey of tryKeys) {
+      if (found) break;
       const urls = [
         `/data/quizzes/${targetKey}.json`,
         `data/quizzes/${targetKey}.json`,
@@ -1064,6 +1084,17 @@ export function persistStudied() {
   }
 }
 
+export function persistSkipped() {
+  const skKey = getSkippedKey();
+  const arr = [...state.skipped];
+  try {
+    localStorage.setItem(skKey, JSON.stringify(arr));
+  } catch { /* ignore */ }
+  if (state.user?.username) {
+    syncEngine.kvSet(syncEngine.getKey(state.user.username, "skipped"), arr);
+  }
+}
+
 export function persistChecklist() {
   const chKey = getChecklistKey();
   const arr = [...state.checklist];
@@ -1150,7 +1181,16 @@ export function markSeen(itemId) {
 }
 
 export function isStudied(itemId) {
-  return !!(itemId && state.studied.has(itemId));
+  return !!(itemId && state.studied?.has(itemId));
+}
+
+export function isSkipped(itemId) {
+  return !!(itemId && state.skipped?.has(itemId));
+}
+
+export function isCompleted(itemId) {
+  if (!itemId) return false;
+  return !!(state.studied?.has(itemId) || state.skipped?.has(itemId));
 }
 
 /** Toggle manual “studied” flag. Returns new studied state. */
@@ -1162,24 +1202,195 @@ export function toggleStudied(itemId) {
     now = false;
   } else {
     state.studied.add(itemId);
+    state.skipped.delete(itemId);
     markSeen(itemId);
     now = true;
   }
   persistStudied();
-  notifyStateChange("studied", { itemId, now });
+  persistSkipped();
+  notifyStateChange("studied", { itemId, now, status: now ? "studied" : "unmarked" });
   return now;
+}
+
+/** Toggle manual “skipped” (already known) flag. Returns new skipped state. */
+export function toggleSkipped(itemId) {
+  if (!itemId) return false;
+  let now = false;
+  if (state.skipped.has(itemId)) {
+    state.skipped.delete(itemId);
+    now = false;
+  } else {
+    state.skipped.add(itemId);
+    state.studied.delete(itemId);
+    markSeen(itemId);
+    now = true;
+  }
+  persistStudied();
+  persistSkipped();
+  notifyStateChange("studied", { itemId, now, status: now ? "skipped" : "unmarked" });
+  return now;
+}
+
+export function getStudyStatus(itemId) {
+  if (!itemId) return "default";
+  if (state.studied.has(itemId)) return "studied";
+  if (state.skipped.has(itemId)) return "skipped";
+  return "default";
+}
+
+/**
+ * 3-State cycling for study button:
+ * 1st click: Default/Unmarked -> Studied (Prostudováno)
+ * 2nd click: Studied -> Skipped (Znáno / Přeskočeno)
+ * 3rd click: Skipped -> Default/Unmarked
+ * Returns the new state: "studied" | "skipped" | "default"
+ */
+export function cycleStudyStatus(itemId) {
+  if (!itemId) return "default";
+  let nextState = "default";
+  if (state.studied.has(itemId)) {
+    // 1st (Studied) -> 2nd (Skipped)
+    state.studied.delete(itemId);
+    state.skipped.add(itemId);
+    markSeen(itemId);
+    nextState = "skipped";
+  } else if (state.skipped.has(itemId)) {
+    // 2nd (Skipped) -> 3rd (Default)
+    state.skipped.delete(itemId);
+    state.studied.delete(itemId);
+    nextState = "default";
+  } else {
+    // 3rd (Default) -> 1st (Studied)
+    state.studied.add(itemId);
+    state.skipped.delete(itemId);
+    markSeen(itemId);
+    nextState = "studied";
+  }
+  persistStudied();
+  persistSkipped();
+  notifyStateChange("studied", { itemId, status: nextState, now: nextState !== "default" });
+  return nextState;
 }
 
 export function setStudied(itemId, on) {
   if (!itemId) return;
   if (on) {
     state.studied.add(itemId);
+    state.skipped.delete(itemId);
     markSeen(itemId);
   } else {
     state.studied.delete(itemId);
   }
   persistStudied();
+  persistSkipped();
   notifyStateChange("studied", { itemId, now: on });
+}
+
+export function setSkipped(itemId, on) {
+  if (!itemId) return;
+  if (on) {
+    state.skipped.add(itemId);
+    state.studied.delete(itemId);
+    markSeen(itemId);
+  } else {
+    state.skipped.delete(itemId);
+  }
+  persistStudied();
+  persistSkipped();
+  notifyStateChange("studied", { itemId, now: on });
+}
+
+/**
+ * Returns accurate course curriculum statistics:
+ * - Lectures: ONLY active lectures (W0..W12 non-skip)
+ * - Exercises: all exercises
+ * - Completed: either studied (✓) OR skipped/known (↷)
+ * - Shelf: W99 & in-week reference decks
+ */
+export function getCourseStats() {
+  const allItems = state.items || [];
+
+  // 1. Target Active Lectures (W0..W13 non-skip, excluding W98 & W99 shelf)
+  const targetLectures = allItems.filter(
+    (it) => it.kind === "lecture" && it.weekNum < 90 && !it.tags?.includes("Skip")
+  );
+  const studiedLectures = targetLectures.filter((it) => isStudied(it.id));
+  const skippedLectures = targetLectures.filter((it) => isSkipped(it.id));
+  const completedLectures = targetLectures.filter((it) => isCompleted(it.id));
+
+  // 2. Target Exercises (all)
+  const targetExercises = allItems.filter((it) => it.kind === "exercise");
+  const studiedExercises = targetExercises.filter((it) => isStudied(it.id));
+  const skippedExercises = targetExercises.filter((it) => isSkipped(it.id));
+  const completedExercises = targetExercises.filter((it) => isCompleted(it.id));
+
+  // 3. Total active target curriculum
+  const totalActive = targetLectures.length + targetExercises.length;
+  const completedActive = completedLectures.length + completedExercises.length;
+  const pct = totalActive > 0 ? Math.round((completedActive / totalActive) * 100) : 0;
+
+  // 4. Reference / Self-study shelf (W98, W99 & in-week skip)
+  const shelfLectures = allItems.filter(
+    (it) => it.kind === "lecture" && (it.weekNum >= 90 || it.tags?.includes("Skip"))
+  );
+  const completedShelf = shelfLectures.filter((it) => isCompleted(it.id));
+
+  return {
+    lectures: {
+      total: targetLectures.length,
+      studied: studiedLectures.length,
+      skipped: skippedLectures.length,
+      completed: completedLectures.length,
+      pct: targetLectures.length > 0 ? Math.round((completedLectures.length / targetLectures.length) * 100) : 0,
+    },
+    exercises: {
+      total: targetExercises.length,
+      studied: studiedExercises.length,
+      skipped: skippedExercises.length,
+      completed: completedExercises.length,
+      pct: targetExercises.length > 0 ? Math.round((completedExercises.length / targetExercises.length) * 100) : 0,
+    },
+    total: {
+      total: totalActive,
+      completed: completedActive,
+      studied: studiedLectures.length + studiedExercises.length,
+      skipped: skippedLectures.length + skippedExercises.length,
+      pct,
+    },
+    shelf: {
+      total: shelfLectures.length,
+      completed: completedShelf.length,
+    },
+  };
+}
+
+/**
+ * Returns stats for a single week block:
+ * - Counts only active non-skip lectures (unless shelf week >= 90)
+ * - Counts all exercises
+ */
+export function getWeekStats(week) {
+  if (!week) return { lecturesTotal: 0, lecturesCompleted: 0, exercisesTotal: 0, exercisesCompleted: 0, total: 0, completed: 0, pct: 0 };
+  const isShelf = week.week >= 90;
+  const weekLectures = (week.lectures || []).filter((l) => isShelf || !l.tags?.includes("Skip"));
+  const weekExercises = week.exercises || [];
+
+  const completedLectures = weekLectures.filter((l) => isCompleted(l.id)).length;
+  const completedExercises = weekExercises.filter((e) => isCompleted(e.id)).length;
+
+  const total = weekLectures.length + weekExercises.length;
+  const completed = completedLectures + completedExercises;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  return {
+    lecturesTotal: weekLectures.length,
+    lecturesCompleted: completedLectures,
+    exercisesTotal: weekExercises.length,
+    exercisesCompleted: completedExercises,
+    total,
+    completed,
+    pct,
+  };
 }
 
 export function buildIndexes(course) {
