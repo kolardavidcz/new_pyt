@@ -1,94 +1,123 @@
-{
-  "slug": "materialy--python--numpy--broadcasting",
-  "total": 8,
-  "slides": [
-    {
-      "id": "id1",
-      "idx": 0,
-      "title": "Úvod",
-      "tags": [
-        "Skip"
-      ],
-      "diff": "basics",
-      "already_studied_in": null,
-      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pojem <strong><em>broadcasting</em>u</strong> je při programování v <em>NumPy</em> velmi důležitý a zároveň bohužel také asi ne úplně snadno stravitelný. Proto se v této přednášce seznámíme s větším počtem příkladů jeho praktické aplikace.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Většinu vysvětlujících příkladů jsem převzal a/nebo upravil podle dokumentu <a href=\"http://scipy.github.io/old-wiki/pages/EricsBroadcastingDoc\" class=\"external\">Array Broadcasting in numpy</a>.\r\n    </div></div>\r\n\r\n</div>"
-    },
-    {
-      "id": "id2",
-      "idx": 1,
-      "title": "Příklad 1",
-      "tags": [
-        "Core"
-      ],
-      "diff": "pythonic",
-      "already_studied_in": null,
-      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Příklad 1</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Typickým příkladem-nepříkladem (protože je to běžné chování) je násobení skalárem:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; numpy.array([1, 2, 3]) * 2\narray([2, 4, 6])</pre>\r\n    <p>\r\n        Zde došlo k jakoby-transformaci skaláru, tedy pole s rozměrem 1×1, na pole s rozměrem 1×3 (a se stejnou hodnotou v každém místě – <code>numpy.array([2, 2, 2])</code>), aby byl rozměr pro operaci násobení stejný.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jak se snadno můžeme přesvědčit, pokud uvedený myšlenkový proces rozepíšeme:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; numpy.array([1, 2, 3]) * numpy.array([2, 2, 2])\narray([2, 4, 6])</pre>\r\n    </div></div>\r\n\r\n</div>"
-    },
-    {
-      "id": "id3",
-      "idx": 2,
-      "title": "Příklad 2",
-      "tags": [
-        "Core"
-      ],
-      "diff": "pythonic",
-      "already_studied_in": null,
-      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Příklad 2</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pro větší dimenze už to začíná být zajímavější:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; a = numpy.array([[0,0,0], [10,10,10], [20,20,20], [30,30,30]])\n&gt;&gt;&gt; a\narray([[ 0,  0,  0],\n       [10, 10, 10],\n       [20, 20, 20],\n       [30, 30, 30]])\n&gt;&gt;&gt; b = numpy.array([0,1,2])\n&gt;&gt;&gt; b\narray([0, 1, 2])\n\n&gt;&gt;&gt; a + b\narray([[ 0,  1,  2],\n       [10, 11, 12],\n       [20, 21, 22],\n       [30, 31, 32]])</pre>\r\n    <p>\r\n        Zde bylo pole <em>b</em> jakoby-upraveno z rozměru 1×3 na rozměr 4×3 kopírováním sebe sama do podoby..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">array([[0, 1, 2],\n        [0, 1, 2],\n        [0, 1, 2],\n        [0, 1, 2]])</pre>\r\n    <p>\r\n      ..aby mělo stejný rozměr jako pole <em>a</em> a bylo je možno obě sečíst složku po složce.\r\n    </p>\r\n\r\n</div>"
-    },
-    {
-      "id": "id4",
-      "idx": 3,
-      "title": "Příklad 3",
-      "tags": [
-        "WOW"
-      ],
-      "diff": "pythonic",
-      "already_studied_in": null,
-      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Příklad 3</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        A pro ještě roztodivnější kombinace už to začíná být kapku nepřehledné:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; a = numpy.array([0, 10, 20, 30])\n&gt;&gt;&gt; b = numpy.array([0, 1, 2])\n\n&gt;&gt;&gt; a + b\nTraceback (most recent call last):\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\nValueError: operands could not be broadcast together with shapes (4,) (3,) \n\n&gt;&gt;&gt; am = a[:,numpy.newaxis]\n&gt;&gt;&gt; am.shape\n(4, 1)\n&gt;&gt;&gt; am\narray([[ 0],\n       [10],\n       [20],\n       [30]])\n&gt;&gt;&gt; am + b\narray([[ 0,  1,  2],\n       [10, 11, 12],\n       [20, 21, 22],\n       [30, 31, 32]])</pre>\r\n    <p>\r\n        Zde jsme prozměnu nejdříve přetransformovali pole <em>a</em> z řádkové matice 1×4 do podoby sloupcové matice 4×1 (pomocí speciálního <em>operátoru indexu</em> <code>numpy.newaxis</code>), načež již byl <em>NumPy</em> schopen matice <em>a</em> i <em>b</em> „protáhnout“ do stejných tvarů 4×3..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">a = array([[ 0,  0,  0],\n            [10, 10, 10],\n            [20, 20, 20],\n            [30, 30, 30]])\nb = array([[0, 1, 2],\n            [0, 1, 2],\n            [0, 1, 2],\n            [0, 1, 2]])</pre>\r\n    <p>\r\n        ..které je již možno sečíst po složkách.\r\n    </p>\r\n\r\n</div>"
-    },
-    {
-      "id": "id5",
-      "idx": 4,
-      "title": "Definice",
-      "tags": [
-        "Tricky"
-      ],
-      "diff": "newconcept",
-      "already_studied_in": null,
-      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Definice</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Když jsme viděli, jak funguje <em>broadcasting</em> v praxi, bude snažší pochopit jeho definici:\r\n    </p>\r\n    <blockquote>\r\n        <em>Broadcasting</em> je možné použít, mají-li pole na <strong>odpovídajících si koncových místech svých os</strong> buď stejné rozměry nebo je jedno z nich jedničkové.\r\n    </blockquote>\r\n    <p>\r\n        Pro stejné rozměry není co řešit, jedničkové osy se pak „protahují“ (fiktivním) kopírováním způsobem, jaký jsme viděli <a href=\"?slajd=6\">na předchozím slajdu</a>.\r\n    </p>\r\n    <p>\r\n        Co si žádá vysvětlení, je pojem <em>odpovídající si koncová místa os</em>. V principu jde o to, že pole v operaci nemusí mít stejný počet os, protože pro potřeby výpočtu budou osy sdružovány od konce. Co to přesně znamená, snad osvětlí příklady na <a href=\"?slajd=6\">dalším slajdu</a>.\r\n    </p>\r\n\r\n</div>"
-    },
-    {
-      "id": "id6",
-      "idx": 5,
-      "title": "Definice – příklady",
-      "tags": [
-        "WOW"
-      ],
-      "diff": "newconcept",
-      "already_studied_in": null,
-      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Definice – příklady</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Mějme RGB-obrázek s rozměry 256×256, tj. vlastně pole 256×256×3. Chtějme transformovat každou z barvových složek jiným koeficientem. Díky <em>broadcasting</em>u stačí kupodivu vynásobit uvedené pole pixelů vektorem 1×3:\r\n    </p>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">vstup:    256×256×3\noperátor:         3\nvýstup:   256×256×3</pre>\r\n\r\n    <p class=\"enumerate\">\r\n        Teď ještě něco obecnějšího, ať je vidět, že k <em>broadcasting</em>u může docházet na více místech najednou:\r\n    </p>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">vstup:    8×1×6×1\noperátor:   7×1×5\nvýstup:   8×7×6×5</pre>\r\n\r\n</div>"
-    },
-    {
-      "id": "id7",
-      "idx": 6,
-      "title": "Poznámky",
-      "tags": [
-        "Core"
-      ],
-      "diff": "paradigm",
-      "already_studied_in": null,
-      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Poznámky</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jak je vidět, <em>broadcasting</em> v některých případech enormně zjednodušuje zápis a především vlastní provedení požadované operace. Navíc je většinou i zrychluje, protože příslušná (binární) <strong>vnější operace</strong> mezi dvěma poli je provedena smyčkou na úrovni Céčka a nikoli samotného Python'u.\r\n    </p>\r\n    <p>\r\n        Na druhou stranu sahá pochopitelně optimalizace pouze odsud-posud, tedy především na dvourozměrná pole. Pokud by <em>broadcasting</em> pro potřeby výpočtu „vyráběl“ vícerozměrná pole, u většího počtu prvků brzo narazíme na omezení.\r\n    </p>\r\n\r\n</div>"
-    },
-    {
-      "id": "id8",
-      "idx": 7,
-      "title": "Ilustrace principu",
-      "tags": [
-        "Core"
-      ],
-      "diff": "basics",
-      "already_studied_in": null,
-      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Ilustrace principu</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Nikde jsem neviděl lepší zobrazení principu (nejen) <em>broadcasting</em>u než u <a href=\"http://www.labri.fr/perso/nrougier/teaching/numpy/numpy.html\" class=\"external\">Nicolase P. Rougiera</a>. Čímžto jeho materiály vřele doporučuji! Z důvodů vlastní lenosti však místo barev používám pro naznačení „kopírování“ dat písmenka:\r\n    </p>\r\n\r\n    <p class=\"enumerate\">\r\n        Součet matice m×n a matice 1×1:\r\n    </p>\r\n    <div class=\"tabobr\">\r\n        <table class=\"blue\">\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n        </table>\r\n        +\r\n        <table class=\"yellow\">\r\n            <tr><td>a</td></tr>\r\n        </table>\r\n        →\r\n        <table class=\"blue\">\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n        </table>\r\n        +\r\n        <table class=\"yellow\">\r\n            <tr><td>a</td><td>a</td><td>a</td></tr>\r\n            <tr><td>a</td><td>a</td><td>a</td></tr>\r\n            <tr><td>a</td><td>a</td><td>a</td></tr>\r\n            <tr><td>a</td><td>a</td><td>a</td></tr>\r\n        </table>\r\n        =\r\n        <table class=\"green\">\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n        </table>\r\n    </div>\r\n\r\n    <p class=\"enumerate\">\r\n        Součet matice m×n a matice 1×n:\r\n    </p>\r\n    <div class=\"tabobr\">\r\n        <table class=\"blue\">\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n        </table>\r\n        +\r\n        <table class=\"yellow\">\r\n            <tr><td>a</td></tr>\r\n            <tr><td>b</td></tr>\r\n            <tr><td>c</td></tr>\r\n            <tr><td>d</td></tr>\r\n        </table>\r\n        →\r\n        <table class=\"blue\">\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n        </table>\r\n        +\r\n        <table class=\"yellow\">\r\n            <tr><td>a</td><td>a</td><td>a</td></tr>\r\n            <tr><td>b</td><td>b</td><td>b</td></tr>\r\n            <tr><td>c</td><td>c</td><td>c</td></tr>\r\n            <tr><td>d</td><td>d</td><td>d</td></tr>\r\n        </table>\r\n        =\r\n        <table class=\"green\">\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n        </table>\r\n    </div>\r\n\r\n    <p class=\"enumerate\">\r\n        Součet matice m×n a matice m×1:\r\n    </p>\r\n    <div class=\"tabobr\">\r\n        <table class=\"blue\">\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n        </table>\r\n        +\r\n        <table class=\"yellow\">\r\n            <tr><td>a</td><td>b</td><td>c</td></tr>\r\n        </table>\r\n        →\r\n        <table class=\"blue\">\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n        </table>\r\n        +\r\n        <table class=\"yellow\">\r\n            <tr><td>a</td><td>b</td><td>c</td></tr>\r\n            <tr><td>a</td><td>b</td><td>c</td></tr>\r\n            <tr><td>a</td><td>b</td><td>c</td></tr>\r\n            <tr><td>a</td><td>b</td><td>c</td></tr>\r\n        </table>\r\n        =\r\n        <table class=\"green\">\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n        </table>\r\n    </div>\r\n\r\n    <p class=\"enumerate\">\r\n        Součet matice 1×n a matice m×1:\r\n    </p>\r\n    <div class=\"tabobr\">\r\n        <table class=\"blue\">\r\n            <tr><td>a</td></tr>\r\n            <tr><td>b</td></tr>\r\n            <tr><td>c</td></tr>\r\n            <tr><td>d</td></tr>\r\n        </table>\r\n        +\r\n        <table class=\"yellow\">\r\n            <tr><td>a</td><td>b</td><td>c</td></tr>\r\n        </table>\r\n        →\r\n        <table class=\"blue\">\r\n            <tr><td>a</td><td>a</td><td>a</td></tr>\r\n            <tr><td>b</td><td>b</td><td>b</td></tr>\r\n            <tr><td>c</td><td>c</td><td>c</td></tr>\r\n            <tr><td>d</td><td>d</td><td>d</td></tr>\r\n        </table>\r\n        +\r\n        <table class=\"yellow\">\r\n            <tr><td>a</td><td>b</td><td>c</td></tr>\r\n            <tr><td>a</td><td>b</td><td>c</td></tr>\r\n            <tr><td>a</td><td>b</td><td>c</td></tr>\r\n            <tr><td>a</td><td>b</td><td>c</td></tr>\r\n        </table>\r\n        =\r\n        <table class=\"green\">\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n            <tr><td></td><td></td><td></td></tr>\r\n        </table>\r\n    </div>\r\n\r\n</div>"
-    }
-  ]
-}
+[
+  {
+    "id": "id1",
+    "idx": 0,
+    "title": "Úvod",
+    "tags": [
+      "Skip"
+    ],
+    "diff": "basics",
+    "already_studied_in": null,
+    "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pojem <strong><em>broadcasting</em>u</strong> je při programování v <em>NumPy</em> velmi důležitý a zároveň bohužel také asi ne úplně snadno stravitelný. Proto se v této přednášce seznámíme s větším počtem příkladů jeho praktické aplikace.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Většinu vysvětlujících příkladů jsem převzal a/nebo upravil podle dokumentu <a href=\"http://scipy.github.io/old-wiki/pages/EricsBroadcastingDoc\" class=\"external\">Array Broadcasting in numpy</a>.\r\n    </div></div>\r\n\r\n</div>"
+  },
+  {
+    "id": "id2",
+    "idx": 1,
+    "title": "Příklad 1",
+    "tags": [
+      "Core"
+    ],
+    "diff": "pythonic",
+    "already_studied_in": null,
+    "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Příklad 1</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Typickým příkladem-nepříkladem (protože je to běžné chování) je násobení skalárem:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; numpy.array([1, 2, 3]) * 2\narray([2, 4, 6])</pre>\r\n    <p>\r\n        Zde došlo k jakoby-transformaci skaláru, tedy pole s rozměrem 1×1, na pole s rozměrem 1×3 (a se stejnou hodnotou v každém místě – <code>numpy.array([2, 2, 2])</code>), aby byl rozměr pro operaci násobení stejný.\r\n    </p>\r\n    <div class=\"note-item\"><span class=\"note-icon\">📝</span><div class=\"note-content\">\r\n        Jak se snadno můžeme přesvědčit, pokud uvedený myšlenkový proces rozepíšeme:\r\n        <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; numpy.array([1, 2, 3]) * numpy.array([2, 2, 2])\narray([2, 4, 6])</pre>\r\n    </div></div>\r\n\r\n</div>"
+  },
+  {
+    "id": "id_img1",
+    "title": "Vizuální schéma: Skalár a 1D vektor",
+    "tags": [
+      "WOW"
+    ],
+    "diff": "pythonic",
+    "already_studied_in": null,
+    "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Vizuální schéma: Skalár a 1D vektor</h2></div><div class=\"section-body\">\n    <p>\n        Při operaci mezi 1D polem (vektorem tvaru <code>(3,)</code>) a skalárem (hodnota <code>2.0</code>) se skalár virtuálně roztáhne na všechny odpovídající prvky pole bez nutnosti alokace paměti:\n    </p>\n    <div style=\"text-align: center; margin: 24px 0;\">\n        <img src=\"/app/images/broadcasting/broadcasting_scalar_matrix.gif\" alt=\"Broadcasting skaláru a 1D pole\" style=\"max-width: 100%; border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); background: #ffffff; padding: 16px;\" />\n    </div>\n    <div class=\"note-item\"><span class=\"note-icon\">💡</span><div class=\"note-content\">\n        Skalár <code>b = 2.0</code> je v paměti pouze jednou, ale v operaci <code>a * b</code> se chová jako plnohodnotné pole <code>[2.0, 2.0, 2.0]</code>.\n    </div></div>\n</div>",
+    "idx": 2
+  },
+  {
+    "id": "id3",
+    "idx": 3,
+    "title": "Příklad 2",
+    "tags": [
+      "Core"
+    ],
+    "diff": "pythonic",
+    "already_studied_in": null,
+    "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Příklad 2</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Pro větší dimenze už to začíná být zajímavější:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; a = numpy.array([[0,0,0], [10,10,10], [20,20,20], [30,30,30]])\n&gt;&gt;&gt; a\narray([[ 0,  0,  0],\n       [10, 10, 10],\n       [20, 20, 20],\n       [30, 30, 30]])\n&gt;&gt;&gt; b = numpy.array([0,1,2])\n&gt;&gt;&gt; b\narray([0, 1, 2])\n\n&gt;&gt;&gt; a + b\narray([[ 0,  1,  2],\n       [10, 11, 12],\n       [20, 21, 22],\n       [30, 31, 32]])</pre>\r\n    <p>\r\n        Zde bylo pole <em>b</em> jakoby-upraveno z rozměru 1×3 na rozměr 4×3 kopírováním sebe sama do podoby..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">array([[0, 1, 2],\n        [0, 1, 2],\n        [0, 1, 2],\n        [0, 1, 2]])</pre>\r\n    <p>\r\n      ..aby mělo stejný rozměr jako pole <em>a</em> a bylo je možno obě sečíst složku po složce.\r\n    </p>\r\n\r\n</div>"
+  },
+  {
+    "id": "id_img2",
+    "title": "Vizuální schéma: 2D matice a 1D řádkový vektor",
+    "tags": [
+      "WOW"
+    ],
+    "diff": "pythonic",
+    "already_studied_in": null,
+    "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Vizuální schéma: 2D matice a 1D řádkový vektor</h2></div><div class=\"section-body\">\n    <p>\n        Při sčítání 2D matice tvaru <code>(4, 3)</code> a 1D vektoru tvaru <code>(3,)</code> je řádkový vektor automaticky broadcastován podél vertikální osy 0 do každého ze 4 řádků matice:\n    </p>\n    <div style=\"text-align: center; margin: 24px 0;\">\n        <img src=\"/app/images/broadcasting/broadcasting_vector_matrix.gif\" alt=\"Broadcasting 1D vektoru na 2D matici\" style=\"max-width: 100%; border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); background: #ffffff; padding: 16px;\" />\n    </div>\n    <div class=\"note-item\"><span class=\"note-icon\">💡</span><div class=\"note-content\">\n        Vektor <code>b = [0, 1, 2]</code> je replikován podél dimenze s rozměrem 4, aniž by se v paměti musela vytvářet duplikovaná matice.\n    </div></div>\n</div>",
+    "idx": 4
+  },
+  {
+    "id": "id4",
+    "idx": 5,
+    "title": "Příklad 3",
+    "tags": [
+      "WOW"
+    ],
+    "diff": "pythonic",
+    "already_studied_in": null,
+    "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Příklad 3</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        A pro ještě roztodivnější kombinace už to začíná být kapku nepřehledné:\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">&gt;&gt;&gt; a = numpy.array([0, 10, 20, 30])\n&gt;&gt;&gt; b = numpy.array([0, 1, 2])\n\n&gt;&gt;&gt; a + b\nTraceback (most recent call last):\n  File \"&lt;stdin&gt;\", line 1, in &lt;module&gt;\nValueError: operands could not be broadcast together with shapes (4,) (3,) \n\n&gt;&gt;&gt; am = a[:,numpy.newaxis]\n&gt;&gt;&gt; am.shape\n(4, 1)\n&gt;&gt;&gt; am\narray([[ 0],\n       [10],\n       [20],\n       [30]])\n&gt;&gt;&gt; am + b\narray([[ 0,  1,  2],\n       [10, 11, 12],\n       [20, 21, 22],\n       [30, 31, 32]])</pre>\r\n    <p>\r\n        Zde jsme prozměnu nejdříve přetransformovali pole <em>a</em> z řádkové matice 1×4 do podoby sloupcové matice 4×1 (pomocí speciálního <em>operátoru indexu</em> <code>numpy.newaxis</code>), načež již byl <em>NumPy</em> schopen matice <em>a</em> i <em>b</em> „protáhnout“ do stejných tvarů 4×3..\r\n    </p>\r\n    <pre class=\"brush: python; gutter: false; toolbar: false; \">a = array([[ 0,  0,  0],\n            [10, 10, 10],\n            [20, 20, 20],\n            [30, 30, 30]])\nb = array([[0, 1, 2],\n            [0, 1, 2],\n            [0, 1, 2],\n            [0, 1, 2]])</pre>\r\n    <p>\r\n        ..které je již možno sečíst po složkách.\r\n    </p>\r\n\r\n</div>"
+  },
+  {
+    "id": "id5",
+    "idx": 6,
+    "title": "Definice",
+    "tags": [
+      "Tricky"
+    ],
+    "diff": "newconcept",
+    "already_studied_in": null,
+    "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Definice</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Když jsme viděli, jak funguje <em>broadcasting</em> v praxi, bude snažší pochopit jeho definici:\r\n    </p>\r\n    <blockquote>\r\n        <em>Broadcasting</em> je možné použít, mají-li pole na <strong>odpovídajících si koncových místech svých os</strong> buď stejné rozměry nebo je jedno z nich jedničkové.\r\n    </blockquote>\r\n    <p>\r\n        Pro stejné rozměry není co řešit, jedničkové osy se pak „protahují“ (fiktivním) kopírováním způsobem, jaký jsme viděli <a href=\"?slajd=6\">na předchozím slajdu</a>.\r\n    </p>\r\n    <p>\r\n        Co si žádá vysvětlení, je pojem <em>odpovídající si koncová místa os</em>. V principu jde o to, že pole v operaci nemusí mít stejný počet os, protože pro potřeby výpočtu budou osy sdružovány od konce. Co to přesně znamená, snad osvětlí příklady na <a href=\"?slajd=6\">dalším slajdu</a>.\r\n    </p>\r\n\r\n</div>"
+  },
+  {
+    "id": "id6",
+    "idx": 7,
+    "title": "Definice – příklady",
+    "tags": [
+      "WOW"
+    ],
+    "diff": "newconcept",
+    "already_studied_in": null,
+    "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Definice – příklady</h2></div><div class=\"section-body\">\r\n\r\n    <p class=\"enumerate\">\r\n        Mějme RGB-obrázek s rozměry 256×256, tj. vlastně pole 256×256×3. Chtějme transformovat každou z barvových složek jiným koeficientem. Díky <em>broadcasting</em>u stačí kupodivu vynásobit uvedené pole pixelů vektorem 1×3:\r\n    </p>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">vstup:    256×256×3\noperátor:         3\nvýstup:   256×256×3</pre>\r\n\r\n    <p class=\"enumerate\">\r\n        Teď ještě něco obecnějšího, ať je vidět, že k <em>broadcasting</em>u může docházet na více místech najednou:\r\n    </p>\r\n    <pre class=\"brush: text; gutter: false; toolbar: false; \">vstup:    8×1×6×1\noperátor:   7×1×5\nvýstup:   8×7×6×5</pre>\r\n\r\n</div>"
+  },
+  {
+    "id": "id_img6",
+    "title": "Vizuální schéma: 2D sloupcový a 2D řádkový vektor",
+    "tags": [
+      "WOW"
+    ],
+    "diff": "pythonic",
+    "already_studied_in": null,
+    "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Vizuální schéma: 2D sloupcový a 2D řádkový vektor</h2></div><div class=\"section-body\">\n    <p>\n        Kombinace sloupcového vektoru tvaru <code>(4, 1)</code> a řádkového vektoru tvaru <code>(1, 3)</code> broadcastuje obě dimenze současně a vytváří výslednou matici tvaru <code>(4, 3)</code> jako vnější operaci (outer product):\n    </p>\n    <div style=\"text-align: center; margin: 24px 0;\">\n        <img src=\"/app/images/broadcasting/broadcasting_outer_vector.gif\" alt=\"Broadcasting sloupcového a řádkového vektoru\" style=\"max-width: 100%; border-radius: 4px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); background: #ffffff; padding: 16px;\" />\n    </div>\n    <div class=\"note-item\"><span class=\"note-icon\">💡</span><div class=\"note-content\">\n        Sloupcový vektor <code>(4, 1)</code> je natažen horizontálně do 3 sloupců a řádkový vektor <code>(1, 3)</code> vertikálně do 4 řádků.\n    </div></div>\n</div>",
+    "idx": 8
+  },
+  {
+    "id": "id7",
+    "idx": 9,
+    "title": "Poznámky",
+    "tags": [
+      "Core"
+    ],
+    "diff": "paradigm",
+    "already_studied_in": null,
+    "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Poznámky</h2></div><div class=\"section-body\">\r\n\r\n    <p>\r\n        Jak je vidět, <em>broadcasting</em> v některých případech enormně zjednodušuje zápis a především vlastní provedení požadované operace. Navíc je většinou i zrychluje, protože příslušná (binární) <strong>vnější operace</strong> mezi dvěma poli je provedena smyčkou na úrovni Céčka a nikoli samotného Python'u.\r\n    </p>\r\n    <p>\r\n        Na druhou stranu sahá pochopitelně optimalizace pouze odsud-posud, tedy především na dvourozměrná pole. Pokud by <em>broadcasting</em> pro potřeby výpočtu „vyráběl“ vícerozměrná pole, u většího počtu prvků brzo narazíme na omezení.\r\n    </p>\r\n\r\n</div>"
+  },
+  {
+    "id": "id8",
+    "idx": 10,
+    "title": "Ilustrace principu",
+    "tags": [
+      "Core"
+    ],
+    "diff": "basics",
+    "already_studied_in": null,
+    "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Ilustrace principu & Pravidla</h2></div><div class=\"section-body\">\n    <p>\n        Vizuální zobrazení principu mechanismu <em>broadcasting</em>u v NumPy vychází z oficiální dokumentace NumPy a materiálů <a href=\"http://www.labri.fr/perso/nrougier/teaching/numpy/numpy.html\" class=\"external\" target=\"_blank\" rel=\"noopener\">Nicolase P. Rougiera</a>.\n    </p>\n    <p>\n        <strong>Klíčové shrnutí pravidel:</strong>\n    </p>\n    <ul style=\"margin-left: 20px; line-height: 1.7;\">\n        <li>Osy polí se porovnávají <strong>od konce (zprava doleva)</strong>.</li>\n        <li>Dvě dimenze jsou kompatibilní, pokud jsou <strong>shodné</strong>, nebo pokud je jedna z nich <strong>rovna 1</strong>.</li>\n        <li>Dimenze o velikosti 1 se automaticky „natáhne“ na velikost odpovídající dimenze druhého operandu.</li>\n        <li>Při chybějící ose v menším poli se pole virtuálně doplní o dimenzi 1 zleva.</li>\n        <li>Výpočet probíhá v optimalizovaných C smyčkách s nulovým overheadem kopírování dat v paměti RAM.</li>\n    </ul>\n</div>"
+  }
+]
