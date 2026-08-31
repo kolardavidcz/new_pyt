@@ -254,13 +254,14 @@ function updateUserUI() {
 }
 
 function bindChrome() {
-  // Theme & Profile & Admin
+  // Theme & Profile & Admin & Bug
   document.getElementById("btnTheme")?.addEventListener("click", toggleTheme);
   document.getElementById("btnTitlebarAdmin")?.addEventListener("click", () => openAdminModal());
   document.getElementById("btnProfileAdmin")?.addEventListener("click", () => {
     document.getElementById("profileModal")?.classList.add("hidden");
     openAdminModal();
   });
+  bindBugModal();
 
   // Profile Modal
   const profileModal = document.getElementById("profileModal");
@@ -628,6 +629,93 @@ function triggerPrint() {
   } else {
     window.print();
   }
+}
+
+export function openBugReportModal(item, pageId) {
+  const modal = document.getElementById("bugReportModal");
+  if (!modal) return;
+  const ctxUrl = document.getElementById("bugContextUrl");
+  const desc = document.getElementById("bugDescription");
+  const feedbackMsg = document.getElementById("bugFeedbackMsg");
+
+  const path = item?.path || (state.activeTabId ? state.tabs.find((t) => t.id === state.activeTabId)?.path : "") || window.location.hash || "home";
+  const fullCtx = item ? `${item.title} (${path}${pageId ? `#${pageId}` : ""})` : path;
+  if (ctxUrl) ctxUrl.textContent = fullCtx;
+  if (desc) desc.value = "";
+  if (feedbackMsg) feedbackMsg.style.display = "none";
+
+  modal.classList.remove("hidden");
+  setTimeout(() => desc?.focus(), 60);
+}
+window.__pcsOpenBugModal = openBugReportModal;
+
+function bindBugModal() {
+  const modal = document.getElementById("bugReportModal");
+  const btnBug = document.getElementById("btnBug");
+  const btnClose = document.getElementById("btnCloseBugReport");
+  const btnCopy = document.getElementById("btnCopyBugDiagnostics");
+  const btnSubmit = document.getElementById("btnSubmitBugReport");
+  const desc = document.getElementById("bugDescription");
+  const cat = document.getElementById("bugCategory");
+  const feedbackMsg = document.getElementById("bugFeedbackMsg");
+
+  btnBug?.addEventListener("click", () => {
+    const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
+    const item = activeTab?.itemId ? state.itemsById.get(activeTab.itemId) : null;
+    openBugReportModal(item, activeTab?.pageId);
+  });
+
+  btnClose?.addEventListener("click", () => modal?.classList.add("hidden"));
+  modal?.addEventListener("click", (e) => {
+    if (e.target === modal) modal.classList.add("hidden");
+  });
+
+  const getDiagnosticsMarkdown = () => {
+    const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
+    const item = activeTab?.itemId ? state.itemsById.get(activeTab.itemId) : null;
+    const category = cat?.value || "general";
+    const description = desc?.value?.trim() || "(bez popisu)";
+    return `### Bug Report / Zpětná vazba
+- **Kontext**: ${item ? `${item.title} (\`${item.path}\`)` : "Obecné zobrazení"}
+- **Slide / Krok**: \`${activeTab?.pageId || "overview"}\`
+- **Uživatel**: \`${state.user?.username || "kolard"}\`
+- **Kategorie**: ${category}
+- **URL**: \`${window.location.href}\`
+- **Prohlížeč**: \`${navigator.userAgent}\`
+- **Rozlišení**: \`${window.innerWidth}x${window.innerHeight}\`
+- **Čas**: \`${new Date().toISOString()}\`
+
+#### Popis:
+${description}`;
+  };
+
+  btnCopy?.addEventListener("click", async () => {
+    const md = getDiagnosticsMarkdown();
+    try {
+      await navigator.clipboard.writeText(md);
+      if (btnCopy) {
+        const origText = btnCopy.textContent;
+        btnCopy.textContent = "Zkopírováno! ✓";
+        setTimeout(() => { btnCopy.textContent = origText; }, 2000);
+      }
+    } catch {
+      alert("Nepodařilo se zkopírovat do schránky.");
+    }
+  });
+
+  btnSubmit?.addEventListener("click", () => {
+    const md = getDiagnosticsMarkdown();
+    const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
+    const item = activeTab?.itemId ? state.itemsById.get(activeTab.itemId) : null;
+    const title = `[Bug] ${item?.title || "Zpětná vazba"}: ${cat?.value || ""}`;
+    const ghUrl = `https://github.com/kolardavidcz/new_pyt/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(md)}`;
+
+    if (feedbackMsg) feedbackMsg.style.display = "block";
+    window.open(ghUrl, "_blank");
+    setTimeout(() => {
+      modal?.classList.add("hidden");
+    }, 1200);
+  });
 }
 
 boot();
