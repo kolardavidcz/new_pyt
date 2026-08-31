@@ -1,0 +1,88 @@
+[
+  {
+    "id": "q1",
+    "type": "predict_output",
+    "question": "Jaký typ mají výstupy při přístupu k prvkům bajtového řetězce?",
+    "options": [
+      "A) <class 'int'> <class 'str'>",
+      "B) <class 'str'> <class 'bytes'>",
+      "C) <class 'bytes'> <class 'bytes'>",
+      "D) <class 'int'> <class 'bytes'>"
+    ],
+    "answer": 3,
+    "explanation": "Přístup k celému jednomu prvku b[0] vrací celočíselnou ASCII hodnotu (int, zde 80 pro 'P'). Výřez b[0:1] vrací nový bajtový řetězec (bytes, b'P'). U textových str vrací obojí typ str.",
+    "code": "b = b'Python'\nprint(type(b[0]), type(b[0:1]))"
+  },
+  {
+    "id": "q2",
+    "type": "predict_output",
+    "question": "Jaký je rozdíl mezi konstruktorem bytes(3) a bytes([3])?",
+    "options": [
+      "A) b'\\x00\\x00\\x00' b'\\x03'",
+      "B) b'\\x00' b'\\x03\\x03\\x03'",
+      "C) b'\\x03\\x03\\x03' b'\\x03'",
+      "D) b'\\x03' b'\\x03'"
+    ],
+    "answer": 0,
+    "explanation": "Volání bytes(N) s celým číslem alokuje N nulových bajtů (b'\\x00\\x00\\x00'). Konstruktor s iterovatelem bytes([3]) převede čísla v rozmezí 0-255 na odpovídající bajty (b'\\x03').",
+    "code": "b1 = bytes(3)\nb2 = bytes([3])\nprint(b1, b2)"
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Co se stane při pokusu o úpravu prvku v bajtovém řetězci bytes?",
+    "options": [
+      "A) Vyhodí výjimku ValueError, protože zadaná hodnota 65 neodpovídá typu str.",
+      "B) Vyhodí výjimku TypeError, protože objekt typu bytes je neměnný (immutable).",
+      "C) Kód automaticky zkonvertuje objekt proměnné data na nový typ bytearray.",
+      "D) Hodnota prvního bajtu se v objektu úspěšně přepíše z 97 na novou hodnotu 65."
+    ],
+    "answer": 1,
+    "explanation": "Typ bytes je neměnná sekvence (immutable). Při pokusu o úpravu b[0] vyhodí TypeError: 'bytes' object does not support item assignment. Pro modifikovatelné bajty je nutné použít bytearray.",
+    "code": "data = b'ahoj'\ndata[0] = 65"
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Který způsob formátování je podporován pro bajtové řetězce bytes v Pythonu 3?",
+    "options": [
+      "A) Formátované řetězce s novým prefiksem fb (například zápis fb'{data}').",
+      "B) Standardní metoda .format() (například zápis b'{}'.format(b'data')).",
+      "C) Interpolace textu pomocí operátoru % (například zápis b'%b' % b'data').",
+      "D) Bajtové řetězce v Pythonu 3 neposkytují vůbec žádné formátovací mechanizmy."
+    ],
+    "answer": 2,
+    "explanation": "Pro bajtové řetězce byla v Pythonu 3.5 zpětně přidána interpolace pomocí operátoru %. Metoda .format() ani f-řetězce s prefiksem fb pro typ bytes neexistují.",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "fill_blank_choice",
+    "question": "Doplňte metodu pro dekódování bajtového řetězce bytes na textový řetězec str:",
+    "code_snippet": "raw_bytes = b'\\xc5\\x99etezec'\ntext = raw_bytes.________('utf-8')",
+    "options": [
+      "encode",
+      "parse",
+      "to_str",
+      "decode"
+    ],
+    "answer": 3,
+    "explanation": "Metoda bytes.decode() převádí binární bajty na textový řetězec str pomocí specifikovaného kódování.",
+    "code": "raw_bytes = b\"V\\xc5\\xa0CHT Praha\"\ntext = raw_bytes.________(\"utf-8\")\n# Výstup: 'VŠCHT Praha'",
+    "expected": "decode"
+  },
+  {
+    "id": "q6",
+    "type": "predict_output",
+    "question": "Jaké hodnoty vrací cyklus for při iteraci přes bajtový řetězec bytes?",
+    "options": [
+      "A) 65 66",
+      "B) 0 1",
+      "C) A B",
+      "D) b'A' b'B'"
+    ],
+    "answer": 0,
+    "explanation": "Iterace přes bytes vrací jednotlivé celočíselné hodnoty bajtů (int 0-255). ASCII hodnota 'A' je 65 a 'B' je 66. Znaky nebo podřetězce b'A' se při iteraci nevytváří.",
+    "code": "for item in b'AB':\n    print(item, end=' ')"
+  }
+]

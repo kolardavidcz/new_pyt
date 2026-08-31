@@ -1,0 +1,72 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "K čemu slouží vestavěný modul ctypes v Pythonu?",
+    "options": [
+      "A) Zabezpečuje šifrování komunikace mezi procesy při přenosu objektů přes síťové sokety v lokální síti.",
+      "B) Slouží k automatické paralelizaci Python smyček vytvořením více systémových vláken bez zámku GIL.",
+      "C) Umožňuje přímé volání funkcí ze sdílených C knihoven (.dll / .so) a poskytuje datové typy kompatibilní s C.",
+      "D) Překládá zdrojový kód Pythonu do samostatného spustitelného binárního souboru bez nutnosti C kompilátoru."
+    ],
+    "answer": 2,
+    "explanation": "Modul ctypes je FFI (Foreign Function Interface) knihovna v Pythonu, která dovoluje načítat sdílené dynamické knihovny napsané v C (DLL/.so) a předávat jim C-kompatibilní datové typy.",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte atribut objektu funkce z načtené knihovny v ctypes pro definici očekávaných typů vstupních parametrů:",
+    "options": [
+      "param_types",
+      "restype",
+      "signature",
+      "argtypes"
+    ],
+    "answer": 3,
+    "explanation": "Atribut argtypes určuje seznam typů z modulu ctypes, které C funkce přijímá. Atribut restype se používá pro definici návratového typu.",
+    "expected": "argtypes",
+    "code": "import ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.spoctu_suma.________ = [ctypes.c_int, ctypes.c_int]"
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jak vyvolat v ctypes C funkci ze sdílené knihovny lib, jejíž název není platným identifikátorem v Pythonu (např. my-func)?",
+    "options": [
+      "A) Voláním funkce přes vestavěnou funkci getattr(lib, \"my-func\") předáním názvu jako řetězce.",
+      "B) Volání takové funkce není v ctypes možné a C knihovna se musí překompilovat s jiným názvem.",
+      "C) Přepsáním pomlčky na podtržítko v Python skriptu, což ctypes automaticky namapuje v paměti.",
+      "D) Načtením knihovny s parametrem rename_rules={\"my-func\": \"my_func\"} v konstruktoru CDLL."
+    ],
+    "answer": 0,
+    "explanation": "Pokud název exportované funkce v C knihovně není platný Python identifikátor (obsahuje např. pomlčku nebo tečku), nelze použít tečkovou notaci lib.my-func. Místo toho se použije getattr(lib, \"my-func\").",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "true_false_tricky",
+    "question": "Vyhodnoťte pravdivost tvrzení o načítání sdílených knihoven v modulu ctypes:\n\nZatímco Windows umožňuje odkazovat na sdílenou knihovnu relativní cestou, Linux striktně vyžaduje absolutní cestu k souboru knihovny.",
+    "options": [
+      "A) Nepravda – Linux automaticky prohledává aktuální složku se skriptem, zatímco Windows vyžaduje výhradně absolutní cesty.",
+      "B) Pravda – Na Linuxu dynamický linker nehledá v aktuálním adresáři, proto je nutné předat např. os.path.abspath(\"mylib.so\")."
+    ],
+    "answer": 1,
+    "explanation": "Pod Linuxem systémový linker neprohledává aktuální pracovní adresář (z bezpečnostních důvodů), takže ctypes.CDLL(\"mylib.so\") selže. Je nutné zadat absolutní cestu (např. přes os.path.join(os.getcwd(), \"mylib.so\")).",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "fill_blank_choice",
+    "question": "Doplňte atribut pro nastavení návratového typu C funkce vracející 64bitové číslo s plovoucí čárkou:",
+    "options": [
+      "result",
+      "restype",
+      "argtypes",
+      "return_type"
+    ],
+    "answer": 1,
+    "explanation": "Atribut restype říká modulu ctypes, jaký typ (např. ctypes.c_double nebo ctypes.c_int) C funkce vrací, aby mohla být návratová hodnota správně přetypována na Python objekt.",
+    "expected": "restype",
+    "code": "import ctypes\nlib = ctypes.CDLL(\"./mylib.so\")\nlib.vypocti_prumer.________ = ctypes.c_double"
+  }
+]

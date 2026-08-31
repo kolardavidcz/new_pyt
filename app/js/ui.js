@@ -195,8 +195,20 @@ export function renderModalOverlay({ id = "globalModal", title = "", bodyEl = nu
 }
 
 /* ── String Escaping Helpers ────────────────────────────── */
-export function escapeHtml(s) {
+export function decodeHtml(s) {
+  if (s == null) return "";
   return String(s)
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&nbsp;/g, " ");
+}
+
+export function escapeHtml(s) {
+  if (s == null) return "";
+  return decodeHtml(s)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")

@@ -1,0 +1,114 @@
+[
+  {
+    "id": "q1",
+    "type": "predict_output",
+    "question": "Jaké výstupy a v jakém pořadí vytiskne následující kód?",
+    "options": [
+      "A) Vytiskne E a potom F.",
+      "B) Vytiskne pouze text L.",
+      "C) Vytiskne L a potom F.",
+      "D) Vytiskne F a potom L."
+    ],
+    "answer": 2,
+    "explanation": "Větev else se provede pouze v případě, že v bloku try nedošlo k žádné výjimce. Větev finally se provede vždy.",
+    "code": "try:\n    x = 1 / 1\nexcept ZeroDivisionError:\n    print('E')\nelse:\n    print('L')\nfinally:\n    print('F')"
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Proč je chyba uvést except Exception: před except ValueError:?",
+    "options": [
+      "A) Druhý blok except alokuje paměťové zdroje, které rodičovská třída automaticky uvolní.",
+      "B) Exception dědí z ValueError, takže druhá větev vyvolá při kompilaci chybu SyntaxError.",
+      "C) ValueError se automaticky převádí na Exception a způsobí nečekaný pád celého programu.",
+      "D) ValueError dědí z Exception, takže první větev zachytí vše a druhá se nikdy nespustí."
+    ],
+    "answer": 3,
+    "explanation": "Python vyhodnocuje except bloky shora dolů. Jelikož ValueError dědí z Exception, obecný except Exception: zachytí i ValueError a ke specifičtějšímu bloku se řízení nedostane.",
+    "code": null
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte hlavičku bloku `except` pro současné odchycení výjimek `ValueError` a `TypeError`.",
+    "options": [
+      "except (ValueError, TypeError)",
+      "except ValueError, TypeError",
+      "except {ValueError, TypeError}",
+      "except [ValueError, TypeError]"
+    ],
+    "answer": 0,
+    "explanation": "Pro zachycení více typů výjimek v jedné větvi `except` musí být třídy výjimek sdruženy do n-tice (tuple) v kulatých závorkách.",
+    "code": "def parse_measurement(val):\n    try:\n        return float(val)\n    ________:\n        return None\n\nprint(parse_measurement(\"chyba\"))  # None\nprint(parse_measurement([1, 2]))   # None",
+    "expected": "except (ValueError, TypeError)"
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Doplňte klíčové slovo pro opětovné přeposlání (re-raise) zachycené výjimky výše v zásobníku volání po zalogování chyby.",
+    "options": [
+      "pass",
+      "raise",
+      "rethrow",
+      "throw"
+    ],
+    "answer": 1,
+    "explanation": "Příkaz `raise` bez argumentů uvnitř bloku `except` znovu vyvolá aktuálně zpracovávanou výjimku včetně jejího původního trasování (traceback).",
+    "code": "def log_and_rethrow(func, *args):\n    try:\n        return func(*args)\n    except Exception as err:\n        print(f\"Chyba při běhu: {err}\")\n        ________  # Znovu vyvolá původní zachycenou výjimku",
+    "expected": "raise"
+  },
+  {
+    "id": "q5",
+    "type": "predict_output",
+    "question": "Co vytiskne příkaz print(ex.args) po zachycení výjimky vyvolané jako raise ValueError('a', 'b')?",
+    "options": [
+      "A) Množinu prvků {'a', 'b'}.",
+      "B) Spojený text ('a' + 'b').",
+      "C) N-tici prvků ('a', 'b').",
+      "D) Seznam prvků ['a', 'b']."
+    ],
+    "answer": 2,
+    "explanation": "Všechny positional argumenty předané konstruktoru výjimky se ukládají do atributu .args jako n-tice (tuple).",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaká je doporučená minimální definice vlastní uživatelské třídy výjimky v Pythonu?",
+    "options": [
+      "A) Třída dědící z obecného object: class AppError(object): pass",
+      "B) Třída dědící z BaseException: class AppErr(BaseException): pass",
+      "C) Třída dědící ze SystemExit: class AppError(SystemExit): pass",
+      "D) Třída dědící z Exception: class AppError(Exception): pass"
+    ],
+    "answer": 3,
+    "explanation": "Uživatelské výjimky by měly dědit z třídy Exception (nikoliv přímo z BaseException, ze které dědí i systémové výjimky jako KeyboardInterrupt nebo SystemExit).",
+    "code": null
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Co se stane s příkazy assert při spuštění skriptu s parametrem python -O script.py?",
+    "options": [
+      "A) Příkazy assert jsou z kódu zcela odstraněny a vůbec se nevykonají.",
+      "B) Příkazy assert vyvolají výjimku AssertionError při každém selhání.",
+      "C) Příkazy assert pouze vypíší varování do konsole a program běží dál.",
+      "D) Příkazy assert se automaticky převedou na klasickou podmínku if not."
+    ],
+    "answer": 0,
+    "explanation": "Při spuštění Pythonu s příznakem optimalizace -O je proměnná __debug__ nastavena na False a všechny příkazy assert jsou bytecode kompilátorem zcela odstraněny.",
+    "code": null
+  },
+  {
+    "id": "q8",
+    "type": "true_false_tricky",
+    "question": "Konstrukce try: ... except: bez specifikace třídy odchytí i přerušení programu klávesnicí KeyboardInterrupt.",
+    "options": [
+      "A) Pravda – holé except: odchytává všechny výjimky odvozené z BaseException.",
+      "B) Nepravda – holé except: odchytává výhradně výjimky odvozené z Exception."
+    ],
+    "answer": 0,
+    "explanation": "Holé except: bez specifikace třídy odchytává všechny výjimky odvozené z BaseException, tedy včetně KeyboardInterrupt a SystemExit.",
+    "code": null
+  }
+]

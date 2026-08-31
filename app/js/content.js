@@ -2,7 +2,10 @@
 
 import {
   state, pagesFor, slideDiff, slideTags, weekVisibleItems, filteredItems, markSeen,
-  isStudied, toggleStudied, setStudied, setUser, logoutUser, syncCloudProgress, setCodeBlockColor, logLinkError,
+  isStudied, isSkipped, isCompleted, toggleStudied, toggleSkipped, setStudied, setSkipped,
+  cycleStudyStatus, getStudyStatus,
+  getCourseStats, getWeekStats,
+  setUser, logoutUser, syncCloudProgress, setCodeBlockColor, logLinkError,
   saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, setPrintWithQuizzes, getQuizFor, getQuizForDeck,
   registerUser, loginWithPassword, resetUserPassword, isAdminUser,
 } from "./state.js";
@@ -27,7 +30,7 @@ export function setLoading(on) {
 export function showHome() {
   const main = document.getElementById("main");
   const course = state.course;
-  const stats = course?.meta?.stats || {};
+  const stats = getCourseStats();
   const weeks = course?.weeks || [];
 
   main.className = "catalog catalog-home";
@@ -36,14 +39,53 @@ export function showHome() {
   const header = el("div", { className: "catalog-header" });
   header.innerHTML = `
     <h1>Python Course Workspace</h1>
-    <p class="desc">VS Code–style shell for students moving from <strong>C / Java</strong> to <strong>Python</strong>.
-      Click a card to open the full lecture. Use filters in the sidebar to narrow the path.</p>
-    <div class="catalog-stats">
-      <span>${stats.weeks ?? weeks.length} weeks</span>
-      <span>${stats.lectures ?? "—"} lectures</span>
-      <span>${stats.exercises ?? "—"} exercises</span>
-      <span>${state.seen.size} seen</span>
+    <p class="desc">Jiný UI pro <a href="http://vyuka.ookami.cz/index.python.html" target="_blank" rel="noopener noreferrer">ookami-&gt;pyt</a> od Pana Inženýra Znamenáčka, senior Full stack developera a pedagoga :)<br>Pokud něco nebude fungovat napište mi na <a href="mailto:kolarv@vscht.cz">kolarv@vscht.cz</a> &lt;3</p>
+    
+    <div class="course-stats-dashboard">
+      <div class="stat-pill-group">
+        <div class="stat-pill-card active-lectures" title="Aktivní přednášky v semestru (bez Skip a bez W99)">
+          <span class="stat-icon">📚</span>
+          <div class="stat-info">
+            <span class="stat-value">${stats.lectures.completed} / ${stats.lectures.total}</span>
+            <span class="stat-label">Přednášky</span>
+          </div>
+          <div class="stat-progress-mini">
+            <div class="stat-progress-bar bg-green" style="width: ${stats.lectures.pct}%"></div>
+          </div>
+        </div>
+
+        <div class="stat-pill-card active-exercises" title="Praktická programátorská cvičení a úlohy">
+          <span class="stat-icon">💻</span>
+          <div class="stat-info">
+            <span class="stat-value">${stats.exercises.completed} / ${stats.exercises.total}</span>
+            <span class="stat-label">Cvičení</span>
+          </div>
+          <div class="stat-progress-mini">
+            <div class="stat-progress-bar bg-purple" style="width: ${stats.exercises.pct}%"></div>
+          </div>
+        </div>
+
+        <div class="stat-pill-card total-progress" title="Celkový postup kurzem (prostudováno + přeskočeno)">
+          <span class="stat-icon">🎯</span>
+          <div class="stat-info">
+            <span class="stat-value">${stats.total.pct}%</span>
+            <span class="stat-label">Hotovo (${stats.total.completed}/${stats.total.total})</span>
+          </div>
+          <div class="stat-progress-mini">
+            <div class="stat-progress-bar bg-accent" style="width: ${stats.total.pct}%"></div>
+          </div>
+        </div>
+
+        <div class="stat-pill-card shelf-ref" title="Doplňkový regál rozšiřujících přednášek a samostudia (W99) – nepočítá se do povinného penza">
+          <span class="stat-icon">📦</span>
+          <div class="stat-info">
+            <span class="stat-value">${stats.shelf.total} témat</span>
+            <span class="stat-label">W99 & Ref</span>
+          </div>
+        </div>
+      </div>
     </div>
+
     <div class="welcome-keys" style="justify-content:flex-start;margin-top:12px">
       <span><kbd class="kbd">Ctrl+P</kbd> Tisk / Print</span>
       <span><kbd class="kbd">Ctrl+K</kbd> Quick open</span>
@@ -82,17 +124,18 @@ export function showWeek(weekId) {
   clear(main);
 
   const items = weekVisibleItems(week);
-  const isGray = week.week === 99 || week.isRemovedSection;
-  const weekLabel = isGray ? "Regál samostudia" : `Týden ${week.week}`;
+  let weekLabel = `Týden ${week.week}`;
+  if (week.week === 99) weekLabel = "Doplňkový regál (W99)";
+  const wStats = getWeekStats(week);
   
   const header = el("div", { className: "catalog-header" },
     el("h1", {}, `${weekLabel}: ${week.title}`),
     week.description ? el("p", { className: "desc" }, week.description) : null,
     el("div", { className: "catalog-stats" },
       el("span", { className: "catalog-stat-pill" }, `⏱️ ${week.time_estimate || "90 min přednáška + 45 min lab"}`),
-      el("span", { className: "catalog-stat-pill" }, `📚 ${(week.lectures || []).length} přednášek`),
-      el("span", { className: "catalog-stat-pill" }, `💻 ${(week.exercises || []).length} cvičení`),
-      el("span", { className: "catalog-stat-pill" }, `🔍 ${items.length} zobrazeno`),
+      el("span", { className: "catalog-stat-pill" }, `📚 ${wStats.lecturesCompleted}/${wStats.lecturesTotal} přednášek`),
+      el("span", { className: "catalog-stat-pill" }, `💻 ${wStats.exercisesCompleted}/${wStats.exercisesTotal} cvičení`),
+      el("span", { className: "catalog-stat-pill" }, `🎯 ${wStats.pct}% splněno`),
     ),
   );
 
@@ -168,8 +211,8 @@ function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = false }
     wrap.appendChild(titleRow);
   }
 
-  // If Week 99 and has shelves, group them nicely
-  if (week.week === 99 && week.shelves && week.shelves.length) {
+  // If week has shelves, group them nicely
+  if (week.shelves && week.shelves.length) {
     const matchedSlugs = new Set();
     for (const shelf of week.shelves) {
       const shelfItems = items.filter((it) => {
@@ -266,14 +309,56 @@ export function toggleFullscreen(forceState) {
   }
 }
 
-export function updatePageStudyButtons(now) {
+export function updatePageStudyButtons() {
   const currentTab = state.tabs.find((t) => t.id === state.activeTabId);
-  const isStudiedNow = now !== undefined ? now : (currentTab?.itemId ? isStudied(currentTab.itemId) : false);
-  document.querySelectorAll(".study-btn, .bottom-nav-study-btn").forEach((b) => {
-    b.classList.toggle("is-studied", isStudiedNow);
-    b.innerHTML = isStudiedNow ? "✓ Studied" : "☐ Mark studied";
-    b.title = isStudiedNow ? "Click to unmark as studied" : "Click to mark as studied for progress";
+  const itemId = currentTab?.itemId;
+  if (!itemId) return;
+  const status = getStudyStatus(itemId); // "studied" | "skipped" | "default"
+
+  document.querySelectorAll(".study-cycle-btn, .study-btn, .bottom-nav-study-btn").forEach((btn) => {
+    btn.classList.remove("is-studied", "is-skipped");
+    if (status === "studied") {
+      btn.classList.add("is-studied");
+      btn.innerHTML = `<span>✓</span> <span class="status-label">Prostudováno</span>`;
+      btn.title = "Stav: Prostudováno (1. klik) · Dalším klikem označíte jako Znáno / Přeskočeno";
+    } else if (status === "skipped") {
+      btn.classList.add("is-skipped");
+      btn.innerHTML = `<span>↷</span> <span class="status-label">Znáno / Přeskočeno</span>`;
+      btn.title = "Stav: Znáno / Přeskočeno (2. klik) · Dalším klikem vrátíte do výchozího stavu";
+    } else {
+      btn.innerHTML = `<span>☐</span> <span class="status-label">Označit splněno</span>`;
+      btn.title = "Klikněte pro označení: 1× Prostudováno, 2× Znáno (přeskočeno), 3× Výchozí";
+    }
   });
+}
+
+function renderStudyActionControl(itemId, { isBottom = false } = {}) {
+  const status = getStudyStatus(itemId);
+  const btn = el("button", {
+    type: "button",
+    className: `btn study-cycle-btn${isBottom ? " bottom-nav-study-btn" : " study-btn"}${status === "studied" ? " is-studied" : status === "skipped" ? " is-skipped" : ""}`,
+    title: status === "studied"
+      ? "Stav: Prostudováno (1. klik) · Dalším klikem označíte jako Znáno / Přeskočeno"
+      : status === "skipped"
+        ? "Stav: Znáno / Přeskočeno (2. klik) · Dalším klikem vrátíte do výchozího stavu"
+        : "Klikněte pro označení: 1× Prostudováno, 2× Znáno (přeskočeno), 3× Výchozí",
+    onClick: () => {
+      cycleStudyStatus(itemId);
+      updatePageStudyButtons();
+      try { renderTree(); } catch { /* */ }
+      window.__pcsUpdateStatus?.();
+    },
+  });
+
+  if (status === "studied") {
+    btn.innerHTML = `<span>✓</span> <span class="status-label">Prostudováno</span>`;
+  } else if (status === "skipped") {
+    btn.innerHTML = `<span>↷</span> <span class="status-label">Znáno / Přeskočeno</span>`;
+  } else {
+    btn.innerHTML = `<span>☐</span> <span class="status-label">Označit splněno</span>`;
+  }
+
+  return btn;
 }
 
 function lectureToolbar(item, mode) {
@@ -314,20 +399,8 @@ function lectureToolbar(item, mode) {
     }, "Tisk 🖨"));
   }
 
-  // Pinned right after Tisk 🖨: Mark studied button
-  const studied = isStudied(item.id);
-  const studyBtn = el("button", {
-    type: "button",
-    className: "btn study-btn" + (studied ? " is-studied" : ""),
-    title: studied ? "Click to unmark as studied" : "Click to mark as studied for progress",
-    onClick: () => {
-      const now = toggleStudied(item.id);
-      updatePageStudyButtons(now);
-      try { renderTree(); } catch { /* */ }
-      window.__pcsUpdateStatus?.();
-    },
-  }, studied ? "✓ Studied" : "☐ Mark studied");
-  bar.appendChild(studyBtn);
+  // Pinned right after Tisk 🖨: Segmented Studied / Skip Control
+  bar.appendChild(renderStudyActionControl(item.id));
 
   // Navrhnout úpravu button
   bar.appendChild(el("button", {
@@ -364,8 +437,6 @@ function buildBottomNavBar(item) {
   const prevItem = idx > 0 ? items[idx - 1] : null;
   const nextItem = idx >= 0 && idx < items.length - 1 ? items[idx + 1] : null;
 
-  const studied = isStudied(item.id);
-
   const bar = el("nav", { className: "bottom-nav-bar", "aria-label": "Item navigation" });
 
   // 1. Previous button
@@ -385,20 +456,8 @@ function buildBottomNavBar(item) {
     bar.appendChild(disabledPrev);
   }
 
-  // 2. Mark Studied Button (default grey when not studied)
-  const studyBtn = el("button", {
-    type: "button",
-    className: "btn bottom-nav-study-btn" + (studied ? " is-studied" : ""),
-    title: studied ? "Click to unmark as studied" : "Click to mark as studied for progress",
-    onClick: () => {
-      const now = toggleStudied(item.id);
-      updatePageStudyButtons(now);
-      try { renderTree(); } catch { /* */ }
-      window.__pcsUpdateStatus?.();
-    },
-  });
-  studyBtn.innerHTML = studied ? "✓ Studied" : "☐ Mark studied";
-  bar.appendChild(studyBtn);
+  // 2. Segmented Study & Skip Action Control
+  bar.appendChild(renderStudyActionControl(item.id, { isBottom: true }));
 
   // 3. Next button
   if (nextItem) {
@@ -1527,24 +1586,35 @@ function progressLevel(pct) {
   return { badge: "Lv MAX", name: "Course complete" };
 }
 
-function studyTile(item, studied, size) {
+function studyTile(item, doneStatus, size) {
   const tasks = item.kind === "exercise"
     ? (state.exercises[item.path]?.task_count || state.exercises[item.path]?.tasks?.length || 0)
     : 0;
+  const status = getStudyStatus(item.id);
+
   const btn = el("div", {
-    className: `study-tile study-tile-${size} ${item.kind}${studied ? " studied" : ""}`,
-    title: `${item.title} — ${studied ? "✓ Studied" : "Not studied"}`,
+    className: `study-tile study-tile-${size} ${item.kind}${status === "studied" ? " studied" : status === "skipped" ? " skipped" : ""}`,
+    title: `${item.title} — ${status === "studied" ? "✓ Prostudováno (1. klik)" : status === "skipped" ? "↷ Znáno / Přeskočeno (2. klik)" : "Ke studiu (klikněte pro označení)"}`,
   });
+
+  const statusBadge = status === "studied"
+    ? '<span class="st-check">✓ PROSTUDOVÁNO</span>'
+    : status === "skipped"
+      ? '<span class="st-skip-check">↷ ZNÁNO</span>'
+      : '<span class="st-pending">☐ KE STUDIU</span>';
+
   btn.innerHTML = `
     <div class="st-top">
-      <input type="checkbox" class="st-chk-box" ${studied ? "checked" : ""} title="Mark studied" />
+      <div class="st-tile-actions">
+        <button type="button" class="st-action-mini st-cycle-mini ${status === 'studied' ? 'btn-mini-done active' : status === 'skipped' ? 'btn-mini-skip active' : ''}" title="Klikněte pro změnu stavu: 1× Prostudováno, 2× Znáno, 3× Výchozí">${status === 'studied' ? '✓' : status === 'skipped' ? '↷' : '○'}</button>
+      </div>
       <span class="st-title" style="cursor:pointer">${escapeHtml(item.title)}</span>
     </div>
     <div class="st-tags-row">
       ${badgesHtml(item.tags)}
     </div>
     <div class="st-meta">
-      ${studied ? "<span class=\"st-check\">✓ SPLNĚNO</span>" : "<span class=\"st-pending\">☐ KE STUDIU</span>"}
+      ${statusBadge}
       ${tasks ? `<span class="st-tasks">${tasks} úkolů</span>` : ""}
       ${starsHtml(item.relevance || 5, 10, "compact")}
     </div>
@@ -1554,10 +1624,9 @@ function studyTile(item, studied, size) {
     window.__pcsNavigate?.({ kind: item.kind, id: item.id });
   });
 
-  const chk = btn.querySelector(".st-chk-box");
-  chk?.addEventListener("change", (e) => {
+  btn.querySelector(".st-cycle-mini")?.addEventListener("click", (e) => {
     e.stopPropagation();
-    setStudied(item.id, e.target.checked);
+    cycleStudyStatus(item.id);
     try { renderTree(); } catch { /* */ }
     window.__pcsUpdateStatus?.();
     showProgress();
@@ -1566,12 +1635,13 @@ function studyTile(item, studied, size) {
   return btn;
 }
 
-function detailedExerciseCard(item, studied) {
+function detailedExerciseCard(item, doneStatus) {
   const exData = state.exercises[item.path];
   const tasks = exData?.tasks || [];
+  const status = getStudyStatus(item.id);
 
   const card = el("div", {
-    className: `study-exercise-card${studied ? " studied" : ""}`,
+    className: `study-exercise-card${status === "studied" ? " studied" : status === "skipped" ? " skipped" : ""}`,
   });
 
   const head = el("div", {
@@ -1579,9 +1649,9 @@ function detailedExerciseCard(item, studied) {
   });
   head.innerHTML = `
     <div class="sec-title-row">
-      <span class="st-status-check" style="cursor:pointer" title="Toggle studied status">${studied ? "✓" : "○"}</span>
+      <span class="st-status-check" style="cursor:pointer" title="Klikněte pro změnu stavu: 1× Prostudováno, 2× Znáno, 3× Výchozí">${status === "studied" ? "✓" : status === "skipped" ? "↷" : "○"}</span>
       <h3 class="sec-title" style="cursor:pointer">${formatInlineCode(item.title)}</h3>
-      <button type="button" class="sec-status-pill" style="cursor:pointer;border:none;font:inherit;background:rgba(110,118,129,0.2);color:var(--text-faint)">${studied ? "✓ SPLNĚNO" : "KE STUDIU"}</button>
+      <button type="button" class="sec-status-pill" style="cursor:pointer;border:none;font:inherit;background:rgba(110,118,129,0.2);color:var(--text-faint)" title="Klikněte pro změnu stavu: 1× Prostudováno, 2× Znáno, 3× Výchozí">${status === "studied" ? "✓ SPLNĚNO" : status === "skipped" ? "↷ ZNÁNO" : "KE STUDIU"}</button>
     </div>
     <div class="sec-meta-row">
       ${badgesHtml(item.tags)}
@@ -1594,16 +1664,16 @@ function detailedExerciseCard(item, studied) {
     window.__pcsNavigate?.({ kind: item.kind, id: item.id });
   });
 
-  const toggleBtn = (e) => {
+  const triggerCycle = (e) => {
     e.stopPropagation();
-    toggleStudied(item.id);
+    cycleStudyStatus(item.id);
     try { renderTree(); } catch { /* */ }
     window.__pcsUpdateStatus?.();
     showProgress();
   };
 
-  head.querySelector(".sec-status-pill")?.addEventListener("click", toggleBtn);
-  head.querySelector(".st-status-check")?.addEventListener("click", toggleBtn);
+  head.querySelector(".sec-status-pill")?.addEventListener("click", triggerCycle);
+  head.querySelector(".st-status-check")?.addEventListener("click", triggerCycle);
 
   card.appendChild(head);
 
@@ -1636,41 +1706,17 @@ export function showProgress() {
   main.className = "catalog progress-view";
   clear(main);
 
-  // Progress counts **studied** (manual Mark studied), not auto-open alone
-  const done = (id) => state.studied.has(id);
-  const total = state.items.length;
-  const studiedN = state.studied.size;
-  const pct = total ? Math.round((studiedN / total) * 100) : 0;
-
-  const lectures = state.items.filter((it) => it.kind === "lecture");
-  const lecDone = lectures.filter((it) => done(it.id)).length;
-  const exercises = state.items.filter((it) => it.kind === "exercise");
-  const exTotal = exercises.length;
-  const exDone = exercises.filter((it) => done(it.id)).length;
-  const exPct = exTotal ? Math.round((exDone / exTotal) * 100) : 0;
-
-  let taskTotal = 0;
-  let taskInStudied = 0;
-  for (const ex of exercises) {
-    const data = state.exercises[ex.path];
-    const n = data?.task_count || data?.tasks?.length || 0;
-    taskTotal += n;
-    if (done(ex.id)) taskInStudied += n;
-  }
-
-  const coreItems = state.items.filter((it) => (it.tags || []).includes("Core"));
-  const coreDone = coreItems.filter((it) => done(it.id)).length;
-  const corePct = coreItems.length ? Math.round((coreDone / coreItems.length) * 100) : 0;
-
+  const stats = getCourseStats();
+  const pct = stats.total.pct;
   const level = progressLevel(pct);
-  const vibe = progressVibe(pct, studiedN, total);
+  const vibe = progressVibe(pct, stats.total.completed, stats.total.total);
   const wrap = el("div", { className: "progress-view" });
 
   // Hero
   const hero = el("div", { className: "progress-hero" });
   const ring = el("div", {
     className: "progress-ring" + (pct >= 100 ? " complete" : pct >= 50 ? " hot" : ""),
-    "aria-label": `${pct} percent studied`,
+    "aria-label": `${pct} percent completed`,
   });
   ring.innerHTML = `
     <svg viewBox="0 0 36 36" class="progress-ring-svg" aria-hidden="true">
@@ -1680,36 +1726,33 @@ export function showProgress() {
     </svg>
     <div class="progress-ring-label">
       <strong>${pct}%</strong>
-      <span>studied</span>
+      <span>hotovo</span>
     </div>
   `;
   const heroText = el("div", { className: "progress-hero-text" });
   heroText.innerHTML = `
     <div class="progress-stats">
-      <div class="progress-stat">
-        <strong>${studiedN}/${total}</strong><span>studied</span>
+      <div class="progress-stat" title="Celkem splněno (prostudováno + přeskočeno)">
+        <strong>${stats.total.completed}/${stats.total.total}</strong><span>splněno</span>
       </div>
-      <div class="progress-stat">
-        <strong>${lecDone}/${lectures.length}</strong><span>lectures</span>
+      <div class="progress-stat" title="Aktivní přednášky v semestru">
+        <strong>${stats.lectures.completed}/${stats.lectures.total}</strong><span>přednášek</span>
       </div>
-      <div class="progress-stat">
-        <strong>${exDone}/${exTotal}</strong><span>exercises</span>
+      <div class="progress-stat" title="Praktická cvičení">
+        <strong>${stats.exercises.completed}/${stats.exercises.total}</strong><span>cvičení</span>
       </div>
-      <div class="progress-stat">
-        <strong>${coreDone}/${coreItems.length}</strong><span>Core</span>
-      </div>
-      <div class="progress-stat">
-        <strong>${taskInStudied}/${taskTotal || "—"}</strong><span>úkolů</span>
+      <div class="progress-stat" title="Přeskočená témata (známá z C/Javy)">
+        <strong>${stats.total.skipped}</strong><span>přeskočeno</span>
       </div>
     </div>
     <div class="progress-dual-bars">
-      <div class="progress-core-bar" title="Core path ${corePct}%">
-        <div class="progress-core-label"><span>Core path</span><span>${corePct}%</span></div>
-        <div class="progress-bar-track"><span class="progress-bar-fill core" style="width:${corePct}%"></span></div>
+      <div class="progress-core-bar" title="Přednášky ${stats.lectures.pct}%">
+        <div class="progress-core-label"><span>Přednášky (aktivní)</span><span>${stats.lectures.pct}%</span></div>
+        <div class="progress-bar-track"><span class="progress-bar-fill core" style="width:${stats.lectures.pct}%"></span></div>
       </div>
-      <div class="progress-core-bar" title="Exercise sets ${exPct}%">
-        <div class="progress-core-label"><span>Exercise dojo</span><span>${exPct}%</span></div>
-        <div class="progress-bar-track"><span class="progress-bar-fill ex" style="width:${exPct}%"></span></div>
+      <div class="progress-core-bar" title="Cvičení ${stats.exercises.pct}%">
+        <div class="progress-core-label"><span>Cvičení & Úlohy</span><span>${stats.exercises.pct}%</span></div>
+        <div class="progress-bar-track"><span class="progress-bar-fill ex" style="width:${stats.exercises.pct}%"></span></div>
       </div>
     </div>
   `;
@@ -1732,19 +1775,21 @@ export function showProgress() {
 
   // Week board: small tiles for lectures, larger for homework sets
   const board = el("div", { className: "study-board" });
-  board.innerHTML = `<div class="progress-section-label">Study board · click tile to open · use “Mark studied” on the item</div>`;
+  board.innerHTML = `<div class="progress-section-label">Study board · kliknutím otevřete téma · možnost označit „Prostudováno ✓“ nebo „Přeskočit ↷“</div>`;
 
   for (const week of state.course?.weeks || []) {
-    const weekItems = [...(week.lectures || []), ...(week.exercises || [])]
+    const isShelf = week.week >= 90;
+    const weekItems = [...(week.lectures || []).filter(l => isShelf || !l.tags?.includes("Skip")), ...(week.exercises || [])]
       .map((it) => state.itemsById.get(it.id) || it);
     if (!weekItems.length) continue;
 
     const block = el("section", { className: "study-week" });
-    const doneN = weekItems.filter((it) => done(it.id)).length;
+    const doneN = weekItems.filter((it) => isCompleted(it.id)).length;
     const wp = Math.round((doneN / weekItems.length) * 100);
+    const weekBadge = "W" + week.week;
     block.innerHTML = `
       <header class="study-week-head">
-        <h2><span class="sw-num">W${week.week}</span> ${escapeHtml(week.title)}</h2>
+        <h2><span class="sw-num">${weekBadge}</span> ${escapeHtml(week.title)}</h2>
         <span class="sw-pct">${doneN}/${weekItems.length} · ${wp}%</span>
       </header>
     `;
@@ -1752,32 +1797,64 @@ export function showProgress() {
     const lecs = weekItems.filter((it) => it.kind === "lecture");
     const exs = weekItems.filter((it) => it.kind === "exercise");
 
-    if (lecs.length) {
-      const row = el("div", { className: "study-row-label" }, "Lectures");
-      block.appendChild(row);
-      const tiles = el("div", { className: "study-tiles lectures" });
-      for (const it of lecs) {
-        tiles.appendChild(studyTile(it, done(it.id), "sm"));
+    if (week.shelves && week.shelves.length) {
+      const matchedSlugs = new Set();
+      for (const shelf of week.shelves) {
+        const shelfLectures = lecs.filter((it) => {
+          const matches = (shelf.slugs || []).some(s => (it.slug || "").includes(s) || (it.path || "").includes(s));
+          if (matches) matchedSlugs.add(it.id);
+          return matches;
+        });
+        if (shelfLectures.length) {
+          const row = el("div", { className: "study-row-label", style: "margin-top:14px;color:var(--text-bright);font-weight:600" }, `${shelf.icon || "📁"} ${shelf.title}`);
+          block.appendChild(row);
+          const tiles = el("div", { className: "study-tiles lectures" });
+          for (const it of shelfLectures) {
+            tiles.appendChild(studyTile(it, isCompleted(it.id), "sm"));
+          }
+          block.appendChild(tiles);
+        }
       }
-      block.appendChild(tiles);
+      const remLecs = lecs.filter(it => !matchedSlugs.has(it.id));
+      if (remLecs.length) {
+        const row = el("div", { className: "study-row-label" }, "Ostatní témata");
+        block.appendChild(row);
+        const tiles = el("div", { className: "study-tiles lectures" });
+        for (const it of remLecs) {
+          tiles.appendChild(studyTile(it, isCompleted(it.id), "sm"));
+        }
+        block.appendChild(tiles);
+      }
+    } else {
+      if (lecs.length) {
+        const row = el("div", { className: "study-row-label" }, "Přednášky");
+        block.appendChild(row);
+        const tiles = el("div", { className: "study-tiles lectures" });
+        for (const it of lecs) {
+          tiles.appendChild(studyTile(it, isCompleted(it.id), "sm"));
+        }
+        block.appendChild(tiles);
+      }
     }
     if (exs.length) {
-      const row = el("div", { className: "study-row-label" }, "Homework & Exercise sets");
+      const row = el("div", { className: "study-row-label" }, "Cvičení a programátorské úlohy");
       block.appendChild(row);
       const exCards = el("div", { className: "study-exercise-cards" });
       for (const it of exs) {
-        exCards.appendChild(detailedExerciseCard(it, done(it.id)));
+        exCards.appendChild(detailedExerciseCard(it, isCompleted(it.id)));
       }
       block.appendChild(exCards);
     }
+
     board.appendChild(block);
   }
+
   wrap.appendChild(board);
 
   // Milestones by studied %
   const milestones = [
-    { at: 1, label: "First mark", icon: "▶", check: () => studiedN >= 1 },
-    { at: 10, label: "10 studied", icon: "10", check: () => pct >= 10 },
+    { at: 1, label: "First mark", icon: "▶", check: () => stats.total.completed >= 1 },
+    { at: 10, label: "10 completed", icon: "10", check: () => pct >= 10 },
     { at: 25, label: "Quarter", icon: "¼", check: () => pct >= 25 },
     { at: 50, label: "Halfway", icon: "½", check: () => pct >= 50 },
     { at: 75, label: "Nearly there", icon: "¾", check: () => pct >= 75 },
@@ -1803,8 +1880,9 @@ export function showProgress() {
   msWrap.appendChild(msRow);
   wrap.appendChild(msWrap);
 
-  const unstudiedEx = exercises
-    .filter((it) => !done(it.id))
+  const allExercises = (state.items || []).filter((it) => it.kind === "exercise");
+  const uncompletedEx = allExercises
+    .filter((it) => !isCompleted(it.id))
     .sort((a, b) => {
       const ac = (a.tags || []).includes("Core") ? 0 : 1;
       const bc = (b.tags || []).includes("Core") ? 0 : 1;
@@ -1812,11 +1890,11 @@ export function showProgress() {
       return (a.weekNum - b.weekNum) || b.relevance - a.relevance;
     });
 
-  if (unstudiedEx.length) {
+  if (uncompletedEx.length) {
     const nextSec = el("div", { className: "progress-next" });
-    nextSec.innerHTML = `<div class="progress-section-label">Next practice (not studied yet)</div>`;
+    nextSec.innerHTML = `<div class="progress-section-label">Doporučená cvičení k vyřešení</div>`;
     const nextList = el("div", { className: "progress-ex-list" });
-    for (const ex of unstudiedEx.slice(0, 8)) {
+    for (const ex of uncompletedEx.slice(0, 8)) {
       const tasks = state.exercises[ex.path]?.task_count
         || state.exercises[ex.path]?.tasks?.length
         || 0;
@@ -1848,14 +1926,18 @@ export function showProgress() {
     type: "button",
     className: "btn progress-reset",
     onClick: () => {
-      if (confirm("Clear all studied marks (and open history)?")) {
+      if (confirm("Resetovat veškerý studijní postup a historii?")) {
         state.seen.clear();
         state.studied.clear();
+        state.skipped.clear();
         try {
           localStorage.removeItem("pcs-seen-v1");
           localStorage.removeItem("pcs-studied-v1");
+          localStorage.removeItem("pcs-skipped-v1");
         } catch { /* */ }
         showProgress();
+        try { renderTree(); } catch { /* */ }
+        window.__pcsUpdateStatus?.();
       }
     },
   }, "Reset progress"));

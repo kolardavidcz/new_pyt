@@ -1,0 +1,91 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl mezi typem set a frozenset v Pythonu?",
+    "options": [
+      "A) set udržuje prvkům pevné pořadí vkládání, zatímco frozenset prvky automaticky seřadí podle hodnoty.",
+      "B) set umožňuje ukládat pouze čísla, zatímco frozenset dokáže uchovávat libovolné proměnné seznamy.",
+      "C) set je proměnný (mutable) a nehešovatelný, zatímco frozenset je neproměnný (immutable) a hešovatelný.",
+      "D) set vyžaduje volání metody copy(), zatímco frozenset se při přiřazení kopíruje automaticky hluboce."
+    ],
+    "answer": 2,
+    "explanation": "frozenset je neproměnnou (immutable) obdobou běžné množiny set. Protože je neproměnný, má definovanou metodu __hash__() a lze ho použít jako prvek jiné množiny nebo jako klíč ve slovníku.",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "fill_blank_choice",
+    "question": "Doplňte název vestavěného konstruktoru pro vytvoření prázdné neměnné (hashovatelné) množiny.",
+    "code_snippet": "empty_fs = ________()\nprint(type(empty_fs).__name__)",
+    "options": [
+      "frozen",
+      "set.freeze",
+      "fset",
+      "frozenset"
+    ],
+    "answer": 3,
+    "explanation": "Typ `frozenset()` představuje neměnnou (immutable) variantu množiny, která je díky své neměnnosti hashovatelná a může sloužit jako klíč ve slovníku.",
+    "code": "# Vytvoření prázdné neměnné množiny pro použití jako klíč ve slovníku\nempty_immutable_set = ________()\n\ncache = {empty_immutable_set: \"vychozi_stav\"}\nprint(type(empty_immutable_set).__name__)  # frozenset",
+    "expected": "frozenset"
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Co se stane při pokusu o zavolání metody add() nad objekt typu frozenset?",
+    "code_snippet": "fs = frozenset([1, 2, 3])\nfs.add(4)",
+    "options": [
+      "A) AttributeError — frozenset je immutable a neobsahuje modifikační metody jako add() nebo remove().",
+      "B) TypeError — prvek 4 nelze přidat do množiny, protože není obalen do samostatného neproměnného objektu.",
+      "C) frozenset({1, 2, 3, 4}) — metoda vytvoří novou zmraženou množinu s přidaným prvkem a vrátí ji zpět.",
+      "D) ValueError — operace přidávání prvku selže, protože kapacita zmražené množiny je vytvořením fixní."
+    ],
+    "answer": 0,
+    "explanation": "Jelikož je frozenset neproměnný typ, neobsahuje žádné metody, které by měnily jeho obsah (add, update, remove, discard, pop, clear). Volání fs.add(4) skončí výjimkou AttributeError: 'frozenset' object has no attribute 'add'.",
+    "code": "fs = frozenset([1, 2, 3])\nfs.add(4)"
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Co bude výstupem následujícího kódu vytvořeného ze seznamu s duplicitami?",
+    "code_snippet": "fs = frozenset([1, 2, 'ahoj', 2, 'ahoj', 3])\nprint(len(fs))",
+    "options": [
+      "A) TypeError — vstupní seznam obsahuje smíšené typy int a str, které nelze zmrazit.",
+      "B) 4 — duplicitní prvky byly při vytváření zmražené množiny automaticky odstraněny.",
+      "C) 6 — frozenset zachovává všechny vložené prvky včetně duplicit v nezměněném pořadí.",
+      "D) 2 — frozenset uchovává pouze prvky stejného datového typu a ostatní položky zahodí."
+    ],
+    "answer": 1,
+    "explanation": "Stejně jako klasická množina set, i frozenset uchovává výhradně unikátní prvky. Unikátní hodnoty v seznamu jsou 1, 2, 'ahoj' a 3, takže výstup funkce len(fs) bude 4.",
+    "code": "fs = frozenset([1, 2, 'ahoj', 2, 'ahoj', 3])\nprint(len(fs))"
+  },
+  {
+    "id": "q5",
+    "type": "multiple_choice",
+    "question": "Proč lze frozenset použít jako klíč ve slovníku, zatímco obyčejný set nikoliv?",
+    "options": [
+      "A) frozenset podporuje operátor [index], takže slovník může přistupovat k jeho prvkům přes pozici prvků.",
+      "B) frozenset automaticky seřadí své prvky abecedně, což slovníku umožňuje rychlé vyhledávání položek.",
+      "C) frozenset je immutable, takže jeho hešovací hodnota zůstává po celou dobu života objektu konstantní.",
+      "D) frozenset spotřebovává méně paměti v RAM než set, což usnadňuje indexaci ve slovníkových tabulkách."
+    ],
+    "answer": 2,
+    "explanation": "Klíče ve slovníku musí být hešovatelné (hashable), což vyžaduje neproměnnost objektu. Běžný set je mutable (lze do něj přidávat prvky), čímž by se měnil jeho hash. Neproměnný frozenset má stabilní hash, a proto splňuje podmínku pro klíč slovníku i prvek množiny.",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Jaký bude výsledek množinového průniku dvou zmražených množin?",
+    "code_snippet": "fs1 = frozenset([1, 2, 3])\nfs2 = frozenset([2, 3, 4])\nprint(fs1 & fs2)",
+    "options": [
+      "A) frozenset({1, 4}) — operátor & vrátí rozdíl prvků přítomných výhradně v jedné ze zadaných množin.",
+      "B) TypeError — operátor & není pro zmražené množiny podporován a je nutné použít intersection().",
+      "C) {2, 3} — výsledek množinových operací nad frozenset se automaticky přetypuje na klasický set.",
+      "D) frozenset({2, 3}) — operátor & vrátí novou zmraženou množinu obsahující společné prvky."
+    ],
+    "answer": 3,
+    "explanation": "Operátor & (průnik / intersection) funguje pro frozenset stejně jako pro set a vrací nový frozenset obsahující prvky přítomné v obou množinách, tedy {2, 3}.",
+    "code": "fs1 = frozenset([1, 2, 3])\nfs2 = frozenset([2, 3, 4])\nprint(fs1 & fs2)"
+  }
+]

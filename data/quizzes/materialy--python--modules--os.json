@@ -1,0 +1,144 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Co bude výsledkem následujícího spojení cest pomocí os.path.join v POSIX systému?",
+    "options": [
+      "A) Vyvolá výjimku ValueError, protože absolutní cesty nelze podle specifikace předávat doprostřed seznamu argumentů.",
+      "B) Vrátí 'data/projects//etc/config.txt', protože metoda zachová dvě lomítka vedle sebe bez jakékoli úpravy řetězce.",
+      "C) Vrátí 'data/projects/etc/config.txt', protože funkce automaticky odstraní úvodní lomítka ze všech vnitřních částí.",
+      "D) Vrátí '/etc/config.txt', protože výskyt absolutní cesty způsobený počátečním lomítkem zahodí všechny předchozí části."
+    ],
+    "answer": 3,
+    "explanation": "Funkce `os.path.join()` spojuje argumenty do cesty. Pokud však některý z argumentů představuje absolutní cestu (začíná lomítkem `/`), všechny předcházející spočítané části se okamžitě zahodí a spojování pokračuje od tohoto absolutního prvku.",
+    "code": "import os\nprint(os.path.join('data', 'projects', '/etc', 'config.txt'))"
+  },
+  {
+    "id": "q2",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl mezi os.scandir() a os.listdir() zavedený v Pythonu 3.5?",
+    "options": [
+      "A) os.scandir() vrací iterátor objektů DirEntry s kešovanými atributy, zatímco os.listdir() vrací prostý seznam řetězců.",
+      "B) os.scandir() vrací seznam obsahující i položky . a .., zatímco os.listdir() tyto speciální adresáře vždy ignoruje.",
+      "C) os.scandir() je určen pouze pro systém Windows, zatímco os.listdir() je univerzální POSIX rozhraní pro všechny OS.",
+      "D) os.listdir() provádí rekurzivní prohledávání celého stromu, zatímco os.scandir() prochází pouze aktuální adresář."
+    ],
+    "answer": 0,
+    "explanation": "`os.scandir()` vrací iterátor objektů `DirEntry`, které v sobě již uchovávají typ a vlastnosti souboru získané přímo při výpisu adresáře. To eliminuje potřebu dodatečných systémových volání (jako `os.path.isdir()`) a činí `os.scandir()` výrazně rychlejším než `os.listdir()`, jež vrací jen seznam textových jmen.",
+    "code": null
+  },
+  {
+    "id": "q3",
+    "type": "fill_blank_choice",
+    "question": "Doplňte funkci modulu `os`, která rekurzivně vytvoří celou cestu k adresáři včetně všech chybějících mezilehlých složek.",
+    "options": [
+      "mkpath",
+      "makedirs",
+      "mkdir",
+      "create_dirs"
+    ],
+    "answer": 1,
+    "explanation": "Funkce `os.makedirs(path, exist_ok=True)` vytvoří koncový adresář i všechny chybějící nadřazené adresáře podél cesty (obdoba příkazu `mkdir -p`).",
+    "code": "import os\n\n# Rekurzivní vytvoření stromu složek pro ukládání exportů\noutput_dir = \"vysledky/mereni_2026/spektra\"\nos.________(output_dir, exist_ok=True)\n\nprint(os.path.isdir(output_dir))  # True",
+    "expected": "makedirs"
+  },
+  {
+    "id": "q4",
+    "type": "multiple_choice",
+    "question": "Který modul a funkce se v Pythonu používají pro zkopírování souboru včetně zachování jeho metadat?",
+    "options": [
+      "A) Funkce shutil.move(), protože při přesunu souboru dochází ke kaskádovému kopírování metadat bez ztráty dat.",
+      "B) Funkce os.path.copy(), protože modul os.path přímo manipuluje s objektovými strukturami souborového systému.",
+      "C) Funkce shutil.copy2(), protože na rozdíl od základního os či shutil.copy() uchovává i časová razítka a atributy.",
+      "D) Funkce os.copyfile(), protože nízkoúrovňový modul os jako jediný garantuje přímý nízkoúrovňový přenos metadat."
+    ],
+    "answer": 2,
+    "explanation": "Základní modul `os` neobsahuje funkce pro kopírování souborů. K tomuto účelu slouží modul `shutil`. Zatímco `shutil.copy()` kopíruje pouze obsah a práva, `shutil.copy2()` navíc kopíruje i všechna ostatní dostupná metadata (např. čas posledního přístupu a modifikace).",
+    "code": null
+  },
+  {
+    "id": "q5",
+    "type": "fill_blank_choice",
+    "question": "Doplňte rozbalení n-tice z generátoru os.walk() pro iteraci přes adresářový strom:",
+    "options": [
+      "dirs, root, files",
+      "path, subdirs, files",
+      "root, files, dirs",
+      "root, dirs, files"
+    ],
+    "answer": 3,
+    "explanation": "Generátor os.walk() v každém kroku vrací trojici (cesta_k_adresáři, seznam_podadresářů, seznam_souborů).",
+    "code": "import os\n\nfor ________ in os.walk('.'):\n    print(f\"Složka {root} obsahuje {len(files)} souborů.\")",
+    "expected": "root, dirs, files"
+  },
+  {
+    "id": "q6",
+    "type": "multiple_choice",
+    "question": "Co se stane při volání funkce os.remove() na cestu, která ukazuje na neprázdný adresář?",
+    "options": [
+      "A) Python vyvolá výjimku (např. IsADirectoryError či OSError), protože os.remove() slouží výhradně k mazání souborů.",
+      "B) Python automaticky přesune adresář do dočasné systémové složky a vyvolá varování typu DeprecationWarning.",
+      "C) Funkce smaže pouze prázdný adresář, ale pokud obsahuje soubory, ticho vrací hodnotu False bez vyvolání výjimky.",
+      "D) Adresář se bez varování smazá včetně veškerého obsahu, protože os.remove() funguje rekurzivně pro všechny cesty."
+    ],
+    "answer": 0,
+    "explanation": "`os.remove()` (rovněž přístupný jako `os.unlink()`) odstraňuje výhradně soubory. Pokud je předaná cesta adresářem, operační systém / Python vyvolá výjimku `IsADirectoryError` (na POSIXu) nebo `PermissionError`/`OSError` (na Windows). Pro odstranění adresáře je nutné použít `os.rmdir()` (pro prázdný) nebo `shutil.rmtree()` (pro celý strom).",
+    "code": null
+  },
+  {
+    "id": "q7",
+    "type": "multiple_choice",
+    "question": "Jak se chová objekt os.environ s proměnnými prostředí během běhu Python skriptu?",
+    "options": [
+      "A) Dynamicky dotazuje operační systém při každém čtení klíče, takže ihned reflektuje změny externích procesů.",
+      "B) Načte proměnné prostředí při prvním importu modulu os a přímou modifikací os.environ zapsané změny promítne.",
+      "C) Je to pouze neproměnný objekt typu tuple, do kterého nelze během běhu skriptu přidávat ani měnit klíče.",
+      "D) Vytváří izolovanou kopii pro každou funkci ve skriptu, takže změny provedené v jedné funkci se nešíří dál."
+    ],
+    "answer": 1,
+    "explanation": "`os.environ` je slovníku podobný objekt (mapování), který se naplní hodnotami proměnných prostředí v momentě prvního importu modulu `os`. Úpravy provedené přímo v `os.environ` se uplatní v běžícím skriptu i v podprocesech vytvářených z Pythonu.",
+    "code": null
+  },
+  {
+    "id": "q8",
+    "type": "multiple_choice",
+    "question": "Proč je v Pythonu preferováno otevírat soubor v bloku try-except místo předchozí kontroly přes os.access()?",
+    "options": [
+      "A) Metoda os.access() funguje pouze na operačním systému Windows a na Unixu způsobuje neplatné selhání přístupu.",
+      "B) Volání funkce os.access() je v Pythonu zastaralé a vyvolá při použití v novějších verzích DeprecationWarning.",
+      "C) Předchází se tím souběhu (TOCTOU) mezi kontrolou a otevřením a kód lépe odpovídá pythonímu principu EAFP.",
+      "D) Blok try-except automaticky uzamkne soubor na úrovni operačního systému proti zápisu ostatními procesy."
+    ],
+    "answer": 2,
+    "explanation": "Kontrola přístupových práv předem pomocí `os.access()` trpí problémem zvaným TOCTOU (Time-of-Check to Time-of-Use): mezi kontrolou a samotným otevřením souboru se stav souborového systému může změnit. Python proto prosazuje přístup EAFP (Easier to ask for forgiveness than permission) – rovnou se pokusit soubor otevřít a případnou chybu zachytit.",
+    "code": null
+  },
+  {
+    "id": "q9",
+    "type": "multiple_choice",
+    "question": "Jaký výstup vytvoří volání os.path.split v níže uvedeném příkladu?",
+    "options": [
+      "A) Vypíše '/var' a 'log/syslog', protože rozdělení probíhá podle prvního nalezeného lomítka zleva zadané cesty.",
+      "B) Vypíše '/var/log/syslog' a '', protože při absenci přípony souboru se celá cesta vrátí jako prvek head.",
+      "C) Vypíše '/var/log/' a 'syslog', protože head si dle specifikace vřele ponechává koncové dělicí lomítko cesty.",
+      "D) Vypíše '/var/log' a 'syslog', protože tail představuje poslední prvek cesty a head zbývající nadřazenou cestu."
+    ],
+    "answer": 3,
+    "explanation": "Funkce `os.path.split(path)` roz dělí cestu na dvojici `(head, tail)`. `tail` je poslední komponent cesty (jméno souboru nebo podadresáře, nikdy neobsahuje lomítko) a `head` je vše, co mu předchází. Pro `/var/log/syslog` je to `('/var/log', 'syslog')`.",
+    "code": "import os\nhead, tail = os.path.split('/var/log/syslog')\nprint(head, tail)"
+  },
+  {
+    "id": "q10",
+    "type": "multiple_choice",
+    "question": "Čím se liší funkce os.renames() od základní funkce os.rename()?",
+    "options": [
+      "A) Vytvoří chybějící nadřazené adresáře pro novou cestu a po přesunu promaže i uvolněné prázdné staré adresáře.",
+      "B) Funguje výhradně pro přejmenovávání adresářů, zatímco os.rename() slouží pouze pro běžné datové soubory.",
+      "C) Provádí přejmenování asynchronně na pozadí bez blokování hlavního vlákna běžícího Python interpreta.",
+      "D) Umožňuje přejmenovávat více souborů najednou pomocí zástupných znaků (wildcards) typu *.txt v jediném kroku."
+    ],
+    "answer": 0,
+    "explanation": "`os.renames(old, new)` před přejmenováním / přesunem vytvoří chybějící nadřazené adresáře v cílí (pomocí `os.makedirs`) a po dokončení se pokusí odstranit prázdné nadřazené adresáře ve zdroji (pomocí `os.removedirs`).",
+    "code": null
+  }
+]

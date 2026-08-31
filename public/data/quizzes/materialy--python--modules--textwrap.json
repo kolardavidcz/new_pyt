@@ -1,0 +1,88 @@
+[
+  {
+    "id": "q1",
+    "type": "multiple_choice",
+    "question": "Jaký je hlavní rozdíl v návratové hodnotě funkcí textwrap.wrap() a textwrap.fill()?",
+    "options": [
+      "A) wrap() zkracuje text podle slov s výpustkou, zatímco fill() odstraňuje ze začátku společné mezery.",
+      "B) fill() vrací seznam jednotlivých řádků jako řetězců, zatímco wrap() vrací jeden řetězec spojený znaky \\n.",
+      "C) wrap() funguje pouze pro jednobajtové řetězce z ASCII, zatímco fill() podporuje i Unicode znaky.",
+      "D) wrap() vrací seznam jednotlivých řádků jako řetězců, zatímco fill() vrací jeden řetězec spojený znaky \\n."
+    ],
+    "answer": 3,
+    "explanation": "textwrap.wrap() zalamuje text a vrací Python list řádků. textwrap.fill() je zkratka pro '\\n'.join(wrap(...)) a vrací zalamovaný víceřádkový řetězec.",
+    "code": null
+  },
+  {
+    "id": "q2",
+    "type": "predict_output",
+    "question": "Jaký bude výstup výrazu textwrap.shorten(\"příliš žluťoučký kůň\", width=12) při výchozím nastavení placeholder=' [...]'?",
+    "options": [
+      "A) 'příliš [...]'",
+      "B) 'příliš ž [...]'",
+      "C) 'příliš žluť'",
+      "D) 'příliš žluťoučký'"
+    ],
+    "answer": 0,
+    "explanation": "shorten() zkracuje text po celých slovech tak, aby se do zadané šířky width vlezl i zástupný symbol (zde 8 znaků '[...]'). 'příliš žluťoučký [...]' má 22 znaků, proto zůstane jen 'příliš [...]' (12 znaků).",
+    "code": null
+  },
+  {
+    "id": "q3",
+    "type": "multiple_choice",
+    "question": "Jakým způsobem funguje funkce textwrap.dedent(text) při úpravě víceřádkového řetězce?",
+    "options": [
+      "A) Odstraní ze všech řádků pouze první znak bez ohledu na to, zda se jedná o mezeru nebo písmeno.",
+      "B) Odstraní ze všech řádků textu maximální počet společných úvodních bílých znaků (mezer a tabulátorů).",
+      "C) Odstraní veškeré bílé znaky na konci všech řádků a nahradí je jedním odřádkováním \\n.",
+      "D) Nahradí všechny tabulátory na začátku řádků přesně čtyřmi mezerami bez ohledu na ostatní řádky."
+    ],
+    "answer": 1,
+    "explanation": "dedent() zkoumá úvodní odsazení neprázdných řádků a odebere z každého řádku prefix z bílých znaků, který sdílejí všechny řádky v textu.",
+    "code": null
+  },
+  {
+    "id": "q4",
+    "type": "fill_blank_choice",
+    "question": "Doplňte predikát funkce textwrap.indent() pro vynucení odsazení všech řádků včetně prázdných:",
+    "options": [
+      "lambda line: line.strip()",
+      "lambda line: bool(line)",
+      "lambda line: True",
+      "lambda line: False"
+    ],
+    "answer": 2,
+    "explanation": "Výchozí predikát vynechává prázdné řádky; předáním lambda line: True se prefix vloží před každý řádek bez výjimky.",
+    "code": "import textwrap\n\ntext = \"první\\n\\ndruhý\"\n# Odsadit všechny řádky včetně prázdných:\nresult = textwrap.indent(text, \"    \", predicate=________)",
+    "expected": "lambda line: True"
+  },
+  {
+    "id": "q5",
+    "type": "true_false_tricky",
+    "question": "Proč je při opakovaném zalamování tisíců textů výhodnější vytvořit vlastní instanci TextWrapper než dokola volat textwrap.fill()?",
+    "options": [
+      "A) Funkce textwrap.fill() nepodporuje pojmenované argumenty width a subsequent_indent při přímém volání.",
+      "B) Samostatná instance TextWrapper automaticky běží v paralelních vláknech a zrychluje výpočet.",
+      "C) Funkce textwrap.fill() modifikuje globální nastavení Pythonu, zatímco instance TextWrapper je izolovaná.",
+      "D) Volání textwrap.fill() při každém spuštění zbytečně instancuje a zahazuje novou instanci třídy TextWrapper."
+    ],
+    "answer": 3,
+    "explanation": "Pomocné funkce wrap, fill i shorten vytvářejí uvnitř při každém volání nový objekt TextWrapper. Pro masivní zalamování je proto z hlediska výkonu efektivnější reusovat jednu instanci.",
+    "code": null
+  },
+  {
+    "id": "q6",
+    "type": "fill_blank_choice",
+    "question": "Který parametr třídy TextWrapper zabrání rozdělení dlouhých slov přesahujících zadanou šířku řádku?",
+    "options": [
+      "break_long_words",
+      "break_on_hyphens",
+      "drop_whitespace",
+      "replace_whitespace"
+    ],
+    "answer": 0,
+    "explanation": "Parametr break_long_words=False v třídě TextWrapper způsobí, že slova přesahující šířku width nebudou násilně roztržena na více řádků.",
+    "code": "import textwrap\n\nwrapper = textwrap.TextWrapper(width=20, ________=False)\ntext = \"Supercalifragilisticexpialidocious je velmi dlouhe slovo\"\nlines = wrapper.wrap(text)\n# Dlouhe slovo zustane v celku na samostatnem radku",
+    "expected": "break_long_words"
+  }
+]

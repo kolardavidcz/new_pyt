@@ -5,7 +5,7 @@ import {
   state, loadPersisted, buildIndexes, clearFilters, filtersActive,
   filteredItems, persistSidebarW, pagesFor, onStateChange,
   setUser, logoutUser, defaultUser, syncCloudProgress, clearLinkErrorLog, markLinkErrorFixed,
-  loadRelevanceOverrides,
+  loadRelevanceOverrides, getCourseStats,
 } from "./state.js";
 import { renderTree, setTreeSelectHandler, expandAll, collapseAll } from "./tree.js";
 import { navigate, refreshActiveView, closeTab, initHistory, getInitialRoute, initScrollTracker } from "./router.js";
@@ -239,18 +239,16 @@ function updateUserUI() {
     }
   }
 
-  // Update profile modal stats
-  const total = state.items.length || 92;
-  const studiedN = state.studied?.size || 0;
-  const pct = total > 0 ? Math.round((studiedN / total) * 100) : 0;
+  // Update profile modal stats based on active curriculum
+  const stats = getCourseStats();
 
   const pstatStudied = document.getElementById("pstatStudied");
   const pstatPct = document.getElementById("pstatPct");
   const pstatTotal = document.getElementById("pstatTotal");
 
-  if (pstatStudied) pstatStudied.textContent = studiedN;
-  if (pstatPct) pstatPct.textContent = `${pct}%`;
-  if (pstatTotal) pstatTotal.textContent = total;
+  if (pstatStudied) pstatStudied.textContent = `${stats.total.completed} splněno (${stats.lectures.completed} přednášek + ${stats.exercises.completed} cvičení)`;
+  if (pstatPct) pstatPct.textContent = `${stats.total.pct}%`;
+  if (pstatTotal) pstatTotal.textContent = `${stats.lectures.total} aktivních přednášek, ${stats.exercises.total} cvičení`;
 
   updateAdminUIElements();
 }
@@ -526,10 +524,10 @@ function syncFilterUI() {
 function updateStatus() {
   const counts = document.getElementById("sbCounts");
   const filter = document.getElementById("sbFilter");
-  const total = state.items.length;
+  const stats = getCourseStats();
   const visible = filteredItems().length;
   if (counts) {
-    counts.textContent = `${visible} / ${total} items · ${state.studied?.size || 0} studied`;
+    counts.textContent = `${stats.total.completed} / ${stats.total.total} splněno (${stats.total.pct}%) · ${stats.lectures.completed}/${stats.lectures.total} přednášek · ${stats.exercises.completed}/${stats.exercises.total} cvičení`;
   }
   if (filter) {
     if (!filtersActive()) {

@@ -41,19 +41,45 @@ if (existsSync(intersectionSlidesPath)) {
 if (existsSync(quizFile)) {
   try {
     const rawQuizzes = JSON.parse(readFileSync(quizFile, "utf-8"));
-    let count = 0;
-    
-    // Per-deck chunks
+    const allQuizKeys = new Map(); // targetFileName -> questions
+
+    // 1. Raw keys from quizzes.json
     for (const [deckKey, questions] of Object.entries(rawQuizzes)) {
       if (deckKey && Array.isArray(questions)) {
-        const payload = JSON.stringify(questions, null, 2);
-        for (const outDir of QUIZZES_OUT_DIRS) {
-          writeFileSync(join(outDir, `${deckKey}.json`), payload, "utf-8");
-        }
-        count++;
+        allQuizKeys.set(deckKey, questions);
       }
     }
-    console.log(`  ✓ Split quizzes.json into ${count} per-deck static quiz chunks in data/quizzes/ and public/data/quizzes/`);
+
+    // 2. Also map full slugs from course.json
+    if (existsSync(courseFile)) {
+      const course = JSON.parse(readFileSync(courseFile, "utf-8"));
+      for (const w of course.weeks || []) {
+        for (const lec of w.lectures || []) {
+          const slug = lec.slug;
+          const base = (lec.path || "").split("/").pop().replace(/\.html?$/, "");
+          const cleanPath = (lec.path || "").replace(/^vyuka_downloaded\//, "").replace(/\.html?$/, "");
+          
+          const matchingQuestions = rawQuizzes[lec.quiz_deck] ||
+                                    rawQuizzes[slug] ||
+                                    rawQuizzes[base] ||
+                                    rawQuizzes[cleanPath];
+
+          if (matchingQuestions && Array.isArray(matchingQuestions)) {
+            if (slug) allQuizKeys.set(slug, matchingQuestions);
+            if (base) allQuizKeys.set(base, matchingQuestions);
+          }
+        }
+      }
+    }
+
+    // Write all per-deck chunks
+    for (const [targetKey, questions] of allQuizKeys.entries()) {
+      const payload = JSON.stringify(questions, null, 2);
+      for (const outDir of QUIZZES_OUT_DIRS) {
+        writeFileSync(join(outDir, `${targetKey}.json`), payload, "utf-8");
+      }
+    }
+    console.log(`  ✓ Split quizzes.json into ${allQuizKeys.size} per-deck static quiz chunks (including full slug aliases) in data/quizzes/ and public/data/quizzes/`);
 
     // Per-week chunks (fallback compatibility)
     if (existsSync(courseFile)) {
@@ -66,9 +92,11 @@ if (existsSync(quizFile)) {
         weekDecks[wKey] = {};
         
         for (const lec of w.lectures || []) {
-          const dKey = lec.quiz_deck || lec.slug;
-          if (dKey && rawQuizzes[dKey]) {
-            weekDecks[wKey][dKey] = rawQuizzes[dKey];
+          const base = (lec.path || "").split("/").pop().replace(/\.html?$/, "");
+          const dKey = lec.quiz_deck || lec.slug || base;
+          const questions = rawQuizzes[dKey] || rawQuizzes[base] || rawQuizzes[lec.slug];
+          if (questions) {
+            weekDecks[wKey][dKey] = questions;
           }
         }
       }
@@ -457,19 +485,86 @@ function normalizeCodeShowcase(text, lang = "python") {
       continue;
     }
 
+/**
+ * Automatically detects and aligns multi-slice multi-dimensional arrays (NumPy 3D/4D ndarray, matrix)
+ * when sub-slices follow a blank line.
+ */
+function alignMultiSliceArrayOutput(lines) {
+  if (!lines || lines.length === 0) return lines;
+
+  const first = lines[0];
+  const mArray = first.match(/^(array|matrix)\((\[+)/);
+  if (!mArray) return lines;
+
+  const prefixLen = mArray[1].length + 1; // 6 for array(, 7 for matrix(
+  const bracketCount = mArray[2].length; // 3 for 3D array([[[
+  const sliceIndent = " ".repeat(prefixLen + Math.max(0, bracketCount - 2)); // 7 spaces for 3D array
+  const rowIndent = " ".repeat(prefixLen + Math.max(0, bracketCount - 1)); // 8 spaces for inner row
+
+  const result = [];
+  let inMultiSlice = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.trim().length === 0) {
+      result.push("");
+      inMultiSlice = true;
+      continue;
+    }
+
+    if (inMultiSlice) {
+      const matchLeading = line.match(/^(\s*)(.*)$/);
+      const rawLeading = matchLeading ? matchLeading[1].length : 0;
+      const rest = matchLeading ? matchLeading[2] : line;
+
+      if (/^\[{2,}/.test(rest) && rawLeading < sliceIndent.length) {
+        result.push(`${sliceIndent}${rest}`);
+        continue;
+      }
+      if (/^\[[0-9\s\-]/.test(rest) && rawLeading < rowIndent.length) {
+        result.push(`${rowIndent}${rest}`);
+        continue;
+      }
+    }
+
+    result.push(line);
+  }
+
+  return result;
+}
+
+    // Accumulate consecutive output lines (preserving internal blank lines in multi-slice arrays)
     const outputChunk = [];
     while (i < replLines.length) {
       const cur = replLines[i];
-      if (cur.trim().length === 0 || /^\s*#/.test(cur) || /^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(cur)) {
+      if (cur.trim().length === 0) {
+        let isInternalBlank = false;
+        let nextIdx = i + 1;
+        while (nextIdx < replLines.length && replLines[nextIdx].trim().length === 0) {
+          nextIdx++;
+        }
+        if (nextIdx < replLines.length) {
+          const nextLine = replLines[nextIdx];
+          if (!/^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(nextLine) && !/^\s*#/.test(nextLine)) {
+            isInternalBlank = true;
+          }
+        }
+        if (!isInternalBlank) {
+          break;
+        }
+      } else if (/^\s*#/.test(cur) || /^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(cur)) {
         break;
       }
+
+      // Strip artifact line numbers
       const cleanLine = cur.replace(/^\d+:\s*(\{\}|\[\]|\(\)|True|False|None|\d+)/, "$1");
       outputChunk.push(cleanLine);
       i++;
     }
 
     if (outputChunk.length > 0) {
-      const dedentedOutput = dedentLines(outputChunk);
+      const alignedOutput = alignMultiSliceArrayOutput(outputChunk);
+      const dedentedOutput = dedentLines(alignedOutput);
       processedReplLines.push(...dedentedOutput);
     }
   }
@@ -621,6 +716,119 @@ function transformCodeBlockquotes(html) {
   });
 }
 
+function decodeHtml(html) {
+  if (!html) return "";
+  return String(html)
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&nbsp;/g, " ");
+}
+
+function decodeMathEntities(s) {
+  if (!s) return "";
+  return String(s)
+    .replace(/&gt;/g, ">")
+    .replace(/&lt;/g, "<")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"');
+}
+
+function escapeMathEntities(s) {
+  if (!s) return "";
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function transformMathExpressions(html) {
+  if (!html) return "";
+
+  // Protect pre and code blocks with placeholders
+  const placeholders = [];
+  let masked = html.replace(/<(pre|code)[^>]*>[\s\S]*?<\/\1>/gi, (match) => {
+    const key = `___CODE_PLACEHOLDER_${placeholders.length}___`;
+    placeholders.push(match);
+    return key;
+  });
+
+  // 1. Process block math $$ ... $$
+  masked = masked.replace(/\$\$([\s\S]*?)\$\$/g, (match, formula) => {
+    let raw = decodeMathEntities(formula.trim());
+
+    // Check for piecewise case functions: sgn(x) = \{ {\table x>0 ⇒ +1; x=0 ⇒ 0; x<0 ⇒ -1 }
+    const mPiecewise = raw.match(/([a-zA-Z_0-9\(\)]+)\s*=\s*(?:\\\{)?\s*\{?\\table\s*([^}]+)\}?/i);
+    if (mPiecewise) {
+      const funcName = mPiecewise[1].trim();
+      const rowsStr = mPiecewise[2].trim();
+      const rows = rowsStr.split(";").map((r) => r.trim()).filter(Boolean);
+
+      let tableHtml = '<span class="math-cases-table">';
+      for (const row of rows) {
+        const parts = row.split(/⇒|=>/);
+        if (parts.length === 2) {
+          tableHtml += `<span class="math-row"><span class="math-cond">${escapeMathEntities(parts[0].trim())}</span><span class="math-arr">⇒</span><span class="math-val">${escapeMathEntities(parts[1].trim())}</span></span>`;
+        } else {
+          tableHtml += `<span class="math-row"><span class="math-cond">${escapeMathEntities(row)}</span></span>`;
+        }
+      }
+      tableHtml += "</span>";
+
+      return `<div class="math-block"><span class="math-func">${escapeMathEntities(funcName)}</span> <span class="math-eq">=</span> <span class="math-cases"><span class="math-brace">{</span>${tableHtml}</span></div>`;
+    }
+
+    // Check for matrix equations: (\table -1, -1, -1; -1, 8, -1; -1, -1, -1) + ...
+    if (raw.includes("\\table") || raw.includes("{\\table")) {
+      const transformed = raw.replace(/\(?\{?\\table\s*([^}\)]+)\}?\)?/gi, (m, tableContent) => {
+        const rows = tableContent.split(";").map((r) => r.trim()).filter(Boolean);
+        let mat = '<table class="math-matrix">';
+        for (const row of rows) {
+          const cells = row.split(",").map((c) => c.trim()).filter(Boolean);
+          mat += "<tr>" + cells.map((c) => `<td>${escapeMathEntities(c)}</td>`).join("") + "</tr>";
+        }
+        mat += "</table>";
+        return mat;
+      });
+
+      return `<div class="math-block">${transformed}</div>`;
+    }
+
+    return `<div class="math-block">${escapeMathEntities(raw)}</div>`;
+  });
+
+  // 2. Process inline math $ ... $ outside <pre> and <code>
+  masked = masked.replace(/(?<!\$)\$(?!\$)([^$\n<]+)\$(?!\$)/g, (match, formula) => {
+    const raw = decodeMathEntities(formula.trim());
+    if (!raw || (raw.startsWith("(") && raw.endsWith(")") && raw.length < 3)) return match;
+
+    if (raw.includes("\\table")) {
+      const transformed = raw.replace(/\(?\{?\\table\s*([^}\)]+)\}?\)?/gi, (m, tableContent) => {
+        const rows = tableContent.split(";").map((r) => r.trim()).filter(Boolean);
+        let mat = '<table class="math-matrix">';
+        for (const row of rows) {
+          const cells = row.split(",").map((c) => c.trim()).filter(Boolean);
+          mat += "<tr>" + cells.map((c) => `<td>${escapeMathEntities(c)}</td>`).join("") + "</tr>";
+        }
+        mat += "</table>";
+        return mat;
+      });
+      return `<span class="math-inline">${transformed}</span>`;
+    }
+
+    return `<span class="math-inline">${escapeMathEntities(raw)}</span>`;
+  });
+
+  // Restore protected placeholders
+  for (let idx = 0; idx < placeholders.length; idx++) {
+    masked = masked.replace(`___CODE_PLACEHOLDER_${idx}___`, () => placeholders[idx]);
+  }
+
+  return masked;
+}
+
 let prebuiltCount = 0;
 const pagesIndexMap = {};
 for (const [relPath, filePath] of fileMap.entries()) {
@@ -638,11 +846,11 @@ for (const [relPath, filePath] of fileMap.entries()) {
 
     while ((match = sectionRegex.exec(htmlContent)) !== null) {
       const sectionId = match[1];
-      const sectionInner = transformPreBlocks(transformCodeBlockquotes(transformExampleTags(match[2], dirname(filePath))));
+      const sectionInner = transformMathExpressions(transformPreBlocks(transformCodeBlockquotes(transformExampleTags(match[2], dirname(filePath)))));
       
-      // Extract title header if present
+      // Extract title header if present and cleanly decode HTML entities
       const hMatch = sectionInner.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i);
-      const title = hMatch ? hMatch[1].replace(/<[^>]+>/g, "").trim() : `Section ${idx + 1}`;
+      const title = hMatch ? decodeHtml(hMatch[1].replace(/<[^>]+>/g, "").trim()) : `Section ${idx + 1}`;
 
       // Check metadata with multiple key variants
       const candidateKeys = [

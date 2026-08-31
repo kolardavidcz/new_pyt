@@ -831,13 +831,77 @@ export function normalizeCodeShowcase(text, lang = "python") {
       continue;
     }
 
-    // Accumulate consecutive output lines
+/**
+ * Automatically detects and aligns multi-slice multi-dimensional arrays (NumPy 3D/4D ndarray, matrix)
+ * when sub-slices follow a blank line.
+ */
+function alignMultiSliceArrayOutput(lines) {
+  if (!lines || lines.length === 0) return lines;
+
+  const first = lines[0];
+  const mArray = first.match(/^(array|matrix)\((\[+)/);
+  if (!mArray) return lines;
+
+  const prefixLen = mArray[1].length + 1; // 6 for array(, 7 for matrix(
+  const bracketCount = mArray[2].length; // 3 for 3D array([[[
+  const sliceIndent = " ".repeat(prefixLen + Math.max(0, bracketCount - 2)); // 7 spaces for 3D array
+  const rowIndent = " ".repeat(prefixLen + Math.max(0, bracketCount - 1)); // 8 spaces for inner row
+
+  const result = [];
+  let inMultiSlice = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.trim().length === 0) {
+      result.push("");
+      inMultiSlice = true;
+      continue;
+    }
+
+    if (inMultiSlice) {
+      const matchLeading = line.match(/^(\s*)(.*)$/);
+      const rawLeading = matchLeading ? matchLeading[1].length : 0;
+      const rest = matchLeading ? matchLeading[2] : line;
+
+      if (/^\[{2,}/.test(rest) && rawLeading < sliceIndent.length) {
+        result.push(`${sliceIndent}${rest}`);
+        continue;
+      }
+      if (/^\[[0-9\s\-]/.test(rest) && rawLeading < rowIndent.length) {
+        result.push(`${rowIndent}${rest}`);
+        continue;
+      }
+    }
+
+    result.push(line);
+  }
+
+  return result;
+}
+
+    // Accumulate consecutive output lines (preserving internal blank lines in multi-slice arrays)
     const outputChunk = [];
     while (i < replLines.length) {
       const cur = replLines[i];
-      if (cur.trim().length === 0 || /^\s*#/.test(cur) || /^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(cur)) {
+      if (cur.trim().length === 0) {
+        let isInternalBlank = false;
+        let nextIdx = i + 1;
+        while (nextIdx < replLines.length && replLines[nextIdx].trim().length === 0) {
+          nextIdx++;
+        }
+        if (nextIdx < replLines.length) {
+          const nextLine = replLines[nextIdx];
+          if (!/^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(nextLine) && !/^\s*#/.test(nextLine)) {
+            isInternalBlank = true;
+          }
+        }
+        if (!isInternalBlank) {
+          break;
+        }
+      } else if (/^\s*#/.test(cur) || /^\s*(?:>{2,3}|\.{3})(?:\s|$)/.test(cur)) {
         break;
       }
+
       // Strip artifact line numbers
       const cleanLine = cur.replace(/^\d+:\s*(\{\}|\[\]|\(\)|True|False|None|\d+)/, "$1");
       outputChunk.push(cleanLine);
@@ -845,7 +909,8 @@ export function normalizeCodeShowcase(text, lang = "python") {
     }
 
     if (outputChunk.length > 0) {
-      const dedentedOutput = dedentLines(outputChunk);
+      const alignedOutput = alignMultiSliceArrayOutput(outputChunk);
+      const dedentedOutput = dedentLines(alignedOutput);
       processedReplLines.push(...dedentedOutput);
     }
   }

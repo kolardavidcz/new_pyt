@@ -89,13 +89,13 @@ export function renderTree() {
 
 function buildWeekNode(week, items) {
   const open = !!state.expanded.get(week.id);
-  const isGrayShelf = week.week === 99;
+  const isShelf = week.week >= 90;
   const li = document.createElement("div");
-  li.className = "tree-node" + (open ? " open" : "") + (isGrayShelf ? " tree-node-gray-shelf" : "");
+  li.className = "tree-node" + (open ? " open" : "") + (isShelf ? " tree-node-gray-shelf" : "");
   li.dataset.key = week.id;
 
   const row = document.createElement("div");
-  row.className = "tree-row" + (isGrayShelf ? " tree-row-gray-shelf" : "");
+  row.className = "tree-row" + (isShelf ? " tree-row-gray-shelf" : "");
   row.setAttribute("role", "treeitem");
   row.setAttribute("aria-expanded", String(open));
   row.tabIndex = 0;
@@ -104,13 +104,14 @@ function buildWeekNode(week, items) {
   if (state.focusedTreeKey === week.id) row.classList.add("active");
 
   const milestoneBadge = week.milestone ? `<span title="Semestrální projektový milník ${week.milestone.number}" style="margin-left:4px;color:#f59e0b;font-size:11px;">🏆</span>` : "";
-  const weekLabel = isGrayShelf
-    ? `📚 Regál doplňků (Self-Study)`
-    : `W${week.week}${milestoneBadge} · ${escape(week.title)}`;
+  let weekLabel = `W${week.week}${milestoneBadge} · ${escape(week.title)}`;
+  if (week.week === 99) {
+    weekLabel = `📚 W99 · Doplňkový regál (Self-Study)`;
+  }
 
   row.innerHTML = `
     <span class="tree-twistie">${svgChevron()}</span>
-    <span class="tree-icon week" style="${isGrayShelf ? 'color:var(--text-faint)' : ''}">${svgFolder()}</span>
+    <span class="tree-icon week" style="${isShelf ? 'color:var(--text-faint)' : ''}">${svgFolder()}</span>
     <span class="tree-label">${weekLabel}</span>
     <span class="tree-meta"><span class="rel-pill" style="color:var(--text-faint)">${items.length}</span></span>
   `;
@@ -134,8 +135,61 @@ function buildWeekNode(week, items) {
   children.className = "tree-children";
   children.setAttribute("role", "group");
 
-  for (const item of items) {
-    children.appendChild(buildItemNode(item));
+  if (week.shelves && week.shelves.length) {
+    const matchedSlugs = new Set();
+    for (const shelf of week.shelves) {
+      const shelfItems = items.filter((it) => {
+        const matches = (shelf.slugs || []).some(s => (it.slug || "").includes(s) || (it.path || "").includes(s));
+        if (matches) matchedSlugs.add(it.id);
+        return matches;
+      });
+
+      if (shelfItems.length) {
+        const shelfKey = `${week.id}-${shelf.id}`;
+        const isShelfOpen = state.expanded.has(shelfKey) ? !!state.expanded.get(shelfKey) : true;
+
+        const shelfNode = document.createElement("div");
+        shelfNode.className = "tree-node" + (isShelfOpen ? " open" : "");
+        shelfNode.dataset.key = shelfKey;
+
+        const shelfRow = document.createElement("div");
+        shelfRow.className = "tree-row tree-row-shelf";
+        shelfRow.setAttribute("role", "treeitem");
+        shelfRow.setAttribute("aria-expanded", String(isShelfOpen));
+        shelfRow.tabIndex = 0;
+        shelfRow.innerHTML = `
+          <span class="tree-twistie">${svgChevron()}</span>
+          <span class="tree-icon shelf" style="font-size:12px">${shelf.icon || "📁"}</span>
+          <span class="tree-label" style="font-weight:600;font-size:11px;color:var(--text-muted)">${escape(shelf.title)}</span>
+          <span class="tree-meta"><span class="rel-pill" style="color:var(--text-faint)">${shelfItems.length}</span></span>
+        `;
+
+        shelfRow.addEventListener("click", (e) => {
+          toggleExpand(shelfKey);
+          renderTree();
+        });
+
+        shelfNode.appendChild(shelfRow);
+
+        const shelfChildren = document.createElement("div");
+        shelfChildren.className = "tree-children";
+        shelfChildren.setAttribute("role", "group");
+        for (const item of shelfItems) {
+          shelfChildren.appendChild(buildItemNode(item));
+        }
+        shelfNode.appendChild(shelfChildren);
+        children.appendChild(shelfNode);
+      }
+    }
+
+    const remainingItems = items.filter(it => !matchedSlugs.has(it.id));
+    for (const item of remainingItems) {
+      children.appendChild(buildItemNode(item));
+    }
+  } else {
+    for (const item of items) {
+      children.appendChild(buildItemNode(item));
+    }
   }
   li.appendChild(children);
   return li;
@@ -163,10 +217,12 @@ function buildItemNode(item) {
   const icon = item.kind === "exercise" ? svgExercise() : svgFile();
   const iconClass = item.kind === "exercise" ? "exercise" : "lecture";
   const studied = state.studied?.has(item.id)
-    ? `<span class="studied-dot" title="Studied"></span>`
-    : state.seen.has(item.id)
-      ? `<span class="seen-dot" title="Opened"></span>`
-      : "";
+    ? `<span class="studied-dot" title="Prostudováno (Splněno)">✓</span>`
+    : state.skipped?.has(item.id)
+      ? `<span class="skipped-dot" title="Znáno / Přeskočeno (Splněno)">↷</span>`
+      : state.seen.has(item.id)
+        ? `<span class="seen-dot" title="Otevřeno"></span>`
+        : "";
 
   row.innerHTML = `
     <span class="tree-twistie">${hasPages ? svgChevron() : ""}</span>
