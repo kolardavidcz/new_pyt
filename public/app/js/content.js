@@ -30,7 +30,6 @@ export function setLoading(on) {
 export function showHome() {
   const main = document.getElementById("main");
   const course = state.course;
-  const stats = getCourseStats();
   const weeks = course?.weeks || [];
 
   main.className = "catalog catalog-home";
@@ -40,51 +39,6 @@ export function showHome() {
   header.innerHTML = `
     <h1>Python Course Workspace</h1>
     <p class="desc">Jiný UI pro <a href="http://vyuka.ookami.cz/index.python.html" target="_blank" rel="noopener noreferrer">ookami-&gt;pyt</a> od Pana Inženýra Znamenáčka, senior Full stack developera a pedagoga :)<br>Pokud něco nebude fungovat napište mi na <a href="mailto:kolarv@vscht.cz">kolarv@vscht.cz</a> &lt;3</p>
-    
-    <div class="course-stats-dashboard">
-      <div class="stat-pill-group">
-        <div class="stat-pill-card active-lectures" title="Aktivní přednášky v semestru (bez Skip a bez W99)">
-          <span class="stat-icon">📚</span>
-          <div class="stat-info">
-            <span class="stat-value">${stats.lectures.completed} / ${stats.lectures.total}</span>
-            <span class="stat-label">Přednášky</span>
-          </div>
-          <div class="stat-progress-mini">
-            <div class="stat-progress-bar bg-green" style="width: ${stats.lectures.pct}%"></div>
-          </div>
-        </div>
-
-        <div class="stat-pill-card active-exercises" title="Praktická programátorská cvičení a úlohy">
-          <span class="stat-icon">💻</span>
-          <div class="stat-info">
-            <span class="stat-value">${stats.exercises.completed} / ${stats.exercises.total}</span>
-            <span class="stat-label">Cvičení</span>
-          </div>
-          <div class="stat-progress-mini">
-            <div class="stat-progress-bar bg-purple" style="width: ${stats.exercises.pct}%"></div>
-          </div>
-        </div>
-
-        <div class="stat-pill-card total-progress" title="Celkový postup kurzem (prostudováno + přeskočeno)">
-          <span class="stat-icon">🎯</span>
-          <div class="stat-info">
-            <span class="stat-value">${stats.total.pct}%</span>
-            <span class="stat-label">Hotovo (${stats.total.completed}/${stats.total.total})</span>
-          </div>
-          <div class="stat-progress-mini">
-            <div class="stat-progress-bar bg-accent" style="width: ${stats.total.pct}%"></div>
-          </div>
-        </div>
-
-        <div class="stat-pill-card shelf-ref" title="Doplňkový regál rozšiřujících přednášek a samostudia (W99) – nepočítá se do povinného penza">
-          <span class="stat-icon">📦</span>
-          <div class="stat-info">
-            <span class="stat-value">${stats.shelf.total} témat</span>
-            <span class="stat-label">W99 & Ref</span>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <div class="welcome-keys" style="justify-content:flex-start;margin-top:12px">
       <span><kbd class="kbd">Ctrl+P</kbd> Tisk / Print</span>
