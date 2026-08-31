@@ -1,10 +1,10 @@
 /** Tab bar + navigation router + browser History API */
 
-import { state } from "./state.js";
-import { clear, svgClose } from "./ui.js";
+import { state, pagesFor, getStudyStatus, cycleStudyStatus, getQuizFor } from "./state.js";
+import { clear, svgClose, el, escapeHtml } from "./ui.js";
 import {
   showHome, showWeek, showFullContent, showPresentation, showPage,
-  showSearchResults, showProgress, showLogin,
+  showSearchResults, showProgress, showLogin, toggleFullscreen,
 } from "./content.js";
 import { revealItem, renderTree } from "./tree.js";
 
@@ -664,6 +664,138 @@ function updateChrome(tab) {
   document.title = docTitle;
   if (titlePath) titlePath.textContent = " — " + pageTitle;
   if (sbPath) sbPath.textContent = path;
+  updateStatusBarControls(tab);
+}
+
+export function updateStatusBarControls(tab) {
+  const sbExplorer = document.getElementById("sbExplorerControls");
+  const sbPresentation = document.getElementById("sbPresentationControls");
+  if (!sbExplorer || !sbPresentation) return;
+
+  const isLectureOrPage = tab && (tab.kind === "page" || tab.kind === "presentation" || tab.kind === "lecture" || tab.kind === "exercise");
+  const item = tab?.itemId ? state.itemsById.get(tab.itemId) : null;
+
+  if (!isLectureOrPage || !item) {
+    sbExplorer.classList.remove("hidden");
+    sbPresentation.classList.add("hidden");
+    sbPresentation.innerHTML = "";
+    return;
+  }
+
+  sbExplorer.classList.add("hidden");
+  sbPresentation.classList.remove("hidden");
+  sbPresentation.innerHTML = "";
+
+  const pages = pagesFor(item.path);
+  const curPageId = tab.pageId;
+  const pageIdx = curPageId ? pages.findIndex((p) => p.id === curPageId) : 0;
+  const status = getStudyStatus(item.id);
+  const quiz = getQuizFor(item.slug);
+
+  // 1. Topic Title Badge / Link
+  const weekLabel = (item.weekNum === 99 || item.week === 99) ? "Gray" : (item.weekNum != null ? `W${item.weekNum}` : "Course");
+  const topicBadge = el("span", {
+    className: "sb-item",
+    style: { fontWeight: "600", cursor: "pointer", maxWidth: "260px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+    title: item.title,
+    onClick: () => navigate({ kind: item.kind, id: item.id })
+  }, `${weekLabel}: ${item.title}`);
+  sbPresentation.appendChild(topicBadge);
+
+  // 2. Slide Navigation (Prev / Counter / Next)
+  if (pages.length > 0) {
+    const hasPrev = pageIdx > 0;
+    const prevBtn = el("button", {
+      type: "button",
+      className: `sb-btn ${hasPrev ? "" : "disabled"}`,
+      disabled: !hasPrev,
+      title: "Předchozí snímek (←)",
+      onClick: () => {
+        if (hasPrev) navigate({ kind: "page", id: item.id, pageId: pages[pageIdx - 1].id });
+      }
+    }, "◀ Předchozí");
+    sbPresentation.appendChild(prevBtn);
+
+    const counterSpan = el("span", {
+      className: "sb-item",
+      style: { fontFamily: "var(--font-mono, monospace)", fontSize: "11px", opacity: "0.95" }
+    }, `Snímek ${Math.max(1, pageIdx + 1)} / ${pages.length}`);
+    sbPresentation.appendChild(counterSpan);
+
+    const hasNext = pageIdx < pages.length - 1;
+    const nextBtn = el("button", {
+      type: "button",
+      className: `sb-btn ${hasNext ? "" : "disabled"}`,
+      disabled: !hasNext,
+      title: "Další snímek (→)",
+      onClick: () => {
+        if (hasNext) navigate({ kind: "page", id: item.id, pageId: pages[pageIdx + 1].id });
+      }
+    }, "Další ▶");
+    sbPresentation.appendChild(nextBtn);
+  }
+
+  // 3. Right-aligned controls
+  const rightWrap = el("div", { className: "sb-right", style: { marginLeft: "auto", display: "flex", gap: "6px", alignItems: "center" } });
+
+  // 3a. Study Status Cycle Button (3-state)
+  const studyBtn = el("button", {
+    type: "button",
+    className: `sb-btn sb-btn-study-cycle ${status === "studied" ? "is-studied" : status === "skipped" ? "is-skipped" : ""}`,
+    title: "Klikněte pro změnu stavu: 1× Prostudováno, 2× Znáno, 3× Výchozí",
+    onClick: () => {
+      cycleStudyStatus(item.id);
+      try { renderTree(); } catch {}
+      window.__pcsUpdateStatus?.();
+      updateStatusBarControls(tab);
+    }
+  }, status === "studied" ? "✓ SPLNĚNO" : status === "skipped" ? "↷ ZNÁNO" : "○ KE STUDIU");
+  rightWrap.appendChild(studyBtn);
+
+  // 3b. Outline / All slides button
+  const outlineBtn = el("button", {
+    type: "button",
+    className: "sb-btn",
+    title: "Zobrazit osnovu prezentace",
+    onClick: () => navigate({ kind: "presentation", id: item.id })
+  }, "📋 Snímky");
+  rightWrap.appendChild(outlineBtn);
+
+  // 3c. Fullscreen Presentation Mode Button
+  const fsBtn = el("button", {
+    type: "button",
+    className: "sb-btn",
+    title: "Režim prezentace na celou obrazovku",
+    onClick: () => toggleFullscreen()
+  }, "⛶ Prezentace");
+  rightWrap.appendChild(fsBtn);
+
+  // 3d. Quiz Button (if quiz available)
+  if (quiz && quiz.questions?.length) {
+    const quizBtn = el("button", {
+      type: "button",
+      className: "sb-btn sb-btn-primary",
+      title: `Otestovat znalosti (${quiz.questions.length} otázek)`,
+      onClick: () => {
+        navigate({ kind: "presentation", id: item.id });
+        setTimeout(() => {
+          document.querySelector(".quiz-section")?.scrollIntoView({ behavior: "smooth" });
+        }, 150);
+      }
+    }, `🎯 Kvíz (${quiz.questions.length})`);
+    rightWrap.appendChild(quizBtn);
+  }
+
+  // 3e. Bug report button on statusbar
+  const bugBtn = el("button", {
+    type: "button",
+    className: "sb-btn sb-btn-bug",
+    title: "Nahlásit chybu v tomto tématu / snímku",
+    onClick: () => window.__pcsOpenBugModal?.(item, curPageId)
+  }, "🐞 Bug");
+  rightWrap.appendChild(bugBtn);
+
+  sbPresentation.appendChild(rightWrap);
 }
 
 function decodeHtml(s) {
