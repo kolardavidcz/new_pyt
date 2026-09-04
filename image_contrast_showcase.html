@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="cs" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Adaptive Image Contrast Showcase — newpyt</title>
+  <style>
+    :root {
+      --bg: #181818;
+      --surface: #1f1f1f;
+      --card-bg: #252526;
+      --border: #333333;
+      --text: #cccccc;
+      --text-bright: #ffffff;
+      --text-muted: #9d9d9d;
+      --accent: #0078d4;
+      --accent-hover: #1c8ae6;
+      --radius: 4px;
+      --radius-lg: 8px;
+    }
+
+    html[data-theme="light"] {
+      --bg: #f3f3f3;
+      --surface: #ffffff;
+      --card-bg: #f8fafc;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-bright: #0f172a;
+      --text-muted: #64748b;
+      --accent: #0284c7;
+      --accent-hover: #0369a1;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 24px;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .showcase-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .title-group h1 {
+      font-size: 1.5rem;
+      color: var(--text-bright);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-group p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-bright);
+      border-radius: var(--radius);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-dark-ink { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-light-ink { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+
+    /* Section & Cards */
+    .section-title {
+      font-size: 1.15rem;
+      color: var(--text-bright);
+      margin: 28px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .diagram-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    .diagram-panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .diagram-panel-title {
+      font-weight: 600;
+      color: var(--text-bright);
+      font-size: 1rem;
+    }
+
+    .diagram-panel-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: monospace;
+    }
+
+    /* Comparison Grid */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .option-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .option-card.highlight {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent);
+    }
+
+    .option-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .option-card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-bright);
+    }
+
+    .option-card-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .preview-box {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 180px;
+      padding: 14px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px dashed var(--border);
+      overflow: hidden;
+    }
+
+    .preview-box img {
+      max-width: 100%;
+      height: auto;
+      max-height: 160px;
+      object-fit: contain;
+    }
+
+    /* =========================================================================
+       THE 3 CONTRAST IMPLEMENTATIONS
+       ========================================================================= */
+
+    /* Baseline: Pure Harsh Contrast */
+    html:not([data-theme="light"]) .style-baseline-dark {
+      background-color: #ffffff !important;
+      padding: 10px 14px;
+      border-radius: 4px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+    html[data-theme="light"] .style-baseline-light {
+      background-color: #181825 !important;
+      padding: 10px 14px;
+      border-radius: 4px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Option 1: Soft Slate Surface (#f1f5f9 / #1e293b) */
+    html:not([data-theme="light"]) .style-opt1-dark {
+      background-color: #f1f5f9 !important; /* Soft Slate-100 */
+      border: 1px solid #cbd5e1 !important;
+      padding: 10px 14px;
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+    html[data-theme="light"] .style-opt1-light {
+      background-color: #1e293b !important; /* Soft Slate-800 */
+      border: 1px solid #334155 !important;
+      padding: 10px 14px;
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    }
+
+    /* Option 2: Translucent Frosted Glass */
+    html:not([data-theme="light"]) .style-opt2-dark {
+      background-color: rgba(241, 245, 249, 0.92) !important;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(255, 255, 255, 0.4) !important;
+      padding: 10px 14px;
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+    html[data-theme="light"] .style-opt2-light {
+      background-color: rgba(30, 41, 59, 0.92) !important;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(0, 0, 0, 0.2) !important;
+      padding: 10px 14px;
+      border-radius: 6px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    }
+
+    /* Option 3: Smart Negative Invert */
+    html:not([data-theme="light"]) .style-opt3-dark {
+      filter: invert(0.88);
+      background: transparent !important;
+      padding: 0 !important;
+    }
+    html[data-theme="light"] .style-opt3-light {
+      filter: invert(0.88);
+      background: transparent !important;
+      padding: 0 !important;
+    }
+
+    .details-list {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      list-style-type: none;
+    }
+    .details-list li {
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .recommend-badge {
+      background: #10b981;
+      color: #ffffff;
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="showcase-header">
+    <div class="title-group">
+      <h1>🖼️ Adaptive Contrast Showcase</h1>
+      <p>Interactive evaluation of background treatments for transparent course diagrams across Dark and Light themes</p>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="btnToggleTheme" onclick="toggleTheme()">
+        <span id="themeIcon">☀️</span> <span id="themeLabel">Přepnout na Světlý motiv</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Section 1: Dark + Transparent Images -->
+  <h2 class="section-title">
+    <span class="badge badge-dark-ink">Category 1: Dark Ink + Transparent Background</span>
+    <span>Critical in Dark Theme (invisible on dark without scaffolding)</span>
+  </h2>
+
+  <!-- Diagram A: objekty.png -->
+  <div class="diagram-panel">
+    <div class="diagram-panel-head">
+      <div>
+        <div class="diagram-panel-title">1. Python OOP Data Model Hierarchy (objekty.png)</div>
+        <div class="diagram-panel-desc">vyuka_downloaded/materialy/python/objects/_files/objekty.png</div>
+      </div>
+      <span class="badge badge-dark-ink">99.4% Transparent · Avg Lum: 30 (Dark Ink)</span>
+    </div>
+
+    <div class="options-grid">
+      <!-- Unstyled -->
+      <div class="option-card">
+        <div class="option-card-header">
+          <span class="option-card-title">0. Unstyled Raw</span>
+          <span class="option-card-meta">No background</span>
+        </div>
+        <div class="preview-box">
+          <img src="/vyuka_downloaded/materialy/python/objects/_files/objekty.png" onerror="this.src='../vyuka_downloaded/materialy/python/objects/_files/objekty.png'" alt="Raw objekty" />
+        </div>
+        <ul class="details-list">
+          <li>⚠️ Dark theme: Black lines blend into dark background</li>
+          <li>✓ Light theme: Naturally visible</li>
+        </ul>
+      </div>
+
+      <!-- Baseline -->
+      <div class="option-card">
+        <div class="option-card-header">
+          <span class="option-card-title">Current Baseline (#ffffff)</span>
+          <span class="option-card-meta">Ratio ~18.5:1</span>
+        </div>
+        <div class="preview-box">
+          <img class="style-baseline-dark" src="/vyuka_downloaded/materialy/python/objects/_files/objekty.png" onerror="this.src='../vyuka_downloaded/materialy/python/objects/_files/objekty.png'" alt="Baseline objekty" />
+        </div>
+        <ul class="details-list">
+          <li>⚠️ Harsh edge glare / flashlight cutout effect</li>
+          <li>✓ 100% legible text & lines</li>
+        </ul>
+      </div>
+
+      <!-- Option 1: Soft Slate -->
+      <div class="option-card highlight">
+        <div class="option-card-header">
+          <span class="option-card-title">Option 1: Soft Slate (#f1f5f9)</span>
+          <span class="recommend-badge">RECOMMENDED</span>
+        </div>
+        <div class="preview-box">
+          <img class="style-opt1-dark" src="/vyuka_downloaded/materialy/python/objects/_files/objekty.png" onerror="this.src='../vyuka_downloaded/materialy/python/objects/_files/objekty.png'" alt="Option 1 objekty" />
+        </div>
+        <ul class="details-list">
+          <li>✓ Glare-free Slate-100 paper tone (Ratio ~14:1)</li>
+          <li>✓ Subtle slate border (#cbd5e1) and soft shadow</li>
+          <li>✓ 100% color & line accuracy preserved</li>
+        </ul>
+      </div>
+
+      <!-- Option 2: Frosted Glass -->
+      <div class="option-card">
+        <div class="option-card-header">
+          <span class="option-card-title">Option 2: Frosted Glass</span>
+          <span class="option-card-meta">rgba(241, 245, 249, 0.92)</span>
+        </div>
+        <div class="preview-box">
+          <img class="style-opt2-dark" src="/vyuka_downloaded/materialy/python/objects/_files/objekty.png" onerror="this.src='../vyuka_downloaded/materialy/python/objects/_files/objekty.png'" alt="Option 2 objekty" />
+        </div>
+        <ul class="details-list">
+          <li>✓ Translucent frosted card with backdrop blur</li>
+          <li>✓ Seamlessly integrates with VS Code glassmorphism</li>
+        </ul>
+      </div>
+
+      <!-- Option 3: Invert Filter -->
+      <div class="option-card">
+        <div class="option-card-header">
+          <span class="option-card-title">Option 3: Smart Invert</span>
+          <span class="option-card-meta">filter: invert(0.88)</span>
+        </div>
+        <div class="preview-box">
+          <img class="style-opt3-dark" src="/vyuka_downloaded/materialy/python/objects/_files/objekty.png" onerror="this.src='../vyuka_downloaded/materialy/python/objects/_files/objekty.png'" alt="Option 3 objekty" />
+        </div>
+        <ul class="details-list">
+          <li>✓ Completely borderless (no white box needed)</li>
+          <li>⚠️ Colors invert (blue becomes orange)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diagram B: Ulam_spiral_howto.png -->
+  <div class="diagram-panel">
+    <div class="diagram-panel-head">
+      <div>
+        <div class="diagram-panel-title">2. Ulam Prime Spiral Matrix (Ulam_spiral_howto.png)</div>
+        <div class="diagram-panel-desc">vyuka_downloaded/priklady/python/_files/Ulam_spiral_howto.png</div>
+      </div>
+      <span class="badge badge-dark-ink">98.2% Transparent · Pure Black Ink</span>
+    </div>
+
+    <div class="options-grid">
+      <div class="option-card">
+        <div class="option-card-header"><span class="option-card-title">0. Unstyled Raw</span></div>
+        <div class="preview-box">
+          <img src="/vyuka_downloaded/priklady/python/_files/Ulam_spiral_howto.png" onerror="this.src='../vyuka_downloaded/priklady/python/_files/Ulam_spiral_howto.png'" alt="Raw Ulam" />
+        </div>
+      </div>
+      <div class="option-card">
+        <div class="option-card-header"><span class="option-card-title">Baseline (#ffffff)</span></div>
+        <div class="preview-box">
+          <img class="style-baseline-dark" src="/vyuka_downloaded/priklady/python/_files/Ulam_spiral_howto.png" onerror="this.src='../vyuka_downloaded/priklady/python/_files/Ulam_spiral_howto.png'" alt="Baseline Ulam" />
+        </div>
+      </div>
+      <div class="option-card highlight">
+        <div class="option-card-header"><span class="option-card-title">Option 1: Soft Slate (#f1f5f9)</span><span class="recommend-badge">RECOMMENDED</span></div>
+        <div class="preview-box">
+          <img class="style-opt1-dark" src="/vyuka_downloaded/priklady/python/_files/Ulam_spiral_howto.png" onerror="this.src='../vyuka_downloaded/priklady/python/_files/Ulam_spiral_howto.png'" alt="Option 1 Ulam" />
+        </div>
+      </div>
+      <div class="option-card">
+        <div class="option-card-header"><span class="option-card-title">Option 2: Frosted Glass</span></div>
+        <div class="preview-box">
+          <img class="style-opt2-dark" src="/vyuka_downloaded/priklady/python/_files/Ulam_spiral_howto.png" onerror="this.src='../vyuka_downloaded/priklady/python/_files/Ulam_spiral_howto.png'" alt="Option 2 Ulam" />
+        </div>
+      </div>
+      <div class="option-card">
+        <div class="option-card-header"><span class="option-card-title">Option 3: Smart Invert</span></div>
+        <div class="preview-box">
+          <img class="style-opt3-dark" src="/vyuka_downloaded/priklady/python/_files/Ulam_spiral_howto.png" onerror="this.src='../vyuka_downloaded/priklady/python/_files/Ulam_spiral_howto.png'" alt="Option 3 Ulam" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Section 2: Light + Transparent Images -->
+  <h2 class="section-title">
+    <span class="badge badge-light-ink">Category 2: Light/White Ink + Transparent Background</span>
+    <span>Critical in Light Theme (invisible on white without scaffolding)</span>
+  </h2>
+
+  <!-- Diagram C: Brown_matplotlib.png -->
+  <div class="diagram-panel">
+    <div class="diagram-panel-head">
+      <div>
+        <div class="diagram-panel-title">3. 2D Brownian Motion Plot (Brown_matplotlib.png)</div>
+        <div class="diagram-panel-desc">vyuka_downloaded/priklady/python/_files/brown/Brown_matplotlib.png</div>
+      </div>
+      <span class="badge badge-light-ink">99.1% Transparent · Avg Lum: 244 (White Ink)</span>
+    </div>
+
+    <div class="options-grid">
+      <!-- Unstyled -->
+      <div class="option-card">
+        <div class="option-card-header">
+          <span class="option-card-title">0. Unstyled Raw</span>
+          <span class="option-card-meta">No background</span>
+        </div>
+        <div class="preview-box">
+          <img src="/vyuka_downloaded/priklady/python/_files/brown/Brown_matplotlib.png" onerror="this.src='../vyuka_downloaded/priklady/python/_files/brown/Brown_matplotlib.png'" alt="Raw Brown" />
+        </div>
+        <ul class="details-list">
+          <li>✓ Dark theme: White lines visible on dark</li>
+          <li>⚠️ Light theme: White lines invisible on white!</li>
+        </ul>
+      </div>
+
+      <!-- Baseline -->
+      <div class="option-card">
+        <div class="option-card-header">
+          <span class="option-card-title">Current Baseline (#181825)</span>
+          <span class="option-card-meta">Harsh Dark Pitch</span>
+        </div>
+        <div class="preview-box">
+          <img class="style-baseline-light" src="/vyuka_downloaded/priklady/python/_files/brown/Brown_matplotlib.png" onerror="this.src='../vyuka_downloaded/priklady/python/_files/brown/Brown_matplotlib.png'" alt="Baseline Brown" />
+        </div>
+        <ul class="details-list">
+          <li>⚠️ Heavy pitch-dark cutout in light theme</li>
+        </ul>
+      </div>
+
+      <!-- Option 1: Soft Slate -->
+      <div class="option-card highlight">
+        <div class="option-card-header">
+          <span class="option-card-title">Option 1: Soft Slate (#1e293b)</span>
+          <span class="recommend-badge">RECOMMENDED</span>
+        </div>
+        <div class="preview-box">
+          <img class="style-opt1-light" src="/vyuka_downloaded/priklady/python/_files/brown/Brown_matplotlib.png" onerror="this.src='../vyuka_downloaded/priklady/python/_files/brown/Brown_matplotlib.png'" alt="Option 1 Brown" />
+        </div>
+        <ul class="details-list">
+          <li>✓ Balanced Slate-800 card in Light Theme</li>
+          <li>✓ Subtle slate border (#334155) and soft shadow</li>
+          <li>✓ Full line contrast without pitch-black glare</li>
+        </ul>
+      </div>
+
+      <!-- Option 2: Frosted Glass -->
+      <div class="option-card">
+        <div class="option-card-header">
+          <span class="option-card-title">Option 2: Frosted Dark Glass</span>
+          <span class="option-card-meta">rgba(30, 41, 59, 0.92)</span>
+        </div>
+        <div class="preview-box">
+          <img class="style-opt2-light" src="/vyuka_downloaded/priklady/python/_files/brown/Brown_matplotlib.png" onerror="this.src='../vyuka_downloaded/priklady/python/_files/brown/Brown_matplotlib.png'" alt="Option 2 Brown" />
+        </div>
+        <ul class="details-list">
+          <li>✓ Translucent dark frosted card with backdrop blur</li>
+        </ul>
+      </div>
+
+      <!-- Option 3: Invert Filter -->
+      <div class="option-card">
+        <div class="option-card-header">
+          <span class="option-card-title">Option 3: Smart Invert</span>
+          <span class="option-card-meta">filter: invert(0.88)</span>
+        </div>
+        <div class="preview-box">
+          <img class="style-opt3-light" src="/vyuka_downloaded/priklady/python/_files/brown/Brown_matplotlib.png" onerror="this.src='../vyuka_downloaded/priklady/python/_files/brown/Brown_matplotlib.png'" alt="Option 3 Brown" />
+        </div>
+        <ul class="details-list">
+          <li>✓ Inverts white lines to dark in Light Theme</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diagram D: pathlib-inheritance.png -->
+  <div class="diagram-panel">
+    <div class="diagram-panel-head">
+      <div>
+        <div class="diagram-panel-title">4. Pathlib Inheritance Hierarchy (pathlib-inheritance.png)</div>
+        <div class="diagram-panel-desc">vyuka_downloaded/materialy/python/files/_files/pathlib-inheritance.png</div>
+      </div>
+      <span class="badge badge-light-ink">66.0% Transparent · White Architecture Boxes</span>
+    </div>
+
+    <div class="options-grid">
+      <div class="option-card">
+        <div class="option-card-header"><span class="option-card-title">0. Unstyled Raw</span></div>
+        <div class="preview-box">
+          <img src="/vyuka_downloaded/materialy/python/files/_files/pathlib-inheritance.png" onerror="this.src='../vyuka_downloaded/materialy/python/files/_files/pathlib-inheritance.png'" alt="Raw Pathlib" />
+        </div>
+      </div>
+      <div class="option-card">
+        <div class="option-card-header"><span class="option-card-title">Baseline (#181825)</span></div>
+        <div class="preview-box">
+          <img class="style-baseline-light" src="/vyuka_downloaded/materialy/python/files/_files/pathlib-inheritance.png" onerror="this.src='../vyuka_downloaded/materialy/python/files/_files/pathlib-inheritance.png'" alt="Baseline Pathlib" />
+        </div>
+      </div>
+      <div class="option-card highlight">
+        <div class="option-card-header"><span class="option-card-title">Option 1: Soft Slate (#1e293b)</span><span class="recommend-badge">RECOMMENDED</span></div>
+        <div class="preview-box">
+          <img class="style-opt1-light" src="/vyuka_downloaded/materialy/python/files/_files/pathlib-inheritance.png" onerror="this.src='../vyuka_downloaded/materialy/python/files/_files/pathlib-inheritance.png'" alt="Option 1 Pathlib" />
+        </div>
+      </div>
+      <div class="option-card">
+        <div class="option-card-header"><span class="option-card-title">Option 2: Frosted Dark Glass</span></div>
+        <div class="preview-box">
+          <img class="style-opt2-light" src="/vyuka_downloaded/materialy/python/files/_files/pathlib-inheritance.png" onerror="this.src='../vyuka_downloaded/materialy/python/files/_files/pathlib-inheritance.png'" alt="Option 2 Pathlib" />
+        </div>
+      </div>
+      <div class="option-card">
+        <div class="option-card-header"><span class="option-card-title">Option 3: Smart Invert</span></div>
+        <div class="preview-box">
+          <img class="style-opt3-light" src="/vyuka_downloaded/materialy/python/files/_files/pathlib-inheritance.png" onerror="this.src='../vyuka_downloaded/materialy/python/files/_files/pathlib-inheritance.png'" alt="Option 3 Pathlib" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleTheme() {
+      const html = document.documentElement;
+      const current = html.getAttribute("data-theme");
+      const next = current === "light" ? "dark" : "light";
+      html.setAttribute("data-theme", next);
+      
+      const icon = document.getElementById("themeIcon");
+      const label = document.getElementById("themeLabel");
+      if (next === "light") {
+        icon.textContent = "🌙";
+        label.textContent = "Přepnout na Tmavý motiv";
+      } else {
+        icon.textContent = "☀️";
+        label.textContent = "Přepnout na Světlý motiv";
+      }
+    }
+  </script>
+</body>
+</html>
