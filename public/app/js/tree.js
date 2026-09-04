@@ -216,10 +216,11 @@ function buildItemNode(item) {
 
   const icon = item.kind === "exercise" ? svgExercise() : svgFile();
   const iconClass = item.kind === "exercise" ? "exercise" : "lecture";
+  const isEx = item.kind === "exercise";
   const studied = state.studied?.has(item.id)
-    ? `<span class="studied-dot" title="Prostudováno (Splněno)">✓</span>`
+    ? `<span class="studied-dot" title="${isEx ? "Vyřešeno (Splněno)" : "Prostudováno (Splněno)"}">✓</span>`
     : state.skipped?.has(item.id)
-      ? `<span class="skipped-dot" title="Znáno / Přeskočeno (Splněno)">↷</span>`
+      ? `<span class="skipped-dot" title="Přeskočeno (ovládám)">↷</span>`
       : state.seen.has(item.id)
         ? `<span class="seen-dot" title="Otevřeno"></span>`
         : "";

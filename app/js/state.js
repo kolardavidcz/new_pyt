@@ -807,7 +807,7 @@ export function loadPersisted() {
     } catch { /* ignore */ }
   }
   for (const [id, rec] of Object.entries(state.checklistEntries)) {
-    if (rec.v === true) state.checklist.add(id);
+    if (rec.v === true || rec.v === "solved" || rec.v === "studied") state.checklist.add(id);
   }
   try {
     const w = parseInt(localStorage.getItem(SIDEBAR_W_KEY) || "", 10);
@@ -1183,7 +1183,7 @@ export async function syncCloudProgress() {
       state.checklistEntries = checklistResult.entries;
       state.checklist.clear();
       for (const [id, rec] of Object.entries(checklistResult.entries)) {
-        if (rec.v === true) {
+        if (rec.v === true || rec.v === "solved" || rec.v === "studied") {
           state.checklist.add(id);
         }
       }
@@ -1387,7 +1387,44 @@ export function persistChecklist() {
 }
 
 export function isChecklistChecked(id) {
-  return !!(id && state.checklist.has(id));
+  if (!id) return false;
+  return !!state.checklist.has(id) || getTaskStatus(id) === "solved";
+}
+
+/** Get individual task status: "default" | "solved" | "skipped" */
+export function getTaskStatus(taskId) {
+  if (!taskId) return "default";
+  const entry = state.checklistEntries[taskId];
+  if (!entry) return "default";
+  if (entry.v === "solved" || entry.v === "studied" || entry.v === true) return "solved";
+  if (entry.v === "skipped") return "skipped";
+  return "default";
+}
+
+/**
+ * 3-State cycling for individual exercise task:
+ * 1st click: Default -> Solved (Vyřešeno)
+ * 2nd click: Solved -> Skipped (Přeskočeno)
+ * 3rd click: Skipped -> Default
+ */
+export function cycleTaskStatus(taskId) {
+  if (!taskId) return "default";
+  const current = getTaskStatus(taskId);
+  let next = "default";
+  if (current === "default") {
+    next = "solved";
+    state.checklist.add(taskId);
+  } else if (current === "solved") {
+    next = "skipped";
+    state.checklist.delete(taskId);
+  } else {
+    next = "default";
+    state.checklist.delete(taskId);
+  }
+  state.checklistEntries[taskId] = { v: next, t: Date.now() };
+  persistChecklist();
+  notifyStateChange("checklist", { taskId, status: next });
+  return next;
 }
 
 export function toggleChecklist(id) {
@@ -1534,7 +1571,7 @@ export function getStudyStatus(itemId) {
 /**
  * 3-State cycling for study button:
  * 1st click: Default/Unmarked -> Studied (Prostudováno)
- * 2nd click: Studied -> Skipped (Znáno / Přeskočeno)
+ * 2nd click: Studied -> Skipped (Přeskočeno / Ovládám)
  * 3rd click: Skipped -> Default/Unmarked
  * Returns the new state: "studied" | "skipped" | "default"
  */

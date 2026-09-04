@@ -40,7 +40,7 @@ Python Hub is engineered upon modern **Computing Education Research (CER)** and 
 - **Faded Worked Examples (Renkl & Sweller)**: Lectures transition from fully annotated code solutions to interactive Code-Fill (cloze tests) and Parson's line-reordering tasks before students tackle unguided code synthesis in the Exercise Dojo.
 - **Tri-State Metacognitive Self-Regulation**: Drawing from Zimmerman’s Self-Regulated Learning (SRL) model, students control their learning path via a 3-state progression model:
   - **`✓ Prostudováno` (Studied)**: Mastered and verified through quizzes or exercises.
-  - **`↷ Znáno` (Known / Skipped)**: Previously mastered from C++/Java coursework, preventing cognitive boredom.
+  - **`↷ Přeskočeno (ovládám)` (Mastered / Skipped)**: Previously mastered from C++/Java coursework, preventing cognitive boredom.
   - **`○ Ke studiu` (To-Study)**: Default queue for upcoming lecture material.
 
 ---
