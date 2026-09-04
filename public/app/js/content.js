@@ -1287,7 +1287,18 @@ function rewriteContentUrls(html, lecturePath) {
   wrap.querySelectorAll("[src]").forEach((node) => {
     const src = node.getAttribute("src");
     if (!src || /^(https?:|data:|\/|#)/i.test(src)) return;
-    node.setAttribute("src", baseUrl + src.replace(/^\.\//, ""));
+    const resolvedUrl = baseUrl + src.replace(/^\.\//, "");
+    node.setAttribute("src", resolvedUrl);
+
+    if (node.tagName === "IMG") {
+      node.setAttribute("loading", "lazy");
+      const cleanRel = resolvedUrl.replace(/^\/vyuka_downloaded\//, "").replace(/^\//, "");
+      node.dataset.fallbackSrc = `http://vyuka.ookami.cz/${cleanRel}`;
+      node.setAttribute(
+        "onerror",
+        "if(!this.dataset.fallbackTried){this.dataset.fallbackTried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';}"
+      );
+    }
   });
 
   wrap.querySelectorAll("a[href]").forEach((node) => {
