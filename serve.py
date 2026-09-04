@@ -144,6 +144,7 @@ def resolve_url_path(url_path: str) -> Path | None:
         # Also serve app fonts under familiar path if needed
         candidates.append(ROOT / "app" / path.lstrip("/"))
     elif path.startswith("/vyuka_downloaded/"):
+        candidates.append(ROOT / path.lstrip("/"))
         candidates.append(ROOT / "public" / path.lstrip("/"))
         candidates.append(OLD / path.lstrip("/"))
     elif path.startswith("/archive/"):
