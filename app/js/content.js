@@ -593,6 +593,7 @@ export async function showPage(itemId, pageId) {
     main.appendChild(slideEl);
     await loadAndInlineExamples(slideEl);
     highlightRoot(slideEl);
+    scanAndContrastImages(slideEl);
 
     const isLastSlide = idx < 0 || idx === pages.length - 1;
     if (isLastSlide) {
@@ -689,6 +690,7 @@ async function renderExerciseView(item, data, main) {
   main.appendChild(list);
   await loadAndInlineExamples(list);
   highlightRoot(list);
+  scanAndContrastImages(list);
   const quizEl = await renderQuizSection(item);
   if (quizEl) main.appendChild(quizEl);
   main.appendChild(buildBottomNavBar(item));
@@ -791,6 +793,7 @@ async function loadFullContent(item, main) {
     main.appendChild(frag);
     await loadAndInlineExamples(main);
     for (const node of nodes) highlightRoot(node);
+    scanAndContrastImages(main);
 
     // Defer mounting remaining offscreen slides
     if (slides.length > initialBatchSize) {
@@ -808,6 +811,7 @@ async function loadFullContent(item, main) {
         remainingContainer.appendChild(remFrag);
         await loadAndInlineExamples(remainingContainer);
         for (const node of remNodes) highlightRoot(node);
+        scanAndContrastImages(remainingContainer);
       };
 
       if ("requestIdleCallback" in window) {
@@ -1277,6 +1281,136 @@ function resolvePresentationHref(href, lecturePath) {
   return { type: "cross_presentation", hash, targetPath, slide: targetSlide };
 }
 
+// ============================================================================
+// Adaptive Image Contrast Engine (for transparent images in dark/light themes)
+// ============================================================================
+
+const PRECLASSIFIED_IMAGE_CONTRAST = {
+  // Dark + Transparent (needs light background in dark theme)
+  "Ulam_spiral_howto.png": "img-contrast-dark-ink",
+  "Sacks_spiral.png": "img-contrast-dark-ink",
+  "objekty.png": "img-contrast-dark-ink",
+  "zivot/1000.png": "img-contrast-dark-ink",
+  "logo_[zirael.org].png": "img-contrast-dark-ink",
+  "screenshot-0.png": "img-contrast-dark-ink",
+  "screenshot-1.png": "img-contrast-dark-ink",
+  "screenshot-2.png": "img-contrast-dark-ink",
+
+  // Light + Transparent (needs dark background in light theme)
+  "Brown_matplotlib.png": "img-contrast-light-ink",
+  "pathlib-inheritance.png": "img-contrast-light-ink",
+  "mandelbrot.png": "img-contrast-light-ink",
+  "anim-00.png": "img-contrast-light-ink",
+  "example_histogram.png": "img-contrast-light-ink",
+  "example_subplot.png": "img-contrast-light-ink",
+  "example_time.png": "img-contrast-light-ink",
+  "plot-01.png": "img-contrast-light-ink",
+  "plot-02.png": "img-contrast-light-ink",
+  "plot-03.png": "img-contrast-light-ink",
+  "plot-04a.png": "img-contrast-light-ink",
+  "plot-04b.png": "img-contrast-light-ink",
+  "plot-04c.png": "img-contrast-light-ink",
+  "plot-04d.png": "img-contrast-light-ink",
+  "plot-05a.png": "img-contrast-light-ink",
+  "plot-05b.png": "img-contrast-light-ink",
+  "showcase_integral.png": "img-contrast-light-ink",
+  "faktorial.png": "img-contrast-light-ink",
+  "fibonacci.png": "img-contrast-light-ink",
+  "notebook.png": "img-contrast-light-ink"
+};
+
+export function autoContrastImage(img) {
+  if (!img || img.dataset.contrastChecked) return;
+
+  // Check pre-classified map first
+  const src = img.getAttribute("src") || "";
+  for (const [key, cls] of Object.entries(PRECLASSIFIED_IMAGE_CONTRAST)) {
+    if (src.includes(key)) {
+      img.classList.add(cls);
+      img.dataset.contrastChecked = "1";
+      return;
+    }
+  }
+
+  const analyze = () => {
+    if (!img.naturalWidth || !img.naturalHeight) return;
+    img.dataset.contrastChecked = "1";
+
+    try {
+      const maxDim = 48;
+      const w = Math.min(img.naturalWidth, maxDim);
+      const h = Math.max(1, Math.round((img.naturalHeight / img.naturalWidth) * w));
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!ctx) return;
+
+      ctx.drawImage(img, 0, 0, w, h);
+      const { data } = ctx.getImageData(0, 0, w, h);
+      const totalPixels = w * h;
+
+      let trans = 0;
+      let vis = 0;
+      let darkVis = 0;
+      let lightVis = 0;
+      let totLum = 0;
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+
+        if (a < 235) trans++;
+        if (a > 25) {
+          vis++;
+          const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          totLum += lum;
+          if (lum < 95) darkVis++;
+          if (lum > 165) lightVis++;
+        }
+      }
+
+      const transRatio = totalPixels > 0 ? trans / totalPixels : 0;
+      const avgLum = vis > 0 ? totLum / vis : 128;
+      const darkRatio = vis > 0 ? darkVis / vis : 0;
+      const lightRatio = vis > 0 ? lightVis / vis : 0;
+
+      if (transRatio > 0.04) {
+        // Dark + transparent: dark ink on transparent background
+        if (avgLum < 130 || (darkRatio > 0.35 && avgLum < 160)) {
+          img.classList.add("img-contrast-dark-ink");
+          img.dataset.contrastType = "dark-transparent";
+        }
+        // Light + transparent: light ink on transparent background
+        else if (avgLum > 165 || (lightRatio > 0.35 && avgLum > 120)) {
+          img.classList.add("img-contrast-light-ink");
+          img.dataset.contrastType = "light-transparent";
+        }
+      }
+    } catch (e) {
+      // Cross-origin canvas restriction, ignore silently
+    }
+  };
+
+  if (img.complete && img.naturalWidth > 0) {
+    analyze();
+  } else {
+    img.addEventListener("load", analyze, { once: true });
+  }
+}
+
+export function scanAndContrastImages(root = document) {
+  if (!root || !root.querySelectorAll) return;
+  root.querySelectorAll("img").forEach((img) => autoContrastImage(img));
+}
+
+if (typeof window !== "undefined") {
+  window.autoContrastImage = autoContrastImage;
+  window.scanAndContrastImages = scanAndContrastImages;
+}
+
 function rewriteContentUrls(html, lecturePath) {
   const baseDir = lecturePath.replace(/\\/g, "/").replace(/\/[^/]+$/, "/");
   const baseUrl = "/" + baseDir;
@@ -1298,6 +1432,15 @@ function rewriteContentUrls(html, lecturePath) {
         "onerror",
         "if(!this.dataset.fallbackTried){this.dataset.fallbackTried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';}"
       );
+      node.setAttribute("onload", "window.autoContrastImage && window.autoContrastImage(this)");
+
+      // Check preclassified map right during HTML generation
+      for (const [key, cls] of Object.entries(PRECLASSIFIED_IMAGE_CONTRAST)) {
+        if (resolvedUrl.includes(key)) {
+          node.classList.add(cls);
+          break;
+        }
+      }
     }
   });
 
