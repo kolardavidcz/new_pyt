@@ -3,7 +3,7 @@
 import {
   state, pagesFor, slideDiff, slideTags, weekVisibleItems, filteredItems, markSeen,
   isStudied, isSkipped, isCompleted, toggleStudied, toggleSkipped, setStudied, setSkipped,
-  cycleStudyStatus, getStudyStatus,
+  cycleStudyStatus, getStudyStatus, getTaskStatus, cycleTaskStatus,
   getCourseStats, getWeekStats,
   setUser, logoutUser, syncCloudProgress, forceCloudDownload, forceCloudUpload, setCodeBlockColor, logLinkError,
   saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, setPrintWithQuizzes, getQuizFor, getQuizForDeck,
@@ -267,35 +267,39 @@ export function updatePageStudyButtons() {
   const currentTab = state.tabs.find((t) => t.id === state.activeTabId);
   const itemId = currentTab?.itemId;
   if (!itemId) return;
+  const item = state.itemsById.get(itemId);
+  const isExercise = item?.kind === "exercise" || itemId.startsWith("exercise:");
   const status = getStudyStatus(itemId); // "studied" | "skipped" | "default"
 
   document.querySelectorAll(".study-cycle-btn, .study-btn, .bottom-nav-study-btn").forEach((btn) => {
     btn.classList.remove("is-studied", "is-skipped");
     if (status === "studied") {
       btn.classList.add("is-studied");
-      btn.innerHTML = `<span>✓</span> <span class="status-label">Prostudováno</span>`;
-      btn.title = "Stav: Prostudováno (1. klik) · Dalším klikem označíte jako Znáno / Přeskočeno";
+      btn.innerHTML = `<span>✓</span> <span class="status-label">${isExercise ? "Vyřešeno" : "Prostudováno"}</span>`;
+      btn.title = `Stav: ${isExercise ? "Vyřešeno" : "Prostudováno"} (1. klik) · Dalším klikem označíte jako Přeskočeno (ovládám)`;
     } else if (status === "skipped") {
       btn.classList.add("is-skipped");
-      btn.innerHTML = `<span>↷</span> <span class="status-label">Znáno / Přeskočeno</span>`;
-      btn.title = "Stav: Znáno / Přeskočeno (2. klik) · Dalším klikem vrátíte do výchozího stavu";
+      btn.innerHTML = `<span>↷</span> <span class="status-label">Přeskočeno (ovládám)</span>`;
+      btn.title = "Stav: Přeskočeno (ovládám) (2. klik) · Dalším klikem vrátíte do výchozího stavu";
     } else {
-      btn.innerHTML = `<span>☐</span> <span class="status-label">Označit splněno</span>`;
-      btn.title = "Klikněte pro označení: 1× Prostudováno, 2× Znáno (přeskočeno), 3× Výchozí";
+      btn.innerHTML = `<span>☐</span> <span class="status-label">${isExercise ? "Označit vyřešeno" : "Označit prostudováno"}</span>`;
+      btn.title = `Klikněte pro označení: 1× ${isExercise ? "Vyřešeno" : "Prostudováno"}, 2× Přeskočeno (ovládám), 3× Výchozí`;
     }
   });
 }
 
 function renderStudyActionControl(itemId, { isBottom = false } = {}) {
+  const item = state.itemsById.get(itemId);
+  const isExercise = item?.kind === "exercise" || (itemId && itemId.startsWith("exercise:"));
   const status = getStudyStatus(itemId);
   const btn = el("button", {
     type: "button",
     className: `btn study-cycle-btn${isBottom ? " bottom-nav-study-btn" : " study-btn"}${status === "studied" ? " is-studied" : status === "skipped" ? " is-skipped" : ""}`,
     title: status === "studied"
-      ? "Stav: Prostudováno (1. klik) · Dalším klikem označíte jako Znáno / Přeskočeno"
+      ? `Stav: ${isExercise ? "Vyřešeno" : "Prostudováno"} (1. klik) · Dalším klikem označíte jako Přeskočeno (ovládám)`
       : status === "skipped"
-        ? "Stav: Znáno / Přeskočeno (2. klik) · Dalším klikem vrátíte do výchozího stavu"
-        : "Klikněte pro označení: 1× Prostudováno, 2× Znáno (přeskočeno), 3× Výchozí",
+        ? "Stav: Přeskočeno (ovládám) (2. klik) · Dalším klikem vrátíte do výchozího stavu"
+        : `Klikněte pro označení: 1× ${isExercise ? "Vyřešeno" : "Prostudováno"}, 2× Přeskočeno (ovládám), 3× Výchozí`,
     onClick: () => {
       cycleStudyStatus(itemId);
       updatePageStudyButtons();
@@ -305,11 +309,11 @@ function renderStudyActionControl(itemId, { isBottom = false } = {}) {
   });
 
   if (status === "studied") {
-    btn.innerHTML = `<span>✓</span> <span class="status-label">Prostudováno</span>`;
+    btn.innerHTML = `<span>✓</span> <span class="status-label">${isExercise ? "Vyřešeno" : "Prostudováno"}</span>`;
   } else if (status === "skipped") {
-    btn.innerHTML = `<span>↷</span> <span class="status-label">Znáno / Přeskočeno</span>`;
+    btn.innerHTML = `<span>↷</span> <span class="status-label">Přeskočeno (ovládám)</span>`;
   } else {
-    btn.innerHTML = `<span>☐</span> <span class="status-label">Označit splněno</span>`;
+    btn.innerHTML = `<span>☐</span> <span class="status-label">${isExercise ? "Označit vyřešeno" : "Označit prostudováno"}</span>`;
   }
 
   return btn;
@@ -639,6 +643,23 @@ export async function showFullContent(itemId) {
   await loadFullContent(item, main);
 }
 
+function updateExerciseMetaProgress(metaEl, tasks) {
+  if (!metaEl || !tasks) return;
+  const total = tasks.length;
+  let solved = 0;
+  let skipped = 0;
+  for (const t of tasks) {
+    const st = getTaskStatus(t.id);
+    if (st === "solved") solved++;
+    else if (st === "skipped") skipped++;
+  }
+  const completed = solved + skipped;
+  metaEl.innerHTML = `
+    <span class="task-count-chip">${total} úkolů</span>
+    ${completed > 0 ? `<span class="task-progress-chip ${completed === total ? "complete" : "in-progress"}">${completed === total ? "✓ Vše hotovo" : `${completed}/${total} hotovo`}${completed > 0 ? ` (${solved} vyřešeno, ${skipped} přeskočeno)` : ""}</span>` : ""}
+  `;
+}
+
 /**
  * Structured exercise view: separated úkol cards with prompt / hint / solution.
  */
@@ -648,7 +669,7 @@ async function renderExerciseView(item, data, main) {
   const hero = lectureHero(item);
   hero.appendChild(lectureToolbar(item, "full"));
   const meta = el("div", { className: "exercise-meta-line" });
-  meta.innerHTML = `<span class="task-count-chip">${data.tasks.length} úkolů</span>`;
+  updateExerciseMetaProgress(meta, data.tasks);
   hero.appendChild(meta);
   main.appendChild(hero);
 
@@ -668,6 +689,7 @@ async function renderExerciseView(item, data, main) {
     const a = el("a", {
       href: `#${task.id}`,
       className: "exercise-toc-item",
+      id: `toc-${task.id}`,
       onClick: (e) => {
         e.preventDefault();
         document.getElementById(task.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -675,7 +697,11 @@ async function renderExerciseView(item, data, main) {
     });
     const tS = task.technical_score ?? 1;
     const lS = task.logical_score ?? 1;
-    a.innerHTML = `<span class="toc-num">${String(task.num).padStart(2, "0")}</span>` +
+    const tStatus = getTaskStatus(task.id);
+    if (tStatus === "solved") a.classList.add("is-solved");
+    else if (tStatus === "skipped") a.classList.add("is-skipped");
+    a.innerHTML = `<span class="toc-status-icon ${tStatus}">${tStatus === "solved" ? "✓" : tStatus === "skipped" ? "↷" : "○"}</span>` +
+      `<span class="toc-num">${String(task.num).padStart(2, "0")}</span>` +
       `<span class="toc-text">${escapeHtml(task.summary || task.title)}</span>` +
       `<span class="toc-score-chips"><span class="toc-chip-t" title="Technická obtížnost (T): ${tS}/5">T${tS}</span><span class="toc-chip-l" title="Logická obtížnost (L): ${lS}/5">L${lS}</span></span>`;
     tocList.appendChild(a);
@@ -683,9 +709,13 @@ async function renderExerciseView(item, data, main) {
   toc.appendChild(tocList);
   main.appendChild(toc);
 
+  const onTaskStatusChanged = () => {
+    updateExerciseMetaProgress(meta, data.tasks);
+  };
+
   const list = el("div", { className: "exercise-tasks" });
   for (const task of data.tasks) {
-    list.appendChild(renderTaskCard(task, item));
+    list.appendChild(renderTaskCard(task, item, onTaskStatusChanged));
   }
   main.appendChild(list);
   await loadAndInlineExamples(list);
@@ -705,7 +735,7 @@ function scoreBarsHtml(score, max = 5) {
   return html;
 }
 
-function renderTaskCard(task, item) {
+function renderTaskCard(task, item, onTaskStatusChanged) {
   const card = el("article", {
     className: "task-card",
     id: task.id,
@@ -715,6 +745,10 @@ function renderTaskCard(task, item) {
   const lS = task.logical_score ?? 1;
   const reason = task.challenge_reason || "";
   const taskTags = task.tags?.length ? task.tags : (item.tags || []);
+  let tStatus = getTaskStatus(task.id);
+
+  if (tStatus === "solved") card.classList.add("is-solved");
+  else if (tStatus === "skipped") card.classList.add("is-skipped");
 
   const head = el("header", { className: "task-card-head" });
   head.innerHTML = `
@@ -726,6 +760,60 @@ function renderTaskCard(task, item) {
       ${scoreBarHtml(lS, 5, "log")}
     </div>
   `;
+
+  const taskBtn = el("button", {
+    type: "button",
+    className: `task-cycle-btn${tStatus === "solved" ? " is-solved" : tStatus === "skipped" ? " is-skipped" : ""}`,
+    title: tStatus === "solved"
+      ? "Stav: Vyřešeno (1. klik) · Dalším klikem označíte jako Přeskočeno (ovládám)"
+      : tStatus === "skipped"
+        ? "Stav: Přeskočeno (ovládám) (2. klik) · Dalším klikem vrátíte do výchozího stavu"
+        : "Klikněte pro označení: 1× Vyřešeno, 2× Přeskočeno (ovládám), 3× Výchozí",
+    onClick: (e) => {
+      e.stopPropagation();
+      const next = cycleTaskStatus(task.id);
+      tStatus = next;
+      card.classList.remove("is-solved", "is-skipped");
+      taskBtn.classList.remove("is-solved", "is-skipped");
+      if (next === "solved") {
+        card.classList.add("is-solved");
+        taskBtn.classList.add("is-solved");
+        taskBtn.innerHTML = `<span class="tcb-icon">✓</span> <span class="tcb-text">Vyřešeno</span>`;
+        taskBtn.title = "Stav: Vyřešeno (1. klik) · Dalším klikem označíte jako Přeskočeno (ovládám)";
+      } else if (next === "skipped") {
+        card.classList.add("is-skipped");
+        taskBtn.classList.add("is-skipped");
+        taskBtn.innerHTML = `<span class="tcb-icon">↷</span> <span class="tcb-text">Přeskočeno</span>`;
+        taskBtn.title = "Stav: Přeskočeno (ovládám) (2. klik) · Dalším klikem vrátíte do výchozího stavu";
+      } else {
+        taskBtn.innerHTML = `<span class="tcb-icon">○</span> <span class="tcb-text">K řešení</span>`;
+        taskBtn.title = "Klikněte pro označení: 1× Vyřešeno, 2× Přeskočeno (ovládám), 3× Výchozí";
+      }
+
+      // Update TOC item if present
+      const tocItem = document.getElementById(`toc-${task.id}`);
+      if (tocItem) {
+        tocItem.classList.remove("is-solved", "is-skipped");
+        if (next === "solved") tocItem.classList.add("is-solved");
+        else if (next === "skipped") tocItem.classList.add("is-skipped");
+        const iconSpan = tocItem.querySelector(".toc-status-icon");
+        if (iconSpan) {
+          iconSpan.className = `toc-status-icon ${next}`;
+          iconSpan.textContent = next === "solved" ? "✓" : next === "skipped" ? "↷" : "○";
+        }
+      }
+
+      onTaskStatusChanged?.(task, next);
+    },
+  });
+
+  taskBtn.innerHTML = tStatus === "solved"
+    ? `<span class="tcb-icon">✓</span> <span class="tcb-text">Vyřešeno</span>`
+    : tStatus === "skipped"
+      ? `<span class="tcb-icon">↷</span> <span class="tcb-text">Přeskočeno</span>`
+      : `<span class="tcb-icon">○</span> <span class="tcb-text">K řešení</span>`;
+
+  head.appendChild(taskBtn);
   card.appendChild(head);
 
   const prompt = el("div", { className: "task-prompt slide-body" });
@@ -1716,26 +1804,28 @@ function progressLevel(pct) {
 }
 
 function studyTile(item, doneStatus, size) {
-  const tasks = item.kind === "exercise"
+  const isExercise = item.kind === "exercise";
+  const tasks = isExercise
     ? (state.exercises[item.path]?.task_count || state.exercises[item.path]?.tasks?.length || 0)
     : 0;
   const status = getStudyStatus(item.id);
 
+  const doneTooltip = isExercise ? "✓ Vyřešeno (1. klik)" : "✓ Prostudováno (1. klik)";
   const btn = el("div", {
     className: `study-tile study-tile-${size} ${item.kind}${status === "studied" ? " studied" : status === "skipped" ? " skipped" : ""}`,
-    title: `${item.title} — ${status === "studied" ? "✓ Prostudováno (1. klik)" : status === "skipped" ? "↷ Znáno / Přeskočeno (2. klik)" : "Ke studiu (klikněte pro označení)"}`,
+    title: `${item.title} — ${status === "studied" ? doneTooltip : status === "skipped" ? "↷ Přeskočeno (ovládám) (2. klik)" : (isExercise ? "K řešení (klikněte pro označení)" : "Ke studiu (klikněte pro označení)")}`,
   });
 
   const statusBadge = status === "studied"
-    ? '<span class="st-check">✓ PROSTUDOVÁNO</span>'
+    ? `<span class="st-check">${isExercise ? "✓ VYŘEŠENO" : "✓ PROSTUDOVÁNO"}</span>`
     : status === "skipped"
-      ? '<span class="st-skip-check">↷ ZNÁNO</span>'
-      : '<span class="st-pending">☐ KE STUDIU</span>';
+      ? '<span class="st-skip-check">↷ PŘESKOČENO</span>'
+      : `<span class="st-pending">☐ ${isExercise ? "K ŘEŠENÍ" : "KE STUDIU"}</span>`;
 
   btn.innerHTML = `
     <div class="st-top">
       <div class="st-tile-actions">
-        <button type="button" class="st-action-mini st-cycle-mini ${status === 'studied' ? 'btn-mini-done active' : status === 'skipped' ? 'btn-mini-skip active' : ''}" title="Klikněte pro změnu stavu: 1× Prostudováno, 2× Znáno, 3× Výchozí">${status === 'studied' ? '✓' : status === 'skipped' ? '↷' : '○'}</button>
+        <button type="button" class="st-action-mini st-cycle-mini ${status === 'studied' ? 'btn-mini-done active' : status === 'skipped' ? 'btn-mini-skip active' : ''}" title="Klikněte pro změnu stavu: 1× ${isExercise ? 'Vyřešeno' : 'Prostudováno'}, 2× Přeskočeno (ovládám), 3× Výchozí">${status === 'studied' ? '✓' : status === 'skipped' ? '↷' : '○'}</button>
       </div>
       <span class="st-title" style="cursor:pointer">${escapeHtml(item.title)}</span>
     </div>
@@ -1778,9 +1868,9 @@ function detailedExerciseCard(item, doneStatus) {
   });
   head.innerHTML = `
     <div class="sec-title-row">
-      <span class="st-status-check" style="cursor:pointer" title="Klikněte pro změnu stavu: 1× Prostudováno, 2× Znáno, 3× Výchozí">${status === "studied" ? "✓" : status === "skipped" ? "↷" : "○"}</span>
+      <span class="st-status-check" style="cursor:pointer" title="Klikněte pro změnu stavu: 1× Vyřešeno, 2× Přeskočeno (ovládám), 3× Výchozí">${status === "studied" ? "✓" : status === "skipped" ? "↷" : "○"}</span>
       <h3 class="sec-title" style="cursor:pointer">${formatInlineCode(item.title)}</h3>
-      <button type="button" class="sec-status-pill" style="cursor:pointer;border:none;font:inherit;background:rgba(110,118,129,0.2);color:var(--text-faint)" title="Klikněte pro změnu stavu: 1× Prostudováno, 2× Znáno, 3× Výchozí">${status === "studied" ? "✓ SPLNĚNO" : status === "skipped" ? "↷ ZNÁNO" : "KE STUDIU"}</button>
+      <button type="button" class="sec-status-pill" style="cursor:pointer;border:none;font:inherit;background:rgba(110,118,129,0.2);color:var(--text-faint)" title="Klikněte pro změnu stavu: 1× Vyřešeno, 2× Přeskočeno (ovládám), 3× Výchozí">${status === "studied" ? "✓ VYŘEŠENO" : status === "skipped" ? "↷ PŘESKOČENO" : "K ŘEŠENÍ"}</button>
     </div>
     <div class="sec-meta-row">
       ${badgesHtml(item.tags)}
@@ -1811,9 +1901,11 @@ function detailedExerciseCard(item, doneStatus) {
     for (const t of tasks) {
       const tS = t.technical_score ?? 1;
       const lS = t.logical_score ?? 1;
-      const tRow = el("div", { className: "study-task-item" });
+      const tStatus = getTaskStatus(t.id);
+      const tRow = el("div", { className: `study-task-item${tStatus === "solved" ? " is-solved" : tStatus === "skipped" ? " is-skipped" : ""}` });
       tRow.innerHTML = `
         <div class="sti-top">
+          <span class="sti-status-icon ${tStatus}">${tStatus === "solved" ? "✓" : tStatus === "skipped" ? "↷" : "○"}</span>
           <span class="sti-num">Úkol ${t.num}</span>
           <span class="sti-title">${formatInlineCode(t.summary || t.title)}</span>
           <div class="sti-scores">

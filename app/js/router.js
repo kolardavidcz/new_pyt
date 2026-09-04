@@ -739,36 +739,39 @@ export function updateStatusBarControls(tab) {
   const rightWrap = el("div", { className: "sb-right", style: { marginLeft: "auto", display: "flex", gap: "6px", alignItems: "center" } });
 
   // 3a. Study Status Cycle Button (3-state)
+  const isExercise = item.kind === "exercise" || (item.id && item.id.startsWith("exercise:"));
   const studyBtn = el("button", {
     type: "button",
     className: `sb-btn sb-btn-study-cycle ${status === "studied" ? "is-studied" : status === "skipped" ? "is-skipped" : ""}`,
-    title: "Klikněte pro změnu stavu: 1× Prostudováno, 2× Znáno, 3× Výchozí",
+    title: `Klikněte pro změnu stavu: 1× ${isExercise ? "Vyřešeno" : "Prostudováno"}, 2× Přeskočeno (ovládám), 3× Výchozí`,
     onClick: () => {
       cycleStudyStatus(item.id);
       try { renderTree(); } catch {}
       window.__pcsUpdateStatus?.();
       updateStatusBarControls(tab);
     }
-  }, status === "studied" ? "✓ SPLNĚNO" : status === "skipped" ? "↷ ZNÁNO" : "○ KE STUDIU");
+  }, status === "studied" ? (isExercise ? "✓ VYŘEŠENO" : "✓ PROSTUDOVÁNO") : status === "skipped" ? "↷ PŘESKOČENO" : (isExercise ? "○ K ŘEŠENÍ" : "○ KE STUDIU"));
   rightWrap.appendChild(studyBtn);
 
-  // 3b. Outline / All slides button
-  const outlineBtn = el("button", {
-    type: "button",
-    className: "sb-btn",
-    title: "Zobrazit osnovu prezentace",
-    onClick: () => navigate({ kind: "presentation", id: item.id })
-  }, "📋 Snímky");
-  rightWrap.appendChild(outlineBtn);
+  // 3b. Outline / All slides button (only for lectures with slides)
+  if (!isExercise && pages.length > 0) {
+    const outlineBtn = el("button", {
+      type: "button",
+      className: "sb-btn",
+      title: "Zobrazit osnovu prezentace",
+      onClick: () => navigate({ kind: "presentation", id: item.id })
+    }, "📋 Snímky");
+    rightWrap.appendChild(outlineBtn);
 
-  // 3c. Fullscreen Presentation Mode Button
-  const fsBtn = el("button", {
-    type: "button",
-    className: "sb-btn",
-    title: "Režim prezentace na celou obrazovku",
-    onClick: () => toggleFullscreen()
-  }, "⛶ Prezentace");
-  rightWrap.appendChild(fsBtn);
+    // 3c. Fullscreen Presentation Mode Button
+    const fsBtn = el("button", {
+      type: "button",
+      className: "sb-btn",
+      title: "Režim prezentace na celou obrazovku",
+      onClick: () => toggleFullscreen()
+    }, "⛶ Prezentace");
+    rightWrap.appendChild(fsBtn);
+  }
 
   // 3d. Quiz Button (if quiz available)
   if (quiz && quiz.questions?.length) {
