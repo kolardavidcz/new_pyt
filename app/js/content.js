@@ -2132,7 +2132,7 @@ function renderUserProfileDashboard(u) {
       </span>
       <div class="v2-row-main">
         <strong>Cloudová synchronizace</strong>
-        <span>Synchronizovat postup studia s online účtem</span>
+        <span>Obousměrný timestamp merge (tablet & PC bez ztráty dat)</span>
       </div>
       <button type="button" class="btn secondary sm" id="btnManualSync">Synchronizovat</button>
     </div>

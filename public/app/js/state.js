@@ -1,5 +1,5 @@
 /** Shared application state */
-import { syncEngine } from "./sync.js";
+import { syncEngine, normalizeToLWWEntries } from "./sync.js";
 
 export const TAGS = ["Core", "WOW", "Legendary", "Tricky", "Skip"];
 export const FLAVORS = ["basics", "resyntax", "newconcept", "pythonic", "paradigm"];
@@ -8,6 +8,7 @@ const SEEN_KEY = "pcs-seen-v1";
 const STUDIED_KEY = "pcs-studied-v1";
 const SKIPPED_KEY = "pcs-skipped-v1";
 const CHECKLIST_KEY = "pcs-checklist-v1";
+const STUDY_STATUS_KEY = "pcs-study-status-v1";
 const SIDEBAR_W_KEY = "pcs-sidebar-w";
 const USER_KEY = "pcs-user-v1";
 
@@ -26,6 +27,11 @@ export function getStudiedKey() {
 export function getSkippedKey() {
   const u = state.user?.username;
   return u ? syncEngine.getKey(u, "skipped") : SKIPPED_KEY;
+}
+
+export function getStudyStatusKey() {
+  const u = state.user?.username;
+  return u ? syncEngine.getKey(u, "study_status") : STUDY_STATUS_KEY;
 }
 
 export function getSeenKey() {
@@ -77,6 +83,7 @@ export const state = {
 
   /** Auto-seen item ids (opened once) */
   seen: new Set(),
+  seenEntries: {},
 
   /** Manually marked “studied” item ids (progress source of truth) */
   studied: new Set(),
@@ -84,8 +91,17 @@ export const state = {
   /** Manually marked “skipped / already known” item ids (counts as completed) */
   skipped: new Set(),
 
+  /** Item-level timestamped study status map: itemId -> { v: "studied" | "skipped" | "default", t: number } */
+  studyStatusEntries: {},
+
   /** Checked items in the 4-level checklist */
   checklist: new Set(),
+
+  /** Item-level timestamped checklist map: taskId -> { v: boolean, t: number } */
+  checklistEntries: {},
+
+  /** Last successful cloud synchronization timestamp */
+  lastSyncTime: 0,
 
   /** Currently focused tree node key */
   focusedTreeKey: null,
@@ -682,6 +698,10 @@ export function logoutUser() {
   state.skipped = new Set();
   state.seen = new Set();
   state.checklist = new Set();
+  state.studyStatusEntries = {};
+  state.checklistEntries = {};
+  state.seenEntries = {};
+  state.lastSyncTime = 0;
   notifyStateChange("user", { user: null });
 }
 
@@ -691,38 +711,75 @@ export function loadPersisted() {
   const skKey = getSkippedKey();
   const seKey = getSeenKey();
   const chKey = getChecklistKey();
+  const stKey = getStudyStatusKey();
 
   state.studied = new Set();
   state.skipped = new Set();
   state.seen = new Set();
   state.checklist = new Set();
+  state.studyStatusEntries = {};
+  state.checklistEntries = {};
+  state.seenEntries = {};
 
+  // 1. Load seen (LWW envelope or legacy array)
   try {
-    const raw = localStorage.getItem(seKey);
+    const raw = localStorage.getItem(seKey) || localStorage.getItem(SEEN_KEY);
     if (raw) {
-      const arr = JSON.parse(raw);
-      if (Array.isArray(arr)) state.seen = new Set(arr);
+      state.seenEntries = normalizeToLWWEntries(JSON.parse(raw));
+      for (const [id, rec] of Object.entries(state.seenEntries)) {
+        if (rec.v === true) state.seen.add(id);
+      }
     }
   } catch { /* ignore */ }
+
+  // 2. Load study status (studied & skipped)
   try {
-    const raw = localStorage.getItem(sKey);
+    const raw = localStorage.getItem(stKey) || localStorage.getItem(STUDY_STATUS_KEY);
     if (raw) {
-      const arr = JSON.parse(raw);
-      if (Array.isArray(arr)) state.studied = new Set(arr);
+      state.studyStatusEntries = normalizeToLWWEntries(JSON.parse(raw));
+      for (const [id, rec] of Object.entries(state.studyStatusEntries)) {
+        if (rec.v === "studied") state.studied.add(id);
+        else if (rec.v === "skipped") state.skipped.add(id);
+      }
     }
   } catch { /* ignore */ }
-  try {
-    const raw = localStorage.getItem(skKey);
-    if (raw) {
-      const arr = JSON.parse(raw);
-      if (Array.isArray(arr)) state.skipped = new Set(arr);
-    }
-  } catch { /* ignore */ }
+
+  // Fallback to legacy arrays if studyStatusEntries is empty
+  if (Object.keys(state.studyStatusEntries).length === 0) {
+    try {
+      const raw = localStorage.getItem(sKey) || localStorage.getItem(STUDIED_KEY);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          for (const id of arr) {
+            state.studied.add(id);
+            state.studyStatusEntries[id] = { v: "studied", t: 1 };
+          }
+        }
+      }
+    } catch { /* ignore */ }
+    try {
+      const raw = localStorage.getItem(skKey) || localStorage.getItem(SKIPPED_KEY);
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) {
+          for (const id of arr) {
+            state.skipped.add(id);
+            state.studyStatusEntries[id] = { v: "skipped", t: 1 };
+          }
+        }
+      }
+    } catch { /* ignore */ }
+  }
+
+  // 3. Load checklist (LWW envelope or legacy array)
   try {
     const raw = localStorage.getItem(chKey) || localStorage.getItem(CHECKLIST_KEY);
     if (raw) {
-      const arr = JSON.parse(raw);
-      if (Array.isArray(arr)) state.checklist = new Set(arr);
+      state.checklistEntries = normalizeToLWWEntries(JSON.parse(raw));
+      for (const [id, rec] of Object.entries(state.checklistEntries)) {
+        if (rec.v === true) state.checklist.add(id);
+      }
     }
   } catch { /* ignore */ }
   try {
@@ -1021,41 +1078,75 @@ export async function syncCloudProgress() {
   if (!username) return;
 
   try {
-    const studiedResult = await syncEngine.syncSet(
+    // 1. Granular LWW Sync for Study Status (studied / skipped / unmarked)
+    const studyResult = await syncEngine.syncLWWMap(
       username,
-      "studied",
-      state.studied,
-      getStudiedKey()
+      "study_status",
+      state.studyStatusEntries,
+      getStudyStatusKey(),
+      ["studied", "skipped"]
     );
-    const seenResult = await syncEngine.syncSet(
-      username,
-      "seen",
-      state.seen,
-      getSeenKey()
-    );
-    const checklistResult = await syncEngine.syncSet(
+
+    // 2. Granular LWW Sync for Checklist / Exercise Tasks
+    const checklistResult = await syncEngine.syncLWWMap(
       username,
       "checklist",
-      state.checklist,
-      getChecklistKey()
+      state.checklistEntries,
+      getChecklistKey(),
+      ["checklist"]
+    );
+
+    // 3. Granular LWW Sync for Seen Pages
+    const seenResult = await syncEngine.syncLWWMap(
+      username,
+      "seen",
+      state.seenEntries,
+      getSeenKey(),
+      ["seen"]
     );
 
     let changed = false;
-    if (studiedResult.changed) {
-      state.studied = studiedResult.set;
-      changed = true;
-    }
-    if (seenResult.changed) {
-      state.seen = seenResult.set;
-      changed = true;
-    }
-    if (checklistResult.changed) {
-      state.checklist = checklistResult.set;
+
+    if (studyResult.changed) {
+      state.studyStatusEntries = studyResult.entries;
+      state.studied.clear();
+      state.skipped.clear();
+      for (const [id, rec] of Object.entries(studyResult.entries)) {
+        if (rec.v === "studied") {
+          state.studied.add(id);
+        } else if (rec.v === "skipped") {
+          state.skipped.add(id);
+        }
+      }
       changed = true;
     }
 
+    if (checklistResult.changed) {
+      state.checklistEntries = checklistResult.entries;
+      state.checklist.clear();
+      for (const [id, rec] of Object.entries(checklistResult.entries)) {
+        if (rec.v === true) {
+          state.checklist.add(id);
+        }
+      }
+      changed = true;
+    }
+
+    if (seenResult.changed) {
+      state.seenEntries = seenResult.entries;
+      state.seen.clear();
+      for (const [id, rec] of Object.entries(seenResult.entries)) {
+        if (rec.v === true) {
+          state.seen.add(id);
+        }
+      }
+      changed = true;
+    }
+
+    state.lastSyncTime = Date.now();
+
     if (changed) {
-      notifyStateChange("cloudSync");
+      notifyStateChange("cloudSync", { timestamp: state.lastSyncTime });
     }
   } catch (err) {
     console.warn("Cloud sync error:", err);
@@ -1064,12 +1155,36 @@ export async function syncCloudProgress() {
 
 export function persistSeen() {
   const seKey = getSeenKey();
-  const arr = [...state.seen];
+  const payload = {
+    _type: "lww-v1",
+    updatedAt: Date.now(),
+    entries: state.seenEntries,
+  };
   try {
-    localStorage.setItem(seKey, JSON.stringify(arr));
+    localStorage.setItem(seKey, JSON.stringify(payload));
+    localStorage.setItem(SEEN_KEY, JSON.stringify([...state.seen]));
   } catch { /* ignore */ }
   if (state.user?.username) {
-    syncEngine.kvSet(syncEngine.getKey(state.user.username, "seen"), arr);
+    syncEngine.kvSet(syncEngine.getKey(state.user.username, "seen"), payload);
+  }
+}
+
+export function persistStudyStatus() {
+  const statusKey = getStudyStatusKey();
+  const payload = {
+    _type: "lww-v1",
+    updatedAt: Date.now(),
+    entries: state.studyStatusEntries,
+  };
+  try {
+    localStorage.setItem(statusKey, JSON.stringify(payload));
+  } catch { /* ignore */ }
+
+  if (state.user?.username) {
+    syncEngine.kvSet(statusKey, payload);
+    // Also save legacy arrays for backward compatibility with external tools
+    syncEngine.kvSet(syncEngine.getKey(state.user.username, "studied"), [...state.studied]);
+    syncEngine.kvSet(syncEngine.getKey(state.user.username, "skipped"), [...state.skipped]);
   }
 }
 
@@ -1082,6 +1197,7 @@ export function persistStudied() {
   if (state.user?.username) {
     syncEngine.kvSet(syncEngine.getKey(state.user.username, "studied"), arr);
   }
+  persistStudyStatus();
 }
 
 export function persistSkipped() {
@@ -1093,16 +1209,22 @@ export function persistSkipped() {
   if (state.user?.username) {
     syncEngine.kvSet(syncEngine.getKey(state.user.username, "skipped"), arr);
   }
+  persistStudyStatus();
 }
 
 export function persistChecklist() {
   const chKey = getChecklistKey();
-  const arr = [...state.checklist];
+  const payload = {
+    _type: "lww-v1",
+    updatedAt: Date.now(),
+    entries: state.checklistEntries,
+  };
   try {
-    localStorage.setItem(chKey, JSON.stringify(arr));
+    localStorage.setItem(chKey, JSON.stringify(payload));
+    localStorage.setItem(CHECKLIST_KEY, JSON.stringify([...state.checklist]));
   } catch { /* ignore */ }
   if (state.user?.username) {
-    syncEngine.kvSet(syncEngine.getKey(state.user.username, "checklist"), arr);
+    syncEngine.kvSet(syncEngine.getKey(state.user.username, "checklist"), payload);
   }
 }
 
@@ -1113,6 +1235,7 @@ export function isChecklistChecked(id) {
 export function toggleChecklist(id) {
   if (!id) return false;
   let now = false;
+  const t = Date.now();
   if (state.checklist.has(id)) {
     state.checklist.delete(id);
     now = false;
@@ -1120,17 +1243,20 @@ export function toggleChecklist(id) {
     state.checklist.add(id);
     now = true;
   }
+  state.checklistEntries[id] = { v: now, t };
   persistChecklist();
   notifyStateChange("checklist", { id, now });
   return now;
 }
 
 export function resetChecklistState() {
+  const t = Date.now();
+  for (const id of state.checklist) {
+    state.checklistEntries[id] = { v: false, t };
+  }
   state.checklist.clear();
-  try {
-    localStorage.removeItem(CHECKLIST_KEY);
-  } catch { /* ignore */ }
-  notifyStateChange("checklist");
+  persistChecklist();
+  notifyStateChange("checklist", { reset: true });
 }
 
 export function calculateChecklistProgress(items = []) {
@@ -1176,6 +1302,7 @@ export function persistSidebarW() {
 export function markSeen(itemId) {
   if (!itemId || state.seen.has(itemId)) return;
   state.seen.add(itemId);
+  state.seenEntries[itemId] = { v: true, t: Date.now() };
   persistSeen();
   notifyStateChange("seen", { itemId });
 }
@@ -1197,18 +1324,22 @@ export function isCompleted(itemId) {
 export function toggleStudied(itemId) {
   if (!itemId) return false;
   let now = false;
+  let status = "default";
   if (state.studied.has(itemId)) {
     state.studied.delete(itemId);
     now = false;
+    status = "default";
   } else {
     state.studied.add(itemId);
     state.skipped.delete(itemId);
     markSeen(itemId);
     now = true;
+    status = "studied";
   }
+  state.studyStatusEntries[itemId] = { v: status, t: Date.now() };
   persistStudied();
   persistSkipped();
-  notifyStateChange("studied", { itemId, now, status: now ? "studied" : "unmarked" });
+  notifyStateChange("studied", { itemId, now, status });
   return now;
 }
 
@@ -1216,18 +1347,22 @@ export function toggleStudied(itemId) {
 export function toggleSkipped(itemId) {
   if (!itemId) return false;
   let now = false;
+  let status = "default";
   if (state.skipped.has(itemId)) {
     state.skipped.delete(itemId);
     now = false;
+    status = "default";
   } else {
     state.skipped.add(itemId);
     state.studied.delete(itemId);
     markSeen(itemId);
     now = true;
+    status = "skipped";
   }
+  state.studyStatusEntries[itemId] = { v: status, t: Date.now() };
   persistStudied();
   persistSkipped();
-  notifyStateChange("studied", { itemId, now, status: now ? "skipped" : "unmarked" });
+  notifyStateChange("studied", { itemId, now, status });
   return now;
 }
 
@@ -1266,6 +1401,7 @@ export function cycleStudyStatus(itemId) {
     markSeen(itemId);
     nextState = "studied";
   }
+  state.studyStatusEntries[itemId] = { v: nextState, t: Date.now() };
   persistStudied();
   persistSkipped();
   notifyStateChange("studied", { itemId, status: nextState, now: nextState !== "default" });
@@ -1281,6 +1417,7 @@ export function setStudied(itemId, on) {
   } else {
     state.studied.delete(itemId);
   }
+  state.studyStatusEntries[itemId] = { v: on ? "studied" : "default", t: Date.now() };
   persistStudied();
   persistSkipped();
   notifyStateChange("studied", { itemId, now: on });
@@ -1295,6 +1432,7 @@ export function setSkipped(itemId, on) {
   } else {
     state.skipped.delete(itemId);
   }
+  state.studyStatusEntries[itemId] = { v: on ? "skipped" : "default", t: Date.now() };
   persistStudied();
   persistSkipped();
   notifyStateChange("studied", { itemId, now: on });
