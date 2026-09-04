@@ -1,5 +1,5 @@
 /** Shared application state */
-import { syncEngine, normalizeToLWWEntries } from "./sync.js";
+import { syncEngine, normalizeToLWWEntries, mergeLWW } from "./sync.js";
 
 export const TAGS = ["Core", "WOW", "Legendary", "Tricky", "Skip"];
 export const FLAVORS = ["basics", "resyntax", "newconcept", "pythonic", "paradigm"];
@@ -559,7 +559,11 @@ export function loadUser() {
       }
     }
   } catch { /* ignore */ }
-  state.user = null;
+  // Auto-default to defaultUser (David Kolar) so progress sync works seamlessly on tablet and PC
+  state.user = { ...defaultUser };
+  try {
+    localStorage.setItem(USER_KEY, JSON.stringify(defaultUser));
+  } catch { /* ignore */ }
 }
 
 const USERS_DB_KEY = "pcs-users-db-v1";
@@ -707,6 +711,7 @@ export function logoutUser() {
 
 export function loadPersisted() {
   loadUser();
+  const username = state.user?.username || "kolard";
   const sKey = getStudiedKey();
   const skKey = getSkippedKey();
   const seKey = getSeenKey();
@@ -721,67 +726,89 @@ export function loadPersisted() {
   state.checklistEntries = {};
   state.seenEntries = {};
 
-  // 1. Load seen (LWW envelope or legacy array)
-  try {
-    const raw = localStorage.getItem(seKey) || localStorage.getItem(SEEN_KEY);
-    if (raw) {
-      state.seenEntries = normalizeToLWWEntries(JSON.parse(raw));
-      for (const [id, rec] of Object.entries(state.seenEntries)) {
-        if (rec.v === true) state.seen.add(id);
-      }
-    }
-  } catch { /* ignore */ }
-
-  // 2. Load study status (studied & skipped)
-  try {
-    const raw = localStorage.getItem(stKey) || localStorage.getItem(STUDY_STATUS_KEY);
-    if (raw) {
-      state.studyStatusEntries = normalizeToLWWEntries(JSON.parse(raw));
-      for (const [id, rec] of Object.entries(state.studyStatusEntries)) {
-        if (rec.v === "studied") state.studied.add(id);
-        else if (rec.v === "skipped") state.skipped.add(id);
-      }
-    }
-  } catch { /* ignore */ }
-
-  // Fallback to legacy arrays if studyStatusEntries is empty
-  if (Object.keys(state.studyStatusEntries).length === 0) {
+  // 1. Load seen across all legacy keys
+  const seenKeys = [seKey, `${SEEN_KEY}:${username}`, SEEN_KEY, `pyt:${username}:seen`];
+  for (const key of seenKeys) {
     try {
-      const raw = localStorage.getItem(sKey) || localStorage.getItem(STUDIED_KEY);
+      const raw = localStorage.getItem(key);
       if (raw) {
-        const arr = JSON.parse(raw);
-        if (Array.isArray(arr)) {
-          for (const id of arr) {
-            state.studied.add(id);
-            state.studyStatusEntries[id] = { v: "studied", t: 1 };
-          }
-        }
+        const parsed = normalizeToLWWEntries(JSON.parse(raw));
+        state.seenEntries = mergeLWW(state.seenEntries, parsed);
       }
     } catch { /* ignore */ }
+  }
+  for (const [id, rec] of Object.entries(state.seenEntries)) {
+    if (rec.v === true) state.seen.add(id);
+  }
+
+  // 2. Load study status (studied & skipped across all key variations)
+  const studyStatusKeys = [stKey, "pcs-study-status-v1", `pcs-study-status-v1:${username}`, `pyt:${username}:study_status`];
+  for (const key of studyStatusKeys) {
     try {
-      const raw = localStorage.getItem(skKey) || localStorage.getItem(SKIPPED_KEY);
+      const raw = localStorage.getItem(key);
       if (raw) {
-        const arr = JSON.parse(raw);
-        if (Array.isArray(arr)) {
-          for (const id of arr) {
-            state.skipped.add(id);
-            state.studyStatusEntries[id] = { v: "skipped", t: 1 };
+        const parsed = normalizeToLWWEntries(JSON.parse(raw));
+        state.studyStatusEntries = mergeLWW(state.studyStatusEntries, parsed);
+      }
+    } catch { /* ignore */ }
+  }
+
+  // Also merge legacy studied arrays across all known keys
+  const legacyStudiedKeys = [sKey, `${STUDIED_KEY}:${username}`, STUDIED_KEY, `pyt:${username}:studied`];
+  for (const key of legacyStudiedKeys) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          for (const id of parsed) {
+            if (!state.studyStatusEntries[id] || state.studyStatusEntries[id].v === "default") {
+              state.studyStatusEntries[id] = { v: "studied", t: 1 };
+            }
           }
         }
       }
     } catch { /* ignore */ }
   }
 
-  // 3. Load checklist (LWW envelope or legacy array)
-  try {
-    const raw = localStorage.getItem(chKey) || localStorage.getItem(CHECKLIST_KEY);
-    if (raw) {
-      state.checklistEntries = normalizeToLWWEntries(JSON.parse(raw));
-      for (const [id, rec] of Object.entries(state.checklistEntries)) {
-        if (rec.v === true) state.checklist.add(id);
+  // Also merge legacy skipped arrays across all known keys
+  const legacySkippedKeys = [skKey, `${SKIPPED_KEY}:${username}`, SKIPPED_KEY, `pyt:${username}:skipped`];
+  for (const key of legacySkippedKeys) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          for (const id of parsed) {
+            if (!state.studyStatusEntries[id] || state.studyStatusEntries[id].v === "default") {
+              state.studyStatusEntries[id] = { v: "skipped", t: 1 };
+            }
+          }
+        }
       }
-    }
-  } catch { /* ignore */ }
+    } catch { /* ignore */ }
+  }
+
+  // Populate active sets from studyStatusEntries
+  for (const [id, rec] of Object.entries(state.studyStatusEntries)) {
+    if (rec.v === "studied") state.studied.add(id);
+    else if (rec.v === "skipped") state.skipped.add(id);
+  }
+
+  // 3. Load checklist across all known keys
+  const checklistKeys = [chKey, `${CHECKLIST_KEY}:${username}`, CHECKLIST_KEY, `pyt:${username}:checklist`];
+  for (const key of checklistKeys) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const parsed = normalizeToLWWEntries(JSON.parse(raw));
+        state.checklistEntries = mergeLWW(state.checklistEntries, parsed);
+      }
+    } catch { /* ignore */ }
+  }
+  for (const [id, rec] of Object.entries(state.checklistEntries)) {
+    if (rec.v === true) state.checklist.add(id);
+  }
   try {
     const w = parseInt(localStorage.getItem(SIDEBAR_W_KEY) || "", 10);
     if (w >= 180 && w <= 520) state.sidebarWidth = w;
@@ -1074,8 +1101,39 @@ export function notifyStateChange(changeType, detail) {
 }
 
 export async function syncCloudProgress() {
-  const username = state.user?.username;
-  if (!username) return;
+  const username = state.user?.username || "kolard";
+  if (!username) return false;
+
+  const studyKeys = [
+    getStudyStatusKey(),
+    "pcs-study-status-v1",
+    `pcs-study-status-v1:${username}`,
+    `pyt:${username}:study_status`,
+    getStudiedKey(),
+    `${STUDIED_KEY}:${username}`,
+    STUDIED_KEY,
+    getSkippedKey(),
+    `${SKIPPED_KEY}:${username}`,
+    SKIPPED_KEY,
+  ];
+
+  const checklistKeys = [
+    getChecklistKey(),
+    "pcs-checklist-v1",
+    `pcs-checklist-v1:${username}`,
+    `${CHECKLIST_KEY}:${username}`,
+    CHECKLIST_KEY,
+    `pyt:${username}:checklist`,
+  ];
+
+  const seenKeys = [
+    getSeenKey(),
+    "pcs-seen-v1",
+    `pcs-seen-v1:${username}`,
+    `${SEEN_KEY}:${username}`,
+    SEEN_KEY,
+    `pyt:${username}:seen`,
+  ];
 
   try {
     // 1. Granular LWW Sync for Study Status (studied / skipped / unmarked)
@@ -1083,7 +1141,7 @@ export async function syncCloudProgress() {
       username,
       "study_status",
       state.studyStatusEntries,
-      getStudyStatusKey(),
+      studyKeys,
       ["studied", "skipped"]
     );
 
@@ -1092,7 +1150,7 @@ export async function syncCloudProgress() {
       username,
       "checklist",
       state.checklistEntries,
-      getChecklistKey(),
+      checklistKeys,
       ["checklist"]
     );
 
@@ -1101,7 +1159,7 @@ export async function syncCloudProgress() {
       username,
       "seen",
       state.seenEntries,
-      getSeenKey(),
+      seenKeys,
       ["seen"]
     );
 
@@ -1145,11 +1203,111 @@ export async function syncCloudProgress() {
 
     state.lastSyncTime = Date.now();
 
-    if (changed) {
-      notifyStateChange("cloudSync", { timestamp: state.lastSyncTime });
-    }
+    // Push legacy arrays for external tool compatibility & flush batch queue immediately
+    syncEngine.kvSet(syncEngine.getKey(username, "studied"), [...state.studied]);
+    syncEngine.kvSet(syncEngine.getKey(username, "skipped"), [...state.skipped]);
+    await syncEngine.flush();
+
+    notifyStateChange("cloudSync", { timestamp: state.lastSyncTime, changed, status: "success" });
+    return true;
   } catch (err) {
     console.warn("Cloud sync error:", err);
+    notifyStateChange("cloudSync", { timestamp: Date.now(), error: err.message, status: "error" });
+    return false;
+  }
+}
+
+/**
+ * Explicitly overwrite local state with the latest state from the cloud.
+ */
+export async function forceCloudDownload() {
+  const username = state.user?.username || "kolard";
+  try {
+    const [rawStatus, rawChecklist, rawSeen] = await Promise.all([
+      syncEngine.fetchDataset(username, "study_status"),
+      syncEngine.fetchDataset(username, "checklist"),
+      syncEngine.fetchDataset(username, "seen"),
+    ]);
+
+    if (rawStatus?.value) {
+      const norm = normalizeToLWWEntries(rawStatus.value);
+      state.studyStatusEntries = norm;
+      state.studied.clear();
+      state.skipped.clear();
+      for (const [id, rec] of Object.entries(norm)) {
+        if (rec.v === "studied") state.studied.add(id);
+        else if (rec.v === "skipped") state.skipped.add(id);
+      }
+      try {
+        localStorage.setItem(getStudyStatusKey(), JSON.stringify({ _type: "lww-v1", updatedAt: Date.now(), entries: norm }));
+        localStorage.setItem(getStudiedKey(), JSON.stringify([...state.studied]));
+        localStorage.setItem(getSkippedKey(), JSON.stringify([...state.skipped]));
+      } catch {}
+    }
+
+    if (rawChecklist?.value) {
+      const norm = normalizeToLWWEntries(rawChecklist.value);
+      state.checklistEntries = norm;
+      state.checklist.clear();
+      for (const [id, rec] of Object.entries(norm)) {
+        if (rec.v === true) state.checklist.add(id);
+      }
+      try {
+        localStorage.setItem(getChecklistKey(), JSON.stringify({ _type: "lww-v1", updatedAt: Date.now(), entries: norm }));
+      } catch {}
+    }
+
+    if (rawSeen?.value) {
+      const norm = normalizeToLWWEntries(rawSeen.value);
+      state.seenEntries = norm;
+      state.seen.clear();
+      for (const [id, rec] of Object.entries(norm)) {
+        if (rec.v === true) state.seen.add(id);
+      }
+      try {
+        localStorage.setItem(getSeenKey(), JSON.stringify({ _type: "lww-v1", updatedAt: Date.now(), entries: norm }));
+      } catch {}
+    }
+
+    state.lastSyncTime = Date.now();
+    notifyStateChange("cloudSync", { timestamp: state.lastSyncTime, status: "success", force: "download" });
+    return true;
+  } catch (err) {
+    console.error("Force download failed:", err);
+    return false;
+  }
+}
+
+/**
+ * Explicitly overwrite cloud state with this device's current state.
+ */
+export async function forceCloudUpload() {
+  const username = state.user?.username || "kolard";
+  const now = Date.now();
+
+  // Stamp all entries with current timestamp so they win any merge
+  for (const id of Object.keys(state.studyStatusEntries)) {
+    state.studyStatusEntries[id].t = now;
+  }
+  for (const id of Object.keys(state.checklistEntries)) {
+    state.checklistEntries[id].t = now;
+  }
+  for (const id of Object.keys(state.seenEntries)) {
+    state.seenEntries[id].t = now;
+  }
+
+  persistStudyStatus();
+  persistChecklist();
+  persistSeen();
+
+  try {
+    await syncEngine.flush();
+    state.lastSyncTime = now;
+    notifyStateChange("cloudSync", { timestamp: state.lastSyncTime, status: "success", force: "upload" });
+    return true;
+  } catch (err) {
+    console.error("Force upload failed:", err);
+    return false;
   }
 }
 

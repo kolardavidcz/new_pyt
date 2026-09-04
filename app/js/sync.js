@@ -241,8 +241,14 @@ export class CloudSyncEngine {
    * Performs granular Item-Level Last-Write-Wins (LWW) merge.
    * Eliminates data loss between tablet reading and PC exercise work,
    * and cleanly handles unchecking without resurrecting old items.
+   *
+   * @param {string} username
+   * @param {string} dataset
+   * @param {Object} localEntries
+   * @param {string|string[]} localStorageKeys - primary and legacy keys to read from and write to
+   * @param {string[]} legacyFallbackDatasets - remote legacy datasets to merge
    */
-  async syncLWWMap(username, dataset, localEntries = {}, localStorageKey = null, legacyFallbackDatasets = []) {
+  async syncLWWMap(username, dataset, localEntries = {}, localStorageKeys = [], legacyFallbackDatasets = []) {
     if (!username) {
       return { entries: localEntries, changed: false };
     }
@@ -251,8 +257,8 @@ export class CloudSyncEngine {
     const remoteResult = await this.fetchDataset(username, dataset);
     let remoteEntries = normalizeToLWWEntries(remoteResult?.value);
 
-    // If primary key is empty, check legacy fallback datasets (e.g. "studied", "skipped")
-    if (Object.keys(remoteEntries).length === 0 && Array.isArray(legacyFallbackDatasets)) {
+    // Merge any legacy fallback datasets from remote cloud (e.g. "studied", "skipped")
+    if (Array.isArray(legacyFallbackDatasets)) {
       for (const fallbackDataset of legacyFallbackDatasets) {
         const fbRes = await this.fetchDataset(username, fallbackDataset);
         if (fbRes?.value) {
@@ -267,13 +273,22 @@ export class CloudSyncEngine {
       }
     }
 
-    // Read local storage if key provided
+    // Read local storage from primary and all fallback keys
+    const localKeys = Array.isArray(localStorageKeys)
+      ? localStorageKeys
+      : (localStorageKeys ? [localStorageKeys] : []);
+
     let localStoredEntries = {};
-    if (localStorageKey) {
-      try {
-        const raw = localStorage.getItem(localStorageKey);
-        if (raw) localStoredEntries = normalizeToLWWEntries(JSON.parse(raw));
-      } catch { /* ignore */ }
+    if (typeof localStorage !== "undefined") {
+      for (const key of localKeys) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = normalizeToLWWEntries(JSON.parse(raw));
+            localStoredEntries = mergeLWW(localStoredEntries, parsed);
+          }
+        } catch { /* ignore */ }
+      }
     }
 
     // Perform 3-way LWW merge: localStored -> remote -> local memory
@@ -281,12 +296,12 @@ export class CloudSyncEngine {
 
     // Check if anything changed compared to localEntries
     let changed = false;
-    const localKeys = Object.keys(localEntries);
-    const mergedKeys = Object.keys(mergedEntries);
-    if (localKeys.length !== mergedKeys.length) {
+    const lKeys = Object.keys(localEntries);
+    const mKeys = Object.keys(mergedEntries);
+    if (lKeys.length !== mKeys.length) {
       changed = true;
     } else {
-      for (const k of mergedKeys) {
+      for (const k of mKeys) {
         if (!localEntries[k] || localEntries[k].v !== mergedEntries[k].v || localEntries[k].t !== mergedEntries[k].t) {
           changed = true;
           break;
@@ -300,15 +315,17 @@ export class CloudSyncEngine {
       entries: mergedEntries,
     };
 
-    // Save back to local storage if key provided
-    if (localStorageKey) {
-      try {
-        localStorage.setItem(localStorageKey, JSON.stringify(payload));
-      } catch { /* ignore */ }
+    // Save back to all provided local storage keys
+    if (typeof localStorage !== "undefined") {
+      for (const key of localKeys) {
+        try {
+          localStorage.setItem(key, JSON.stringify(payload));
+        } catch { /* ignore */ }
+      }
     }
 
     // Push merged LWW map to cloud
-    if (Object.keys(mergedEntries).length > 0) {
+    if (Object.keys(mergedEntries).length > 0 || remoteResult?.isLegacy) {
       await this.kvSet(primaryKey, payload);
     }
 
@@ -352,7 +369,9 @@ export function normalizeToLWWEntries(raw) {
 
 /**
  * Performs granular Last-Write-Wins (LWW) merge across multiple entry sources.
- * Sources are evaluated in order; entries with higher timestamps (t) win.
+ * Sources are evaluated in order; entries with strictly higher timestamps (t) win.
+ * For identical timestamps (e.g. baseline migration t === 1):
+ * Active states ("studied", "skipped", true) ALWAYS prevail over default/false.
  */
 export function mergeLWW(...sources) {
   const merged = {};
@@ -366,8 +385,19 @@ export function mergeLWW(...sources) {
       } else {
         const curTime = current.t || 0;
         const newTime = rec.t || 0;
-        if (newTime >= curTime) {
+        if (newTime > curTime) {
           merged[id] = { v: rec.v, t: newTime };
+        } else if (newTime === curTime) {
+          const isCurrentActive = current.v && current.v !== "default" && current.v !== false;
+          const isNewActive = rec.v && rec.v !== "default" && rec.v !== false;
+          if (!isCurrentActive && isNewActive) {
+            merged[id] = { v: rec.v, t: newTime };
+          } else if (isCurrentActive && !isNewActive) {
+            // Retain active current state
+          } else {
+            // Later source overrides if equivalent activity
+            merged[id] = { v: rec.v, t: newTime };
+          }
         }
       }
     }

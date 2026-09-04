@@ -5,7 +5,7 @@ import {
   isStudied, isSkipped, isCompleted, toggleStudied, toggleSkipped, setStudied, setSkipped,
   cycleStudyStatus, getStudyStatus,
   getCourseStats, getWeekStats,
-  setUser, logoutUser, syncCloudProgress, setCodeBlockColor, logLinkError,
+  setUser, logoutUser, syncCloudProgress, forceCloudDownload, forceCloudUpload, setCodeBlockColor, logLinkError,
   saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, setPrintWithQuizzes, getQuizFor, getQuizForDeck,
   registerUser, loginWithPassword, resetUserPassword, isAdminUser,
 } from "./state.js";
@@ -2132,10 +2132,18 @@ function renderUserProfileDashboard(u) {
       </span>
       <div class="v2-row-main">
         <strong>Cloudová synchronizace</strong>
-        <span>Obousměrný timestamp merge (tablet & PC bez ztráty dat)</span>
+        <span>${state.lastSyncTime ? `Naposledy: ${new Date(state.lastSyncTime).toLocaleTimeString("cs-CZ")} (LWW merge)` : "Zatím nesynchronizováno (LWW merge)"}</span>
       </div>
-      <button type="button" class="btn secondary sm" id="btnManualSync">Synchronizovat</button>
+      <button type="button" class="btn secondary sm" id="btnManualSync">Synchronizovat 🔄</button>
     </div>
+
+    <details style="margin:2px 0 10px; padding:6px 8px; background:rgba(255,255,255,0.03); border-radius:4px; border:1px solid var(--border-subtle, #333);">
+      <summary style="font-size:11px; color:var(--text-muted, #888); cursor:pointer; font-weight:500;">Pokročilá synchronizace (Ruční přepsání)</summary>
+      <div style="display:flex; gap:8px; margin-top:8px;">
+        <button type="button" class="btn secondary sm" id="btnForceDownload" style="flex:1; font-size:11px;" title="Přepíše lokální stav nejnovějšími daty ze serveru">Stáhnout z cloudu ⬇️</button>
+        <button type="button" class="btn secondary sm" id="btnForceUpload" style="flex:1; font-size:11px;" title="Přepíše data na serveru aktuálním stavem z tohoto zařízení">Odeslat do cloudu ⬆️</button>
+      </div>
+    </details>
 
     <div class="v2-row">
       <span class="v2-row-icon" style="color:#569cd6">
@@ -2198,10 +2206,28 @@ function renderUserProfileDashboard(u) {
       await syncCloudProgress();
       btn.textContent = "Synchronizováno ✓";
       setTimeout(() => {
-        btn.textContent = "Synchronizovat";
+        btn.textContent = "Synchronizovat 🔄";
         btn.disabled = false;
         showLogin();
       }, 1000);
+    });
+
+    card.querySelector("#btnForceDownload")?.addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      btn.textContent = "Stahuji…";
+      btn.disabled = true;
+      const ok = await forceCloudDownload();
+      btn.textContent = ok ? "Stáhnuto ✓" : "Chyba ✕";
+      setTimeout(() => { showLogin(); }, 900);
+    });
+
+    card.querySelector("#btnForceUpload")?.addEventListener("click", async (e) => {
+      const btn = e.currentTarget;
+      btn.textContent = "Odesílám…";
+      btn.disabled = true;
+      const ok = await forceCloudUpload();
+      btn.textContent = ok ? "Odesláno ✓" : "Chyba ✕";
+      setTimeout(() => { showLogin(); }, 900);
     });
 
     card.querySelector("#selectCodeBlockColor")?.addEventListener("change", (e) => {

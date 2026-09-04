@@ -65,14 +65,21 @@ async function boot() {
   setInterval(() => syncCloudProgress(), 30000);
 
   // Reactive Event Bus listener: auto-update UI components when state mutates
-  onStateChange((_, changeType) => {
-    if (changeType === "studied" || changeType === "cloudSync" || changeType === "seen" || changeType === "user") {
+  onStateChange((_, changeType, payload) => {
+    if (
+      changeType === "studied" ||
+      changeType === "checklist" ||
+      changeType === "cloudSync" ||
+      changeType === "seen" ||
+      changeType === "user"
+    ) {
       updatePageStudyButtons();
       try { renderTree(); } catch {}
       updateStatus();
       updateUserUI();
+      updateCloudSyncUI(changeType === "cloudSync" ? payload?.status : "synced");
       const tab = state.tabs.find((t) => t.id === state.activeTabId);
-      if (tab && (tab.kind === "progress" || tab.kind === "week" || tab.kind === "search" || tab.kind === "home")) {
+      if (tab) {
         refreshActiveView();
       }
     }
@@ -251,15 +258,45 @@ function updateUserUI() {
   if (pstatTotal) pstatTotal.textContent = `${stats.lectures.total} aktivních přednášek, ${stats.exercises.total} cvičení`;
 
   updateAdminUIElements();
+  updateCloudSyncUI("synced");
+}
+
+export function updateCloudSyncUI(status = "synced") {
+  const btn = document.getElementById("btnCloudSync");
+  const label = document.getElementById("syncStatusLabel");
+  if (!btn) return;
+
+  btn.classList.remove("is-syncing", "is-error", "is-synced");
+
+  if (status === "syncing") {
+    btn.classList.add("is-syncing");
+    if (label) label.textContent = "Sync…";
+    btn.title = "Probíhá synchronizace s cloudem…";
+  } else if (status === "error") {
+    btn.classList.add("is-error");
+    if (label) label.textContent = "Chyba syncu";
+    btn.title = "Při synchronizaci došlo k chybě. Klikněte pro opakování.";
+  } else {
+    btn.classList.add("is-synced");
+    const diffSec = state.lastSyncTime ? Math.round((Date.now() - state.lastSyncTime) / 1000) : null;
+    const timeStr = diffSec !== null ? (diffSec < 10 ? "právě teď" : `před ${diffSec}s`) : "připraveno";
+    if (label) label.textContent = "Sync ✓";
+    btn.title = `Cloudová data jsou aktuální (${timeStr}). Klikněte pro okamžitou synchronizaci.`;
+  }
 }
 
 function bindChrome() {
-  // Theme & Profile & Admin & Bug
+  // Theme & Profile & Admin & Bug & Cloud Sync
   document.getElementById("btnTheme")?.addEventListener("click", toggleTheme);
   document.getElementById("btnTitlebarAdmin")?.addEventListener("click", () => openAdminModal());
   document.getElementById("btnProfileAdmin")?.addEventListener("click", () => {
     document.getElementById("profileModal")?.classList.add("hidden");
     openAdminModal();
+  });
+  document.getElementById("btnCloudSync")?.addEventListener("click", async () => {
+    updateCloudSyncUI("syncing");
+    const ok = await syncCloudProgress();
+    updateCloudSyncUI(ok ? "synced" : "error");
   });
   bindBugModal();
 
