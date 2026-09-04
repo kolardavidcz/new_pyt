@@ -236,6 +236,143 @@ export class CloudSyncEngine {
 
     return { dict: mergedDict, changed };
   }
+
+  /**
+   * Performs granular Item-Level Last-Write-Wins (LWW) merge.
+   * Eliminates data loss between tablet reading and PC exercise work,
+   * and cleanly handles unchecking without resurrecting old items.
+   */
+  async syncLWWMap(username, dataset, localEntries = {}, localStorageKey = null, legacyFallbackDatasets = []) {
+    if (!username) {
+      return { entries: localEntries, changed: false };
+    }
+
+    const primaryKey = this.getKey(username, dataset);
+    const remoteResult = await this.fetchDataset(username, dataset);
+    let remoteEntries = normalizeToLWWEntries(remoteResult?.value);
+
+    // If primary key is empty, check legacy fallback datasets (e.g. "studied", "skipped")
+    if (Object.keys(remoteEntries).length === 0 && Array.isArray(legacyFallbackDatasets)) {
+      for (const fallbackDataset of legacyFallbackDatasets) {
+        const fbRes = await this.fetchDataset(username, fallbackDataset);
+        if (fbRes?.value) {
+          const normFb = normalizeToLWWEntries(fbRes.value);
+          for (const [id, rec] of Object.entries(normFb)) {
+            if (rec.v === true) {
+              normFb[id] = { v: fallbackDataset, t: 1 };
+            }
+          }
+          remoteEntries = mergeLWW(remoteEntries, normFb);
+        }
+      }
+    }
+
+    // Read local storage if key provided
+    let localStoredEntries = {};
+    if (localStorageKey) {
+      try {
+        const raw = localStorage.getItem(localStorageKey);
+        if (raw) localStoredEntries = normalizeToLWWEntries(JSON.parse(raw));
+      } catch { /* ignore */ }
+    }
+
+    // Perform 3-way LWW merge: localStored -> remote -> local memory
+    const mergedEntries = mergeLWW(localStoredEntries, remoteEntries, localEntries);
+
+    // Check if anything changed compared to localEntries
+    let changed = false;
+    const localKeys = Object.keys(localEntries);
+    const mergedKeys = Object.keys(mergedEntries);
+    if (localKeys.length !== mergedKeys.length) {
+      changed = true;
+    } else {
+      for (const k of mergedKeys) {
+        if (!localEntries[k] || localEntries[k].v !== mergedEntries[k].v || localEntries[k].t !== mergedEntries[k].t) {
+          changed = true;
+          break;
+        }
+      }
+    }
+
+    const payload = {
+      _type: "lww-v1",
+      updatedAt: Date.now(),
+      entries: mergedEntries,
+    };
+
+    // Save back to local storage if key provided
+    if (localStorageKey) {
+      try {
+        localStorage.setItem(localStorageKey, JSON.stringify(payload));
+      } catch { /* ignore */ }
+    }
+
+    // Push merged LWW map to cloud
+    if (Object.keys(mergedEntries).length > 0) {
+      await this.kvSet(primaryKey, payload);
+    }
+
+    return { entries: mergedEntries, changed, payload };
+  }
+}
+
+/**
+ * Normalizes any format (legacy array of IDs, dictionary, or LWW envelope)
+ * into a canonical item-level map: { [id]: { v: any, t: number } }
+ */
+export function normalizeToLWWEntries(raw) {
+  const entries = {};
+  if (!raw) return entries;
+
+  if (Array.isArray(raw)) {
+    for (const id of raw) {
+      if (typeof id === "string" || typeof id === "number") {
+        entries[String(id)] = { v: true, t: 1 };
+      }
+    }
+    return entries;
+  }
+
+  if (typeof raw === "object") {
+    const source = raw._type === "lww-v1" && raw.entries ? raw.entries : raw;
+    for (const [id, rec] of Object.entries(source)) {
+      if (id.startsWith("_")) continue;
+      if (rec && typeof rec === "object") {
+        const v = rec.v !== undefined ? rec.v : (rec.checked !== undefined ? rec.checked : (rec.status !== undefined ? rec.status : true));
+        const t = rec.t || rec.updatedAt || rec.timestamp || 1;
+        entries[id] = { v, t };
+      } else {
+        entries[id] = { v: rec, t: 1 };
+      }
+    }
+  }
+
+  return entries;
+}
+
+/**
+ * Performs granular Last-Write-Wins (LWW) merge across multiple entry sources.
+ * Sources are evaluated in order; entries with higher timestamps (t) win.
+ */
+export function mergeLWW(...sources) {
+  const merged = {};
+  for (const src of sources) {
+    if (!src) continue;
+    for (const [id, rec] of Object.entries(src)) {
+      if (!rec) continue;
+      const current = merged[id];
+      if (!current) {
+        merged[id] = { v: rec.v, t: rec.t || 1 };
+      } else {
+        const curTime = current.t || 0;
+        const newTime = rec.t || 0;
+        if (newTime >= curTime) {
+          merged[id] = { v: rec.v, t: newTime };
+        }
+      }
+    }
+  }
+  return merged;
 }
 
 export const syncEngine = new CloudSyncEngine();
