@@ -182,43 +182,8 @@ export async function saveQuestionImprovement(data) {
         state.questionImprovements = data.result;
       }
     }
-  } catch { /* fallback to direct Upstash */ }
-
-  // 2. Direct Upstash Redis Cloud DB fallback if serverless proxy unreachable
-  if (!synced) {
-    try {
-      const kvUrl = "https://[REDACTED_UPSTASH_HOST]";
-      const kvToken = "[REDACTED_UPSTASH_TOKEN]";
-      
-      const getRes = await fetch(`${kvUrl}/get/pyt:global:question_improvements`, {
-        headers: { Authorization: `Bearer ${kvToken}` },
-      });
-      let remoteList = [];
-      if (getRes.ok) {
-        const gData = await getRes.json();
-        if (gData && gData.result) {
-          let parsed = gData.result;
-          while (typeof parsed === "string") {
-            try { parsed = JSON.parse(parsed); } catch { break; }
-          }
-          remoteList = Array.isArray(parsed) ? parsed : [];
-        }
-      }
-
-      const byId = new Map();
-      for (const item of remoteList) if (item && item.id) byId.set(item.id, item);
-      byId.set(entry.id, entry);
-      const mergedList = Array.from(byId.values()).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-      await fetch(`${kvUrl}/set/pyt:global:question_improvements`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${kvToken}` },
-        body: JSON.stringify(JSON.stringify(mergedList)),
-      });
-      state.questionImprovements = mergedList;
-    } catch (err) {
-      console.warn("[Upstash Direct Sync Warning]", err);
-    }
+  } catch (err) {
+    console.warn("[Question Improvement Sync Warning]", err);
   }
 
   notifyStateChange("questionImprovement", { entry });
@@ -226,9 +191,6 @@ export async function saveQuestionImprovement(data) {
 }
 
 export async function loadQuestionImprovements() {
-  const kvUrl = "https://[REDACTED_UPSTASH_HOST]";
-  const kvToken = "[REDACTED_UPSTASH_TOKEN]";
-  
   let remoteItems = null;
 
   // 1. Fetch from /api/question-improvement (Cloud-first)
@@ -240,27 +202,8 @@ export async function loadQuestionImprovements() {
         remoteItems = data.result;
       }
     }
-  } catch { /* fallback */ }
-
-  // 2. Direct Upstash fallback if /api/question-improvement failed
-  if (!remoteItems) {
-    try {
-      const getRes = await fetch(`${kvUrl}/get/pyt:global:question_improvements`, {
-        headers: { Authorization: `Bearer ${kvToken}` },
-      });
-      if (getRes.ok) {
-        const gData = await getRes.json();
-        if (gData && gData.result) {
-          let parsed = gData.result;
-          while (typeof parsed === "string") {
-            try { parsed = JSON.parse(parsed); } catch { break; }
-          }
-          if (Array.isArray(parsed)) remoteItems = parsed;
-        }
-      }
-    } catch (err) {
-      console.warn("[Upstash Fetch Improvements Warning]", err);
-    }
+  } catch (err) {
+    console.warn("[Fetch Question Improvements Warning]", err);
   }
 
   if (Array.isArray(remoteItems)) {
@@ -282,7 +225,7 @@ export async function updateQuestionImprovement(id, updates = {}) {
     state.questionImprovements[idx] = { ...state.questionImprovements[idx], ...updates };
   }
 
-  // Sync to API and Upstash
+  // Sync to API
   try {
     const res = await fetch("/api/question-improvement", {
       method: "POST",
@@ -295,16 +238,8 @@ export async function updateQuestionImprovement(id, updates = {}) {
         state.questionImprovements = data.result;
       }
     }
-  } catch {
-    try {
-      const kvUrl = "https://[REDACTED_UPSTASH_HOST]";
-      const kvToken = "[REDACTED_UPSTASH_TOKEN]";
-      await fetch(`${kvUrl}/set/pyt:global:question_improvements`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${kvToken}` },
-        body: JSON.stringify(JSON.stringify(state.questionImprovements)),
-      });
-    } catch { /* ignore */ }
+  } catch (err) {
+    console.warn("[Update Improvement Warning]", err);
   }
 
   notifyStateChange("questionImprovementUpdated", { id, updates });
@@ -331,16 +266,8 @@ export async function deleteQuestionImprovement(id) {
         state.questionImprovements = data.result;
       }
     }
-  } catch {
-    try {
-      const kvUrl = "https://[REDACTED_UPSTASH_HOST]";
-      const kvToken = "[REDACTED_UPSTASH_TOKEN]";
-      await fetch(`${kvUrl}/set/pyt:global:question_improvements`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${kvToken}` },
-        body: JSON.stringify(JSON.stringify(state.questionImprovements)),
-      });
-    } catch { /* ignore */ }
+  } catch (err) {
+    console.warn("[Delete Improvement Warning]", err);
   }
 
   notifyStateChange("questionImprovementDeleted", { id });
@@ -482,16 +409,8 @@ export function saveRelevanceOverride(deckKey, newRelevance) {
 
   notifyStateChange("relevanceUpdated", { deckKey, relevanceTeacher: relNum });
 
-  // Optional Upstash sync
-  try {
-    const kvUrl = "https://[REDACTED_UPSTASH_HOST]";
-    const kvToken = "[REDACTED_UPSTASH_TOKEN]";
-    fetch(`${kvUrl}/set/pyt:global:relevance_overrides`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${kvToken}` },
-      body: JSON.stringify(JSON.stringify(overrides)),
-    });
-  } catch { /* ignore */ }
+  // Optional Cloud sync through sync proxy
+  syncEngine.kvSet("pyt:global:relevance_overrides", overrides).catch(() => {});
 }
 
 const ERROR_LOG_KEY = "pcs-error-link-log-v1";

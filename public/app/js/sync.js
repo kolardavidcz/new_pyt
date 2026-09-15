@@ -6,7 +6,6 @@
  */
 
 export const DEFAULT_KV_URL = "https://[REDACTED_UPSTASH_HOST]";
-export const DEFAULT_KV_TOKEN = "[REDACTED_UPSTASH_TOKEN]";
 
 export class CloudSyncEngine {
   constructor(options = {}) {

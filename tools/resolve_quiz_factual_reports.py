@@ -4,6 +4,7 @@ Fix factual/unclear quiz questions in data/quizzes.json and mark the correspondi
 """
 
 import json
+import os
 import urllib.request
 import urllib.parse
 from datetime import datetime, timezone
@@ -14,6 +15,18 @@ ROOT = Path(__file__).resolve().parent.parent
 QUIZZES_JSON = ROOT / "data" / "quizzes.json"
 DB_JSON = ROOT / "data" / "question_improvements.json"
 PUB_DB_JSON = ROOT / "public" / "data" / "question_improvements.json"
+
+def load_env() -> dict[str, str]:
+    env: dict[str, str] = {}
+    env_file = ROOT / ".env.local"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            env[k.strip()] = v.strip().strip('"').strip("'")
+    return env
 
 def main():
     quizzes = json.loads(QUIZZES_JSON.read_text(encoding="utf-8"))
@@ -104,16 +117,18 @@ def main():
             local_items = []
 
     remote_items = []
-    kv_url = "https://[REDACTED_UPSTASH_HOST]"
-    kv_token = "[REDACTED_UPSTASH_TOKEN]"
+    local_env = load_env()
+    kv_url = os.environ.get("KV_REST_API_URL") or local_env.get("KV_REST_API_URL") or "https://[REDACTED_UPSTASH_HOST]"
+    kv_token = os.environ.get("KV_REST_API_TOKEN") or local_env.get("KV_REST_API_TOKEN", "")
 
-    try:
-        req = urllib.request.Request(
-            f"{kv_url}/get/pyt:global:question_improvements",
-            headers={"Authorization": f"Bearer {kv_token}"}
-        )
-        with urllib.request.urlopen(req, timeout=5) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
+    if kv_token:
+        try:
+            req = urllib.request.Request(
+                f"{kv_url}/get/pyt:global:question_improvements",
+                headers={"Authorization": f"Bearer {kv_token}"}
+            )
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
             if data and data.get("result"):
                 res_val = data["result"]
                 while isinstance(res_val, str):
@@ -158,18 +173,19 @@ def main():
     print("  ✓ Saved updated reports to data/question_improvements.json and public/data/question_improvements.json")
 
     # Push to Upstash Redis
-    try:
-        set_req = urllib.request.Request(
-            f"{kv_url}/set/pyt:global:question_improvements",
-            data=json.dumps(json.dumps(merged_list, ensure_ascii=False)).encode("utf-8"),
-            headers={"Authorization": f"Bearer {kv_token}"},
-            method="POST"
-        )
-        with urllib.request.urlopen(set_req, timeout=5) as resp:
-            if resp.status == 200:
-                print("  ✓ Successfully synced resolved reports to Upstash Cloud DB!")
-    except Exception as e:
-        print(f"  ⚠️ Could not push to Upstash Redis: {e}")
+    if kv_token:
+        try:
+            set_req = urllib.request.Request(
+                f"{kv_url}/set/pyt:global:question_improvements",
+                data=json.dumps(json.dumps(merged_list, ensure_ascii=False)).encode("utf-8"),
+                headers={"Authorization": f"Bearer {kv_token}"},
+                method="POST"
+            )
+            with urllib.request.urlopen(set_req, timeout=5) as resp:
+                if resp.status == 200:
+                    print("  ✓ Successfully synced resolved reports to Upstash Cloud DB!")
+        except Exception as e:
+            print(f"  ⚠️ Could not push to Upstash Redis: {e}")
 
 if __name__ == "__main__":
     main()
