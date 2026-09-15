@@ -89,8 +89,14 @@ export class CloudSyncEngine {
     const payload = Array.from(this.queueMap.entries()).map(([key, val]) => ({ key, val }));
     this.queueMap.clear();
 
+    const hasGlobal = payload.some((item) => typeof item?.key === "string" && item.key.startsWith("pyt:global:"));
+    const headers = { "Content-Type": "application/json" };
+    if (hasGlobal) {
+      headers["x-admin-key"] = "pcs-admin-key-v1";
+    }
+
     try {
-      if (typeof navigator !== "undefined" && navigator.sendBeacon && document.visibilityState === "hidden") {
+      if (!hasGlobal && typeof navigator !== "undefined" && navigator.sendBeacon && document.visibilityState === "hidden") {
         const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
         navigator.sendBeacon(this.apiEndpoint, blob);
         return true;
@@ -98,8 +104,9 @@ export class CloudSyncEngine {
 
       const res = await fetch(this.apiEndpoint, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(payload),
+        keepalive: typeof document !== "undefined" && document.visibilityState === "hidden",
       });
       return res.ok;
     } catch {

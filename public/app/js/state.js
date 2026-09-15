@@ -229,7 +229,10 @@ export async function updateQuestionImprovement(id, updates = {}) {
   try {
     const res = await fetch("/api/question-improvement", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": "pcs-admin-key-v1",
+      },
       body: JSON.stringify({ action: "update", id, ...updates }),
     });
     if (res.ok) {
@@ -257,7 +260,10 @@ export async function deleteQuestionImprovement(id) {
   try {
     const res = await fetch("/api/question-improvement", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": "pcs-admin-key-v1",
+      },
       body: JSON.stringify({ action: "delete", id }),
     });
     if (res.ok) {

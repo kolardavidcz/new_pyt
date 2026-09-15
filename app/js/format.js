@@ -18,6 +18,16 @@ function escapeHtml(s) {
     .replace(/"/g, "&quot;");
 }
 
+export function sanitizeHtmlTag(tagStr) {
+  if (!tagStr) return "";
+  // Strip inline event handlers: on*="..." or on*='...' or on*=...
+  let safe = tagStr.replace(/\s+on[a-z0-9_-]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "");
+  // Neutralize javascript: or data: URIs in href/src attributes
+  safe = safe.replace(/\s+(href|src)\s*=\s*(["'])\s*(?:javascript|data):[^"'>]*\2/gi, ' $1="#"');
+  safe = safe.replace(/\s+(href|src)\s*=\s*(?:javascript|data):[^\s>]*/gi, ' $1="#"');
+  return safe;
+}
+
 export function formatInlineCode(str) {
   if (!str) return "";
 
@@ -73,7 +83,7 @@ export function formatInlineCode(str) {
             const withBuiltins = escaped.replace(DYNAMIC_PY_FUNC_REGEX, '<code class="inline-code"><span class="tok-builtin">$1</span>()</code>');
             out.push(withBuiltins);
           } else {
-            out.push(subParts[j]);
+            out.push(sanitizeHtmlTag(subParts[j]));
           }
         }
       } else {

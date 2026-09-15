@@ -4,10 +4,17 @@
  */
 
 export default async function handler(req, res) {
-  // CORS Headers
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  // CORS origin check
+  const origin = req.headers.origin;
+  const isAllowedOrigin = !origin || 
+    origin.includes("localhost") || 
+    origin.includes("127.0.0.1") || 
+    origin.endsWith(".vercel.app") ||
+    origin.includes("vscht.cz");
+  
+  res.setHeader("Access-Control-Allow-Origin", isAllowedOrigin ? (origin || "*") : "null");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, x-admin-key");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
@@ -21,6 +28,16 @@ export default async function handler(req, res) {
   }
 
   const REDIS_KEY = "pyt:global:question_improvements";
+  const adminSecret = process.env.ADMIN_API_KEY || "pcs-admin-key-v1";
+  const clientKey = req.headers["x-admin-key"] || req.headers["authorization"]?.replace(/^Bearer\s+/i, "");
+  const isAuthorizedAdmin = Boolean(clientKey && clientKey === adminSecret);
+
+  function sanitizeId(id) {
+    if (typeof id === "string" && /^imp-\d+-[a-zA-Z0-9_-]{1,16}$/.test(id)) {
+      return id;
+    }
+    return `imp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  }
 
   async function fetchRemoteImprovements() {
     try {
@@ -62,18 +79,30 @@ export default async function handler(req, res) {
     }
 
     if (req.method === "POST") {
+      // Enforce 32KB max payload length to protect cloud storage quota
+      const rawLen = parseInt(req.headers["content-length"] || "0", 10);
+      if (rawLen > 32768) {
+        return res.status(413).json({ error: "Payload too large (max 32KB)" });
+      }
+
       const body = req.body || {};
 
-      // 1. Explicit Delete Action
+      // 1. Explicit Delete Action (Admin-Only)
       if (body.action === "delete" && body.id) {
+        if (!isAuthorizedAdmin) {
+          return res.status(403).json({ error: "Unauthorized: admin credentials required for delete action" });
+        }
         const remoteItems = await fetchRemoteImprovements();
         const updatedList = remoteItems.filter((i) => i.id !== body.id);
         await saveRemoteImprovements(updatedList);
         return res.status(200).json({ status: "ok", action: "delete", id: body.id, result: updatedList, total: updatedList.length });
       }
 
-      // 2. Explicit Update Action (Status, fixSummary, category, userNote, etc.)
+      // 2. Explicit Update Action (Admin-Only)
       if (body.action === "update" && body.id) {
+        if (!isAuthorizedAdmin) {
+          return res.status(403).json({ error: "Unauthorized: admin credentials required for update action" });
+        }
         const remoteItems = await fetchRemoteImprovements();
         const idx = remoteItems.findIndex((i) => i.id === body.id);
         if (idx !== -1) {
@@ -81,13 +110,19 @@ export default async function handler(req, res) {
           if (updates.status === "resolved" && !updates.resolvedAt) {
             updates.resolvedAt = new Date().toISOString();
           }
+          if (updates.fixSummary) {
+            updates.fixSummary = String(updates.fixSummary).slice(0, 500);
+          }
+          if (updates.userNote) {
+            updates.userNote = String(updates.userNote).slice(0, 2000);
+          }
           remoteItems[idx] = { ...remoteItems[idx], ...updates };
           await saveRemoteImprovements(remoteItems);
         }
         return res.status(200).json({ status: "ok", action: "update", id: body.id, result: remoteItems, total: remoteItems.length });
       }
 
-      // 3. Upsert / Add report entry or array of entries
+      // 3. Upsert / Add report entry or array of entries (Students & Public)
       const incomingEntries = Array.isArray(body)
         ? body
         : (body.entry ? [body.entry] : (body.id || body.deckKey ? [body] : []));
@@ -96,19 +131,19 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: "Missing improvement payload" });
       }
 
-      const validEntries = incomingEntries.map((e) => ({
-        id: e.id || `imp-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      const validEntries = incomingEntries.slice(0, 10).map((e) => ({
+        id: sanitizeId(e.id),
         timestamp: e.timestamp || new Date().toISOString(),
-        deckKey: e.deckKey || "",
-        questionId: e.questionId || "presentation-content",
-        questionText: e.questionText || "",
-        questionType: e.questionType || "presentation",
-        category: e.category || "content_error",
-        categoryLabel: e.categoryLabel || "Chyba v obsahu prezentace",
-        userNote: e.userNote || "",
-        status: e.status || "open",
-        resolvedAt: e.resolvedAt || undefined,
-        fixSummary: e.fixSummary || undefined,
+        deckKey: String(e.deckKey || "").slice(0, 64),
+        questionId: String(e.questionId || "presentation-content").slice(0, 64),
+        questionText: String(e.questionText || "").slice(0, 500),
+        questionType: String(e.questionType || "presentation").slice(0, 32),
+        category: String(e.category || "content_error").slice(0, 32),
+        categoryLabel: String(e.categoryLabel || "Chyba v obsahu prezentace").slice(0, 64),
+        userNote: String(e.userNote || "").slice(0, 2000),
+        status: "open",
+        resolvedAt: undefined,
+        fixSummary: undefined,
       }));
 
       const remoteItems = await fetchRemoteImprovements();

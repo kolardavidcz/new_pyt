@@ -19,7 +19,7 @@ import {
   clearLinkErrorLog,
   registerUser,
 } from "./state.js";
-import { el, escapeHtml, starsHtml } from "./ui.js";
+import { el, escapeHtml, escapeAttr, starsHtml } from "./ui.js";
 
 let adminModalEl = null;
 
@@ -249,7 +249,7 @@ function renderImprovementsTab() {
       const hasZnamenacek = isSlide && isFactual;
 
       return `
-        <div class="admin-item-card" data-id="${item.id}" style="border-radius:2px;">
+        <div class="admin-item-card" data-id="${escapeAttr(item.id)}" style="border-radius:2px;">
           <div class="admin-item-head" style="display:flex; justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <span style="font-size:11px; font-weight:600; padding:2px 6px; border-radius:2px; background:${isSlide ? "rgba(56,189,248,0.15)" : "rgba(168,85,247,0.15)"}; color:${isSlide ? "#38bdf8" : "#c084fc"};">
@@ -273,15 +273,15 @@ function renderImprovementsTab() {
           <div style="font-size:10.5px; color:var(--fg-subtle); margin-top:6px;">${new Date(item.timestamp).toLocaleString("cs-CZ")}</div>
           
           <div class="admin-item-actions" style="margin-top:8px;">
-            ${status !== "resolved" ? `<button type="button" class="admin-btn-sm success btn-act-resolve" data-id="${item.id}">Vyřešit</button>` : ""}
-            ${status !== "dismissed" ? `<button type="button" class="admin-btn-sm btn-act-dismiss" data-id="${item.id}">Zamítnout</button>` : ""}
-            ${status !== "open" ? `<button type="button" class="admin-btn-sm btn-act-reopen" data-id="${item.id}">Znovu otevřít</button>` : ""}
-            <button type="button" class="admin-btn-sm btn-act-edit" data-id="${item.id}">Upravit</button>
-            <button type="button" class="admin-btn-sm danger btn-act-delete" data-id="${item.id}">Smazat</button>
+            ${status !== "resolved" ? `<button type="button" class="admin-btn-sm success btn-act-resolve" data-id="${escapeAttr(item.id)}">Vyřešit</button>` : ""}
+            ${status !== "dismissed" ? `<button type="button" class="admin-btn-sm btn-act-dismiss" data-id="${escapeAttr(item.id)}">Zamítnout</button>` : ""}
+            ${status !== "open" ? `<button type="button" class="admin-btn-sm btn-act-reopen" data-id="${escapeAttr(item.id)}">Znovu otevřít</button>` : ""}
+            <button type="button" class="admin-btn-sm btn-act-edit" data-id="${escapeAttr(item.id)}">Upravit</button>
+            <button type="button" class="admin-btn-sm danger btn-act-delete" data-id="${escapeAttr(item.id)}">Smazat</button>
           </div>
 
           <!-- Inline Edit Drawer -->
-          <div class="admin-edit-panel hidden" id="editPanel-${item.id}" style="margin-top:10px; padding:12px; background:var(--editor, #1e1e1e); border:1px solid var(--border-subtle, #444); border-radius:2px;">
+          <div class="admin-edit-panel hidden" data-edit-id="${escapeAttr(item.id)}" style="margin-top:10px; padding:12px; background:var(--editor, #1e1e1e); border:1px solid var(--border-subtle, #444); border-radius:2px;">
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
               <div style="flex:1; min-width:200px;">
                 <label style="font-size:11px; color:var(--fg-muted); display:block; margin-bottom:4px;">Kategorie:</label>
@@ -310,8 +310,8 @@ function renderImprovementsTab() {
               <input type="text" class="admin-search-input edit-fix-summary" placeholder="Např. Opraveno v prezentaci, upraveno zadání otázky..." value="${escapeHtml(item.fixSummary || "")}" style="width:100%; font-family:inherit;" />
             </div>
             <div style="display:flex; justify-content:flex-end; gap:8px;">
-              <button type="button" class="admin-btn-sm btn-cancel-inline-edit" data-id="${item.id}">Zrušit</button>
-              <button type="button" class="admin-btn-sm success btn-save-inline-edit" data-id="${item.id}">Uložit změny</button>
+              <button type="button" class="admin-btn-sm btn-cancel-inline-edit" data-id="${escapeAttr(item.id)}">Zrušit</button>
+              <button type="button" class="admin-btn-sm success btn-save-inline-edit" data-id="${escapeAttr(item.id)}">Uložit změny</button>
             </div>
           </div>
         </div>
@@ -348,8 +348,8 @@ function renderImprovementsTab() {
 
     container.querySelectorAll(".btn-act-edit").forEach((b) => {
       b.addEventListener("click", () => {
-        const id = b.getAttribute("data-id");
-        const panel = container.querySelector(`#editPanel-${id}`);
+        const card = b.closest(".admin-item-card");
+        const panel = card?.querySelector(".admin-edit-panel");
         if (panel) {
           panel.classList.toggle("hidden");
         }
@@ -358,8 +358,8 @@ function renderImprovementsTab() {
 
     container.querySelectorAll(".btn-cancel-inline-edit").forEach((b) => {
       b.addEventListener("click", () => {
-        const id = b.getAttribute("data-id");
-        const panel = container.querySelector(`#editPanel-${id}`);
+        const card = b.closest(".admin-item-card");
+        const panel = card?.querySelector(".admin-edit-panel");
         if (panel) panel.classList.add("hidden");
       });
     });
