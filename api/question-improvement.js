@@ -20,11 +20,11 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const kvUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || "https://[REDACTED_UPSTASH_HOST]";
+  const kvUrl = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
   const kvToken = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
 
-  if (!kvToken) {
-    return res.status(500).json({ error: "Serverless KV storage token is not configured" });
+  if (!kvUrl || !kvToken) {
+    return res.status(500).json({ error: "Serverless KV storage is not configured" });
   }
 
   const REDIS_KEY = "pyt:global:question_improvements";

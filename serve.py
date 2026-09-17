@@ -73,7 +73,7 @@ def get_kv_config() -> tuple[str, str]:
         or os.environ.get("KV_REST_API_URL")
         or LOCAL_ENV.get("UPSTASH_REDIS_REST_URL")
         or LOCAL_ENV.get("KV_REST_API_URL")
-        or "https://[REDACTED_UPSTASH_HOST]"
+        or ""
     )
     token: str = (
         os.environ.get("UPSTASH_REDIS_REST_TOKEN")

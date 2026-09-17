@@ -118,10 +118,10 @@ def main():
 
     remote_items = []
     local_env = load_env()
-    kv_url = os.environ.get("KV_REST_API_URL") or local_env.get("KV_REST_API_URL") or "https://[REDACTED_UPSTASH_HOST]"
+    kv_url = os.environ.get("KV_REST_API_URL") or local_env.get("KV_REST_API_URL", "")
     kv_token = os.environ.get("KV_REST_API_TOKEN") or local_env.get("KV_REST_API_TOKEN", "")
 
-    if kv_token:
+    if kv_url and kv_token:
         try:
             req = urllib.request.Request(
                 f"{kv_url}/get/pyt:global:question_improvements",

@@ -5,8 +5,6 @@
  * Example: pyt:kolard:studied (for Python project) or cpp:kolard:studied (for C++ project)
  */
 
-export const DEFAULT_KV_URL = "https://[REDACTED_UPSTASH_HOST]";
-
 export class CloudSyncEngine {
   constructor(options = {}) {
     this.appId = options.appId || "pyt";
