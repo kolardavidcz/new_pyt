@@ -327,12 +327,6 @@ function bindChrome() {
   // Profile Modal
   const profileModal = document.getElementById("profileModal");
   const btnProfile = document.getElementById("btnProfile");
-  const btnCloseProfile = document.getElementById("btnCloseProfile");
-  const btnSwitchProfile = document.getElementById("btnSwitchProfile");
-  const btnLogoutProfile = document.getElementById("btnLogoutProfile");
-  const profileUserView = document.getElementById("profileUserView");
-  const profileLoginForm = document.getElementById("profileLoginForm");
-  const btnCancelLogin = document.getElementById("btnCancelLogin");
 
   // Error Log Modal
   const errorLogModal = document.getElementById("errorLogModal");
@@ -360,45 +354,7 @@ function bindChrome() {
     if (e.target === profileModal) profileModal.classList.add("hidden");
   });
 
-  btnCloseProfile?.addEventListener("click", () => profileModal?.classList.add("hidden"));
-  btnCancelLogin?.addEventListener("click", () => {
-    if (state.user) {
-      profileLoginForm?.classList.add("hidden");
-      profileUserView?.classList.remove("hidden");
-    } else {
-      profileModal?.classList.add("hidden");
-    }
-  });
 
-  btnSwitchProfile?.addEventListener("click", () => {
-    profileUserView?.classList.add("hidden");
-    profileLoginForm?.classList.remove("hidden");
-    const inputU = document.getElementById("inputUsername");
-    if (inputU) inputU.focus();
-  });
-
-  btnLogoutProfile?.addEventListener("click", () => {
-    logoutUser();
-    updateUserUI();
-    profileUserView?.classList.add("hidden");
-    profileLoginForm?.classList.remove("hidden");
-  });
-
-  profileLoginForm?.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const rawUser = document.getElementById("inputUsername")?.value.trim();
-    if (!rawUser) return;
-
-    const cleanUsername = rawUser.includes("@") ? rawUser.split("@")[0].toLowerCase() : rawUser.toLowerCase();
-
-    setUser({
-      username: cleanUsername,
-    });
-    updateUserUI();
-    profileLoginForm?.classList.add("hidden");
-    profileUserView?.classList.remove("hidden");
-    profileModal?.classList.add("hidden");
-  });
 
   // Activity bar
   document.querySelectorAll(".activity-btn[data-view]").forEach((btn) => {

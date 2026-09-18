@@ -566,25 +566,8 @@ export async function loginWithPassword({ usernameOrEmail, password }) {
   const db = getUsersDb();
   let userRecord = db[clean];
 
-  // Auto-seed admin account on first login if not present in DB
-  if (!userRecord && clean === "kolard") {
-    const salt = generateSalt();
-    const passwordHash = await hashPassword("kolard123", salt);
-    userRecord = {
-      username: "kolard",
-      name: "David Kolar",
-      email: "kolard@vscht.cz",
-      salt,
-      passwordHash,
-      faculty: "FCHI · VSČHT Praha",
-      studentId: "987654",
-      role: "admin",
-    };
-    saveUserToDb(userRecord);
-  }
-
   if (!userRecord) {
-    throw new Error("Uživatel nenalezen. Zkontrolujte jméno nebo se zaregistrujte.");
+    throw new Error("Uživatel nenalezen. Zkontrolujte jméno nebo se zaregistrujte v záložce Registrace.");
   }
 
   const computedHash = await hashPassword(password, userRecord.salt);
