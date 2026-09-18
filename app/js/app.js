@@ -4,7 +4,7 @@
 import {
   state, loadPersisted, buildIndexes, clearFilters, filtersActive,
   filteredItems, persistSidebarW, pagesFor, onStateChange,
-  setUser, logoutUser, defaultUser, syncCloudProgress, clearLinkErrorLog, markLinkErrorFixed,
+  setUser, logoutUser, syncCloudProgress, clearLinkErrorLog, markLinkErrorFixed,
   loadRelevanceOverrides, getCourseStats,
 } from "./state.js";
 import { renderTree, setTreeSelectHandler, expandAll, collapseAll } from "./tree.js";
@@ -222,7 +222,14 @@ function stepSlide(dir) {
 function updateUserUI() {
   const u = state.user;
   const userLabel = document.getElementById("userLabel");
-  if (userLabel) userLabel.textContent = u ? u.username : "Přihlásit se";
+  const btnProfile = document.getElementById("btnProfile");
+  if (userLabel) userLabel.textContent = u ? (u.name || u.username) : "Přihlásit se";
+  if (btnProfile) {
+    btnProfile.title = u
+      ? `Student profil: ${u.name || u.username} (${u.email || u.username + "@vscht.cz"})`
+      : "Přihlásit se ke studijnímu profilu (VSČHT)";
+    btnProfile.classList.toggle("is-logged-in", Boolean(u));
+  }
 
   const pName = document.getElementById("profileName");
   const pUsername = document.getElementById("profileUsername");
@@ -234,7 +241,7 @@ function updateUserUI() {
     if (pName) pName.textContent = u.name || u.username;
     if (pUsername) pUsername.textContent = u.username;
     if (pFaculty) pFaculty.textContent = u.faculty || "VSČHT Praha";
-    if (pId) pId.textContent = `ID: ${u.studentId || "987654"}`;
+    if (pId) pId.textContent = `ID: ${u.studentId || ""}`;
     if (pAvatar) {
       const initials = (u.name || u.username)
         .split(" ")
@@ -244,6 +251,12 @@ function updateUserUI() {
         .slice(0, 2);
       pAvatar.textContent = initials || "VS";
     }
+  } else {
+    if (pName) pName.textContent = "Nepřihlášen";
+    if (pUsername) pUsername.textContent = "host";
+    if (pFaculty) pFaculty.textContent = "Lokální režim";
+    if (pId) pId.textContent = "";
+    if (pAvatar) pAvatar.textContent = "👤";
   }
 
   // Update profile modal stats based on active curriculum
@@ -267,6 +280,13 @@ export function updateCloudSyncUI(status = "synced") {
   if (!btn) return;
 
   btn.classList.remove("is-syncing", "is-error", "is-synced");
+
+  if (!state.user) {
+    btn.classList.add("is-synced");
+    if (label) label.textContent = "Sync";
+    btn.title = "Lokální režim (přihlaste se pro synchronizaci s cloudem napříč zařízeními)";
+    return;
+  }
 
   if (status === "syncing") {
     btn.classList.add("is-syncing");
@@ -294,6 +314,10 @@ function bindChrome() {
     openAdminModal();
   });
   document.getElementById("btnCloudSync")?.addEventListener("click", async () => {
+    if (!state.user) {
+      showLogin();
+      return;
+    }
     updateCloudSyncUI("syncing");
     const ok = await syncCloudProgress();
     updateCloudSyncUI(ok ? "synced" : "error");
@@ -717,7 +741,7 @@ function bindBugModal() {
     return `### Bug Report / Zpětná vazba
 - **Kontext**: ${item ? `${item.title} (\`${item.path}\`)` : "Obecné zobrazení"}
 - **Slide / Krok**: \`${activeTab?.pageId || "overview"}\`
-- **Uživatel**: \`${state.user?.username || "kolard"}\`
+- **Uživatel**: \`${state.user?.username || "anonymní host"}\`
 - **Kategorie**: ${category}
 - **URL**: \`${window.location.href}\`
 - **Prohlížeč**: \`${navigator.userAgent}\`

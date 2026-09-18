@@ -2271,14 +2271,6 @@ function renderUserProfileDashboard(u) {
       </div>
     ` : ""}
 
-    <div class="v2-dev">
-      <p class="v2-dev-label" style="color:var(--fg-muted);">Rychlé přepnutí testovacího účtu:</p>
-      <div class="quick-buttons" style="display:flex; gap:6px;">
-        <button type="button" class="btn secondary sm" id="btnQuickSwitchKolard" style="flex:1; font-size:11px;">kolard@vscht.cz</button>
-        <button type="button" class="btn secondary sm" id="btnQuickSwitchStudent" style="flex:1; font-size:11px;">student1@vscht.cz</button>
-      </div>
-    </div>
-
     <div class="v2-actions" style="margin-top:14px;">
       <button type="button" class="btn danger" id="btnPageLogout">Odhlásit se</button>
     </div>
@@ -2336,16 +2328,6 @@ function renderUserProfileDashboard(u) {
       openAdminModal();
     });
 
-    card.querySelector("#btnQuickSwitchKolard")?.addEventListener("click", async () => {
-      await loginWithPassword({ usernameOrEmail: "kolard@vscht.cz", password: "kolard123" });
-      showLogin();
-    });
-
-    card.querySelector("#btnQuickSwitchStudent")?.addEventListener("click", async () => {
-      await loginWithPassword({ usernameOrEmail: "student1@vscht.cz", password: "student123" });
-      showLogin();
-    });
-
     card.querySelector("#btnPageLogout")?.addEventListener("click", () => {
       logoutUser();
       showLogin();
@@ -2377,17 +2359,18 @@ function renderLoginForm() {
       <div id="loginErrorBanner" style="display:none; font-size:11.5px; color:#ef4444; background:rgba(239,68,68,0.1); padding:8px 10px; border-left:2px solid #ef4444;"></div>
 
       <div class="v2-field">
-        <label>Školní e-mail (@vscht.cz)</label>
-        <input type="email" id="pageInputEmail" value="kolard@vscht.cz" placeholder="např. novakj@vscht.cz" required autocomplete="email" />
+        <label>Školní e-mail (@vscht.cz) nebo přihlašovací jméno</label>
+        <input type="text" id="pageInputEmail" placeholder="např. novakj nebo novakj@vscht.cz" required autocomplete="username" />
       </div>
 
       <div class="v2-field">
         <label>Heslo</label>
-        <input type="password" id="pageInputPassword" value="kolard123" placeholder="Zadejte heslo..." required autocomplete="current-password" />
+        <input type="password" id="pageInputPassword" placeholder="Zadejte heslo..." required autocomplete="current-password" />
       </div>
 
-      <div style="display:flex; justify-content:flex-end;">
-        <button type="button" id="btnGoToReset" style="background:none; border:none; color:var(--accent); font-size:11px; cursor:pointer; text-decoration:underline;">Zapomněli jste heslo?</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2px;">
+        <button type="button" id="btnGuestContinue" style="background:none; border:none; color:var(--fg-muted, var(--text-muted)); font-size:11px; cursor:pointer; text-decoration:underline; padding:0;">Pokračovat jako host (bez přihlášení)</button>
+        <button type="button" id="btnGoToReset" style="background:none; border:none; color:var(--accent); font-size:11px; cursor:pointer; text-decoration:underline; padding:0;">Zapomněli jste heslo?</button>
       </div>
 
       <button type="submit" class="btn primary xl v2-submit" id="btnLoginSubmit" style="margin-top:6px;">Přihlásit se</button>
@@ -2426,14 +2409,6 @@ function renderLoginForm() {
 
       <button type="submit" class="btn primary xl v2-submit" id="btnResetSubmit" style="margin-top:6px;">Změnit heslo</button>
     </form>
-
-    <div class="v2-dev">
-      <p class="v2-dev-label" style="color:var(--fg-muted);">Rychlé testovací přihlášení:</p>
-      <div class="quick-buttons" style="display:flex; gap:6px;">
-        <button type="button" class="btn secondary sm" id="btnQuickKolard" style="flex:1; font-size:11px;">kolard@vscht.cz</button>
-        <button type="button" class="btn secondary sm" id="btnQuickStudent" style="flex:1; font-size:11px;">student1@vscht.cz</button>
-      </div>
-    </div>
   `;
 
   // Bind login form events
@@ -2554,15 +2529,9 @@ function renderLoginForm() {
       }
     });
 
-    // Quick Dev Accounts
-    card.querySelector("#btnQuickKolard")?.addEventListener("click", async () => {
-      await loginWithPassword({ usernameOrEmail: "kolard@vscht.cz", password: "kolard123" });
-      showLogin();
-    });
-
-    card.querySelector("#btnQuickStudent")?.addEventListener("click", async () => {
-      await loginWithPassword({ usernameOrEmail: "student1@vscht.cz", password: "student123" });
-      showLogin();
+    // Guest continue without logging in
+    card.querySelector("#btnGuestContinue")?.addEventListener("click", () => {
+      profileModal?.classList.add("hidden");
     });
   }, 0);
 

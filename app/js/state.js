@@ -12,12 +12,7 @@ const STUDY_STATUS_KEY = "pcs-study-status-v1";
 const SIDEBAR_W_KEY = "pcs-sidebar-w";
 const USER_KEY = "pcs-user-v1";
 
-export const defaultUser = {
-  username: "kolard",
-  name: "David Kolar",
-  studentId: "987654",
-  faculty: "FCHI · VSČHT Praha",
-};
+export const defaultUser = null;
 
 export function getStudiedKey() {
   const u = state.user?.username;
@@ -479,16 +474,19 @@ export function loadUser() {
     if (raw) {
       const u = JSON.parse(raw);
       if (u && u.username) {
+        // Clear legacy unauthenticated auto-seeded dummy sessions
+        const db = getUsersDb();
+        if (u.username === "kolard" && !u.email && !db["kolard"]) {
+          localStorage.removeItem(USER_KEY);
+          state.user = null;
+          return;
+        }
         state.user = u;
         return;
       }
     }
   } catch { /* ignore */ }
-  // Auto-default to defaultUser (David Kolar) so progress sync works seamlessly on tablet and PC
-  state.user = { ...defaultUser };
-  try {
-    localStorage.setItem(USER_KEY, JSON.stringify(defaultUser));
-  } catch { /* ignore */ }
+  state.user = null;
 }
 
 const USERS_DB_KEY = "pcs-users-db-v1";
@@ -557,21 +555,30 @@ export async function registerUser({ email, password }) {
 }
 
 export async function loginWithPassword({ usernameOrEmail, password }) {
-  const clean = usernameOrEmail.includes("@") ? usernameOrEmail.split("@")[0].toLowerCase() : usernameOrEmail.toLowerCase();
+  const raw = String(usernameOrEmail || "").trim().toLowerCase();
+  if (!raw) {
+    throw new Error("Zadejte uživatelské jméno nebo e-mail.");
+  }
+  if (!password) {
+    throw new Error("Zadejte heslo.");
+  }
+  const clean = raw.includes("@") ? raw.split("@")[0] : raw;
   const db = getUsersDb();
   let userRecord = db[clean];
 
-  // Auto-seed dev accounts if not present
-  if (!userRecord && (clean === "kolard" || clean === "student1")) {
+  // Auto-seed admin account on first login if not present in DB
+  if (!userRecord && clean === "kolard") {
     const salt = generateSalt();
-    const passwordHash = await hashPassword(clean === "kolard" ? "kolard123" : "student123", salt);
+    const passwordHash = await hashPassword("kolard123", salt);
     userRecord = {
-      username: clean,
-      email: `${clean}@vscht.cz`,
+      username: "kolard",
+      name: "David Kolar",
+      email: "kolard@vscht.cz",
       salt,
       passwordHash,
-      faculty: clean === "kolard" ? "FCHI · VSČHT Praha" : "FPBT · VSČHT Praha",
-      studentId: clean === "kolard" ? "987654" : "123456",
+      faculty: "FCHI · VSČHT Praha",
+      studentId: "987654",
+      role: "admin",
     };
     saveUserToDb(userRecord);
   }
@@ -582,7 +589,7 @@ export async function loginWithPassword({ usernameOrEmail, password }) {
 
   const computedHash = await hashPassword(password, userRecord.salt);
   if (computedHash !== userRecord.passwordHash) {
-    throw new Error("Nespárované heslo. Zkontrolujte zadané heslo.");
+    throw new Error("Nesprávné heslo. Zkontrolujte zadané heslo.");
   }
 
   const sessionUser = { ...userRecord };
@@ -631,12 +638,13 @@ export function logoutUser() {
   state.checklistEntries = {};
   state.seenEntries = {};
   state.lastSyncTime = 0;
+  loadPersisted();
   notifyStateChange("user", { user: null });
 }
 
 export function loadPersisted() {
   loadUser();
-  const username = state.user?.username || "kolard";
+  const username = state.user?.username || "guest";
   const sKey = getStudiedKey();
   const skKey = getSkippedKey();
   const seKey = getSeenKey();
@@ -1026,7 +1034,7 @@ export function notifyStateChange(changeType, detail) {
 }
 
 export async function syncCloudProgress() {
-  const username = state.user?.username || "kolard";
+  const username = state.user?.username;
   if (!username) return false;
 
   const studyKeys = [
@@ -1146,7 +1154,8 @@ export async function syncCloudProgress() {
  * Explicitly overwrite local state with the latest state from the cloud.
  */
 export async function forceCloudDownload() {
-  const username = state.user?.username || "kolard";
+  const username = state.user?.username;
+  if (!username) return false;
   try {
     const [rawStatus, rawChecklist, rawSeen] = await Promise.all([
       syncEngine.fetchDataset(username, "study_status"),
@@ -1207,7 +1216,8 @@ export async function forceCloudDownload() {
  * Explicitly overwrite cloud state with this device's current state.
  */
 export async function forceCloudUpload() {
-  const username = state.user?.username || "kolard";
+  const username = state.user?.username;
+  if (!username) return false;
   const now = Date.now();
 
   // Stamp all entries with current timestamp so they win any merge
