@@ -464,7 +464,7 @@ function renderUsersTab() {
         usersDb[adm] = {
           username: adm,
           email: adm.includes("@") ? adm : `${adm}@vscht.cz`,
-          faculty: adm === "kolard" || adm === "kolard@vscht.cz" ? "FCHI · VSČHT Praha" : "VSČHT Praha",
+          faculty: "VSČHT Praha",
           studentId: "000000",
           role: "admin",
         };
@@ -485,6 +485,7 @@ function renderUsersTab() {
     container.innerHTML = userKeys.map((u) => {
       const rec = usersDb[u];
       const isAdmin = isAdminUser({ username: u, role: rec.role });
+      const isCurrentUser = (state.user && state.user.username && state.user.username.toLowerCase() === u.toLowerCase());
 
       return `
         <div class="admin-item-card" style="border-radius:2px;">
@@ -501,11 +502,11 @@ function renderUsersTab() {
           <form autocomplete="off" onsubmit="return false;" class="admin-item-actions" style="align-items:center; margin-top:8px; display:flex; gap:8px;">
             <input type="password" class="admin-search-input adm-pass-input" name="admin_user_reset_pwd_${escapeHtml(u)}" autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-form-type="other" placeholder="Nové heslo..." style="min-width:140px; font-size:11.5px;" data-user="${escapeHtml(u)}" />
             <button type="button" class="admin-btn-sm success btn-act-reset-pass" data-user="${escapeHtml(u)}">Změnit heslo</button>
-            ${u !== "kolard" && u !== "kolard@vscht.cz" ? (
+            ${!isCurrentUser ? (
               isAdmin
                 ? `<button type="button" class="admin-btn-sm btn-act-revoke-admin" data-user="${escapeHtml(u)}">Odebrat správce</button>`
                 : `<button type="button" class="admin-btn-sm btn-act-grant-admin" data-user="${escapeHtml(u)}">Udělit správce</button>`
-            ) : `<span style="font-size:11px; color:var(--accent); font-weight:600;">Hlavní administrátor</span>`}
+            ) : `<span style="font-size:11px; color:var(--accent); font-weight:600;">Aktuální správce</span>`}
           </form>
         </div>
       `;

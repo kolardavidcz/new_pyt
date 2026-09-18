@@ -283,18 +283,16 @@ export function getAdminsList() {
     if (raw) {
       const list = JSON.parse(raw);
       if (Array.isArray(list)) {
-        if (!list.includes("kolard")) list.push("kolard");
         return list;
       }
     }
   } catch { /* ignore */ }
-  return ["kolard"];
+  return [];
 }
 
 export function isAdminUser(user = state.user) {
   if (!user || !user.username) return false;
   const clean = user.username.toLowerCase();
-  if (clean === "kolard") return true;
   if (user.role === "admin" || user.isAdmin === true) return true;
   const admins = getAdminsList();
   return admins.includes(clean);
@@ -321,8 +319,10 @@ export function addAdminUser(username) {
 
 export function removeAdminUser(username) {
   const clean = String(username || "").trim().toLowerCase();
-  if (!clean || clean === "kolard") return; // kolard is superadmin, cannot be removed
+  const currentUsername = (state.user && state.user.username) ? state.user.username.toLowerCase() : "";
+  if (!clean || clean === currentUsername) return; // Cannot revoke own admin status
   let list = getAdminsList();
+  if (list.length <= 1) return; // Cannot remove the last remaining administrator
   list = list.filter((u) => u !== clean);
   try {
     localStorage.setItem(ADMINS_LIST_KEY, JSON.stringify(list));
@@ -476,7 +476,8 @@ export function loadUser() {
       if (u && u.username) {
         // Clear legacy unauthenticated auto-seeded dummy sessions
         const db = getUsersDb();
-        if (u.username === "kolard" && !u.email && !db["kolard"]) {
+        const cleanName = (u.username || "").toLowerCase();
+        if (!u.email && !db[cleanName]) {
           localStorage.removeItem(USER_KEY);
           state.user = null;
           return;
@@ -565,6 +566,10 @@ export async function loginWithPassword({ usernameOrEmail, password }) {
   const clean = raw.includes("@") ? raw.split("@")[0] : raw;
   const db = getUsersDb();
   let userRecord = db[clean];
+  if (!userRecord) {
+    const foundKey = Object.keys(db).find((k) => (db[k].email || "").toLowerCase() === raw);
+    if (foundKey) userRecord = db[foundKey];
+  }
 
   if (!userRecord) {
     throw new Error("Uživatel nenalezen. Zkontrolujte jméno nebo se zaregistrujte v záložce Registrace.");
