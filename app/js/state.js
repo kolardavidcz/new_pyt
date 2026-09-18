@@ -627,12 +627,6 @@ export function logoutUser() {
 
 export function loadPersisted() {
   loadUser();
-  const username = state.user?.username || "guest";
-  const sKey = getStudiedKey();
-  const skKey = getSkippedKey();
-  const seKey = getSeenKey();
-  const chKey = getChecklistKey();
-  const stKey = getStudyStatusKey();
 
   state.studied = new Set();
   state.skipped = new Set();
@@ -641,6 +635,48 @@ export function loadPersisted() {
   state.studyStatusEntries = {};
   state.checklistEntries = {};
   state.seenEntries = {};
+
+  // Global user-independent client UI settings
+  try {
+    const w = parseInt(localStorage.getItem(SIDEBAR_W_KEY) || "", 10);
+    if (w >= 180 && w <= 520) state.sidebarWidth = w;
+  } catch { /* ignore */ }
+  try {
+    const sOpen = localStorage.getItem("pcs-sidebar-open");
+    if (sOpen !== null) state.sidebarOpen = JSON.parse(sOpen) === true;
+    else state.sidebarOpen = false;
+  } catch {
+    state.sidebarOpen = false;
+  }
+  try {
+    const cbc = localStorage.getItem("pcs-code-block-color") || localStorage.getItem("pcs-print-theme");
+    if (cbc === "dark" || cbc === "light") state.codeBlockColor = cbc;
+  } catch { /* ignore */ }
+  try {
+    const pwq = localStorage.getItem("pcs-print-quizzes");
+    if (pwq !== null) state.printWithQuizzes = pwq === "true";
+  } catch { /* ignore */ }
+  try {
+    const raw = localStorage.getItem(ERROR_LOG_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) state.errorLinkLog = arr;
+    }
+  } catch { /* ignore */ }
+  document.documentElement.setAttribute("data-code-block-color", state.codeBlockColor);
+  document.documentElement.setAttribute("data-print-quizzes", state.printWithQuizzes ? "true" : "false");
+
+  // Unauthenticated guests: progress is not tracked or saved until user logs in
+  if (!state.user?.username) {
+    return;
+  }
+
+  const username = state.user.username;
+  const sKey = getStudiedKey();
+  const skKey = getSkippedKey();
+  const seKey = getSeenKey();
+  const chKey = getChecklistKey();
+  const stKey = getStudyStatusKey();
 
   // 1. Load seen across all legacy keys
   const seenKeys = [seKey, `${SEEN_KEY}:${username}`, SEEN_KEY, `pyt:${username}:seen`];
@@ -725,10 +761,7 @@ export function loadPersisted() {
   for (const [id, rec] of Object.entries(state.checklistEntries)) {
     if (rec.v === true || rec.v === "solved" || rec.v === "studied") state.checklist.add(id);
   }
-  try {
-    const w = parseInt(localStorage.getItem(SIDEBAR_W_KEY) || "", 10);
-    if (w >= 180 && w <= 520) state.sidebarWidth = w;
-  } catch { /* ignore */ }
+
   try {
     const raw = localStorage.getItem(QUIZ_SCORES_KEY);
     if (raw) {
@@ -736,30 +769,6 @@ export function loadPersisted() {
       if (obj && typeof obj === "object") state.quizScores = obj;
     }
   } catch { /* ignore */ }
-  try {
-    const sOpen = localStorage.getItem("pcs-sidebar-open");
-    if (sOpen !== null) state.sidebarOpen = JSON.parse(sOpen) === true;
-    else state.sidebarOpen = false;
-  } catch {
-    state.sidebarOpen = false;
-  }
-  try {
-    const cbc = localStorage.getItem("pcs-code-block-color") || localStorage.getItem("pcs-print-theme");
-    if (cbc === "dark" || cbc === "light") state.codeBlockColor = cbc;
-  } catch { /* ignore */ }
-  try {
-    const pwq = localStorage.getItem("pcs-print-quizzes");
-    if (pwq !== null) state.printWithQuizzes = pwq === "true";
-  } catch { /* ignore */ }
-  try {
-    const raw = localStorage.getItem(ERROR_LOG_KEY);
-    if (raw) {
-      const arr = JSON.parse(raw);
-      if (Array.isArray(arr)) state.errorLinkLog = arr;
-    }
-  } catch { /* ignore */ }
-  document.documentElement.setAttribute("data-code-block-color", state.codeBlockColor);
-  document.documentElement.setAttribute("data-print-quizzes", state.printWithQuizzes ? "true" : "false");
 
   syncCloudProgress();
 }
@@ -1230,6 +1239,7 @@ export async function forceCloudUpload() {
 }
 
 export function persistSeen() {
+  if (!state.user?.username) return;
   const seKey = getSeenKey();
   const payload = {
     _type: "lww-v1",
@@ -1240,12 +1250,11 @@ export function persistSeen() {
     localStorage.setItem(seKey, JSON.stringify(payload));
     localStorage.setItem(SEEN_KEY, JSON.stringify([...state.seen]));
   } catch { /* ignore */ }
-  if (state.user?.username) {
-    syncEngine.kvSet(syncEngine.getKey(state.user.username, "seen"), payload);
-  }
+  syncEngine.kvSet(syncEngine.getKey(state.user.username, "seen"), payload);
 }
 
 export function persistStudyStatus() {
+  if (!state.user?.username) return;
   const statusKey = getStudyStatusKey();
   const payload = {
     _type: "lww-v1",
@@ -1256,39 +1265,35 @@ export function persistStudyStatus() {
     localStorage.setItem(statusKey, JSON.stringify(payload));
   } catch { /* ignore */ }
 
-  if (state.user?.username) {
-    syncEngine.kvSet(statusKey, payload);
-    // Also save legacy arrays for backward compatibility with external tools
-    syncEngine.kvSet(syncEngine.getKey(state.user.username, "studied"), [...state.studied]);
-    syncEngine.kvSet(syncEngine.getKey(state.user.username, "skipped"), [...state.skipped]);
-  }
+  syncEngine.kvSet(statusKey, payload);
+  syncEngine.kvSet(syncEngine.getKey(state.user.username, "studied"), [...state.studied]);
+  syncEngine.kvSet(syncEngine.getKey(state.user.username, "skipped"), [...state.skipped]);
 }
 
 export function persistStudied() {
+  if (!state.user?.username) return;
   const sKey = getStudiedKey();
   const arr = [...state.studied];
   try {
     localStorage.setItem(sKey, JSON.stringify(arr));
   } catch { /* ignore */ }
-  if (state.user?.username) {
-    syncEngine.kvSet(syncEngine.getKey(state.user.username, "studied"), arr);
-  }
+  syncEngine.kvSet(syncEngine.getKey(state.user.username, "studied"), arr);
   persistStudyStatus();
 }
 
 export function persistSkipped() {
+  if (!state.user?.username) return;
   const skKey = getSkippedKey();
   const arr = [...state.skipped];
   try {
     localStorage.setItem(skKey, JSON.stringify(arr));
   } catch { /* ignore */ }
-  if (state.user?.username) {
-    syncEngine.kvSet(syncEngine.getKey(state.user.username, "skipped"), arr);
-  }
+  syncEngine.kvSet(syncEngine.getKey(state.user.username, "skipped"), arr);
   persistStudyStatus();
 }
 
 export function persistChecklist() {
+  if (!state.user?.username) return;
   const chKey = getChecklistKey();
   const payload = {
     _type: "lww-v1",
@@ -1299,9 +1304,7 @@ export function persistChecklist() {
     localStorage.setItem(chKey, JSON.stringify(payload));
     localStorage.setItem(CHECKLIST_KEY, JSON.stringify([...state.checklist]));
   } catch { /* ignore */ }
-  if (state.user?.username) {
-    syncEngine.kvSet(syncEngine.getKey(state.user.username, "checklist"), payload);
-  }
+  syncEngine.kvSet(syncEngine.getKey(state.user.username, "checklist"), payload);
 }
 
 export function isChecklistChecked(id) {
@@ -1327,6 +1330,10 @@ export function getTaskStatus(taskId) {
  */
 export function cycleTaskStatus(taskId) {
   if (!taskId) return "default";
+  if (!state.user) {
+    notifyStateChange("requireLogin", { reason: "Pro ukládání splněných úkolů se prosím přihlaste." });
+    return "default";
+  }
   const current = getTaskStatus(taskId);
   let next = "default";
   if (current === "default") {
@@ -1347,6 +1354,10 @@ export function cycleTaskStatus(taskId) {
 
 export function toggleChecklist(id) {
   if (!id) return false;
+  if (!state.user) {
+    notifyStateChange("requireLogin", { reason: "Pro ukládání splněných úkolů se prosím přihlaste." });
+    return false;
+  }
   let now = false;
   const t = Date.now();
   if (state.checklist.has(id)) {
@@ -1436,6 +1447,10 @@ export function isCompleted(itemId) {
 /** Toggle manual “studied” flag. Returns new studied state. */
 export function toggleStudied(itemId) {
   if (!itemId) return false;
+  if (!state.user) {
+    notifyStateChange("requireLogin", { reason: "Pro ukládání studijního postupu se prosím přihlaste." });
+    return false;
+  }
   let now = false;
   let status = "default";
   if (state.studied.has(itemId)) {
@@ -1459,6 +1474,10 @@ export function toggleStudied(itemId) {
 /** Toggle manual “skipped” (already known) flag. Returns new skipped state. */
 export function toggleSkipped(itemId) {
   if (!itemId) return false;
+  if (!state.user) {
+    notifyStateChange("requireLogin", { reason: "Pro ukládání studijního postupu se prosím přihlaste." });
+    return false;
+  }
   let now = false;
   let status = "default";
   if (state.skipped.has(itemId)) {
@@ -1495,6 +1514,10 @@ export function getStudyStatus(itemId) {
  */
 export function cycleStudyStatus(itemId) {
   if (!itemId) return "default";
+  if (!state.user) {
+    notifyStateChange("requireLogin", { reason: "Pro ukládání studijního postupu se prosím přihlaste." });
+    return "default";
+  }
   let nextState = "default";
   if (state.studied.has(itemId)) {
     // 1st (Studied) -> 2nd (Skipped)
@@ -1523,6 +1546,10 @@ export function cycleStudyStatus(itemId) {
 
 export function setStudied(itemId, on) {
   if (!itemId) return;
+  if (!state.user) {
+    notifyStateChange("requireLogin", { reason: "Pro ukládání studijního postupu se prosím přihlaste." });
+    return;
+  }
   if (on) {
     state.studied.add(itemId);
     state.skipped.delete(itemId);
@@ -1538,6 +1565,10 @@ export function setStudied(itemId, on) {
 
 export function setSkipped(itemId, on) {
   if (!itemId) return;
+  if (!state.user) {
+    notifyStateChange("requireLogin", { reason: "Pro ukládání studijního postupu se prosím přihlaste." });
+    return;
+  }
   if (on) {
     state.skipped.add(itemId);
     state.studied.delete(itemId);

@@ -66,6 +66,10 @@ async function boot() {
 
   // Reactive Event Bus listener: auto-update UI components when state mutates
   onStateChange((_, changeType, payload) => {
+    if (changeType === "requireLogin") {
+      showLogin(payload?.reason);
+      return;
+    }
     if (
       changeType === "studied" ||
       changeType === "checklist" ||
@@ -739,14 +743,18 @@ ${description}`;
 
 boot();
 
-// Register high-performance Service Worker for instant offline & caching
-if ("serviceWorker" in navigator && !window.location.host.includes("-noworker")) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js", { scope: "/" }).then((reg) => {
-      // Check for updates
-      reg.update().catch(() => {});
-    }).catch((err) => {
-      console.debug("[SW] Registration skipped:", err);
-    });
-  });
+// Unregister legacy Service Workers and purge stale CacheStorage
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const registration of registrations) {
+      registration.unregister().catch(() => {});
+    }
+  }).catch(() => {});
+}
+if (typeof caches !== "undefined") {
+  caches.keys().then((keys) => {
+    for (const key of keys) {
+      caches.delete(key).catch(() => {});
+    }
+  }).catch(() => {});
 }

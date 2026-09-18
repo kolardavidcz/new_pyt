@@ -2166,7 +2166,7 @@ export function showProgress() {
 
 /* ── Dedicated Login & Account Profile Command Center ────── */
 
-export function showLogin() {
+export function showLogin(reason = null) {
   const profileModal = document.getElementById("profileModal");
   if (!profileModal) return;
 
@@ -2179,7 +2179,7 @@ export function showLogin() {
   if (u) {
     cardContainer.appendChild(renderUserProfileDashboard(u));
   } else {
-    cardContainer.appendChild(renderLoginForm());
+    cardContainer.appendChild(renderLoginForm(reason));
   }
 
   profileModal.classList.remove("hidden");
@@ -2277,73 +2277,77 @@ function renderUserProfileDashboard(u) {
   `;
 
   // Bind dashboard events
-  setTimeout(() => {
-    const profileModal = document.getElementById("profileModal");
-    card.querySelector("#btnCloseProfileModal")?.addEventListener("click", () => {
-      profileModal?.classList.add("hidden");
-    });
+  const profileModal = document.getElementById("profileModal");
+  card.querySelector("#btnCloseProfileModal")?.addEventListener("click", () => {
+    profileModal?.classList.add("hidden");
+  });
 
-    card.querySelector("#btnManualSync")?.addEventListener("click", async (e) => {
-      const btn = e.currentTarget;
-      btn.textContent = "Synchronizuji…";
-      btn.disabled = true;
-      await syncCloudProgress();
-      btn.textContent = "Synchronizováno ✓";
-      setTimeout(() => {
-        btn.textContent = "Synchronizovat 🔄";
-        btn.disabled = false;
-        showLogin();
-      }, 1000);
-    });
-
-    card.querySelector("#btnForceDownload")?.addEventListener("click", async (e) => {
-      const btn = e.currentTarget;
-      btn.textContent = "Stahuji…";
-      btn.disabled = true;
-      const ok = await forceCloudDownload();
-      btn.textContent = ok ? "Stáhnuto ✓" : "Chyba ✕";
-      setTimeout(() => { showLogin(); }, 900);
-    });
-
-    card.querySelector("#btnForceUpload")?.addEventListener("click", async (e) => {
-      const btn = e.currentTarget;
-      btn.textContent = "Odesílám…";
-      btn.disabled = true;
-      const ok = await forceCloudUpload();
-      btn.textContent = ok ? "Odesláno ✓" : "Chyba ✕";
-      setTimeout(() => { showLogin(); }, 900);
-    });
-
-    card.querySelector("#selectCodeBlockColor")?.addEventListener("change", (e) => {
-      setCodeBlockColor(e.target.value);
-    });
-
-    card.querySelector("#selectPrintWithQuizzes")?.addEventListener("change", (e) => {
-      setPrintWithQuizzes(e.target.value === "true");
-      updatePrintQuizButtons();
-    });
-
-    card.querySelector("#btnProfileOpenAdmin")?.addEventListener("click", () => {
-      profileModal?.classList.add("hidden");
-      openAdminModal();
-    });
-
-    card.querySelector("#btnPageLogout")?.addEventListener("click", () => {
-      logoutUser();
+  card.querySelector("#btnManualSync")?.addEventListener("click", async (e) => {
+    const btn = e.currentTarget;
+    btn.textContent = "Synchronizuji…";
+    btn.disabled = true;
+    await syncCloudProgress();
+    btn.textContent = "Synchronizováno ✓";
+    setTimeout(() => {
+      btn.textContent = "Synchronizovat 🔄";
+      btn.disabled = false;
       showLogin();
-    });
-  }, 0);
+    }, 1000);
+  });
+
+  card.querySelector("#btnForceDownload")?.addEventListener("click", async (e) => {
+    const btn = e.currentTarget;
+    btn.textContent = "Stahuji…";
+    btn.disabled = true;
+    const ok = await forceCloudDownload();
+    btn.textContent = ok ? "Stáhnuto ✓" : "Chyba ✕";
+    setTimeout(() => { showLogin(); }, 900);
+  });
+
+  card.querySelector("#btnForceUpload")?.addEventListener("click", async (e) => {
+    const btn = e.currentTarget;
+    btn.textContent = "Odesílám…";
+    btn.disabled = true;
+    const ok = await forceCloudUpload();
+    btn.textContent = ok ? "Odesláno ✓" : "Chyba ✕";
+    setTimeout(() => { showLogin(); }, 900);
+  });
+
+  card.querySelector("#selectCodeBlockColor")?.addEventListener("change", (e) => {
+    setCodeBlockColor(e.target.value);
+  });
+
+  card.querySelector("#selectPrintWithQuizzes")?.addEventListener("change", (e) => {
+    setPrintWithQuizzes(e.target.value === "true");
+    updatePrintQuizButtons();
+  });
+
+  card.querySelector("#btnProfileOpenAdmin")?.addEventListener("click", () => {
+    profileModal?.classList.add("hidden");
+    openAdminModal();
+  });
+
+  card.querySelector("#btnPageLogout")?.addEventListener("click", () => {
+    logoutUser();
+    showLogin();
+  });
 
   return card;
 }
 
-function renderLoginForm() {
+function renderLoginForm(reason = null) {
   const card = el("div", { className: "v2-card", style: "width:100%; border:none; padding:0; background:transparent;" });
   card.innerHTML = `
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle, #333); padding-bottom:10px; margin-bottom:14px;">
       <h3 style="margin:0; font-size:15px; font-weight:600; color:var(--fg);">Přihlášení k účtu</h3>
       <button type="button" class="icon-btn" id="btnCloseProfileModal" title="Zavřít" style="background:transparent; border:none; color:var(--fg-muted); cursor:pointer; font-size:16px;">✕</button>
     </div>
+
+    ${reason ? `
+      <div style="font-size:12.5px; color:var(--accent, #38bdf8); background:rgba(56,189,248,0.1); border-left:3px solid var(--accent, #38bdf8); padding:9px 12px; margin-bottom:14px; border-radius:4px; line-height:1.4;">
+        ℹ️ ${escapeHtml(reason)}
+      </div>
+    ` : ""}
 
     <p class="v2-desc" style="margin-top:0;">Zadejte své školní údaje (@vscht.cz) pro synchronizaci postupu napříč zařízeními.</p>
 
@@ -2412,128 +2416,126 @@ function renderLoginForm() {
   `;
 
   // Bind login form events
-  setTimeout(() => {
-    const profileModal = document.getElementById("profileModal");
-    card.querySelector("#btnCloseProfileModal")?.addEventListener("click", () => {
-      profileModal?.classList.add("hidden");
-    });
+  const profileModal = document.getElementById("profileModal");
+  card.querySelector("#btnCloseProfileModal")?.addEventListener("click", () => {
+    profileModal?.classList.add("hidden");
+  });
 
-    const tabLogin = card.querySelector("#tabBtnLogin");
-    const tabReg = card.querySelector("#tabBtnRegister");
-    const tabReset = card.querySelector("#tabBtnReset");
+  const tabLogin = card.querySelector("#tabBtnLogin");
+  const tabReg = card.querySelector("#tabBtnRegister");
+  const tabReset = card.querySelector("#tabBtnReset");
 
-    const formLogin = card.querySelector("#pageLoginForm");
-    const formReg = card.querySelector("#pageRegisterForm");
-    const formReset = card.querySelector("#pageResetForm");
+  const formLogin = card.querySelector("#pageLoginForm");
+  const formReg = card.querySelector("#pageRegisterForm");
+  const formReset = card.querySelector("#pageResetForm");
 
-    const loginErr = card.querySelector("#loginErrorBanner");
-    const regErr = card.querySelector("#regErrorBanner");
-    const resetBanner = card.querySelector("#resetStatusBanner");
+  const loginErr = card.querySelector("#loginErrorBanner");
+  const regErr = card.querySelector("#regErrorBanner");
+  const resetBanner = card.querySelector("#resetStatusBanner");
 
-    const setActiveTab = (activeTab, activeForm) => {
-      [tabLogin, tabReg, tabReset].forEach((t) => {
-        if (t === activeTab) {
-          t.classList.add("primary", "active");
-          t.classList.remove("secondary");
-        } else {
-          t.classList.add("secondary");
-          t.classList.remove("primary", "active");
-        }
-      });
-      [formLogin, formReg, formReset].forEach((f) => {
-        if (f === activeForm) {
-          f.style.display = "flex";
-        } else {
-          f.style.display = "none";
-        }
-      });
-    };
-
-    tabLogin?.addEventListener("click", () => setActiveTab(tabLogin, formLogin));
-    tabReg?.addEventListener("click", () => setActiveTab(tabReg, formReg));
-    tabReset?.addEventListener("click", () => setActiveTab(tabReset, formReset));
-
-    card.querySelector("#btnGoToReset")?.addEventListener("click", () => {
-      setActiveTab(tabReset, formReset);
-    });
-
-    // Submit Password Login Form
-    formLogin?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (loginErr) loginErr.style.display = "none";
-
-      const usernameOrEmail = card.querySelector("#pageInputEmail")?.value.trim();
-      const password = card.querySelector("#pageInputPassword")?.value.trim();
-
-      if (!usernameOrEmail || !password) return;
-
-      try {
-        await loginWithPassword({ usernameOrEmail, password });
-        showLogin();
-      } catch (err) {
-        if (loginErr) {
-          loginErr.textContent = err.message || "Přihlášení selhalo.";
-          loginErr.style.display = "block";
-        }
+  const setActiveTab = (activeTab, activeForm) => {
+    [tabLogin, tabReg, tabReset].forEach((t) => {
+      if (t === activeTab) {
+        t.classList.add("primary", "active");
+        t.classList.remove("secondary");
+      } else {
+        t.classList.add("secondary");
+        t.classList.remove("primary", "active");
       }
     });
-
-    // Submit Registration Form
-    formReg?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (regErr) regErr.style.display = "none";
-
-      const email = card.querySelector("#regInputEmail")?.value.trim();
-      const password = card.querySelector("#regInputPassword")?.value.trim();
-
-      if (!email || !password) return;
-
-      try {
-        await registerUser({ email, password });
-        showLogin();
-      } catch (err) {
-        if (regErr) {
-          regErr.textContent = err.message || "Registrace selhala.";
-          regErr.style.display = "block";
-        }
+    [formLogin, formReg, formReset].forEach((f) => {
+      if (f === activeForm) {
+        f.style.display = "flex";
+      } else {
+        f.style.display = "none";
       }
     });
+  };
 
-    // Submit Password Reset Form
-    formReset?.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (resetBanner) resetBanner.style.display = "none";
+  tabLogin?.addEventListener("click", () => setActiveTab(tabLogin, formLogin));
+  tabReg?.addEventListener("click", () => setActiveTab(tabReg, formReg));
+  tabReset?.addEventListener("click", () => setActiveTab(tabReset, formReset));
 
-      const email = card.querySelector("#resetInputEmail")?.value.trim();
-      const newPass = card.querySelector("#resetInputNewPass")?.value.trim();
+  card.querySelector("#btnGoToReset")?.addEventListener("click", () => {
+    setActiveTab(tabReset, formReset);
+  });
 
-      if (!email || !newPass) return;
+  // Submit Password Login Form
+  formLogin?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (loginErr) loginErr.style.display = "none";
 
-      try {
-        await resetUserPassword(email, newPass);
-        if (resetBanner) {
-          resetBanner.style.display = "block";
-          resetBanner.style.color = "#89d185";
-          resetBanner.style.background = "rgba(137,209,133,0.1)";
-          resetBanner.style.borderLeft = "2px solid #89d185";
-          resetBanner.textContent = `✓ Pokyny pro reset hesla byly odeslány na ${email}. Heslo bylo úspěšně změněno.`;
-        }
-      } catch (err) {
-        if (resetBanner) {
-          resetBanner.style.display = "block";
-          resetBanner.style.color = "#ef4444";
-          resetBanner.style.background = "rgba(239,68,68,0.1)";
-          resetBanner.style.borderLeft = "2px solid #ef4444";
-          resetBanner.textContent = err.message || "Reset hesla selhal.";
-        }
+    const usernameOrEmail = card.querySelector("#pageInputEmail")?.value.trim();
+    const password = card.querySelector("#pageInputPassword")?.value.trim();
+
+    if (!usernameOrEmail || !password) return;
+
+    try {
+      await loginWithPassword({ usernameOrEmail, password });
+      showLogin();
+    } catch (err) {
+      if (loginErr) {
+        loginErr.textContent = err.message || "Přihlášení selhalo.";
+        loginErr.style.display = "block";
       }
-    });
+    }
+  });
 
-    // Guest continue without logging in
-    card.querySelector("#btnGuestContinue")?.addEventListener("click", () => {
-      profileModal?.classList.add("hidden");
-    });
-  }, 0);
+  // Submit Registration Form
+  formReg?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (regErr) regErr.style.display = "none";
+
+    const email = card.querySelector("#regInputEmail")?.value.trim();
+    const password = card.querySelector("#regInputPassword")?.value.trim();
+
+    if (!email || !password) return;
+
+    try {
+      await registerUser({ email, password });
+      showLogin();
+    } catch (err) {
+      if (regErr) {
+        regErr.textContent = err.message || "Registrace selhala.";
+        regErr.style.display = "block";
+      }
+    }
+  });
+
+  // Submit Password Reset Form
+  formReset?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (resetBanner) resetBanner.style.display = "none";
+
+    const email = card.querySelector("#resetInputEmail")?.value.trim();
+    const newPass = card.querySelector("#resetInputNewPass")?.value.trim();
+
+    if (!email || !newPass) return;
+
+    try {
+      await resetUserPassword(email, newPass);
+      if (resetBanner) {
+        resetBanner.style.display = "block";
+        resetBanner.style.color = "#89d185";
+        resetBanner.style.background = "rgba(137,209,133,0.1)";
+        resetBanner.style.borderLeft = "2px solid #89d185";
+        resetBanner.textContent = `✓ Pokyny pro reset hesla byly odeslány na ${email}. Heslo bylo úspěšně změněno.`;
+      }
+    } catch (err) {
+      if (resetBanner) {
+        resetBanner.style.display = "block";
+        resetBanner.style.color = "#ef4444";
+        resetBanner.style.background = "rgba(239,68,68,0.1)";
+        resetBanner.style.borderLeft = "2px solid #ef4444";
+        resetBanner.textContent = err.message || "Reset hesla selhal.";
+      }
+    }
+  });
+
+  // Guest continue without logging in
+  card.querySelector("#btnGuestContinue")?.addEventListener("click", () => {
+    profileModal?.classList.add("hidden");
+  });
 
   return card;
 }
