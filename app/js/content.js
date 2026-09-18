@@ -7,7 +7,7 @@ import {
   getCourseStats, getWeekStats,
   setUser, logoutUser, syncCloudProgress, forceCloudDownload, forceCloudUpload, setCodeBlockColor, logLinkError,
   saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, setPrintWithQuizzes, getQuizFor, getQuizForDeck,
-  registerUser, loginWithPassword, resetUserPassword, isAdminUser,
+  registerUser, loginWithPassword, resetUserPassword, isAdminUser, syncUsersDbFromCloud,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot, highlightCode, dedentCode } from "./highlight.js";
@@ -2167,6 +2167,7 @@ export function showProgress() {
 /* ── Dedicated Login & Account Profile Command Center ────── */
 
 export function showLogin(reason = null) {
+  syncUsersDbFromCloud().catch(() => {});
   const profileModal = document.getElementById("profileModal");
   if (!profileModal) return;
 

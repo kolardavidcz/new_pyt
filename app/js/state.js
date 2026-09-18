@@ -290,6 +290,36 @@ export function getAdminsList() {
   return [];
 }
 
+export async function syncAdminsListFromCloud() {
+  try {
+    const resp = await fetch("/api/sync?key=" + encodeURIComponent(ADMINS_LIST_KEY));
+    if (!resp.ok) return getAdminsList();
+    const data = await resp.json();
+    let raw = data?.result;
+    if (typeof raw === "string") {
+      try { raw = JSON.parse(raw); } catch { /* ignore */ }
+    }
+    if (Array.isArray(raw) && raw.length > 0) {
+      const local = getAdminsList();
+      const merged = Array.from(new Set([...raw, ...local]));
+      localStorage.setItem(ADMINS_LIST_KEY, JSON.stringify(merged));
+      return merged;
+    }
+  } catch { /* ignore */ }
+  return getAdminsList();
+}
+
+export async function pushAdminsListToCloud() {
+  try {
+    const list = getAdminsList();
+    await fetch("/api/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: ADMINS_LIST_KEY, val: list }),
+    });
+  } catch { /* ignore */ }
+}
+
 export function isAdminUser(user = state.user) {
   if (!user || !user.username) return false;
   const clean = user.username.toLowerCase();
@@ -307,6 +337,7 @@ export function addAdminUser(username) {
     try {
       localStorage.setItem(ADMINS_LIST_KEY, JSON.stringify(list));
     } catch { /* ignore */ }
+    pushAdminsListToCloud().catch(() => {});
   }
   // Promote in DB if present
   const db = getUsersDb();
@@ -327,6 +358,7 @@ export function removeAdminUser(username) {
   try {
     localStorage.setItem(ADMINS_LIST_KEY, JSON.stringify(list));
   } catch { /* ignore */ }
+  pushAdminsListToCloud().catch(() => {});
 
   const db = getUsersDb();
   if (db[clean]) {
@@ -339,11 +371,19 @@ export function removeAdminUser(username) {
 export async function resetUserPassword(usernameOrEmail, newPassword) {
   const clean = String(usernameOrEmail || "").trim().toLowerCase();
   if (!clean || !newPassword) throw new Error("Zadejte e-mail nebo uživatelské jméno a nové heslo.");
-  const db = getUsersDb();
+  let db = getUsersDb();
   let userRecord = db[clean];
   if (!userRecord) {
     const foundKey = Object.keys(db).find((k) => (db[k].email || "").toLowerCase() === clean);
     if (foundKey) userRecord = db[foundKey];
+  }
+  if (!userRecord) {
+    db = await syncUsersDbFromCloud();
+    userRecord = db[clean];
+    if (!userRecord) {
+      const foundKey = Object.keys(db).find((k) => (db[k].email || "").toLowerCase() === clean);
+      if (foundKey) userRecord = db[foundKey];
+    }
   }
   if (!userRecord) throw new Error(`Uživatel s e-mailem "${clean}" nebyl nalezen v databázi.`);
 
@@ -355,6 +395,7 @@ export async function resetUserPassword(usernameOrEmail, newPassword) {
   notifyStateChange("userPasswordReset", { username: userRecord.username });
   return true;
 }
+
 
 export function loadRelevanceOverrides() {
   let overrides = {};
@@ -516,12 +557,43 @@ export function getUsersDb() {
   return {};
 }
 
+export async function syncUsersDbFromCloud() {
+  try {
+    const resp = await fetch("/api/sync?key=" + encodeURIComponent(USERS_DB_KEY));
+    if (!resp.ok) return getUsersDb();
+    const data = await resp.json();
+    let raw = data?.result;
+    if (typeof raw === "string") {
+      try { raw = JSON.parse(raw); } catch { /* ignore */ }
+    }
+    if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+      const local = getUsersDb();
+      const merged = { ...raw, ...local };
+      localStorage.setItem(USERS_DB_KEY, JSON.stringify(merged));
+      return merged;
+    }
+  } catch { /* ignore */ }
+  return getUsersDb();
+}
+
+export async function pushUsersDbToCloud() {
+  try {
+    const db = getUsersDb();
+    await fetch("/api/sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ key: USERS_DB_KEY, val: db }),
+    });
+  } catch { /* ignore */ }
+}
+
 export function saveUserToDb(userRecord) {
   const db = getUsersDb();
   db[userRecord.username] = userRecord;
   try {
     localStorage.setItem(USERS_DB_KEY, JSON.stringify(db));
   } catch { /* ignore */ }
+  pushUsersDbToCloud().catch(() => {});
 }
 
 export async function registerUser({ email, password }) {
@@ -532,7 +604,8 @@ export async function registerUser({ email, password }) {
   const cleanUsername = rawEmail.includes("@") ? rawEmail.split("@")[0] : rawEmail;
   const fullEmail = rawEmail.includes("@") ? rawEmail : `${cleanUsername}@vscht.cz`;
 
-  const db = getUsersDb();
+  // Pre-sync with cloud before checking for duplicates
+  let db = await syncUsersDbFromCloud();
   if (db[cleanUsername]) {
     throw new Error(`Účet pro ${fullEmail} již existuje. Přihlaste se.`);
   }
@@ -564,11 +637,21 @@ export async function loginWithPassword({ usernameOrEmail, password }) {
     throw new Error("Zadejte heslo.");
   }
   const clean = raw.includes("@") ? raw.split("@")[0] : raw;
-  const db = getUsersDb();
+  let db = getUsersDb();
   let userRecord = db[clean];
   if (!userRecord) {
     const foundKey = Object.keys(db).find((k) => (db[k].email || "").toLowerCase() === raw);
     if (foundKey) userRecord = db[foundKey];
+  }
+
+  // If user is not found in local cache, fetch latest database from cloud
+  if (!userRecord) {
+    db = await syncUsersDbFromCloud();
+    userRecord = db[clean];
+    if (!userRecord) {
+      const foundKey = Object.keys(db).find((k) => (db[k].email || "").toLowerCase() === raw);
+      if (foundKey) userRecord = db[foundKey];
+    }
   }
 
   if (!userRecord) {
@@ -579,6 +662,7 @@ export async function loginWithPassword({ usernameOrEmail, password }) {
   if (computedHash !== userRecord.passwordHash) {
     throw new Error("Nesprávné heslo. Zkontrolujte zadané heslo.");
   }
+
 
   const sessionUser = { ...userRecord };
   delete sessionUser.passwordHash;
@@ -670,6 +754,9 @@ export function loadPersisted() {
   } catch { /* ignore */ }
   document.documentElement.setAttribute("data-code-block-color", state.codeBlockColor);
   document.documentElement.setAttribute("data-print-quizzes", state.printWithQuizzes ? "true" : "false");
+  // Pre-sync registered users and admins list from cloud in background
+  syncUsersDbFromCloud().catch(() => {});
+  syncAdminsListFromCloud().catch(() => {});
 
   // Unauthenticated guests: progress is not tracked or saved until user logs in
   if (!state.user?.username) {
