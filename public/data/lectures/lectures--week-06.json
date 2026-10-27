@@ -1,0 +1,249 @@
+{
+  "slug": "lectures--week-06",
+  "total": 27,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod a osnova",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod a osnova</h2></div><div class=\"section-body\">\n<p>Vítejte v šesté přednášce kurzu programování v jazyce Python. Dnes se zaměříme na jeden z nejmocnějších a nejtypičtějších konceptů moderního Pythonu — <strong>líné vyhodnocování (lazy evaluation)</strong>, iterační protokol, generátory a modul <code>itertools</code>.</p>\n<p>V kompilovaných jazycích jako C++ nebo Java vyžaduje zpracování velkých datových souborů buď masivní alokaci paměti do polí, nebo ruční implementaci složitých stavových automatů. Python přináší přirozenou abstrakci, která umožňuje zpracovávat neomezené datové toky v konstantní paměti \\(O(1)\\).</p>\n<h3>Osnova dnešní 90minutové přednášky:</h3>\n<ol>\n  <li><strong>Iterační paradigma C/Java vs. Python</strong>: Ukazatelová aritmetika a <code>Iterator&lt;E&gt;</code> vs. protokol <code>__iter__</code> a <code>__next__</code>.</li>\n  <li><strong>Iterační protokol pod kapotou</strong>: Jak CPython provádí cyklus <code>for</code>, role výjimky <code>StopIteration</code>.</li>\n  <li><strong>Vlastní iterátory</strong>: Stavová třída implementující metody <code>__iter__()</code> a <code>__next__()</code>.</li>\n  <li><strong>Dvouargumentová funkce <code>iter()</code></strong>: Sentinelový vzor pro proudové čtení souborů a síťových socketů.</li>\n  <li><strong>Generátory a klíčové slovo <code>yield</code></strong>: Přerušení a obnovení běhu funkce, generátorový objekt.</li>\n  <li><strong>Paměťová analýza \\(O(1)\\)</strong>: Zpracování mnohagigabajtových dat bez rizika <code>MemoryError</code>.</li>\n  <li><strong>Generátorové výrazy (Generator Expressions)</strong>: Kompaktní líná alternativa k list comprehensions.</li>\n  <li><strong>Proudové pipeline (Data Pipelines)</strong>: Řetězení generátorů analogicky k unixovým rourám <code>|</code>.</li>\n  <li><strong>Delegace generátorů <code>yield from</code></strong>: Transparentní kompozice a obousměrné předávání.</li>\n  <li><strong>Obousměrné generátory jako korutiny</strong>: Metody <code>.send()</code>, <code>.throw()</code> a <code>.close()</code>.</li>\n  <li><strong>Modul <code>itertools</code></strong>: Nekonečné generátory (<code>count</code>, <code>cycle</code>, <code>repeat</code>), řezání přes <code>islice</code>.</li>\n  <li><strong>Kombinatorika a řetězení</strong>: <code>chain</code>, <code>pairwise</code> (Python 3.10+), <code>product</code>, <code>permutations</code>, <code>combinations</code>.</li>\n  <li><strong>Metaprogramování funkcí: Dekorátory</strong>: Anatomie dekorátoru, <code>@functools.wraps</code>, měření výkonu a memoizace (<code>@cache</code>).</li>\n  <li><strong>Most k praxi</strong>: Reálné zpracování velkých sekvencí FASTA/FASTQ a most k objektovému modelu v Týdnu 7.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "C/Java vs. Python: Iterační Paradigma",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">C/Java vs. Python: Iterační Paradigma</h2></div><div class=\"section-body\">\n<p>V jazyce C probíhá procházení pole přímým indexováním nebo posunem ukazatele:</p>\n<pre class=\"brush: c; gutter: false; toolbar: false;\">// C: Explicitní indexace a znalost přesné velikosti pole\nint arr[] = {10, 20, 30, 40};\nsize_t len = sizeof(arr) / sizeof(arr[0]);\nfor (size_t i = 0; i &lt; len; ++i) {\n    printf(\"%d\\n\", arr[i]);\n}</pre>\n<p>V Javě máme rozhraní <code>Iterable&lt;T&gt;</code> a <code>Iterator&lt;T&gt;</code> s metodami <code>hasNext()</code> a <code>next()</code>:</p>\n<pre class=\"brush: java; gutter: false; toolbar: false;\">// Java: Stavový objekt vyžadující dotazování hasNext()\nList&lt;String&gt; list = List.of(\"A\", \"B\", \"C\");\nIterator&lt;String&gt; it = list.iterator();\nwhile (it.hasNext()) {\n    String val = it.next();\n    System.out.println(val);\n}</pre>\n<h3>Python: Duck-typing a řízení výjimkou StopIteration</h3>\n<p>V Pythonu se cyklus <code>for</code> neptá dopředu <em>\"Máš další prvek?\"</em>. Místo toho rovnou žádá další hodnotu:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">cisla = [10, 20, 30, 40]\nfor x in cisla:\n    print(x)</pre>\n<p>Proč? V dynamickém a paralelním světě je atomické vyzvednutí hodnoty bezpečnější než dvoufázové testování <code>hasNext()</code>, kde by se mezi testem a vyzvednutím mohl stav změnit.</p>\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Iterační protokol pod kapotou: Jak funguje for cyklus",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Iterační protokol pod kapotou: Jak funguje for cyklus</h2></div><div class=\"section-body\">\n<p>Když napíšete cyklus <code>for item in sequence:</code>, interpretr CPython provede v bajtkódu (<code>GET_ITER</code>, <code>FOR_ITER</code>) následující přesnou sekvenci:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Co reálně vykoná for cyklus:\nkolekce = [10, 20, 30]\n\n# 1. Získání iterátoru zavoláním vestavěné funkce iter()\n# Interně volá kolekce.__iter__()\niterator = iter(kolekce)\n\n# 2. Nekonečná smyčka s voláním next()\nwhile True:\n    try:\n        # Interně volá iterator.__next__()\n        item = next(iterator)\n    except StopIteration:\n        # Konec sekvence! Výjimka je interně zachycena a cyklus čistě skončí\n        break\n    \n    # Tělo for cyklu\n    print(item)</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">❗</span><div class=\"note-content\"><p><strong>StopIteration není chyba, ale řídicí signál!</strong> V Pythonu je vyvolání výjimky <code>StopIteration</code> standardním způsobem oznámení, že sekvence byla vyčerpána. Je to ukázkový příklad filozofie <strong>EAFP</strong> (<em>Easier to Ask for Forgiveness than Permission</em>).</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Objekt Iterable vs. Iterator",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Objekt Iterable vs. Iterator</h2></div><div class=\"section-body\">\n<p>Je zásadní rozlišovat mezi dvěma pojmy:</p>\n<table class=\"table\">\n  <thead><tr><th>Vlastnost</th><th><code>Iterable</code> (Iterovatelný objekt)</th><th><code>Iterator</code> (Iterátor)</th></tr></thead>\n  <tbody>\n    <tr><td><strong>Definice</strong></td><td>Objekt schopný vrátit iterátor</td><td>Samotný stavový ukazatel procházející data</td></tr>\n    <tr><td><strong>Metody</strong></td><td><code>__iter__() -&gt; Iterator</code></td><td><code>__next__() -&gt; Hodnota</code> a <code>__iter__() -&gt; self</code></td></tr>\n    <tr><td><strong>Příklady</strong></td><td><code>list</code>, <code>dict</code>, <code>str</code>, <code>set</code>, <code>tuple</code>, <code>range</code></td><td>Výsledek <code>iter(list)</code>, generátor, souborový deskriptor</td></tr>\n    <tr><td><strong>Počet průchodů</strong></td><td>Lze procházet opakovaně</td><td><strong>Pouze jednou!</strong> Po vyčerpání je prázdný</td></tr>\n  </tbody>\n</table>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">cisla = [1, 2, 3]  # Iterable\n\nit1 = iter(cisla)  # Iterator\nit2 = iter(cisla)  # Nezávislý druhý Iterator\n\nprint(next(it1))  # 1\nprint(next(it1))  # 2\nprint(next(it2))  # 1 (it2 má vlastní nezávislý stav!)\n\nprint(list(it1))  # [3] (zbývající prvek)\nprint(list(it1))  # []  (it1 je definitivně vyčerpán!)</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Každý <code>Iterator</code> je zároveň <code>Iterable</code>, protože jeho metoda <code>__iter__()</code> vrací <code>self</code>. Díky tomu můžete předat samotný iterátor do cyklu <code>for</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Implementace vlastního iterátoru třídou",
+      "tags": ["Core"],
+      "diff": "resyntax",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Implementace vlastního iterátoru třídou</h2></div><div class=\"section-body\">\n<p>Vytvořme vlastní třídu <code>Odpocet</code>, která generuje sestupnou číselnou řadu bez alokace seznamu:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class Odpocet:\n    \"\"\"Iterátor generující sestupnou řadu celých čísel od start do 1.\"\"\"\n    \n    def __init__(self, start: int) -&gt; None:\n        self.aktualni: int = start\n\n    def __iter__(self) -&gt; \"Odpocet\":\n        # Iterátor musí v metodě __iter__ vrátit sám sebe\n        return self\n\n    def __next__(self) -&gt; int:\n        if self.aktualni &lt;= 0:\n            # Signál pro ukončení iterace\n            raise StopIteration\n        \n        hodnota = self.aktualni\n        self.aktualni -= 1\n        return hodnota\n\n# Použití ve for cyklu:\nodpocet = Odpocet(3)\nfor cislo in odpocet:\n    print(cislo)\n# Výstup: 3, 2, 1</pre>\n<p>Všimněte si: Třída si musí v instančních proměnných <code>self.aktualni</code> manuálně ukládat stav mezi jednotlivými voláními <code>__next__()</code>.</p>\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Dvouargumentová funkce iter() a Sentinel vzor",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Dvouargumentová funkce iter() a Sentinel vzor</h2></div><div class=\"section-body\">\n<p>Málokdo ví, že vestavěná funkce <code>iter()</code> má dvě odlišné podoby:</p>\n<ol>\n  <li><code>iter(iterable)</code>: Standardní získání iterátoru.</li>\n  <li><code>iter(callable, sentinel)</code>: <strong>Zázrak pro čtení datových proudů.</strong></li>\n</ol>\n<p>CPython bude opakovaně volat funkci <code>callable()</code> bez parametrů, dokud vrácená hodnota není rovna hodnotě <code>sentinel</code>. Tehdy automaticky vyvolá <code>StopIteration</code>.</p>\n<h3>Příklad: Čtení binárního souboru po 64KB blocích</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def cti_velky_soubor(cesta: str, velikost_bloku: int = 65536):\n    with open(cesta, \"rb\") as f:\n        # iter(f.read, b\"\") bude volat f.read(velikost_bloku)\n        # a zastaví se, jakmile read vrátí prázdný bajtový řetězec b\"\" (EOF)\n        cteni_bloku = iter(lambda: f.read(velikost_bloku), b\"\")\n        for blok in cteni_bloku:\n            zpracuj_blok(blok)</pre>\n<p>Tento zápis kompletně eliminuje ošklivé konstrukce <code>while True: data = f.read(); if not data: break</code>.</p>\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Generátory a klíčové slovo yield",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Generátory a klíčové slovo yield</h2></div><div class=\"section-body\">\n<p>Psaní tříd s metodami <code>__iter__</code> a <code>__next__</code> a ruční správou stavu je zdlouhavé. Python proto přichází s revolučním konceptem: <strong>Generátory</strong>.</p>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">❗</span><div class=\"note-content\"><p><strong>Generátorová funkce</strong> je jakákoliv funkce, v jejímž těle se vyskytuje klíčové slovo <strong><code>yield</code></strong>.</p></div></div></div>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def odpocet_generator(start: int):\n    print(\"--&gt; Start generátoru\")\n    aktualni = start\n    while aktualni &gt; 0:\n        yield aktualni  # Pozastaví běh a vrátí hodnotu volajícímu\n        aktualni -= 1\n    print(\"--&gt; Konec generátoru\")\n\n# Volání funkce NESPUSTÍ kód! Pouze vrátí generator object:\ngen = odpocet_generator(3)\nprint(gen)  # &lt;generator object odpocet_generator at 0x7f8...&gt;\n\nprint(next(gen))  # Vypíše: '--&gt; Start generátoru' a vrátí: 3\nprint(next(gen))  # Vrátí: 2\nprint(next(gen))  # Vrátí: 1\n# next(gen)       # Vypíše: '--&gt; Konec generátoru' a vyvolá StopIteration!</pre>\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Stavový automat generátoru: Freeze Frame stacku",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Stavový automat generátoru: Freeze Frame stacku</h2></div><div class=\"section-body\">\n<p>Co se děje uvnitř CPython interpretu při vykonání <code>yield</code>?</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">Volající                       Generátor (PyGenObject)\n   │                                      │\n   ├─────── gen = odpocet(3) ────────────&gt;│ Vytvoří frame na haldě (stav: GEN_CREATED)\n   │                                      │ (Kód zatím neběží!)\n   ├─────── next(gen) ───────────────────&gt;│ Spustí běh až k prvnímu yield (GEN_RUNNING)\n   │&lt;────── yield 3 ──────────────────────┤ Zmrazí stack frame (GEN_SUSPENDED)\n   │                                      │ (Uchová lokální proměnné, program counter)\n   ├─────── next(gen) ───────────────────&gt;│ Obnoví běh z místa za yieldem (GEN_RUNNING)\n   │&lt;────── yield 2 ──────────────────────┤ Opět zmrazí stack frame (GEN_SUSPENDED)\n   │                                      │\n   ├─────── next(gen) ───────────────────&gt;│ Dokončí funkci / narazí na return\n   │&lt;────── StopIteration ────────────────┤ Stav: GEN_CLOSED (frame je dealokován)</pre>\n<p>Generátor se chová jako <strong>lehká korutina</strong>: Stack frame se nezruší po návratu hodnoty (jako u <code>return</code>), ale zůstává uložený na haldě v pozastaveném stavu!</p>\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Paměťová analýza O(1) vs. O(n)",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Paměťová analýza O(1) vs. O(n)</h2></div><div class=\"section-body\">\n<p>Představte si, že máte logovací soubor serveru o velikosti <strong>20 GB</strong> a potřebujete najít všechny řádky obsahující <code>\"ERROR 500\"</code>.</p>\n<h3>Špatně: Načtení celého souboru do paměti (\\(O(n)\\))</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># readlines() nebo list(f) alokuje všechny řádky v RAM:\ndef spatne_hledani(cesta: str) -&gt; list[str]:\n    with open(cesta, \"r\", encoding=\"utf-8\") as f:\n        radky = f.readlines()  # CHYBA: 20 GB v paměti -&gt; MemoryError / pád serveru!\n    return [r for r in radky if \"ERROR 500\" in r]</pre>\n<h3>Správně: Proudové zpracování generátorem (\\(O(1)\\))</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def streamuj_chyby(cesta: str):\n    # Souborový objekt je sám o sobě generátor řádků!\n    with open(cesta, \"r\", encoding=\"utf-8\") as f:\n        for radek in f:  # V paměti je v každý okamžik pouze JEDINÝ řádek (~1 KB)\n            if \"ERROR 500\" in radek:\n                yield radek.strip()\n\n# Paměťová spotřeba: konstantních ~8 MB pro jakkoliv velký soubor!\nfor chyba in streamuj_chyby(\"server.log\"):\n    odesli_alert(chyba)</pre>\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Generátorové výrazy (Generator Expressions)",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Generátorové výrazy (Generator Expressions)</h2></div><div class=\"section-body\">\n<p>V přednášce 4 jsme se seznámili s list comprehensions <code>[x for x in data]</code>. Co se stane, když hranaté závorky nahradíte kulatými?</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># 1. List Comprehension: Vytvoří a naplní celý seznam v RAM okamžitě\nseznam_kvadratu = [x**2 for x in range(1_000_000)]\nprint(type(seznam_kvadratu))  # &lt;class 'list'&gt;\n# Paměť: cca 8.5 MB RAM\n\n# 2. Generator Expression: Nevytvoří žádná data, pouze připraví generátor!\ngenerator_kvadratu = (x**2 for x in range(1_000_000))\nprint(type(generator_kvadratu))  # &lt;class 'generator'&gt;\n# Paměť: cca 120 bajtů RAM!</pre>\n<h3>Přímé předání do agregačních funkcí:</h3>\n<p>Pokud je generátorový výraz jediným argumentem funkce, nemusíte psát dvojité závorky:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Syntaktický cukr: sum((x**2 for x in cisla)) -&gt; sum(x**2 for x in cisla)\ncelkovy_soucet = sum(x**2 for x in range(1_000_000))\nprint(celkovy_soucet)  # 333332833333500000\n\nmaximalni_delka = max(len(slovo) for slovo in [\"jablko\", \"hruska\", \"mandarinka\"])</pre>\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Proudové Pipeline: Řetězení generátorů",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Proudové Pipeline: Řetězení generátorů</h2></div><div class=\"section-body\">\n<p>Jednou z nejkrásnějších vlastností generátorů je možnost jejich skládání do <strong>datových rour</strong> (<em>Pipelines</em>). Každý krok zpracuje prvek a okamžitě ho předá dalšímu kroku:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from typing import Iterator\n\ndef cti_radky(cesta: str) -&gt; Iterator[str]:\n    with open(cesta, \"r\", encoding=\"utf-8\") as f:\n        for radek in f:\n            yield radek\n\ndef filtruj_komentare(radky: Iterator[str]) -&gt; Iterator[str]:\n    for r in radky:\n        clean = r.strip()\n        if clean and not clean.startswith(\"#\"):\n            yield clean\n\ndef parsuj_cisla(radky: Iterator[str]) -&gt; Iterator[float]:\n    for r in radky:\n        yield float(r.split(\",\")[1])\n\n# Sestavení pipeline (žádná data se zatím nezpracovala!):\nraw = cti_radky(\"mereni.csv\")\nbez_komentaru = filtruj_komentare(raw)\ncisla = parsuj_cisla(bez_komentaru)\n\n# Teprve zde začne proudové protékání dat prvek po prvku:\nprumer = sum(cisla)</pre>\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Delegace generátorů: yield from",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Delegace generátorů: yield from</h2></div><div class=\"section-body\">\n<p>Pokud generátor potřebuje delegovat generování hodnot na jiný iterátor nebo vnořený generátor, dříve se musela psát smyčka:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Zastaralý přístup:\ndef sloucit_stary(seznamy):\n    for sublist in seznamy:\n        for prvek in sublist:\n            yield prvek\n\n# Moderní přístup s yield from:\ndef sloucit_moderni(seznamy):\n    for sublist in seznamy:\n        yield from sublist  # Deleguje iteraci přímo na sublist</pre>\n<h3>Rekurzivní procházení stromových struktur:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def projdi_strom(uzel):\n    yield uzel.hodnota\n    for dite in uzel.deti:\n        yield from projdi_strom(dite)</pre>\n<p><code>yield from</code> navíc automaticky navazuje obousměrnou komunikaci pro metody <code>.send()</code> a <code>.throw()</code> mezi vnějším volajícím a vnitřním generátorem!</p>\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Obousměrné generátory: Metoda .send()",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Obousměrné generátory: Metoda .send()</h2></div><div class=\"section-body\">\n<p>Generátor nemusí data pouze produkovat, ale může je také <strong>přijímat jako konzument</strong>. Výraz <code>yield</code> může stát na pravé straně přiřazení:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def klouzavy_prumer():\n    \"\"\"Generátor počítající kumulativní průměr zasílaných hodnot.\"\"\"\n    celkem = 0.0\n    pocet = 0\n    prumer = 0.0\n    while True:\n        # yield prumer odešle průměr ven a pozastaví se;\n        # .send(hodnota) probudí generátor a dosadí hodnotu do proměnné nova_hodnota\n        nova_hodnota = yield prumer\n        if nova_hodnota is None:\n            break\n        celkem += nova_hodnota\n        pocet += 1\n        prumer = celkem / pocet\n\n# Použití:\nprumerovac = klouzavy_prumer()\n\n# 1. Nastartování (Prime) generátoru k prvnímu yield:\nnext(prumerovac)  # nebo prumerovac.send(None) -&gt; vrátí 0.0\n\n# 2. Zasílání hodnot:\nprint(prumerovac.send(10))  # 10.0\nprint(prumerovac.send(20))  # 15.0\nprint(prumerovac.send(30))  # 20.0</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Tento princip tvořil historický základ pro asynchronní korutiny v Pythonu před zavedením <code>async/await</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Ukončení a výjimky v generátoru: .close() a .throw()",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Ukončení a výjimky v generátoru: .close() a .throw()</h2></div><div class=\"section-body\">\n<p>Generátor má vlastní metody pro řízení životního cyklu:</p>\n<h3>1. <code>gen.close()</code>:</h3>\n<p>Vyvolá uvnitř pozastaveného generátoru speciální výjimku <code>GeneratorExit</code>. Generátor by měl uklidit zdroje (bloky <code>finally</code>) a skončit.</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def otevri_proud():\n    try:\n        while True:\n            yield \"data\"\n    finally:\n        print(\"Proud byl bezpečně uzavřen a prostředky uvolněny!\")\n\ng = otevri_proud()\nnext(g)\ng.close()  # Vypíše: 'Proud byl bezpečně uzavřen...'</pre>\n<h3>2. <code>gen.throw(typ_vyjimky)</code>:</h3>\n<p>Vyvolá zadanou výjimku v místě, kde je generátor právě pozastaven. To umožňuje generátoru zareagovat na externí chybu (např. timeout sítě).</p>\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Standardní knihovna itertools: Úvod",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Standardní knihovna itertools: Úvod</h2></div><div class=\"section-body\">\n<p>Modul <strong><code>itertools</code></strong> je klenotem standardní knihovny Pythonu. Poskytuje sadu rychlých, v C napsaných stavebních bloků pro efektivní iterování.</p>\n<h3>Filozofie modulu itertools:</h3>\n<ol>\n  <li>Všechny funkce pracují <strong>líně</strong> (vrací iterátory).</li>\n  <li>Mají paměťovou náročnost \\(O(1)\\).</li>\n  <li>Jsou optimalizované na úrovni CPython C-API a běží výrazně rychleji než čistě pythoní ekvivalenty.</li>\n</ol>\n<p>Funkce v <code>itertools</code> dělíme do tří kategorií:</p>\n<ul>\n  <li><strong>Nekonečné iterátory</strong>: <code>count()</code>, <code>cycle()</code>, <code>repeat()</code></li>\n  <li><strong>Ukončovací a výběrové iterátory</strong>: <code>islice()</code>, <code>takewhile()</code>, <code>dropwhile()</code>, <code>filterfalse()</code></li>\n  <li><strong>Kombinatorické generátory</strong>: <code>product()</code>, <code>permutations()</code>, <code>combinations()</code>, <code>combinations_with_replacement()</code></li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import itertools</pre>\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Nekonečné iterátory: count, cycle, repeat",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Nekonečné iterátory: count, cycle, repeat</h2></div><div class=\"section-body\">\n<p>Někdy potřebujeme generovat posloupnost, jejíž konec předem neznáme:</p>\n<h3>1. <code>itertools.count(start=0, step=1)</code></h3>\n<p>Nekonečné počítadlo (obdoba <code>range</code>, ale bez horního limitu):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import itertools\n\nfor i in itertools.count(start=100, step=5):\n    if i &gt; 120:\n        break\n    print(i, end=\" \")\n# Výstup: 100 105 110 115 120</pre>\n<h3>2. <code>itertools.cycle(iterable)</code></h3>\n<p>Nekonečně cyklí zadanou sekvenci dokola:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">hraci = itertools.cycle([\"Hráč 1\", \"Hráč 2\", \"Hráč 3\"])\nfor kolo in range(5):\n    print(f\"Kolo {kolo + 1}: Na tahu je {next(hraci)}\")</pre>\n<h3>3. <code>itertools.repeat(obj, times=None)</code></h3>\n<p>Vrací stále tentýž objekt (často se používá s <code>map()</code> nebo <code>zip()</code>):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">mocniny = list(map(pow, range(5), itertools.repeat(2)))\n# [0**2, 1**2, 2**2, 3**2, 4**2] -&gt; [0, 1, 4, 9, 16]</pre>\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Výběr a řezání iterátorů: islice, takewhile, dropwhile",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Výběr a řezání iterátorů: islice, takewhile, dropwhile</h2></div><div class=\"section-body\">\n<p>Běžný slicing <code>kolekce[start:stop:step]</code> funguje pouze na sekvencích (<code>list</code>, <code>str</code>), které podporují indexaci. Na generátorech selže s <code>TypeError</code>!</p>\n<h3><code>itertools.islice(iterable, [start], stop, [step])</code>:</h3>\n<p>Líný slice fungující nad jakýmkoliv iterátorem bez jeho převodu na seznam:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import itertools\n\ndef velka_rada():\n    for x in itertools.count(1):\n        yield x**2\n\n# Získáme prvky od indexu 10 do indexu 15:\nvyber = itertools.islice(velka_rada(), 10, 15)\nprint(list(vyber))  # [121, 144, 169, 196, 225]</pre>\n<h3><code>takewhile</code> a <code>dropwhile</code>:</h3>\n<ul>\n  <li><code>takewhile(predikat, data)</code>: Bere prvky, dokud platí predikát; při prvním <code>False</code> okamžitě skončí.</li>\n  <li><code>dropwhile(predikat, data)</code>: Zahazuje prvky, dokud platí predikát; jakmile padne <code>False</code>, začne vracet všechny zbývající prvky.</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">data = [1, 3, 5, 8, 9, 2, 4]\nlist(itertools.takewhile(lambda x: x &lt; 7, data))  # [1, 3, 5] (zastaví se na 8)\nlist(itertools.dropwhile(lambda x: x &lt; 7, data))  # [8, 9, 2, 4]</pre>\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Sdružování a řetězení: itertools.chain",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Sdružování a řetězení: itertools.chain</h2></div><div class=\"section-body\">\n<p>Potřebujete projít několik různých kolekcí postupně za sebou?</p>\n<h3>Špatně: Sčítání kolekcí operátorem +</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">list1 = [1, 2, 3]\nlist2 = [4, 5, 6]\n# Vytvoří TŘETÍ seznam v paměti a zkopíruje do něj všechny prvky:\nvysledek = list1 + list2  # O(n + m) paměti navíc!</pre>\n<h3>Správně: itertools.chain</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import itertools\n\nlist1 = [1, 2, 3]\nlist2 = [4, 5, 6]\nmnozina = {7, 8}\n\n# Žádná alokace paměti! Prochází prvky sekvenčně:\nfor prvek in itertools.chain(list1, list2, mnozina):\n    print(prvek, end=\" \")\n# Výstup: 1 2 3 4 5 6 7 8</pre>\n<h3><code>itertools.chain.from_iterable()</code>:</h3>\n<p>Pokud máte seznam seznamů nebo generátor vracející kolekce:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">matice = [[1, 2], [3, 4], [5, 6]]\nplochy_seznam = list(itertools.chain.from_iterable(matice))\n# [1, 2, 3, 4, 5, 6]</pre>\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "Dvojice a sousedé: itertools.pairwise (Python 3.10+)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Dvojice a sousedé: itertools.pairwise (Python 3.10+)</h2></div><div class=\"section-body\">\n<p>Velmi častá programátorská úloha: Procházet sousední dvojice prvků \\((x_i, x_{i+1})\\), například pro výpočet rozdílů, rychlosti nebo vzdáleností.</p>\n<h3>Starý těžkopádný způsob:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">body = [10, 15, 13, 22, 28]\n# Ošklivé indexování s rizikem IndexError:\nrozdily = [body[i+1] - body[i] for i in range(len(body) - 1)]</pre>\n<h3>Moderní Python 3.10+: <code>itertools.pairwise</code></h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import itertools\n\nbody = [10, 15, 13, 22, 28]\n\nfor predchozi, aktualni in itertools.pairwise(body):\n    diference = aktualni - predchozi\n    print(f\"Změna z {predchozi} na {aktualni}: {diference:+d}\")\n\n# Výstup:\n# Změna z 10 na 15: +5\n# Změna z 15 na 13: -2\n# Změna z 13 na 22: +9\n# Změna z 22 na 28: +6</pre>\n<p>Funguje i na generátorech a proudech dat bez nutnosti znát délku nebo ukládat prvky do pole!</p>\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "Kombinatorika: product, permutations, combinations",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Kombinatorika: product, permutations, combinations</h2></div><div class=\"section-body\">\n<p>Psaní vnořených cyklů pro generování kombinací je náchylné k chybám. <code>itertools</code> nabízí optimalizovaná řešení:</p>\n<h3>1. Kartézský součin: <code>itertools.product(*iterables, repeat=1)</code></h3>\n<p>Nahrazuje hluboko vnořené cykly:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import itertools\n\nbarvy = [\"červená\", \"modrá\"]\nvelikosti = [\"S\", \"M\", \"L\"]\n\nfor b, v in itertools.product(barvy, velikosti):\n    print(f\"{b}-{v}\", end=\" | \")\n# červená-S | červená-M | červená-L | modrá-S | modrá-M | modrá-L |</pre>\n<h3>2. Permutace: <code>itertools.permutations(iterable, r=None)</code></h3>\n<p>Záleží na pořadí prvků:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">list(itertools.permutations(\"ABC\", 2))\n# [('A', 'B'), ('A', 'C'), ('B', 'A'), ('B', 'C'), ('C', 'A'), ('C', 'B')]</pre>\n<h3>3. Kombinace: <code>itertools.combinations(iterable, r)</code></h3>\n<p>Nezáleží na pořadí (bez opakování):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">list(itertools.combinations(\"ABC\", 2))\n# [('A', 'B'), ('A', 'C'), ('B', 'C')]</pre>\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "Seskupování dat: itertools.groupby a past s řazením",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Seskupování dat: itertools.groupby a past s řazením</h2></div><div class=\"section-body\">\n<p>Funkce <code>itertools.groupby(iterable, key=None)</code> seskupuje po sobě jdoucí prvky se stejným klíčem.</p>\n<div class=\"notes-block\"><div class=\"note-item caution\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p><strong>Kritická past <code>itertools.groupby</code>:</strong> Na rozdíl od SQL <code>GROUP BY</code> seskupuje <code>itertools.groupby</code> <strong>pouze po sobě jdoucí prvky</strong>! Pokud data nejsou předem seřazena podle klíče, vytvoří se více oddělených skupin pro stejnou hodnotu!</p></div></div></div>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import itertools\n\nstudenti = [\n    {\"jmeno\": \"Alice\", \"rocnik\": 2},\n    {\"jmeno\": \"Bob\", \"rocnik\": 1},\n    {\"jmeno\": \"Cyril\", \"rocnik\": 2},\n]\n\n# CHYBA: Neuspořádaná data vytvoří ročník 2 dvakrát!\n# SPRÁVNĚ: Nejprve data seřadíme podle klíče:\nstudenti.sort(key=lambda s: s[\"rocnik\"])\n\nfor rocnik, skupina in itertools.groupby(studenti, key=lambda s: s[\"rocnik\"]):\n    jmena = [s[\"jmeno\"] for s in skupina]\n    print(f\"Ročník {rocnik}: {jmena}\")\n\n# Výstup:\n# Ročník 1: ['Bob']\n# Ročník 2: ['Alice', 'Cyril']</pre>\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Funkcionální Metaprogramování: Anatomie dekorátoru",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Funkcionální Metaprogramování: Anatomie dekorátoru</h2></div><div class=\"section-body\">\n<p>V předchozí přednášce jsme viděli, že funkce jsou objekty první kategorie. Dekorátor je syntaktický cukr, který tuto vlastnost využívá na maximum:</p>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p><strong>Dekorátor</strong> je funkce, která přijme jinou funkci jako argument, obalí ji dodatečnou logikou a vrátí novou (upravenou) funkci.</p></div></div></div>\n<p>Zápis se zavináčem <code>@dekorator</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">@muj_dekorator\ndef pozdrav(jmeno):\n    return f\"Ahoj {jmeno}\"\n\n# Je přesným ekvivalentem zápisu:\n# pozdrav = muj_dekorator(pozdrav)</pre>\n<h3>Základní šablona dekorátoru s <code>functools.wraps</code>:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import functools\nfrom typing import Callable, Any\n\ndef muj_dekorator(func: Callable) -&gt; Callable:\n    # wraps zachová jméno, docstring a anotace původní funkce!\n    @functools.wraps(func)\n    def wrapper(*args: Any, **kwargs: Any) -&gt; Any:\n        print(\"[LOG] Před voláním funkce\")\n        vysledek = func(*args, **kwargs)\n        print(\"[LOG] Po volání funkce\")\n        return vysledek\n    return wrapper</pre>\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "Praktický dekorátor: Měření času běhu (@timer)",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">Praktický dekorátor: Měření času běhu (@timer)</h2></div><div class=\"section-body\">\n<p>Vytvořme produkční dekorátor pro přesné profilování libovolné funkce:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import time\nimport functools\nfrom typing import Callable, Any\n\ndef timer(func: Callable) -&gt; Callable:\n    \"\"\"Měří čas běhu ozdobené funkce a vypíše výsledek v milisekundách.\"\"\"\n    @functools.wraps(func)\n    def wrapper(*args: Any, **kwargs: Any) -&gt; Any:\n        start = time.perf_counter()\n        vysledek = func(*args, **kwargs)\n        konec = time.perf_counter()\n        trvani_ms = (konec - start) * 1000\n        print(f\"⏱️ Funkce '{func.__name__}' trvala: {trvani_ms:.3f} ms\")\n        return vysledek\n    return wrapper\n\n@timer\ndef spocitej_faktorial(n: int) -&gt; int:\n    import math\n    return math.factorial(n)\n\nvysledek = spocitej_faktorial(50_000)\n# Vypíše např.: ⏱️ Funkce 'spocitej_faktorial' trvala: 42.150 ms</pre>\n<p>Díky <code>*args</code> a <code>**kwargs</code> je dekorátor plně univerzální pro jakoukoliv signaturu funkce.</p>\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Parametrizované dekorátory: Tříúrovňové uzávěry",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Parametrizované dekorátory: Tříúrovňové uzávěry</h2></div><div class=\"section-body\">\n<p>Co když chceme dekorátoru předávat konfigurační argumenty, např. <code>@opakuj(pokusu=3, zpozdeni=0.5)</code>?</p>\n<p>Dekorátor s parametry není samotný dekorátor, ale <strong>továrna na dekorátory</strong> (<em>decorator factory</em>). Vyžaduje tři úrovně vnoření funkcí:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import time\nimport functools\nfrom typing import Callable, Any\n\ndef opakuj(pokusu: int = 3, zpozdeni: float = 0.5):\n    \"\"\"Dekorátor, který při selhání zopakuje volání funkce zadaný počet krát.\"\"\"\n    def decorator(func: Callable) -&gt; Callable:\n        @functools.wraps(func)\n        def wrapper(*args: Any, **kwargs: Any) -&gt; Any:\n            posledni_chyba = None\n            for pokus in range(1, pokusu + 1):\n                try:\n                    return func(*args, **kwargs)\n                except Exception as e:\n                    posledni_chyba = e\n                    print(f\"Pokus {pokus}/{pokusu} selhal: {e}. Čekám {zpozdeni} s...\")\n                    time.sleep(zpozdeni)\n            raise RuntimeError(f\"Všech {pokusu} pokusů selhalo!\") from posledni_chyba\n        return wrapper\n    return decorator\n\n@opakuj(pokusu=3, zpozdeni=1.0)\ndef stahni_data(url: str):\n    # Simulace síťového volání\n    pass</pre>\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "Automatická memoizace: functools.cache a lru_cache",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Automatická memoizace: functools.cache a lru_cache</h2></div><div class=\"section-body\">\n<p>Výpočet Fibonacciho posloupnosti naivní rekurzí má exponenciální složitost \\(O(2^n)\\):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Bez memoizace: fib(35) trvá několik sekund, fib(100) nedoběhne nikdy!\ndef fib_pomaly(n: int) -&gt; int:\n    if n &lt; 2:\n        return n\n    return fib_pomaly(n - 1) + fib_pomaly(n - 2)</pre>\n<p>Standardní knihovna Pythonu nabízí hotový memoizační dekorátor:</p>\n<ul>\n  <li><strong><code>@functools.cache</code></strong> (Python 3.9+): Neomezená hešovací mezipaměť (rychlejší).</li>\n  <li><strong><code>@functools.lru_cache(maxsize=128)</code></strong>: Least-Recently-Used cache s omezenou velikostí.</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import functools\n\n@functools.cache\ndef fib_bleskovy(n: int) -&gt; int:\n    if n &lt; 2:\n        return n\n    return fib_bleskovy(n - 1) + fib_bleskovy(n - 2)\n\nprint(fib_bleskovy(100))  # 354224848179261915075 (okamžitý výsledek v O(n) čase!)\nprint(fib_bleskovy.cache_info())\n# CacheInfo(hits=98, misses=101, maxsize=None, currsize=101)</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">❗</span><div class=\"note-content\"><p>Argumenty cachované funkce <strong>musí být hešovatelné</strong> (<code>hash(arg)</code>), protože slouží jako klíče interního slovníku!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Případová studie: Proudové zpracování FASTA souborů",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Případová studie: Proudové zpracování FASTA souborů</h2></div><div class=\"section-body\">\n<p>V bioinformatice a chemické informatice mají soubory se sekvencemi DNA/proteinů (formát FASTA) běžně desítky gigabajtů. Každý záznam začíná hlavičkou <code>&gt;ID</code> následovanou řádky nukleotidů.</p>\n<p>Napišme elegantní generátorový parser:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from typing import Iterator\n\ndef parsuj_fasta(cesta: str) -&gt; Iterator[tuple[str, str]]:\n    \"\"\"Proudový parser FASTA souborů s paměťovou složitostí O(1).\"\"\"\n    aktualni_hlavicka = None\n    buffer_sekvence = []\n    \n    with open(cesta, \"r\", encoding=\"utf-8\") as f:\n        for radek in f:\n            radek = radek.strip()\n            if not radek:\n                continue\n            if radek.startswith(\"&gt;\"):\n                if aktualni_hlavicka is not None:\n                    yield aktualni_hlavicka, \"\".join(buffer_sekvence)\n                    buffer_sekvence.clear()\n                aktualni_hlavicka = radek[1:]  # Odstranění '&gt;'\n            else:\n                buffer_sekvence.append(radek)\n        \n        # Vrácení posledního záznamu po dosažení EOF\n        if aktualni_hlavicka is not None:\n            yield aktualni_hlavicka, \"\".join(buffer_sekvence)\n\n# Použití ve spojení s itertools:\n# for header, seq in itertools.islice(parsuj_fasta(\"velky_genom.fasta\"), 10):\n#     print(f\"ID: {header[:20]} | Délka sekvence: {len(seq)} bp\")</pre>\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Shrnutí a most k Týdnu 7 (OOP a Datový Model)",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Shrnutí a most k Týdnu 7 (OOP a Datový Model)</h2></div><div class=\"section-body\">\n<p>Dnes jsme ovládli jeden z nejdůležitějších pilířů idiomatického Pythonu:</p>\n<h3>Klíčové poznatky dnešní přednášky:</h3>\n<ol>\n  <li><strong>Iterační protokol</strong>: <code>iter(obj)</code> volá <code>__iter__()</code>, <code>next(it)</code> volá <code>__next__()</code>, ukončení řídí <code>StopIteration</code>.</li>\n  <li><strong>Generátory s <code>yield</code></strong>: Zmrazují stack frame na haldě a umožňují psát stavové iterátory bez třídní režie.</li>\n  <li><strong>Paměťová složitost \\(O(1)\\)</strong>: Zpracování neomezených datových proudů a souborů bez rizika vyčerpání paměti RAM.</li>\n  <li><strong>Modul <code>itertools</code></strong>: Standardní rychlé C-iterátory pro řezání (<code>islice</code>), dvojice (<code>pairwise</code>), kombinatoriku a řetězení.</li>\n  <li><strong>Dekorátory</strong>: Obalování funkcí, zachování metadat přes <code>@functools.wraps</code> a memoizace pomocí <code>@functools.cache</code>.</li>\n</ol>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">Evoluce abstrakcí v kurzu:\nTýdny 1-4: Datové typy &amp; Hešovací tabulky\nTýden 5: Funkce, Closures &amp; Moderní Typový systém (PEP 695)\nTýden 6: Líné toky dat (Iterátory, Generátory &amp; itertools) ──┐\n                                                            ▼\nPříští týden (Týden 7): Objektově Orientované Programování &amp; Python Data Model\n- Třídy a paměťový layout PyObject\n- Instance slovník __dict__ vs. paměťová optimalizace __slots__\n- Dunder metody (__repr__, __len__, __getitem__, __matmul__)\n- Kontextové manažery (with protokol)\n- Cesta k Milestone 2 (Maticový datový model)</pre>\n</div>"
+    }
+  ]
+}

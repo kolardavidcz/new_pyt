@@ -1,0 +1,249 @@
+{
+  "slug": "lectures--week-05",
+  "total": 27,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod a osnova",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod a osnova</h2></div><div class=\"section-body\">\n<p>Vítejte v páté přednášce kurzu programování v jazyce Python. Dnešním tématem jsou funkce — stavební kameny modularity a abstrakce v procedurálním i funkcionálním paradigmatu — a moderní statický typový systém jazyka Python.</p>\n<h3>Osnova dnešní 90minutové přednášky:</h3>\n<ol>\n  <li><strong>Funkce v C/Javě vs. Pythonu</strong>: Funkce jako plnohodnotné objekty první kategorie (<em>first-class citizens</em>).</li>\n  <li><strong>Mechanismus předávání argumentů</strong>: C/Java hodnota/reference vs. Python <em>Call by Object Reference</em> (sdílení reference).</li>\n  <li><strong>Typy parametrů</strong>: Poziční vs. pojmenované argumenty (<em>keyword arguments</em>).</li>\n  <li><strong>Striktní oddělovače (PEP 570 &amp; PEP 3102)</strong>: Positional-only <code>/</code> a Keyword-only <code>*</code>.</li>\n  <li><strong>Variadické funkce</strong>: Sběrné parametry <code>*args</code> (n-tice) a <code>**kwargs</code> (slovník).</li>\n  <li><strong>Rozbalování při volání</strong>: Forwarding a kompozice argumentů přes <code>*</code> a <code>**</code>.</li>\n  <li><strong>Klasická past s výchozí hodnotou</strong>: Proč <code>def f(x=[])</code> sdílí stav a jak funguje <code>__defaults__</code>.</li>\n  <li><strong>Rozsah platnosti (Scope) a pravidlo LEGB</strong>: Local, Enclosing, Global a Built-in.</li>\n  <li><strong>Manipulace se scope</strong>: Klíčová slova <code>global</code> a <code>nonlocal</code> a jejich rizika.</li>\n  <li><strong>Uzávěry (Closures)</strong>: Jak funkce uzavírá lexikální prostředí a vnitřní struktura buňky (<code>cell</code>).</li>\n  <li><strong>Anonymní funkce (lambda)</strong>: Jednořádkové lambda výrazy, limity a idiomatické použití.</li>\n  <li><strong>Funkcionální nástroje standardní knihovny</strong>: <code>map()</code>, <code>filter()</code>, <code>zip()</code>, <code>enumerate()</code>, <code>any()</code> a <code>all()</code>.</li>\n  <li><strong>Modul functools</strong>: Částečná aplikace argumentů pomocí <code>functools.partial</code>.</li>\n  <li><strong>Moduly a balíčky</strong>: Jak CPython hledá kód (<code>sys.path</code>), importní mechanismus a <code>__name__ == '__main__'</code>.</li>\n  <li><strong>Evoluce typového systému</strong>: Od čistého dynamického duck-typingu k PEP 484 a volitelnému statickému typování.</li>\n  <li><strong>Moderní typové anotace (Python 3.10+)</strong>: Operátor sjednocení <code>int | str</code>, <code>list[T]</code>, <code>dict[K, V]</code>.</li>\n  <li><strong>Typování funkcí a uzávěrů</strong>: <code>Callable[[int, str], bool]</code>.</li>\n  <li><strong>Revoluce v Pythonu 3.12 (PEP 695)</strong>: Nová syntaxe typových aliasů klíčovým slovem <code>type</code>.</li>\n  <li><strong>Generické funkce (PEP 695)</strong>: Přirozená generika <code>def prvni[T](seznam: list[T]) -&gt; T</code>.</li>\n  <li><strong>Produkční most</strong>: Statická kontrola typů pomocí nástrojů <code>mypy</code> a <code>pyright</code> v CI/CD pipeline.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "C/Java vs. Python: Funkce jako First-Class Citizens",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">C/Java vs. Python: Funkce jako First-Class Citizens</h2></div><div class=\"section-body\">\n<p>V kompilovaných jazycích jsou funkce a metody instrukční bloky v textovém segmentu binárky. V Javě navíc funkce nemůže existovat samostatně — musí být zabalena do třídy jako metoda:</p>\n<pre class=\"brush: java; gutter: false; toolbar: false;\">// Java: Funkce nemůže existovat bez třídy\npublic class MathUtils {\n    public static int zdvojnasob(int x) { return x * 2; }\n}</pre>\n<h3>Python: Funkce je standardní heap objekt (<code>PyFunctionObject</code>):</h3>\n<p>V Pythonu má funkce stejný status jako číslo, řetězec nebo seznam:</p>\n<ol>\n  <li>Můžete ji uložit do proměnné.</li>\n  <li>Můžete ji předat jako argument jiné funkci.</li>\n  <li>Můžete ji vrátit z jiné funkce.</li>\n  <li>Můžete ji uložit do seznamu nebo slovníku.</li>\n</ol>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def pozdrav(jmeno: str) -&gt; str:\n    return f\"Ahoj, {jmeno}!\"\n\n# 1. Přiřazení funkce do proměnné:\nmoje_funkce = pozdrav\nprint(moje_funkce(\"Karlovi\"))  # 'Ahoj, Karlovi!'\n\n# 2. Inspekce objektu funkce:\nprint(type(pozdrav))      # &lt;class 'function'&gt;\nprint(pozdrav.__name__)   # 'pozdrav'\nprint(pozdrav.__code__)   # &lt;code object pozdrav at 0x7f8...&gt;</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Závorky <code>()</code> znamenají <strong>volání</strong> funkce. Název funkce bez závorek reprezentuje <strong>samotný objekt funkce</strong>!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Mechanismus předávání: Call by Object Reference",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Mechanismus předávání: Call by Object Reference</h2></div><div class=\"section-body\">\n<p>V C se parametry předávají hodnotou (kopírováním) nebo explicitním ukazatelem (<code>int*</code>). V Javě se primitiva předávají hodnotou a objekty hodnotou reference.</p>\n<p>Jak funguje Python? Python používá <strong>Call by Object Reference</strong> (také nazýváno <em>Call by Sharing</em>):</p>\n<ul>\n  <li>Do funkce se vždy předává <strong>kopie reference</strong> na objekt na haldě.</li>\n  <li>Zda funkce může změnit stav volajícího, závisí <strong>výhradně na mutabilitě předaného objektu</strong>!</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># 1. Neměnný objekt (int, str, tuple):\ndef zmen_cislo(n: int) -&gt; None:\n    n = n + 1  # Vytvoří nový objekt int a přepíše lokální referenci 'n'\n\nx = 10\nzmen_cislo(x)\nprint(x)  # 10 -- Původní proměnná x zůstala nezměněna!\n\n# 2. Měnitelný objekt (list, dict, set):\ndef pridej_prvek(seznam: list[int]) -&gt; None:\n    seznam.append(99)  # Mutuje původní objekt na haldě!\n\ncisla = [1, 2, 3]\npridej_prvek(cisla)\nprint(cisla)  # [1, 2, 3, 99] -- Změna se projevila i mimo funkci!</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">❗</span><div class=\"note-content\"><p>Pokud uvnitř funkce přiřadíte <code>seznam = [99]</code>, přepíšete pouze lokální referenci a volající změnu neuvidí. Pokud však zavoláte mutační metodu (<code>append</code>, <code>extend</code>, <code>[0] = ...</code>), měníte tentýž objekt v paměti!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Poziční vs. Pojmenované argumenty",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Poziční vs. Pojmenované argumenty</h2></div><div class=\"section-body\">\n<p>V C/C++ závisí význam argumentů striktně na jejich pořadí v záhlaví funkce. V Pythonu můžete parametry volat buď pozičně, nebo <strong>explicitním pojmenováním</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\ndef vytvor_profil(jmeno: str, vek: int, role: str = \"user\", aktivni: bool = True) -&gt; dict:\n    return {\"jmeno\": jmeno, \"vek\": vek, \"role\": role, \"aktivni\": aktivni}\n\n# 1. Poziční volání (pořadí odpovídá definici):\np1 = vytvor_profil(\"Alice\", 25)\n\n# 2. Pojmenované volání (Keyword arguments) -- pořadí nehraje roli:\np2 = vytvor_profil(vek=30, jmeno=\"Bob\", aktivni=False)\n\n# 3. Kombinace: Poziční argumenty MUSÍ předcházet pojmenovaným!\np3 = vytvor_profil(\"Cyril\", 28, role=\"admin\")\n\n# CHYBA: Poziční argument po pojmenovaném:\n# p4 = vytvor_profil(jmeno=\"David\", 22)\n# SyntaxError: positional argument follows keyword argument</pre>\n<h3>Proč jsou pojmenované argumenty zásadní v praxi?</h3>\n<ol>\n  <li><strong>Samodokumentující kód</strong>: Volání <code>otevri_okno(sirka=800, vyska=600, modalni=True)</code> je okamžitě srozumitelné na rozdíl od kryptického <code>otevri_okno(800, 600, True)</code>.</li>\n  <li><strong>Odolnost vůči změnám API</strong>: Přidání nových volitelných parametrů s výchozí hodnotou nerozbije stávající volání.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Striktní oddělovače parametrů: / a * (PEP 570 & PEP 3102)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Striktní oddělovače parametrů: / a * (PEP 570 &amp; PEP 3102)</h2></div><div class=\"section-body\">\n<p>Často chceme jako autoři API vynutit, aby některé argumenty byly předávány <strong>výhradně pozičně</strong> (např. matematické funkce jako <code>sin(x)</code>), nebo naopak <strong>výhradně pojmenovaně</strong> (např. přepínače konfigurace).</p>\n<p>Python nabízí dva syntaktické oddělovače:</p>\n<ul>\n  <li><strong><code>/</code> (lomítko)</strong>: Všechny parametry <strong>před ním</strong> jsou <strong>Positional-only</strong>.</li>\n  <li><strong><code>*</code> (hvězdička)</strong>: Všechny parametry <strong>za ním</strong> jsou <strong>Keyword-only</strong>.</li>\n</ul>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">def konfigurovat(cesta, /, mod=\"r\", *, kodovani=\"utf-8\", timeout=30):\n                 └────┬─┘  └───┬───┘    └──────────────┬─────────────┘\n                Pouze pozičně  Obojí             Pouze pojmenovaně</pre>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Platná volání:\nkonfigurovat(\"/data/log.txt\", \"w\", kodovani=\"ascii\", timeout=10)\nkonfigurovat(\"/data/log.txt\", mod=\"r\", kodovani=\"utf-8\")\n\n# CHYBY:\n# konfigurovat(cesta=\"/data/log.txt\")\n# TypeError: konfigurovat() got some positional-only arguments passed as keyword arguments: 'cesta'\n\n# konfigurovat(\"/data/log.txt\", \"r\", \"utf-8\")\n# TypeError: konfigurovat() takes from 1 to 2 positional arguments but 3 were given</pre>\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Variadické parametry: *args a **kwargs",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Variadické parametry: *args a **kwargs</h2></div><div class=\"section-body\">\n<p>Jak definovat funkci, která přijímá libovolný počet argumentů (jako např. <code>print()</code> nebo <code>min()</code>)?</p>\n<h3>1. Parametr <code>*args</code> (Sběr přebytečných pozičních argumentů):</h3>\n<p>Všechny dodatečné poziční argumenty zabalí CPython do <strong>neměnné n-tice (<code>tuple</code>)</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def aritmeticky_prumer(prvni: float, *dalsi: float) -&gt; float:\n    # 'prvni' je povinný parametr, 'dalsi' je tuple se zbylými argumenty\n    vsechna_cisla = (prvni,) + dalsi\n    return sum(vsechna_cisla) / len(vsechna_cisla)\n\nprint(aritmeticky_prumer(10))              # 10.0 (dalsi je ())\nprint(aritmeticky_prumer(10, 20, 30, 40))  # 25.0 (dalsi je (20, 30, 40))</pre>\n<h3>2. Parametr <code>**kwargs</code> (Sběr přebytečných pojmenovaných argumentů):</h3>\n<p>Všechny dodatečné pojmenované argumenty zabalí CPython do <strong>slovníku (<code>dict</code>)</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def generuj_html_tag(nazev: str, text: str = \"\", **atributy: str) -&gt; str:\n    # atributy je běžný dict: klíč -&gt; hodnota\n    attrs_str = \"\".join(f' {k}=\"{v}\"' for k, v in atributy.items())\n    return f\"&lt;{nazev}{attrs_str}&gt;{text}&lt;/{nazev}&gt;\"\n\nprint(generuj_html_tag(\"a\", \"Klikněte zde\", href=\"https://cuni.cz\", target=\"_blank\"))\n# &lt;a href=\"https://cuni.cz\" target=\"_blank\"&gt;Klikněte zde&lt;/a&gt;</pre>\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Rozbalování argumentů při volání: * a **",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Rozbalování argumentů při volání: * a **</h2></div><div class=\"section-body\">\n<p>Operátory <code>*</code> a <code>**</code> nefungují pouze v hlavičce definice funkce, ale také <strong>při jejím volání</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def spocitej_objem(delka: float, sirka: float, vyska: float) -&gt; float:\n    return delka * sirka * vyska\n\n# Máme data v seznamu:\nrozmery_list = [10.5, 4.0, 2.5]\n# Místo: spocitej_objem(rozmery_list[0], rozmery_list[1], rozmery_list[2])\nobjem = spocitej_objem(*rozmery_list)  # Rozbalí sekvenci na 3 poziční argumenty!\nprint(objem)  # 105.0\n\n# Máme data ve slovníku:\nrozmery_dict = {\"delka\": 10.5, \"sirka\": 4.0, \"vyska\": 2.5}\nobjem2 = spocitej_objem(**rozmery_dict)  # Rozbalí slovník na pojmenované argumenty!\nprint(objem2)  # 105.0</pre>\n<h3>Univerzální forwarding wrapper (Základ dekorátorů):</h3>\n<p>Tento vzor umožňuje předat libovolné argumenty dál beze změny:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def mereni_casu(cilova_funkce, *args, **kwargs):\n    print(f\"Spouštím funkci {cilova_funkce.__name__}...\")\n    vysledek = cilova_funkce(*args, **kwargs)  # Perfektní přenesení všech parametrů!\n    print(\"Dokončeno.\")\n    return vysledek</pre>\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Největší syntaktická past: def f(x=[])",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Největší syntaktická past: def f(x=[])</h2></div><div class=\"section-body\">\n<p>Zkoumáte následující kód. Co vypíše?</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def pridej_polozku(polozka: str, kosik: list[str] = []) -&gt; list[str]:\n    kosik.append(polozka)\n    return kosik\n\nprint(pridej_polozku(\"jablko\"))  # ['jablko']\nprint(pridej_polozku(\"banan\"))   # Co bude zde? ['banan'] ???</pre>\n<h3>Překvapivý výsledek:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">print(pridej_polozku(\"banan\"))   # ['jablko', 'banan'] !\nprint(pridej_polozku(\"kiwi\"))    # ['jablko', 'banan', 'kiwi'] !</pre>\n<h3>Proč se to děje? CPython Internal Mechanics:</h3>\n<p>V C/C++ a Javě se výchozí hodnoty vyhodnocují při každém volání funkce. V Pythonu se příkaz <code>def</code> vyhodnocuje <strong>pouze jednou — při načtení (definici) modulu</strong>!</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">Krok 1 (Čas definice funkce):\n  Interpret vytvoří objekt PyFunctionObject.\n  Vyhodnotí výraz [] a vytvoří jedinou instanci listu na haldě.\n  Uloží referenci na tento list do vnitřního atributu funkce: pridej_polozku.__defaults__.\n\nKrok 2 (Čas volání funkce bez 2. parametru):\n  Funkce nepoužije nový list, ale opakovaně sáhne do __defaults__[0]!</pre>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">print(pridej_polozku.__defaults__)  # (['jablko', 'banan', 'kiwi'],)</pre>\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Správný idiom pro měnitelné výchozí argumenty",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Správný idiom pro měnitelné výchozí argumenty</h2></div><div class=\"section-body\">\n<p>Jak správně implementovat výchozí prázdný seznam, slovník nebo množinu?</p>\n<p>Použijte <strong>neměnnou hodnotu <code>None</code> jako sentinel</strong> a nový objekt vytvořte až <strong>uvnitř těla funkce</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># SPRÁVNÝ A PROFESIONÁLNÍ ZÁPIS:\ndef pridej_polozku(polozka: str, kosik: list[str] | None = None) -&gt; list[str]:\n    \"\"\"Pokud košík není předán, vytvoříme nový nezávislý seznam.\"\"\"\n    if kosik is None:\n        kosik = []  # Tento řádek se spustí při KAŽDÉM volání znovu!\n    kosik.append(polozka)\n    return kosik\n\n# Nyní má každé volání vlastní izolovaný seznam:\nprint(pridej_polozku(\"jablko\"))  # ['jablko']\nprint(pridej_polozku(\"banan\"))   # ['banan']  -- Funguje přesně podle očekávání!\n\n# A pokud uživatel předá vlastní seznam, mutuje se jeho instance:\nmuj_nakup = [\"chléb\"]\npridej_polozku(\"máslo\", muj_nakup)\nprint(muj_nakup)                 # ['chléb', 'máslo']</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">💡</span><div class=\"note-content\"><p>Jako výchozí hodnoty parametrů používejte <strong>výhradně neměnné typy</strong>: <code>None</code>, <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code> nebo <code>tuple</code>. Nikdy nepoužívejte <code>[]</code>, <code>{}</code> ani <code>set()</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Rozsah platnosti (Scope) a pravidlo LEGB",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Rozsah platnosti (Scope) a pravidlo LEGB</h2></div><div class=\"section-body\">\n<p>Když se v kódu odkážete na proměnnou <code>x</code>, jakým způsobem ji CPython vyhledává?</p>\n<p>CPython prohledává jmenné prostory v přísném pořadí <strong>LEGB</strong>:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">   L  ──►  Local (lokální scope uvnitř aktuální funkce)\n   E  ──►  Enclosing (scope vnějších obalujících funkcí / uzávěrů)\n   G  ──►  Global (modulární scope -- proměnné na úrovni souboru)\n   B  ──►  Built-in (vestavěná jména: len, range, print, ValueError)</pre>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">x = \"GLOBAL\"\n\ndef vnejsi():\n    x = \"ENCLOSING\"\n    \n    def vnitrni():\n        x = \"LOCAL\"\n        print(x)  # Vypíše 'LOCAL' (nalezeno v L)\n    \n    vnitrni()\n\nvnejsi()</pre>\n<h3>Důležitý rozdíl oproti C/C++ a Javě:</h3>\n<p>V C a Javě vytváří každý složený blok <code>{ ... }</code> (např. tělo <code>if</code> nebo cyklu <code>for</code>) nový samostatný scope. V Pythonu bloky <code>if</code>, <code>for</code>, <code>while</code>, <code>try</code> <strong>nezakládají nový scope</strong>! Nový scope zakládají pouze <strong>funkce</strong>, <strong>třídy</strong> a <strong>generátory/comprehensions</strong>.</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">if True:\n    tajemstvi = 42\nprint(tajemstvi)  # 42 -- Zcela legální! Proměnná unikla z bloku if!</pre>\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Klíčová slova global a nonlocal",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Klíčová slova global a nonlocal</h2></div><div class=\"section-body\">\n<p>Co se stane, když chceme uvnitř funkce <strong>přiřadit hodnotu</strong> do proměnné definované výše?</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">pocitadlo = 0\n\ndef inkrementuj():\n    # pocitadlo = pocitadlo + 1  # UnboundLocalError: cannot access local variable 'pocitadlo'\n    pass</pre>\n<h3>Proč nastane UnboundLocalError?</h3>\n<p>CPython analyzuje kód funkce při kompilaci do bajtkódu. Pokud vidí přiřazení (<code>pocitadlo = ...</code>), označí symbol <code>pocitadlo</code> jako <strong>striktně lokální proměnnou</strong> pro celou funkci. Při čtení na pravé straně však lokální proměnná ještě nemá hodnotu!</p>\n<h3>Řešení 1: Klíčové slovo <code>global</code> (úroveň modulu):</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">pocitadlo = 0\n\ndef inkrementuj():\n    global pocitadlo  # Explicitně oznamujeme: proměnná patří do globálního modulu!\n    pocitadlo += 1</pre>\n<h3>Řešení 2: Klíčové slovo <code>nonlocal</code> (úroveň vnořené funkce, Python 3+):</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\ndef vytvor_generator_id():\n    aktualni_id = 0\n    def dalsi_id():\n        nonlocal aktualni_id  # Odkazuje na proměnnou v obalující funkci (Enclosing)!\n        aktualni_id += 1\n        return aktualni_id\n    return dalsi_id</pre>\n<div class=\"notes-block\"><div class=\"note-item warning\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p>Klíčovému slovu <code>global</code> se v produkčním kódu vyhýbejte — globální mutabilní stav ničí testovatelnost a způsobuje skryté závislosti. Pro zachování stavu preferujte třídy nebo uzávěry (<code>nonlocal</code>).</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Uzávěry (Closures) a buňky v paměti",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Uzávěry (Closures) a buňky v paměti</h2></div><div class=\"section-body\">\n<p><strong>Uzávěr (Closure)</strong> je funkce, která si pamatuje hodnoty proměnných ze svého lexikálního okolí (Enclosing scope), i když už vnější funkce dávno skončila a opustila zásobník!</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\ndef mocnina_faktory(exponent: int):\n    # 'exponent' je lokální proměnná funkce mocnina_faktory\n    def umocni(zaklad: float) -&gt; float:\n        return zaklad ** exponent  # Používá 'exponent' z vnějšího scopu!\n    return umocni\n\nkvadrat = mocnina_faktory(2)\nkubik = mocnina_faktory(3)\n\nprint(kvadrat(5))  # 25.0\nprint(kubik(5))    # 125.0</pre>\n<h3>Jak to CPython dělá, když rámec vnější funkce zanikl?</h3>\n<p>CPython vytvoří speciální objekt typu <strong><code>cell</code></strong>, který žije na haldě nezávisle na zásobníku volání. Vnitřní funkce si nese referenci na tuto buňku ve svém atributu <code>__closure__</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">print(kvadrat.__closure__)\n# (&lt;cell at 0x7f...: int object at 0x9e...&gt;,)\n\nprint(kvadrat.__closure__[0].cell_contents)  # 2\nprint(kubik.__closure__[0].cell_contents)    # 3</pre>\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Anonymní funkce: Lambda výrazy",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Anonymní funkce: Lambda výrazy</h2></div><div class=\"section-body\">\n<p>Lambda výraz je syntaktická zkratka pro vytvoření jednoduché bezejmenné funkce na jediném řádku:</p>\n<p>$$\\lambda \\;\\text{parametry} : \\text{návratový\\_výraz}$$</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Ekvivalentní definice:\n# def zdvojnasob(x): return x * 2\nzdvojnasob = lambda x: x * 2\n\nprint(zdvojnasob(7))  # 14</pre>\n<h3>Omezení lambda výrazů v Pythonu:</h3>\n<ol>\n  <li>Tělo smí obsahovat <strong>pouze jediný výraz</strong> (<em>expression</em>), nikoliv příkazy (<em>statements</em>).</li>\n  <li>Nelze použít <code>if-elif-else</code> (lze pouze ternární operátor <code>A if cond else B</code>).</li>\n  <li>Nelze použít <code>while</code>, <code>for</code>, <code>try-except</code> ani přiřazení proměnné <code>=</code>.</li>\n  <li>Nelze psát typové anotace přímo do signatury lambdy.</li>\n</ol>\n<h3>Kde lambdu používat (Idiomatické nasazení):</h3>\n<p>Jako jednoúčelové klíče pro řazení (<code>key=</code>) nebo transformace:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">pacienti = [\n    {\"jmeno\": \"Alice\", \"vek\": 34, \"tlak\": 120},\n    {\"jmeno\": \"Bob\",   \"vek\": 62, \"tlak\": 145},\n    {\"jmeno\": \"Cyril\", \"vek\": 28, \"tlak\": 115},\n]\n\n# Řazení podle věku:\npacienti.sort(key=lambda p: p[\"vek\"])\n\n# Hledání pacienta s nejvyšším tlakem:\nnejrizikovejsi = max(pacienti, key=lambda p: p[\"tlak\"])\nprint(nejrizikovejsi[\"jmeno\"])  # 'Bob'</pre>\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Funkcionální nástroje standardní knihovny",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Funkcionální nástroje standardní knihovny</h2></div><div class=\"section-body\">\n<p>Python nabízí sadu vestavěných líně vyhodnocovaných funkcí pro efektivní zpracování kolekcí:</p>\n<h3>1. <code>enumerate(iterable, start=0)</code>:</h3>\n<p>Nahrazuje manuální čítače indexů v cyklech:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">barvy = [\"červená\", \"zelená\", \"modrá\"]\nfor i, barva in enumerate(barvy, start=1):\n    print(f\"{i}. barva je {barva}\")</pre>\n<h3>2. <code>zip(*iterables)</code>:</h3>\n<p>Paralelní procházení více sekvencí současně v čase $O(n)$:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">jmena = [\"Alice\", \"Bob\", \"Cyril\"]\nbody  = [95, 82, 91]\n\nfor jmeno, body_studenta in zip(jmena, body):\n    print(f\"{jmeno}: {body_studenta} b\")\n\n# Vytvoření slovníku z dvojice seznamů:\ntabulka = dict(zip(jmena, body))\nprint(tabulka)  # {'Alice': 95, 'Bob': 82, 'Cyril': 91}</pre>\n<h3>3. Predikátové agregace: <code>any()</code> a <code>all()</code>:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\nvysledky = [True, True, False, True]\nprint(any(vysledky))  # True  (alespoň jeden je pravdivý)\nprint(all(vysledky))  # False (ne všechny jsou pravdivé)</pre>\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Modul functools: Částečná aplikace s partial",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Modul functools: Částečná aplikace s functools.partial</h2></div><div class=\"section-body\">\n<p>V funkcionálním programování je <strong>částečná aplikace (Partial Application)</strong> technika, kdy z existující funkce s $N$ parametry vytvoříme novou funkci s méně parametry tím, že některé argumenty \"zafixujeme\":</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from functools import partial\n\ndef vypocitej_cenu_s_dani(cena: float, sazba_dph: float, sleva: float = 0.0) -&gt; float:\n    zaklad = cena - sleva\n    return zaklad * (1.0 + sazba_dph)\n\n# Zafixujeme základní sazbu DPH 21 %:\ncena_standard = partial(vypocitej_cenu_s_dani, sazba_dph=0.21)\n\n# Zafixujeme sníženou sazbu DPH 12 %:\ncena_snizena  = partial(vypocitej_cenu_s_dani, sazba_dph=0.12)\n\n# Nyní voláme specializované funkce pouze s cenou:\nprint(cena_standard(100.0))  # 121.0\nprint(cena_snizena(100.0))   # 112.0</pre>\n<h3>Proč raději <code>partial</code> než <code>lambda</code>?</h3>\n<ol>\n  <li><strong>Introspekce</strong>: Objekt vrácený <code>partial</code> má atributy <code>.func</code>, <code>.args</code> a <code>.keywords</code>, takže jej lze debugovat a serializovat (např. v <code>pickle</code>).</li>\n  <li><strong>Přehlednost</strong>: Signatura zůstává čistá a čitelná pro nástroje statické analýzy.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Moduly a balíčky: Jak CPython hledá kód",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Moduly a balíčky: Jak CPython hledá kód</h2></div><div class=\"section-body\">\n<p>V Pythonu je <strong>každý <code>.py</code> soubor modulem</strong> a <strong>každý adresář s kódem je balíčkem (package)</strong>.</p>\n<p>Jak interpret ví, odkud načíst <code>import muj_nastroj</code>? Prohledává seznam adresářů v <strong><code>sys.path</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sys\nfor cesta in sys.path:\n    print(cesta)</pre>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">Pořadí prohledávání v sys.path:\n  1. Aktuální pracovní adresář (nebo adresář spouštěného skriptu).\n  2. Adresáře definované v systémové proměnné PYTHONPATH.\n  3. Standardní knihovna Pythonu (/usr/lib/python3.12).\n  4. Adresář třetích stran (site-packages ve vašem virtuálním prostředí .venv).</pre>\n<h3>Struktura balíčků:</h3>\n<p>Od Pythonu 3.3 (PEP 420) již není soubor <code>__init__.py</code> striktně povinný (tzv. Namespace Packages), ale v produkčních balíčcích se <strong>silně doporučuje jej uvádět</strong>:</p>\n<ul>\n  <li><code>__init__.py</code> definuje veřejné rozhraní balíčku (<code>__all__</code>).</li>\n  <li>Umožňuje zjednodušit importy: <code>from muj_balicek import analyzuj</code> místo dlouhého <code>from muj_balicek.podmodul.nastroj import analyzuj</code>.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Idiom if __name__ == '__main__':",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Idiom if __name__ == '__main__':</h2></div><div class=\"section-body\">\n<p>Když spustíte soubor <code>python skript.py</code>, interpret mu automaticky přiřadí speciální interní proměnnou:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">__name__ = \"__main__\"</pre>\n<p>Pokud je tentýž soubor načten jako modul příkazem <code>import skript</code> v jiném programu, interpret nastaví:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">__name__ = \"skript\"</pre>\n<h3>Proč je tento idiom klíčový?</h3>\n<p>Odděluje <strong>definici znovupoužitelného kódu</strong> (funkce, třídy) od <strong>jeho přímého spuštění</strong> (CLI, testy):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># modul matematika.py:\ndef secti(a: int, b: int) -&gt; int:\n    return a + b\n\ndef main() -&gt; None:\n    # Tento kód se spustí POUZE při přímém volání v terminálu:\n    print(\"Test sčítání:\", secti(10, 20))\n\nif __name__ == \"__main__\":\n    main()</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">❗</span><div class=\"note-content\"><p>Pokud byste kód na úrovni modulu neuzavřeli do podmínky <code>if __name__ == '__main__':</code>, spustil by se při každém importu vašeho modulu do jiných skriptů nebo testů!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Dokumentační řetězce (Docstrings) a PEP 257",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Dokumentační řetězce (Docstrings) a PEP 257</h2></div><div class=\"section-body\">\n<p>V C++ a Javě se komentáře Doxygen/Javadoc odstraňují během kompilace. V Pythonu jsou dokumentační řetězce <strong>živými objekty uloženými v paměti v atributu <code>__doc__</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def spocitej_bmi(hmotnost_kg: float, vyska_m: float) -&gt; float:\n    \"\"\"Vypočítá index tělesné hmotnosti (BMI).\n\n    Args:\n        hmotnost_kg: Hmotnost člověka v kilogramech. Musí být &gt; 0.\n        vyska_m: Tělesná výška v metrech. Musí být v intervalu (0, 3].\n\n    Returns:\n        Hodnota BMI jako reálné číslo.\n\n    Raises:\n        ValueError: Pokud jsou rozměry neplatné nebo záporné.\n    \"\"\"\n    if hmotnost_kg &lt;= 0 or not (0 &lt; vyska_m &lt;= 3.0):\n        raise ValueError(\"Neplatné tělesné míry\")\n    return hmotnost_kg / (vyska_m ** 2)</pre>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Interaktivní zkoumání v REPL nebo v IDE:\nhelp(spocitej_bmi)\nprint(spocitej_bmi.__doc__)</pre>\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "Evoluce typování: Duck Typing vs. Type Hints",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Evoluce typování: Duck Typing vs. Type Hints</h2></div><div class=\"section-body\">\n<p>Python byl historicky čistě dynamicky typovaným jazykem řídícím se filozofií <strong>Duck Typingu</strong>:</p>\n<blockquote><p><em>\"Pokud to chodí jako kachna a kváká jako kachna, je to pro mě kachna.\"</em></p></blockquote>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def delka_objektu(x):\n    return len(x)  # interpret neřeší, zda x je str, list, dict nebo vlastní třída!</pre>\n<h3>Problém Duck Typingu ve větších projektech:</h3>\n<ol>\n  <li><strong>Nulová asistence IDE</strong>: Editor nemůže nabízet autocompletion, protože neví, co do funkce přijde.</li>\n  <li><strong>Pozdní odhalení chyb</strong>: Překlep v typu nebo předání <code>None</code> vyvolá chybu až v hluboké produkci po 3 hodinách běhu.</li>\n  <li><strong>Absence explicitního kontraktu</strong>: Vývojář musí číst tělo funkce, aby pochopil, co se od něj očekává.</li>\n</ol>\n<h3>Řešení: Type Annotations (PEP 484 až Python 3.12):</h3>\n<ul>\n  <li>Typové anotace jsou <strong>syntaktickou součástí jazyka</strong>.</li>\n  <li>Běhový interpret CPythonu je ignoruje (nepřináší žádné zpomalení).</li>\n  <li>Externí statické analyzátory (<code>mypy</code>, <code>pyright</code>, VS Code) kód zkontrolují <strong>před jeho spuštěním</strong>!</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "Moderní typové anotace v Pythonu 3.10+",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Moderní typové anotace v Pythonu 3.10+</h2></div><div class=\"section-body\">\n<p>Zapomeňte na zastaralé importy <code>from typing import List, Dict, Union, Optional</code>. Moderní Python 3.10+ integruje typování přímo do vestavěných typů:</p>\n<h3>1. Operátor sjednocení <code>|</code> (PEP 604):</h3>\n<p>Nahrazuje dřívější <code>Union[int, str]</code> a <code>Optional[str]</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Dříve: Optional[str] -&gt; Dnes: str | None\ndef najdi_uzivatele(id_uzivatele: int) -&gt; str | None:\n    if id_uzivatele == 1:\n        return \"Alice\"\n    return None\n\n# Hodnota může být int nebo float:\ncislo: int | float = 3.14</pre>\n<h3>2. Generické vestavěné kontejnery (PEP 585):</h3>\n<p>Přímo používáme <code>list</code>, <code>dict</code>, <code>set</code>, <code>tuple</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\ndef filtruj_aktivni(uzivatele: dict[str, bool]) -&gt; list[str]:\n    return [jmeno for jmeno, aktivni in uzivatele.items() if aktivni]\n\nsouradnice: tuple[float, float, float] = (50.0, 14.4, 250.0)</pre>\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "Typování funkcí vyšších řádů: Typ Callable",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Typování funkcí vyšších řádů: Typ Callable</h2></div><div class=\"section-body\">\n<p>Když funkce přijímá jinou funkci jako argument (např. callback nebo transformační funkci), jak ji přesně otypovat?</p>\n<p>Použijeme typ <strong><code>collections.abc.Callable[[VstupniTypy, ...], NavratovyTyp]</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from collections.abc import Callable\n\ndef transformuj_cisla(\n    cisla: list[int], \n    transformator: Callable[[int], int]\n) -&gt; list[int]:\n    \"\"\"Aplikuje funkci transformator na každý prvek seznamu.\"\"\"\n    return [transformator(x) for x in cisla]\n\n# Použití s běžnou funkcí:\ndef na_treti(n: int) -&gt; int:\n    return n ** 3\n\nvysledek = transformuj_cisla([1, 2, 3, 4], na_treti)\nprint(vysledek)  # [1, 8, 27, 64]\n\n# Použití s lambda výrazem:\nvysledek2 = transformuj_cisla([1, 2, 3], lambda x: x * 10)\nprint(vysledek2)  # [10, 20, 30]</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Pokud funkce přijímá libovolné parametry bez omezení, zapisuje se elipsa: <code>Callable[..., bool]</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Revoluce v Pythonu 3.12: Příkaz type (PEP 695)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Revoluce v Pythonu 3.12: Příkaz type (PEP 695)</h2></div><div class=\"section-body\">\n<p>Před verzí Python 3.12 se typové aliasy definovaly běžným přiřazením, což mátlo analyzátory i lidi: <code>Vector = list[float]</code> (Je to proměnná? Konstanta? Typ?).</p>\n<p>Python 3.12 zavedl <strong>oficiální klíčové slovo <code>type</code></strong> (PEP 695):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># 1. Čistý a jednoznačný typový alias:\ntype Point = tuple[float, float]\ntype JSONValue = str | int | float | bool | None | list[\"JSONValue\"] | dict[str, \"JSONValue\"]\n\ndef vzdalenost(a: Point, b: Point) -&gt; float:\n    return ((a[0] - b[0])**2 + (a[1] - b[1])**2) ** 0.5\n\nstart: Point = (0.0, 0.0)\ncil: Point   = (3.0, 4.0)\nprint(vzdalenost(start, cil))  # 5.0</pre>\n<h3>Výhody nového příkazu <code>type</code>:</h3>\n<ol>\n  <li><strong>Líné vyhodnocení (Lazy Evaluation)</strong>: Typové aliasy mohou přirozeně odkazovat samy na sebe (rekurzivní typy jako <code>JSONValue</code> výše bez nutnosti uvozovek!).</li>\n  <li><strong>Čistá deklarace pro IDE</strong>: Okamžitá identifikace, že jde o doménový typ.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "Generické funkce v Pythonu 3.12 (PEP 695)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">Generické funkce v Pythonu 3.12: Syntaxe [T]</h2></div><div class=\"section-body\">\n<p>V C++ píšeme šablony <code>template &lt;typename T&gt;</code>, v Javě generické metody <code>&lt;T&gt; T getFirst(List&lt;T&gt; list)</code>.</p>\n<p>Ve starém Pythonu bylo nutné importovat a vytvářet těžkopádný <code>T = TypeVar(\"T\")</code>.</p>\n<p>Od Pythonu 3.12 píšeme generika <strong>přirozeně v hranatých závorkách <code>[T]</code> přímo za název funkce</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Moderní generická funkce v Pythonu 3.12+:\ndef vrat_prvni[T](seznam: list[T]) -&gt; T:\n    \"\"\"Vrátí první prvek libovolného homogenního seznamu.\"\"\"\n    if not seznam:\n        raise IndexError(\"Seznam je prázdný!\")\n    return seznam[0]\n\n# IDE i mypy přesně ví, jaký typ dostanou zpět:\njmeno = vrat_prvni([\"Alice\", \"Bob\"])   # jmeno je automaticky typu str!\ncislo = vrat_prvni([10, 20, 30])       # cislo je automaticky typu int!</pre>\n<h3>Generické slovníkové páry:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\ndef prohod_klic_a_hodnotu[K, V](slovnik: dict[K, V]) -&gt; dict[V, K]:\n    return {hodnota: klic for klic, hodnota in slovnik.items()}</pre>\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Zúžení typů (Type Narrowing)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Zúžení typů (Type Narrowing)</h2></div><div class=\"section-body\">\n<p>Když má proměnná sjednocený typ (např. <code>str | None</code> nebo <code>int | str</code>), jak interpret a typový inspektor pozná, o jaký typ jde uvnitř bloku?</p>\n<p>Moderní typové kontrolery provádějí <strong>automatické zúžení typů (Type Narrowing)</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\ndef zpracuj_vstup(hodnota: int | str | None) -&gt; str:\n    # Zde je typ: int | str | None\n    \n    if hodnota is None:\n        return \"Žádná hodnota\"\n    \n    # Nyní mypy ví, že hodnota je striktně: int | str\n    if isinstance(hodnota, int):\n        # Nyní mypy ví, že hodnota je striktně int:\n        return f\"Číslo: {hodnota * 10}\"\n    \n    # Zde už hodnota MŮŽE být pouze str:\n    return f\"Text o délce {len(hodnota)}\"</pre>\n<h3>Pokročilé zúžení pomocí <code>typing.assert_never</code>:</h3>\n<p>Ověření úplnosti větví (Exhaustiveness checking) při kompilaci:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from typing import assert_never\n\ndef zpracuj_rezim(mod: \"cteni | zapis\") -&gt; None:\n    match mod:\n        case \"cteni\": pass\n        case \"zapis\": pass\n        case _ as unreachable:\n            assert_never(unreachable)  # mypy nahlásí chybu, pokud přidáme nový režim a neošetříme jej!</pre>\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "Produkční most: mypy a pyright v CI/CD",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Produkční most: mypy a pyright v CI/CD</h2></div><div class=\"section-body\">\n<p>Jak reálně zajistit, že nikdo v týmu neodevzdá kód s typovou chybou?</p>\n<p>Zapojujeme statické analyzátory kódu do pre-commit háčků a CI/CD pipeline:</p>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Spuštění typového analyzátoru přes uv:\nuv run mypy src/ --strict</pre>\n<h3>Ukázka, co dokáže mypy odhalit PŘED spuštěním kódu:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\ndef spocitej_prumer(cisla: list[float]) -&gt; float:\n    return sum(cisla) / len(cisla)\n\nhodnoty = [10.5, 20.0, None]  # Překlep: do dat se vloudilo None!\n\n# Běžný Python kód spustí a spadne až za běhu:\n# TypeError: unsupported operand type(s) for +: 'float' and 'NoneType'\n\n# Ale 'mypy' odhalí chybu okamžitě při psaní kódu:\n# error: List item 2 has incompatible type \"None\"; expected \"float\"  [list-item]</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">💡</span><div class=\"note-content\"><p>Zapněte si v VS Code rozšíření <strong>Mypy Type Checker</strong> nebo <strong>Pyright (Pylance)</strong>. Chyby uvidíte podtržené červeně přímo během psaní kódu stejně jako v Javě nebo C++!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Architektonický most k laboratornímu cvičení",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Architektonický most k laboratornímu cvičení</h2></div><div class=\"section-body\">\n<p>Ukázka profesionální funkcionální architektury spojující dnešní témata: uzávěry, variadické funkce, <code>functools</code> a moderní typový systém PEP 695:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from collections.abc import Callable\nfrom typing import TypeVar\n\ntype Validator[T] = Callable[[T], bool]\ntype Transformer[T, R] = Callable[[T], R]\n\ndef vytvor_cistici_pipeline[T](\n    validatory: list[Validator[T]],\n    transformace: list[Transformer[T, T]],\n) -&gt; Callable[[list[T]], list[T]]:\n    \"\"\"Vyrobí uzávěr, který filtruje a transformuje datový proud.\"\"\"\n    \n    def pipeline(data: list[T]) -&gt; list[T]:\n        vysledek: list[T] = []\n        for polozka in data:\n            # 1. Ověření všemi validátory:\n            if not all(val(polozka) for val in validatory):\n                continue\n            # 2. Aplikace všech transformací:\n            aktualni = polozka\n            for trans in transformace:\n                aktualni = trans(aktualni)\n            vysledek.append(aktualni)\n        return vysledek\n    \n    return pipeline</pre>\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Shrnutí přednášky a příprava na cvičení",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Shrnutí přednášky a příprava na cvičení</h2></div><div class=\"section-body\">\n<p>Dnes jsme probrali funkce a typový systém od základů až po standardy Pythonu 3.12:</p>\n<h3>Hlavní body pro zapamatování:</h3>\n<ol>\n  <li><strong>First-Class Citizens</strong>: Funkce jsou objekty na haldě — lze je předávat, ukládat do struktur a vracet z jiných funkcí.</li>\n  <li><strong>Call by Object Reference</strong>: Předává se odkaz na objekt; mutabilní argumenty (<code>list</code>, <code>dict</code>) lze uvnitř funkce modifikovat.</li>\n  <li><strong>Parametry</strong>: Poziční vs. pojmenované; oddělovače <code>/</code> (positional-only) a <code>*</code> (keyword-only).</li>\n  <li><strong>Variadické funkce</strong>: <code>*args</code> sbírá do n-tice, <code>**kwargs</code> sbírá do slovníku; <code>*</code> a <code>**</code> rozbalují argumenty při volání.</li>\n  <li><strong>Past s výchozí hodnotou</strong>: Nikdy nepoužívejte <code>def f(x=[])</code>; výchozí hodnota se vyhodnotí jen jednou při načtení modulu. Použijte <code>x=None</code>.</li>\n  <li><strong>LEGB a Scope</strong>: Hledání jmen Local $\\rightarrow$ Enclosing $\\rightarrow$ Global $\\rightarrow$ Built-in. Uzávěry (<code>cell</code> objekty) vážou proměnné přes <code>nonlocal</code>.</li>\n  <li><strong>Moduly</strong>: Import hledá v <code>sys.path</code>. Spouštěcí kód chraňte podmínkou <code>if __name__ == '__main__':</code>.</li>\n  <li><strong>Moderní typový systém</strong>: Sjednocení <code>int | str</code>, generika v Pythonu 3.12 <code>def func[T](...)</code>, typové aliasy <code>type Point = tuple[...]</code>.</li>\n  <li><strong>Statická typová kontrola</strong>: Používejte <code>mypy</code> / <code>pyright</code> pro eliminaci chyb dříve, než se kód dostane do produkce.</li>\n</ol>\n<h3>Co vás čeká v následujícím 1,5hodinovém cvičení:</h3>\n<ul>\n  <li>Praktická implementace generických validačních a filtračních funkcí.</li>\n  <li>Práce s variadickými argumenty a uzávěry.</li>\n  <li>Typová kontrola vlastního kódu pomocí <code>mypy</code>.</li>\n</ul>\n</div>"
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+{
+  "slug": "lectures--week-01",
+  "total": 27,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod a osnova",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod a osnova</h2></div><div class=\"section-body\">\n<p>Vítejte v první plnohodnotné přednášce kurzu programování v jazyce Python. Dnešním cílem je pochopit, jak CPython reprezentuje data v operační paměti a jak se v Pythonu idiomaticky řídí tok programu.</p>\n<h3>Osnova dnešní 90minutové přednášky:</h3>\n<ol>\n  <li><strong>Architektura paměti</strong>: C/Java paměťový model (stack vs. heap) vs. CPython <code>PyObject</code>.</li>\n  <li><strong>Životní cyklus paměti</strong>: Reference counting (<code>ob_refcnt</code>) a cyklický Garbage Collector.</li>\n  <li><strong>Proměnná jako reference</strong>: Rozdíl mezi typem proměnné a typem hodnoty, small integer caching.</li>\n  <li><strong>Identita vs. rovnost</strong>: Rozdíl mezi operátory <code>is</code> a <code>==</code>.</li>\n  <li><strong>Číselné typy</strong>: <code>int</code> s libovolnou přesností (<em>arbitrary precision</em>) a <code>float</code> v normě IEEE 754.</li>\n  <li><strong>Řízení toku</strong>: Podmínky <code>if-elif-else</code>, ternární výraz a cyklus <code>while</code> s walrus operátorem <code>:=</code>.</li>\n  <li><strong>Iterace a cykly</strong>: Filozofie <code>for-in</code>, generátor <code>range()</code>, idiomatické <code>enumerate()</code> a <code>zip()</code>.</li>\n  <li><strong>Netradiční konstrukce</strong>: Větve <code>for-else</code> a <code>while-else</code> pro vyhledávací algoritmy.</li>\n  <li><strong>Strukturální Pattern Matching</strong>: Deklarativní <code>match-case</code> (PEP 634), sequence patterns a pattern guards.</li>\n  <li><strong>Produkční most</strong>: Statické typové anotace (<em>Type Hints</em>) a ověřování pomocí <code>mypy</code> / <code>pyright</code>.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "C/Java vs. CPython: Paměťový model",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Architektura paměti: Zásobník vs. CPython halda</h2></div><div class=\"section-body\">\n<p>V jazycích C/C++ a částečně v Javě existuje striktní rozdělení mezi <strong>zásobníkem (stack)</strong> a <strong>haldou (heap)</strong>:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">[ C / C++ ]\n  int x = 42;          ──> 4 bajty přímo na zásobníku (rychlé, bez režie, fixní adresa)\n  int* p = malloc(...); ──> Ukazatel na zásobníku, surová data na haldě\n\n[ Java ]\n  int x = 42;          ──> Primitivní typ alokovaný přímo na zásobníku\n  Integer obj = 42;    ──> Reference na zásobníku, objekt s hlavičkou na haldě JVM\n\n[ CPython ]\n  x = 42               ──> Pouze pojmenovaný ukazatel v tabulce symbolů.\n                           Všechna data žijí jako PyObject na haldě!</pre>\n<h3>Struktura hlavičky <code>PyObject</code> v C kódu CPythonu:</h3>\n<p>Každý objekt v CPythonu začíná společnou hlavičkou definovanou v hlavičkovém souboru <code>object.h</code>:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">struct _object {\n    _PyObject_HEAD_EXTRA // zřetězení pro debugovací účely\n    Py_ssize_t ob_refcnt; // čítač referencí (8 bajtů na 64-bit OS)\n    PyTypeObject *ob_type; // ukazatel na deskriptor typu (8 bajtů)\n};</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">💡</span><div class=\"note-content\"><p>V Pythonu <strong>neexistují primitivní hodnoty</strong> na zásobníku. I obyčejné celé číslo <code>0</code> je plnohodnotným objektem na haldě a zabírá v 64bitovém CPythonu <strong>28 bajtů</strong> (<code>sys.getsizeof(0)</code>).</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Reference Counting a Cyklický GC",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Životní cyklus paměti: Reference Counting a Cyklický GC</h2></div><div class=\"section-body\">\n<p>CPython kombinuje dva mechanismy pro správu paměti:</p>\n<h3>1. Počítání referencí (<em>Reference Counting</em> — primární a okamžité)</h3>\n<p>Při každém přiřazení nebo uložení do kolekce se čítač referencí <code>ob_refcnt</code> inkrementuje. Při zániku proměnné se dekrementuje:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sys\n\na = [1, 2, 3]\nprint(sys.getrefcount(a))  # Vypíše 2 (proměnná 'a' + dočasná reference v argumentu getrefcount)\nb = a\nprint(sys.getrefcount(a))  # Vypíše 3 (přibyla reference z 'b')\ndel b\nprint(sys.getrefcount(a))  # Klesne zpět na 2</pre>\n<p>Jakmile <code>ob_refcnt == 0</code>, CPython paměť <strong>ihned deterministicky vrátí alokátoru</strong>.</p>\n<h3>2. Cyklický Garbage Collector (sekundární a asynchronní)</h3>\n<p>Pokud dva objekty odkazují navzájem na sebe, jejich čítač referencí nikdy neklesne na nulu:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">x = []\ny = [x]\nx.append(y)  # Vznikl cyklus: x odkazuje na y a y na x\ndel x, y     # Objekty jsou z programu nedostupné, ale refcnt je stále 1!</pre>\n<p>Pro tyto případy spouští CPython periodicky generátorský cyklický GC, který hledá nepropojitelné ostrovy referencí a uvolňuje je.</p>\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Dynamické a silné typování",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Dynamické a silné typování: Proměnná je jen štítek</h2></div><div class=\"section-body\">\n<p>V C/C++ má typ <strong>samotná proměnná</strong> (paměťový slot):</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">int a = 5;\na = \"ahoj\"; // CHYBA PŘI KOMPILACI: incompatible types in assignment</pre>\n<p>V Pythonu platí základní pravidlo: <strong>Proměnné nemají typ. Typ má pouze hodnota na haldě.</strong> Proměnná je pouze jméno (štítek či ukazatel), které ukazuje na určitý objekt.</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">x = 42        # x ukazuje na instanci typu int\nprint(type(x))  # &lt;class 'int'&gt;\n\nx = \"ahoj\"    # x nyní ukazuje na instanci typu str (původní int má refcnt snížen)\nprint(type(x))  # &lt;class 'str'&gt;</pre>\n<h3>Python je dynamický, ale SILNĚ typovaný!</h3>\n<p>Na rozdíl od jazyků se slabým typováním (jako JavaScript nebo historické PHP) Python <strong>nikdy neprovádí tichou konverzi typů</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">vysledek = \"Počet: \" + 10  # Vyvolá TypeError: can only concatenate str to str, not \"int\"</pre>\n<p>Konverzi musíte provést explicitně: <code>\"Počet: \" + str(10)</code> nebo pomocí f-stringu <code>f\"Počet: {10}\"</code>.</p>\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Identita vs. Rovnost: is vs. ==",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Identita vs. Rovnost: Operátor is vs. ==</h2></div><div class=\"section-body\">\n<p>Pro programátory přicházející z Javy je toto zásadní změna mentálního modelu:</p>\n<table class=\"slide-table\"><thead><tr><th>Operátor</th><th>Co porovnává</th><th>Analogie v Javě</th><th>Volaná dunder metoda</th></tr></thead><tbody><tr><td><strong><code>==</code></strong></td><td><strong>Hodnotu (ekvivalenci)</strong></td><td><code>.equals()</code></td><td><code>__eq__()</code></td></tr><tr><td><strong><code>is</code></strong></td><td><strong>Identitu (adresu v paměti)</strong></td><td><code>==</code></td><td>Porovnává <code>id(a) == id(b)</code></td></tr></tbody></table>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">a = [1, 2, 3]\nb = [1, 2, 3]\n\nprint(a == b)  # True (mají shodný obsah)\nprint(a is b)  # False (jsou to dva různé objekty na různých adresách haldy)</pre>\n<h3>Past: CPython Small Integer Caching (-5 až 256)</h3>\n<p>CPython v rámci optimalizace předalokuje pole celých čísel v intervalu $[-5, 256]$ jako globální singletony:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">x = 250\ny = 250\nprint(x is y)  # True (ukazují na tentýž předalokovaný singleton)\n\nm = 1000\nn = 1000\nprint(m is n)  # False v REPL (dva různé nově vytvořené objekty!)</pre>\n<div class=\"notes-block\"><div class=\"note-item warning\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p>Nikdy nepoužívejte <code>is</code> k porovnávání čísel nebo textových řetězců! Operátor <code>is</code> se v praxi používá <strong>výhradně k porovnání se singletony</strong>, zejména s <code>None</code> (<code>if x is None:</code>).</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Celá čísla: Arbitrary Precision int",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Celá čísla: int s libovolnou přesností vs. C Integer Overflow</h2></div><div class=\"section-body\">\n<p>V jazycích C/C++ a Javě mají celá čísla pevnou šířku v bitech (typicky 32bit nebo 64bit):</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">int32_t a = 2147483647; // 2^31 - 1\na = a + 1;              // Přetečení (Integer Overflow): hodnota je nyní -2147483648!</pre>\n<p>V Pythonu 3 byl původní typ <code>long</code> sjednocen do typu <code>int</code>. Čísla typu <code>int</code> mají <strong>neomezenou přesnost</strong> (omezenou pouze dostupnou operační pamětí RAM počítače):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">obrovske_cislo = 2 ** 1000\nprint(obrovske_cislo)\n# Vypíše přesné 302ciferné číslo bez jakéhokoliv přetečení nebo ztráty přesnosti!</pre>\n<h3>Jak to funguje pod kapotou:</h3>\n<p>CPython reprezentuje velká čísla interně jako pole číslic (tzv. <em>digits</em>) o základu $2^{30}$. Pokud výsledek operace přesáhne 30 bitů, CPython automaticky alokuje strukturu <code>PyVarObject</code> s potřebným počtem číslic a provede algoritmy dlouhého násobení a sčítání.</p>\n<h3>Zápis velkých čísel (PEP 515):</h3>\n<p>Pro zvýšení čitelnosti lze v zápisu čísel používat podtržítka:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">pocet_bytu = 1_048_576\nbinarni_maska = 0b1111_0000\nhex_adresa = 0xDEAD_BEEF</pre>\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Reálná čísla float a IEEE 754",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Reálná čísla: float a přesnost plovoucí řádové čárky</h2></div><div class=\"section-body\">\n<p>Typ <code>float</code> v CPythonu odpovídá 64bitovému číslu s dvojitou přesností (<code>double</code> v C a Javě) dle mezinárodní normy <strong>IEEE 754</strong>:</p>\n<ul>\n  <li>1 bit pro znaménko.</li>\n  <li>11 bitů pro exponent.</li>\n  <li>52 bitů pro mantisu (cca 15–17 platných desetinných číslic).</li>\n</ul>\n<h3>Základní past binární reprezentace zlomků:</h3>\n<p>Číslo $0.1$ nelze v binární soustavě reprezentovat konečným rozvojem (je to periodické číslo, podobně jako $1/3$ v desítkové soustavě):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">print(0.1 + 0.2)\n# 0.30000000000000004\n\nprint(0.1 + 0.2 == 0.3)\n# False!</pre>\n<h3>Správné řešení v praxi:</h3>\n<p>Pro porovnávání reálných čísel nikdy nepoužívejte <code>==</code>. Použijte funkci <code>math.isclose()</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import math\n\nprint(math.isclose(0.1 + 0.2, 0.3, rel_tol=1e-9))  # True</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p>Pro finanční transakce nebo úlohy vyžadující absolutní desítkovou přesnost použijte standardní modul <code>decimal.Decimal</code> nebo modul pro zlomky <code>fractions.Fraction</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Logický typ bool a koncept Truthy/Falsy",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Logický typ bool a koncept Truthy / Falsy</h2></div><div class=\"section-body\">\n<p>V Pythonu je typ <code>bool</code> přímou podtřídou celočíselného typu <code>int</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">print(issubclass(bool, int))  # True\nprint(True == 1)              # True\nprint(False == 0)             # True\nprint(True + True)            # 2 (aritmetika nad booly funguje, ačkoliv není doporučena)</pre>\n<h3>Pravdivostní vyhodnocení libovolného objektu:</h3>\n<p>Každý objekt v Pythonu lze vyhodnotit v logickém kontextu (např. v podmínce <code>if</code>). Objekt je buď <strong>falsy</strong> (vyhodnotí se jako nepravda), nebo <strong>truthy</strong> (vyhodnotí se jako pravda).</p>\n<table class=\"slide-table\"><thead><tr><th>Falsy hodnoty (vše ostatní je Truthy)</th><th>Příklad</th></tr></thead><tbody><tr><td>Konstanta <code>None</code> a logické <code>False</code></td><td><code>None</code>, <code>False</code></td></tr><tr><td>Číselná nula libovolného typu</td><td><code>0</code>, <code>0.0</code>, <code>0j</code></td></tr><tr><td>Prázdné textové řetězce</td><td><code>\"\"</code>, <code>''</code></td></tr><tr><td>Prázdné vestavěné kolekce</td><td><code>[]</code>, <code>()</code>, <code>{}</code>, <code>set()</code></td></tr><tr><td>Objekty definující <code>__bool__()</code> vracející False</td><td>Vlastní třídy</td></tr></tbody></table>\n<h3>Idiomatický Python:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">polozky = []\n\n# ŠPATNĚ (C/Java styl):\nif len(polozky) == 0:\n    pass\n\n# SPRÁVNĚ (Pythonic styl využívající falsy prázdného seznamu):\nif not polozky:\n    print(\"Seznam je prázdný!\")</pre>\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Zkrácené vyhodnocování and a or",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Zkrácené vyhodnocování operátorů and a or</h2></div><div class=\"section-body\">\n<p>Operátory <code>and</code> a <code>or</code> v Pythonu fungují na principu zkráceného vyhodnocování (<em>short-circuit evaluation</em>), ale mají jednu unikátní vlastnost: <strong>Nevracejí hodnoty typu bool, ale vrací přímo hodnotu naposledy vyhodnoceného operandu!</strong></p>\n<h3>Pravidla:</h3>\n<ul>\n  <li><code>a or b</code>: Pokud je <code>a</code> truthy, vrátí <code>a</code>. Jinak vyhodnotí a vrátí <code>b</code>.</li>\n  <li><code>a and b</code>: Pokud je <code>a</code> falsy, vrátí <code>a</code>. Jinak vyhodnotí a vrátí <code>b</code>.</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Využití or pro definici výchozí hodnoty:\njmeno = uzivatelsky_vstup or \"Anonym\"\n\nprint(42 or \"náhradní\")       # Vypíše 42\nprint(\"\" or \"náhradní\")       # Vypíše 'náhradní'\nprint(\"ahoj\" and [1, 2, 3])   # Vypíše [1, 2, 3]\nprint([] and \"ahoj\")          # Vypíše []</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Nezaměňujte logické operátory <code>and</code>, <code>or</code>, <code>not</code> s bitovými operátory <code>&amp;</code>, <code>|</code>, <code>~</code>, <code>^</code>. Bitové operátory počítají s jednotlivými bity celých čísel nebo provádějí množinové operace nad <code>set</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Podmíněný běh: if-elif-else",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Podmíněné větvení: if, elif, else</h2></div><div class=\"section-body\">\n<p>V jazycích C a Java se podmínky uzavírají do kulatých závorek a bloky do složených závorek <code>{}</code>. V Pythonu jsou závorky zbytečné a bloky jsou vymezeny <strong>striktním odsazením</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">skore = 85\n\nif skore >= 90:\n    znamka = \"A\"\nelif skore >= 80:\n    znamka = \"B\"\nelif skore >= 70:\n    znamka = \"C\"\nelse:\n    znamka = \"F\"</pre>\n<h3>Zásady čistého kódu (PEP 8):</h3>\n<ol>\n  <li><strong>Odsazení</strong>: Vždy používejte přesně <strong>4 mezery</strong> na jednu úroveň odsazení. Nikdy nemíchejte tabulátory a mezery!</li>\n  <li><strong>Kulaté závorky</strong>: Okolo podmínek nepíšeme <code>if (x > 5):</code>, píšeme čisté <code>if x > 5:</code>. Závorky používáme pouze pro zalomení dlouhých složených podmínek na více řádků.</li>\n  <li><strong>Prázdné bloky</strong>: Pokud potřebujete syntakticky platný prázdný blok (např. při návrhu kostry kódu), použijte klíčové slovo <code>pass</code> nebo elipsu <code>...</code>:</li>\n</ol>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">if debug_mod:\n    pass  # TODO: Implementovat detailní logování</pre>\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Ternární podmíněný výraz",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Ternární výraz: Podmíněné přiřazení v jednom řádku</h2></div><div class=\"section-body\">\n<p>V jazycích C/C++ a Java slouží pro podmíněné přiřazení operátor <code>? :</code>:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">int max = (a > b) ? a : b;</pre>\n<p>V Pythonu má ternární operátor přirozenou anglickou syntaxi:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">max_hodnota = a if a > b else b</pre>\n<h3>Klíčové vlastnosti:</h3>\n<ul>\n  <li><strong>Je to výraz (<em>expression</em>), nikoliv příkaz (<em>statement</em>)</strong>: Vrací hodnotu a lze jej použít kdekoliv, kde je očekávána hodnota (např. uvnitř volání funkce nebo v list comprehension).</li>\n  <li><strong>Líné vyhodnocování</strong>: Větev <code>b</code> se vůbec nevyhodnotí, pokud podmínka <code>a > b</code> platí.</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">stav = \"Plnoletý\" if vek >= 18 else \"Mladistvý\"\n\n# Použití přímo v argumentu funkce:\nprint(f\"Server běží v režimu: {'PRODUKCE' if je_produkce else 'LOKÁLNÍ VÝVOJ'}\")</pre>\n<div class=\"notes-block\"><div class=\"note-item caution\"><span class=\"note-icon\">🛑</span><div class=\"note-content\"><p>Vyhněte se vnořování více ternárních výrazů do sebe (<code>a if c1 else b if c2 else c</code>). Takový kód je extrémně nečitelný a porušuje zásadu <em>Zen of Python</em>: \"Readability counts.\"</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Smyčka while a Walrus operátor",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Smyčka while a Walrus operátor := (PEP 572)</h2></div><div class=\"section-body\">\n<p>Cyklus <code>while</code> opakuje blok kódu, dokud je podmínka pravdivá:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">pocitadlo = 0\nwhile pocitadlo &lt; 5:\n    print(pocitadlo)\n    pocitadlo += 1</pre>\n<h3>Zjednodušení kódu: Walrus operátor <code>:=</code> (Python 3.8+)</h3>\n<p>Častým scénářem je načítání dat v cyklu, kde potřebujeme načíst hodnotu, otestovat ji a následně zpracovat.</p>\n<p><strong>Historický zápis (duplikace kódu):</strong></p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">radek = soubor.readline()\nwhile radek != \"\":\n    zpracuj(radek)\n    radek = soubor.readline()</pre>\n<p><strong>Moderní zápis s operátorem přiřazení <code>:=</code>:</strong></p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">while (radek := soubor.readline()):\n    zpracuj(radek)</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Walrus operátor <code>:=</code> přiřadí hodnotu do proměnné <code>radek</code> a zároveň tuto hodnotu vrátí jako výsledek výrazu, který je ihned otestován na truthiness smyčkou <code>while</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Filozofie cyklu for-in",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Filozofie cyklu for-in: Vždy čistý for-each iterátor</h2></div><div class=\"section-body\">\n<p>Zásadní kontrast pro programátory z C: <strong>V Pythonu neexistuje tříprvkový cyklus <code>for (int i = 0; i &lt; n; i++)</code>!</strong></p>\n<p>Každý cyklus <code>for</code> v Pythonu je <strong>for-each iterátorem</strong>. Prochází prvky jakéhokoliv objektu, který implementuje protokol iterátoru:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Iterace přes seznam:\nfor jmeno in [\"Alice\", \"Bob\", \"Charlie\"]:\n    print(jmeno)\n\n# Iterace přes znaky řetězce:\nfor znak in \"Python\":\n    print(znak)\n\n# Iterace přes klíče slovníku:\nstudenti = {\"Alice\": 1, \"Bob\": 2}\nfor klic in studenti:\n    print(klic, \"->\", studenti[klic])</pre>\n<h3>Proč je tento přístup nadřazený C-stylu:</h3>\n<ul>\n  <li><strong>Žádné chyby o jedničku (<em>Off-by-one errors</em>)</strong>: Nemůžete omylem přetéct index pole (<code>i &lt;= len(arr)</code>).</li>\n  <li><strong>Nezávislost na indexaci</strong>: Můžete stejným způsobem procházet datové struktury bez přímého indexového přístupu (množiny, souborové proudy, síťové sockety, databázové kurzory).</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Generování číselných řad: range()",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Generování číselných řad: Objekt range</h2></div><div class=\"section-body\">\n<p>Jak v Pythonu vyřešit situaci, kdy potřebujeme provést cyklus $N$-krát nebo generovat číselnou posloupnost? K tomu slouží vestavěný typ <code>range</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># range(stop) -> 0 až stop-1\nfor i in range(5):\n    print(i, end=\" \")  # 0 1 2 3 4\n\n# range(start, stop) -> interval [start, stop)\nfor i in range(2, 7):\n    print(i, end=\" \")  # 2 3 4 5 6\n\n# range(start, stop, step) -> s krokem\nfor i in range(10, 0, -2):\n    print(i, end=\" \")  # 10 8 6 4 2</pre>\n<h3>Paměťová efektivita $O(1)$:</h3>\n<p>Objekt <code>range</code> v Pythonu 3 <strong>nevytváří seznam čísel v paměti</strong>! Je to líný generátor, který počítá prvky na požádání:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sys\n\nvelky_rozsah = range(1_000_000_000)\nprint(sys.getsizeof(velky_rozsah))  # Pouhých 48 bajtů paměti!</pre>\n<p>Bez ohledu na to, zda generujete 10 čísel nebo 10 miliard čísel, paměťová náročnost je konstantní.</p>\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Idiomatické procházení: enumerate a zip",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Idiomatické procházení kolekcí: enumerate() a zip()</h2></div><div class=\"section-body\">\n<h3>Antipattern studentů z C/Javy:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">seznam = [\"zlato\", \"stříbro\", \"bronz\"]\n\n# ŠPATNĚ: Indexování přes range(len(...))\nfor i in range(len(seznam)):\n    print(f\"{i + 1}. místo: {seznam[i]}\")</pre>\n<h3>Idiom 1: Funkce <code>enumerate(iterable, start=0)</code></h3>\n<p>Vrací přímo dvojice <code>(index, hodnota)</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># SPRÁVNĚ a čistě:\nfor poradi, kov in enumerate(seznam, start=1):\n    print(f\"{poradi}. místo: {kov}\")</pre>\n<h3>Idiom 2: Funkce <code>zip(*iterables)</code> pro paralelní procházení</h3>\n<p>Prochází více sekvencí současně v paměťové složitosti $O(1)$:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">hraci = [\"Alice\", \"Bob\", \"Charlie\"]\nbody = [100, 85, 92]\n\nfor hrac, skore in zip(hraci, body):\n    print(f\"{hrac}: {skore} bodů\")</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p>Od Pythonu 3.10 podporuje <code>zip</code> parametr <code>strict=True</code> (<code>zip(a, b, strict=True)</code>). Pokud mají sekvence různou délku, vyvolá <code>ValueError</code> místo tichého zahození přebývajících prvků!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Skákání v cyklech a Scope proměnné",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Řízení cyklů a Záludnost: Leak proměnné do scope</h2></div><div class=\"section-body\">\n<p>Příkazy pro změnu průběhu smyčky:</p>\n<ul>\n  <li><code>break</code>: Okamžitě ukončí vykonávání celé smyčky.</li>\n  <li><code>continue</code>: Okamžitě přeskočí zbytek těla smyčky a přejde na další iteraci.</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">for cislo in range(10):\n    if cislo % 2 == 0:\n        continue  # Přeskoč sudá čísla\n    if cislo > 7:\n        break     # Ukonči smyčku při čísle větším než 7\n    print(cislo, end=\" \")  # Vypíše: 1 3 5 7</pre>\n<h3>Zásadní rozdíl oproti C/Javě: Scope proměnné cyklu!</h3>\n<p>V C a Javě je rozsah platnosti proměnné deklarované v hlavičce for-cyklu omezen pouze na tělo cyklu. <strong>V Pythonu proměnná cyklu prosakuje (leaks) do okolního scope!</strong></p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">for i in range(3):\n    pass\n\nprint(i)  # Vypíše 2! Proměnná 'i' po skončení cyklu nezmizela.</pre>\n<div class=\"notes-block\"><div class=\"note-item warning\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p>Pokud použijete stejné jméno iterační proměnné jako v nadřazeném kódu, přepíšete si původní proměnnou.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Netradiční konstrukce: for-else a while-else",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Unikátní konstrukce: Větve for-else a while-else</h2></div><div class=\"section-body\">\n<p>Většina začátečníků očekává, že větev <code>else</code> u cyklu se spustí, pokud podmínka cyklu od začátku neplatila. Skutečné pravidlo CPythonu zní: <strong>Větev <code>else</code> se vykoná, pokud cyklus doběhl přirozeně do konce a NEBYL přerušen příkazem <code>break</code>!</strong></p>\n<h3>Vyhledávací algoritmus bez pomocných příznaků (flags):</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Hledání prvočísla\nn = 13\nfor i in range(2, int(n ** 0.5) + 1):\n    if n % i == 0:\n        print(f\"Číslo {n} je složené (dělitelné {i}).\")\n        break\nelse:\n    # Tento blok se spustí POUZE tehdy, pokud se ani jednou nezavolal break!\n    print(f\"Číslo {n} je prvočíslo.\")</pre>\n<h3>Proč je to elegantní:</h3>\n<p>V C/Javě byste museli deklarovat pomocnou proměnnou <code>bool nalezeno = false;</code> a po skončení cyklu testovat <code>if (!nalezeno)</code>. Konstrukce <code>for-else</code> tento boilerplate kód zcela eliminuje.</p>\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Strukturální Pattern Matching: Úvod",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Strukturální Pattern Matching (PEP 634, Python 3.10+)</h2></div><div class=\"section-body\">\n<p>Mnoho programátorů vnímá <code>match-case</code> jako pouhou náhradu chybějícího <code>switch-case</code> z C/Javy. To je však hrubé podcenění: <strong>Pattern Matching v Pythonu je mocný deklarativní systém dekonstrukce a validace dat převzatý z funkcionálních jazyků (Haskell, Rust, Scala).</strong></p>\n<h3>Klíčové rozdíly oproti C/Java switch:</h3>\n<ol>\n  <li><strong>Žádné propadávání (<em>fall-through</em>)</strong>: Po vykonání odpovídající větve <code>case</code> se z celé konstrukce vyskočí. Není potřeba psát otravné <code>break</code>.</li>\n  <li><strong>Shoda nad tvary dat (<em>Destructuring</em>)</strong>: Dokáže rozbalit vnořené sekvence, slovníky a objekty v jediném kroku.</li>\n  <li><strong>Přiřazení do proměnných (<em>Variable Capture</em>)</strong>: Hodnoty z vnořených struktur lze přímo navázat na nová jména.</li>\n  <li><strong>Podmíněné stráže (<em>Guards</em>)</strong>: Možnost doplnit libovolnou booleovskou podmínku za vzor.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "Match-Case: Literal patterns a Wildcard",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Match-Case: Porovnání s literály a zástupný znak _</h2></div><div class=\"section-body\">\n<p>Nejjednodušší formou je porovnání s konkrétními konstantami (čísla, řetězce, <code>True`, `False`, `None`):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def obsluz_http_kod(status: int) -> str:\n    match status:\n        case 200:\n            return \"OK: Požadavek byl úspěšně vyřízen.\"\n        case 301 | 302:\n            return \"Přesměrování: Zdroj se nachází jinde.\"\n        case 400:\n            return \"Chybný požadavek klienta.\"\n        case 401 | 403:\n            return \"Chyba autorizace: Přístup odepřen.\"\n        case 404:\n            return \"Nenalezeno: Požadovaný zdroj neexistuje.\"\n        case 500 | 502 | 503:\n            return \"Chyba serveru.\"\n        case _:\n            # Wildcard vzor '_' odpovídá libovolné hodnotě (jako 'default:' v C)\n            return f\"Neznámý stavový kód: {status}\"</pre>\n<h3>Operátor | (OR pattern):</h3>\n<p>Všimněte si zápisu <code>case 401 | 403:</code>. Umožňuje sdružit více možností do jediného případu bez duplikace obslužného kódu.</p>\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "Match-Case: Sequence patterns",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Match-Case: Dekonstrukce sekvencí (List a Tuple)</h2></div><div class=\"section-body\">\n<p>Pattern matching dokáže ověřit tvar seznamu nebo n-tice a současně extrahovat jednotlivé prvky do proměnných:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def zpracuj_prikaz(prikaz: list[str]) -> None:\n    match prikaz:\n        case [\"konec\"]:\n            print(\"Ukončuji aplikaci...\")\n        case [\"otevri\", soubor]:\n            # Proměnná 'soubor' zachytí druhý prvek sekvence!\n            print(f\"Otevírám soubor: {soubor}\")\n        case [\"presun\", x, y]:\n            print(f\"Přesouvám kurzor na souřadnice [{x}, {y}]\")\n        case [\"kresli\", \"bod\", x, y]:\n            print(f\"Kreslím bod na [{x}, {y}]\")\n        case [\"zprava\", *slova]:\n            # Hvězdičkový vzor zachytí zbytek sekvence libovolné délky\n            text = \" \".join(slova)\n            print(f\"Zpráva: {text}\")\n        case _:\n            print(f\"Neznámý formát příkazu: {prikaz}\")</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Zápis <code>case [x, y]:</code> ověřuje, zda má sekvence <strong>přesně dva prvky</strong>. Pokud má jiný počet prvků, vzor se neshoduje a interpret zkouší další větev.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "Match-Case: Mapping patterns a Třídní vzory",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Match-Case: Slovníky a Třídní vzory</h2></div><div class=\"section-body\">\n<h3>1. Mapping Patterns (kontrola slovníků):</h3>\n<p>Na rozdíl od sekvencí kontroluje mapping pattern pouze přítomnost zadaných klíčů; přebývající klíče nevadí:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">data = {\"typ\": \"senzor_teploty\", \"id\": 42, \"teplota\": 23.5, \"baterie\": 95}\n\nmatch data:\n    case {\"typ\": \"senzor_teploty\", \"teplota\": t, \"baterie\": b}:\n        print(f\"Teplota ze senzoru: {t} °C (Baterie: {b} %)\")</pre>\n<h3>2. Class Patterns (inspekce objektů bez isinstance):</h3>\n<p>Můžeme testovat instanci třídy a extrahovat její atributy:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from dataclasses import dataclass\n\n@dataclass\nclass Bod:\n    x: float\n    y: float\n\nbod = Bod(0.0, 15.0)\n\nmatch bod:\n    case Bod(x=0.0, y=0.0):\n        print(\"Počátek souřadnic\")\n    case Bod(x=0.0, y=y_val):\n        print(f\"Bod leží na ose Y v hodnotě {y_val}\")\n    case Bod(x=x_val, y=0.0):\n        print(f\"Bod leží na ose X v hodnotě {x_val}\")\n    case Bod(x=x, y=y):\n        print(f\"Bod v obecné poloze [{x}, {y}]\")</pre>\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Pattern Guards a As-patterns",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Pokročilý Match: Pattern Guards a As-Patterns</h2></div><div class=\"section-body\">\n<h3>1. Pattern Guards (if podmínka za vzorem):</h3>\n<p>Někdy samotný strukturní tvar nestačí a potřebujeme otestovat logické vztahy mezi extrahovanými proměnnými:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">match bod:\n    case Bod(x=x, y=y) if x == y:\n        print(f\"Bod [{x}, {y}] leží na hlavní diagonále!\")\n    case Bod(x=x, y=y) if x > 0 and y > 0:\n        print(f\"Bod [{x}, {y}] leží v I. kvadrantu.\")</pre>\n<p>Podmínka za <code>if</code> se vyhodnotí až ve chvíli, kdy byl vzor strukturálně úspěšně napasován.</p>\n<h3>2. As-patterns (as pro zachycení celku):</h3>\n<p>Chcete dekonstruovat vnitřek, ale zároveň si ponechat referenci na celý složený objekt:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">match bod:\n    case Bod(x=x, y=y) as cely_objekt if x > 100 or y > 100:\n        log_varovani(cely_objekt)\n        print(f\"Extrémní souřadnice: [{x}, {y}]\")</pre>\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "Pod kapotou: Bajtkód řízení toku",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">Pod kapotou: Jak CPython překládá podmínky a cykly</h2></div><div class=\"section-body\">\n<p>Podívejme se, jak CPython překládá podmínku do instrukcí virtuálního stroje pomocí vestavěného modulu <code>dis</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import dis\n\ndef zkontroluj(x: int) -> str:\n    if x > 10:\n        return \"Větší\"\n    return \"Menší\"\n\ndis.dis(zkontroluj)</pre>\n<h3>Výpis instrukcí bajtkódu:</h3>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">  1           0 RESUME                   0\n\n  2           2 LOAD_FAST                0 (x)\n              4 LOAD_CONST               1 (10)\n              6 COMPARE_OP              68 (>)\n             12 POP_JUMP_FORWARD_IF_FALSE 4 (to 22)\n\n  3          14 LOAD_CONST               2 ('Větší')\n             16 RETURN_VALUE\n\n  4     >>   22 LOAD_CONST               3 ('Menší')\n             24 RETURN_VALUE</pre>\n<p>Instrukce <code>COMPARE_OP</code> vyhodnotí relaci a <code>POP_JUMP_FORWARD_IF_FALSE</code> provede podmíněný skok přesunutím ukazatele instrukcí (<em>instruction pointer</em>), analogicky k instrukci <code>jz</code> (jump if zero) v assembleru.</p>\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Nejčastější začátečnické pasti",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">4 nejčastější pasti řízení toku a typů v Pythonu</h2></div><div class=\"section-body\">\n<h3>1. Modifikace kolekce během iterace přes ni</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">cisla = [1, 2, 3, 4, 5, 6]\n# ŠPATNĚ: Během iterace přesouváte indexy pod rukama interpretu!\nfor c in cisla:\n    if c % 2 == 0:\n        cisla.remove(c)  # Přeskočí liché prvky následující po smazaném prvku!\n\n# SPRÁVNĚ: Vytvoření nového seznamu nebo iterace přes kopii:\ncisla = [c for c in cisla if c % 2 != 0]</pre>\n<h3>2. Záměna is a ==</h3>\n<p>Porovnávání řetězců nebo větších čísel přes <code>is</code> může v závislosti na optimalizátoru kompilátoru náhodně selhávat.</p>\n<h3>3. Zřetězená porovnání a jejich záludnosti</h3>\n<p>Python podporuje matematický zápis <code>1 &lt; x &lt; 10</code> (což je ekvivalentní <code>1 &lt; x and x &lt; 10</code>, přičemž <code>x</code> se vyhodnotí pouze jednou). Pozor na nechtěné zřetězení: <code>a == b == c</code> testuje, zda se všechny tři hodnoty navzájem rovnají.</p>\n<h3>4. Zapomenuté break v hledacím algoritmu s for-else</h3>\n<p>Pokud ve vyhledávacím cyklu zapomenete zavolat <code>break</code>, větev <code>else</code> se vykoná vždy.</p>\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "Produkční most: Typové anotace",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Produkční most: Typové anotace v Pythonu 3.12+ (PEP 484)</h2></div><div class=\"section-body\">\n<p>Ačkoliv Python zůstává za běhu dynamicky typovaným jazykem, v moderní softwarové praxi (2026) se veškerý produkční kód píše s <strong>typovými anotacemi</strong> (<em>Type Hints</em>):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Moderní syntaxe unie typů pomocí operátoru | (Python 3.10+)\ndef najdi_uzivatele(user_id: int) -> str | None:\n    if user_id == 42:\n        return \"Alice\"\n    return None\n\ndef zpracuj_skore(hodnoty: list[int | float], koeficient: float = 1.0) -> list[float]:\n    return [polozka * koeficient for polozka in hodnoty]</pre>\n<h3>Zásadní fakt: Nulová režie za běhu!</h3>\n<ul>\n  <li>CPython typové anotace za běhu <strong>nijak nekontroluje ani nevynucuje</strong>.</li>\n  <li>Funkce <code>najdi_uzivatele(\"text\")</code> bez problému proběhne a nehodí běhovou chybu, pokud tomu nezabrání váš kód.</li>\n  <li>K čemu tedy slouží? Pro <strong>statickou analýzu kódu v IDE</strong>, automatické doplňování (<em>IntelliSense</em>) a kontrolu v CI/CD pipeline!</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Produkční most: Kontrola kódu pomocí mypy a pyright",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Produkční most: Statická typová kontrola (mypy a pyright)</h2></div><div class=\"section-body\">\n<p>V kompilovaných jazycích (C, Java) kontroluje typové chyby kompilátor před sestavením binárky. V Pythonu dosahujeme stejné úrovně spolehlivosti pomocí <strong>statických analyzátorů typů</strong>:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">[ Vývojář píše kód ] ──> [ mypy / pyright ] ──> [ Nalezeny chyby před spuštěním! ]</pre>\n<h3>Typický scénář zachycené chyby:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def pozdrav(jmeno: str | None) -> str:\n    # mypy zde zahlásí chybu: Item \"None\" of \"str | None\" has no attribute \"strip\"\n    return f\"Ahoj {jmeno.strip()}!\"</pre>\n<p>Statický checker vás donutí ošetřit možnost, že hodnota je <code>None</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def pozdrav(jmeno: str | None) -> str:\n    if jmeno is None:\n        return \"Ahoj anonyme!\"\n    return f\"Ahoj {jmeno.strip()}!\"</pre>\n<h3>Spuštění typového analyzátoru:</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Rychlá kontrola celého projektu přes uv:\nuv run mypy src/</pre>\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Shrnutí a přechod do cvičení",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Shrnutí přednášky a příprava na cvičení</h2></div><div class=\"section-body\">\n<p>Dnes jsme si osvojili fundamentální mentální model jazyka Python:</p>\n<h3>Hlavní body pro zapamatování:</h3>\n<ol>\n  <li><strong>Paměť</strong>: Vše je <code>PyObject</code> na haldě; reference counting uvolňuje objekty ihned, cyklický GC řeší cykly.</li>\n  <li><strong>Proměnné</strong>: Jsou to pouhé pojmenované reference; typ má hodnota na haldě, nikoliv proměnná.</li>\n  <li><strong>Porovnávání</strong>: <code>==</code> porovnává hodnoty, <code>is</code> porovnává identitu (používejte pouze pro <code>None</code>).</li>\n  <li><strong>Čísla</strong>: <code>int</code> má libovolnou přesnost bez přetečení; <code>float</code> je IEEE 754 a porovnává se přes <code>math.isclose</code>.</li>\n  <li><strong>Cykly</strong>: <code>for-in</code> je vždy for-each iterátorem; pro indexy používáme <code>enumerate()</code>, pro paralelní průchod <code>zip()</code>.</li>\n  <li><strong>Pattern Matching</strong>: <code>match-case</code> umožňuje dekonstruovat sekvence, slovníky a třídy s volitelnými guard podmínkami.</li>\n  <li><strong>Statické typování</strong>: Typové anotace + <code>mypy</code> přinášejí bezpečnost kompilovaných jazyků do dynamického Pythonu.</li>\n</ol>\n<h3>Co vás čeká v následujícím 1,5hodinovém cvičení:</h3>\n<ul>\n  <li>Experimenty s referencemi a zkoumání <code>sys.getrefcount()</code> v interaktivním REPLu.</li>\n  <li>Praktické úlohy na práci s <code>match-case</code> a parsování strukturovaných zpráv.</li>\n  <li>Nastavení a spuštění <code>mypy</code> na sadě vzorových skriptů.</li>\n</ul>\n</div>"
+    }
+  ]
+}

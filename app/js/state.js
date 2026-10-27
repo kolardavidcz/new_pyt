@@ -1894,7 +1894,13 @@ export function clearFilters() {
 }
 
 export function pagesFor(path) {
-  const pages = state.pagesIndex[path];
+  if (!path) return [];
+  const cleanRel = path.replace(/\\/g, "/").replace(/^.*?(vyuka_downloaded|content)\//, "").replace(/^\//, "").replace(/\.(html?|md)$/, "");
+  const slug = cleanRel.replace(/[\/\\]/g, "--");
+  const pages = state.pagesIndex[path]
+    || state.pagesIndex[cleanRel]
+    || state.pagesIndex[slug]
+    || state.pagesIndex[path.replace(/\\/g, "/")];
   if (pages && pages.length) return pages;
   // Exercises: surface úkols as page-level nodes
   const ex = state.exercises[path];

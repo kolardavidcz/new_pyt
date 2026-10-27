@@ -1,0 +1,249 @@
+{
+  "slug": "lectures--week-03",
+  "total": 27,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod a osnova",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod a osnova</h2></div><div class=\"section-body\">\n<p>Vítejte ve třetí přednášce kurzu programování v jazyce Python. Dnešním tématem jsou sekvenční datové struktury — základní stavební kameny pro organizaci, transformaci a zpracování kolekcí dat.</p>\n<h3>Osnova dnešní 90minutové přednášky:</h3>\n<ol>\n  <li><strong>Architektura sekvencí</strong>: C/Java paměťový model (souvislá homogenní pole) vs. CPython heterogenní pole ukazatelů.</li>\n  <li><strong>Sekvenční protokol</strong>: Společné operátory <code>in</code>, <code>+</code>, <code>*</code>, <code>len()</code>, <code>min()</code>, <code>max()</code> a indexace.</li>\n  <li><strong>N-tice (<code>tuple</code>)</strong>: Neměnný sekvenční záznam, interní paměťové výhody a syntaktická past s čárkou <code>(1,)</code>.</li>\n  <li><strong>Rozbalování (Unpacking)</strong>: Paralelní přiřazení a rozšířené rozbalení s hvězdičkou <code>*rest</code>.</li>\n  <li><strong>Řezy (Slicing) v plné šíři</strong>: Syntax <code>[start:stop:step]</code>, inverzní procházení a mutace řezů (<code>s[1:4] = [...]</code>).</li>\n  <li><strong>Dynamické seznamy (<code>list</code>)</strong>: Růstová strategie CPythonu (over-allocation) a amortizované $O(1)$ vkládání.</li>\n  <li><strong>Složitost operací</strong>: Proč je <code>append()</code> $O(1)$, ale <code>insert(0)</code> a <code>remove()</code> $O(n)$.</li>\n  <li><strong>Reference a kopírování</strong>: Past mělkých kopií, šachovnicová past <code>[[0]*3]*3</code> a modul <code>copy</code>.</li>\n  <li><strong>Algoritmus Timsort &amp; Powersort</strong>: Stabilní hybridní řazení, <code>list.sort()</code> vs. <code>sorted()</code>, klíče <code>key=</code> a modul <code>operator</code>.</li>\n  <li><strong>Produkční most</strong>: Efektivní fronta <code>collections.deque</code> a typované neměnné záznamy <code>typing.NamedTuple</code>.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "C/Java vs. Python: Paměťový model polí",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">C/Java vs. Python: Paměťový model polí</h2></div><div class=\"section-body\">\n<p>V kompilovaných jazycích představuje pole <strong>souvislý blok paměti</strong>, kde jsou prvky stejného primitivního typu uloženy těsně za sebou:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">[ C / C++ int arr[4] ]\n  Paměť: [ 10 ][ 20 ][ 30 ][ 40 ]  ──> Souvislý blok 4 × 4 B = 16 bajtů.\n  arr[i] = BaseAddress + i * sizeof(int)  ──> Přímá adresace bleskovým výpočtem O(1).\n  Omezení: Fixní velikost, striktně jediný datový typ.\n\n[ Java ArrayList&lt;Integer&gt; ]\n  Paměť: [ ptr ][ ptr ][ ptr ][ ptr ]  ──> Souvislé pole 64bitových referencí.\n  Každý ptr ukazuje na samostatný heap objekt Integer (boxing overhead).\n\n[ CPython list ]\n  Paměť: PyListObject obsahuje pointer na pole PyObject*.\n  Prvky jsou libovolné heterogenní objekty (číslo, string, jiný seznam, funkce)!</pre>\n<h3>Proč Python nepoužívá souvislá primitivní pole ve standardním seznamu?</h3>\n<ul>\n  <li><strong>Dynamické typování</strong>: Python předem nezná velikost ukládaných prvků.</li>\n  <li><strong>Univerzálnost</strong>: Do jednoho seznamu můžete uložit int, float, text i vlastní objekt.</li>\n  <li><strong>Cena za flexibilitu</strong>: Přístup k datům vyžaduje dvojí dereferenci pointeru a alokaci hlaviček <code>PyObject</code>.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Heterogenní pole ukazatelů pod kapotou",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Heterogenní pole ukazatelů pod kapotou</h2></div><div class=\"section-body\">\n<p>Prozkoumejme, jak vypadá <code>list</code> přímo ve zdrojovém kódu CPythonu (<code>Include/cpython/listobject.h</code>):</p>\n<pre class=\"brush: c; gutter: false; toolbar: false;\">typedef struct {\n    PyObject_VAR_HEAD\n    PyObject **ob_item;      /* Ukazatel na dynamické C pole ukazatelů */\n    Py_ssize_t allocated;    /* Celková alokovaná kapacita slotů */\n} PyListObject;</pre>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">polozky = [42, \"bioinformatika\", 3.14, True]</pre>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">PyListObject\n ├── ob_refcnt = 1\n ├── ob_type = &amp;PyList_Type\n ├── ob_size = 4             (aktuální počet prvků)\n ├── allocated = 4          (kapacita C pole)\n └── ob_item ──► [ ptr_0 ] ──► PyLongObject (42)\n                 [ ptr_1 ] ──► PyUnicodeObject (\"bioinformatika\")\n                 [ ptr_2 ] ──► PyFloatObject (3.14)\n                 [ ptr_3 ] ──► PyBoolObject (True)</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Samotný <code>PyListObject</code> neobsahuje data, ale pouze <strong>ukazatele na existující objekty v paměti</strong>. Když přiřadíte prvek do seznamu, pouze se inkrementuje <code>ob_refcnt</code> daného objektu.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Jednotný sekvenční protokol",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Jednotný sekvenční protokol (The Sequence Protocol)</h2></div><div class=\"section-body\">\n<p>Python definuje formální protokol, který sdílejí všechny sekvenční kontejnery: <code>str</code>, <code>tuple</code>, <code>list</code>, <code>range</code>, <code>bytes</code>.</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">s = [10, 20, 30, 40, 50]\n\n# 1. Dotaz na délku a výskyt:\nprint(len(s))       # 5  (volá s.__len__(), O(1) - hodnota je uložena v ob_size)\nprint(30 in s)      # True (volá s.__contains__(), sekvenční průchod O(n))\nprint(99 not in s)  # True\n\n# 2. Zřetězení a násobení (vytváří VŽDY novou instanci):\nspojeno = s + [60, 70]   # [10, 20, ..., 70]\nopakovano = [0] * 4      # [0, 0, 0, 0]\n\n# 3. Agregace a extrémy:\nprint(min(s))       # 10\nprint(max(s))       # 50\nprint(sum(s))       # 150\n\n# 4. Hledání indexu a počítání výskytů:\nprint(s.index(30))  # 2  (ValueError pokud prvek neexistuje)\nprint(s.count(20))  # 1</pre>\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "N-tice (tuple): Neměnnost a paměťová optimalizace",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">N-tice (tuple): Neměnný sekvenční záznam</h2></div><div class=\"section-body\">\n<p>Objekt typu <code>tuple</code> je neměnná (immutable) sekvence hodnot.</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">bod = (10, 20, 30)\n# bod[0] = 99  # TypeError: 'tuple' object does not support item assignment</pre>\n<h3>Proč používat tuple místo listu?</h3>\n<ol>\n  <li><strong>Sémantický význam</strong>: <code>tuple</code> reprezentuje heterogenní <strong>záznam</strong> (např. souřadnice <code>(x, y, z)</code>, řádek databáze <code>(id, jmeno, email)</code>). <code>list</code> reprezentuje homogenní kolekci položek stejného druhu.</li>\n  <li><strong>Hešovatelnost</strong>: Pokud <code>tuple</code> obsahuje pouze neměnné prvky, je hešovatelný a může sloužit jako klíč ve slovníku <code>dict</code> nebo prvek v množině <code>set</code>.</li>\n  <li><strong>Výkon a paměť</strong>: CPython nepotřebuje u <code>tuple</code> alokovat rezervní kapacitu. <code>tuple</code> je paměťově menší a jeho vytvoření je rychlejší díky interní vyrovnávací paměti (free list).</li>\n</ol>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sys\nprint(sys.getsizeof((1, 2, 3, 4)))   # 72 bajtů\nprint(sys.getsizeof([1, 2, 3, 4]))   # 120 bajtů (overhead pro dynamické přidávání)</pre>\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Syntaktická past: Čárka tvoří tuple, nikoliv závorky",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Syntaktická past: Čárka tvoří tuple, nikoliv závorky!</h2></div><div class=\"section-body\">\n<p>Mnoho začátečníků se domnívá, že n-tici definují kulaté závorky <code>(...)</code>. Ve skutečnosti n-tici tvoří <strong>čárka <code>,</code></strong>!</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># 1. Co je tohle?\na = (42)\nprint(type(a))  # &lt;class 'int'&gt; ! Pouhé uzávorkování výrazu!\n\n# 2. Jak vytvořit jednoprvkový tuple?\nb = (42,)\nprint(type(b))  # &lt;class 'tuple'&gt;\nprint(len(b))   # 1\n\n# 3. Tuple bez závorek (Tuple Packing):\nc = 1, 2, 3\nprint(type(c))  # &lt;class 'tuple'&gt;\nprint(c)        # (1, 2, 3)\n\n# 4. Jediná výjimka, kde jsou závorky povinné:\nprazdny = ()    # Prázdný tuple (nemá prvky, tedy ani čárku)\nprint(len(prazdny))  # 0</pre>\n<div class=\"notes-block\"><div class=\"note-item warning\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p>Zapomenutá čárka na konci řádku vytvoří z běžného čísla nebo řetězce n-tici: <code>x = 5,</code> způsobí, že <code>x</code> je <code>(5,)</code>, což vede k těžko odhalitelným chybám v matematických výpočtech!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Rozbalování sekvencí (Tuple Unpacking)",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Rozbalování sekvencí (Tuple Unpacking)</h2></div><div class=\"section-body\">\n<p>Python umožňuje rozbalit libovolnou sekvenci do samostatných proměnných v jediném kroku:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Paralelní přiřazení:\nsouradnice = (50.087, 14.421)\nlat, lon = souradnice\nprint(f\"Zeměpisná šířka: {lat}, délka: {lon}\")</pre>\n<h3>Prohození hodnot bez pomocné proměnné:</h3>\n<p>V C/C++ a Javě vyžaduje prohození dvou proměnných dočasnou proměnnou <code>tmp</code>:</p>\n<pre class=\"brush: c; gutter: false; toolbar: false;\">// C / Java:\nint tmp = a;\na = b;\nb = tmp;</pre>\n<p>V Pythonu je to idiom na jediném řádku:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">a, b = b, a  # Na pravé straně se vytvoří tuple (b, a) a na levé straně se rozbalí!</pre>\n<p>Počet proměnných na levé straně musí přesně odpovídat délce sekvence:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">x, y = (1, 2, 3)  # ValueError: too many values to unpack (expected 2)</pre>\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Hvězdičková syntaxe: Extended Unpacking (*rest)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Hvězdičková syntaxe: Extended Unpacking (*rest)</h2></div><div class=\"section-body\">\n<p>Od standardu PEP 3132 můžete použít operátor <code>*</code> pro zachycení libovolného zbývajícího počtu prvků do samostatného seznamu:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">hodnoty = [10, 20, 30, 40, 50, 60]\n\n# 1. První prvek a zbytek:\nprvni, *zbytek = hodnoty\nprint(prvni)   # 10\nprint(zbytek)  # [20, 30, 40, 50, 60] (vždy typu list!)\n\n# 2. První, prostředek a poslední prvek:\nstart, *stred, konec = hodnoty\nprint(start)  # 10\nprint(stred)  # [20, 30, 40, 50]\nprint(konec)  # 60\n\n# 3. Zahazování nepotřebných hodnot konvencí podtržítka _:\nhlavicka, *_, paticka = hodnoty</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>V jednom přiřazení smí být nejvýše jeden výraz s hvězdičkou <code>*</code>. Konstrukce <code>*a, *b = hodnoty</code> je syntaktická chyba <code>SyntaxError: two starred expressions in assignment</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Protokol řezů (Slicing): [start:stop:step]",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Protokol řezů (Slicing): [start:stop:step]</h2></div><div class=\"section-body\">\n<p>Řez (slice) extrahuje vybranou podmnožinu prvků v polouzavřeném intervalu <code>[start, stop)</code>:</p>\n<p>$$\\text{indexy} = \\{ \\text{start} + k \\cdot \\text{step} \\mid 0 \\le k &lt; \\frac{\\text{stop} - \\text{start}}{\\text{step}} \\}$$</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">data = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]\n\nprint(data[2:6])      # [20, 30, 40, 50] (od indexu 2 do 5)\nprint(data[:4])       # [0, 10, 20, 30]  (výchozí start = 0)\nprint(data[6:])       # [60, 70, 80, 90] (výchozí stop = len(data))\nprint(data[1:8:2])    # [10, 30, 50, 70] (každý druhý prvek)</pre>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">Indexy:     0     1     2     3     4     5     6     7     8     9\nPrvky:    [10]  [20]  [30]  [40]  [50]  [60]  [70]  [80]  [90] [100]\nZáporné:  -10    -9    -8    -7    -6    -5    -4    -3    -2    -1</pre>\n<h3>Proč jsou intervaly polouzavřené [start, stop)?</h3>\n<ul>\n  <li><strong>Délka řezu</strong>: Počet prvků je jednoduše $\\text{stop} - \\text{start}$ (např. <code>data[2:6]</code> má $6 - 2 = 4$ prvky).</li>\n  <li><strong>Bezešvé rozdělení</strong>: <code>data[:k]</code> a <code>data[k:]</code> rozdělí sekvenci na dvě části bez překryvu a bez mezery.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Pokročilé triky s řezy: Krok, obrácení a slice objekt",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Pokročilé triky s řezy: Krok, obrácení a slice objekt</h2></div><div class=\"section-body\">\n<h3>1. Záporný krok a obrácení sekvence:</h3>\n<p>Když je <code>step</code> záporný, sekvence se prochází pozpátku:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">cisla = [1, 2, 3, 4, 5]\nprint(cisla[::-1])     # [5, 4, 3, 2, 1] (obrácený seznam!)\nprint(cisla[4:1:-1])   # [5, 4, 3] (od indexu 4 k indexu 2)</pre>\n<h3>2. Klonování seznamu pomocí [:]:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">kopie = cisla[:]       # Vytvoří nový nezávislý mělký seznam</pre>\n<h3>3. Samostatný objekt typu slice:</h3>\n<p>Věděli jste, že operátor <code>s[a:b:c]</code> je pouze syntaktický cukr pro <code>s[slice(a, b, c)]</code>?</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Pojmenované řezy pro čtení pevných datových vět:\nZAZNAM = \"ID120485Jan       Novak     25.40\"\n\nPOLE_ID = slice(0, 8)\nPOLE_JMENO = slice(8, 26)\nPOLE_HODNOTA = slice(26, None)\n\nprint(ZAZNAM[POLE_ID])       # 'ID120485'\nprint(ZAZNAM[POLE_JMENO].strip())   # 'Jan       Novak'\nprint(float(ZAZNAM[POLE_HODNOTA]))  # 25.4</pre>\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Zápis do řezu (Slice Assignment) a mazání",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Zápis do řezu (Slice Assignment) a mazání prvků</h2></div><div class=\"section-body\">\n<p>Řezy v seznamech neslouží pouze pro čtení — můžete do nich i <strong>přiřazovat</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">s = [10, 20, 30, 40, 50]\n\n# 1. Nahrazení úseku (může změnit délku seznamu!):\ns[1:4] = [99, 100]\nprint(s)  # [10, 99, 100, 50]\n\n# 2. Vložení prvků bez mazání na konkrétní pozici:\ns[2:2] = [777, 888]\nprint(s)  # [10, 99, 777, 888, 100, 50]\n\n# 3. Vymazání úseku pomocí přiřazení prázdného seznamu:\ns[1:3] = []\nprint(s)  # [10, 888, 100, 50]\n\n# 4. Mazání každého druhého prvku operátorem del:\ndel s[::2]\nprint(s)  # [888, 50]</pre>\n<div class=\"notes-block\"><div class=\"note-item warning\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p>Pokud má řez krok různý od 1 (<code>step != 1</code>), musí přiřazovaná sekvence mít <strong>přesně stejný počet prvků</strong> jako cílový řez: <code>s[::2] = [1, 2, 3]</code> selže s <code>ValueError</code>, pokud délka neodpovídá!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Dynamický seznam (list): Paměťový růst v CPythonu",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Dynamický seznam: Geometrický růst paměti</h2></div><div class=\"section-body\">\n<p>Když do seznamu přidáváte prvky metodou <code>.append()</code>, CPython nealokuje paměť pro každý prvek zvlášť. To by vedlo k extrémní fragmentaci paměti a složitosti $O(n^2)$.</p>\n<p>CPython používá vzorec pro <strong>geometrickou realokaci s rezervou (Over-allocation)</strong>:</p>\n<p>$$\\text{nová\\_kapacita} = \\text{velikost} + (\\text{velikost} \\gg 3) + (\\text{velikost} &lt; 9 \\mathrel{?} 3 : 6)$$</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sys\n\nseznam = []\nminula_velikost = sys.getsizeof(seznam)\n\nprint(\"Počet | Velikost v bytech\")\nprint(\"-\" * 25)\nfor i in range(25):\n    seznam.append(i)\n    aktualni = sys.getsizeof(seznam)\n    if aktualni != minula_velikost:\n        print(f\"Prvků: {len(seznam):2d} | RAM: {aktualni:3d} B (překročena kapacita!)\")\n        minula_velikost = aktualni</pre>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">Růst kapacity slotů v CPythonu:\n0 ──► 4 ──► 8 ──► 16 ──► 24 ──► 32 ──► 40 ──► 52 ──► 64 ──► 76 ...</pre>\n<p>Díky této strategii je amortizovaná složitost metody <code>append()</code> rovna <strong>$O(1)$</strong>!</p>\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Časová složitost operací na seznamu",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Časová složitost operací: O(1) vs. O(n)</h2></div><div class=\"section-body\">\n<p>Porozumění vnitřní struktuře pole je zásadní pro psaní rychlého kódu:</p>\n<table class=\"slide-table\"><thead><tr><th>Operace</th><th>Příklad syntaxe</th><th>Časová složitost</th><th>Důvod / CPython chování</th></tr></thead><tbody><tr><td>Indexace / Čtení</td><td><code>s[i]</code></td><td><strong>$O(1)$</strong></td><td>Přímý výpočet adresy ukazatele</td></tr><tr><td>Zápis na index</td><td><code>s[i] = x</code></td><td><strong>$O(1)$</strong></td><td>Přepsání pointeru v C poli</td></tr><tr><td>Přidání na konec</td><td><code>s.append(x)</code></td><td><strong>Amort. $O(1)$</strong></td><td>Využívá předem alokované sloty</td></tr><tr><td>Odebrání z konce</td><td><code>s.pop()</code></td><td><strong>$O(1)$</strong></td><td>Pouhé snížení čítače <code>ob_size</code></td></tr><tr><td>Vložení na začátek</td><td><code>s.insert(0, x)</code></td><td><strong>$O(n)$</strong></td><td><strong>Katastrofa</strong>: Posun všech $n$ pointerů doprava!</td></tr><tr><td>Odebrání ze začátku</td><td><code>s.pop(0)</code></td><td><strong>$O(n)$</strong></td><td>Posun všech $n-1$ pointerů doleva</td></tr><tr><td>Hledání hodnoty</td><td><code>x in s</code>, <code>s.index(x)</code></td><td><strong>$O(n)$</strong></td><td>Lineární průchod polem</td></tr><tr><td>Mazání prvku</td><td><code>s.remove(x)</code></td><td><strong>$O(n)$</strong></td><td>Hledání $O(n)$ + posun zbytku pole $O(n)$</td></tr><tr><td>Řazení</td><td><code>s.sort()</code></td><td><strong>$O(n \\log n)$</strong></td><td>Timsort / Powersort</td></tr></tbody></table>\n<div class=\"notes-block\"><div class=\"note-item caution\"><span class=\"note-icon\">🛑</span><div class=\"note-content\"><p>Nikdy nepoužívejte <code>list</code> jako frontu FIFO s operacemi <code>insert(0, x)</code> nebo <code>pop(0)</code>! Pro 100 000 prvků zabere tato chyba desítky sekund místo zlomku milisekundy. Pro fronty použijte <code>collections.deque</code>!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Kritický antipattern: Mazání prvků během iterace",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Kritický antipattern: Mazání prvků během iterace</h2></div><div class=\"section-body\">\n<p>Klasická chyba, kterou udělal alespoň jednou každý programátor:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">cisla = [1, 2, 2, 3, 4, 2, 5]\n\n# Cíl: Smazat všechna čísla 2\nfor x in cisla:\n    if x == 2:\n        cisla.remove(x)\n\nprint(cisla)  # Výsledek: [1, 3, 4, 2, 5] -- JEDNA DVOJKA ZŮSTALA!</pre>\n<h3>Proč k tomu došlo?</h3>\n<p>Interní iterátor si udržuje celočíselný index ukazující na aktuální prvek. Když zavoláte <code>cisla.remove(2)</code>, prvky vpravo se posunou o jedno místo doleva. Iterátor se však posune na další index a tím <strong>přeskočí bezprostředně následující prvek</strong>!</p>\n<h3>Správná řešení:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Řešení 1: List comprehension (vytvoření nového čistého seznamu):\ncisla = [x for x in cisla if x != 2]\n\n# Řešení 2: Iterace přes kopii seznamu:\nfor x in cisla[:]:\n    if x == 2:\n        cisla.remove(x)\n\n# Řešení 3: Procházení odzadu (mazání neovlivní předchozí indexy):\nfor i in range(len(cisla) - 1, -1, -1):\n    if cisla[i] == 2:\n        del cisla[i]</pre>\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Reference, mutace a past se sdíleným stavem",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Reference, mutace a past se sdíleným stavem</h2></div><div class=\"section-body\">\n<p>Připomeňme si lekci o paměťovém modelu: proměnná v Pythonu je pouhou visačkou (referencí) na objekt v haldě:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">a = [1, 2, 3]\nb = a          # b ukazuje na PŘESNĚ STEJNÝ objekt jako a!\n\nb.append(4)\nprint(a)       # [1, 2, 3, 4] -- a bylo také modifikováno!\nprint(a is b)  # True (stejná paměťová identita)</pre>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">Proměnná a ──┐\n             ├──► [ PyListObject v paměti: 1, 2, 3, 4 ]\nProměnná b ──┘</pre>\n<p>Pokud chcete nezávislou kopii seznamu, musíte ji vytvořit explicitně:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">c = a.copy()    # nebo c = list(a) nebo c = a[:]\nc.append(99)\nprint(a)        # [1, 2, 3, 4] (původní seznam zůstal nedotčen)\nprint(c)        # [1, 2, 3, 4, 99]\nprint(a is c)   # False</pre>\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Šachovnicová past: 2D pole pomocí [[0] * n] * m",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Šachovnicová past: Inicializace 2D matic</h2></div><div class=\"section-body\">\n<p>Představte si, že chcete vytvořit matici nul o rozměrech $3 \\times 3$:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># ZDÁNLIVĚ ELEGANTNÍ ZÁPIS:\nmatice = [[0] * 3] * 3\nprint(matice)  # [[0, 0, 0], [0, 0, 0], [0, 0, 0]]</pre>\n<p>Nyní změníme prvek v levém horním rohu:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">matice[0][0] = 99\nprint(matice)\n# VÝSLEDEK: [[99, 0, 0], [99, 0, 0], [99, 0, 0]] !\n# Změnily se všechny řádky naráz!</pre>\n<h3>Proč se to stalo?</h3>\n<p>Operátor násobení <code>[sublist] * 3</code> zkopíruje <strong>referenci</strong> na vnitřní seznam třikrát! Vznikla matice obsahující třikrát ten samý řádek v paměti:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">matice ──► [ ref_1, ref_2, ref_3 ]\n               │       │       │\n               └───────┴───────┴──► [ 0, 0, 0 ]  (jediný seznam v RAM!)</pre>\n<h3>Správné řešení pomocí generátoru seznamu (Comprehension):</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Pokaždé se vyhodnotí nová instance [0] * 3:\nmatice = [[0] * 3 for _ in range(3)]\nmatice[0][0] = 99\nprint(matice)  # [[99, 0, 0], [0, 0, 0], [0, 0, 0]] -- Funguje perfektně!</pre>\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Mělká vs. Hluboká kopie: Modul copy",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Mělká (Shallow) vs. Hluboká (Deep) kopie</h2></div><div class=\"section-body\">\n<p>Co když seznam obsahuje vnořené měnitelné objekty (např. další seznamy, slovníky)?</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">puvodni = [[1, 2], [3, 4]]\nmelka_kopie = puvodni.copy()  # nebo puvodni[:]\n\nmelka_kopie[0][0] = 999\nprint(puvodni)  # [[999, 2], [3, 4]] -- Původní vnořený seznam se změnil!</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p><strong>Mělká kopie (Shallow Copy)</strong> vytvoří nový vnější kontejner, ale reference na vnitřní vnořené objekty zkopíruje beze změny.</p></div></div></div>\n<h3>Řešení: Hluboká kopie pomocí modulu copy:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import copy\n\npuvodni = [[1, 2], [3, 4]]\nhluboka_kopie = copy.deepcopy(puvodni)\n\nhluboka_kopie[0][0] = 999\nprint(puvodni)        # [[1, 2], [3, 4]] (původní data jsou 100% v bezpečí!)\nprint(hluboka_kopie)  # [[999, 2], [3, 4]]</pre>\n<p><code>copy.deepcopy()</code> rekurzivně prochází celou stromovou strukturu objektů a udržuje si tabulku navštívených referencí (dokáže bezpečně zkopírovat i cyklické grafy).</p>\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Třídění v Pythonu: list.sort() vs. sorted()",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Třídění v Pythonu: list.sort() vs. sorted()</h2></div><div class=\"section-body\">\n<p>Python nabízí dva různé způsoby řazení:</p>\n<h3>1. Metoda seznamu: list.sort()</h3>\n<ul>\n  <li>Modifikuje seznam <strong>přímo na místě (in-place)</strong>.</li>\n  <li>Vrací hodnotu <code>None</code> (pro zamezení záměny s novým seznamem).</li>\n  <li>Je paměťově efektivnější, protože nevytváří kopii pole.</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">cisla = [5, 2, 9, 1, 7]\nvysledek = cisla.sort()\nprint(vysledek)  # None !\nprint(cisla)     # [1, 2, 5, 7, 9] (původní seznam byl seřazen)</pre>\n<h3>2. Vestavěná funkce: sorted(iterable)</h3>\n<ul>\n  <li>Původní kolekci ponechá beze změny.</li>\n  <li>Vrací <strong>zbrusu nový seřazený list</strong>.</li>\n  <li>Funguje nad <strong>jakýmkoliv iterovatelným objektem</strong> (n-tice, řetězec, množina, soubor).</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">ntice = (5, 2, 9, 1, 7)\nserazeno = sorted(ntice)\nprint(serazeno)  # [1, 2, 5, 7, 9] (nový list!)\nprint(ntice)     # (5, 2, 9, 1, 7) (původní n-tice zůstala nezměněna)</pre>\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "Jak funguje Timsort a moderní Powersort",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Jak funguje Timsort a moderní Powersort</h2></div><div class=\"section-body\">\n<p>Třídicí algoritmus v Pythonu vytvořil Tim Peters v roce 2002 (<strong>Timsort</strong>). Dnes jej převzaly i jazyky Java, Rust, Android i V8 Chrome engine. Od Pythonu 3.11 používá vylepšenou variantu <strong>Powersort</strong> (Munro &amp; Wild, 2018).</p>\n<h3>Klíčové vlastnosti algoritmu:</h3>\n<ol>\n  <li><strong>Hybridní architektura</strong>: Kombinuje <em>Merge Sort</em> (pro velké celky) a <em>Insertion Sort</em> (pro malé úseky pod 64 prvků).</li>\n  <li><strong>Využití reálných dat</strong>: Reálná data málokdy bývají náhodná — často obsahují již seřazené úseky (tzv. <em>runs</em>). Timsort tyto vzestupné a sestupné běhy detekuje v lineárním čase $O(n)$!</li>\n  <li><strong>Striktní stabilita</strong>: Prvky se shodným klíčem si <strong>vždy zachovají své původní vzájemné pořadí</strong>.</li>\n</ol>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">Časová složitost:\n  Nejlepší případ (již seřazeno): O(n)\n  Průměrný případ:                O(n log n)\n  Nejhorší případ:                O(n log n)\n  Paměťová složitost:             O(n)</pre>\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "Funkcionální třídění s klíčem: Parametr key=",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Řazení s klíčem: Parametr key=</h2></div><div class=\"section-body\">\n<p>V C++ píšete přetížený operátor <code>&lt;</code> nebo <code>std::less</code>. V Javě implementujete <code>Comparable</code> nebo předáváte <code>Comparator</code>.</p>\n<p>V Pythonu je přístup mnohem přímočařejší: předáte funkci do parametru <strong><code>key=</code></strong>:</p>\n<p>$$\\text{prvek } x \\implies \\text{hodnota pro porovnání } f(x)$$</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">slova = [\"slon\", \"pes\", \"velryba\", \"kočka\", \"had\"]\n\n# 1. Řazení podle délky slova:\nprint(sorted(slova, key=len))\n# ['had', 'pes', 'slon', 'kočka', 'velryba']\n\n# 2. Řazení bez ohledu na velikost písmen:\njmena = [\"alice\", \"Bob\", \"cyril\", \"David\"]\nprint(sorted(jmena, key=str.lower))\n# ['alice', 'Bob', 'cyril', 'David']\n\n# 3. Řazení komplexních n-tic pomocí lambda funkce:\nstudenti = [(\"Alice\", 1.2), (\"Bob\", 2.8), (\"Cyril\", 1.5)]\n# Seřadit podle známky (druhý prvek):\nstudenti.sort(key=lambda s: s[1])\nprint(studenti)\n# [('Alice', 1.2), ('Cyril', 1.5), ('Bob', 2.8)]</pre>\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "Stabilita třídění a vícekriteriální řazení",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Stabilita třídění a vícekriteriální řazení</h2></div><div class=\"section-body\">\n<p>Díky tomu, že je Timsort striktně <strong>stabilní</strong>, můžeme objekty snadno řadit podle více kritérií najednou.</p>\n<h3>1. Řazení pomocí n-tice klíčů (Standardní Pythonic cesta):</h3>\n<p>N-tice v Pythonu se porovnávají prvek po prvku (lexikograficky): <code>(1, 2) &lt; (1, 3)</code>.</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">zamestnanci = [\n    {\"odd\": \"IT\", \"prijmeni\": \"Novák\", \"plat\": 65000},\n    {\"odd\": \"HR\", \"prijmeni\": \"Svobodová\", \"plat\": 55000},\n    {\"odd\": \"IT\", \"prijmeni\": \"Dvořák\", \"plat\": 80000},\n    {\"odd\": \"HR\", \"prijmeni\": \"Černý\", \"plat\": 55000},\n]\n\n# Chceme seřadit: primárně podle oddělení, sekundárně podle platu sestupně!\nzamestnanci.sort(key=lambda z: (z[\"odd\"], -z[\"plat\"]))\n\nfor z in zamestnanci:\n    print(f\"{z['odd']} | {z['plat']} Kč | {z['prijmeni']}\")</pre>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">HR | 55000 Kč | Svobodová\nHR | 55000 Kč | Černý\nIT | 80000 Kč | Dvořák\nIT | 65000 Kč | Novák</pre>\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Modul operator: itemgetter a attrgetter pro vysoký výkon",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Modul operator: itemgetter a attrgetter</h2></div><div class=\"section-body\">\n<p>Používání <code>lambda s: s[1]</code> v parametru <code>key=</code> je sice přehledné, ale pro statisíce prvků vyvolává zbytečný overhead volání interpretovaného Python rámu.</p>\n<p>Standardní modul <strong><code>operator</code></strong> nabízí céčkové funkce optimalizované pro vytahování položek:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from operator import itemgetter, attrgetter\n\nkatalog = [\n    (\"chemie\", \"Aspirin\", 120),\n    (\"fyzika\", \"Laser\", 9500),\n    (\"chemie\", \"Ethanol\", 450),\n    (\"biologie\", \"Mikroskop\", 18000),\n]\n\n# 1. Rychlé řazení podle indexu (itemgetter):\n# Nahrazuje lambda x: x[2]\nkatalog.sort(key=itemgetter(2))  # Řadí podle ceny\n\n# 2. Vícesložkový itemgetter:\n# Nahrazuje lambda x: (x[0], x[1])\nkatalog.sort(key=itemgetter(0, 1))  # Primárně obor, sekundárně název\n\nprint(katalog)</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p><code>itemgetter</code> a <code>attrgetter</code> běží přímo v nativním C kódu CPythonu a jsou typicky o 20 až 40 % rychlejší než ekvivalentní lambda výrazy.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "Homogenní C pole: Modul array a šetření pamětí",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">Homogenní C pole: Modul array</h2></div><div class=\"section-body\">\n<p>Co když potřebujete v čistém Pythonu bez NumPy uložit 10 milionů 32bitových celých čísel?</p>\n<ul>\n  <li><code>list</code> 10M čísel v CPythonu zabere přes <strong>80 MB</strong> na samotné ukazatele + <strong>280 MB</strong> na hlavičky celých čísel = <strong>~360 MB RAM</strong>!</li>\n  <li>Standardní modul <strong><code>array</code></strong> ukládá data jako souvislé primitivní C pole bez jakéhokoliv obalování do <code>PyObject</code>:</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import array\nimport sys\n\n# 'i' reprezentuje podepsané 32bitové celé číslo (C signed int):\ncisla_array = array.array('i', range(1_000_000))\ncisla_list = list(range(1_000_000))\n\nprint(f\"Velikost array.array: {sys.getsizeof(cisla_array) / 1024 / 1024:.2f} MB\")\nprint(f\"Velikost listu (pouze pointery): {sys.getsizeof(cisla_list) / 1024 / 1024:.2f} MB\")\n# array.array zabírá přesně ~4 MB (1M × 4 B)!</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Modul <code>array</code> se používá především pro nízkoúrovňové binární soubory, síťové sockety a předávání dat do C knihoven. Pro vědecké výpočty s maticemi pak budeme používat specializovaný <strong>NumPy</strong> (přednáška 9).</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Produkční most: collections.deque pro O(1) fronty",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Produkční most: Obousměrná fronta collections.deque</h2></div><div class=\"section-body\">\n<p>Jak jsme si ukázali, <code>list.insert(0, x)</code> a <code>list.pop(0)</code> mají katastrofální složitost <strong>$O(n)$</strong>.</p>\n<p>Kdykoliv potřebujete datovou strukturu typu <strong>FIFO Fronta (Queue)</strong> nebo <strong>Obousměrný zásobník (Deque)</strong>, použijte třídu <strong><code>collections.deque</code></strong> (Double-Ended Queue):</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">[ collections.deque paměťová struktura ]\n  Obousměrně vázaný seznam bloků fixní velikosti (každý blok má 64 pointerů).\n  Přidání / odebrání na obou koncích: O(1) bez nutnosti posouvat celé pole!</pre>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from collections import deque\n\nfronta = deque([10, 20, 30])\n\n# 1. Operace na pravém konci (stejné jako list):\nfronta.append(40)\nprvek = fronta.pop()        # 40 (O(1))\n\n# 2. Bleskové operace na LEVÉM konci:\nfronta.appendleft(5)        # Přidá na začátek v O(1)!\nprvni = fronta.popleft()    # Odebere ze začátku v O(1)!\n\nprint(fronta)  # deque([10, 20, 30])</pre>\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "collections.deque v praxi: Klouzavé okno s maxlen",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Deque v praxi: Klouzavé okno s parametrem maxlen</h2></div><div class=\"section-body\">\n<p>Geniální vlastností <code>deque</code> je možnost definovat maximální délku <strong><code>maxlen</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from collections import deque\n\n# Kruhový buffer posledních 3 měření:\nposledni_teploty = deque(maxlen=3)\n\nnamerene_hodnoty = [20.5, 21.0, 21.2, 22.5, 23.1, 22.8]\n\nfor t in namerene_hodnoty:\n    posledni_teploty.append(t)\n    print(f\"Přidáno {t:4.1f} °C -> Historie: {list(posledni_teploty)}\")</pre>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">Přidáno 20.5 °C -> Historie: [20.5]\nPřidáno 21.0 °C -> Historie: [20.5, 21.0]\nPřidáno 21.2 °C -> Historie: [20.5, 21.0, 21.2]\nPřidáno 22.5 °C -> Historie: [21.0, 21.2, 22.5]  &lt;-- 20.5 automaticky vypadlo!\nPřidáno 23.1 °C -> Historie: [21.2, 22.5, 23.1]\nPřidáno 22.8 °C -> Historie: [22.5, 23.1, 22.8]</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p>Když je dosaženo <code>maxlen</code>, <code>deque</code> při přidání nového prvku na jednom konci automaticky a bez paměťových realokací zahodí prvek na opačném konci. Ideální pro rotující logy, klouzavé průměry a cache.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Produkční most: Typované záznamy typing.NamedTuple",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Produkční most: Typované záznamy typing.NamedTuple</h2></div><div class=\"section-body\">\n<p>Obyčejný <code>tuple</code> je skvělý, ale přístup přes číselné indexy <code>bod[0]</code>, <code>bod[1]</code> je nepřehledný.</p>\n<p>Moderní Python nabízí <strong><code>typing.NamedTuple</code></strong> (ekvivalent Java Records nebo C++ readonly structů):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from typing import NamedTuple\n\nclass Mereni(NamedTuple):\n    senzor_id: str\n    teplota: float\n    tlak: float = 1013.25  # Výchozí hodnota\n\nm = Mereni(\"S-01\", 24.8)\n\n# 1. Čitelný přístup přes pojmenované atributy:\nprint(m.senzor_id)  # 'S-01'\nprint(m.teplota)    # 24.8\nprint(m.tlak)       # 1013.25\n\n# 2. Stále je to plnohodnotný tuple:\nid_s, t, p = m      # Plně podporuje unpacking!\nprint(m[0])         # 'S-01' (přístup přes index stále funguje)\n\n# 3. Záznam je striktně neměnný:\n# m.teplota = 25.0  # AttributeError: can't set attribute</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p><code>NamedTuple</code> má nulový paměťový overhead oproti běžnému <code>tuple</code> — nevytváří slovník instančních atributů <code>__dict__</code> a plně spolupracuje s nástrojem <code>mypy</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Shrnutí a přechod do cvičení",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Shrnutí přednášky a příprava na cvičení</h2></div><div class=\"section-body\">\n<p>Dnes jsme prozkoumali vnitřní architekturu sekvencí v jazyce Python:</p>\n<h3>Hlavní body pro zapamatování:</h3>\n<ol>\n  <li><strong>Paměťový model</strong>: Python <code>list</code> je pole ukazatelů na <code>PyObject*</code>, nikoliv souvislá primitivní paměť.</li>\n  <li><strong>N-tice (<code>tuple</code>)</strong>: Neměnný heterogenní záznam; čárka tvoří tuple: <code>(1,)</code>.</li>\n  <li><strong>Unpacking</strong>: Paralelní přiřazení <code>a, b = b, a</code> a operátor <code>*rest</code> pro zachycení zbývajících prvků.</li>\n  <li><strong>Řezy (Slicing)</strong>: Polouzavřené meze <code>[start:stop:step]</code>; podpora obrácení <code>[::-1]</code> a zápisu do řezů.</li>\n  <li><strong>Výkon seznamu</strong>: <code>.append()</code> a <code>.pop()</code> jsou $O(1)$; <code>.insert(0, ...)</code> a <code>.pop(0)</code> jsou $O(n)$!</li>\n  <li><strong>Kopírování</strong>: Mělká kopie nesleduje vnořené objekty; pro hluboké stromy použijte <code>copy.deepcopy()</code>. Pozor na past <code>[[0]*3]*3</code>!</li>\n  <li><strong>Řazení</strong>: Timsort/Powersort je stabilní v $O(n \\log n)$; preferujte parametr <code>key=itemgetter(...)</code>.</li>\n  <li><strong>Produkční kontejnery</strong>: Pro fronty použijte <code>collections.deque</code>; pro typované záznamy <code>typing.NamedTuple</code>.</li>\n</ol>\n<h3>Co vás čeká v následujícím 1,5hodinovém cvičení:</h3>\n<ul>\n  <li>Implementace řazení složitých vědeckých tabulek podle více kritérií.</li>\n  <li>Detekce a oprava paměťových chyb u sdílených 2D matic.</li>\n  <li>Zpracování časových řad a výpočet klouzavého průměru pomocí <code>collections.deque(maxlen=...)</code>.</li>\n</ul>\n</div>"
+    }
+  ]
+}

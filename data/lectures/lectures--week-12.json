@@ -1,0 +1,250 @@
+{
+  "slug": "lectures--week-12",
+  "total": 27,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod a osnova",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod a osnova</h2></div><div class=\"section-body\">\n<p>Vítejte v závěrečné dvanácté přednášce kurzu programování v jazyce Python. Dnes propojíme všechny dosud získané znalosti a proměníme naše skripty v <strong>profesionální systémové aplikace, vysoce výkonné CLI nástroje a paralelní výpočetní enginy</strong>.</p>\n<p>Python se v inženýrské praxi často nazývá „lepidlem systémů“ (<em>glue language</em>). V této přednášce se naučíme, jak toto lepidlo ovládat na nejvyšší úrovni: od robustního parsování příkazové řádky a bezpečné správy procesů přes nízkoúrovňové binární struktury a mapování souborů do paměti (<code>mmap</code>) až po přímé volání C knihoven přes <strong><code>ctypes</code></strong>, JIT kompilaci v <strong>Numbě</strong> a překonání limitů <strong>GIL</strong> pomocí víceprocesového paralelismu.</p>\n<h3>Osnova dnešní 90minutové přednášky:</h3>\n<ol>\n  <li><strong>C/Java vs. Python v systémovém programování</strong>: Od <code>main(argc, argv)</code> a POSIXu k Python stdlib.</li>\n  <li><strong>Příkazová řádka: <code>sys.argv</code> a návratové kódy</strong>: Standardní toky, <code>sys.exit()</code> a unixové konvence.</li>\n  <li><strong>Standardní parser argumentů: Modul <code>argparse</code></strong>: Třída <code>ArgumentParser</code>, poziční vs. volitelné přepínače.</li>\n  <li><strong>Pokročilé prvky <code>argparse</code></strong>: Typové konverze, volby <code>choices</code>, nápověda a podřízené příkazy (<code>subparsers</code>).</li>\n  <li><strong>Moderní deklarativní CLI: Knihovna <code>typer</code></strong>: Tvorba CLI nástrojů z typových anotací funkcí (PEP 484).</li>\n  <li><strong>Spouštění procesů: Zastaralý <code>os.system</code> vs. <code>subprocess</code></strong>: Riziko Shell Injection a moderní paradigma.</li>\n  <li><strong>Bleskový a bezpečný běh: <code>subprocess.run()</code></strong>: Parametry v seznamu, <code>capture_output</code>, <code>text</code> a <code>check=True</code>.</li>\n  <li><strong>Roury a proudové propojování procesů</strong>: Přesměrování <code>stdout</code> do <code>stdin</code> dalšího procesu (<code>subprocess.PIPE</code>).</li>\n  <li><strong>Binární data: <code>bytes</code> a <code>bytearray</code></strong>: Neměnné sekvence vs. měnitelné bajtové vyrovnávací paměti.</li>\n  <li><strong>Strukturovaná binární data: Modul <code>struct</code></strong>: Balení C struktur (<code>pack</code>, <code>unpack</code>), endianita a zarovnání v paměti.</li>\n  <li><strong>Mapování souborů do paměti: Modul <code>mmap</code></strong>: Koncept virtuální paměti OS a Zero-Copy práce s gigabajty dat.</li>\n  <li><strong>Práce s <code>mmap</code> v Pythonu</strong>: Čtení a zápis do diskového souboru jako do obyčejného bajtového pole.</li>\n  <li><strong>C-Interoperabilita &amp; FFI</strong>: Co je Foreign Function Interface a proč volat C knihovny přímo.</li>\n  <li><strong>Standardní modul <code>ctypes</code></strong>: Načítání <code>.so</code> a <code>.dll</code>, mapování C datových typů a ukazatelů.</li>\n  <li><strong>Předávání polí a struktur v <code>ctypes</code></strong>: Propojení NumPy polí s C funkcemi bez kopírování.</li>\n  <li><strong>Just-In-Time (JIT) akcelerace: Knihovna Numba</strong>: Kompilace pythoních funkcí do strojového kódu přes LLVM.</li>\n  <li><strong>Numba v praxi</strong>: Dekorátor <code>@jit(nopython=True)</code>, vektorizace a paralelní smyčky <code>prange</code>.</li>\n  <li><strong>Architektura CPythonu: Global Interpreter Lock (GIL)</strong>: Proč GIL existuje a co znamená pro vícejádrová CPU.</li>\n  <li><strong>Vlákna v Pythonu: Modul <code>threading</code></strong>: Kdy vlákna pomáhají (I/O-bound) a proč nepomohou u CPU výpočtů.</li>\n  <li><strong>Vícejádrový paralelismus: Modul <code>multiprocessing</code></strong>: Izolované procesy, obcházení GIL a paměťová architektura.</li>\n  <li><strong>Komunikace mezi procesy</strong>: Bezpečné fronty <code>Queue</code> a roury <code>Pipe</code>.</li>\n  <li><strong>Moderní paralelní rozhraní: <code>concurrent.futures</code></strong>: <code>ThreadPoolExecutor</code> vs. <code>ProcessPoolExecutor</code>.</li>\n  <li><strong>Rozhodovací strom souběžnosti</strong>: Kdy zvolit threading, multiprocessing, asyncio nebo C-FFI.</li>\n  <li><strong>Architektura produkčního CLI nástroje</strong>: Návrhový vzor pro robustní systémové utility.</li>\n  <li><strong>Most k Milestone 3</strong>: Akcelerovaný CLI signálový filtr (zadání a architektonické požadavky).</li>\n  <li><strong>Retrospektiva semestru</strong>: Co vše jste zvládli od Týdne 0 do Týdne 12.</li>\n  <li><strong>Závěr kurzu a kudy dál</strong>: Cesta k pokročilému softwarovému inženýrství v Pythonu.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "C/Java vs. Python v systémovém programování",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">C/Java vs. Python v systémovém programování</h2></div><div class=\"section-body\">\n<p>V jazyce C začíná každý program známou signaturou funkce <code>main</code>:</p>\n<pre class=\"brush: c; gutter: false; toolbar: false;\">// C: Přímý přístup k argumentům operačního systému\nint main(int argc, char *argv[]) {\n    if (argc &lt; 2) {\n        fprintf(stderr, \"Chyba: Chybí parametr!\\n\");\n        return 1; // Návratový kód chyby pro operační systém\n    }\n    printf(\"Zadán parametr: %s\\n\", argv[1]);\n    return 0; // Úspěch\n}</pre>\n<p>V Javě je vstupem pole řetězců <code>public static void main(String[] args)</code>.</p>\n<h3>Python: Skript je spustitelný od prvního řádku</h3>\n<p>V Pythonu žádná povinná funkce <code>main</code> neexistuje — interpret vyhodnocuje kód shora dolů. Přesto se v profesionálním kódu striktně dodržuje idiom <strong><code>if __name__ == \"__main__\":</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sys\n\ndef main() -&gt; int:\n    if len(sys.argv) &lt; 2:\n        sys.stderr.write(\"Chyba: Chybí parametr!\\n\")\n        return 1\n    print(f\"Zadán parametr: {sys.argv[1]}\")\n    return 0\n\nif __name__ == \"__main__\":\n    sys.exit(main())</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">💡</span><div class=\"note-content\"><p><strong>Proč předávat návratový kód do sys.exit()?</strong> Operační systém vyhodnocuje návratový kód procesu. Hodnota <code>0</code> značí úspěch, jakékoli nenulové číslo (1 .. 255) signalizuje chybu. To je zásadní pro skládání skriptů do CI/CD pipeline a bashových rour.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Příkazová řádka: sys.argv a standardní toky",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Příkazová řádka: sys.argv a standardní toky</h2></div><div class=\"section-body\">\n<p>Seznam <strong><code>sys.argv</code></strong> obsahuje surové textové argumenty předané programu z terminálu:</p>\n<ul>\n  <li><strong><code>sys.argv[0]</code></strong>: Cesta ke spuštěnému skriptu (nebo jeho název).</li>\n  <li><strong><code>sys.argv[1]</code> až <code>sys.argv[n]</code></strong>: Jednotlivé argumenty oddělené mezerami.</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># skript.py\nimport sys\n\nprint(\"Spuštěný program:\", sys.argv[0])\nprint(\"Počet argumentů:\", len(sys.argv) - 1)\nprint(\"Seznam parametrů:\", sys.argv[1:])</pre>\n<h3>Standardní I/O toky v modulu <code>sys</code>:</h3>\n<ol>\n  <li><strong><code>sys.stdin</code></strong>: Standardní vstup (čtení dat přesměrovaných rourou z jiného programu).</li>\n  <li><strong><code>sys.stdout</code></strong>: Standardní výstup (běžný text, kam zapisuje <code>print()</code>).</li>\n  <li><strong><code>sys.stderr</code></strong>: Standardní chybový výstup (kam patří varování a chybové hlášky).</li>\n</ol>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sys\nsys.stdout.write(\"Vysledek: 42\\n\")\nsys.stderr.write(\"LOG: Výpočet dokončen za 0.12 s\\n\")</pre>\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Standardní parser argumentů: Modul argparse",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Standardní parser argumentů: Modul argparse</h2></div><div class=\"section-body\">\n<p>Standardní knihovna Pythonu obsahuje modul <strong><code>argparse</code></strong> — plnohodnotný deklarativní parser:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># cli_nastroj.py\nimport argparse\nfrom pathlib import Path\n\n# 1. Vytvoření parseru s popisem utility:\nparser = argparse.ArgumentParser(\n    prog=\"signalfir\",\n    description=\"Inženýrský CLI nástroj pro filtraci signálů a obrazů.\"\n)\n\n# 2. Definice POZIČNÍHO argumentu (povinný):\nparser.add_argument(\"vstup\", type=Path, help=\"Cesta ke vstupnímu binárnímu souboru\")\n\n# 3. Definice VOLITELNÉHO přepínače s hodnotou:\nparser.add_argument(\"-o\", \"--vystup\", type=Path, default=Path(\"vystup.bin\"),\n                    help=\"Cesta k cílovému souboru (výchozí: vystup.bin)\")\n\n# 4. Definice PŘEPÍNAČE bez hodnoty (booleovská vlajka):\nparser.add_argument(\"-v\", \"--verbose\", action=\"store_true\",\n                    help=\"Zapne podrobný diagnostický výpis\")\n\n# 5. Parsování argumentů z příkazové řádky:\nargs = parser.parse_args()\n\nprint(f\"Zpracovávám soubor: {args.vstup}\")\nif args.verbose:\n    print(f\"Výstup bude uložen do: {args.vystup}\")</pre>\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Pokročilé prvky argparse: Typy, volby a podřízené příkazy",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Pokročilé prvky argparse: Typy, volby a podřízené příkazy</h2></div><div class=\"section-body\">\n<p><code>argparse</code> automaticky kontroluje platnost vstupů a převádí řetězce na požadované typy:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">parser.add_argument(\n    \"--zisk\",\n    type=float,\n    default=1.0,\n    help=\"Zesílení filtru jako reálné číslo\"\n)\n\nparser.add_argument(\n    \"--metoda\",\n    choices=[\"lowpass\", \"highpass\", \"median\"],\n    default=\"lowpass\",\n    help=\"Algoritmus filtrace (povoleny pouze uvedené varianty)\"\n)</pre>\n<h3>Automaticky generovaná nápověda (<code>--help</code> / <code>-h</code>):</h3>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">usage: signalfir [-h] [-o VYSTUP] [-v] [--zisk ZISK] [--metoda {lowpass,highpass,median}] vstup\n\nInženýrský CLI nástroj pro filtraci signálů a obrazů.\n\npositional arguments:\n  vstup                 Cesta ke vstupnímu binárnímu souboru\n\noptions:\n  -h, --help            show this help message and exit\n  -o, --vystup VYSTUP   Cesta k cílovému souboru (výchozí: vystup.bin)\n  -v, --verbose         Zapne podrobný diagnostický výpis</pre>\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Moderní deklarativní CLI: Knihovna typer",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Moderní deklarativní CLI: Knihovna typer</h2><span class=\"modern-python-pill\" title=\"Modernizovaný výklad pro Python 3.12+\">✨ Python 3.12+</span></div><div class=\"section-body\">\n<p>Ačkoli je <code>argparse</code> ve standardní knihovně, v moderním pythoním ekosystému dominuje knihovna <strong><code>typer</code></strong> (vytvořená autorem FastAPI). Využívá <strong>statické typové anotace (Type Hints)</strong> k automatickému vygenerování CLI bez boilerplatu:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># moderni_cli.py\nimport typer\nfrom pathlib import Path\nfrom typing import Annotated\n\napp = typer.Typer(help=\"Moderní CLI nástroj s automatickým typováním.\")\n\n@app.command()\ndef filtruj(\n    vstup: Annotated[Path, typer.Argument(help=\"Cesta ke vstupním datům\")],\n    vystup: Annotated[Path, typer.Option(\"-o\", \"--out\", help=\"Výstupní soubor\")] = Path(\"out.bin\"),\n    zisk: float = 1.0,\n    verbose: bool = False\n):\n    \"\"\"Aplikuje numerický filtr na binární soubor.\"\"\"\n    if verbose:\n        typer.echo(f\"Aplikuji filtr se ziskem {zisk} na {vstup}\")\n    typer.secho(\"Zpracování úspěšně dokončeno!\", fg=typer.colors.GREEN)\n\nif __name__ == \"__main__\":\n    app()</pre>\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Spouštění procesů: Zastaralý os.system vs. subprocess",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Spouštění procesů: Zastaralý os.system vs. subprocess</h2></div><div class=\"section-body\">\n<p>Ve starších učebnicích se pro spuštění systémového příkazu doporučovala funkce <code>os.system(\"příkaz\")</code>.</p>\n<h3>Proč je <code>os.system</code> nebezpečný a zakázaný v moderním kódu?</h3>\n<ol>\n  <li><strong>Zranitelnost Shell Injection</strong>: <code>os.system</code> předává řetězec přímo systémovému shellu. Pokud je součástí příkazu uživatelský vstup, útočník může připojit středník a spustit libovolný příkaz (např. <code>jmeno = \"test.txt; rm -rf /\"</code>).</li>\n  <li><strong>Nemožnost zachytit výstup</strong>: <code>os.system</code> vrátí pouze návratový kód celého shellu, ale nedovolí vám přečíst vygenerovaná data z RAM.</li>\n  <li><strong>Závislost na shellu</strong>: Různé chování napříč Linuxem, macOS a Windows.</li>\n</ol>\n<p>Od verze Python 3.5 je jediným správným standardem modul <strong><code>subprocess</code></strong> a jeho sjednocená funkce <strong><code>subprocess.run()</code></strong>.</p>\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Bleskový a bezpečný běh: subprocess.run()",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Bleskový a bezpečný běh: subprocess.run()</h2></div><div class=\"section-body\">\n<p>Funkce <code>subprocess.run()</code> spouští externí proces přímo přes systémové volání operačního systému <strong>bez spouštění shellu</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import subprocess\nfrom pathlib import Path\n\n# Bezpečné spuštění: argumenty předáváme jako SEZNAM řetězců:\nvysledek = subprocess.run(\n    [\"git\", \"status\", \"--short\"],\n    capture_output=True,  # Zachytí stdout i stderr do paměti\n    text=True,            # Převede bajty na pythoní řetězec (str) přes UTF-8\n    check=True            # Pokud proces vrátí kód != 0, vyvolá CalledProcessError!\n)\n\n# Získání výstupu:\nprint(\"Výstup gitu:\")\nprint(vysledek.stdout)\nprint(\"Návratový kód:\", vysledek.returncode)</pre>\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Roury a proudové propojování procesů",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Roury a proudové propojování procesů</h2></div><div class=\"section-body\">\n<p>V modulu <code>subprocess</code> lze propojit výstup jednoho běžícího procesu přímo do vstupu druhého bez ukládání mezivýsledků na disk:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import subprocess\n\n# 1. První proces: vygeneruje data (např. vypsání souboru)\np1 = subprocess.Popen(\n    [\"cat\", \"system.log\"],\n    stdout=subprocess.PIPE\n)\n\n# 2. Druhý proces: převezme stdout prvního procesu jako svůj stdin\np2 = subprocess.Popen(\n    [\"grep\", \"ERROR\"],\n    stdin=p1.stdout,\n    stdout=subprocess.PIPE,\n    text=True\n)\n\np1.stdout.close()  # Umožníme p1 obdržet signál SIGPIPE\n\n# 3. Získání finálního filtrovaného výstupu:\nvystup, _ = p2.communicate()\nprint(\"Chybové řádky:\", vystup)</pre>\n<p>Data proudí v reálném čase přes vyrovnávací paměť jádra OS (kernel pipe buffer) bez alokace paměti v Pythonu.</p>\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Binární data: bytes a bytearray",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Binární data: bytes a bytearray</h2></div><div class=\"section-body\">\n<p>Při systémovém programování, síťové komunikaci a zpracování multimédií nepracujeme s textem, ale se <strong>surovými bajty</strong>.</p>\n<h3>1. <code>bytes</code> (Neměnná sekvence bajtů)</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">hlavicka: bytes = b\"\\x89PNG\\r\\n\\x1a\\n\"  # Magická čísla PNG formátu\nprint(hlavicka[0])  # 137 (celé číslo uint8!)\nprint(len(hlavicka)) # 8 bajtů</pre>\n<h3>2. <code>bytearray</code> (Měnitelná vyrovnávací paměť)</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">pufr = bytearray(b\"\\x00\\x00\\x00\\x00\")\npufr[0] = 255\npufr.append(128)\nprint(pufr)  # bytearray(b'\\xff\\x00\\x00\\x00\\x80')</pre>\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Strukturovaná binární data: Modul struct",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Strukturovaná binární data: Modul struct</h2></div><div class=\"section-body\">\n<p>K převodu mezi pythoními objekty a binárními C strukturami slouží vestavěný modul <strong><code>struct</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import struct\n\n# Formátovací řetězec:\n# '&lt;' = Little-Endian (Intel x86/ARM standard)\n# 'H' = unsigned short (uint16, 2B)\n# 'I' = unsigned int (uint32, 4B)\n# 'f' = float (IEEE 754, 4B)\nformat_struktury = \"&lt;HIf\"\n\n# 1. ZABALENÍ (Python hodnoty -&gt; surové bajty):\nbinarni_blok: bytes = struct.pack(format_struktury, 42, 1714567890, 23.75)\nprint(f\"Velikost bloku v RAM: {len(binarni_blok)} bajtů\")  # Přesně 10 bajtů!\n\n# 2. ROZBALENÍ (Surové bajty -&gt; Python hodnoty):\nid_z, cas, teplota = struct.unpack(format_struktury, binarni_blok)\nprint(f\"Zařízení: {id_z}, Čas: {cas}, Teplota: {teplota:.2f} °C\")</pre>\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Mapování souborů do paměti: Modul mmap",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Mapování souborů do paměti: Modul mmap</h2></div><div class=\"section-body\">\n<p>Představte si, že máte binární soubor o velikosti <strong>10 GB</strong> a potřebujete v něm přečíst nebo upravit několik bajtů na náhodných pozicích.</p>\n<p>Systémové volání <strong>`mmap` (Memory Mapping)</strong> namapuje soubor na disku přímo do <strong>virtuálního adresního prostoru vašeho procesu</strong>:</p>\n<ul>\n  <li>Soubor se <strong>nenačítá celý do RAM</strong>.</li>\n  <li>Jádro OS načte do paměti pouze ty stránky (typicky 4 KB), na které váš program právě sáhne (<em>demand paging</em>).</li>\n  <li>Čtení probíhá rychlostí přístupu do RAM bez přepínání kontextu jádra (<strong>Zero-Copy I/O</strong>).</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Práce s mmap v Pythonu",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Práce s mmap v Pythonu</h2></div><div class=\"section-body\">\n<p>V Pythonu poskytuje třída <code>mmap.mmap</code> rozhraní, které se chová současně jako <strong>otevřený soubor</strong> i jako <strong>měnitelné bajtové pole (bytearray)</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import mmap\nfrom pathlib import Path\n\ncesta = Path(\"obri_mereni.dat\")\n\n# 1. Otevřeme soubor v binárním režimu pro čtení i zápis:\nwith open(cesta, mode=\"r+b\") as f:\n    # 2. Namapujeme celý soubor (délka 0 = celý soubor):\n    with mmap.mmap(f.fileno(), length=0, access=mmap.ACCESS_WRITE) as mm:\n        # Přečteme prvních 16 bajtů jako obyčejný slice:\n        hlavicka = mm[0:16]\n        \n        # Bleskové vyhledávání podřetězce v gigabajtovém souboru:\n        pozice = mm.find(b\"CHYBA_SENZORU\")\n        if pozice != -1:\n            # Modifikace přímo na disku pouhým přiřazením do paměti!\n            mm[pozice:pozice+5] = b\"OPRAV\"\n            mm.flush()  # Vynutí synchronizaci změn na fyzický disk</pre>\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "C-Interoperabilita & FFI: Co je ctypes?",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">C-Interoperabilita &amp; FFI: Co je ctypes?</h2></div><div class=\"section-body\">\n<p>Co když máte vysoce optimalizovanou C/C++ knihovnu a chcete ji volat z Pythonu?</p>\n<p>Použijeme <strong>FFI (Foreign Function Interface)</strong>: Načtení již existující zkompilované sdílené knihovny (<code>.so</code> na Linuxu, <code>.dll</code> na Windows) přímo za běhu.</p>\n<p>Ve standardní knihovně Pythonu k tomu slouží modul <strong><code>ctypes</code></strong>:</p>\n<ul>\n  <li>Umožňuje volat libovolné C funkce ze sdílených knihoven,</li>\n  <li>Poskytuje C-kompatibilní datové typy (<code>c_int</code>, <code>c_double</code>, <code>c_char_p</code>),</li>\n  <li>Umožňuje předávat ukazatele a pracovat se surovou pamětí.</li>\n</ul>\n</div>"
+    }
+,
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Předávání polí a struktur v ctypes",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Předávání polí a struktur v ctypes</h2></div><div class=\"section-body\">\n<p>Pro bezpečné volání C funkcí je nutné explicitně definovat typy argumentů (<code>argtypes</code>) a návratový typ (<code>restype</code>):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import ctypes\nimport numpy as np\n\n# Načteme naši zkompilovanou knihovnu filtr.so:\nlib = ctypes.CDLL(\"./libfiltr.so\")\n\n# 1. Striktní definice signatury funkce:\nlib.spocitej_prumer.argtypes = [\n    ctypes.POINTER(ctypes.c_double),  # const double *\n    ctypes.c_int                      # int n\n]\nlib.spocitej_prumer.restype = ctypes.c_double\n\n# 2. Příprava NumPy pole v paměti:\ndata = np.array([10.5, 20.0, 30.5, 40.0], dtype=np.float64)\n\n# 3. Získání přímého ukazatele na surová data bez kopírování:\nukazatel = data.ctypes.data_as(ctypes.POINTER(ctypes.c_double))\n\n# 4. Přímé bleskové volání C kódu:\nvysledek = lib.spocitej_prumer(ukazatel, len(data))\nprint(\"Průměr z C funkce:\", vysledek)</pre>\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Just-In-Time (JIT) akcelerace: Knihovna Numba",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Just-In-Time (JIT) akcelerace: Knihovna Numba</h2></div><div class=\"section-body\">\n<p>Co když nechcete konfigurovat C kompilátor, ale přesto potřebujete, aby váš numerický algoritmus běžel plnou C rychlostí?</p>\n<p>Řešením je <strong>Numba</strong> — specializovaný JIT (Just-In-Time) kompilátor pro Python zaměřený na numerické výpočty s NumPy poli:</p>\n<ol>\n  <li>Numba analyzuje bytekód pythoní funkce.</li>\n  <li>Při prvním zavolání provede typovou inferenci.</li>\n  <li>Přeloží kód do mezireprezentace <strong>LLVM</strong> (backend používaný Clangem a Rustem).</li>\n  <li>Vygeneruje <strong>optimalizovaný strojový kód procesoru (SIMD, AVX-512)</strong>.</li>\n  <li>Další volání běží plnou rychlostí nativního C kódu!</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Numba v praxi: Dekorátor @jit a paralelismus",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Numba v praxi: Dekorátor @jit a paralelismus</h2></div><div class=\"section-body\">\n<p>Základním stavebním kamenem je dekorátor <strong><code>@jit</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import numpy as np\nfrom numba import jit, prange\n\n@jit(nopython=True, fastmath=True)\ndef klouzavy_prumer(signal: np.ndarray, okno: int) -&gt; np.ndarray:\n    n = len(signal)\n    vystup = np.zeros(n - okno + 1, dtype=np.float64)\n    \n    for i in range(len(vystup)):\n        soucet = 0.0\n        for j in range(okno):\n            soucet += signal[i + j]\n        vystup[i] = soucet / okno\n        \n    return vystup</pre>\n<h3>Automatický paralelismus s <code>parallel=True</code> a <code>prange</code>:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">@jit(nopython=True, parallel=True)\ndef paralelni_inverze(obraz: np.ndarray) -&gt; np.ndarray:\n    vystup = np.empty_like(obraz)\n    for i in prange(obraz.shape[0]):\n        for j in range(obraz.shape[1]):\n            vystup[i, j] = 255 - obraz[i, j]\n    return vystup</pre>\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Architektura CPythonu: Global Interpreter Lock (GIL)",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Architektura CPythonu: Global Interpreter Lock (GIL)</h2></div><div class=\"section-body\">\n<p>V referenčním interpretu CPython nelze zrychlit čistý pythoní výpočet pouhým spuštěním více vláken. Důvodem je <strong>Global Interpreter Lock (GIL)</strong>:</p>\n<h3>Proč GIL existuje?</h3>\n<ul>\n  <li>Správa paměti v CPythonu je založena na <strong>čítačích referencí (<code>ob_refcnt</code>)</strong>.</li>\n  <li>Pokud by dvě vlákna současně upravovala čítač referencí stejného objektu, vznikl by souběh (<em>race condition</em>).</li>\n  <li>Pouze jedno vlákno může v daný okamžik vykonávat pythoní bytekód.</li>\n</ul>\n<div class=\"notes-block\"><div class=\"note-item warning\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p><strong>Vlákna a CPU výpočty:</strong> Pokud v čistém Pythonu rozdělíte těžký matematický výpočet mezi 4 vlákna (<code>threading.Thread</code>), program <strong>nepoběží rychleji</strong>. Naopak poběží mírně pomaleji kvůli neustálému přepínání zámku GIL!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "Vlákna v Pythonu: Kdy modul threading exceluje?",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Vlákna v Pythonu: Kdy modul threading exceluje?</h2></div><div class=\"section-body\">\n<p>Vlákna excelují u <strong>I/O-Bound úloh</strong> (stahování dat z webu, síťové dotazy, čtení z disku). Když vlákno čeká na I/O operaci jádra OS, <strong>CPython automaticky uvolní GIL</strong>!</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import threading\nimport time\n\ndef stahuj_data(url: str):\n    print(f\"Začínám stahovat: {url}\")\n    time.sleep(2.0)  # Simulace síťového čekání (uvolňuje GIL!)\n    print(f\"Staženo: {url}\")\n\nvlakna = []\nfor i in range(5):\n    t = threading.Thread(target=stahuj_data, args=(f\"https://api.vscht.cz/data/{i}\",))\n    vlakna.append(t)\n    t.start()\n\nfor t in vlakna:\n    t.join()\n# 5 požadavků trvajících 2 s proběhne současně za cca 2 sekundy celkem!</pre>\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "Vícejádrový paralelismus: Modul multiprocessing",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Vícejádrový paralelismus: Modul multiprocessing</h2></div><div class=\"section-body\">\n<p>Pro výpočetně náročné úlohy (CPU-bound) slouží vestavěný modul <strong><code>multiprocessing</code></strong>:</p>\n<ul>\n  <li>Každý proces má svůj <strong>vlastní interpret CPythonu</strong> a <strong>vlastní nezávislý zámek GIL</strong>.</li>\n  <li>Operační systém naplánuje procesy na různá fyzická jádra CPU — dosahujeme <strong>skutečného paralelismu</strong>!</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import multiprocessing\nimport math\n\ndef tezky_vypocet(cislo: int) -&gt; int:\n    return sum(math.isqrt(i) for i in range(cislo))\n\nif __name__ == \"__main__\":\n    vstupy = [10_000_000, 10_000_000, 10_000_000, 10_000_000]\n    \n    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:\n        vysledky = pool.map(tezky_vypocet, vstupy)\n        \n    print(\"Všechny výpočty dokončeny:\", vysledky)</pre>\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "Komunikace mezi procesy: Queue a Pipe",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Komunikace mezi procesy: Queue a Pipe</h2></div><div class=\"section-body\">\n<p>Protože procesy nesdílejí paměťový prostor, data se předávají přes meziprocesové kanály:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import multiprocessing\n\ndef delnik(fronta: multiprocessing.Queue, data: list[int]):\n    mezisoucet = sum(data)\n    fronta.put(mezisoucet)  # Vloží výsledek do fronty\n\nif __name__ == \"__main__\":\n    fronta = multiprocessing.Queue()\n    \n    p1 = multiprocessing.Process(target=delnik, args=(fronta, [1, 2, 3]))\n    p2 = multiprocessing.Process(target=delnik, args=(fronta, [4, 5, 6]))\n    \n    p1.start()\n    p2.start()\n    \n    res1 = fronta.get()\n    res2 = fronta.get()\n    \n    p1.join()\n    p2.join()\n    \n    print(\"Celkový součet:\", res1 + res2)  # 21</pre>\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Moderní paralelní rozhraní: concurrent.futures",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Moderní paralelní rozhraní: concurrent.futures</h2></div><div class=\"section-body\">\n<p>Modul <strong><code>concurrent.futures</code></strong> poskytuje jednotné rozhraní pro vlákna i procesy pomocí návrhového vzoru <em>Executor</em>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed\nimport time\n\ndef zpracuj_polozku(identifikator: int) -&gt; str:\n    time.sleep(0.1)\n    return f\"Hotovo-{identifikator}\"\n\nif __name__ == \"__main__\":\n    with ProcessPoolExecutor(max_workers=4) as executor:\n        # Metoda map: zachovává pořadí výsledků:\n        vysledky = list(executor.map(zpracuj_polozku, range(10)))\n        print(vysledky)\n        \n        # Metoda submit + as_completed:\n        budoucnosti = [executor.submit(zpracuj_polozku, i) for i in range(5)]\n        for fut in as_completed(budoucnosti):\n            print(\"Přišel hotový výsledek:\", fut.result())</pre>\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "Rozhodovací strom souběžnosti v Pythonu",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">Rozhodovací strom souběžnosti v Pythonu</h2></div><div class=\"section-body\">\n<table class=\"slide-table\"><thead><tr><th>Technologie</th><th>Vhodné pro</th><th>Výhody</th><th>Nevýhody</th></tr></thead><tbody><tr><td><code>threading</code></td><td>I/O, stahování, GUI</td><td>Nízká režie paměti, sdílená RAM</td><td>Nezrychlí CPU výpočty (GIL)</td></tr><tr><td><code>asyncio</code></td><td>Webové servery (FastAPI)</td><td>Extrémní škálování (10 000+ spojení)</td><td>Vyžaduje asynchronní knihovny</td></tr><tr><td><code>multiprocessing</code></td><td>CPU simulace, parsování</td><td>Skutečný běh na všech jádrech CPU</td><td>Overhead serializace paměti</td></tr><tr><td><code>Numba / Cython</code></td><td>Maticové algoritmy, filtry</td><td>Plná rychlost C (100×), uvolnění GIL</td><td>Omezeno na numerické typy</td></tr></tbody></table>\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Architektura produkčního systémového nástroje",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Architektura produkčního systémového nástroje</h2></div><div class=\"section-body\">\n<p>Inženýrský návrhový vzor CLI aplikace s oddělením CLI rozhraní a výpočetního jádra:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># cli.py - Vstupní bod programu:\nimport sys\nimport argparse\nfrom pathlib import Path\n\ndef main() -&gt; int:\n    parser = argparse.ArgumentParser(prog=\"sigfilt\")\n    parser.add_argument(\"vstup\", type=Path)\n    parser.add_argument(\"-o\", \"--vystup\", type=Path, default=Path(\"out.bin\"))\n    parser.add_argument(\"-j\", \"--jobs\", type=int, default=1, help=\"Počet procesů\")\n    \n    args = parser.parse_args()\n    try:\n        # zpracuj_proud(args.vstup, args.vystup, workers=args.jobs)\n        return 0\n    except Exception as e:\n        sys.stderr.write(f\"Kritická chyba: {e}\\n\")\n        return 1\n\nif __name__ == \"__main__\":\n    sys.exit(main())</pre>\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "Most k Milestone 3: Akcelerovaný CLI filtr",
+      "tags": ["Core"],
+      "diff": "wow",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Most k Milestone 3: Akcelerovaný CLI filtr</h2></div><div class=\"section-body\">\n<p>V závěrečném projektu <strong>Milestone 3</strong> zužitkujete všechny klíčové dovednosti získané v kurzu:</p>\n<h3>Cíle Milestone 3:</h3>\n<ol>\n  <li><strong>Robustní CLI</strong>: Parsování vstupů, validace existujících souborů, automatická nápověda <code>--help</code> a návratové kódy.</li>\n  <li><strong>Efektivní I/O</strong>: Čtení binárních vzorků (např. signály nebo PPM obrazy) pomocí paměťového mapování <strong><code>mmap</code></strong> bez zbytečného plýtvání RAM.</li>\n  <li><strong>Akcelerace</strong>: Implementace jádra filtru (konvoluce, mediánový filtr, FFT) s využitím <strong>Cythonu s <code>nogil</code></strong> nebo <strong>Numby <code>@jit</code></strong>.</li>\n  <li><strong>Paralelizace</strong>: Rozdělení velkého signálu mezi procesy pomocí <strong><code>ProcessPoolExecutor</code></strong>.</li>\n  <li><strong>Empirické srovnání</strong>: Měření zrychlení čistého Pythonu vs. akcelerované varianty pomocí <strong><code>timeit</code></strong>.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Retrospektiva semestru: Co jste dokázali",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Retrospektiva semestru: Co jste dokázali</h2></div><div class=\"section-body\">\n<p>Během dvanácti týdnů jste ušli cestu od základních konceptů interpretu až po systémové inženýrství:</p>\n<ul>\n  <li><strong>Týden 0–1</strong>: Moderní prostředí (<code>uv</code>, <code>ruff</code>), paměťový model CPythonu, reference a mutabilita.</li>\n  <li><strong>Týden 2–3</strong>: Neměnné textové řetězce, formátování, hashovací tabulky a složitost O(1) kolekcí.</li>\n  <li><strong>Týden 4–5</strong>: Řízení toku, uzávěry, dekorátory, líný iterační protokol a generátory.</li>\n  <li><strong>Týden 6–7</strong>: Bezpečné RAII kontexty <code>with</code>, hierarchie výjimek a plnohodnotný OOP datový model s dunder metodami.</li>\n  <li><strong>Týden 8–9</strong>: Vědecké numerické výpočty v NumPy (<code>ndarray</code>, strides, broadcasting), moderní souborové cesty <code>pathlib</code>, transakční SQLite3 a analýza dat v Pandas.</li>\n  <li><strong>Týden 11–12</strong>: Automatizované testování (<code>pytest</code>, fixtures), statické typování (<code>mypy</code>), profilování <code>cProfile</code>, přímá kompilace do C v Cythonu, systémové nástroje <code>argparse</code> a paralelismus.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Závěr kurzu a kudy dál",
+      "tags": ["Core"],
+      "diff": "wow",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Závěr kurzu a kudy dál</h2></div><div class=\"section-body\">\n<p>Python je dnes univerzálním jazykem moderní vědy, umělé inteligence a systémové integrace. Dnešní přednáškou výuka nekončí, ale začíná:</p>\n<h3>Kudy pokračovat dál?</h3>\n<ol>\n  <li><strong>Asynchronní architektury</strong>: Prozkoumejte modul <code>asyncio</code> a framework <strong>FastAPI</strong> pro tvorbu vysoce škálovaných webových služeb.</li>\n  <li><strong>Machine Learning &amp; AI</strong>: Využijte své znalosti NumPy a maticového modelu při práci s <strong>PyTorch</strong> a <strong>scikit-learn</strong>.</li>\n  <li><strong>Výkonnostní inženýrství</strong>: Prozkoumejte <strong>Rust FFI (PyO3)</strong> jako moderní a bezpečnou alternativu k Cythonu pro psaní nativních rozšíření.</li>\n  <li><strong>Čistý kód a architektura</strong>: Ponořte se do knihy <em>Fluent Python</em> (Luciano Ramalho) a standardů moderního vývoje.</li>\n</ol>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p><strong>Závěrečná rada pro praxi:</strong> Nehledejte v Pythonu náhradu za C++ nebo Javu tam, kde jsou potřeba mikrosekundové latence. Síla Pythonu spočívá v <strong>maximální rychlosti vývoje (Developer Velocity)</strong> v kombinaci se schopností delegovat kritická výpočetní jádra do nativního kódu.</p></div></div></div>\n</div>"
+    }
+  ]
+}

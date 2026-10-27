@@ -1,0 +1,249 @@
+{
+  "slug": "lectures--week-02",
+  "total": 27,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod a osnova",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod a osnova</h2></div><div class=\"section-body\">\n<p>Vítejte ve druhé přednášce kurzu programování v jazyce Python. Dnešním tématem je práce s textem — nejběžnějším formátem pro výměnu vědeckých, bioinformatických i webových dat.</p>\n<h3>Osnova dnešní 90minutové přednášky:</h3>\n<ol>\n  <li><strong>Architektura textu</strong>: C/Java modely (<code>char[]</code>, <code>std::string</code>, <code>String</code>) vs. CPython <code>str</code>.</li>\n  <li><strong><code>str</code> pod kapotou</strong>: Standard PEP 393 (Flexible String Representation) a immutabilita.</li>\n  <li><strong>Základní manipulace</strong>: Indexování, řetězcové řezy (<em>slicing</em>) a proč v Pythonu neexistuje typ <code>char</code>.</li>\n  <li><strong>Metody řetězců</strong>: Čištění (<code>strip</code>), dělení (<code>split</code>), skládání (<code>join</code>) a bezpečné hledání.</li>\n  <li><strong>Text vs. Bajty</strong>: Rozdíl mezi <code>str</code> a <code>bytes</code>, kódování UTF-8, <code>.encode()</code> a <code>.decode()</code>.</li>\n  <li><strong>Past s kódováním v OS</strong>: Proč vždy explicitně psát <code>encoding=\"utf-8\"</code> u souborového I/O.</li>\n  <li><strong>Evoluce formátování</strong>: Od <code>%</code> přes <code>.format()</code> k f-stringům a novinky Pythonu 3.12 (PEP 701).</li>\n  <li><strong>Čtení textových proudů</strong>: Iterace přes soubor po řádcích v paměťové složitosti $O(1)$.</li>\n  <li><strong>Regulární výrazy (modul <code>re</code>)</strong>: Raw stringy <code>r\"...\"</code>, chamtivost, skupiny a funkce <code>search</code> vs. <code>match</code>.</li>\n  <li><strong>Produkční most</strong>: Předkompilace <code>re.compile()</code>, pojmenované skupiny a čitelné regexy s <code>re.VERBOSE</code>.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "C/Java vs. Python: Reprezentace textu",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Architektura textu: Od bajtového pole k plnému Unicode</h2></div><div class=\"section-body\">\n<p>V nízkoúrovňových a kompilovaných jazycích je reprezentace textu zatížena historickým vývojem:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">[ C / C++ ]\n  char s[] = \"ahoj\";        ──> Pole 8bitových bajtů zakončené nulovým bajtem '\\0' (ASCII / lokální kódování)\n  std::string               ──> Dynamické pole bajtů (nerozumí vícebajtovým UTF-8 znakům bez knihoven)\n\n[ Java ]\n  String s = \"ahoj\";        ──> Pole 16bitových UTF-16 code units (char[]).\n                                Emodži a historická písma vyžadují dva znaky (surrogate pairs)!\n\n[ CPython 3 ]\n  s = \"ahoj 🐍\"             ──> Plnohodnotný řetězec abstraktních Unicode znaků (Code Points).\n                                Žádné ukončovací nuly, žádné surrogate pairs, O(1) indexace!</pre>\n<h3>Zásadní rozdíl: V Pythonu NEEXISTUJE samostatný typ char!</h3>\n<p>V C a Javě je <code>char</code> 1bajtový či 2bajtový primitivní celočíselný typ. V Pythonu je i jediný znak textu <strong>plnohodnotným jednoznakovým řetězcem typu <code>str</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">znak = \"A\"\nprint(type(znak))  # &lt;class 'str'&gt;\nprint(len(znak))   # 1</pre>\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "str pod kapotou: PEP 393",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">str pod kapotou: Standard PEP 393 (Flexible String Representation)</h2></div><div class=\"section-body\">\n<p>Jak může CPython zaručit, že přístup k libovolnému znaku <code>s[i]</code> má časovou složitost <strong>$O(1)$</strong>, když znaky v Unicode mohou mít různou délku v bajtech?</p>\n<p>Od Pythonu 3.3 používá CPython standard <strong>PEP 393</strong>: Interpret při vytvoření řetězce zkontroluje nejvyšší kódový bod znaku a zvolí nejúspornější fixní šířku pro <strong>celý řetězec</strong>:</p>\n<table class=\"slide-table\"><thead><tr><th>Nejvyšší znak v řetězci</th><th>Šířka znaku v paměti</th><th>Kódování paměti</th><th>Příklad obsahu</th></tr></thead><tbody><tr><td>Do <code>U+00FF</code> (do 255)</td><td><strong>1 bajt</strong> per znak</td><td>Latin-1 / ASCII</td><td><code>\"hello world\"</code></td></tr><tr><td>Do <code>U+FFFF</code> (do 65 535)</td><td><strong>2 bajty</strong> per znak</td><td>UCS-2</td><td><code>\"český text (řečtina, azbuka)\"</code></td></tr><tr><td>Nad <code>U+FFFF</code></td><td><strong>4 bajty</strong> per znak</td><td>UCS-4</td><td><code>\"chemie ⚗️ a emodži 🐍\"</code></td></tr></tbody></table>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sys\n\ns1 = \"hello\"       # 1 bajt per znak\ns2 = \"příliš\"      # 2 bajty per znak (obsahuje české znaky s diakritikou)\ns3 = \"had 🐍\"      # 4 bajty per znak (emodži vyžaduje UCS-4)\n\nprint(sys.getsizeof(s1))  # 54 bajtů (hlavička + 5×1 B)\nprint(sys.getsizeof(s2))  # 86 bajtů (hlavička + 6×2 B)\nprint(sys.getsizeof(s3))  # 96 bajtů (hlavička + 5×4 B)</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Díky PEP 393 je Pythoní práce s Unicode paměťově úsporná a indexování <code>s[i]</code> probíhá pouhým násobením indexu šířkou buňky ($O(1)$).</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Neměnnost (Immutability) a spojování",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Neměnnost (Immutability) a Past kvadratického spojování</h2></div><div class=\"section-body\">\n<p>Objekty typu <code>str</code> jsou v Pythonu <strong>striktně neměnné (immutable)</strong>. Jakmile je řetězec vytvořen, nelze změnit žádný jeho znak:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">s = \"Python\"\ns[0] = \"J\"  # TypeError: 'str' object does not support item assignment</pre>\n<h3>Proč je řetězec neměnný?</h3>\n<ol>\n  <li><strong>Hešovatelnost</strong>: Řetězec lze bezpečně použít jako klíč ve slovníku (<code>dict</code>) a prvek v množině (<code>set</code>).</li>\n  <li><strong>Bezpečnost paměti</strong>: Řetězce lze bezpečně sdílet mezi vlákny bez zamykání.</li>\n  <li><strong>Internování (<em>String Interning</em>)</strong>: CPython ukládá identifikátory a krátké texty pouze jednou v globální tabulce singletonů (<code>sys.intern()</code>).</li>\n</ol>\n<h3>Kritická past: Skládání textu pomocí += v cyklu:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># KATASTROFÁLNÍ ANTIPATTERN: Časová složitost O(n^2)!\nvysledek = \"\"\nfor slovo in velky_seznam_slov:\n    vysledek += slovo  # Při každé iteraci se alokuje a kopíruje celý nový string!\n\n# SPRÁVNÝ IDIOM: Časová složitost O(n)!\ncasti = []\nfor slovo in velky_seznam_slov:\n    casti.append(slovo)\nvysledek = \"\".join(casti)  # Alokuje paměť přesně jednou na základě celkové délky</pre>\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Indexování a řetězcové řezy",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Indexování a řezy řetězců (String Slicing)</h2></div><div class=\"section-body\">\n<p>Řetězce plně implementují sekvenční protokol: $\\text{retezec}[\\text{start} : \\text{stop} : \\text{krok}]$</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">text = \"Bionformatika\"\n\nprint(text[0])       # 'B' (první znak)\nprint(text[-1])      # 'a' (poslední znak)\nprint(text[0:4])     # 'Bion' (polouzavřený interval [0, 4))\nprint(text[:4])      # 'Bion' (od začátku)\nprint(text[4:])      # 'formatika' (až do konce)\nprint(text[::2])     # 'Bnomti' (každý druhý znak)\nprint(text[::-1])    # 'akitaminoinB' (obrácení řetězce!)</pre>\n<h3>Bezpečnost řezů oproti indexování:</h3>\n<p>Pokud přistoupíte k indexu mimo rozsah řetězce, Python vyvolá chybu:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">text[100]  # IndexError: string index out of range</pre>\n<p>Řezy (<em>slices</em>) jsou však k mezím tolerantní a automaticky se oříznou:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">print(text[4:100])  # 'formatika' (žádná chyba nevznikne)</pre>\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Čištění a vyhledávání v textu",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Metody řetězců: Čištění a vyhledávání</h2></div><div class=\"section-body\">\n<p>Při zpracování reálných dat potřebujeme text normalizovat a testovat:</p>\n<h3>1. Ořezání bílých znaků:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">radek = \"   24.5 ; 10.2 \\n\\t\"\ncisty = radek.strip()  # Odstraní mezery, tabulátory a konce řádků na obou stranách\nprint(repr(cisty))     # '24.5 ; 10.2'</pre>\n<h3>2. Testy začátku a konce:</h3>\n<p>Metody <code>.startswith()</code> a <code>.endswith()</code> přijímají i n-tici (<em>tuple</em>) možností:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">soubor = \"experiment_01.csv\"\nif soubor.endswith((\".csv\", \".tsv\", \".txt\")):\n    print(\"Podporovaný tabulkový formát!\")</pre>\n<h3>3. Vyhledání podřetězce: .find() vs. .index():</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">email = \"student@vscht.cz\"\n\n# find() vrací index prvního výskytu, nebo -1 pokud podřetězec neexistuje:\npozice = email.find(\"@\")  # 7\nnenalezeno = email.find(\"#\")  # -1 (bezpečné pro podmínky)\n\n# index() funguje stejně, ale při nenalezení vyvolá výjimku ValueError:\n# email.index(\"#\")  # ValueError: substring not found!</pre>\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Dělení a spojování: split a join",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Metody řetězců: Dělení (split) a spojování (join)</h2></div><div class=\"section-body\">\n<p>Zpracování CSV, TSV a konfiguračních řádek:</p>\n<h3>1. Metoda .split(separator=None, maxsplit=-1):</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Bez argumentu: dělí podle libovolně dlouhých shluků mezer a tabulátorů!\nzaznam = \"Jan    Novak   25   Praha\"\nprint(zaznam.split())  # ['Jan', 'Novak', '25', 'Praha']\n\n# S konkrétním oddělovačem:\ncsv_radek = \"Aspirin;C9H8O4;180.16\"\nprint(csv_radek.split(\";\"))  # ['Aspirin', 'C9H8O4', '180.16']\n\n# Omezení počtu rozdělení:\nhlavicka = \"KEY = VALUE = EXTRA\"\nklic, hodnota = hlavicka.split(\" = \", maxsplit=1)</pre>\n<h3>2. Metoda separator.join(iterable):</h3>\n<p>Všimněte si, že metoda <code>join</code> je volána <strong>na oddělovači</strong>, nikoliv na seznamu:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">hodnoty = [\"10.5\", \"20.3\", \"15.8\"]\nvysledny_radek = \"\\t\".join(hodnoty)\nprint(vysledny_radek)  # '10.5\\t20.3\\t15.8'</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Proč je syntaxe <code>\", \".join(seznam)</code> a ne <code>seznam.join(\", \")</code>? Protože <code>join</code> funguje nad <strong>jakýmkoliv iterovatelným objektem</strong> (n-tice, množina, souborový generátor), aniž by tyto objekty musely dědit ze společné třídy seznamu!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Text vs. Bajty: str vs. bytes",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Text vs. Bajty: Duální model str a bytes</h2></div><div class=\"section-body\">\n<p>Jedna z největších změn mezi Pythonem 2 a moderním Pythonem 3: <strong>Text a binární data jsou striktně oddělené typy!</strong></p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">[ str ]               Unicode text (abstraktní znaky: 'A', 'ř', '🐍')\n  │\n  ├─── .encode(\"utf-8\") ───►  [ bytes ]  Surová binární data (bity v paměti / síti / disku)\n  │                                │\n  └─── .decode(\"utf-8\") ◄──────────┘</pre>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">text = \"Čeština 🐍\"\nprint(type(text))        # &lt;class 'str'&gt;\nprint(len(text))         # 9 znaků\n\nsurove_bajty = text.encode(\"utf-8\")\nprint(type(surove_bajty))  # &lt;class 'bytes'&gt;\nprint(len(surove_bajty))   # 14 bajtů! (české znaky zabírají 2 B, emodži 4 B)\nprint(surove_bajty)      # b'\\xc4\\x8ce\\xc5\\xa1tina \\xf0\\x9f\\x90\\x8d'</pre>\n<h3>Pravidlo pro vývojáře:</h3>\n<ul>\n  <li><strong>Uvnitř vašeho programu</strong>: Vždy pracujte výhradně s typem <code>str</code>.</li>\n  <li><strong>Na hranicích systému</strong> (čtení ze sítě, zápis na disk, komunikace s C knihovnami): Převádějte data přes <code>.encode()</code> a <code>.decode()</code>.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Kódování UTF-8 a řešení chyb",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Kódování UTF-8 a strategie ošetření chyb</h2></div><div class=\"section-body\">\n<p>UTF-8 je dominantní světový standard pro ukládání textu:</p>\n<ul>\n  <li>Znaky základní ASCII (0–127) zabírají přesně <strong>1 bajt</strong> (100% zpětná kompatibilita).</li>\n  <li>Evropská diakritika, řečtina, hebrejština zabírají <strong>2 bajty</strong>.</li>\n  <li>Asijská písma zabírají <strong>3 bajty</strong>.</li>\n  <li>Emodži a historické symboly zabírají <strong>4 bajty</strong>.</li>\n</ul>\n<h3>Co když narazíte na poškozená data?</h3>\n<p>Při dekódování můžete specifikovat parametr <code>errors</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">poskozena_data = b\"Teplota: 25 \\xb0C\"  # Znak stupně v kódování ISO-8859-1, nikoliv UTF-8!\n\n# 1. Výchozí striktní režim (vyvolá výjimku):\n# poskozena_data.decode(\"utf-8\")  # UnicodeDecodeError!\n\n# 2. Náhrada nečitelných znaků symbolem  (U+FFFD):\nprint(poskozena_data.decode(\"utf-8\", errors=\"replace\"))\n# 'Teplota: 25 C'\n\n# 3. Ignorování poškozených bajtů:\nprint(poskozena_data.decode(\"utf-8\", errors=\"ignore\"))\n# 'Teplota: 25 C'</pre>\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Past s kódováním v souborovém I/O",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Past s kódováním v operačním systému</h2></div><div class=\"section-body\">\n<p>Při čtení nebo zápisu textových souborů pomocí <code>open()</code> se mnoho programátorů dopouští zásadní chyby:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># KATASTROFÁLNÍ ZÁPIS:\nwith open(\"vysledky.txt\", \"w\") as f:\n    f.write(\"Naměřená hodnota: 15.4 °C\")</pre>\n<h3>Proč je tento kód nebezpečný?</h3>\n<p>Pokud nespecifikujete parametr <code>encoding</code>, CPython použije <strong>výchozí kódování operačního systému</strong>:</p>\n<ul>\n  <li>Na Linuxu a macOS: téměř vždy UTF-8.</li>\n  <li>Na Windows: často historické kódování <strong>CP1250</strong> (středoevropské Windows) nebo <strong>CP1252</strong>!</li>\n  <li>Důsledek: Skript, který vám funguje na Linuxu, na Windows zhaví s <code>UnicodeEncodeError</code>, jakmile zkusíte zapsat emoji nebo cizí znak!</li>\n</ul>\n<h3>Zlaté pravidlo moderního Pythonu:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># VŽDY a bez výjimky uvádějte explicitní UTF-8:\nwith open(\"vysledky.txt\", \"w\", encoding=\"utf-8\") as f:\n    f.write(\"Naměřená hodnota: 15.4 °C ⚗️\")</pre>\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Evoluce formátování: Od % k f-stringům",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Evoluce formátování: Od operátoru % k moderním f-stringům</h2></div><div class=\"section-body\">\n<p>Python prošel třemi generacemi formátování řetězců:</p>\n<h3>1. Generace: Operátor % (ve stylu C printf)</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">jmeno = \"Alice\"; vek = 22\nprint(\"Student: %s, věk: %d\" % (jmeno, vek))  # Zastaralé od roku 2008</pre>\n<h3>2. Generace: Metoda .format() (Python 2.6 / 3.0)</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">print(\"Student: {}, věk: {}\".format(jmeno, vek))\nprint(\"Student: {n}, věk: {v}\".format(n=jmeno, v=vek))</pre>\n<h3>3. Generace: Formátované řetězcové literály — f-stringy (Python 3.6+, PEP 498)</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">print(f\"Student: {jmeno}, věk: {vek}\")</pre>\n<h3>Proč jsou f-stringy absolutním standardem:</h3>\n<ul>\n  <li><strong>Přímá čitelnost</strong>: Výrazy vkládáte přímo do textu ve složených závorkách <code>{}</code>.</li>\n  <li><strong>Rychlost</strong>: F-stringy se neparsují za běhu jako formátovací řetězce, ale překládají se přímo do optimalizovaného bajtkódu (jsou rychlejší než <code>.format()</code> i <code>%</code>).</li>\n  <li><strong>Podpora libovolných výrazů</strong>: <code>{vek + 1}</code>, <code>{jmeno.upper()}</code>, <code>{len(seznam)}</code>.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "F-stringy: Specifikátory formátu",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">F-stringy: Čísla, zarovnání a formátovací značky</h2></div><div class=\"section-body\">\n<p>Za proměnnou uvnitř složených závorek můžete přidat dvojtečku <code>:</code> a formátovací specifikátor:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">pi = 3.1415926535\ncastka = 1250000.5\npomer = 0.8526\n\n# 1. Počet desetinných míst a zaokrouhlování:\nprint(f\"Pí: {pi:.2f}\")            # 'Pí: 3.14'\n\n# 2. Oddělovač tisíců (čárka nebo podtržítko):\nprint(f\"Částka: {castka:,.2f} Kč\") # 'Částka: 1,250,000.50 Kč'\nprint(f\"Částka: {castka:_.2f} Kč\") # 'Částka: 1_250_000.50 Kč'\n\n# 3. Procentuální formát:\nprint(f\"Úspěšnost: {pomer:.1%}\")   # 'Úspěšnost: 85.3%'\n\n# 4. Zarovnání textu a výplň:\njmeno = \"Test\"\nprint(f\"'{jmeno:&lt;10}'\")           # ''Test      '' (zarovnání vlevo)\nprint(f\"'{jmeno:&gt;10}'\")           # ''      Test'' (zarovnání vpravo)\nprint(f\"'{jmeno:^10}'\")           # ''   Test   '' (vycentrování)\nprint(f\"Kód: {42:0&gt;6}\")           # 'Kód: 000042' (doplnění nulami)</pre>\n<h3>Rychlý debugging s operátorem = (Python 3.8+):</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">x = 42; y = 100\nprint(f\"{x=}, {y=}, {x + y=}\")  # Vypíše: 'x=42, y=100, x + y=142'</pre>\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Novinky f-stringů v Pythonu 3.12 (PEP 701)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Novinky f-stringů v Pythonu 3.12+ (PEP 701)</h2></div><div class=\"section-body\">\n<p>Před verzí Python 3.12 měly f-stringy několik nepříjemných syntaktických omezení. Standard <strong>PEP 701</strong> přepsal gramatiku f-stringů přímo do formálního PEG parseru.</p>\n<h3>Co je nově povoleno od Pythonu 3.12:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">studenti = {\"Alice\": [1, 2, 1], \"Bob\": [3, 2, 2]}\n\n# 1. Opakované použití stejných uvozovek uvnitř výrazu:\n# (Dříve bylo nutné střídat jednoduché ' a dvojité \" uvozovky!)\ninfo = f\"Student: {studenti[\"Alice\"]}\"\n\n# 2. Zpětná lomítka a escape sekvence uvnitř složených závorek:\nradky = [\"první\", \"druhý\", \"třetí\"]\nprint(f\"Výpis:\\n{'\\n'.join(radky)}\")\n\n# 3. Komentáře uvnitř víceřádkových f-stringů:\nvypocet = f\"Výsledek: {\n    sum(studenti['Alice'])  # sečteme známky\n    / len(studenti['Alice']) # spočítáme průměr\n:.2f}\"</pre>\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Čtení textových proudů po řádcích",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Čtení textových souborů: Streamování v O(1) paměti</h2></div><div class=\"section-body\">\n<p>Když pracujete se soubory o velikosti gigabajtů (sekvenační data, experimentální měření, serverové logy), musíte šetřit paměť RAM:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># ŠPATNĚ: f.readlines() nebo f.read() načte celý soubor naráz do paměti!\nwith open(\"obri_experiment.csv\", \"r\", encoding=\"utf-8\") as f:\n    radky = f.readlines()  # Při 10GB souboru program zkolabuje na Out-of-Memory!\n\n# SPRÁVNĚ A IDIOMATICKY: Objekt souboru je líným iterátorem řádků!\nwith open(\"obri_experiment.csv\", \"r\", encoding=\"utf-8\") as f:\n    for radek in f:\n        radek = radek.strip()\n        if not radek or radek.startswith(\"#\"):\n            continue  # Přeskoč prázdné řádky a komentáře\n        zpracuj_radek(radek)</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p>Díky tomu, že <code>open()</code> vrací iterátor, spotřebovává procházení souboru v CPythonu konstantní množství paměti $O(1)$ (velikost interní vyrovnávací paměti, typicky 8 KB).</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Proč regulární výrazy (Regex)?",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Proč regulární výrazy (Regular Expressions)?</h2></div><div class=\"section-body\">\n<p>Základní metody <code>str</code> (<code>split</code>, <code>find</code>, <code>startswith</code>) stačí pro jednoduché úlohy s fixními oddělovači. V reálném světě jsou však data nestrukturovaná nebo variabilní:</p>\n<ul>\n  <li>Jak ověřit, zda je text validní e-mailovou adresou?</li>\n  <li>Jak z logu vytáhnout všechny IP adresy a chybové kódy?</li>\n  <li>Jak najít vzor chemického vzorce nebo DNA motivu s proměnným počtem opakování?</li>\n</ul>\n<p>K tomu slouží <strong>regulární výrazy (RegEx)</strong> — specializovaný deklarativní minisystém zabudovaný do standardní knihovny v modulu <strong><code>re</code></strong>.</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import re\n\ntext = \"Uživatel jan.novak@vscht.cz poslal 3 zprávy z IP 192.168.1.105 v 14:30.\"\n\n# Nalezení e-mailu:\nemail = re.search(r\"[\\w\\.-]+@[\\w\\.-]+\\.\\w+\", text)\nif email:\n    print(\"Nalezen e-mail:\", email.group())  # 'jan.novak@vscht.cz'</pre>\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Raw stringy r'...' a zpětná lomítka",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Surové řetězce: Proč u regulárních výrazů VŽDY psát r\"...\"?</h2></div><div class=\"section-body\">\n<p>V běžném textovém řetězci má zpětné lomítko <code>\\</code> speciální význam (<em>escape sekvence</em>): <code>\\n</code> je nový řádek, <code>\\t</code> je tabulátor.</p>\n<p>V regulárních výrazech má zpětné lomítko také speciální význam: <code>\\d</code> je číslice, <code>\\b</code> je hranice slova.</p>\n<p>Pokud byste použili běžný řetězec, nastane tzv. <strong>Backslash Plague</strong>: Abyste regexu předali sekvenci <code>\\b</code>, musíte v běžném řetězci napsat <code>\"\\\\b\"</code>. Chcete-li hledat doslovný znak <code>\\</code>, musíte napsat <code>\"\\\\\\\\\"</code>!</p>\n<h3>Řešení: Raw string literály r\"...\"</h3>\n<p>Předřazené písmeno <code>r</code> říká CPythonu: <em>Ignoruj jakékoliv escape sekvence a interpretuj zpětná lomítka doslovně!</em></p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># ŠPATNĚ (nebezpečné, \\b může být interpretováno jako backspace):\nvzor = \"\\\\d+\\.\\\\d+\"\n\n# SPRÁVNĚ a čistě:\nvzor = r\"\\d+\\.\\d+\"</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">💡</span><div class=\"note-content\"><p>Pro všechny regulární výrazy v Pythonu bez výjimky používejte zápis <strong><code>r\"...\"</code></strong>!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Stavební kameny regulárních výrazů",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Základní stavební kameny syntaxe regulárních výrazů</h2></div><div class=\"section-body\">\n<table class=\"slide-table\"><thead><tr><th>Symbol</th><th>Význam</th><th>Příklad</th><th>Shoduje se s</th></tr></thead><tbody><tr><td><strong><code>.</code></strong></td><td>Libovolný znak (kromě nového řádku <code>\\n</code>)</td><td><code>k.t</code></td><td><code>kat</code>, <code>kot</code>, <code>k9t</code></td></tr><tr><td><strong><code>\\d</code></strong></td><td>Libovolná číslice (0–9)</td><td><code>\\d\\d</code></td><td><code>42</code>, <code>07</code></td></tr><tr><td><strong><code>\\D</code></strong></td><td>Libovolný znak kromě číslice</td><td><code>\\D+</code></td><td><code>ahoj</code></td></tr><tr><td><strong><code>\\w</code></strong></td><td>Znak slova (písmena, číslice, podtržítko)</td><td><code>\\w+</code></td><td><code>promenna_1</code></td></tr><tr><td><strong><code>\\s</code></strong></td><td>Bílý znak (mezera, tabulátor, nový řádek)</td><td><code>\\s+</code></td><td><code>   </code>, <code>\\t\\n</code></td></tr><tr><td><strong><code>[abc]</code></strong></td><td>Znaková třída: právě jeden ze zadaných znaků</td><td><code>[A-Z]</code></td><td>Libovolné velké písmeno</td></tr><tr><td><strong><code>[^abc]</code></strong></td><td>Negovaná třída: jakýkoliv znak KROMĚ zadaných</td><td><code>[^0-9]</code></td><td>Jakýkoliv nečíselný znak</td></tr><tr><td><strong><code>^</code> / <code>$</code></strong></td><td>Kotvy: Začátek řádku (<code>^</code>) a Konec řádku (<code>$</code>)</td><td><code>^\\d+$</code></td><td>Řetězec tvořený pouze čísly</td></tr><tr><td><strong><code>\\b</code></strong></td><td>Hranice slova</td><td><code>\\bpes\\b</code></td><td><code>'pes'</code>, ale ne <code>'pesek'</code></td></tr></tbody></table>\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Kvantifikátory: Chamtivost vs. Línost",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Kvantifikátory: Chamtivé (Greedy) vs. Líné (Non-greedy)</h2></div><div class=\"section-body\">\n<p>Kvantifikátory určují, kolikrát se smí předchozí prvek opakovat:</p>\n<ul>\n  <li><code>*</code> : 0 nebo vícekrát.</li>\n  <li><code>+</code> : 1 nebo vícekrát.</li>\n  <li><code>?</code> : 0 nebo 1krát (volitelný prvek).</li>\n  <li><code>{n,m}</code> : minimálně $n$-krát, maximálně $m$-krát.</li>\n</ul>\n<h3>Záludnost chamtivého vyhodnocování:</h3>\n<p>Regulární výrazy jsou ve výchozím nastavení <strong>chamtivé (greedy)</strong> — snaží se spolknout co nejdelší možný podřetězec:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import re\n\nhtml = \"&lt;div&gt;První blok&lt;/div&gt;&lt;div&gt;Druhý blok&lt;/div&gt;\"\n\n# 1. Chamtivý kvantifikátor .* (spolkne vše až po POSLEDNÍ &lt;/div&gt;):\nchamtivy = re.findall(r\"&lt;div&gt;.*&lt;/div&gt;\", html)\nprint(chamtivy)\n# ['&lt;div&gt;První blok&lt;/div&gt;&lt;div&gt;Druhý blok&lt;/div&gt;']\n\n# 2. Líný kvantifikátor .*? (zastaví se u NEJBLIŽŠÍHO &lt;/div&gt;):\nliny = re.findall(r\"&lt;div&gt;.*?&lt;/div&gt;\", html)\nprint(liny)\n# ['&lt;div&gt;První blok&lt;/div&gt;', '&lt;div&gt;Druhý blok&lt;/div&gt;']</pre>\n<div class=\"notes-block\"><div class=\"note-item warning\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p>Přidáním otazníku <code>?</code> za kvantifikátor (<code>*?</code>, <code>+?</code>) přepnete vyhodnocování do líného (<em>reluctant</em>) režimu.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "Funkce re: search vs. match vs. fullmatch",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Klíčové funkce modulu re: search, match a fullmatch</h2></div><div class=\"section-body\">\n<p>Častý zdroj chyb: Jaký je rozdíl mezi těmito třemi funkcemi?</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">text = \"Chyba na řádku 42: neplatný vstup\"</pre>\n<h3>1. re.search(pattern, text):</h3>\n<p>Prohledává <strong>celý text</strong> a vrátí první místo, kde vzor vyhovuje:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">m = re.search(r\"\\d+\", text)\nprint(m.group())  # '42' (úspěšně nalezeno uprostřed textu)</pre>\n<h3>2. re.match(pattern, text):</h3>\n<p>Ověřuje shodu <strong>POUZE na samém začátku textu</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">m = re.match(r\"\\d+\", text)\nprint(m)  # None! (Protože na začátku textu je slovo 'Chyba', nikoliv číslice)</pre>\n<h3>3. re.fullmatch(pattern, text):</h3>\n<p>Vyžaduje, aby vzor pokryl <strong>celý text od prvního do posledního znaku</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Ideální pro formulářové validace (např. rodné číslo, PSČ):\npsc = \"16000\"\nif re.fullmatch(r\"\\d{5}\", psc):\n    print(\"Platné PSČ!\")</pre>\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "Práce s objektem shody (Match Object)",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Práce s objektem shody (Match Object)</h2></div><div class=\"section-body\">\n<p>Pokud vyhledávací funkce uspěje, nevrací pouhý text, ale bohatý objekt typu <code>re.Match</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import re\n\nzprava = \"Naměřeno pH: 7.35 v laboratoři L12\"\nm = re.search(r\"pH:\\s*(\\d+\\.\\d+)\", zprava)\n\nif m is not None:\n    # 1. Celý nalezený úsek:\n    print(\"Celá shoda:\", m.group(0))      # 'pH: 7.35'\n\n    # 2. Počáteční a koncový index v původním řetězci:\n    print(\"Počátek:\", m.start())           # 9\n    print(\"Konec:\", m.end())               # 17\n    print(\"Rozpětí (span):\", m.span())     # (9, 17)\n\n    # 3. Extrahovaná závorková skupina:\n    print(\"Samotná hodnota pH:\", m.group(1))  # '7.35'</pre>\n<h3>Moderní walrus operátor := pro zkrácení zápisu:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">if m := re.search(r\"pH:\\s*(\\d+\\.\\d+)\", zprava):\n    print(\"Hodnota pH je:\", m.group(1))</pre>\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "Závorkové skupiny (Capturing Groups)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Závorkové skupiny (Capturing Groups) a rozbalování</h2></div><div class=\"section-body\">\n<p>Kulaté závorky <code>(...)</code> v regulárním výrazu slouží k <strong>extrakci konkrétních částí vzoru</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">datum = \"Datum experimentu: 2026-10-27\"\nvzor = r\"(\\d{4})-(\\d{2})-(\\d{2})\"\n\nm = re.search(vzor, datum)\nif m:\n    rok = m.group(1)     # '2026'\n    mesic = m.group(2)   # '10'\n    den = m.group(3)     # '27'\n\n    # Metoda .groups() vrátí n-tici všech skupin:\n    rok, mesic, den = m.groups()\n    print(f\"Den: {den}, Měsíc: {mesic}, Rok: {rok}\")</pre>\n<h3>Nezachytávající skupiny (?:...):</h3>\n<p>Někdy potřebujete závorky pouze pro logické seskupení (např. s operátorem <code>|</code>), ale nechcete jejich obsah extrahovat do výsledků:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Skupina (?:https?|ftp) seskupí protokoly, ale nealokuje capture index:\nurl_vzor = r\"(?:https?|ftp)://([a-zA-Z0-9\\.-]+)\"\nm = re.search(url_vzor, \"Odkaz: https://vscht.cz/studium\")\nprint(m.group(1))  # 'vscht.cz' (přímo doména, protokol byl nezachytávající)</pre>\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Pojmenované skupiny (?P<name>...)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Pojmenované skupiny: Konec nepřehledných číselných indexů</h2></div><div class=\"section-body\">\n<p>Spoléhat se na číselné indexy <code>m.group(1)</code>, <code>m.group(2)</code> je u složitějších regexů křehké: pokud doprostřed vzoru přidáte novou závorku, posunou se čísla všech následujících skupin!</p>\n<p>Python nabízí elegantní řešení: <strong>Pojmenované skupiny</strong> se syntaxí <code>(?P&lt;nazev&gt;vzorec)</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">radek_logu = \"2026-10-27 14:32:05 [ERROR] Databáze neodpovídá na portu 5432\"\n\nvzor = r\"(?P&lt;datum&gt;\\d{4}-\\d{2}-\\d{2})\\s+(?P&lt;cas&gt;\\d{2}:\\d{2}:\\d{2})\\s+\\[(?P&lt;uroven&gt;[A-Z]+)\\]\\s+(?P&lt;zprava&gt;.*)\"\n\nm = re.search(vzor, radek_logu)\nif m:\n    print(m.group(\"uroven\"))  # 'ERROR'\n    print(m.group(\"zprava\"))  # 'Databáze neodpovídá na portu 5432'\n\n    # Metoda .groupdict() vytvoří čistý slovník Pythonu!\n    data = m.groupdict()\n    print(data)\n    # {\n    #   'datum': '2026-10-27',\n    #   'cas': '14:32:05',\n    #   'uroven': 'ERROR',\n    #   'zprava': 'Databáze neodpovídá na portu 5432'\n    # }</pre>\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "Hromadné vyhledávání: findall vs. finditer",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">Hromadné vyhledávání: re.findall() vs. re.finditer()</h2></div><div class=\"section-body\">\n<p>Když text obsahuje více výskytů hledaného vzoru:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">text = \"Navážky vzorků: A=12.5g, B=3.4g, C=105.8g\"</pre>\n<h3>1. re.findall(pattern, text):</h3>\n<p>Vrátí přímo <strong>seznam textových řetězců</strong> (nebo n-tic, pokud vzor obsahuje skupiny):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">vsechna_cisla = re.findall(r\"\\d+\\.\\d+\", text)\nprint(vsechna_cisla)  # ['12.5', '3.4', '105.8']</pre>\n<h3>2. re.finditer(pattern, text) — Paměťově optimální přístup:</h3>\n<p>Nevytváří seznam v paměti, ale vrací <strong>líný generátor objektů Match</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">for m in re.finditer(r\"(?P&lt;vzorek&gt;[A-Z])=(?P&lt;vaha&gt;\\d+\\.\\d+)g\", text):\n    print(f\"Vzorek {m.group('vzorek')} má hmotnost {m.group('vaha')} gramů (pozice {m.span()})\")</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p>Pro zpracování rozsáhlých databází či souborů vždy preferujte <code>re.finditer()</code>, protože nealokuje zbytečné seznamy a zachovává přístup k pozicím v textu.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Nahrazování textu: re.sub",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Nahrazování textu: Funkce re.sub() a zpětné reference</h2></div><div class=\"section-body\">\n<p>Pro nahrazení vzoru jiným textem slouží funkce <code>re.sub()</code>:</p>\n<h3>1. Jednoduché nahrazení:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import re\n\ntext = \"Uživatel má telefon 123-456-789 nebo 987-654-321.\"\nanonymizovano = re.sub(r\"\\d{3}-\\d{3}-\\d{3}\", \"[SKRYTO]\", text)\nprint(anonymizovano)  # 'Uživatel má telefon [SKRYTO] nebo [SKRYTO].'</pre>\n<h3>2. Zpětné reference v náhradě:</h3>\n<p>Můžete v náhradním textu použít extrahované skupiny pomocí <code>\\g&lt;nazev&gt;</code> nebo <code>\\1</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Přeformátování data z YYYY-MM-DD na DD.MM.YYYY:\ndatumy = \"Start: 2026-10-27, Konec: 2026-11-05\"\ncesky_format = re.sub(r\"(\\d{4})-(\\d{2})-(\\d{2})\", r\"\\3.\\2.\\1\", datumy)\nprint(cesky_format)  # 'Start: 27.10.2026, Konec: 05.11.2026'</pre>\n<h3>3. Nahrazování pomocí funkce (Callback function):</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def prevod_na_kelviny(m: re.Match) -> str:\n    celsius = float(m.group(1))\n    return f\"{celsius + 273.15:.2f} K\"\n\nzaznam = \"Teploty: 25.0 C a 100.0 C\"\nprint(re.sub(r\"(\\d+\\.\\d+)\\s*C\", prevod_na_kelviny, zaznam))\n# 'Teploty: 298.15 K a 373.15 K'</pre>\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "Produkční most: Předkompilace re.compile",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Produkční most: Předkompilace regulárních výrazů (re.compile)</h2></div><div class=\"section-body\">\n<p>Když zavoláte <code>re.search(r\"...\", text)</code>, CPython musí textový vzor tokenizovat a přeložit do bajtkódu vnitřního regulárního automatu. CPython si sice ukládá posledních cca 512 použitých vzorů do cache, ale v produkčním kódu s miliony iterací je toto neefektivní.</p>\n<h3>Profesionální idiom:</h3>\n<p>Zkompilujte regulární výraz <strong>jednou na úrovni modulu</strong> do objektu <code>re.Pattern</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import re\n\n# Kompilace na úrovni modulu (proběhne pouze jednou při importu):\nVZOR_LOGU = re.compile(\n    r\"^(?P&lt;ip&gt;\\d{1,3}(?:\\.\\d{1,3}){3})\\s+-\\s+\\[(?P&lt;cas&gt;[^\\]]+)\\]\\s+\\\"(?P&lt;metoda&gt;[A-Z]+)\\s+(?P&lt;url&gt;[^\\s]+)\"\n)\n\ndef zpracuj_webovy_log(cesta_k_souboru: str) -> list[dict[str, str]]:\n    vysledky = []\n    with open(cesta_k_souboru, \"r\", encoding=\"utf-8\") as f:\n        for radek in f:\n            if m := VZOR_LOGU.match(radek):\n                vysledky.append(m.groupdict())\n    return vysledky</pre>\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Produkční most: Čitelné regexy s re.VERBOSE",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Produkční most: Čitelný a dokumentovaný regex (re.VERBOSE)</h2></div><div class=\"section-body\">\n<p>V softwarovém inženýrství platí vtip: <em>\"Někdo měl problém, tak použil regulární výraz. Nyní má problémy dva.\"</em> Důvodem je, že dlouhé regulární výrazy na jednom řádku jsou pro člověka nečitelné.</p>\n<p>Python nabízí přepínač <strong><code>re.VERBOSE</code> (nebo <code>re.X</code>)</strong>: Ignoruje netriviální mezery a umožňuje <strong>vkládat komentáře přímo do regulárního výrazu</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import re\n\nREGEX_EMAIL = re.compile(r\"\"\"\n    ^                        # Začátek řetězce\n    (?P&lt;user&gt;[\\w\\.-]+)       # Uživatelské jméno (písmena, tečky, pomlčky)\n    @                        # Znak zavináče\n    (?P&lt;domain&gt;[a-zA-Z0-9-]+ # Doména 2. řádu\n        (?:\\.[a-zA-Z0-9-]+)* # Volitelné subdomény\n    )\n    \\.                       # Tečka před TLD\n    (?P&lt;tld&gt;[a-zA-Z]{2,})    # Národní doména nejvyššího řádu (cz, com, org)\n    $                        # Konec řetězce\n\"\"\", re.VERBOSE | re.IGNORECASE)\n\nm = REGEX_EMAIL.match(\"kolar@vscht.cz\")\nprint(m.groupdict())\n# {'user': 'kolar', 'domain': 'vscht', 'tld': 'cz'}</pre>\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Shrnutí a přechod do cvičení",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Shrnutí přednášky a příprava na cvičení</h2></div><div class=\"section-body\">\n<p>Dnes jsme zvládli práci s textem, kódováním i pokročilým parsováním:</p>\n<h3>Hlavní body pro zapamatování:</h3>\n<ol>\n  <li><strong>Unicode</strong>: <code>str</code> v Pythonu používá PEP 393; indexování je $O(1)$ a paměť se přizpůsobuje nejširšímu znaku.</li>\n  <li><strong>Immutabilita</strong>: Řetězce nelze modifikovat na místě; pro skládání textu používejte <code>''.join(seznam)</code>, nikdy <code>+=</code> v cyklu.</li>\n  <li><strong>Kódování</strong>: Striktně oddělujte text <code>str</code> a bajty <code>bytes</code>; soubory otevírejte <strong>vždy s <code>encoding=\"utf-8\"</code></strong>.</li>\n  <li><strong>F-stringy</strong>: Nejrychlejší a nejčistší formátování textu; od Pythonu 3.12 podporuje uvozovky a zpětná lomítka uvnitř výrazů (PEP 701).</li>\n  <li><strong>Regex</strong>: Používejte raw stringy <code>r\"...\"</code>; pro parsování definujte pojmenované skupiny <code>(?P&lt;name&gt;...)</code>.</li>\n  <li><strong>Produkční standard</strong>: Regexy předkompilujte přes <code>re.compile()</code> a dokumentujte pomocí <code>re.VERBOSE</code>.</li>\n</ol>\n<h3>Co vás čeká v následujícím 1,5hodinovém cvičení:</h3>\n<ul>\n  <li>Extrakce a čištění dat z experimentálních CSV souborů bez externích knihoven.</li>\n  <li>Napsání regex parseru pro validaci rodných čísel a e-mailů.</li>\n  <li>Parsování a agregace HTTP stavových kódů z reálného Apache/Nginx webového logu.</li>\n</ul>\n</div>"
+    }
+  ]
+}

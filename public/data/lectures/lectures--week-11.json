@@ -1,0 +1,250 @@
+{
+  "slug": "lectures--week-11",
+  "total": 27,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod a osnova",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod a osnova</h2></div><div class=\"section-body\">\n<p>Vítejte v jedenácté přednášce kurzu programování v jazyce Python. V předchozích týdnech jsme prozkoumali syntaxi jazyka, objektový model, manipulaci s daty i vědecké knihovny. Dnešní téma představuje zlom v inženýrském myšlení: <strong>Kvalita kódu, automatizované testování, výkonnostní profilování a nativní C-akcelerace v Cythonu</strong>.</p>\n<p>V dynamickém jazyce, kde neprobíhá kompilace do striktního binárního tvaru před spuštěním, leží veškerá tíha odhalování chyb na <strong>automatizovaných testech a statických analyzátorech</strong>. Současně se naučíme, jak exaktně měřit výkon kódu a jak odstranit úzká hrdla pomocí přímé kompilace do jazyka C.</p>\n<h3>Osnova dnešní 90minutové přednášky:</h3>\n<ol>\n  <li><strong>C/Java vs. Python mentalita kvality</strong>: Kompilátorové garance vs. dynamický runtime testbed.</li>\n  <li><strong>Spustitelná dokumentace: Modul <code>doctest</code></strong>: Interaktivní příklady v docstringách a ověřování.</li>\n  <li><strong>Limity doctestu</strong>: Kdy přejít k formálnímu testovacímu frameworku.</li>\n  <li><strong>Standardní knihovna: Modul <code>unittest</code></strong>: Třída <code>unittest.TestCase</code> a životní cyklus testu.</li>\n  <li><strong>Assert metody v <code>unittest</code></strong>: <code>assertEqual</code>, <code>assertRaises</code> a nástrahy porovnávání <code>float</code>.</li>\n  <li><strong>Test Discovery</strong>: Automatické vyhledávání a spouštění testovacích sad.</li>\n  <li><strong>Moderní standard: Framework <code>pytest</code></strong>: Proč svět opustil těžkopádné OOP testy ve prospěch funkcí.</li>\n  <li><strong>Kouzlo nativního <code>assert</code> v pytestu</strong>: Magie AST introspekce a detailní reporty chyb.</li>\n  <li><strong>Správa testovacích stavů: <code>@pytest.fixture</code></strong>: Dependency Injection a oddělení inicializace od logiky.</li>\n  <li><strong>Životní cyklus fixture</strong>: Klíčové slovo <code>yield</code>, teardown a úrovně platnosti (<code>scope</code>).</li>\n  <li><strong>Parametrizace testů: <code>@pytest.mark.parametrize</code></strong>: Expanze testovacích scénářů bez duplicitního kódu.</li>\n  <li><strong>Programová varování: Modul <code>warnings</code></strong>: <code>warnings.warn()</code> vs. výjimky a kategorie varování.</li>\n  <li><strong>Filtrování varování v praxi</strong>: Potlačování hlášek a režim <code>python -W error</code> v CI/CD pipeline.</li>\n  <li><strong>Měření výkonu: Modul <code>timeit</code></strong>: Proč <code>time.time()</code> selhává pro mikrobenchmarky.</li>\n  <li><strong>Použití modulu <code>timeit</code></strong>: CLI rozhraní a programové měření v kódu.</li>\n  <li><strong>Deterministické profilování: Modul <code>cProfile</code></strong>: Kde program tráví čas a kolikrát co volal.</li>\n  <li><strong>Analýza profilu: Modul <code>pstats</code></strong>: Kumulativní vs. vlastní čas a odhalení úzkých hrdel.</li>\n  <li><strong>Statické typové anotace: PEP 484 &amp; Modul <code>typing</code></strong>: Statická bezpečnost v dynamickém těle.</li>\n  <li><strong>Moderní typová syntaxe (Python 3.10–3.12)</strong>: Operátor <code>|</code>, generické typy a <code>type</code> aliasy (PEP 695).</li>\n  <li><strong>Statický typový kontrolor <code>mypy</code></strong>: Odhalení chyb bez jediného spuštění programu.</li>\n  <li><strong>Přechod k akceleraci: Proč je CPython pomalý?</strong>: Dynamický dispatch, <code>PyObject</code> boxing a GIL.</li>\n  <li><strong>Úvod do Cythonu</strong>: Nadmnožina Pythonu kompilovaná přímo do jazyka C/C++.</li>\n  <li><strong>Statické typování v Cythonu: Klíčové slovo <code>cdef</code></strong>: C typy bez paměťového overheadu.</li>\n  <li><strong>Tři typy funkcí v Cythonu</strong>: Rozdíly mezi <code>def</code>, <code>cdef</code> a hybridním <code>cpdef</code>.</li>\n  <li><strong>Uvolnění GIL: Klíčové slovo <code>nogil</code></strong>: Skutečný vícevláknový paralelismus v C sekcích.</li>\n  <li><strong>Kompilace Cython kódu</strong>: Modul <code>setuptools</code>, soubory <code>.pyx</code> a příkaz <code>cythonize</code>.</li>\n  <li><strong>Most k praxi a shrnutí 11. přednášky</strong>: Synergie testů, typů a C-akcelerace.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "C/Java vs. Python: Mentalita kvality kódu",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">C/Java vs. Python: Mentalita kvality kódu</h2></div><div class=\"section-body\">\n<p>V programovacích jazycích se statickým typováním (C, C++, Java) funguje kompilátor jako <strong>první přísná obranná linie</strong>:</p>\n<pre class=\"brush: java; gutter: false; toolbar: false;\">// Java: Kompilátor okamžitě odmítne kód s nekompatibilními typy\npublic int secti(int a, int b) {\n    return a + b;\n}\n// secti(\"10\", 20); -&gt; CHYBA PŘI KOMPILACI: incompatible types</pre>\n<p>Kompilátor Javy nebo C++ prověří existenci metod, typy parametrů a návratové hodnoty dříve, než se vygeneruje jediný bajt spustitelného kódu.</p>\n<h3>Python: Dynamická svoboda vyžaduje inženýrskou disciplínu</h3>\n<p>V Pythonu se typy nekontrolují při načítání souboru, ale až v okamžiku, kdy procesor narazí na konkrétní instrukci za běhu (<strong>Dynamic Duck Typing</strong>):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def secti(a, b):\n    return a + b\n\n# Zcela validní kód pro interpret! Chyba nastane až v produkci o půlnoci:\nsecti(\"10\", 20)  # TypeError: can only concatenate str (not \"int\") to str</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">💡</span><div class=\"note-content\"><p><strong>Paradox dynamických jazyků:</strong> Protože Python nemá kompilátor, který by garantoval typovou integritu a existenci metod, <strong>potřebuje robustnější sadu automatizovaných testů než kompilované jazyky</strong>. Testy v Pythonu nenahrazují pouze integrační scénáře, ale i základní typové ověření.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Spustitelná dokumentace: Modul doctest",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Spustitelná dokumentace: Modul doctest</h2></div><div class=\"section-body\">\n<p>Jedním z nejunikátnějších nástrojů standardní knihovny Pythonu je modul <strong><code>doctest</code></strong>. Vychází z filozofie, že <strong>nejlepší dokumentace je ta, která obsahuje ověřitelné ukázky kódu</strong>.</p>\n<p>Přímo do dokumentačního řetězce (docstringu) funkce napíšete příklady formátované přesně tak, jak vypadají v interaktivním shellu Pythonu (<code>&gt;&gt;&gt;</code>):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># matematika.py\ndef faktorial(n: int) -&gt; int:\n    \"\"\"Spočítá faktoriál nezáporného celého čísla n.\n\n    Příklady použití:\n    &gt;&gt;&gt; faktorial(0)\n    1\n    &gt;&gt;&gt; faktorial(1)\n    1\n    &gt;&gt;&gt; faktorial(5)\n    120\n    &gt;&gt;&gt; faktorial(-1)\n    Traceback (most recent call last):\n        ...\n    ValueError: Číslo n nesmí být záporné!\n    \"\"\"\n    if n &lt; 0:\n        raise ValueError(\"Číslo n nesmí být záporné!\")\n    vysledek = 1\n    for i in range(2, n + 1):\n        vysledek *= i\n    return vysledek\n\nif __name__ == \"__main__\":\n    import doctest\n    doctest.testmod()</pre>\n<h3>Spuštění z příkazové řádky:</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Pokud všechny testy projdou, nevypíše nic (tichý režim):\npython -m doctest matematika.py\n\n# Verbózní režim s detailním výpisem každého ověření:\npython -m doctest -v matematika.py</pre>\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Limity doctestu a přechod k formálnímu testování",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Limity doctestu a přechod k formálnímu testování</h2></div><div class=\"section-body\">\n<p>Modul <code>doctest</code> je skvělý pro rychlou dokumentaci a jednoduché čisté funkce. Má však zásadní omezení:</p>\n<h3>Kdy je <code>doctest</code> nevhodný?</h3>\n<ol>\n  <li><strong>Nestabilní výstupy</strong>: Slovníky před Pythonem 3.7 nebo množiny vypisují prvky v nedefinovaném pořadí. Adresy objektů v paměti (<code>&lt;Objekt at 0x7f8a...&gt;</code>) selžou při každém spuštění.</li>\n  <li><strong>Složité testovací stavy</strong>: Inicializace databáze, vytváření falešných síťových požadavků (Mocking) a vícestupňový setup promění docstring v nečitelný zmatek.</li>\n  <li><strong>Příliš dlouhé výstupy</strong>: Pokud funkce vrací tabulku o 1 000 řádcích, nelze ji celou vepsat do docstringu.</li>\n  <li><strong>Smíchání dokumentace a testů</strong>: Docstring má sloužit člověku jako návod k použití, nikoli jako skladiště hraničních testovacích případů (Edge Cases).</li>\n</ol>\n<p>Proto se pro reálné aplikace používají dedikované testovací frameworky: vestavěný <strong><code>unittest</code></strong> a moderní de facto standard <strong><code>pytest</code></strong>.</p>\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Standardní knihovna: Modul unittest",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Standardní knihovna: Modul unittest</h2></div><div class=\"section-body\">\n<p>Modul <strong><code>unittest</code></strong> (historicky nazývaný <em>PyUnit</em>) je součástí standardní knihovny a byl přímo inspirován Javovským frameworkem <strong>JUnit</strong>:</p>\n<ul>\n  <li>Testy se píší jako metody ve třídách dědících z <strong><code>unittest.TestCase</code></strong>.</li>\n  <li>Každá testovací metoda musí začínat předponou <strong><code>test_</code></strong>.</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># test_kalkulacka.py\nimport unittest\n\ndef deleni(a: float, b: float) -&gt; float:\n    if b == 0:\n        raise ZeroDivisionError(\"Dělení nulou není povoleno!\")\n    return a / b\n\nclass TestKalkulacka(unittest.TestCase):\n    def setUp(self):\n        \"\"\"Spustí se před KAŽDOU testovací metodou (příprava stavu).\"\"\"\n        self.vychozi_hodnota = 100.0\n\n    def tearDown(self):\n        \"\"\"Spustí se po KAŽDÉ testovací metodě (úklid prostředků).\"\"\"\n        pass\n\n    def test_kladne_deleni(self):\n        self.assertEqual(deleni(10.0, 2.0), 5.0)\n\n    def test_deleni_nulou(self):\n        with self.assertRaises(ZeroDivisionError):\n            deleni(10.0, 0.0)\n\nif __name__ == \"__main__\":\n    unittest.main()</pre>\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Assert metody v unittest",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Assert metody v unittest</h2></div><div class=\"section-body\">\n<p>Třída <code>unittest.TestCase</code> nabízí bohatou škálu specializovaných metod pro ověřování podmínek:</p>\n<table class=\"slide-table\"><thead><tr><th>Metoda unittestu</th><th>Co ověřuje</th><th>Ekvivalent v čistém Pythonu</th></tr></thead><tbody><tr><td><code>self.assertEqual(a, b)</code></td><td>a == b</td><td><code>assert a == b</code></td></tr><tr><td><code>self.assertNotEqual(a, b)</code></td><td>a != b</td><td><code>assert a != b</code></td></tr><tr><td><code>self.assertTrue(x)</code></td><td><code>bool(x) is True</code></td><td><code>assert x</code></td></tr><tr><td><code>self.assertFalse(x)</code></td><td><code>bool(x) is False</code></td><td><code>assert not x</code></td></tr><tr><td><code>self.assertIs(a, b)</code></td><td>a je identický objekt jako b</td><td><code>assert a is b</code></td></tr><tr><td><code>self.assertIsNone(x)</code></td><td>x je <code>None</code></td><td><code>assert x is None</code></td></tr><tr><td><code>self.assertIn(a, b)</code></td><td>a se nachází v kontejneru b</td><td><code>assert a in b</code></td></tr><tr><td><code>self.assertAlmostEqual(a, b, places=7)</code></td><td>Čísla s plovoucí řádovou čárkou</td><td><code>assert round(abs(a - b), 7) == 0</code></td></tr></tbody></table>\n<h3>Pozor na porovnávání reálných čísel (<code>float</code>)!</h3>\n<p>V binární reprezentaci IEEE 754 platí, že <code>0.1 + 0.2 != 0.3</code> (výsledkem je <code>0.30000000000000004</code>).</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># ŠPATNĚ: Selže kvůli zaokrouhlovací chybě reprezentace v paměti:\n# self.assertEqual(0.1 + 0.2, 0.3)\n\n# SPRÁVNĚ: Ověření shody na daný počet desetinných míst:\nself.assertAlmostEqual(0.1 + 0.2, 0.3, places=7)</pre>\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Test Discovery: Organizace testovacích sad",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Test Discovery: Organizace testovacích sad</h2></div><div class=\"section-body\">\n<p>V reálných projektech netestujeme voláním jednotlivých skriptů. Používá se mechanismus <strong>Test Discovery</strong>, který automaticky rekurzivně projde celý adresář projektu, najde všechny testy a spustí je najednou.</p>\n<h3>Standardní struktura projektu:</h3>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">muj_projekt/\n├── pyproject.toml\n├── src/\n│   └── balicek/\n│       ├── __init__.py\n│       └── jadro.py\n└── tests/\n    ├── __init__.py\n    ├── test_jadro.py\n    └── test_databaze.py</pre>\n<h3>Spuštění vyhledávání testů z terminálu:</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Spustí všechny testy odpovídající vzoru 'test*.py' v aktuální složce:\npython -m unittest discover -s tests -p \"test_*.py\"\n\n# Zkrácený zápis (pokud jsou testy ve složce tests/):\npython -m unittest</pre>\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Moderní standard v praxi: Framework pytest",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Moderní standard v praxi: Framework pytest</h2></div><div class=\"section-body\">\n<p>Ačkoli je <code>unittest</code> součástí standardní knihovny, <strong>více než 90 % moderních pythoních projektů používá framework <code>pytest</code></strong>.</p>\n<h3>Proč svět přešel od unittest k pytestu?</h3>\n<ol>\n  <li><strong>Žádné zbytečné OOP třídy</strong>: Test je <strong>obyčejná pythoní funkce</strong>, nikoli rigidní třída.</li>\n  <li><strong>Konec desítek assert metod</strong>: Používá se <strong>čistý vestavěný příkaz <code>assert</code></strong>.</li>\n  <li><strong>Méně boilerplatu</strong>: O 50–70 % méně kódu pro stejný testovací scénář.</li>\n  <li><strong>Mnohem bohatší ekosystém</strong>: Tisíce pluginů (<code>pytest-cov</code>, <code>pytest-asyncio</code>, <code>pytest-xdist</code>).</li>\n</ol>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Srovnání syntaxe: unittest vs. pytest\n\n# 1. Zastaralý unittest styl:\nimport unittest\nclass TestStary(unittest.TestCase):\n    def test_scitani(self):\n        self.assertEqual(secti(2, 3), 5)\n\n# 2. Moderní elegantní pytest styl:\ndef test_scitani():\n    assert secti(2, 3) == 5</pre>\n<p>Spuštění testů v terminálu je triviální: stačí spustit příkaz <code>pytest</code> (nebo <code>uv run pytest</code>).</p>\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Kouzlo nativního assert v pytestu",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Kouzlo nativního assert v pytestu</h2></div><div class=\"section-body\">\n<p>V čistém Pythonu příkaz <code>assert a == b</code> při selhání vyvolá pouze strohý <code>AssertionError`</code> bez jakýchkoli doplňujících informací. V <code>unittestu</code> jste proto museli volat <code>self.assertEqual(a, b)</code>, aby se vypsalo, jaké hodnoty proměnné měly.</p>\n<h3>Jak funguje magie v pytestu? (AST Rewriting)</h3>\n<p><code>pytest</code> při importu testovacích souborů <strong>přepíše jejich abstraktní syntaktický strom (AST - Abstract Syntax Tree)</strong>. Nahradí obyčejný <code>assert</code> komplexním inspekčním kódem.</p>\n<p>Když test selže, pytest vypíše <strong>hloubkovou dekompozici výrazu</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def test_analyza_vysledku():\n    seznam = [10, 20, 30]\n    hledany = 99\n    assert hledany in seznam</pre>\n<h3>Výstup v terminálu:</h3>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">&gt;       assert hledany in seznam\nE       AssertionError: assert 99 in [10, 20, 30]\nE        +  where 99 = hledany\nE        +  and   [10, 20, 30] = seznam</pre>\n<p>Nemusíte se učit žádné speciální assertovací metody — píšete přirozený Python a o zbytek se postará interpret.</p>\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Správa testovacích stavů: @pytest.fixture",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Správa testovacích stavů: @pytest.fixture</h2></div><div class=\"section-body\">\n<p>V <code>unittestu</code> se stav před testem inicializoval v metodě <code>setUp()</code>. To vedlo k problémům: pokud 10 testů potřebovalo různé konfigurace, třída se rozrostla o nepřehledné pomocné proměnné v <code>self</code>.</p>\n<p><code>pytest</code> řeší správu testovacích závislostí pomocí <strong>Fixtures</strong> na principu <strong>Dependency Injection</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import pytest\nimport sqlite3\n\n# 1. Definice fixture jako funkce s dekorátorem:\n@pytest.fixture\ndef testovaci_databaze():\n    \"\"\"Vytvoří dočasnou SQLite databázi v paměti a naplní ji testovacími daty.\"\"\"\n    conn = sqlite3.connect(\":memory:\")\n    conn.execute(\"CREATE TABLE uzivatele (id INT, jmeno TEXT)\")\n    conn.execute(\"INSERT INTO uzivatele VALUES (1, 'Karel'), (2, 'Eva')\")\n    return conn\n\n# 2. Použití v testu: jméno fixture předáme jako parametr funkce:\ndef test_pocet_uzivatelu(testovaci_databaze):\n    cursor = testovaci_databaze.cursor()\n    cursor.execute(\"SELECT COUNT(*) FROM uzivatele\")\n    pocet = cursor.fetchone()[0]\n    assert pocet == 2\n\ndef test_jmeno_prvniho(testovaci_databaze):\n    cursor = testovaci_databaze.cursor()\n    cursor.execute(\"SELECT jmeno FROM uzivatele WHERE id = 1\")\n    assert cursor.fetchone()[0] == \"Karel\"</pre>\n<p>Pytest automaticky rozpozná, že parametr <code>testovaci_databaze</code> odpovídá stejnojmenné fixture, spustí ji a předá její návratovou hodnotu do testu.</p>\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Životní cyklus fixture: yield a scope",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Životní cyklus fixture: yield a scope</h2></div><div class=\"section-body\">\n<p>Často potřebujete po skončení testu uklidit prostředky (zavřít soubor, smazat dočasnou složku, odpojit se od sítě). V pytestu se to řeší klíčovým slovem <strong><code>yield</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import pytest\nfrom pathlib import Path\n\n@pytest.fixture\ndef docasny_soubor(tmp_path: Path):\n    # Kód PŘED yield = setUp (inicializace):\n    f = tmp_path / \"mereni.txt\"\n    f.write_text(\"10.5\\n20.3\\n30.1\\n\", encoding=\"utf-8\")\n    \n    yield f  # Zde se předá řízení testu\n    \n    # Kód PO yield = tearDown (úklid po skončení testu):\n    if f.exists():\n        f.unlink()</pre>\n<h3>Úrovně platnosti (<code>scope</code>):</h3>\n<p>Ve výchozím stavu se fixture spouští znovu pro každý test (<code>scope=\"function\"</code>). Pokud je inicializace náročná (např. spuštění Docker kontejneru nebo trénování modelu), můžeme platnost rozšířit:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">@pytest.fixture(scope=\"module\")  # Spustí se 1x pro celý testovací soubor\ndef natrenovany_model():\n    return nacti_obri_model()</pre>\n<p>Možné hodnoty <code>scope</code>: <code>\"function\"</code> (výchozí), <code>\"class\"</code>, <code>\"module\"</code>, <code>\"package\"</code>, <code>\"session\"</code> (jednou pro celý běh pytestu).</p>\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Parametrizace testů: @pytest.mark.parametrize",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Parametrizace testů: @pytest.mark.parametrize</h2></div><div class=\"section-body\">\n<p>Představte si, že chcete otestovat validátor e-mailových adres na 20 různých vstupech. V pytestu použijeme dekorátor <strong><code>@pytest.mark.parametrize</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import pytest\n\ndef je_validni_vek(vek: int) -&gt; bool:\n    return 0 &lt;= vek &lt;= 120\n\n@pytest.mark.parametrize(\"zadany_vek, ocekavany_vysledek\", [\n    (25, True),      # Běžný věk\n    (0, True),       # Spodní hraniční hodnota\n    (120, True),     # Horní hraniční hodnota\n    (-1, False),     # Záporné číslo (neplatné)\n    (121, False),    # Příliš vysoký věk (neplatné)\n    (1000, False),   # Extrém\n])\ndef test_validace_veku(zadany_vek: int, ocekavany_vysledek: bool):\n    assert je_validni_vek(zadany_vek) == ocekavany_vysledek</pre>\n<h3>Výhoda v reportu:</h3>\n<p>Pytest nespustí jeden test s cyklem, ale vygeneruje <strong>6 samostatných nezávislých testů</strong>. Pokud jeden vstup selže, ostatní normálně proběhnou!</p>\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Programová varování: Modul warnings",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Programová varování: Modul warnings</h2></div><div class=\"section-body\">\n<p>Často potřebujete upozornit uživatele vaší knihovny na problém, který ale <strong>není fatální chybou</strong>:</p>\n<ul>\n  <li>Zastaralá funkce, která bude v příští verzi smazána (<em>Deprecation</em>).</li>\n  <li>Neoptimální konfigurace (např. pomalý fallback algoritmus).</li>\n  <li>Podezřelé hodnoty parametrů.</li>\n</ul>\n<p>V takovém případě nevyvoláváme výjimku (<code>raise Exception</code>), ale odešleme varování pomocí modulu <strong><code>warnings</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import warnings\n\ndef stary_vypocet(x: float) -&gt; float:\n    warnings.warn(\n        \"Funkce 'stary_vypocet' je zastaralá a bude v Pythonu 3.14 odstraněna. \"\n        \"Použijte 'novy_vypocet'.\",\n        category=DeprecationWarning,\n        stacklevel=2\n    )\n    return x * 2.0</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p><strong>Význam parametru stacklevel=2:</strong> Ve výchozím stavu (<code>stacklevel=1</code>) varování ukazuje na řádek s příkazem <code>warnings.warn(...)</code> uvnitř knihovny. Nastavením <code>stacklevel=2</code> se hlášení připíše <strong>kódu, který funkci zavolal</strong>, což programátorovi přesně ukáže místo v jeho vlastním skriptu.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Kategorie a filtrování varování",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Kategorie a filtrování varování</h2></div><div class=\"section-body\">\n<p>Standardní knihovna rozlišuje několik zabudovaných kategorií varování (dědí z <code>Warning</code>): <code>UserWarning</code>, <code>DeprecationWarning</code>, <code>SyntaxWarning</code>, <code>RuntimeWarning</code>.</p>\n<h3>Řízení varování přes filterwarnings:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import warnings\n\n# Potlačit všechna DeprecationWarning:\nwarnings.filterwarnings(\"ignore\", category=DeprecationWarning)\n\n# Změnit všechna varování na výjimky (zastaví běh programu):\nwarnings.filterwarnings(\"error\", category=UserWarning)</pre>\n<h3>Osvědčená praxe v CI/CD pipeline:</h3>\n<p>Při spouštění testů v produkci nebo na GitHub Actions spouštějte Python s přepínačem <strong><code>-W error</code></strong>: <code>python -W error -m pytest</code>. Tím zajistíte, že žádná zastaralá volání ani skrytá varování neprojdou do produkce bez povšimnutí!</p>\n</div>"
+    }
+,
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Měření výkonu: Proč time.time() nestačí?",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Měření výkonu: Proč time.time() nestačí?</h2></div><div class=\"section-body\">\n<p>Když začátečník měří rychlost kódu v Pythonu, obvykle sáhne po modulu <code>time</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># NAIVNÍ A NEPŘESNÉ MĚŘENÍ:\nimport time\n\nstart = time.time()\nvysledek = [x**2 for x in range(1_000_000)]\nkonec = time.time()\n\nprint(f\"Doba běhu: {konec - start} sekund\")</pre>\n<h3>Proč je toto měření pro mikrobenchmarky zcela nespolehlivé?</h3>\n<ol>\n  <li><strong>Nízké rozlišení hodin systému</strong>: Na starších OS může mít <code>time.time()</code> rozlišení jen 10–15 milisekund.</li>\n  <li><strong>Rušení Garbage Collectorem (GC)</strong>: Pokud během vašeho jediného měření proběhne cyklus vyhledávání kruhových referencí (GC collection), naměříte falešně vysoký čas.</li>\n  <li><strong>Plánovač operačního systému (OS Context Switching)</strong>: Přepnutí na jiný proces v systému zkreslí jednorázové měření.</li>\n  <li><strong>Vliv teplé CPU cache</strong>: První průchod je pomalejší kvůli načítání instrukcí do L1/L2 cache procesoru.</li>\n</ol>\n<p>Správným nástrojem je vestavěný modul <strong><code>timeit</code></strong>: Spustí kód milionkrát ve smyčce, dočasně vypne Garbage Collector a vybere minimální naměřený čas.</p>\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Použití modulu timeit v praxi",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Použití modulu timeit v praxi</h2></div><div class=\"section-body\">\n<p>Modul <code>timeit</code> lze používat jak z příkazové řádky, tak přímo uvnitř pythoního kódu:</p>\n<h3>1. Rychlé porovnání z příkazové řádky (CLI):</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Porovnání rychlosti tvorby seznamu: list() vs. []\npython -m timeit \"list()\"\n# 20000000 loops, best of 5: 14.5 nsec per loop\n\npython -m timeit \"[]\"\n# 50000000 loops, best of 5: 5.8 nsec per loop (2.5x rychlejší!)</pre>\n<h3>2. Programové měření v kódu:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import timeit\n\npriprava = \"data = list(range(1000))\"\nkod_hledani = \"999 in data\"\n\n# timeit.timeit(stmt, setup, number):\ndoba = timeit.timeit(stmt=kod_hledani, setup=priprava, number=10_000)\nprint(f\"Průměrný čas jednoho testu: {doba / 10_000 * 1e6:.2f} mikrosekund\")\n\n# timeit.repeat() provede více nezávislých sérií:\nserie = timeit.repeat(stmt=kod_hledani, setup=priprava, repeat=5, number=10_000)\nprint(f\"Nejlepší čas: {min(serie) / 10_000 * 1e6:.2f} µs\")</pre>\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Deterministické profilování: Modul cProfile",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Deterministické profilování: Modul cProfile</h2></div><div class=\"section-body\">\n<p>Zatímco <code>timeit</code> měří konkrétní izolovaný řádek kódu, <strong>profilování (Profiling)</strong> odpovídá na otázku: <strong>Ve kterých funkcích mé komplexní aplikace se ztrácí nejvíce času?</strong></p>\n<p>Podle Pareto principu platí, že 80 % času běhu stráví program v pouhých 20 % kódu (často v jediném vnitřním cyklu).</p>\n<p>Python obsahuje standardní C-rozšíření <strong><code>cProfile</code></strong> — deterministický profiler zaznamenávající každé volání funkce, čas strávený uvnitř funkce i čas v podvoláních.</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import cProfile\n\ndef slozity_vypocet():\n    # ... tisíce volání funkcí ...\n    pass\n\nprofiler = cProfile.Profile()\nprofiler.enable()\n\nslozity_vypocet()\n\nprofiler.disable()\nprofiler.dump_stats(\"vysledek.prof\")  # Uloží binární statistiku pro další analýzu</pre>\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Analýza profilu: Modul pstats",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Analýza profilu: Modul pstats</h2></div><div class=\"section-body\">\n<p>Pro čtení a formátování výsledků profilování slouží modul <strong><code>pstats</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import pstats\n\np = pstats.Stats(\"vysledek.prof\")\np.strip_dirs()\np.sort_stats(\"cumulative\").print_stats(10)</pre>\n<h3>Význam sloupců v reportu cProfile:</h3>\n<ul>\n  <li><strong><code>ncalls</code></strong>: Počet volání dané funkce.</li>\n  <li><strong><code>tottime</code> (Total Time)</strong>: Čistý čas strávený <strong>výhradně v těle dané funkce</strong> (bez započtení volání jiných podfunkcí). <em>Klíčový ukazatel pro optimalizaci!</em></li>\n  <li><strong><code>cumtime</code> (Cumulative Time)</strong>: Celkový čas od vstupu do funkce až po její opuštění (včetně všech volaných podfunkcí).</li>\n  <li><strong><code>percall</code></strong>: Průměrný čas na jedno volání (<code>tottime / ncalls</code> resp. <code>cumtime / ncalls</code>).</li>\n</ul>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p><strong>Kam zaměřit optimalizaci?</strong> Vždy hledejte funkce s vysokým <strong>tottime</strong>. Pokud funkce volá jinou knihovnu (vysoký cumtime, ale nízký tottime), problém není v ní, ale v podfunkci.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "Statické typové anotace: PEP 484 & Modul typing",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Statické typové anotace: PEP 484 &amp; Modul typing</h2></div><div class=\"section-body\">\n<p>Od Pythonu 3.5 zavedl standard <strong>PEP 484</strong> do jazyka volitelný systém <strong>typových anotací (Type Hints)</strong>.</p>\n<p>Anotace nemají <strong>žádný vliv na chování programu za běhu</strong>. Interpret CPython je v runtime ignoruje (pouze je uloží do atributu <code>__annotations__</code>).</p>\n<p>Slouží však pro statickou analýzu kódu (<code>mypy</code>, <code>ruff</code>), našeptávání v IDE a dokumentaci rozhraní:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Základní syntaxe anotací proměnných a funkcí:\njmeno: str = \"Alice\"\nvek: int = 30\nvaha: float = 65.5\nje_student: bool = False\n\ndef spocitej_index(vahy: list[float], faktor: float = 1.0) -&gt; float:\n    return sum(vahy) * faktor</pre>\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "Moderní typová syntaxe (Python 3.10–3.12)",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Moderní typová syntaxe (Python 3.10–3.12)</h2><span class=\"modern-python-pill\" title=\"Modernizovaný výklad pro Python 3.12+\">✨ Python 3.12+</span></div><div class=\"section-body\">\n<p>V moderním Pythonu 3.10+ je syntaxe typů čistá a přirozená:</p>\n<h3>1. Sjednocení typů operátorem <code>|</code> (PEP 604)</h3>\n<p>Nahrazuje staré <code>Union[int, str]</code> a <code>Optional[int]</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def najdi_id(dotaz: str | int) -&gt; int | None:\n    if isinstance(dotaz, str) and not dotaz.isdigit():\n        return None\n    return int(dotaz)</pre>\n<h3>2. Vestavěné generické kontejnery (PEP 585)</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">uzivatele: dict[str, list[int]] = {\"admin\": [1, 2, 3]}\nsouradnice: tuple[float, float, float] = (10.0, 20.0, 5.0)</pre>\n<h3>3. Nový příkaz <code>type</code> pro type aliasy (PEP 695 - Python 3.12+)</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">type MaticovyRadek = list[float]\ntype Matice = list[MaticovyRadek]</pre>\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "Statický typový kontrolor: Nástroj mypy",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Statický typový kontrolor: Nástroj mypy</h2></div><div class=\"section-body\">\n<p><strong><code>mypy</code></strong> je nezávislý statický typový analyzátor pro Python vyvíjený pod záštitou Dropboxu a tvůrce jazyka Guida van Rossuma. Spouští se <strong>před spuštěním kódu</strong> a analyzuje celý projekt podobně jako kompilátor v Javě nebo C++.</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># priklad_chyby.py\ndef ziskej_delku(text: str | None) -&gt; int:\n    # mypy zde nahlásí CHYBU: Item \"None\" of \"str | None\" has no attribute \"strip\"\n    return len(text.strip())</pre>\n<h3>Chybový report mypy:</h3>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">priklad_chyby.py:3: error: Item \"None\" of \"str | None\" has no attribute \"strip\"  [union-attr]</pre>\n<h3>Oprava kódu s využitím Type Guard:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def ziskej_delku(text: str | None) -&gt; int:\n    if text is None:\n        return 0\n    # Mypy ví, že za if podmínkou už text MŮŽE BÝT POUZE str (Type Narrowing):\n    return len(text.strip())</pre>\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Přechod k akceleraci: Proč je CPython pomalý?",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Přechod k akceleraci: Proč je CPython pomalý?</h2></div><div class=\"section-body\">\n<p>Standardní referenční interpret CPython je zhruba <strong>10× až 100× pomalejší než kompilované jazyky C nebo Rust</strong> na čistě CPU-bound úlohách:</p>\n<h3>Tři hlavní důvody pomalosti CPythonu:</h3>\n<ol>\n  <li><strong>Interpretovaný Bytecode</strong>: Každá operace prochází vyhodnocovací smyčkou virtuálního stroje (velký <code>switch</code> v C jádře interpretu).</li>\n  <li><strong>Boxing do <code>PyObject</code></strong>: Každé číslo v Pythonu je 28bajtový objekt na haldě s čítačem referencí a dynamickým typovým deskriptorem.</li>\n  <li><strong>Dynamický method lookup</strong>: Při volání <code>obj.metoda()</code> interpret v každé iteraci prochází slovník třídy <code>__dict__</code> a lineární strom MRO.</li>\n  <li><strong>Global Interpreter Lock (GIL)</strong>: Zabraňuje paralelnímu běhu více nativních vláken v jednom procesu Pythonu.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "Úvod do Cythonu: Most mezi Pythonem a C",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">Úvod do Cythonu: Most mezi Pythonem a C</h2></div><div class=\"section-body\">\n<p><strong>Cython</strong> je programovací jazyk a kompilátor, který představuje <strong>nadmnožinu jazyka Python s podporou C datových typů</strong>.</p>\n<h3>Základní koncept:</h3>\n<ol>\n  <li>Vezmete existující pythoní kód a uložíte jej s příponou <strong><code>.pyx</code></strong>.</li>\n  <li>Již pouhá kompilace čistého Python kódu Cythonem přinese 2× až 5× zrychlení (odstraní se režie interpretace bytekódu).</li>\n  <li>Pokud do kódu doplníte <strong>statické typové deklarace v jazyce C</strong>, Cython vygeneruje C kód, který pracuje přímo se surovými registry a pamětí procesoru.</li>\n  <li>Výsledek dosahuje <strong>100× až 200× zrychlení</strong>, srovnatelného s ručně psaným C++.</li>\n</ol>\n<p>Knihovny jako <strong>NumPy, SciPy, Pandas a scikit-learn</strong> mají své nejrychlejší vnitřní algoritmy napsané právě v Cythonu!</p>\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Statické typování v Cythonu: Klíčové slovo cdef",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Statické typování v Cythonu: Klíčové slovo cdef</h2></div><div class=\"section-body\">\n<p>Klíčem k extrémnímu výkonu v Cythonu je klíčové slovo <strong><code>cdef</code></strong>. Umožňuje deklarovat proměnné se <strong>statickými typy jazyka C</strong>:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\"># vypocet_cy.pyx\ndef prvocisla_cython(int limit):\n    # Deklarace C typů: tyto proměnné nealokují žádný PyObject!\n    cdef int i, j, n\n    cdef bint je_prvocislo\n    cdef list vysledky = []\n\n    for n in range(2, limit):\n        je_prvocislo = True\n        for i in range(2, int(n ** 0.5) + 1):\n            if n % i == 0:\n                je_prvocislo = False\n                break\n        if je_prvocislo:\n            vysledky.append(n)\n            \n    return vysledky</pre>\n<p>Proměnné <code>i</code>, <code>j</code>, <code>n</code> jsou uloženy přímo v <strong>CPU registrech</strong> nebo na zásobníku jako 32/64bitová celá čísla bez režie <code>PyObject</code>.</p>\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "Tři typy funkcí v Cythonu: def, cdef a cpdef",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Tři typy funkcí v Cythonu: def, cdef a cpdef</h2></div><div class=\"section-body\">\n<p>Cython rozlišuje tři způsoby definice funkcí podle toho, odkud a jak mají být volány:</p>\n<h3>1. <code>def</code> (Standardní Python funkce)</h3>\n<ul>\n  <li>Volatelná z běžného Python kódu.</li>\n  <li>Vstupní parametry a návratová hodnota se převádějí mezi C typy a <code>PyObject</code>.</li>\n</ul>\n<h3>2. <code>cdef</code> (Čistá C funkce)</h3>\n<ul>\n  <li><strong>Nelze volat z čistého Pythonu!</strong> Slouží jako rychlá vnitřní pomocná funkce v Cythonu.</li>\n  <li>Přímé volání na úrovni C stacku bez jakékoliv režie Pythonu.</li>\n</ul>\n<h3>3. <code>cpdef</code> (Hybridní obojetná funkce)</h3>\n<ul>\n  <li>Při volání z Pythonu se chová jako <code>def</code>, při volání z Cythonu se volá jako blesková <code>cdef</code> funkce.</li>\n</ul>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">cdef double euklid_c(double x1, double y1, double x2, double y2):\n    return ((x2 - x1)**2 + (y2 - y1)**2)**0.5\n\ncpdef double spocitej_vzdalenost(double x1, double y1, double x2, double y2):\n    return euklid_c(x1, y1, x2, y2)</pre>\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Uvolnění GIL v Cythonu: nogil paralelismus",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Uvolnění GIL v Cythonu: nogil paralelismus</h2></div><div class=\"section-body\">\n<p>Protože čistý C kód nepotřebuje přistupovat k interním strukturám CPythonu ani k <code>PyObject</code>, Cython umožňuje <strong>uvolnit GIL pomocí klíčového slova <code>nogil</code></strong>:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\"># acely_vypocet.pyx\nfrom cython.parallel import prange\n\ndef paralelni_zpracovani(double[:] vstup, double[:] vystup, int n):\n    cdef int i\n    \n    # Blok 'with nogil' uvolní GIL -&gt; CPU jádra mohou běžet 100% paralelně!\n    with nogil:\n        # prange = paralelní for-cyklus v OpenMP (využije všechna CPU jádra):\n        for i in prange(n, schedule='static'):\n            vystup[i] = vstup[i] * 2.5 + 1.2</pre>\n<div class=\"notes-block\"><div class=\"note-item caution\"><span class=\"note-icon\">🛑</span><div class=\"note-content\"><p><strong>Pravidla v bloku nogil:</strong> Uvnitř sekce <code>with nogil:</code> <strong>nesmíte vytvořit ani použít žádný pythoní objekt</strong> (žádné seznamy, slovníky, print(), ani volání běžných Python funkcí). Pracovat lze výhradně se surovými C typy, poli a C knihovnami.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Most k praxi a shrnutí 11. přednášky",
+      "tags": ["Core"],
+      "diff": "wow",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Most k praxi a shrnutí 11. přednášky</h2></div><div class=\"section-body\">\n<p>Dnešní přednáška završila přechod od skriptování k profesionálnímu softwarovému inženýrství:</p>\n<h3>Shrnutí klíčových bodů:</h3>\n<ol>\n  <li><strong><code>doctest</code></strong>: Skvělý pro živou, ověřitelnou dokumentaci v docstringách.</li>\n  <li><strong><code>unittest</code> vs. <code>pytest</code></strong>: <code>unittest</code> poskytuje formální OOP základ ve stdlib, ale moderní standard je <strong><code>pytest</code></strong> s přirozeným příkazem <code>assert</code> a mocnými <code>@pytest.fixture</code>.</li>\n  <li><strong>Varování (<code>warnings</code>)</strong>: Používejte <code>warnings.warn()</code> pro zastaralý kód a parametr <code>-W error</code> v CI/CD pipeline.</li>\n  <li><strong>Měření a profilování</strong>: Nikdy nepoužívejte <code>time.time()</code> pro mikrobenchmarky (použijte <code>timeit</code>). Hledejte úzká hrdla pomocí <code>cProfile</code> a řaďte podle <code>tottime</code>.</li>\n  <li><strong>Typová kontrola (<code>mypy</code>)</strong>: Statické typové anotace v Pythonu 3.10+ (<code>|</code>, generika) eliminují celou třídu běhových chyb ještě před nasazením.</li>\n  <li><strong>Cython</strong>: Umožňuje kompilaci do nativního C/C++ kódu, odstranění <code>PyObject</code> režie přes <code>cdef</code> a skutečný paralelismus uvolněním GIL (<code>with nogil:</code>).</li>\n</ol>\n<p>V závěrečné 12. přednášce propojíme tyto znalosti se <strong>systémovým programováním, CLI rozhraními a Milestone 3</strong>!</p>\n</div>"
+    }
+  ]
+}

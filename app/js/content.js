@@ -1121,9 +1121,9 @@ export async function fetchAndExtract(path) {
     if (Array.isArray(cached) && cached.length > 0) return cached;
   }
 
-  const cleanRel = path.replace(/\\/g, "/").replace(/^.*?vyuka_downloaded\//, "").replace(/^\//, "").replace(/\.html?$/, "");
+  const cleanRel = path.replace(/\\/g, "/").replace(/^.*?(vyuka_downloaded|content)\//, "").replace(/^\//, "").replace(/\.(html?|md)$/, "");
   const pathSlug = cleanRel.replace(/[\/\\]/g, "--");
-  const baseName = path.split("/").pop().replace(/\.html?$/, "");
+  const baseName = path.split("/").pop().replace(/\.(html?|md)$/, "");
 
   // 1. Try static pre-rendered JSON slide tree (canonical pathSlug, then fallback to baseName)
   const candidates = [pathSlug, baseName].filter(Boolean);
@@ -1135,6 +1135,17 @@ export async function fetchAndExtract(path) {
         const slides = Array.isArray(data) ? data : (data?.slides && Array.isArray(data.slides) ? data.slides : null);
         if (slides && slides.length > 0) {
           cache.set(path, slides);
+          if (!state.pagesIndex[path] || !state.pagesIndex[path].length) {
+            const mappedPages = slides.map((sl) => ({
+              id: sl.id,
+              title: sl.title,
+              tags: sl.tags || ["Core"],
+              diff: sl.diff || "basics",
+              is_intersection: !!sl.is_intersection,
+            }));
+            state.pagesIndex[path] = mappedPages;
+            state.pagesIndex[pathSlug] = mappedPages;
+          }
           return slides;
         }
       }

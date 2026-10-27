@@ -1,0 +1,249 @@
+{
+  "slug": "lectures--week-04",
+  "total": 27,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod a osnova",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod a osnova</h2></div><div class=\"section-body\">\n<p>Vítejte ve čtvrté přednášce kurzu programování v jazyce Python. Dnešním tématem jsou hešovací datové struktury — slovníky (<code>dict</code>) a množiny (<code>set</code>) — a moderní architektura ošetřování chyb založená na výjimkách.</p>\n<h3>Osnova dnešní 90minutové přednášky:</h3>\n<ol>\n  <li><strong>Hešování pod kapotou</strong>: Princip hešovatelnosti (<code>hash()</code>, <code>__hash__</code>, <code>__eq__</code>) a proč měnitelné objekty nesmí být klíči.</li>\n  <li><strong>Kompaktní hešovací tabulka (PEP 468)</strong>: Architektura CPythonu od verze 3.6/3.7, úspora paměti a garantované pořadí vkládání.</li>\n  <li><strong>Slovníky (<code>dict</code>)</strong>: Bezpečný přístup přes <code>.get()</code>, dynamické pohledy (<code>keys</code>, <code>values</code>, <code>items</code>) a moderní operátory sjednocení <code>|</code> a <code>|=</code> (PEP 584).</li>\n  <li><strong>Množiny (<code>set</code> &amp; <code>frozenset</code>)</strong>: Deduplikace dat, testy příslušnosti v $O(1)$ a množinová algebra (<code>|</code>, <code>&amp;</code>, <code>-</code>, <code>^</code>).</li>\n  <li><strong>Dict a Set Comprehensions</strong>: Elegantní jednorázové transformace a filtrování kolekcí.</li>\n  <li><strong>Filozofie ošetřování chyb</strong>: Kontrola předem (LBYL) vs. Pythonic odpuštění (EAFP: <em>Easier to Ask for Forgiveness than Permission</em>).</li>\n  <li><strong>Anatomie výjimek</strong>: Úplný cyklus <code>try-except-else-finally</code>, hierarchie <code>Exception</code> a toxický antipattern <code>except: pass</code>.</li>\n  <li><strong>Pokročilé techniky</strong>: Řetězení chyb <code>raise ... from err</code>, kontextové poznámky <code>add_note()</code> a skupiny výjimek <code>ExceptionGroup</code> s <code>except*</code> (PEP 654).</li>\n  <li><strong>Produkční most</strong>: Pokročilé agregace s <code>collections.defaultdict</code> a frekvenční analýza s <code>collections.Counter</code>.</li>\n  <li><strong>Most k Milníku 1</strong>: Návrh robustního frekvenčního analyzátoru textu.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "Hešování pod kapotou: Co je hešovatelnost (Hashability)",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Hešování pod kapotou: Co je hešovatelnost (Hashability)</h2></div><div class=\"section-body\">\n<p>Jak dokáže slovník vyhledat hodnotu mezi milionem položek v okamžitém čase <strong>$O(1)$</strong>?</p>\n<p>Pod kapotou leží matematická <strong>hešovací funkce</strong>:</p>\n<p>$$\\text{klíč} \\xrightarrow{\\quad\\text{hash()}\\quad} \\text{64bitové celé číslo} \\xrightarrow{\\quad \\pmod{\\text{kapacita}}\\quad} \\text{index slotu v tabulce}$$</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">print(hash(\"Aspirin\"))        # např. 7283648102938472910\nprint(hash((1, 2, 3)))        # např. 529344067295497451\nprint(hash(42))               # 42</pre>\n<h3>Podmínky hešovatelnosti objektu v Pythonu:</h3>\n<p>Objekt je hešovatelný (splňuje rozhraní <code>collections.abc.Hashable</code>), pokud:</p>\n<ol>\n  <li>Má definovanou metodu <code>__hash__()</code>, která vrací stejné celé číslo po celou dobu existence objektu.</li>\n  <li>Má definovanou metodu <code>__eq__()</code> pro test rovnosti.</li>\n  <li><strong>Platí axiom rovnosti</strong>: Pokud se dva objekty rovnají (<code>a == b</code>), jejich heše <strong>musí být identické</strong> (<code>hash(a) == hash(b)</code>).</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Proč měnitelné objekty nesmí být hešovatelné?",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Proč měnitelné objekty nesmí být hešovatelné?</h2></div><div class=\"section-body\">\n<p>Co by se stalo, kdybychom jako klíč ve slovníku použili měnitelný seznam <code>list</code>?</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">klic = [1, 2]\n# muj_dict[klic] = \"hodnota\"  # TypeError: unhashable type: 'list'</pre>\n<h3>Katastrofický scénář, kterému Python zabraňuje:</h3>\n<ol>\n  <li>Vložíte <code>klic = [1, 2]</code> do slovníku. Hešovací funkce spočítá heš a uloží prvek do slotu číslo 5.</li>\n  <li>Následně seznam na místě modifikujete: <code>klic.append(3)</code>.</li>\n  <li>Obsah seznamu se změnil, a tím se změnil i jeho hypotetický heš!</li>\n  <li>Když se později pokusíte zavolat <code>muj_dict[klic]</code>, Python spočítá nový heš, podívá se do slotu číslo 12 a nahlásí: <strong>Klíč nenalezen!</strong></li>\n  <li>Původní položka ve slotu 5 by zůstala navždy uvězněna jako nedosažitelný \"zombie\" záznam v paměti!</li>\n</ol>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">❗</span><div class=\"note-content\"><p>Všechny vestavěné <strong>neměnné (immutable)</strong> typy (<code>int</code>, <code>float</code>, <code>str</code>, <code>tuple</code>, <code>frozenset</code>, <code>bytes</code>) jsou hešovatelné. Všechny <strong>měnitelné (mutable)</strong> typy (<code>list</code>, <code>dict</code>, <code>set</code>) jsou striktně nehešovatelné.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "C/Java vs. CPython: Kompaktní hešovací tabulka",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">C/Java vs. CPython: Kompaktní hešovací tabulka</h2></div><div class=\"section-body\">\n<p>V C++ (<code>std::unordered_map</code>) a starém Pythonu (před verzí 3.6) se hešovací tabulka skládala z jednoho velkého řídkého pole, kde většina slotů zela prázdnotou:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">[ Tradiční řídká hešovací tabulka (Java HashMap, starý Python) ]\nSlot 0:  EMPTY\nSlot 1:  [ hash, key_ptr, value_ptr ]  (24 bajtů)\nSlot 2:  EMPTY\nSlot 3:  EMPTY\nSlot 4:  [ hash, key_ptr, value_ptr ]  (24 bajtů)\n--&gt; Obrovské plýtvání pamětí: 66 % slotů musí zůstat prázdných kvůli kolizím!\n--&gt; Pořadí prvků bylo pseudonáhodné a záviselo na heších!</pre>\n<h3>Revoluce: Kompaktní slovník CPythonu (Raymond Hettinger, PEP 468):</h3>\n<p>Od Pythonu 3.6/3.7 CPython oddělil indexy od samotných dat do dvou polí:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">Indices (řídké pole malých čísel, 1 B per slot):\n  [ -1,  0, -1, -1,  1, -1, -1, -1 ]\n\nEntries (husté pole záznamů, přesně tolik slotů, kolik je prvků):\n  Index 0: [ hash1, \"klic_A\", 100 ]\n  Index 1: [ hash2, \"klic_B\", 200 ]</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p><strong>Dva revoluční důsledky</strong>:<br>1. Úspora paměti o <strong>20 až 25 %</strong> oproti tradičním hešovacím tabulkám.<br>2. Slovníky si <strong>striktně pamatují pořadí vkládání prvků (Insertion Order)</strong> jako oficiální součást jazykového standardu!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Práce se slovníkem: Indexace vs. .get()",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Práce se slovníkem: Indexace vs. .get()</h2></div><div class=\"section-body\">\n<p>Slovník je asociativní pole mapující unikátní klíče na libovolné hodnoty:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">ceny = {\"jablko\": 25, \"banan\": 38, \"pomeranc\": 42}\n\n# 1. Čtení pomocí hranatých závorek []:\nprint(ceny[\"banan\"])     # 38\n# print(ceny[\"meloun\"])  # KeyError: 'meloun' ! Zastaví celý program!\n\n# 2. Bezpečné čtení metodou .get(key, default=None):\nprint(ceny.get(\"meloun\"))         # None (žádná výjimka nevznikne)\nprint(ceny.get(\"meloun\", 0))      # 0 (uživatelská výchozí hodnota)\n\n# 3. Test existence klíče operátorem in:\nif \"jablko\" in ceny:              # O(1) blesková hešovací kontrola!\n    print(\"Máme jablka na skladě.\")\n\n# 4. Zápis a přepsání:\nceny[\"kiwi\"] = 55       # Vloží nový klíč\nceny[\"jablko\"] = 28     # Přepíše stávající hodnotu</pre>\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Dynamické pohledy na slovník (Dictionary Views)",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Dynamické pohledy na slovník (Dictionary Views)</h2></div><div class=\"section-body\">\n<p>V Pythonu 2 vracely metody <code>keys()</code> a <code>values()</code> statické zkopírované seznamy. V moderním Pythonu 3 vrací <strong>dynamické pohledy (Views)</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">sklad = {\"triko\": 15, \"kalhoty\": 8, \"bunda\": 3}\n\nk = sklad.keys()\nv = sklad.values()\nit = sklad.items()\n\nprint(it)  # dict_items([('triko', 15), ('kalhoty', 8), ('bunda', 3)])\n\n# Změníme slovník:\nsklad[\"cepice\"] = 20\n\n# Pohled k okamžitě a bez alokace reflektuje změnu!\nprint(k)   # dict_keys(['triko', 'kalhoty', 'bunda', 'cepice'])</pre>\n<h3>Procházení slovníku ve smyčce:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">for polozka, pocet in sklad.items():\n    print(f\"{polozka:10s} : {pocet:3d} ks\")</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">💡</span><div class=\"note-content\"><p>Pohledy <code>keys()</code> a <code>items()</code> se chovají jako <strong>množiny</strong>! Můžete nad nimi provádět množinové operace: <code>dict_a.keys() &amp; dict_b.keys()</code> okamžitě vrátí společné klíče.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Modifikace a slučování: Operátory | a |= (PEP 584)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Modifikace a slučování: Operátory | a |= (PEP 584)</h2></div><div class=\"section-body\">\n<p>Od Pythonu 3.9 můžete slovníky elegantně slučovat pomocí operátoru roury <code>|</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">vychozi_konfigurace = {\"host\": \"localhost\", \"port\": 8080, \"debug\": True}\nuzivatelska_volba   = {\"port\": 5000, \"debug\": False, \"timeout\": 30}\n\n# 1. Nový sloučený slovník (hodnoty vpravo přepisují hodnoty vlevo):\naktivni_konfig = vychozi_konfigurace | uzivatelska_volba\nprint(aktivni_konfig)\n# {'host': 'localhost', 'port': 5000, 'debug': False, 'timeout': 30}\n\n# 2. In-place modifikace stávajícího slovníku pomocí |= :\nvychozi_konfigurace |= {\"timeout\": 60}\n\n# 3. Metoda .setdefault(key, default):\n# Vrátí hodnotu klíče, a pokud klíč neexistuje, nejprve jej do slovníku vloží!\nskupiny = {}\nskupiny.setdefault(\"A\", []).append(\"Alice\")\nskupiny.setdefault(\"A\", []).append(\"Adam\")\nprint(skupiny)  # {'A': ['Alice', 'Adam']}</pre>\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Množiny (set): Rychlá deduplikace a O(1) hledání",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Množiny (set): Rychlá deduplikace a O(1) hledání</h2></div><div class=\"section-body\">\n<p>Množina <code>set</code> je neuspořádaná kolekce <strong>unikátních hešovatelných prvků</strong>.</p>\n<p>Pod kapotou funguje stejně jako <code>dict</code>, ale ukládá pouze heš a klíč (hodnota je prázdná).</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># 1. Vytvoření množiny:\ncisla = {1, 2, 3, 2, 1, 4}\nprint(cisla)  # {1, 2, 3, 4} (duplicity byly automaticky zahozeny!)\n\n# 2. POZOR na vytvoření prázdné množiny:\nprazdna = set()  # Jediný správný způsob!\n# prazdna = {}   # CHYBA! To vytvoří prázdný slovník dict, nikoliv set!\n\n# 3. Blesková deduplikace velkého seznamu v čase O(n):\nid_pacientu = [102, 105, 102, 108, 105, 109, 102]\nunikatni = list(set(id_pacientu))\nprint(unikatni)  # [102, 105, 108, 109]</pre>\n<h3>Vyhledávání prvku: list vs. set:</h3>\n<ul>\n  <li>V seznamu <code>list</code> vyžaduje operátor <code>x in seznam</code> <strong>lineární průchod $O(n)$</strong>.</li>\n  <li>V množině <code>set</code> vyžaduje operátor <code>x in mnozina</code> <strong>hešovací skok $O(1)$</strong>!</li>\n  <li>Pro kolekci o $100\\,000$ prvcích je <code>set</code> typicky <strong>$5\\,000\\times$ až $10\\,000\\times$ rychlejší</strong>!</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Množinová algebra v Pythonu",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Množinová algebra v Pythonu</h2></div><div class=\"section-body\">\n<p>Python nabízí plnou matematickou množinovou algebru přímo v operátorech:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">skupina_A = {\"Alice\", \"Bob\", \"Cyril\", \"David\"}\nskupina_B = {\"Cyril\", \"David\", \"Eva\", \"Filip\"}\n\n# 1. Sjednocení (Union) -- v A nebo v B:\nprint(skupina_A | skupina_B)\n# {'Alice', 'Bob', 'Cyril', 'David', 'Eva', 'Filip'}\n\n# 2. Průnik (Intersection) -- v A a zároveň v B:\nprint(skupina_A &amp; skupina_B)\n# {'Cyril', 'David'}\n\n# 3. Rozdíl (Difference) -- v A, ale ne v B:\nprint(skupina_A - skupina_B)\n# {'Alice', 'Bob'}\n\n# 4. Symetrický rozdíl (Symmetric Difference) -- v A nebo v B, ale ne v obou:\nprint(skupina_A ^ skupina_B)\n# {'Alice', 'Bob', 'Eva', 'Filip'}\n\n# 5. Podmnožina a nadmnožina:\nprint({\"Cyril\", \"David\"} &lt;= skupina_A)  # True (podmnožina)</pre>\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Zmrazené množiny: Typ frozenset",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Zmrazené množiny: Typ frozenset</h2></div><div class=\"section-body\">\n<p>Běžná množina <code>set</code> je měnitelná (lze volat <code>.add()</code>, <code>.discard()</code>), a proto <strong>není hešovatelná</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Nelze vytvořit množinu množin:\n# mnoziny = {{1, 2}, {3, 4}}  # TypeError: unhashable type: 'set'</pre>\n<h3>Řešení: Neměnná zmrazená množina frozenset:</h3>\n<p><code>frozenset</code> je immutable obdoba typu <code>set</code>. Jakmile je vytvořen, nelze jej měnit, má stálý heš a je plně hešovatelný:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">mnozina_1 = frozenset([1, 2])\nmnozina_2 = frozenset([3, 4])\n\n# 1. Frozenset jako prvek v jiné množině:\nkomplexni_mnozina = {mnozina_1, mnozina_2}\nprint(len(komplexni_mnozina))  # 2\n\n# 2. Frozenset jako klíč ve slovníku:\n# (Ideální pro grafové hrany mezi neorientovanými uzly!)\nvzdalenosti = {\n    frozenset({\"Praha\", \"Brno\"}): 205,\n    frozenset({\"Praha\", \"Plzen\"}): 95,\n}\n\nprint(vzdalenosti[frozenset({\"Brno\", \"Praha\"})])  # 205 (pořadí nehraje roli!)</pre>\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Generátory slovníků a množin (Comprehensions)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Generátory slovníků a množin (Comprehensions)</h2></div><div class=\"section-body\">\n<p>Stejně jako u seznamů můžete slovníky a množiny tvořit deklarativně v jediné linii:</p>\n<h3>1. Set Comprehension:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">text = \"Bioinformatika a chemie lékových struktur\"\n# Získat unikátní malá písmena, která nejsou mezery:\nsamohlasky = {znak.lower() for znak in text if znak.lower() in \"aeiouy\"}\nprint(samohlasky)  # {'a', 'e', 'i', 'o', 'u', 'y'}</pre>\n<h3>2. Dict Comprehension:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\ngeny = [\"TP53\", \"EGFR\", \"BRCA1\", \"MYC\"]\n\n# Vytvoření indexového slovníku: název -&gt; délka řetězce\ndelky = {gen: len(gen) for gen in geny}\nprint(delky)  # {'TP53': 4, 'EGFR': 4, 'BRCA1': 5, 'MYC': 3}\n\n# Invertování slovníku (prohození klíčů a hodnot):\npuvodni = {\"a\": 1, \"b\": 2, \"c\": 3}\nobraceny = {v: k for k, v in puvodni.items()}\nprint(obraceny)  # {1: 'a', 2: 'b', 3: 'c'}</pre>\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Filozofie ošetřování chyb: LBYL vs. EAFP",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Filozofie ošetřování chyb: LBYL vs. EAFP</h2></div><div class=\"section-body\">\n<p>Jak přistupovat k situacím, kde může nastat chyba (soubor neexistuje, klíč chybí, dělení nulou)?</p>\n<h3>1. Tradiční C / Java přístup: LBYL (Look Before You Leap)</h3>\n<p><em>Dvakrát měř, jednou řež.</em> Před každou operací nejprve složitě testujeme všechny podmínky:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Styl LBYL (Neoptimální a upovídaný v Pythonu):\nif \"uzivatel\" in session:\n    if \"role\" in session[\"uzivatel\"]:\n        role = session[\"uzivatel\"][\"role\"]\n    else:\n        role = \"guest\"</pre>\n<h3>2. Pythonic přístup: EAFP (Easier to Ask for Forgiveness than Permission)</h3>\n<p><em>Raději požádej o odpuštění, než o svolení.</em> Předpokládejte, že operace proběhne v pořádku, a případnou chybu odchyťte výjimkou:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Styl EAFP (Idiomatický moderní Python):\ntry:\n    role = session[\"uzivatel\"][\"role\"]\nexcept KeyError:\n    role = \"guest\"</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">💡</span><div class=\"note-content\"><p><strong>Proč je EAFP v Pythonu lepší?</strong><br>1. <strong>Rychlost (Happy Path)</strong>: Pokud chyba nenastane (což je 99 % případů), blok <code>try</code> nezpůsobuje žádné zpoždění.<br>2. <strong>Prevence Race Conditions (TOCTOU)</strong>: Mezi kontrolou <code>if os.path.exists(f)</code> a otevřením souboru <code>open(f)</code> mohl jiný proces soubor smazat! EAFP soubor rovnou otevře a zachytí <code>FileNotFoundError</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Kostra ošetření chyb: try - except - else - finally",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Kostra ošetření chyb: try - except - else - finally</h2></div><div class=\"section-body\">\n<p>Python nabízí čtyřdílnou konstrukci pro robustní správu běhových stavů:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">try:\n    # 1. Zde provádíme kód, který MŮŽE vyvolat výjimku:\n    f = open(\"vysledky.txt\", \"r\", encoding=\"utf-8\")\n    data = f.read()\n    hodnota = float(data.strip())\nexcept FileNotFoundError:\n    # 2. Spustí se POUZE, pokud soubor neexistuje:\n    print(\"Soubor nebyl nalezen, použijeme výchozí hodnotu 0.0\")\n    hodnota = 0.0\nexcept ValueError as e:\n    # 3. Spustí se POUZE, pokud text nelze převést na float:\n    print(f\"Data v souboru jsou poškozená: {e}\")\n    hodnota = 0.0\nelse:\n    # 4. Spustí se POUZE, pokud v bloku try NENASTALA ŽÁDNÁ CHYBA:\n    print(f\"Úspěšně načteno: {hodnota}\")\nfinally:\n    # 5. Spustí se VŽDY -- ať k chybě došlo, nebo nedošlo (úklid zdrojů):\n    print(\"Ukončení operace (úklid hotov).\")</pre>\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Proč je větev else v bloku try zásadní?",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Proč je větev else v bloku try zásadní?</h2></div><div class=\"section-body\">\n<p>Mnoho programátorů přehlíží větev <code>else</code> a všechen následující kód napíše přímo na konec bloku <code>try</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># ŠPATNÝ ZÁPIS:\ntry:\n    zaznam = ziskej_zaznam_z_databaze(uzivatel_id)  # Může vyvolat KeyError\n    zpracuj_a_odesli_email(zaznam)                   # Také může vyvolat KeyError!\nexcept KeyError:\n    print(\"Uživatel v databázi neexistuje!\")</pre>\n<h3>Problém: Maskování chyb (Exception Masking)!</h3>\n<p>Pokud nastane <code>KeyError</code> uvnitř funkce <code>zpracuj_a_odesli_email()</code> (např. kvůli chybějícímu klíči <code>\"smtp_server\"</code>), zachytí ji náš blok <code>except</code> a falešně ohlásí, že uživatel neexistuje v databázi!</p>\n<h3>Správný idiom s větví else:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># SPRÁVNÝ A PROFESIONÁLNÍ ZÁPIS:\ntry:\n    zaznam = ziskej_zaznam_z_databaze(uzivatel_id)\nexcept KeyError:\n    print(\"Uživatel v databázi neexistuje!\")\nelse:\n    # Spustí se jen při úspěchu, ale je chráněn před falešným odchycením:\n    zpracuj_a_odesli_email(zaznam)</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>V bloku <code>try</code> ponechte <strong>výhradně řádek, který očekávanou výjimku vyvolává</strong>. Následný kód přesuňte do větve <code>else</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Hierarchie výjimek v Pythonu",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Hierarchie výjimek v Pythonu</h2></div><div class=\"section-body\">\n<p>Všechny výjimky v Pythonu jsou standardní třídy uspořádané do přísné dědičné hierarchie:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">BaseException\n ├── SystemExit            (vyvoláno funkcí sys.exit())\n ├── KeyboardInterrupt     (uživatel stiskl Ctrl+C)\n ├── GeneratorExit         (uzavření generátoru)\n └── Exception             ◄─── BÁZOVÁ TŘÍDA PRO VŠECHNY BĚŽNÉ APLIKAČNÍ CHYBY!\n      ├── ArithmeticError\n      │    └── ZeroDivisionError\n      ├── LookupError\n      │    ├── IndexError   (index mimo pole)\n      │    └── KeyError     (klíč nenalezen v dict)\n      ├── ValueError        (správný typ, neplatná hodnota: int(\"abc\"))\n      ├── TypeError         (operace nad nekompatibilním typem: 5 + \"a\")\n      └── OSError\n           ├── FileNotFoundError\n           └── PermissionError</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">❗</span><div class=\"note-content\"><p>Pokud chcete zachytit jakoukoliv aplikační chybu, zachytávejte <strong>výhradně <code>Exception</code></strong>, nikdy <code>BaseException</code>! Pokud byste zachytili <code>BaseException</code>, váš program by nešlo ukončit ani klávesovou zkratkou <code>Ctrl+C</code> (<code>KeyboardInterrupt</code>)!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Toxický antipattern: Slepé potlačování chyb",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Toxický antipattern: Slepé potlačování chyb</h2></div><div class=\"section-body\">\n<p>Nejnebezpečnější konstrukce, jakou můžete v Pythonu napsat:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># ABSOLUTNÍ PROGRAMÁTORSKÝ HŘÍCH:\ntry:\n    data = vypocitej_dulezite_vysledky()\n    uloz_do_databaze(data)\nexcept:\n    pass  # Mlčky pokračujeme dál...</pre>\n<h3>Proč je tento kód katastrofální?</h3>\n<ol>\n  <li><strong>Skryje překlepy v kódu</strong>: Pokud v kódu uděláte chybu v názvu proměnné (<code>NameError</code>), Python ji spolkne a vy se nikdy nedozvíte, proč data chybí!</li>\n  <li><strong>Skryje výpadky paměti</strong>: Zachytí a spolkne i <code>MemoryError</code> nebo <code>SystemExit</code>.</li>\n  <li><strong>Nemorální debugging</strong>: Způsobí, že systém selže o 500 řádků dál na zcela nesouvisejícím místě s chybou <code>TypeError: 'NoneType' object is not subscriptable</code>.</li>\n</ol>\n<h3>Pravidlo pro vývojáře:</h3>\n<p>Vždy specifikujte <strong>konkrétní typ výjimky</strong>, kterou očekáváte:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">try:\n    data = parse_int(hodnota)\nexcept ValueError as err:\n    logger.warning(f\"Chybný formát čísla: {err}\")</pre>\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Vyvolávání chyb a řetězení výjimek (raise ... from)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Vyvolávání chyb a řetězení výjimek (raise ... from)</h2></div><div class=\"section-body\">\n<p>Chybu vyvoláváme klíčovým slovem <strong><code>raise</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def nastav_vek(vek: int) -&gt; None:\n    if vek &lt; 0 or vek &gt; 150:\n        raise ValueError(f\"Neplatný věk: {vek}. Musí být v intervalu [0, 150].\")</pre>\n<h3>Řetězení výjimek (Exception Chaining, PEP 3134):</h3>\n<p>Při překladu nízkoúrovňových chyb na doménové výjimky použijte syntaxi <strong><code>raise ... from err</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def nacti_konfiguraci(cesta: str) -&gt; dict[str, str]:\n    try:\n        with open(cesta, \"r\", encoding=\"utf-8\") as f:\n            return json.load(f)\n    except FileNotFoundError as err:\n        # Zabalíme nízkoúrovňovou I/O chybu do konfigurační výjimky:\n        raise ConfigurationError(\"Konfigurační soubor aplikace nebyl nalezen\") from err</pre>\n<p>CPython v tracebacku zobrazí obě chyby i kauzální souvislost:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">The above exception was the direct cause of the following exception:\nConfigurationError: Konfigurační soubor aplikace nebyl nalezen</pre>\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Tvorba vlastních doménových výjimek",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Tvorba vlastních doménových výjimek</h2></div><div class=\"section-body\">\n<p>V profesionálních aplikacích a knihovnách nevystačíte pouze s generickými <code>ValueError</code> a <code>KeyError</code>. Chcete, aby uživatel vaší knihovny mohl odchytit vaše specifické chyby.</p>\n<p>Vytvoření vlastní výjimky je v Pythonu otázkou <strong>dědění ze třídy <code>Exception</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Bázová výjimka celého vašeho modulu/knihovny:\nclass BioDataError(Exception):\n    \"\"\"Základní výjimka pro všechny chyby zpracování biologických dat.\"\"\"\n    pass\n\n# Konkrétní specializované podtřídy:\nclass InvalidSequenceError(BioDataError):\n    \"\"\"Vyvoláno, když DNA/RNA řetězec obsahuje neplatné nukleotidy.\"\"\"\n    def __init__(self, sequence: str, invalid_chars: set[str]) -&gt; None:\n        super().__init__(f\"Sekvence obsahuje neplatné znaky: {invalid_chars} v '{sequence[:15]}...'\")\n        self.sequence = sequence\n        self.invalid_chars = invalid_chars\n\ndef validuj_dna(sekvence: str) -&gt; None:\n    povolene = set(\"ACGT\")\n    nalezeno = set(sekvence.upper()) - povolene\n    if nalezeno:\n        raise InvalidSequenceError(sekvence, nalezeno)</pre>\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "Obohacování chyb: Metoda e.add_note() (Python 3.11+, PEP 678)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Obohacování chyb: Metoda e.add_note() (Python 3.11+, PEP 678)</h2></div><div class=\"section-body\">\n<p>Častý problém v produkci: funkce hluboko ve volacím zásobníku vyvolá výjimku <code>ValueError(\"Invalid ID\")</code>. Když traceback doputuje na úroveň API handleru, chybí kontext: <em>Který konkrétní uživatel to byl? Který HTTP request? Který soubor?</em></p>\n<p>Před Pythonem 3.11 bylo nutné složitě vytvářet novou výjimku a řetězit ji přes <code>from err</code>.</p>\n<p>Od Pythonu 3.11 má každá výjimka metodu <strong><code>add_note(text)</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def zpracuj_soubor_pacienta(cesta_k_souboru: str) -&gt; None:\n    try:\n        parsuj_mereni(cesta_k_souboru)\n    except ValueError as err:\n        # Přidáme kontextové informace bez narušení typu původní výjimky:\n        err.add_note(f\"Chyba nastala při zpracování souboru: {cesta_k_souboru}\")\n        err.add_note(f\"Časový otisk zpracování: {datetime.now().isoformat()}\")\n        raise  # Znovu vyvoláme obohacenou výjimku!</pre>\n<p>Poznámky se v terminálu zobrazí přímo pod tracebackem:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">ValueError: Invalid ID format\nChyba nastala při zpracování souboru: /data/pacient_042.dat\nČasový otisk zpracování: 2026-10-27T14:30:00</pre>\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "Skupiny výjimek: ExceptionGroup a except* (PEP 654)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Skupiny výjimek: ExceptionGroup a except* (PEP 654)</h2></div><div class=\"section-body\">\n<p>V asynchronním programování (<code>asyncio</code>) nebo paralelních vláknech může nastat <strong>více nezávislých výjimek současně</strong> (např. 3 úlohy ze 4 selhaly v téže milisekundě).</p>\n<p>Python 3.11 zavedl typ <strong><code>ExceptionGroup</code></strong> a novou syntaxi <strong><code>except*</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def soubezne_ulohy():\n    # Vyvolání skupiny více chyb naráz:\n    raise ExceptionGroup(\n        \"Selhaly 2 paralelní síťové dotazy\",\n        [\n            FileNotFoundError(\"Konfigurační soubor chybí\"),\n            ConnectionRefusedError(\"Databázový server neodpovídá\"),\n            ValueError(\"Neplatná hodnota parametru timeout\"),\n        ]\n    )\n\ntry:\n    soubezne_ulohy()\nexcept* FileNotFoundError as eg:\n    # Zachytí POUZE chyby typu FileNotFoundError ze skupiny!\n    print(\"Ošetřuji chybějící soubor:\", eg.exceptions)\nexcept* (ConnectionRefusedError, TimeoutError) as eg:\n    # Zachytí síťové chyby ze skupiny:\n    print(\"Ošetřuji síťový výpadek:\", eg.exceptions)</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Všimněte si hvězdičky u <code>except*</code>: tento blok může být vyhodnocen <strong>vícekrát v jediném try-catch bloku</strong>, pokud skupina obsahuje chyby odpovídající různým větvím!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "Pravdivostní hodnoty (Truthiness) a zkrácené vyhodnocování",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Pravdivostní hodnoty (Truthiness) a zkrácené vyhodnocování</h2></div><div class=\"section-body\">\n<p>V Pythonu má každý objekt přirozenou pravdivostní hodnotu v logickém kontextu:</p>\n<h3>Hodnoty vyhodnocované jako False (Falsy):</h3>\n<ul>\n  <li>Konstanty: <code>None</code>, <code>False</code></li>\n  <li>Celočíselné nuly: <code>0</code>, <code>0.0</code>, <code>0j</code></li>\n  <li>Prázdné sekvence a kolekce: <code>\"\"</code> (prázdný str), <code>[]</code>, <code>()</code>, <code>{}</code>, <code>set()</code></li>\n</ul>\n<p>Všechny ostatní hodnoty (včetně libovolného neprázdného seznamu či řetězce <code>\"False\"</code>) jsou <strong>Truthy</strong>!</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">polozky = []\nif not polozky:  # Idiomatický způsob, jak ověřit prázdnost! (Ne: if len(polozky) == 0)\n    print(\"Seznam je prázdný!\")</pre>\n<h3>Operátory and a or vracejí hodnotu operandu:</h3>\n<p>Pythoní <code>and</code> a <code>or</code> nevrací pouhé <code>True</code>/<code>False</code>, ale <strong>hodnotu operandu, na kterém se vyhodnocování zastavilo (Short-circuit)</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># or vrátí první pravdivou hodnotu, nebo poslední hodnotu:\nuzivatelske_jmeno = \"\" or \"Anonym\"\nprint(uzivatelske_jmeno)  # 'Anonym'\n\n# and vrátí první nepravdivou hodnotu, nebo poslední hodnotu:\nkonfigurace = {\"db\": \"postgres\"}\nvysledek = konfigurace and konfigurace.get(\"db\")\nprint(vysledek)  # 'postgres'</pre>\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Produkční most: collections.defaultdict",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Produkční most: collections.defaultdict</h2></div><div class=\"section-body\">\n<p>Při seskupování dat do seznamů podle klíčů narážíme na nutnost kontrolovat, zda klíč existuje:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># ZASTARALÝ A ZBYTEČNĚ SLOŽITÝ KÓD:\nkatalog = {}\nfor oddeleni, jmeno in zaznamy:\n    if oddeleni not in katalog:\n        katalog[oddeleni] = []\n    katalog[oddeleni].append(jmeno)</pre>\n<h3>Řešení: collections.defaultdict</h3>\n<p><code>defaultdict</code> přijímá jako argument tzv. <strong>default factory</strong> — bezargumentovou funkci (nebo typ), která vyrobí výchozí hodnotu, jakmile se interpret dotáže na neexistující klíč:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from collections import defaultdict\n\n# factory = list -&gt; při prvním dotazu na neexistující klíč se automaticky zavolá list():\nstudenti_dle_oboru = defaultdict(list)\n\nstudenti_dle_oboru[\"Informatika\"].append(\"Alice\")\nstudenti_dle_oboru[\"Informatika\"].append(\"Bob\")\nstudenti_dle_oboru[\"Chemie\"].append(\"Cyril\")\n\nprint(dict(studenti_dle_oboru))\n# {'Informatika': ['Alice', 'Bob'], 'Chemie': ['Cyril']}</pre>\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "defaultdict v praxi: Počítadla a vnořené struktury",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">defaultdict v praxi: Počítadla a vnořené struktury</h2></div><div class=\"section-body\">\n<h3>1. Počítadlo výskytů s int (výchozí hodnota int() je 0):</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from collections import defaultdict\n\nfrekvence_slov = defaultdict(int)\n\nslova = [\"pes\", \"kočka\", \"pes\", \"kůň\", \"pes\", \"kočka\"]\nfor s in slova:\n    frekvence_slov[s] += 1  # Žádná KeyError! Pokud slovo chybí, začne na 0 a přičte 1!\n\nprint(dict(frekvence_slov))  # {'pes': 3, 'kočka': 2, 'kůň': 1}</pre>\n<h3>2. Autovytváření stromů (Autovivification ve stylu Perlu):</h3>\n<p>Rekurzivní <code>defaultdict</code>, který se sám generuje do nekonečné hloubky:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">def strom():\n    return defaultdict(strom)\n\nadresar = strom()\nadresar[\"domov\"][\"kolar\"][\"dokumenty\"][\"diplomka.pdf\"] = \"1.4 MB\"\n\nprint(adresar[\"domov\"][\"kolar\"][\"dokumenty\"][\"diplomka.pdf\"])  # '1.4 MB'</pre>\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Produkční most: collections.Counter",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Produkční most: collections.Counter</h2></div><div class=\"section-body\">\n<p>Potřebujete zjistit nejčastější nukleotidy v DNA, nejfrekventovanější slova v článku nebo nejčastější HTTP chybové kódy v logu?</p>\n<p>Třída <strong><code>collections.Counter</code></strong> je specializovaný podtyp slovníku optimalizovaný pro počítání prvků:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from collections import Counter\n\ndna = \"ACGTGGTCAAGCTAATCGGATCGATCGATC\"\npocitadlo = Counter(dna)\n\nprint(pocitadlo)\n# Counter({'A': 8, 'C': 8, 'G': 8, 'T': 7})\n\n# 1. Čtení chybějícího klíče nevrací chybu, ale 0:\nprint(pocitadlo[\"U\"])  # 0 (Uracil se v DNA nevyskytuje)\n\n# 2. Metoda .most_common(n): Vrátí n nejčastějších prvků a jejich počty:\nnejcastejsi = pocitadlo.most_common(2)\nprint(nejcastejsi)  # [('A', 8), ('C', 8)]</pre>\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "Counter v praxi: Multimnožinová algebra",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Counter v praxi: Multimnožinová algebra</h2></div><div class=\"section-body\">\n<p><code>Counter</code> reprezentuje matematickou <strong>multimnožinu (Bag)</strong>, kde každý prvek může existovat vícekrát:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from collections import Counter\n\nkosik_1 = Counter(jablka=4, banany=2, pomerance=1)\nkosik_2 = Counter(jablka=2, banany=5, melouny=1)\n\n# 1. Sčítání zásob:\ncelkem = kosik_1 + kosik_2\nprint(celkem)\n# Counter({'banany': 7, 'jablka': 6, 'pomerance': 1, 'melouny': 1})\n\n# 2. Odečítání (ponechá pouze kladné počty):\nrozdil = kosik_1 - kosik_2\nprint(rozdil)\n# Counter({'jablka': 2, 'pomerance': 1})\n\n# 3. Průnik (minimum z obou) a sjednocení (maximum z obou):\nprint(kosik_1 &amp; kosik_2)  # Counter({'jablka': 2, 'banany': 2})\nprint(kosik_1 | kosik_2)  # Counter({'banany': 5, 'jablka': 4, 'pomerance': 1, 'melouny': 1})</pre>\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Architektonický most k Milníku 1: Frekvenční analyzátor",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Architektonický most k Milníku 1: Frekvenční analyzátor</h2></div><div class=\"section-body\">\n<p>Na konci tohoto týdne odevzdáváte <strong>Milník 1: CLI Tokenizér &amp; Frekvenční analyzátor textu</strong>.</p>\n<p>Ukázka profesionální architektury propojující vše z 0. až 4. týdne:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import re\nimport sys\nfrom collections import Counter\nfrom pathlib import Path\n\ndef frekvencni_analyza_souboru(cesta: Path, stop_slova: set[str], top_n: int = 5) -&gt; list[tuple[str, int]]:\n    \"\"\"Načte soubor v streamovaném O(1) režimu a vrátí top N nejčastějších tokenů.\"\"\"\n    pocitadlo: Counter[str] = Counter()\n    vzor_slova = re.compile(r\"\\b[a-zA-Zá-žÁ-Ž]{3,}\\b\")\n\n    try:\n        with open(cesta, \"r\", encoding=\"utf-8\") as f:\n            for radek in f:\n                slova = [s.lower() for s in vzor_slova.findall(radek)]\n                # Filtrujeme stop-slova v O(1) čase pomocí množiny:\n                cista_slova = [s for s in slova if s not in stop_slova]\n                pocitadlo.update(cista_slova)\n    except FileNotFoundError as err:\n        err.add_note(f\"Zkontrolujte cestu k datům: {cesta.resolve()}\")\n        raise\n    except UnicodeDecodeError as err:\n        raise ValueError(f\"Soubor {cesta} není validní UTF-8 text!\") from err\n\n    return pocitadlo.most_common(top_n)</pre>\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Shrnutí přednášky a příprava na cvičení",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Shrnutí přednášky a příprava na cvičení</h2></div><div class=\"section-body\">\n<p>Dnes jsme zvládli hešovací struktury a moderní správu chyb:</p>\n<h3>Hlavní body pro zapamatování:</h3>\n<ol>\n  <li><strong>Hešovatelnost</strong>: Klíče v <code>dict</code> a prvky v <code>set</code> musí být striktně neměnné; měnitelné objekty jako <code>list</code> nelze hešovat.</li>\n  <li><strong>Kompaktní dict (PEP 468)</strong>: CPython garantuje zachování pořadí vkládání a šetří 25 % paměti.</li>\n  <li><strong>Bezpečný dict</strong>: Pro čtení používejte <code>.get(key, default)</code>; pro sloučení operátor <code>|</code> (PEP 584).</li>\n  <li><strong>Množiny (<code>set</code> &amp; <code>frozenset</code>)</strong>: Bleskové testy <code>in</code> v $O(1)$; plná podpora množinové algebry (<code>|</code>, <code>&amp;</code>, <code>-</code>, <code>^</code>).</li>\n  <li><strong>EAFP vs. LBYL</strong>: Preferujte <code>try-except</code> před kaskádami <code>if</code>; větev <code>else</code> použijte pro kód závislý na úspěchu.</li>\n  <li><strong>Hierarchie výjimek</strong>: Zachytávejte konkrétní chyby nebo <code>Exception</code>; nikdy nepoužívejte slepé <code>except: pass</code> ani neodchytávejte <code>BaseException</code>.</li>\n  <li><strong>Pokročilé chyby</strong>: Řetězte přes <code>raise ... from</code>, obohacujte kontextem <code>err.add_note()</code> a pro souběžnost využijte <code>except*</code>.</li>\n  <li><strong>Produkční kontejnery</strong>: Pro agregaci seskupujte přes <code>collections.defaultdict</code>; pro frekvence použijte <code>collections.Counter</code>.</li>\n</ol>\n<h3>Co vás čeká v následujícím 1,5hodinovém cvičení:</h3>\n<ul>\n  <li>Praktická implementace frekvenční analýzy reálného datasetu států a jejich hustoty zalidnění.</li>\n  <li>Ošetření I/O výjimek a poškozených záznamů pomocí doménových výjimek.</li>\n  <li>Dokončení a odevzdání <strong>Milníku 1</strong>.</li>\n</ul>\n</div>"
+    }
+  ]
+}

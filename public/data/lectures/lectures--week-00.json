@@ -1,0 +1,249 @@
+{
+  "slug": "lectures--week-00",
+  "total": 27,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod a osnova",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod a osnova</h2></div><div class=\"section-body\">\n<p>Vítejte v kurzu programování v jazyce Python. Tento kurz je určen pro studenty se zkušenostmi s procedurálním či objektovým programováním v kompilovaných jazycích (C/C++, Java).</p>\n<h3>Osnova dnešní 90minutové přednášky:</h3>\n<ol>\n  <li><strong>Architektonický model</strong>: C/C++ a Java vs. virtuální stroj CPython.</li>\n  <li><strong>Životní cyklus programu</strong>: Od zdrojového textu k bajtkódu <code>.pyc</code>.</li>\n  <li><strong>Izolace závislostí</strong>: Proč potřebujeme virtuální prostředí (<code>venv</code>, PEP 405 a PEP 668).</li>\n  <li><strong>Balíčkování a standardy</strong>: Od imperativního <code>setup.py</code> k deklarativnímu <code>pyproject.toml</code> (PEP 621).</li>\n  <li><strong>Verzovací systém Git</strong>: Mentální model obsahově adresovatelné databáze a moderní workflow (<code>git switch</code>, <code>git restore</code>).</li>\n  <li><strong>Interaktivní prostředí</strong>: REPL, nový PyREPL v Pythonu 3.13 a JupyterLab.</li>\n  <li><strong>Produkční most (2026)</strong>: Nástroje nové generace v Rustu — <strong><code>uv</code></strong> a <strong><code>ruff</code></strong>.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "C/Java vs. Python: Mentální model",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">Architektonický kontrast: Kompilace vs. CPython interpret</h2></div><div class=\"section-body\">\n<p>V jazycích C/C++ kompilátor přeloží zdrojový kód do nativního strojového kódu konkrétního procesoru (ELF binárka, <code>.exe</code>). V Javě kompilátor vytvoří bajtkód <code>.class</code>, který za běhu optimalizuje Just-In-Time (JIT) kompilátor JVM:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">[ C/C++ ]  Zdroj (.c/.cpp) ──[ GCC/Clang ]──> Strojový kód (CPU instrukce)\n[ Java  ]  Zdroj (.java)   ──[ javac ]──────> Bajtkód (.class) ──[ JVM HotSpot JIT ]──> CPU\n[ Python]  Zdroj (.py)     ──[ CPython ]────> Bajtkód (.pyc v paměti) ──[ Ceval Loop ]──> OS/C runtime</pre>\n<h3>Zásadní rozdíly pro vývojáře:</h3>\n<ul>\n  <li><strong>Žádný samostatný kompilátor</strong>: Spuštěním <code>python main.py</code> interpret provede překlad i běh v jediném kroku.</li>\n  <li><strong>Dynamické typování za běhu</strong>: Typy se nekontrolují předem v kompilátoru, ale až ve chvíli, kdy virtuální stroj vykonává konkrétní operaci.</li>\n  <li><strong>Vše je alokováno na haldě</strong>: V C může být struktura uložena přímo na zásobníku (<em>stack allocation</em>). V Pythonu je každé číslo, řetězec i funkce plnohodnotným objektem (<code>PyObject</code>) žijícím na haldě.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Jak CPython vykonává kód",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Životní cyklus CPythonu: Od textu k instrukcím virtuálního stroje</h2></div><div class=\"section-body\">\n<p>Když zavoláte <code>python main.py</code>, interpret provede následující kroky:</p>\n<ol>\n  <li><strong>Tokenizace (Lexer/Scanner)</strong>: Převede textový proud znaků na proud syntaktických tokenů (např. <code>NAME</code>, <code>NUMBER</code>, <code>INDENT</code>).</li>\n  <li><strong>Parsování (PEG Parser)</strong>: Od Pythonu 3.9 staví abstraktní syntaktický strom (<em>AST – Abstract Syntax Tree</em>) pomocí moderního PEG parseru.</li>\n  <li><strong>Kompilace do bajtkódu</strong>: AST je přeložen do sekvence instrukcí zásobníku virtuálního stroje (<em>Python Bytecode</em>).</li>\n  <li><strong>Ceval Loop (Vyhodnocovací smyčka)</strong>: Jádro CPythonu (napsané v C) ve velké smyčce čte instrukce a provádí odpovídající C operace.</li>\n</ol>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import dis\n\ndef secti(a: int, b: int) -> int:\n    return a + b\n\n# Prozkoumání instrukcí bajtkódu\ndis.dis(secti)</pre>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">  LOAD_FAST     0 (a)\n  LOAD_FAST     1 (b)\n  BINARY_OP     0 (+)\n  RETURN_VALUE</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Soubory v adresáři <code>__pycache__/*.pyc</code> jsou pouze uloženou mezipamětí přeloženého bajtkódu pro importované moduly, aby se při příštím spuštění ušetřil čas parsování.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Správa paměti: Reference Counting a GC",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Správa paměti: Reference Counting vs. Garbage Collector</h2></div><div class=\"section-body\">\n<p>V C alokujete paměť pomocí <code>malloc()</code> a uvolňujete přes <code>free()</code>. V Javě probíhá automatický tracing garbage collection (Mark &amp; Sweep).</p>\n<p>Python používá <strong>dvoustupňovou správu paměti</strong>:</p>\n<h3>1. Počítání referencí (<em>Reference Counting</em> – primární mechanismus)</h3>\n<p>Každý objekt v CPythonu má hlavičku <code>PyObject</code>, která obsahuje čítač <code>ob_refcnt</code>:</p>\n<ul>\n  <li>Když přiřadíte objekt do nové proměnné: <code>ob_refcnt</code> se zvýší o 1.</li>\n  <li>Když proměnná zanikne (např. opuštěním funkce) nebo je přepsána: <code>ob_refcnt</code> klesne o 1.</li>\n  <li><strong>Jakmile <code>ob_refcnt == 0</code></strong>: Paměť objektu je <strong>okamžitě a deterministicky uvolněna</strong>.</li>\n</ul>\n<h3>2. Cyklický Garbage Collector (sekundární mechanismus)</h3>\n<p>Pokud dva objekty odkazují navzájem na sebe (<code>a.dalsi = b; b.predchozi = a</code>), jejich čítač referencí nikdy neklesne na nulu, i když se stanou z programu nedostupnými:</p>\n<ul>\n  <li>Pro tyto případy obsahuje CPython generátorský cyklický GC, který periodicky prochází podezřelé kontejnery a cyklické vazby detekuje a vyčistí.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Problém závislostí a kolizí",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Problém sdílených knihoven: Proč nestačí globální instalace?</h2></div><div class=\"section-body\">\n<p>V C/C++ se knihovny typicky linkují staticky nebo dynamicky ze systémových cest (<code>/usr/lib</code>). V Javě řeší Maven či Gradle závislosti per-projekt stažením JAR souborů do lokálního repozitáře.</p>\n<p>Historický Python však standardně ukládal všechny instalované knihovny do <strong>jediného sdíleného adresáře</strong> v operačním systému:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">/usr/lib/python3.12/site-packages/</pre>\n<h3>Proč je globální instalace katastrofou:</h3>\n<ul>\n  <li><strong>Konflikt verzí (Dependency Hell)</strong>: Projekt A vyžaduje <code>pydantic 1.10</code>, ale Projekt B vyžaduje novou verzi <code>pydantic 2.8</code> s nekompatibilním API. V globálním adresáři může existovat pouze jedna verze!</li>\n  <li><strong>Ohrožení operačního systému</strong>: Distribuce Linuxu (Ubuntu, Fedora) využívají systémový Python pro běh kritických utilit (správci sítě, instalační nástroje). Pokud globálním příkazem <code>pip install</code> přepíšete systémovou knihovnu, můžete poškodit stabilitu celého OS.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "PEP 405: Virtuální prostředí (venv)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Virtuální prostředí: Izolace podle standardu PEP 405</h2></div><div class=\"section-body\">\n<p>Řešením je <strong>virtuální prostředí</strong> (<em>virtual environment</em>, zkráceně <code>venv</code>): zcela izolovaný adresářový strom obsahující vlastní interpret, binárky a privátní složku <code>site-packages</code>.</p>\n<p>Každý projekt má své vlastní virtuální prostředí, které obvykle umisťujeme přímo do kořene projektu do skryté složky <code>.venv</code>.</p>\n<p>Tím dosáhneme stoprocentní reprodukovatelnosti: smazáním složky <code>.venv</code> projekt uvedeme do původního stavu a opětovnou instalací závislostí jej zrekonstruujeme bez jakéhokoliv dopadu na zbytek počítače.</p>\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Jak venv funguje pod kapotou",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Anatomie venv: Konfigurační soubor pyvenv.cfg</h2></div><div class=\"section-body\">\n<p>Jak Python pozná, že běží uvnitř virtuálního prostředí a kde má hledat balíčky?</p>\n<p>Vytvořením prostředí vestavěným modulem:</p>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\">python3 -m venv .venv</pre>\n<p>Vznikne následující adresářová struktura:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">.venv/\n├── pyvenv.cfg            <-- Klíč k celé magii!\n├── bin/                  (Scripts/ na Windows)\n│   ├── python -> /usr/bin/python3\n│   ├── python3 -> python\n│   └── activate          (bash/zsh skript)\n└── lib/python3.12/\n    └── site-packages/    <-- Zde se instalují balíčky pouze pro tento projekt</pre>\n<h3>Algoritmus vyhledávání knihoven:</h3>\n<ol>\n  <li>Při spuštění binárky <code>.venv/bin/python</code> interpret zkontroluje svůj nadřazený adresář.</li>\n  <li>Nalezne soubor <code>pyvenv.cfg</code>, který obsahuje řádek <code>home = /usr/bin</code>.</li>\n  <li>Interpret nastaví proměnnou <code>sys.prefix</code> na cestu k <code>.venv/</code>.</li>\n  <li>Složka <code>site-packages</code> systémového Pythonu je zcela ignorována a používá se výhradně <code>.venv/.../site-packages</code>!</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Aktivace prostředí a PEP 668",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Práce s virtuálním prostředím a ochrana PEP 668</h2></div><div class=\"section-body\">\n<p>Pro práci s virtuálním prostředím v terminálu existují dva rovnocenné způsoby:</p>\n<h3>Způsob 1: Explicitní volání binárky (nejbezpečnější v automatizaci)</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\">./.venv/bin/python main.py\n./.venv/bin/pip install requests</pre>\n<h3>Způsob 2: Aktivace shellu (komfortní pro interaktivní práci)</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Na Linuxu / macOS:\nsource .venv/bin/activate\n\n# Na Windows (PowerShell):\n.venv\\Scripts\\Activate.ps1</pre>\n<p>Aktivace pouze upraví proměnnou prostředí <code>$PATH</code> tak, že <code>.venv/bin/</code> zařadí na první místo, a přidá vizuální indikátor <code>(.venv)</code> do promptu.</p>\n<div class=\"notes-block\"><div class=\"note-item warning\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p><strong>PEP 668 — Externally Managed Environments</strong>: Na moderních systémech (Ubuntu 23+, Debian 12+, macOS Homebrew) vám příkaz <code>pip install</code> mimo aktivní virtuální prostředí selže s chybou <code>error: externally-managed-environment</code>. Jde o záměrnou ochranu, která vám brání zničit systémový OS. <strong>Vždy tvořte .venv!</strong></p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Správce balíčků pip a PyPI",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Balíčkovací manažer pip a PyPI</h2></div><div class=\"section-body\">\n<p>Oficiálním registrem otevřeného softwaru pro Python je <strong>PyPI</strong> (<em>Python Package Index</em>, <a href=\"https://pypi.org/\" class=\"external\" target=\"_blank\" rel=\"noopener noreferrer\">pypi.org</a>).</p>\n<p>K instalaci slouží vestavěný nástroj <code>pip</code>:</p>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Instalace balíčku do aktivního prostředí\npython -m pip install httpx\n\n# Instalace přesné verze\npython -m pip install \"pydantic>=2.5.0,<3.0.0\"\n\n# Odinstalace\npython -m pip uninstall httpx</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p><strong>Proč volat python -m pip namísto pouhého pip?</strong> Příkaz <code>pip</code> může v systému ukazovat na jinou verzi Pythonu, než kterou máte aktuálně spuštěnou. Zápis <code>python -m pip</code> garantuje, že se použije modul <code>pip</code> patřící k přesně tomu interpretu, který zrovna spouštíte.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Distribuce balíčků: Wheels vs. Sdists",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Formáty balíčků: Wheels (PEP 427) vs. Zdrojové distribuce</h2></div><div class=\"section-body\">\n<p>Při instalaci balíčku z PyPI můžete narazit na dva různé formáty:</p>\n<h3>1. Source Distribution (<code>.tar.gz</code>, sdist)</h3>\n<ul>\n  <li>Obsahuje surové zdrojové kódy.</li>\n  <li>Pokud balíček obsahuje rozšíření v C/C++ (např. NumPy, cryptography), <strong>musí se zkompilovat přímo na vašem počítači</strong>.</li>\n  <li>Vyžaduje přítomnost C kompilátoru (<code>gcc</code>, <code>MSVC</code>) a hlavičkových souborů knihoven.</li>\n</ul>\n<h3>2. Wheel (<code>.whl</code>, PEP 427 — standard od roku 2012)</h3>\n<ul>\n  <li>Již <strong>předkompilovaný binární balíček</strong> zabalený ve formátu ZIP.</li>\n  <li>Instalace spočívá v pouhém rozbalení souborů do složky <code>site-packages</code>.</li>\n  <li>Je okamžitá (vteřiny) a nevyžaduje na cílovém stroji žádný kompilátor ani C vývojové nástroje.</li>\n</ul>\n<p>PyPI dnes pro hlavní platformy (Linux x86_64, Windows x64, macOS ARM64) standardně distribuuje hotové Wheels.</p>\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Deklarativní standard: pyproject.toml",
+      "tags": ["Core"],
+      "diff": "resyntax",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Od imperativního setup.py k deklarativnímu pyproject.toml</h2></div><div class=\"section-body\">\n<p>Historicky se konfigurace Python projektů psala do spustitelného skriptu <code>setup.py</code> za pomoci modulu <code>distutils</code>. To přinášelo bezpečnostní rizika (kód se musel spustit, aby se zjistilo, jaké má balíček závislosti) a vedlo ke křehkým instalacím.</p>\n<p>Dnes je jednotným standardem <strong>deklarativní soubor <code>pyproject.toml</code></strong> (PEP 517, PEP 518, PEP 621):</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">[project]\nname = \"muj-projekt\"\nversion = \"0.1.0\"\ndescription = \"Příklad moderní konfigurace v Pythonu 3.12+\"\nreadme = \"README.md\"\nrequires-python = \">=3.12\"\nauthors = [\n    { name = \"Jan Novák\", email = \"novak@vscht.cz\" }\n]\ndependencies = [\n    \"httpx>=0.27.0\",\n    \"pydantic>=2.8.0\",\n]\n\n[project.optional-dependencies]\ndev = [\n    \"pytest>=8.0.0\",\n    \"ruff>=0.5.0\",\n]</pre>\n<p>Soubor <code>pyproject.toml</code> sjednocuje metadata projektu, závislosti i konfiguraci vývojových nástrojů na jednom místě.</p>\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Verze Pythonu a spouštěče",
+      "tags": ["Skip"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Správa verzí Pythonu a spouštěcí mechanismy</h2></div><div class=\"section-body\">\n<p>Na jednom počítači můžete mít nainstalováno více různých verzí Pythonu (např. 3.10, 3.12 a 3.13):</p>\n<h3>1. Na operačním systému Windows (<code>py.exe</code>)</h3>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">py --list           # vypíše všechny nainstalované verze\npy -3.12 main.py    # spustí skript v Pythonu 3.12\npy -3.13 main.py    # spustí skript v Pythonu 3.13</pre>\n<h3>2. Na systémech Linux a macOS</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\">python3.11 -m venv .venv311\npython3.12 -m venv .venv312</pre>\n<h3>3. Hlavička Shebang v unixových skriptech</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">#!/usr/bin/env python3</pre>\n<p>Příkaz <code>env</code> dynamicky vyhledá první dostupný <code>python3</code> v aktuální proměnné <code>$PATH</code> (což spolehlivě zacílí aktivní virtuální prostředí).</p>\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Git: Mentální model verzování",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Verzovací systém Git: Obsahově adresovatelná databáze</h2></div><div class=\"section-body\">\n<p>Většina starších verzovacích systémů (např. Subversion / SVN nebo CVS) přemýšlí o verzování jako o <strong>seznamu změn a souborových rozdílů (delta storage)</strong>:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">[ SVN ]  Soubor 1 (v1) ───> Delta 1 ───> Delta 2 ───> Delta 3</pre>\n<p><strong>Git funguje zcela odlišně</strong>: Git přemýšlí o svých datech jako o <strong>řadě snímků (snapshots)</strong> celého souborového systému v čase.</p>\n<p>Pokud se soubor v daném commitu nezměnil, Git nevytváří novou kopii, ale uloží pouze odkaz na již existující identický objekt v interní databázi.</p>\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Git pod kapotou: Objekty v .git",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Git pod kapotou: Čtyři základní typy objektů</h2></div><div class=\"section-body\">\n<p>Vše v Gitu je uloženo v adresáři <code>.git/objects/</code> a adresováno pomocí kryptografického kontrolního součtu (SHA-1 / SHA-256):</p>\n<ol>\n  <li><strong>Blob (<em>Binary Large Object</em>)</strong>: Ukládá čistý obsah souboru bez jeho názvu, práv či časového razítka.</li>\n  <li><strong>Strom (<em>Tree</em>)</strong>: Reprezentuje adresář. Obsahuje seznam odkazů na bloby (soubory) a další vnořené stromy včetně jejich názvů a oprávnění.</li>\n  <li><strong>Commit</strong>: Ukazuje na kořenový Tree daného stavu projektu. Obsahuje autora, časové razítko, zprávu a odkaz na rodičovský commit.</li>\n  <li><strong>Značka (<em>Annotated Tag</em>)</strong>: Trvalý pojmenovaný ukazatel na konkrétní commit (např. verze <code>v1.0.0</code>).</li>\n</ol>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Větev v Gitu (<em>branch</em>) není nic víc než <strong>obyčejný textový soubor obsahující 40znakový heš commitu</strong>, na který aktuálně ukazuje. Vytvoření větve trvá zlomek milisekundy a spotřebuje 41 bajtů na disku.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Tři stavy a tři oblasti Gitu",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Třístupňová architektura Gitu</h2></div><div class=\"section-body\">\n<p>Při práci s Gitem se vaše soubory nacházejí v jedné ze tří oblastí:</p>\n<ol>\n  <li><strong>Pracovní strom (<em>Working Tree</em>)</strong>: Reálné soubory na disku, které právě editujete ve VS Code.</li>\n  <li><strong>Přípravná oblast (<em>Staging Area / Index</em>)</strong>: Vybrané změny připravené příkazem <code>git add</code> k zápisu.</li>\n  <li><strong>Místní repozitář (<em>Git Directory / .git</em>)</strong>: Trvale zaznamenané snapshoty vytvořené příkazem <code>git commit</code>.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Základní workflow: init, add, commit",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Zahájení práce: Inicializace a první commit</h2></div><div class=\"section-body\">\n<h3>1. Nastavení globální identity (nutné před prvním commitem):</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\">git config --global user.name \"Jan Novák\"\ngit config --global user.email \"novak@vscht.cz\"\ngit config --global init.defaultBranch main</pre>\n<h3>2. Vytvoření repozitáře a commit:</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\">git init\ngit add main.py pyproject.toml\ngit commit -m \"feat: inicializace projektu a základní konfigurace\"</pre>\n<h3>3. Kontrola stavu projektu:</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\">git status</pre>\n<p>Poskytne vám okamžitý přehled o tom, jaké soubory jsou změněné, jaké jsou připravené k zápisu a na jaké větvi se nacházíte.</p>\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Projektová hygiena: Soubor .gitignore",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Projektová hygiena: Pravidla pro soubor .gitignore</h2></div><div class=\"section-body\">\n<p>V Pythonu vzniká během překladu a běhu programů řada generovaných souborů a mezipamětí. <strong>Tyto soubory do gitu nikdy nepatří!</strong></p>\n<p>Do kořene repozitáře vždy umístěte soubor <strong><code>.gitignore</code></strong>:</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\"># Virtuální prostředí\n.venv/\nenv/\n\n# Mezipaměť bajtkódu CPythonu\n__pycache__/\n*.py[cod]\n\n# Výstupy testů a linterů\n.pytest_cache/\n.ruff_cache/\n.coverage\n\n# Lokální konfigurace editorů a tajné klíče\n.idea/\n.vscode/\n.env</pre>\n<div class=\"notes-block\"><div class=\"note-item caution\"><span class=\"note-icon\">🛑</span><div class=\"note-content\"><p>Nikdy do Gitu necommitujte soubory s hesly, API klíči nebo privátními daty (např. <code>.env</code>). Jakmile je tajný klíč jednou commitnut, zůstává v historii gitu navždy, i když soubor v dalším commitu smažete!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Moderní Git: switch a restore",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Moderní příkazy Gitu: git switch & git restore</h2></div><div class=\"section-body\">\n<p>Dlouhá léta byl příkaz <code>git checkout</code> nechvalně proslulý tím, že dělal dvě zcela nesouvisející věci najednou: přepínal větve a zároveň zahazoval neuložené změny v souborech.</p>\n<p>Od verze Git 2.23 jsou k dispozici dva moderní a bezpečné příkazy:</p>\n<h3>1. <code>git switch</code> — určen výhradně pro větve:</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Vytvoření a okamžité přepnutí do nové větve\ngit switch -c nova-funkce\n\n# Přepnutí zpět na hlavní větev\ngit switch main</pre>\n<h3>2. <code>git restore</code> — určen výhradně pro obnovu a zahazování změn:</h3>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Zahodit lokální změny v souboru a vrátit stav z commitu\ngit restore main.py\n\n# Vyřadit soubor ze Staging Area zpět mezi modified (unstage)\ngit restore --staged main.py</pre>\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "Větvení a slučování (Branches & Merges)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Větvení a slučování: Fast-Forward vs. 3-Way Merge</h2></div><div class=\"section-body\">\n<p>Větve umožňují paralelní práci na nových vlastnostech v izolaci:</p>\n<h3>Dva základní typy sloučení:</h3>\n<ol>\n  <li><strong>Fast-Forward Merge</strong>: Pokud na hlavní větvi <code>main</code> od odpojení větve <code>feature</code> nepřibyl žádný nový commit, Git pouze posune ukazatel <code>main</code> dopředu. Nevzniká žádný speciální commit.</li>\n  <li><strong>Three-Way Merge (3-cestné sloučení)</strong>: Pokud na <code>main</code> mezitím vznikly jiné commity, Git vyhledá společného předka, porovná obě linie a vytvoří nový <strong>Merge Commit</strong>, který spojí obě historie dohromady.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "Vzdálené repozitáře a spolupráce",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Vzdálené repozitáře: GitHub, GitLab a týmová spolupráce</h2></div><div class=\"section-body\">\n<p>Git je distribuovaný — každý vývojář má na svém počítači plnohodnotnou kopii celé historie projektu.</p>\n<p>K synchronizaci se vzdáleným serverem (<em>remote</em>, typicky GitHub, GitLab či univerzitní server) slouží:</p>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Propojení s existujícím vzdáleným repozitářem přes SSH\ngit remote add origin git@github.com:uzivatel/projekt.git\n\n# Odeslání lokálních commitů na server\ngit push -u origin main\n\n# Stažení nových změn ze serveru a jejich začlenění\ngit pull --rebase</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p><strong>Proč preferovat git pull --rebase?</strong> Standardní <code>git pull</code> vytvoří zbytečný 'Merge branch' commit pokaždé, když vaši kolegové mezitím něco nahráli. Příkaz <code>git pull --rebase</code> položí vaše lokální commity čistě navrch stažené historie, takže historie zůstává lineární a přehledná.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "Interaktivní prostředí: REPL a PyREPL",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Interaktivní interpret: REPL a nový PyREPL v Pythonu 3.13</h2></div><div class=\"section-body\">\n<p>Kromě spouštění skriptů nabízí Python interaktivní smyčku <strong>REPL</strong> (<em>Read-Eval-Print-Loop</em>). Spustíte ji pouhým zadáním <code>python</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">>>> a = 40 + 2\n>>> a\n42\n>>> import math\n>>> math.sqrt(a)\n6.48074069840786</pre>\n<h3>Revoluce v Pythonu 3.13: PyREPL</h3>\n<p>Až do verze 3.12 byla základní konzole Pythonu na terminálu poměrně spartánská. V <strong>Pythonu 3.13</strong> přichází nový <strong>PyREPL</strong>:</p>\n<ul>\n  <li>Plnohodnotná <strong>víceřádková editace</strong> s možností vracet se šipkami nahoru v rámci bloku.</li>\n  <li>Integrované barevné <strong>zvýrazňování syntaxe</strong> přímo při psaní.</li>\n  <li>Okamžitá interaktivní nápověda stiskem klávesy <code>F1</code>.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Interaktivní vědecký vývoj: JupyterLab",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Interaktivní vědecké prostředí: Jupyter Notebooky</h2></div><div class=\"section-body\">\n<p>Ve vědecké a datové praxi (chemie, bioinformatika, fyzika) je standardem prostředí <strong>Jupyter Notebook</strong> (resp. moderní rozhraní <strong>JupyterLab</strong>):</p>\n<h3>Proč je Jupyter oblíbený:</h3>\n<ul>\n  <li><strong>Buňková struktura</strong>: Kód rozdělíte do bloků, které lze spouštět nezávisle na sobě.</li>\n  <li><strong>Data zůstávají v paměti</strong>: Načtení velkého chemického datasetu trvá 30 vteřin, provedete ho v buňce 1 jednou a v dalších buňkách již pracujete s daty v paměti bez restartu skriptu.</li>\n  <li><strong>Bohatý multimediální výstup</strong>: Možnost kombinovat text v Markdownu, vzorce v LaTeXu, tabulky a interaktivní grafy.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "Pasti a chyby začátečníků",
+      "tags": ["Tricky"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">Časté pasti v úvodu studia a jak se jim vyhnout</h2></div><div class=\"section-body\">\n<ol>\n  <li><strong>Záměna interpretů (Missing Virtualenv)</strong>: Nainstalujete balíček přes pip, spustíte skript ve VS Code a dostanete <code>ModuleNotFoundError</code>. VS Code běží v systémovém Pythonu! Řešení: Stiskněte <code>Ctrl+Shift+P</code> -> <code>Python: Select Interpreter</code> a zvolte <code>.venv</code>.</li>\n  <li><strong>Commitnutí složky .venv do Gitu</strong>: Složka <code>.venv</code> obsahuje desítky tisíc binárních souborů specifických pro váš konkrétní operační systém. <strong>Nikdy ji nesdílejte přes Git!</strong> Ostatní vývojáři si prostředí vytvoří z <code>pyproject.toml</code>.</li>\n  <li><strong>Chybějící konfigurace identity v Gitu</strong>: Pokud před prvním commitem nenastavíte <code>user.name</code> a <code>user.email</code>, Git selže nebo použije anonymní systémové jméno stroje.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Produkční most: Nástroj uv",
+      "tags": ["WOW"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Produkční most: Nástroj uv (Nová éra Python ekosystému)</h2></div><div class=\"section-body\">\n<p>Standardní nástroje <code>pip</code> a <code>venv</code> jsou napsány v Pythonu a instalace složitějších závislostí trvá desítky vteřin.</p>\n<p>V roce 2024 vytvořil tým Astral projekt <strong><code>uv</code></strong> — extrémně rychlého správce balíčků a projektů napsaného v <strong>Rustu</strong>:</p>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\">curl -LsSf https://astral.sh/uv/install.sh | sh</pre>\n<h3>Srovnání rychlosti a funkcionality:</h3>\n<ul>\n  <li><strong>10× až 100× rychlejší než pip</strong>: Paralelní stahování, sdílená globální mezipaměť a efektivní SAT solver.</li>\n  <li><strong>All-in-One nástroj</strong>: Zastoupí <code>pip</code>, <code>venv</code> i <code>pyenv</code>.</li>\n  <li>Dokáže dokonce <strong>sám stáhnout a nainstalovat správnou verzi CPythonu</strong>:</li>\n</ul>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\">uv python install 3.12\nuv venv --python 3.12\nuv pip install httpx</pre>\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "Produkční most: Spouštění přes uvx",
+      "tags": ["WOW"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Spouštění nástrojů v izolaci: uvx / pipx</h2></div><div class=\"section-body\">\n<p>Často potřebujete jednorázově spustit nějaký globální nástroj (linter, formátovač nebo CLI utilitu), ale nechcete si kvůli němu instalovat závislosti do systému ani do projektu.</p>\n<p>K tomu slouží nástroj <strong><code>uvx</code></strong> (resp. standardní <code>pipx</code>):</p>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Spustí nástroj Ruff v izolovaném dočasném prostředí\nuvx ruff check .\n\n# Spustí JupyterLab bez nutnosti instalovat ho do projektového venv\nuvx --with numpy jupyter lab\n\n# Spustí interaktivní konzoli bpython\nuvx bpython</pre>\n<p><code>uvx</code> stáhne nástroj do vyrovnávací paměti, spustí jej a neznečistí žádné z vašich pracovních prostředí.</p>\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Produkční most: Linter a formátovač Ruff",
+      "tags": ["WOW"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Formátování a statická analýza: Nástroj Ruff</h2></div><div class=\"section-body\">\n<p>V profesionálním vývoji se dříve používalo několik různých nástrojů najednou: <code>black</code> (formátování), <code>flake8</code> (kontrola chyb), <code>isort</code> (řazení importů).</p>\n<p>Dnes je standardem <strong><code>Ruff</code></strong>:</p>\n<ul>\n  <li>Napsán v Rustu, <strong>10–100× rychlejší</strong> než původní nástroje.</li>\n  <li>Zastupuje formátovač i linter v jediné binárce.</li>\n  <li>Okamžitá kontrola v reálném čase přímo ve vašem editoru (VS Code rozšíření <em>Ruff</em>).</li>\n</ul>\n<pre class=\"brush: bash; gutter: false; toolbar: false;\"># Kontrola chyb a porušení konvencí PEP 8\nruff check .\n\n# Automatická oprava většiny nalezených problémů\nruff check --fix .\n\n# Formátování kódu (podle standardu Black)\nruff format .</pre>\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Shrnutí a přechod na cvičení",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Shrnutí přednášky a checklist pro laboratorní cvičení</h2></div><div class=\"section-body\">\n<p>Dnes jsme si osvojili fundamentální základy ekosystému a architektury:</p>\n<ol>\n  <li><strong>CPython</strong> interpretuje bajtkód v paměti na virtuálním stroji; proměnné jsou reference na <code>PyObject</code>.</li>\n  <li><strong>Virtuální prostředí (<code>venv</code>)</strong> je nezbytnou podmínkou pro každý projekt — zabraňuje konfliktům knihoven a chrání operační systém (PEP 405 / PEP 668).</li>\n  <li><strong><code>pyproject.toml</code></strong> je moderní deklarativní standard pro konfiguraci projektu a definici závislostí.</li>\n  <li><strong>Git</strong> ukládá snapshoty celé adresářové struktury v čase; základem je lineární hygiena, <code>.gitignore</code> a používání moderních příkazů <code>git switch</code> a <code>git restore</code>.</li>\n  <li><strong>Moderní nástroje (2026)</strong>: <code>uv</code> pro bleskovou správu prostředí a <code>ruff</code> pro čistý a bezchybný kód.</li>\n</ol>\n<h3>Checklist pro následující 90minutové cvičení:</h3>\n<ul>\n  <li>Ověření verze: <code>python3 --version</code> (vyžadován Python 3.12+).</li>\n  <li>Vytvoření a aktivace prvního virtuálního prostředí <code>.venv</code>.</li>\n  <li>Nastavení Git identity (<code>git config</code>) a inicializace cvičného repozitáře.</li>\n  <li>Vytvoření souboru <code>.gitignore</code> a první commit.</li>\n  <li>Vyzkoušení interaktivního REPLu a spuštění prvního Python skriptu.</li>\n</ul>\n</div>"
+    }
+  ]
+}

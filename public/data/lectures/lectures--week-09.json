@@ -1,0 +1,250 @@
+{
+  "slug": "lectures--week-09",
+  "total": 27,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod a osnova",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod a osnova</h2></div><div class=\"section-body\">\n<p>Vítejte v deváté přednášce kurzu programování v jazyce Python. Dnes opustíme čistě výpočetní operace v operační paměti a zaměříme se na <strong>perzistenci, práci se souborovým systémem, relačními databázemi a tabulkovou analýzu dat</strong>.</p>\n<p>Data žijí v souborech různých formátů (textové logy, binární struktury, JSON, TOML, CSV) nebo v relačních databázích. Seznámíme se s moderním objektovým přístupem ke správě cest <strong><code>pathlib.Path</code></strong>, ukážeme si, jak bezpečně pracovat s vestavěnou relační databází <strong><code>sqlite3</code></strong> bez rizika SQL Injection, a položíme základy práce s de facto standardem pro datovou analýzu v Pythonu — knihovnou <strong>Pandas</strong> (<code>Series</code> a <code>DataFrame</code>).</p>\n<h3>Osnova dnešní 90minutové přednášky:</h3>\n<ol>\n  <li><strong>C/Java vs. Python I/O paradigma</strong>: Od <code>FILE*</code> a streamů k bezpečnému Python RAII kontextu.</li>\n  <li><strong>Textový vs. Binární režim</strong>: Konec řádků (<code>\\r\\n</code> vs. <code>\\n</code>), UTF-8 kódování a PEP 597/686.</li>\n  <li><strong>Základy práce se soubory</strong>: Funkce <code>open()</code>, přístupové režimy, buffering a metody čtení.</li>\n  <li><strong>Ukazatel v souboru (Seek &amp; Tell)</strong>: Náhodný přístup v proudech a binární hlavičky.</li>\n  <li><strong>Problém starého přístupu <code>os.path</code></strong>: Proč jsou textové řetězce nevhodnou abstrakcí.</li>\n  <li><strong>Objektové cesty s <code>pathlib.Path</code></strong>: Operátor <code>/</code>, absolutní cesty a anatomie cesty (<code>stem</code>, <code>suffix</code>).</li>\n  <li><strong>Manipulace se souborovým systémem</strong>: <code>.exists()</code>, <code>.is_file()</code>, <code>.mkdir()</code>, mazání a přesuny.</li>\n  <li><strong>Bleskové čtení a zápis s Path</strong>: Metody <code>.read_text()</code>, <code>.write_text()</code>, <code>.read_bytes()</code>.</li>\n  <li><strong>Vyhledávání a procházení složek</strong>: Masky <code>.glob()</code> a rekurzivní stromy s <code>.rglob()</code>.</li>\n  <li><strong>Serializace strukturovaných dat: JSON</strong>: Modul <code>json</code>, párování typů a serializační pasti.</li>\n  <li><strong>Moderní konfigurace s <code>tomllib</code></strong>: Proč formát TOML nahradil INI/YAML (PEP 680).</li>\n  <li><strong>Tabulková data s modulem <code>csv</code></strong>: <code>reader</code>, <code>writer</code>, <code>DictReader</code> a parametr <code>newline=\"\"</code>.</li>\n  <li><strong>Bezpečnost serializace (Proč ne pickle)</strong>: Riziko spuštění libovolného kódu a bezpečné alternativy.</li>\n  <li><strong>Relační databáze v Pythonu: SQLite3</strong>: Architektura bezserverové transakční databáze.</li>\n  <li><strong>Připojení a kurzor</strong>: <code>connect()</code>, <code>cursor.execute()</code>, <code>fetchone()</code> a <code>fetchall()</code>.</li>\n  <li><strong>Kritická bezpečnost: Ochrana před SQL Injection</strong>: Parametrizované dotazy (<code>?</code>) vs. f-stringy.</li>\n  <li><strong>Transakční integrita</strong>: Správce kontextu <code>with conn:</code> a automatický <code>COMMIT</code> / <code>ROLLBACK</code>.</li>\n  <li><strong>Dávkové operace a výkon</strong>: Metoda <code>executemany()</code> a hromadné vkládání tisíců řádků.</li>\n  <li><strong>Most k tabulkové analýze: Proč Pandas?</strong>: Omezení SQL pro in-memory analytiku.</li>\n  <li><strong>Základní stavební kámen: <code>pd.Series</code></strong>: 1D vektor s pojmenovaným indexem a vektorizace.</li>\n  <li><strong>Dvourozměrné tabulky: <code>pd.DataFrame</code></strong>: Sloupce, řádky, sdílený index a tvorba tabulek.</li>\n  <li><strong>Načítání dat do Pandas</strong>: <code>pd.read_csv()</code>, <code>pd.read_sql_query()</code> a binární <code>read_parquet()</code>.</li>\n  <li><strong>Selekce dat: <code>.loc[]</code> vs. <code>.iloc[]</code></strong>: Výběr podle návěští vs. celočíselné pozice.</li>\n  <li><strong>Logické filtrování v Pandas</strong>: Booleovské masky a složené podmínky.</li>\n  <li><strong>Čištění dat a chybějící hodnoty</strong>: Práce s <code>NaN</code>, metody <code>isna()</code>, <code>dropna()</code>, <code>fillna()</code>.</li>\n  <li><strong>Agregace a seskupování (GroupBy)</strong>: Princip Split-Apply-Combine a metoda <code>.agg()</code>.</li>\n  <li><strong>Most k praxi a labu</strong>: Cvičení NetPBM + Analýza ornitologických dat &amp; Příprava na Week 11.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "C/Java vs. Python I/O: Kontextové paradigma",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">C/Java vs. Python I/O: Kontextové paradigma</h2></div><div class=\"section-body\">\n<p>V jazycích C a Java bylo tradiční čtení souboru spojeno s rizikem <strong>úniku souborových deskriptorů</strong> (Resource Leaks). Pokud v C zapomenete zavolat <code>fclose(f)</code>, nebo v Javě vyletí výjimka před voláním <code>in.close()</code>, operační systém drží soubor otevřený až do vyčerpání systémových limitů:</p>\n<pre class=\"brush: c; gutter: false; toolbar: false;\">// C: Nebezpečný procedurální přístup s rizikem memory/handle leaku\nFILE *f = fopen(\"mereni.dat\", \"r\");\nif (f == NULL) { return -1; }\n// Pokud zde nastane chyba nebo předčasný return, soubor zůstane otevřený!\nfclose(f);</pre>\n<pre class=\"brush: java; gutter: false; toolbar: false;\">// Java: Verbózní try-with-resources\ntry (BufferedReader br = new BufferedReader(new FileReader(\"mereni.dat\"))) {\n    String line = br.readLine();\n} catch (IOException e) {\n    e.printStackTrace();\n}</pre>\n<h3>Python: Elegantní RAII přes správce kontextu <code>with</code></h3>\n<p>V Pythonu se soubory <strong>nikdy neotevírají bez správce kontextu <code>with</code></strong>:</p>\n<ul>\n  <li>Interpret garantuje zavolání metody <code>__exit__()</code> (a tedy uzavření deskriptoru na úrovni CPythonu i jádra OS) za všech okolností — i při nečekané výjimce nebo příkazu <code>return</code>.</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">with open(\"mereni.dat\", mode=\"r\", encoding=\"utf-8\") as f:\n    obsah: str = f.read()\n# Zde je soubor již garantovaně bezpečně uzavřen</pre>\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Textový vs. Binární režim & Kódování UTF-8",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Textový vs. Binární režim &amp; Kódování UTF-8</h2></div><div class=\"section-body\">\n<p>Při volání <code>open(cesta, mode=...)</code> musíte striktně rozlišovat mezi dvěma světy:</p>\n<h3>1. Textový režim (výchozí: <code>'r'</code>, <code>'w'</code>, <code>'a'</code>)</h3>\n<ul>\n  <li>Pracuje s pythoním typem <strong><code>str</code></strong> (řetězec Unicode znaků).</li>\n  <li><strong>Automatický překlad konců řádků (Universal Newlines)</strong>: Na Windows ukládají programy konce řádků jako <code>\\r\\n</code> (CRLF), na Linuxu/macOS jako <code>\\n</code> (LF). V textovém režimu Python transparentně převádí všechny varianty (<code>\\r\\n</code>, <code>\\r</code>) na jednotné <code>\\n</code> při čtení a zpět při zápisu.</li>\n  <li><strong>Kódování znaků (Encoding)</strong>: Vždy <strong>explicitně uvádějte <code>encoding=\"utf-8\"</code></strong>! Spoléhání se na výchozí kódování systému je nejčastější příčinou chyb <code>UnicodeDecodeError</code> při přenosu kódu mezi Linuxem a Windows (kde bývalo výchozí cp1250). PEP 686 činí UTF-8 globálním výchozím standardem.</li>\n</ul>\n<h3>2. Binární režim (<code>'rb'</code>, <code>'wb'</code>, <code>'ab'</code>)</h3>\n<ul>\n  <li>Pracuje s pythoním typem <strong><code>bytes</code></strong> (surová sekvence bajtů 0 .. 255).</li>\n  <li>Žádný překlad konců řádků ani kódování znaků neprobíhá — data jsou čtena a zapisována přesně tak, jak leží na disku.</li>\n  <li>Nezbytné pro obrázky (JPEG, PNG, NetPBM), komprimované archivy (ZIP), audio/video a databáze.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Práce se soubory: Režimy a metody čtení",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Práce se soubory: Režimy a metody čtení</h2></div><div class=\"section-body\">\n<h3>Přehled přístupových režimů:</h3>\n<table class=\"slide-table\"><thead><tr><th>Režim</th><th>Význam</th><th>Chování při neexistenci</th><th>Pozice ukazatele</th></tr></thead><tbody><tr><td><code>'r'</code></td><td>Čtení (výchozí)</td><td>Vyvolá <code>FileNotFoundError</code></td><td>Začátek (0)</td></tr><tr><td><code>'w'</code></td><td>Zápis (přepsání)</td><td>Vytvoří nový soubor</td><td>Začátek (smaže původní obsah!)</td></tr><tr><td><code>'a'</code></td><td>Připojení (Append)</td><td>Vytvoří nový soubor</td><td>Konec souboru</td></tr><tr><td><code>'x'</code></td><td>Výhradní vytvoření</td><td>Vyvolá <code>FileExistsError</code>, pokud existuje</td><td>Začátek</td></tr><tr><td><code>'+'</code></td><td>Čtení i zápis</td><td>Aktualizace existujícího souboru</td><td>Kombinace (<code>'r+'</code>, <code>'w+'</code>)</td></tr></tbody></table>\n<h3>Tři způsoby čtení textového souboru:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">with open(\"data.txt\", mode=\"r\", encoding=\"utf-8\") as f:\n    # 1. Celý soubor najednou do paměti jako jeden řetězec:\n    vsechno: str = f.read()\n\nwith open(\"data.txt\", mode=\"r\", encoding=\"utf-8\") as f:\n    # 2. Celý soubor jako seznam řádků:\n    radky: list[str] = f.readlines()\n\nwith open(\"data.txt\", mode=\"r\", encoding=\"utf-8\") as f:\n    # 3. IDIOMATICKÝ ZPŮSOB: Iterace přes řádky (paměťově O(1)!):\n    for radek in f:\n        zpracuj(radek.rstrip(\"\\n\"))</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p><strong>Proč iterovat přes soubor přímo?</strong> Objekt otevřeného souboru je iterátor. Čte řádky líně přes vnitřní vyrovnávací paměť (buffer). Zpracování stogigabajtového logovacího souboru pomocí <code>for radek in f:</code> spotřebuje pouze několik kilobajtů RAM!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Ukazatel v souboru: Seek & Tell",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Ukazatel v souboru: Seek &amp; Tell</h2></div><div class=\"section-body\">\n<p>Operační systém udržuje pro každý otevřený souborový deskriptor <strong>ukazatel aktuální pozice</strong> (file pointer):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">with open(\"priklad.dat\", mode=\"rb\") as f:\n    # Kde se právě nacházíme? (offset v bajtech od začátku)\n    pozice: int = f.tell()  # 0\n\n    hlavicka = f.read(4)    # Přečteme první 4 bajty\n    print(f.tell())         # 4</pre>\n<h3>Posun ukazatele: Metoda <code>seek(offset, whence)</code></h3>\n<p>Metoda <code>seek()</code> umožňuje náhodný přístup k datům v souboru:</p>\n<ul>\n  <li><strong><code>whence = 0</code></strong> (<code>os.SEEK_SET</code>): Od začátku souboru (výchozí).</li>\n  <li><strong><code>whence = 1</code></strong> (<code>os.SEEK_CUR</code>): Relativně k aktuální pozici (vyžaduje binární režim).</li>\n  <li><strong><code>whence = 2</code></strong> (<code>os.SEEK_END</code>): Relativně ke konci souboru (vyžaduje binární režim).</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import os\n\nwith open(\"obrazek.ppm\", mode=\"rb\") as f:\n    # Skočit na bajt 100 od začátku souboru:\n    f.seek(100, os.SEEK_SET)\n\n    # Posunout se o 16 bajtů dopředu:\n    f.seek(16, os.SEEK_CUR)\n\n    # Skočit na posledních 10 bajtů souboru:\n    f.seek(-10, os.SEEK_END)\n    paticka = f.read(10)</pre>\n<div class=\"notes-block\"><div class=\"note-item caution\"><span class=\"note-icon\">🛑</span><div class=\"note-content\"><p><strong>seek() v textovém režimu:</strong> V textovém režimu s UTF-8 kódováním neodpovídá 1 znak vždy 1 bajtu (česká diakritika zabírá 2 bajty). V textovém režimu je povoleno volat <code>seek()</code> pouze s hodnotou 0 (návrat na začátek) nebo s hodnotou dříve získanou z <code>tell()</code>.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Od os.path k modernímu pathlib.Path",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Od os.path k modernímu pathlib.Path</h2></div><div class=\"section-body\">\n<p>Historicky se v Pythonu (a jazyce C) manipulovalo s cestami jako s <strong>obyčejnými textovými řetězci</strong> pomocí modulu <code>os.path</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Zastaralý přístup (Python 2 / raný Python 3):\nimport os\n\nadresar = \"/home/kolar/projekt\"\nsoubor = \"vysledky.csv\"\n\n# Manuální lepení řetězců funkcemi:\ncesta = os.path.join(adresar, \"vystupy\", soubor)\nnazev = os.path.basename(cesta)\npripona = os.path.splitext(cesta)[1]\nje_soubor = os.path.isfile(cesta)</pre>\n<h3>Proč je <code>os.path</code> zastaralý a neergonomický?</h3>\n<ol>\n  <li><strong>Stringly-typed API</strong>: Cesta je pouze <code>str</code>. Nelze z jejího typu poznat, zda reprezentuje existující soubor, složku nebo neplatný řetězec.</li>\n  <li><strong>Nekonečné vnořování funkcí</strong>: <code>os.path.dirname(os.path.abspath(os.path.join(...)))</code> je nečitelné.</li>\n  <li><strong>Rozdíly mezi platformami</strong>: Lomítka <code>/</code> (POSIX) vs. zpětná lomítka <code>\\</code> (Windows).</li>\n</ol>\n<p>Od Pythonu 3.4 nabízí standardní knihovna modul <strong><code>pathlib</code></strong> (PEP 428): Cesta je <strong>plnohodnotný objekt</strong> se zapouzdřenými metodami a přetíženými operátory.</p>\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Objektové cesty s pathlib.Path",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Objektové cesty s pathlib.Path</h2></div><div class=\"section-body\">\n<p>Třída <code>pathlib.Path</code> poskytuje jednotné a bezpečné rozhraní pro práci s cestami napříč všemi operačními systémy:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from pathlib import Path\n\n# Vytvoření cesty (aktuální složka):\nkoren = Path.cwd()\n\n# Elegantní operátor / pro skládání cest (nahrazuje os.path.join):\ncesta: Path = koren / \"data\" / \"mereni\" / \"teplota.csv\"\n\n# Domovská složka uživatele:\nhome = Path.home() / \"dokumenty\"</pre>\n<h3>Anatomie objektu Path:</h3>\n<p>Představme si cestu <code>p = Path(\"/home/kolar/analyza/vystup_v2.tar.gz\")</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">p = Path(\"/home/kolar/analyza/vystup_v2.tar.gz\")\n\nprint(p.name)      # \"vystup_v2.tar.gz\"  (celé jméno souboru)\nprint(p.stem)      # \"vystup_v2.tar\"     (jméno bez poslední přípony)\nprint(p.suffix)    # \".gz\"               (poslední přípona)\nprint(p.suffixes)  # [\".tar\", \".gz\"]     (všechny přípony!)\nprint(p.parent)    # Path(\"/home/kolar/analyza\") (rodičovská složka)\nprint(p.parts)     # ('/', 'home', 'kolar', 'analyza', 'vystup_v2.tar.gz')\n\n# Snadná změna přípony nebo jména:\nnova_cesta = p.with_suffix(\".zip\")      # .../vystup_v2.tar.zip\njiny_nazev = p.with_name(\"zaloha.dat\")  # .../zaloha.dat</pre>\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Manipulace se souborovým systémem",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Manipulace se souborovým systémem</h2></div><div class=\"section-body\">\n<p>Objekt <code>Path</code> obsahuje veškeré metody pro zjišťování stavu a modifikaci souborového systému:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from pathlib import Path\n\ncesta = Path(\"vystupy/grafy/trend.png\")\n\n# 1. Testování existence a typu:\nif cesta.exists():\n    print(f\"Existuje! Je to soubor? {cesta.is_file()}, Je to složka? {cesta.is_dir()}\")\n\n# 2. Vytvoření složky (včetně všech chybějících nadřazených složek):\nslozka = Path(\"vystupy/export/2026/leden\")\nslozka.mkdir(parents=True, exist_ok=True)\n# parents=True  -&gt; obdoba 'mkdir -p' (vytvoří celou cestu)\n# exist_ok=True -&gt; nevyvolá chybu, pokud složka již existuje\n\n# 3. Informace o souboru (metadata, velikost, čas změny):\ninfo = cesta.stat()\nprint(f\"Velikost: {info.st_size} bajtů\")\nprint(f\"Čas poslední změny: {info.st_mtime}\")\n\n# 4. Mazání a přejmenování:\nif cesta.exists():\n    cesta.unlink(missing_ok=True)  # Smaže soubor (missing_ok zabrání chybě)\n\nprazdna_slozka = Path(\"docasne\")\nprazdna_slozka.rmdir()             # Smaže prázdnou složku\n\n# Přejmenování nebo přesun souboru:\nzdroj = Path(\"stare_jmeno.txt\")\ncil = Path(\"archiv/nove_jmeno.txt\")\nzdroj.rename(cil)                  # Přesun / přejmenování</pre>\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Bleskové čtení a zápis s Path",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Bleskové čtení a zápis s Path</h2></div><div class=\"section-body\">\n<p>Pro rychlé načtení nebo uložení souboru již nemusíte psát blok <code>with open(...) as f:</code>. <code>Path</code> obsahuje vysoce optimalizované jednorázové metody:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from pathlib import Path\n\nkonfigurace = Path(\"app_config.toml\")\n\n# 1. Přečtení celého textu jedním voláním (automaticky otevře, přečte a zavře):\nobsah: str = konfigurace.read_text(encoding=\"utf-8\")\n\n# 2. Zápis textu jedním voláním:\nreport = Path(\"vystupy/souhrn.txt\")\nreport.write_text(\"Všechny testy prošly úspěšně.\\n\", encoding=\"utf-8\")\n\n# 3. Binární čtení a zápis (vrací a přijímá typ bytes):\nbinarni_soubor = Path(\"ikona.png\")\nsurova_data: bytes = binarni_soubor.read_bytes()\n\nzaloha = Path(\"ikona_kopie.png\")\nzaloha.write_bytes(surova_data)</pre>\n<h3>Kdy použít <code>read_text()</code> a kdy <code>open()</code>?</h3>\n<ul>\n  <li><strong><code>Path.read_text()</code> / <code>write_text()</code></strong>: Ideální pro konfigurační soubory, JSON, šablony a menší data, která se pohodlně vejdou do paměti RAM.</li>\n  <li><strong><code>with cesta.open() as f:</code></strong>: Nezbytné pro velké soubory (proudové zpracování po řádcích), proudový zápis logů nebo práci s binárními proudy.</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Vyhledávání v souborovém systému: glob a rglob",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Vyhledávání v souborovém systému: glob a rglob</h2></div><div class=\"section-body\">\n<p>Procházení adresářové struktury v jazyce C vyžadovalo funkce <code>opendir</code>, <code>readdir</code> a rekurzivní volání. V Pythonu stačí metody <strong><code>.glob()</code></strong> a <strong><code>.rglob()</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from pathlib import Path\n\nprojekt = Path.cwd()\n\n# 1. Ploché vyhledávání v jedné složce (.glob):\n# Najdi všechny CSV soubory přímo ve složce data:\nfor csv_file in (projekt / \"data\").glob(\"*.csv\"):\n    print(\"Nalezen CSV:\", csv_file.name)\n\n# 2. REKURZIVNÍ vyhledávání celým podstromem (.rglob):\n# Najdi všechny pythoní skripty kdekoli v projektu (odpovídá vzoru '**/*.py'):\npython_skripty = list(projekt.rglob(\"*.py\"))\nprint(f\"Nalezeno {len(python_skripty)} pythoních skriptů v projektu.\")\n\n# 3. Filtrování a proudové zpracování generátorem:\nvelke_logy = (\n    soubor for soubor in projekt.rglob(\"*.log\")\n    if soubor.is_file() and soubor.stat().st_size &gt; 10 * 1024 * 1024  # &gt; 10 MB\n)\n\nfor log in velke_logy:\n    print(f\"Pozor: Obří log soubor {log.relative_to(projekt)} ({log.stat().st_size / 1e6:.1f} MB)\")</pre>\n<p>Metody <code>.glob()</code> a <code>.rglob()</code> vracejí <strong>generátory</strong>, takže nezpůsobují alokaci seznamu tisíců souborů najednou.</p>\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Serializace strukturovaných dat: Modul json",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Serializace strukturovaných dat: Modul json</h2></div><div class=\"section-body\">\n<p>Formát <strong>JSON</strong> (JavaScript Object Notation) je univerzálním standardem pro výměnu dat mezi webovými rozhraními a ukládání strukturovaných dokumentů.</p>\n<p>Standardní knihovna Pythonu obsahuje vestavěný modul <strong><code>json</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import json\nfrom pathlib import Path\n\ndata = {\n    \"uzivatel\": \"Jan Novak\",\n    \"id\": 4821,\n    \"role\": [\"admin\", \"editor\"],\n    \"aktivni\": True,\n    \"nastaveni\": {\"dark_mode\": True, \"limit\": None}\n}\n\n# 1. Serializace do textového řetězce (dumps = dump string):\njson_text: str = json.dumps(data, indent=2, ensure_ascii=False)\n\n# 2. Serializace přímo do souboru (dump):\nwith open(\"user.json\", \"w\", encoding=\"utf-8\") as f:\n    json.dump(data, f, indent=2, ensure_ascii=False)\n\n# 3. Deserializace z textového řetězce (loads = load string):\nnactena_data: dict = json.loads(json_text)\n\n# 4. Deserializace přímo ze souboru (load):\nwith open(\"user.json\", \"r\", encoding=\"utf-8\") as f:\n    soubor_data: dict = json.load(f)</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">💡</span><div class=\"note-content\"><p><strong>Klíčové parametry modulu json:</strong> <code>indent=2</code>: Pěkné formátování s odsazením (pretty print). <code>ensure_ascii=False</code>: Zabraňuje převodu českých znaků na nevzhledné <code>\\u010d\\u00ed</code>. Znaky jsou uloženy přímo v UTF-8.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Moderní konfigurace s tomllib (Python 3.11+)",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Moderní konfigurace s tomllib (Python 3.11+)</h2></div><div class=\"section-body\">\n<p>Zatímco JSON je skvělý pro přenos dat, pro konfigurační soubory psané člověkem je nevhodný (nepodporuje komentáře a vyžaduje přísnou syntaxi čárek).</p>\n<p>V moderním Pythonu se formát <strong>TOML</strong> (Tom's Obvious Minimal Language) stal standardem pro konfiguraci projektů (<code>pyproject.toml</code>). Od verze Python 3.11 je čtečka TOML integrována přímo ve standardní knihovně jako modul <strong><code>tomllib</code></strong> (PEP 680):</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\"># config.toml\n[databaze]\nhostitel = \"localhost\"\nport = 5432\ntimeout = 30.5\npovolene_tabulky = [\"uzivatele\", \"faktury\", \"logy\"]\n\n[autentizace]\nvyzadovat_mfa = true\nadmin_email = \"admin@vscht.cz\"</pre>\n<h3>Načtení TOML v Pythonu 3.11+:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import tomllib\nfrom pathlib import Path\n\ncesta = Path(\"config.toml\")\n\n# tomllib.load() vyžaduje otevření v BINÁRNÍM režimu (\"rb\"):\nwith cesta.open(\"rb\") as f:\n    config: dict = tomllib.load(f)\n\nprint(config[\"databaze\"][\"port\"])           # 5432 (int)\nprint(config[\"databaze\"][\"povolene_tabulky\"]) # ['uzivatele', 'faktury', 'logy'] (list)</pre>\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Tabulková data s modulem csv",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Tabulková data s modulem csv</h2></div><div class=\"section-body\">\n<p>Formát CSV (Comma-Separated Values) je nejrozšířenějším formátem pro export dat ze سنجů a databází. Nikdy neparsujte CSV soubory vlastnoručně pomocí <code>line.split(\",\")</code>! Takový kód okamžitě selže, jakmile buňka obsahuje čárku v uvozovkách (<code>\"Praha, Dejvice\"</code>) nebo odřádkování uvnitř buňky.</p>\n<p>Standardní modul <strong><code>csv</code></strong> řeší veškerá úskalí specifikace RFC 4180:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import csv\nfrom pathlib import Path\n\n# 1. Objektové čtení přes DictReader (vrací slovníky podle záhlaví):\nwith open(\"studenti.csv\", mode=\"r\", encoding=\"utf-8\", newline=\"\") as f:\n    reader = csv.DictReader(f, delimiter=\";\")\n    for radek in reader:\n        print(f\"Student: {radek['jmeno']}, Body: {radek['body']}\")\n\n# 2. Zápis slovníků přes DictWriter:\ndata_k_zapisu = [\n    {\"jmeno\": \"Eva\", \"obor\": \"Bioinformatika\", \"rocnik\": 3},\n    {\"jmeno\": \"Petr\", \"obor\": \"Chemoinformatika\", \"rocnik\": 2},\n]\n\nwith open(\"vystup.csv\", mode=\"w\", encoding=\"utf-8\", newline=\"\") as f:\n    fieldnames = [\"jmeno\", \"obor\", \"rocnik\"]\n    writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter=\";\")\n    writer.writeheader()      # Zapíše první řádek se jmény sloupců\n    writer.writerows(data_k_zapisu)</pre>\n<div class=\"notes-block\"><div class=\"note-item warning\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p><strong>Zásadní parametr newline=\"\":</strong> Při otevírání souboru pro modul <code>csv</code> <strong>vždy předejte <code>newline=\"\"</code></strong>. Zabráníte tím zdvojování prázdných řádků na operačním systému Windows (<code>\\r\\r\\n</code>).</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Bezpečnost serializace: Proč se vyhnout modulu pickle",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Bezpečnost serializace: Proč se vyhnout modulu pickle</h2></div><div class=\"section-body\">\n<p>V mnoha starších učebnicích Pythonu narazíte na modul <strong><code>pickle</code></strong>. Slouží k binární serializaci libovolných pythoních objektů (včetně instancí vlastních tříd, funkcí a referencí).</p>\n<h3>Proč je <code>pickle</code> v moderním vývoji zapovězen?</h3>\n<p>Modul <code>pickle</code> <strong>není bezpečný</strong>. Deserializace neznámého nebo nedůvěryhodného souboru <code>.pickle</code> pomocí <code>pickle.load()</code> může vést k <strong>okamžitému spuštění libovolného kódu útočníka (Remote Code Execution)</strong>!</p>\n<p>Mechanismus <code>__reduce__</code> uvnitř serializovaného streamu totiž umožňuje instruovat interpret, aby spustil jakoukoli funkci operačního systému (např. <code>os.system('rm -rf /')</code>):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Útočný pickle stream (ukázka bezpečnostního rizika):\nimport pickle, base64\n\nclass Utok:\n    def __reduce__(self):\n        import os\n        return (os.system, (\"echo HACKED BY PICKLE\",))\n\npodvrzena_data = pickle.dumps(Utok())\n# Oběť načte data v dobré víře:\n# pickle.loads(podvrzena_data)  -&gt; OKAMŽITĚ PROVEDE SYSTÉMOVÝ PŘÍKAZ!</pre>\n<h3>Moderní a bezpečné alternativy:</h3>\n<ol>\n  <li><strong>JSON / TOML</strong>: Pro strukturované konfigurace a výměnu dat.</li>\n  <li><strong>SQLite / Parquet</strong>: Pro tabulková data a analytické datasety.</li>\n  <li><strong>Pydantic / dataclasses</strong>: Pro validaci a rekonstrukci objektů z bezpečných JSON formátů.</li>\n</ol>\n</div>"
+    }
+,
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Relační databáze: Modul sqlite3",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Relační databáze: Modul sqlite3</h2></div><div class=\"section-body\">\n<p>Pokud vaše data přesahují možnosti plochých souborů a vyžadují transakce, indexy a relační integritu, Python nabízí plnohodnotný SQL engine přímo v základní instalaci: <strong><code>sqlite3</code></strong>.</p>\n<p>SQLite je nejrozšířenější databázový engine na světě:</p>\n<ul>\n  <li><strong>Zero Configuration</strong>: Žádný databázový server, žádné konfigurační porty, žádné přihlašovací údaje.</li>\n  <li><strong>Serverless &amp; In-Process</strong>: Databázový stroj běží přímo v procesu vaší aplikace.</li>\n  <li><strong>Single File</strong>: Celá databáze (tabulky, indexy, triggery) je uložena v jediném kompaktním souboru na disku (nebo v operační paměti <code>:memory:</code>).</li>\n</ul>\n<p>Pro práci se SQLite v Pythonu nepotřebujete instalovat žádné externí ovladače (žádný JDBC driver ani pip balíčky) — stačí <code>import sqlite3</code>.</p>\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Připojení a kurzor v SQLite",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Připojení a kurzor v SQLite</h2></div><div class=\"section-body\">\n<p>Práce se SQLite se řídí standardem <strong>Python DB-API 2.0 (PEP 249)</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sqlite3\nfrom pathlib import Path\n\ndb_path = Path(\"vyzkum.db\")\n\n# 1. Navázání spojení (Connection):\nconn = sqlite3.connect(db_path)\n\n# 2. Vytvoření kurzoru (Cursor) pro vykonávání SQL příkazů:\ncursor = conn.cursor()\n\n# 3. Vytvoření tabulky pomocí DDL dotazu:\ncursor.execute(\"\"\"\n    CREATE TABLE IF NOT EXISTS vzorky (\n        id INTEGER PRIMARY KEY AUTOINCREMENT,\n        oznaceni TEXT NOT NULL UNIQUE,\n        teplota REAL,\n        koncentrace REAL,\n        cas_mereni TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n    )\n\"\"\")\n\n# 4. Vložení jednoho záznamu (DML):\ncursor.execute(\"\"\"\n    INSERT INTO vzorky (oznaceni, teplota, koncentrace)\n    VALUES ('VZ-2026-A', 23.4, 0.15)\n\"\"\")\n\n# Potvrzení změn a uzavření:\nconn.commit()\nconn.close()</pre>\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Kritická bezpečnost: Ochrana před SQL Injection",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Kritická bezpečnost: Ochrana před SQL Injection</h2></div><div class=\"section-body\">\n<p>Toto je nejdůležitější bezpečnostní pravidlo pro práci s jakoukoli databází v libovolném programovacím jazyce:</p>\n<div class=\"notes-block\"><div class=\"note-item caution\"><span class=\"note-icon\">🛑</span><div class=\"note-content\"><p><strong>ZÁKAZ vkládání hodnot do SQL pomocí f-stringů nebo formátování řetězců!</strong> Nikdy, za žádných okolností, neskládejte SQL dotaz pomocí <code>f\"SELECT ... WHERE jmeno = '{vstup}'\"</code>! Otevíráte tím dveře fatální zranitelnosti <strong>SQL Injection</strong>.</p></div></div></div>\n<h3>Správné řešení: Parametrizované dotazy (<code>?</code> zástupný symbol)</h3>\n<p>Při použití zástupného symbolu <code>?</code> předáte parametry jako <strong>samostatnou n-tici (tuple)</strong>. Databázový engine nejprve dotaz zkompiluje a parametry dosadí bezpečně jako surové literály:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># SPRÁVNĚ A BEZPEČNĚ:\nhledane_jmeno = \"Novak\"\n# Hodnoty předáváme jako n-tici (tuple) v druhém argumentu:\ncursor.execute(\"SELECT * FROM uzivatele WHERE jmeno = ?\", (hledane_jmeno,))\n\n# Vícenásobné parametry:\ncursor.execute(\"\"\"\n    SELECT id, teplota FROM vzorky\n    WHERE teplota &gt; ? AND koncentrace &lt; ?\n\"\"\", (20.0, 0.5))\n\nvysledky: list[tuple] = cursor.fetchall()</pre>\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Správa transakcí a kontextový manažer",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Správa transakcí a kontextový manažer</h2></div><div class=\"section-body\">\n<p>V relačních databázích musí být změny atomické (<strong>ACID</strong> vlastnosti). Pokud převádíte peníze z jednoho účtu na druhý, musíte provést odečtení i přičtení v jediné transakci. Pokud druhaan operace selže, celá transakce musí být vrácena zpět (<strong>ROLLBACK</strong>).</p>\n<p>Objekt spojení <code>conn</code> v <code>sqlite3</code> funguje jako <strong>správce kontextu transakcí</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sqlite3\n\nconn = sqlite3.connect(\"banka.db\")\n\ntry:\n    # Blok 'with conn:' automaticky řídí transakci:\n    with conn:\n        conn.execute(\"UPDATE ucty SET zustatek = zustatek - 500 WHERE id = 1\")\n        \n        # Představme si neočekávanou chybu:\n        if stav_chyby:\n            raise ValueError(\"Chyba platební brány!\")\n            \n        conn.execute(\"UPDATE ucty SET zustatek = zustatek + 500 WHERE id = 2\")\n    # Pokud blok proběhne bez výjimky -&gt; automaticky proběhne conn.commit()\n\nexcept Exception as e:\n    # Při jakékoli výjimce správce kontextu automaticky provedl conn.rollback()!\n    print(\"Transakce selhala a byla bezpečně vrácena:\", e)\n\nfinally:\n    conn.close()</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p><strong>Rozdíl mezi with conn: a with open():</strong> V <code>sqlite3</code> správce kontextu <code>with conn:</code> <strong>neuzavírá spojení</strong>, ale pouze ohraničuje transakci (<code>commit</code>/<code>rollback</code>). Uzavření spojení <code>conn.close()</code> musíte provést explicitně (např. ve <code>finally</code>).</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "Výkon v SQLite: executemany a dávkové vkládání",
+      "tags": ["Core"],
+      "diff": "internals",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Výkon v SQLite: executemany a dávkové vkládání</h2></div><div class=\"section-body\">\n<p>Pokud potřebujete do databáze vložit 100 000 naměřených bodů, volání <code>cursor.execute(\"INSERT ...\")</code> v obyčejném pythoním for-cyklu s autocommitem může trvat desítky sekund, protože disk provádí synchronní zápis pro každou transakci zvlášť.</p>\n<h3>1. Dávkové vkládání pomocí <code>cursor.executemany()</code></h3>\n<p>Metoda <code>executemany()</code> zkompiluje SQL příkaz v C jádře pouze jednou a aplikuje jej na celou sekvenci n-tic:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sqlite3\n\nconn = sqlite3.connect(\"velka_data.db\")\ncursor = conn.cursor()\n\n# Generátor nebo seznam 100 000 měření:\nnamerena_data = [\n    (f\"SENZOR_{i % 10}\", 20.0 + (i * 0.01), 0.5)\n    for i in range(100_000)\n]\n\n# Zabalení do jediné transakce a executemany:\nwith conn:\n    cursor.executemany(\"\"\"\n        INSERT INTO vzorky (oznaceni, teplota, koncentrace)\n        VALUES (?, ?, ?)\n    \"\"\", namerena_data)\n\n# Výsledek: Vložení 100 000 záznamů proběhne za méně než 0.2 sekundy!</pre>\n<h3>2. Čtení výsledků jako slovníků: <code>sqlite3.Row</code></h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">conn.row_factory = sqlite3.Row\ncursor = conn.cursor()\ncursor.execute(\"SELECT id, oznaceni, teplota FROM vzorky LIMIT 1\")\nrow = cursor.fetchone()\n\nprint(row[\"oznaceni\"], row[\"teplota\"])  # Přístup jako ve slovníku!</pre>\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "Most k tabulkové analýze: Proč Pandas?",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Most k tabulkové analýze: Proč Pandas?</h2></div><div class=\"section-body\">\n<p>SQLite je skvělá pro perzistentní ukládání a SQL filtrování. Jakmile ale potřebujete data:</p>\n<ul>\n  <li>Statisticky agregovat a počítat korelace,</li>\n  <li>Čistit chybějící hodnoty (<code>NaN</code>),</li>\n  <li>Přeskupovat tabulky (pivot tables, reshape),</li>\n  <li>Spojovat nesourodé datasety (Merge/Join) v paměti RAM,</li>\n  <li>Okamžitě vykreslovat grafy,</li>\n</ul>\n<p>SQL jazyk se stává těžkopádným. Zde nastupuje <strong>knihovna Pandas</strong> — absolutní standard moderní datové vědy v Pythonu. Pandas přináší koncept <strong>Data Frame (datový rámec)</strong> — virtuální relační tabulku žijící přímo v operační paměti RAM, postavenou na bleskovém homogenním základu <strong>NumPy</strong> a <strong>Apache Arrow</strong>.</p>\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "Základní stavební kámen: pd.Series",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Základní stavební kámen: pd.Series</h2></div><div class=\"section-body\">\n<p>Objekt <strong><code>pd.Series</code></strong> je jednorozměrné pole schopné pojmout libovolný datový typ. Na rozdíl od 1D pole v NumPy má <code>Series</code> navíc <strong>pojmenovaný Index</strong> (popisky řádků):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import pandas as pd\nimport numpy as np\n\n# 1. Vytvoření Series ze seznamu s výchozím celočíselným indexem (0, 1, 2...):\ns1 = pd.Series([10.5, 21.0, 18.2, 33.7], name=\"Teplota\")\n\n# 2. Vytvoření Series s vlastním pojmenovaným indexem:\nteploty = pd.Series(\n    [21.5, 19.8, 24.2, 18.0],\n    index=[\"Praha\", \"Brno\", \"Ostrava\", \"Plzen\"],\n    name=\"Teplota_C\"\n)\nprint(teploty)\n# Praha      21.5\n# Brno       19.8\n# Ostrava    24.2\n# Plzen      18.0</pre>\n<h3>Vektorizované operace nad Series:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Převod na Kelviny jedním příkazem:\nteploty_k = teploty + 273.15\n\n# Vektorizované filtrování (booleovská maska):\nteple_mesta = teploty[teploty &gt; 20.0]\nprint(teple_mesta)  # Praha: 21.5, Ostrava: 24.2</pre>\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Dvourozměrné tabulky: pd.DataFrame",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Dvourozměrné tabulky: pd.DataFrame</h2></div><div class=\"section-body\">\n<p>Objekt <strong><code>pd.DataFrame</code></strong> reprezentuje 2D tabulku. Můžete si jej představit jako tabulku v Excelu, relační SQL tabulku nebo slovník objektů <code>Series</code>, které sdílejí společný index:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import pandas as pd\n\n# Vytvoření DataFrame ze slovníku seznamů:\ndata = {\n    \"Mesto\": [\"Praha\", \"Brno\", \"Ostrava\", \"Plzen\"],\n    \"Kraj\": [\"Hlavní město\", \"Jihomoravský\", \"Moravskoslezský\", \"Plzeňský\"],\n    \"Obyvatel\": [1335000, 380000, 280000, 175000],\n    \"Nadmorska_vyska\": [235, 220, 210, 310]\n}\n\ndf = pd.DataFrame(data)\nprint(df)</pre>\n<h3>Rychlá inspekce DataFrame:</h3>\n<ul>\n  <li><code>df.head(n)</code>: Zobrazí prvních n řádků tabulky.</li>\n  <li><code>df.tail(n)</code>: Zobrazí posledních n řádků tabulky.</li>\n  <li><code>df.info()</code>: Přehled sloupců, jejich typů (<code>dtypes</code>) a počtu nenulových hodnot.</li>\n  <li><code>df.describe()</code>: Blesková deskriptivní statistika číselných sloupců (průměr, směrodatná odchylka, kvartily, min, max).</li>\n</ul>\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "Načítání dat do Pandas: CSV, SQL a Parquet",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">Načítání dat do Pandas: CSV, SQL a Parquet</h2></div><div class=\"section-body\">\n<p>Pandas disponuje sadou vysoce optimalizovaných I/O funkcí začínajících předponou <code>read_*</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import sqlite3\nimport pandas as pd\n\n# 1. Načtení z CSV souboru (C parser pod kapotou, nesrovnatelně rychlejší než modul csv):\ndf_csv = pd.read_csv(\"data/mereni.csv\", sep=\";\", encoding=\"utf-8\")\n\n# 2. Načtení přímo z relační SQL databáze:\nconn = sqlite3.connect(\"vyzkum.db\")\ndf_sql = pd.read_sql_query(\"\"\"\n    SELECT oznaceni, teplota, koncentrace\n    FROM vzorky\n    WHERE teplota &gt; 20.0\n\"\"\", conn)\nconn.close()\n\n# 3. Moderní binární formát Apache Parquet (sloupcové ukládání, komprese Snappy):\ndf_parquet = pd.read_parquet(\"data/velka_data.parquet\")\n\n# 4. Uložení výsledků zpět:\ndf_sql.to_csv(\"vystupy/filtrovano.csv\", index=False)\ndf_sql.to_parquet(\"vystupy/vysledky.parquet\")</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">✨</span><div class=\"note-content\"><p><strong>Proč Parquet místo CSV?</strong> Formát <strong>Parquet</strong> uchovává datové typy (datum, float, int) v binární podobě a je sloupcově komprimovaný. Načtení gigabajtového datasetu z Parquetu je často <strong>10× až 50× rychlejší</strong> než parsování textového CSV.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Selekce dat: .loc[] vs. .iloc[]",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Selekce dat: .loc[] vs. .iloc[]</h2></div><div class=\"section-body\">\n<p>Nejčastější začátečnickou chybou v Pandas je chaotické používání hranatých závorek <code>df[...]</code>. V moderním Pandas se pro výběr řádků a sloupců používají dva explicitní indexery:</p>\n<h3>1. <code>df.iloc[...]</code> (Integer Location — celočíselné indexy jako v NumPy/C)</h3>\n<p>Přistupuje k řádkům a sloupcům výhradně podle jejich <strong>číselných pozic od 0 do N-1</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># První dva řádky, první tři sloupce:\nsub1 = df.iloc[0:2, 0:3]\n\n# Poslední řádek, všechny sloupce:\nlast_row = df.iloc[-1, :]</pre>\n<h3>2. <code>df.loc[...]</code> (Label Location — výběr podle textových návěští / jmen)</h3>\n<p>Přistupuje k datům podle <strong>názvů sloupců</strong> a <strong>popisků indexu</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Nastavíme Město jako index tabulky:\ndf_mesta = df.set_index(\"Mesto\")\n\n# Výběr řádku 'Praha' a sloupce 'Obyvatel':\nobyv_prahy = df_mesta.loc[\"Praha\", \"Obyvatel\"]  # 1335000\n\n# Výběr více měst a konkrétních sloupců:\nsub2 = df_mesta.loc[[\"Praha\", \"Brno\"], [\"Obyvatel\", \"Nadmorska_vyska\"]]</pre>\n<div class=\"notes-block\"><div class=\"note-item warning\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p><strong>Rozdíl v řezání (Slicing endpoint):</strong> Pozor: Zatímco <code>iloc[0:2]</code> končí před indexem 2 (jak je v Pythonu zvykem), <code>loc[\"Praha\":\"Ostrava\"]</code> je <strong>včetně koncového prvku</strong>!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "Čištění dat a chybějící hodnoty (NaN)",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Čištění dat a chybějící hodnoty (NaN)</h2></div><div class=\"section-body\">\n<p>V reálných datech z laboratorních přístrojů nebo senzorů se neustále setkáte s chybějícími hodnotami. V Pandas jsou chybějící data reprezentována hodnotou <code>NaN</code> (Not a Number z IEEE 754) nebo novým <code>pd.NA</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import pandas as pd\nimport numpy as np\n\ndf = pd.DataFrame({\n    \"Senzor\": [\"A1\", \"A2\", \"A3\", \"A4\"],\n    \"Tlak\": [101.3, np.nan, 102.1, np.nan],\n    \"Vlhkost\": [45.0, 52.0, np.nan, 48.0]\n})\n\n# 1. Detekce chybějících hodnot (vrací booleovskou tabulku):\nprint(df.isna())\nprint(df.isna().sum())  # Počet chybějících hodnot v jednotlivých sloupcích\n\n# 2. Odstranění řádků s chybějícími hodnotami:\ndf_ciste = df.dropna()               # Zahodí řádek, pokud obsahuje jakékoli NaN\ndf_tlak_ok = df.dropna(subset=[\"Tlak\"]) # Zahodí pouze pokud chybí Tlak\n\n# 3. Nahrazení chybějících hodnot (Imputace):\n# Nahradíme chybějící tlak průměrnou hodnotou:\nprumer_tlak = df[\"Tlak\"].mean()\ndf[\"Tlak\"] = df[\"Tlak\"].fillna(prumer_tlak)\n\n# Dopředné vyplnění (Forward Fill — vezme poslední známou hodnotu v čase):\ndf[\"Vlhkost\"] = df[\"Vlhkost\"].ffill()</pre>\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Agregace a seskupování: GroupBy",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Agregace a seskupování: GroupBy</h2></div><div class=\"section-body\">\n<p>Metoda <strong><code>groupby()</code></strong> implementuje slavné analytické paradigma <strong>Split-Apply-Combine</strong>:</p>\n<ol>\n  <li><strong>Split</strong>: Rozdělí data na skupiny podle hodnot v jednom nebo více sloupcích.</li>\n  <li><strong>Apply</strong>: Aplikuje na každou skupinu agregační nebo transformační funkci.</li>\n  <li><strong>Combine</strong>: Spojí dílčí výsledky do nové přehledné tabulky.</li>\n</ol>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import pandas as pd\n\nmereni = pd.DataFrame({\n    \"Laborator\": [\"Lab_A\", \"Lab_B\", \"Lab_A\", \"Lab_B\", \"Lab_A\"],\n    \"Metoda\": [\"Spektro\", \"Spektro\", \"HPLC\", \"HPLC\", \"Spektro\"],\n    \"Vitezek\": [88.5, 91.2, 76.4, 79.1, 89.0],\n    \"Doba_min\": [45, 42, 120, 115, 40]\n})\n\n# 1. Průměrný výtěžek podle laboratoře:\navg_lab = mereni.groupby(\"Laborator\")[\"Vitezek\"].mean()\n\n# 2. Vícenásobná agregace přes metodu .agg():\nsouhrn = mereni.groupby(\"Laborator\").agg(\n    prumerny_vitezek=(\"Vitezek\", \"mean\"),\n    max_vitezek=(\"Vitezek\", \"max\"),\n    pocet_mereni=(\"Vitezek\", \"count\"),\n    prumerna_doba=(\"Doba_min\", \"mean\")\n)\nprint(souhrn)</pre>\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Most k praxi a shrnutí 9. přednášky",
+      "tags": ["Core"],
+      "diff": "wow",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Most k praxi a shrnutí 9. přednášky</h2></div><div class=\"section-body\">\n<p>Dnešní přednáška propojila základní perzistenci se skutečnou datovou analytikou:</p>\n<h3>Shrnutí klíčových bodů:</h3>\n<ol>\n  <li><strong><code>open()</code> a správce kontextu <code>with</code></strong>: Vždy používejte <code>with</code> a explicitní <code>encoding=\"utf-8\"</code>, abyste předešli leakům a chybám kódování.</li>\n  <li><strong><code>pathlib.Path</code></strong>: Nahrazuje starý <code>os.path</code>. Používejte operátor <code>/</code> a metody <code>.read_text()</code> / <code>.write_text()</code>.</li>\n  <li><strong>Serializace dat</strong>: Zvolte <code>json</code> pro API, <code>tomllib</code> pro konfigurace a <strong>vyhněte se modulu <code>pickle</code></strong>.</li>\n  <li><strong><code>sqlite3</code></strong>: Vestavěná relační databáze bez nutnosti serveru. Vždy používejte <strong>parametrizované dotazy (<code>?</code>)</strong> proti SQL Injection a transakční blok <code>with conn:</code>.</li>\n  <li><strong>Pandas <code>Series</code> a <code>DataFrame</code></strong>: Výkonný most mezi relačními databázemi a numerickými maticemi NumPy. Používejte <code>.loc[]</code> a <code>.iloc[]</code> pro selekci a <code>.groupby()</code> pro agregace.</li>\n</ol>\n<h3>Co nás čeká v laboratoři:</h3>\n<ul>\n  <li><strong>NetPBM (PPM) formát</strong>: Nízkoúrovňové binární I/O a čtení obrazových pixelů po bajtech.</li>\n  <li><strong>Ornitologická analýza</strong>: Zpracování reálné terénní datové sady pozorování vodních ptáků v Pandas!</li>\n</ul>\n</div>"
+    }
+  ]
+}

@@ -1,0 +1,249 @@
+{
+  "slug": "lectures--week-07",
+  "total": 27,
+  "slides": [
+    {
+      "id": "id1",
+      "idx": 0,
+      "title": "Úvod a osnova",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">1</span><h2 class=\"section-title\">Úvod a osnova</h2></div><div class=\"section-body\">\n<p>Vítejte v sedmé přednášce kurzu programování v jazyce Python. Dnešním tématem je <strong>Objektově orientované programování (OOP)</strong> a fascinující <strong>Python Data Model</strong>.</p>\n<p>Většina programátorů přicházejících z jazyků C++ nebo Java se snaží psát objektový kód v Pythonu stejným způsobem: vytvářejí hluboké hierarchie dědičnosti, píší manuální gettery a settery a bojují s absencí klíčového slova <code>private</code>. Dnes si ukážeme, proč je objektový model Pythonu zásadně odlišný, elegantnější a jak plně ovládnout speciální metody objektů (tzv. <strong>dunder metody</strong>), správce kontextu a moderní nástroje <code>@dataclass</code> a <strong>Pydantic v2</strong>.</p>\n<h3>Osnova dnešní 90minutové přednášky:</h3>\n<ol>\n  <li><strong>C++/Java vs. Python objektový model</strong>: Statické vtabulky a modifikátory přístupu vs. otevřený <code>PyTypeObject</code>.</li>\n  <li><strong>Definice třídy a konstruktor</strong>: Třída <code>class</code>, explicitní parametr <code>self</code> a inicializátor <code>__init__()</code>.</li>\n  <li><strong>Atributy třídy vs. instance</strong>: Kde v paměti leží data a past se sdíleným měnitelným stavem.</li>\n  <li><strong>Zapouzdření v Pythonu</strong>: Filozofie <em>\"consenting adults\"</em>, konvence <code>_protected</code> a name-mangling <code>__private</code>.</li>\n  <li><strong>Paměťová optimalizace: <code>__dict__</code> vs. <code>__slots__</code></strong>: Jak zredukovat spotřebu paměti o 60 % a zrychlit přístup k atributům.</li>\n  <li><strong>Řízené atributy: <code>@property</code></strong>: Elegantní zapouzdření bez nutnosti psát gettery a settery.</li>\n  <li><strong>Dědičnost a <code>super()</code></strong>: Správné volání předka a kooperativní vícenásobná dědičnost.</li>\n  <li><strong>Algoritmus MRO (Method Resolution Order)</strong>: Jak C3 linearizace řeší problém diamantové dědičnosti.</li>\n  <li><strong>Python Data Model (Dunder metody)</strong>: Základní princip jednotného rozhraní Pythonu.</li>\n  <li><strong>Reprezentace objektu</strong>: Zásadní rozdíl mezi <code>__repr__()</code> (pro vývojáře) a <code>__str__()</code> (pro uživatele).</li>\n  <li><strong>Rovnost a hešování</strong>: Dunder metody <code>__eq__()</code> a <code>__hash__()</code> pro bezpečné použití v množinách a slovnících.</li>\n  <li><strong>Porovnávání a řazení</strong>: Bohaté porovnávání (<code>__lt__</code>) a dekorátor <code>@functools.total_ordering</code>.</li>\n  <li><strong>Kolekční protokol</strong>: <code>__len__()</code>, <code>__getitem__()</code>, <code>__setitem__()</code> a implementace slicingu.</li>\n  <li><strong>Aritmetické operátory</strong>: Přetížení <code>+</code>, <code>-</code>, <code>*</code> a operátoru maticového násobení <code>@</code> (<code>__matmul__</code>).</li>\n  <li><strong>Správce kontextu (Context Managers)</strong>: Protokol <code>with</code>, metody <code>__enter__()</code> a <code>__exit__()</code> a <code>@contextlib.contextmanager</code>.</li>\n  <li><strong>Moderní datové třídy (<code>@dataclass</code>)</strong>: Automatizace boilerplate kódu, <code>frozen=True</code> a <code>slots=True</code>.</li>\n  <li><strong>Produkční most: Datová validace s Pydantic v2</strong>: Runtime validace, Rust jádro a most k Milestone 2.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id2",
+      "idx": 1,
+      "title": "C++/Java vs. Python: Objektové paradigma",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">2</span><h2 class=\"section-title\">C++/Java vs. Python: Objektové paradigma</h2></div><div class=\"section-body\">\n<p>V C++ a Javě je třída neměnným kompilovaným předpisem. Velikost instance v bajtech je pevně daná při kompilaci a metody jsou volány přes statické vtabulky (virtual method tables):</p>\n<pre class=\"brush: java; gutter: false; toolbar: false;\">// Java: Pevná struktura, striktní zapouzdření a ukecanost\npublic class Bod {\n    private final double x;\n    private final double y;\n\n    public Bod(double x, double y) {\n        this.x = x;\n        this.y = y;\n    }\n    public double getX() { return this.x; }\n    public double getY() { return this.y; }\n}</pre>\n<h3>Python: Třída je objekt a instance je dynamická jmenná schránka</h3>\n<p>V Pythonu je i samotná třída objektem na haldě (instance metatřídy <code>type</code>):</p>\n<ul>\n  <li>Instance si standardně nese vlastní slovník atributů <code>__dict__</code>.</li>\n  <li>Atributy lze za běhu libovolně přidávat nebo měnit (pokud nepoužijete <code>__slots__</code>).</li>\n  <li>Neexistuje binární bariéra <code>private</code> — interpretr nic před programátorem nezamyká.</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class Bod:\n    def __init__(self, x: float, y: float) -&gt; None:\n        self.x = x\n        self.y = y\n\nb = Bod(1.0, 2.0)\nprint(b.__dict__)  # {'x': 1.0, 'y': 2.0} -&gt; Běžný slovník!</pre>\n</div>"
+    },
+    {
+      "id": "id3",
+      "idx": 2,
+      "title": "Definice třídy a konstruktor: Proč explicitní self?",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">3</span><h2 class=\"section-title\">Definice třídy a konstruktor: Proč explicitní self?</h2></div><div class=\"section-body\">\n<p>V C++ a Javě je ukazatel <code>this</code> implicitní — kompilátor ho dosazuje automaticky na pozadí. V Pythonu musí být instance předána jako <strong>první explicitní argument</strong> každé metody (konvenčně pojmenovaný <code>self</code>).</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class Uzivatel:\n    def __init__(self, jmeno: str, email: str) -&gt; None:\n        \"\"\"Inicializátor instance (není to konstruktor v C++ smyslu).\"\"\"\n        self.jmeno: str = jmeno\n        self.email: str = email\n\n    def pozdrav(self) -&gt; str:\n        return f\"Ahoj, já jsem {self.jmeno}!\"\n\nu = Uzivatel(\"Karel\", \"karel@vscht.cz\")</pre>\n<h3>Co se reálně stane při volání metody?</h3>\n<p>Zápis <code>u.pozdrav()</code> je pouze syntaktickým cukrem pro volání přes třídu:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\"># Tyto dva zápisy jsou v CPythonu 100% identické:\nprint(u.pozdrav())              # Metoda volaná na instanci\nprint(Uzivatel.pozdrav(u))      # Funkce třídy s explicitním předáním instance u</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Metoda <code>__init__</code> nevytváří instanci (k tomu slouží nízkoúrovňová metoda <code>__new__</code>), ale pouze ji inicializuje poté, co byla alokována na haldě. Proto <code>__init__</code> nesmí nikdy vracet hodnotu (<code>return None</code>).</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id4",
+      "idx": 3,
+      "title": "Atributy třídy vs. Atributy instance",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">4</span><h2 class=\"section-title\">Atributy třídy vs. Atributy instance</h2></div><div class=\"section-body\">\n<p>Kde přesně leží proměnná, kterou nadefinujete?</p>\n<ul>\n  <li><strong>Atribut třídy (Class Attribute)</strong>: Definovaný přímo v těle třídy. Existuje v jediné kopii sdílené všemi instancemi (obdoba <code>static</code> v C++/Javě).</li>\n  <li><strong>Atribut instance (Instance Attribute)</strong>: Přiřazený k <code>self</code> (obvykle v <code>__init__</code>). Každá instance má vlastní nezávislou kopii.</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class DatabazoveSpojeni:\n    # Atribut třídy: Sdílený všemi instancemi\n    vychozi_port: int = 5432\n    aktivni_spojeni: list[str] = []  # POZOR: Mutabilní stav!\n\n    def __init__(self, hostitel: str) -&gt; None:\n        # Atribut instance: Unikátní pro tuto instanci\n        self.hostitel: str = hostitel\n\ns1 = DatabazoveSpojeni(\"db1.vscht.cz\")\ns2 = DatabazoveSpojeni(\"db2.vscht.cz\")\n\nprint(s1.vychozi_port, s2.vychozi_port)  # 5432 5432</pre>\n<div class=\"notes-block\"><div class=\"note-item caution\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p><strong>Past s mutabilním atributem třídy:</strong> Pokud do <code>s1.aktivni_spojeni.append(\"conn1\")</code> přidáte prvek, změníte tentýž seznam pro všechny instance <code>s2</code>, <code>s3</code> i samotnou třídu!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id5",
+      "idx": 4,
+      "title": "Zapouzdření v Pythonu: Consenting Adults a Name Mangling",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">5</span><h2 class=\"section-title\">Zapouzdření v Pythonu: Consenting Adults a Name Mangling</h2></div><div class=\"section-body\">\n<p>V C++ nebo Javě je klíčové slovo <code>private</code> vynucováno kompilátorem. V Pythonu platí slavná zásada Guida van Rossuma: <em>\"We are all consenting adults here.\"</em> (Všichni jsme zde dospělí a svéprávní lidé.)</p>\n<p>Interpretr vám nezabrání sáhnout na jakýkoliv atribut, pokud to opravdu chcete. Existují však striktní konvence:</p>\n<h3>1. Jednoduché podtržítko <code>_protected</code>:</h3>\n<p>Signál pro programátory a IDE: <em>\"Tento atribut je interní implementační detail, nesahej na něj zvenčí.\"</em> (Žádné syntaktické omezení).</p>\n<h3>2. Dvojité podtržítko <code>__private</code> (Name Mangling):</h3>\n<p>Pokud název atributu začíná alespoň dvěma podtržítky a končí nanejvýš jedním, CPython jeho název interně přepíše na <code>_NazevTridy__atribut</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class BankovniUcet:\n    def __init__(self, zustatek: float) -&gt; None:\n        self.__zustatek = zustatek  # Bude přejmenováno na _BankovniUcet__zustatek\n\nucet = BankovniUcet(1000.0)\n# ucet.__zustatek  # AttributeError: 'BankovniUcet' object has no attribute '__zustatek'\n\n# Ale stále je přístupný přes zkomolený název:\nprint(ucet._BankovniUcet__zustatek)  # 1000.0</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">❗</span><div class=\"note-content\"><p>Účelem <strong>Name Manglingu</strong> není bezpečnost ani šifrování dat, ale <strong>ochrana před nechtěným přepsáním atributu v odvozených podtřídách</strong> při vícenásobné dědičnosti!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id6",
+      "idx": 5,
+      "title": "Paměťový model: __dict__ vs. optimalizace __slots__",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">6</span><h2 class=\"section-title\">Paměťový model: __dict__ vs. optimalizace __slots__</h2></div><div class=\"section-body\">\n<p>Standardně si každá instance nese slovník <code>__dict__</code>. Slovník je hešovací tabulka — je extrémně flexibilní, ale má nezanedbatelnou paměťovou režii (cca 150–200 bajtů na prázdnou instanci).</p>\n<p>Pokud vytváříte miliony instancí (např. částice v simulaci, body v 3D grafice nebo bioinformatické záznamy), použijte <strong><code>__slots__</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class BodStandard:\n    def __init__(self, x: float, y: float) -&gt; None:\n        self.x = x\n        self.y = y\n\nclass BodSlots:\n    # Explicitní výčet povolených atributů: CPython vytvoří C pole ukazatelů!\n    __slots__ = (\"x\", \"y\")\n    \n    def __init__(self, x: float, y: float) -&gt; None:\n        self.x = x\n        self.y = y</pre>\n<h3>Výhody a důsledky __slots__:</h3>\n<ol>\n  <li><strong>Masivní úspora paměti</strong>: Snížení spotřeby RAM o <strong>60 % až 75 %</strong> (žádný <code>__dict__</code> ani <code>__weakref__</code>).</li>\n  <li><strong>Vyšší rychlost</strong>: Přístup k atributům je přímý offset v C struktuře (rychlejší než vyhledávání v hešovací tabulce).</li>\n  <li><strong>Pevná struktura</strong>: Pokus o přiřazení nedeklarovaného atributu <code>b.z = 10</code> vyvolá okamžitý <code>AttributeError</code>.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id7",
+      "idx": 6,
+      "title": "Řízený přístup k atributům: Dekorátor @property",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">7</span><h2 class=\"section-title\">Řízený přístup k atributům: Dekorátor @property</h2></div><div class=\"section-body\">\n<p>V Javě se učí: <em>\"Nikdy nevystavujte veřejné atributy! Vždy pište getX() a setX() pro případ, že v budoucnu budete potřebovat validaci.\"</em></p>\n<p>V Pythonu je to antipattern! Začněte s běžným veřejným atributem <code>self.teplota</code>. Pokud později potřebujete validaci, převeďte ho na <strong><code>@property</code></strong> bez rozbití veřejného API:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class Teplomer:\n    def __init__(self, stupne_celsius: float = 0.0) -&gt; None:\n        self.teplota = stupne_celsius  # Volá setter níže!\n\n    @property\n    def teplota(self) -&gt; float:\n        \"\"\"Getter: Čtení atributu.\"\"\"\n        return self._teplota\n\n    @teplota.setter\n    def teplota(self, hodnota: float) -&gt; None:\n        \"\"\"Setter: Validace při zápisu.\"\"\"\n        if hodnota &lt; -273.15:\n            raise ValueError(f\"Teplota {hodnota} °C je pod absolutní nulou!\")\n        self._teplota = hodnota\n\n    @property\n    def stupne_fahrenheit(self) -&gt; float:\n        \"\"\"Počítaná vlastnost (Read-only property bez setteru).\"\"\"\n        return self._teplota * 9 / 5 + 32\n\nt = Teplomer(25.0)\nprint(t.teplota)            # 25.0 (volá getter)\nprint(t.stupne_fahrenheit)  # 77.0\nt.teplota = 100.0           # Nastaví hodnotu přes setter\n# t.teplota = -300.0        # Vyvolá ValueError: Teplota -300.0 °C je pod absolutní nulou!</pre>\n<p>Kód volajícího zůstává čistý: <code>t.teplota = 100</code> místo <code>t.setTeplota(100)</code>.</p>\n</div>"
+    },
+    {
+      "id": "id8",
+      "idx": 7,
+      "title": "Dědičnost a volání předka: super()",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">8</span><h2 class=\"section-title\">Dědičnost a volání předka: super()</h2></div><div class=\"section-body\">\n<p>Dědičnost v Pythonu zapisujeme předáním rodičovské třídy v závorce: <code>class Potomek(Predek):</code>.</p>\n<p>Pro volání metod předka používáme vestavěnou funkci <strong><code>super()</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class Zamestnanec:\n    def __init__(self, jmeno: str, plat: float) -&gt; None:\n        self.jmeno: str = jmeno\n        self.plat: float = plat\n\n    def popis(self) -&gt; str:\n        return f\"{self.jmeno} (plat: {self.plat:.0f} Kč)\"\n\nclass Manazer(Zamestnanec):\n    def __init__(self, jmeno: str, plat: float, bonus: float) -&gt; None:\n        # Volání inicializátoru předka:\n        super().__init__(jmeno, plat)\n        self.bonus: float = bonus\n\n    def popis(self) -&gt; str:\n        # Rozšíření metody předka:\n        zaklad = super().popis()\n        return f\"{zaklad} + bonus: {self.bonus:.0f} Kč\"\n\nm = Manazer(\"Alice\", 80_000, 20_000)\nprint(m.popis())  # Alice (plat: 80000 Kč) + bonus: 20000 Kč\nprint(isinstance(m, Zamestnanec))  # True\nprint(issubclass(Manazer, Zamestnanec))  # True</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>V Pythonu 3 píšeme čistě <code>super().__init__(...)</code> bez parametrů. Starý zápis z Pythonu 2 <code>super(Manazer, self).__init__(...)</code> je zastaralý.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id9",
+      "idx": 8,
+      "title": "Vícenásobná dědičnost a MRO: C3 Linearizace",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">9</span><h2 class=\"section-title\">Vícenásobná dědičnost a MRO: C3 Linearizace</h2></div><div class=\"section-body\">\n<p>Java zakazuje vícenásobnou dědičnost tříd kvůli <strong>problému diamantu</strong> (<em>Diamond Problem</em>). C++ ji povoluje, ale přináší komplikace s duplikací bázových stavů.</p>\n<p>Python vícenásobnou dědičnost plně podporuje a řeší ji deterministickým algoritmem <strong>C3 Linearization</strong> zvaným <strong>MRO (Method Resolution Order)</strong>.</p>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">       ┌───────┐\n       │   A   │\n       └───┬───┘\n         ▲   ▲\n    ┌────┴┐ ┌┴────┐\n    │  B  │ │  C  │\n    └────┬┘ └┬────┘\n         ▲   ▲\n       ┌─┴───┴─┐\n       │   D   │\n       └───────┘</pre>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class A:\n    def akce(self): print(\"A\")\n\nclass B(A):\n    def akce(self): print(\"B\"); super().akce()\n\nclass C(A):\n    def akce(self): print(\"C\"); super().akce()\n\nclass D(B, C):\n    def akce(self): print(\"D\"); super().akce()\n\nd = D()\nd.akce()\n# Výstup: D -&gt; B -&gt; C -&gt; A (každá metoda proběhne přesně jednou!)\n\nprint([cls.__name__ for cls in D.mro()])\n# ['D', 'B', 'C', 'A', 'object']</pre>\n</div>"
+    },
+    {
+      "id": "id10",
+      "idx": 9,
+      "title": "Python Data Model: Filozofie Dunder metod",
+      "tags": ["Core"],
+      "diff": "paradigm",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">10</span><h2 class=\"section-title\">Python Data Model: Filozofie Dunder metod</h2></div><div class=\"section-body\">\n<p>Co dělá Python tak konzistentním a intuitivním jazykem? Odpovědí je <strong>Python Data Model</strong> (Objektový datový model).</p>\n<p>V jiných jazycích má každá třída vlastní vymyšlené metody:</p>\n<ul>\n  <li>Java: <code>str.length()</code>, <code>list.size()</code>, <code>map.size()</code>, <code>array.length</code> (čtyři různé způsoby pro zjištění délky!).</li>\n  <li>C++: <code>vec.size()</code>, <code>str.length()</code>.</li>\n</ul>\n<p>V Pythonu existuje <strong>jediné univerzální rozhraní</strong>: funkce <code>len(obj)</code>.</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">len(\"Ahoj\")       # str\nlen([1, 2, 3])     # list\nlen({\"a\": 1})      # dict\nlen(moje_instance) # Vlastní třída implementující __len__</pre>\n<p>Interpretr CPython při zavolání <code>len(x)</code> přeloží volání na nízkoúrovňový slot <code>x.__len__()</code>.</p>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">❗</span><div class=\"note-content\"><p><strong>Dunder metody</strong> (z anglického <em>Double Underscore</em>, např. <code>__init__</code>, <code>__repr__</code>, <code>__getitem__</code>) jsou speciální háčky (<em>hooks</em>), kterými vaše třídy napojíte přímo na syntaktické konstrukce jazyka Python!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id11",
+      "idx": 10,
+      "title": "Reprezentace objektu: __repr__ vs. __str__",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">11</span><h2 class=\"section-title\">Reprezentace objektu: __repr__ vs. __str__</h2></div><div class=\"section-body\">\n<p>Každý objekt v Pythonu by měl mít jasnou textovou reprezentaci. K tomu slouží dvě metody, které se často pletou:</p>\n<table class=\"table\">\n  <thead><tr><th>Metoda</th><th>Kdy se volá?</th><th>Cílové publikum</th><th>Cíl</th></tr></thead>\n  <tbody>\n    <tr><td><strong><code>__repr__()</code></strong></td><td>REPL, ladění, logy, vnoření v seznamech <code>[obj]</code></td><td><strong>Vývojář</strong></td><td>Jednoznačný technický popis; ideálně platný Python kód pro znovuvytvoření objektu: <code>eval(repr(obj)) == obj</code></td></tr>\n    <tr><td><strong><code>__str__()</code></strong></td><td><code>print(obj)</code>, <code>str(obj)</code>, formátování f-stringy <code>{obj}</code></td><td><strong>Běžný uživatel</strong></td><td>Čitelná a přehledná prezentace</td></tr>\n  </tbody>\n</table>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class Vektor2D:\n    def __init__(self, x: float, y: float) -&gt; None:\n        self.x = x\n        self.y = y\n\n    def __repr__(self) -&gt; str:\n        # Formát: NázevTřídy(parametry...)\n        return f\"Vektor2D(x={self.x!r}, y={self.y!r})\"\n\n    def __str__(self) -&gt; str:\n        # Uživatelsky přívětivý formát\n        return f\"({self.x}, {self.y})\"\n\nv = Vektor2D(3.0, 4.5)\nprint(str(v))   # (3.0, 4.5)\nprint(repr(v))  # Vektor2D(x=3.0, y=4.5)\n\n# V seznamu se VŽDY volá __repr__!\nvektory = [v, Vektor2D(0.0, 1.0)]\nprint(vektory)  # [Vektor2D(x=3.0, y=4.5), Vektor2D(x=0.0, y=1.0)]</pre>\n<div class=\"notes-block\"><div class=\"note-item tip\"><span class=\"note-icon\">💡</span><div class=\"note-content\"><p><strong>Zlaté pravidlo:</strong> Pokud implementujete pouze jednu z nich, implementujte vždy <code>__repr__</code>! Pokud <code>__str__</code> chybí, Python automaticky použije <code>__repr__</code> jako náhradu.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id12",
+      "idx": 11,
+      "title": "Rovnost a hešování: __eq__ a __hash__",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">12</span><h2 class=\"section-title\">Rovnost a hešování: __eq__ a __hash__</h2></div><div class=\"section-body\">\n<p>V přednášce 4 jsme zjistili, že klíče ve slovníku a prvky v množině musí být <strong>hešovatelné</strong>.</p>\n<p>Standardně se objekty porovnávají podle identity (adresy na haldě <code>id(self)</code>):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class PrvekLogicky:\n    def __init__(self, id_: int, nazev: str) -&gt; None:\n        self.id_ = id_\n        self.nazev = nazev\n\n    def __eq__(self, other: object) -&gt; bool:\n        if not isinstance(other, PrvekLogicky):\n            return NotImplemented\n        return self.id_ == other.id_ and self.nazev == other.nazev\n\n    def __hash__(self) -&gt; int:\n        # Heš MUSÍ být odvozen ze stejných neměnných polí jako rovnost!\n        return hash((self.id_, self.nazev))</pre>\n<div class=\"notes-block\"><div class=\"note-item caution\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p><strong>Bezpečnostní pravidlo CPythonu:</strong> Jakmile ve své třídě implementujete metodu <code>__eq__</code>, Python <strong>automaticky nastaví <code>__hash__ = None</code></strong>! Třída se stane nehešovatelnou, dokud explicitně nenapíšete i metodu <code>__hash__</code>. Tím Python brání vložení mutabilních objektů do množin!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id13",
+      "idx": 12,
+      "title": "Bohaté porovnávání: @functools.total_ordering",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">13</span><h2 class=\"section-title\">Bohaté porovnávání: @functools.total_ordering</h2></div><div class=\"section-body\">\n<p>Aby bylo možné objekty řadit funkcí <code>sorted()` nebo operátory <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>, musíte definovat metody porovnávání:</p>\n<ul>\n  <li><code>__lt__</code> (&lt;), <code>__le__</code> (&le;), <code>__gt__</code> (&gt;), <code>__ge__</code> (&ge;).</li>\n</ul>\n<p>Implementovat všech 6 metod (včetně <code>__eq__</code> a <code>__ne__</code>) je pracné. Standardní knihovna nabízí dekorátor <strong><code>@functools.total_ordering</code></strong>:</p>\n<p>Stačí implementovat pouze <strong><code>__eq__</code></strong> a <strong>jednu z relačních metod</strong> (nejlépe <code>__lt__</code>):</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import functools\n\n@functools.total_ordering\nclass Student:\n    def __init__(self, jmeno: str, prumer: float) -&gt; None:\n        self.jmeno = jmeno\n        self.prumer = prumer\n\n    def __eq__(self, other: object) -&gt; bool:\n        if not isinstance(other, Student):\n            return NotImplemented\n        return self.prumer == other.prumer\n\n    def __lt__(self, other: object) -&gt; bool:\n        if not isinstance(other, Student):\n            return NotImplemented\n        # Lepší průměr je menší číslo (1.0 je lepší než 2.0)\n        return self.prumer &lt; other.prumer\n\ns1 = Student(\"Alice\", 1.2)\ns2 = Student(\"Bob\", 1.8)\n\nprint(s1 &lt; s2)   # True\nprint(s1 &lt;= s2)  # True (automaticky dopočítáno dekorátorem!)\nprint(s1 &gt; s2)   # False (automaticky dopočítáno dekorátorem!)</pre>\n</div>"
+    },
+    {
+      "id": "id14",
+      "idx": 13,
+      "title": "Kolekční protokol: __len__, __getitem__, __setitem__",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">14</span><h2 class=\"section-title\">Kolekční protokol: __len__, __getitem__, __setitem__</h2></div><div class=\"section-body\">\n<p>Chcete, aby se vaše vlastní třída chovala jako seznam nebo slovník a podporovala indexaci <code>obj[i]</code>, slicing <code>obj[1:5]</code> a cyklus <code>for</code>?</p>\n<p>Stačí implementovat metody kolekčního protokolu:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class Kniha:\n    def __init__(self, nazev: str, stranky: list[str]) -&gt; None:\n        self.nazev = nazev\n        self.stranky = stranky\n\n    def __len__(self) -&gt; int:\n        return len(self.stranky)\n\n    def __getitem__(self, index: int | slice) -&gt; str | list[str]:\n        # Pokud index je int nebo slice (např. 1:3), delegujeme na seznam stránek\n        return self.stranky[index]\n\n    def __setitem__(self, index: int, text: str) -&gt; None:\n        self.stranky[index] = text\n\nkniha = Kniha(\"Python Manuál\", [\"Úvod\", \"Datové typy\", \"Funkce\", \"OOP\"])\nprint(len(kniha))       # 4 (volá __len__)\nprint(kniha[1])         # 'Datové typy' (volá __getitem__)\nprint(kniha[1:3])       # ['Datové typy', 'Funkce'] (slicing!)\n\n# Magie: Python automaticky umožní iteraci přes for cyklus i bez __iter__!\nfor kapitola in kniha:\n    print(\"-&gt;\", kapitola)</pre>\n<div class=\"notes-block\"><div class=\"note-item note\"><span class=\"note-icon\">📝</span><div class=\"note-content\"><p>Pokud třída neimplementuje <code>__iter__</code>, ale implementuje <code>__getitem__</code>, Python automaticky zkusí iterovat voláním <code>obj[0]</code>, <code>obj[1]</code>, dokud nedostane <code>IndexError</code>!</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id15",
+      "idx": 14,
+      "title": "Aritmetické operátory a maticové násobení @",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">15</span><h2 class=\"section-title\">Aritmetické operátory a maticové násobení @</h2></div><div class=\"section-body\">\n<p>V Pythonu můžete přetížit veškeré matematické operátory. Zde je přehled klíčových dunder metod:</p>\n<table class=\"table\">\n  <thead><tr><th>Operátor</th><th>Dunder metoda</th><th>Příklad použití</th></tr></thead>\n  <tbody>\n    <tr><td><code>+</code></td><td><code>__add__(self, other)</code></td><td><code>a + b</code></td></tr>\n    <tr><td><code>-</code></td><td><code>__sub__(self, other)</code></td><td><code>a - b</code></td></tr>\n    <tr><td><code>*</code></td><td><code>__mul__(self, other)</code></td><td><code>a * b</code> (skalární násobení)</td></tr>\n    <tr><td><code>/</code></td><td><code>__truediv__(self, other)</code></td><td><code>a / b</code> (reálné dělení)</td></tr>\n    <tr><td><code>//</code></td><td><code>__floordiv__(self, other)</code></td><td><code>a // b</code> (celočíselné dělení)</td></tr>\n    <tr><td><code>@</code></td><td><strong><code>__matmul__(self, other)</code></strong></td><td><code>A @ B</code> (<strong>Maticové násobení</strong>, PEP 465)</td></tr>\n  </tbody>\n</table>\n<h3>Příklad implementace 2D vektoru:</h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class Vektor:\n    def __init__(self, x: float, y: float) -&gt; None:\n        self.x = x\n        self.y = y\n\n    def __add__(self, other: \"Vektor\") -&gt; \"Vektor\":\n        if not isinstance(other, Vektor):\n            return NotImplemented\n        return Vektor(self.x + other.x, self.y + other.y)\n\n    def __mul__(self, scalar: float) -&gt; \"Vektor\":\n        \"\"\"Vynásobení vektoru číslem: v * 2.5\"\"\"\n        if not isinstance(scalar, (int, float)):\n            return NotImplemented\n        return Vektor(self.x * scalar, self.y * scalar)\n\n    def __matmul__(self, other: \"Vektor\") -&gt; float:\n        \"\"\"Skalární součin dvou vektorů pomocí operátoru @: v1 @ v2\"\"\"\n        if not isinstance(other, Vektor):\n            return NotImplemented\n        return self.x * other.x + self.y * other.y\n\nv1 = Vektor(1.0, 2.0)\nv2 = Vektor(3.0, 4.0)\nv3 = v1 + v2       # Vektor(4.0, 6.0)\ndot = v1 @ v2      # 1.0*3.0 + 2.0*4.0 = 11.0</pre>\n</div>"
+    },
+    {
+      "id": "id16",
+      "idx": 15,
+      "title": "Reverzní operátory a in-place úpravy",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">16</span><h2 class=\"section-title\">Reverzní operátory a in-place úpravy</h2></div><div class=\"section-body\">\n<p>Co se stane, když napíšete <code>2.5 * v1</code> místo <code>v1 * 2.5</code>?</p>\n<p>CPython se nejprve pokusí zavolat <code>(2.5).__mul__(v1)</code>. Protože vestavěný typ <code>float</code> nezná vaši třídu <code>Vektor</code>, vrátí speciální konstantu <code>NotImplemented</code>.</p>\n<p>Interpretr v takovém případě otočí pořadí a zavolá <strong>reverzní operátor</strong> na pravém operandu: <strong><code>v1.__rmul__(2.5)</code></strong>!</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class Vektor:\n    def __mul__(self, scalar: float) -&gt; \"Vektor\":\n        return Vektor(self.x * scalar, self.y * scalar)\n\n    def __rmul__(self, scalar: float) -&gt; \"Vektor\":\n        # Komutativní operace: 2.5 * v je totéž jako v * 2.5\n        return self.__mul__(scalar)\n\n    def __iadd__(self, other: \"Vektor\") -&gt; \"Vektor\":\n        # In-place operátor += (modifikace stávajícího objektu bez nové alokace)\n        self.x += other.x\n        self.y += other.y\n        return self</pre>\n<div class=\"notes-block\"><div class=\"note-item important\"><span class=\"note-icon\">❗</span><div class=\"note-content\"><p>Pokud operace nepodporuje daný typ operandu, <strong>nikdy nevyvolávejte TypeError ručně</strong>! Vždy vraťte <code>return NotImplemented</code>. Tím dáte interpretu šanci vyzkoušet reverzní metodu druhého operandu.</p></div></div></div>\n</div>"
+    },
+    {
+      "id": "id17",
+      "idx": 16,
+      "title": "Volatelné objekty: Dunder metoda __call__",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">17</span><h2 class=\"section-title\">Volatelné objekty: Dunder metoda __call__</h2></div><div class=\"section-body\">\n<p>Může se instance třídy chovat jako běžná funkce a nechat se zavolat pomocí kulatých závorek <code>instance()</code>?</p>\n<p>Ano! Stačí implementovat metodu <strong><code>__call__()</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class LinearniFunkce:\n    \"\"\"Reprezentuje lineární funkci y = k * x + q s vlastním stavovým nastavením.\"\"\"\n    \n    def __init__(self, k: float, q: float) -&gt; None:\n        self.k = k\n        self.q = q\n\n    def __call__(self, x: float) -&gt; float:\n        # Zavolá se při f(x)\n        return self.k * x + self.q\n\n# Vytvoření instance (funktoru):\nf = LinearniFunkce(k=2.0, q=5.0)\n\n# Volání instance jako funkce:\nprint(f(10.0))  # 2.0 * 10.0 + 5.0 = 25.0\nprint(callable(f))  # True</pre>\n<h3>Kde se __call__ používá v praxi?</h3>\n<ol>\n  <li><strong>Stavové dekorátory</strong>: Třída dekorátoru, která si pamatuje počet volání nebo konfiguraci.</li>\n  <li><strong>Strojové učení a neuronové sítě</strong>: Všechny vrstvy v PyTorch (<code>nn.Module</code>) implementují <code>__call__</code> pro dopředný průchod <code>output = model(input_tensor)</code>.</li>\n</ol>\n</div>"
+    },
+    {
+      "id": "id18",
+      "idx": 17,
+      "title": "Správce kontextu: Protokol with (__enter__, __exit__)",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">18</span><h2 class=\"section-title\">Správce kontextu: Protokol with (__enter__, __exit__)</h2></div><div class=\"section-body\">\n<p>Konstrukce <code>with vyraz as cil:</code> slouží k bezpečné správě systémových prostředků (soubory, databázové transakce, síťové zámky, dočasné soubory).</p>\n<p>Ekvivalent k <code>try-with-resources</code> v Javě a RAII v C++.</p>\n<p>Protokol správce kontextu vyžaduje dvě dunder metody:</p>\n<ul>\n  <li><strong><code>__enter__(self)</code></strong>: Provede inicializaci/zamčení a vrátí objekt, který se dosadí do proměnné za klíčovým slovem <code>as</code>.</li>\n  <li><strong><code>__exit__(self, exc_type, exc_val, exc_tb)</code></strong>: Provede úklid. Zavolá se <strong>vždy</strong>, i když uvnitř bloku <code>with</code> došlo k chybě!</li>\n</ul>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class Stopky:\n    def __enter__(self):\n        import time\n        self.start = time.perf_counter()\n        return self\n\n    def __exit__(self, exc_type, exc_val, exc_tb):\n        import time\n        self.konec = time.perf_counter()\n        self.trvani = self.konec - self.start\n        print(f\"⏱️ Blok trval: {self.trvani * 1000:.2f} ms\")\n        return False\n\nwith Stopky():\n    suma = sum(x**2 for x in range(1_000_000))\n# Automaticky vypíše: ⏱️ Blok trval: 58.30 ms</pre>\n</div>"
+    },
+    {
+      "id": "id19",
+      "idx": 18,
+      "title": "Modul contextlib: Tvorba správců přes generátory",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">19</span><h2 class=\"section-title\">Modul contextlib: Tvorba správců přes generátory</h2></div><div class=\"section-body\">\n<p>Psát celou třídu s metodami <code>__enter__</code> a <code>__exit__</code> pro jednoduché otevření a zavření je zbytečně dlouhé.</p>\n<p>Standardní knihovna nabízí geniální dekorátor <strong><code>@contextlib.contextmanager</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">import contextlib\nimport os\nfrom typing import Iterator\n\n@contextlib.contextmanager\ndef docasny_adresar(cesta: str) -&gt; Iterator[None]:\n    \"\"\"Bezpečně přepne pracovní adresář a po skončení bloku vrátí původní.\"\"\"\n    puvodni_dir = os.getcwd()\n    try:\n        os.chdir(cesta)\n        yield  # Zde se spustí kód uvnitř bloku with!\n    finally:\n        # Tento kód se provede VŽDY při opuštění bloku\n        os.chdir(puvodni_dir)\n\nprint(\"Před:\", os.getcwd())\nwith docasny_adresar(\"/tmp\"):\n    print(\"Uvnitř:\", os.getcwd())\nprint(\"Po:\", os.getcwd())</pre>\n<p>Generátor se pozastaví na příkazu <code>yield</code> a po dokončení bloku <code>with</code> pokračuje kódem v bloku <code>finally</code>.</p>\n</div>"
+    },
+    {
+      "id": "id20",
+      "idx": 19,
+      "title": "Složené kontexty v závorkách (Python 3.10+)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">20</span><h2 class=\"section-title\">Složené kontexty v závorkách (Python 3.10+)</h2></div><div class=\"section-body\">\n<p>Často potřebujeme otevřít dva nebo více kontextů současně (např. čtení ze zdrojového souboru a zápis do cílového).</p>\n<h3>Moderní Python 3.10+ (PEP 617 PEG Parser):</h3>\n<p>Nyní můžete seskupit libovolné množství kontextových manažerů do přehledných <strong>kulatých závorek</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">with (\n    open(\"velka_data.csv\", \"r\", encoding=\"utf-8\") as f_in,\n    open(\"vysledky.csv\", \"w\", encoding=\"utf-8\") as f_out,\n    Stopky() as mereni,\n):\n    for radek in f_in:\n        f_out.write(radek.upper())</pre>\n<p>Zápis je čistý, nevyžaduje ošklivá zpětná lomítka <code>\\</code> na konci řádků a garantuje správné uvolnění všech zdrojů v opačném pořadí jejich otevření.</p>\n</div>"
+    },
+    {
+      "id": "id21",
+      "idx": 20,
+      "title": "Moderní datové třídy: @dataclass (PEP 557)",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">21</span><h2 class=\"section-title\">Moderní datové třídy: @dataclass (PEP 557)</h2></div><div class=\"section-body\">\n<p>Většina tříd v praxi slouží jako přepravky dat (<em>Data Transfer Objects</em>). Psaní konstruktoru <code>__init__</code>, metody <code>__repr__</code> a porovnávání <code>__eq__</code> je monotónní boilerplate kód.</p>\n<p>Od Pythonu 3.7 máme vestavěný dekorátor <strong><code>@dataclass</code></strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from dataclasses import dataclass\n\n@dataclass\nclass Ucastnik:\n    jmeno: str\n    email: str\n    aktivni: bool = True\n    body: int = 0\n\n# Automaticky vygenerováno:\n# 1. __init__(self, jmeno: str, email: str, aktivni: bool = True, body: int = 0)\n# 2. __repr__(self) -&gt; \"Ucastnik(jmeno='Alice', email='a@vscht.cz', aktivni=True, body=0)\"\n# 3. __eq__(self, other) -&gt; Porovná všechny atributy\nu1 = Ucastnik(\"Alice\", \"alice@vscht.cz\", body=100)\nu2 = Ucastnik(\"Alice\", \"alice@vscht.cz\", body=100)\n\nprint(u1)        # Ucastnik(jmeno='Alice', email='alice@vscht.cz', aktivni=True, body=100)\nprint(u1 == u2)  # True!</pre>\n</div>"
+    },
+    {
+      "id": "id22",
+      "idx": 21,
+      "title": "Pokročilé parametry @dataclass (Python 3.10+)",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">22</span><h2 class=\"section-title\">Pokročilé parametry @dataclass (Python 3.10+)</h2></div><div class=\"section-body\">\n<p>Dekorátor <code>@dataclass</code> nabízí mocné přepínače:</p>\n<h3>1. <code>frozen=True</code> (Neměnnost a hešovatelnost):</h3>\n<p>Instance se stane neměnnou (přiřazení do atributu vyvolá <code>FrozenInstanceError</code>) a automaticky se vygeneruje metoda <code>__hash__()</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">@dataclass(frozen=True)\nclass Konfigurace:\n    db_url: str\n    timeout: int = 30\n\ncfg = Konfigurace(\"postgres://localhost:5432/db\")\nmnozina_konfiguraci = {cfg}  # Platné! Lze použít v set i jako klíč dict.</pre>\n<h3>2. <code>slots=True</code> (Python 3.10+):</h3>\n<p>Automaticky vygeneruje <code>__slots__</code> pro všechny definované typové anotace:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">@dataclass(slots=True)\nclass Bod3D:\n    x: float\n    y: float\n    z: float\n# Extrémní úspora paměti bez nutnosti manuálního psaní __slots__!</pre>\n<h3>3. <code>kw_only=True</code> (Python 3.10+):</h3>\n<p>Vynutí, aby všechny parametry v konstruktoru byly předávány výhradně pojmenovaně (<code>kw-only</code>).</p>\n</div>"
+    },
+    {
+      "id": "id23",
+      "idx": 22,
+      "title": "Pole datových tříd: field a __post_init__",
+      "tags": ["Core"],
+      "diff": "tricky",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">23</span><h2 class=\"section-title\">Pole datových tříd: field a __post_init__</h2></div><div class=\"section-body\">\n<p>Jak vyřešit výchozí hodnotu pro měnitelný seznam nebo slovník v dataclass?</p>\n<div class=\"notes-block\"><div class=\"note-item caution\"><span class=\"note-icon\">⚠️</span><div class=\"note-content\"><p>Přímý zápis <code>polozky: list[str] = []</code> v dataclass skončí chybou <code>ValueError: mutable default &lt;class 'list'&gt; is not allowed</code>!</p></div></div></div>\n<h3>Správně: <code>field(default_factory=list)</code></h3>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from dataclasses import dataclass, field\n\n@dataclass\nclass Kosik:\n    zakaznik: str\n    # default_factory zajistí vytvoření nového seznamu pro každou instanci:\n    polozky: list[str] = field(default_factory=list)\n    celkova_cena: float = field(init=False, default=0.0)\n\n    def __post_init__(self) -&gt; None:\n        \"\"\"Spustí se automaticky po dokončení vygenerovaného __init__.\"\"\"\n        if not self.zakaznik:\n            raise ValueError(\"Košík musí mít přiřazeného zákazníka!\")\n        self.celkova_cena = len(self.polozky) * 100.0\n\nk = Kosik(\"Petr\")\nk.polozky.append(\"Kniha\")\nprint(k)  # Kosik(zakaznik='Petr', polozky=['Kniha'], celkova_cena=0.0)</pre>\n</div>"
+    },
+    {
+      "id": "id24",
+      "idx": 23,
+      "title": "Produkční most: Datová validace s Pydantic v2",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">24</span><h2 class=\"section-title\">Produkční most: Datová validace s Pydantic v2</h2></div><div class=\"section-body\">\n<p>Zatímco standardní <code>@dataclass</code> typové anotace pouze dokumentuje (ale za běhu <strong>nevymáhá</strong> — můžete předat řetězec do pole typu <code>int</code>), v reálných produkčních systémech (FastAPI, webové služby, mikroservisy) potřebujeme striktní <strong>runtime validaci</strong>.</p>\n<p>Průmyslovým standardem moderního Pythonu je knihovna <strong>Pydantic v2</strong>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from pydantic import BaseModel, EmailStr, Field\n\nclass RegistraceUzivatele(BaseModel):\n    uzivatelske_jmeno: str = Field(min_length=3, max_length=20)\n    email: EmailStr\n    vek: int = Field(ge=18, le=120)  # ge = greater or equal\n    admin: bool = False\n\n# 1. Automatické přetypování a striktní validace:\nu = RegistraceUzivatele(\n    uzivatelske_jmeno=\"karel\",\n    email=\"karel@vscht.cz\",\n    vek=\"25\",  # Pydantic automaticky převede string \"25\" na int 25!\n)\nprint(u.vek)  # 25 (typ int)</pre>\n<h3>Proč je Pydantic v2 tak revoluční?</h3>\n<p>Jádro Pydantic v2 je kompletně přepsáno v <strong>jazyce Rust</strong> (<code>pydantic-core</code>), díky čemuž je <strong>5× až 50× rychlejší</strong> než původní verze v1 a zpracovává miliony JSON záznamů za sekundu.</p>\n</div>"
+    },
+    {
+      "id": "id25",
+      "idx": 24,
+      "title": "Pydantic v2: Vlastní validátory a serializace",
+      "tags": ["Core"],
+      "diff": "pythonic",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">25</span><h2 class=\"section-title\">Pydantic v2: Vlastní validátory a serializace</h2></div><div class=\"section-body\">\n<p>Pydantic umožňuje psát vlastní validační pravidla pomocí dekorátoru <code>@field_validator</code>:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">from pydantic import BaseModel, field_validator\n\nclass MereniTeploty(BaseModel):\n    senzor_id: str\n    hodnoty: list[float]\n\n    @field_validator(\"senzor_id\")\n    @classmethod\n    def over_format_senzoru(cls, v: str) -&gt; str:\n        if not v.startswith(\"SENSOR-\"):\n            raise ValueError(\"ID senzoru musí začínat předponou 'SENSOR-'\")\n        return v.upper()\n\nm = MereniTeploty(senzor_id=\"sensor-01\", hodnoty=[21.5, 22.1, 20.8])\n\n# 2. Obousměrná serializace do formátu JSON:\njson_string = m.model_dump_json(indent=2)\nprint(json_string)\n\n# 3. Zpětné načtení ze surového JSONu:\nm2 = MereniTeploty.model_validate_json(json_string)</pre>\n<p>Pydantic tvoří páteř moderního ekosystému Pythonu (zejména FastAPI, LangChain, SQLModel).</p>\n</div>"
+    },
+    {
+      "id": "id26",
+      "idx": 25,
+      "title": "Případová studie a Milestone 2: Třída Matrix",
+      "tags": ["Core"],
+      "diff": "newconcept",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">26</span><h2 class=\"section-title\">Případová studie a Milestone 2: Třída Matrix</h2></div><div class=\"section-body\">\n<p>V Milestonu 2 máte za úkol implementovat samopopisnou maticovou třídu s perzistencí a transakcemi. Zde je architektonický vzor, jak propojit vše, co jsme se dnes naučili:</p>\n<pre class=\"brush: python; gutter: false; toolbar: false;\">class Matrix:\n    \"\"\"Samopopisná maticová třída implementující Python Data Model.\"\"\"\n    __slots__ = (\"_rows\", \"_cols\", \"_data\")\n\n    def __init__(self, data: list[list[float]]) -&gt; None:\n        self._rows = len(data)\n        self._cols = len(data[0]) if self._rows &gt; 0 else 0\n        self._data = [list(row) for row in data]\n\n    @property\n    def shape(self) -&gt; tuple[int, int]:\n        return (self._rows, self._cols)\n\n    def __repr__(self) -&gt; str:\n        return f\"Matrix({self._data!r})\"\n\n    def __getitem__(self, idx: tuple[int, int]) -&gt; float:\n        r, c = idx\n        return self._data[r][c]\n\n    def __matmul__(self, other: \"Matrix\") -&gt; \"Matrix\":\n        \"\"\"Maticové násobení operátorem @.\"\"\"\n        if self._cols != other._rows:\n            raise ValueError(f\"Nekompatibilní tvary matic: {self.shape} @ {other.shape}\")\n        \n        result = [\n            [sum(self._data[r][k] * other._data[k][c] for k in range(self._cols))\n             for c in range(other._cols)]\n            for r in range(self._rows)\n        ]\n        return Matrix(result)</pre>\n<p>Tato třída podporuje <code>len()</code>, <code>@property</code>, <code>__getitem__</code> s indexací <code>m[r, c]</code>, <code>__repr__</code> a operátor <code>@</code>!</p>\n</div>"
+    },
+    {
+      "id": "id27",
+      "idx": 26,
+      "title": "Shrnutí a most k Týdnu 8 (NumPy a Vektorizace)",
+      "tags": ["Core"],
+      "diff": "basics",
+      "already_studied_in": null,
+      "html": "<div class=\"section-header\"><span class=\"section-num\">27</span><h2 class=\"section-title\">Shrnutí a most k Týdnu 8 (NumPy a Vektorizace)</h2></div><div class=\"section-body\">\n<p>Dnes jsme odhalili skutečnou sílu objektového programování v jazyce Python:</p>\n<h3>Klíčové poznatky dnešní přednášky:</h3>\n<ol>\n  <li><strong>Objektový model</strong>: Dynamický <code>PyObject</code> s <code>__dict__</code>, žádné falešné bariéry, explicitní <code>self</code>.</li>\n  <li><strong>Paměťová optimalizace</strong>: Použití <code>__slots__</code> a <code>@dataclass(slots=True)</code> pro radikální úsporu RAM u milionů instancí.</li>\n  <li><strong>Zapouzdření</strong>: Dekorátor <code>@property</code> pro čisté veřejné rozhraní bez nutnosti getterů a setterů.</li>\n  <li><strong>MRO a super()</strong>: Deterministické řešení vícenásobné dědičnosti pomocí C3 linearizace.</li>\n  <li><strong>Python Data Model</strong>: Dunder metody (<code>__repr__</code>, <code>__len__</code>, <code>__getitem__</code>, <code>__eq__</code>, <code>__matmul__</code>) jako most k vestavěné syntaxi.</li>\n  <li><strong>Moderní standard</strong>: <code>@dataclass</code> pro interní doménové modely a <strong>Pydantic v2</strong> pro rychlou a striktní validaci vstupů.</li>\n</ol>\n<pre class=\"brush: plain; gutter: false; toolbar: false;\">Evoluce abstrakcí v kurzu:\nTýdny 1-4: Datové typy &amp; Hešovací tabulky\nTýdny 5-6: Funkce, Generátory &amp; Proudové zpracování\nTýden 7: Objektový model, Dunder metody &amp; Dataclasses ──────┐\n                                                           ▼\nPříští týden (Týden 8): Vědecké Výpočty: Homogenní Pole NumPy &amp; Vektorizace\n- Paměťové rozložení ndarray v C-kontinuální paměti\n- Strides a multi-dimenzionální výřezy bez kopírování dat\n- Vektorizované operace (ufuncs) eliminující pomalé Python cykly\n- Pravidla vysílání (Broadcasting)\n- Příprava na velká vědecká a chemická data</pre>\n</div>"
+    }
+  ]
+}
