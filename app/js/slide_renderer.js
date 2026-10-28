@@ -493,7 +493,7 @@ export function renderRecapReturnBreadcrumb(currentItem) {
 // Global click delegation for cross-lecture recap buttons
 if (typeof document !== "undefined") {
   document.addEventListener("click", (e) => {
-    const recapBtn = e.target.closest(".recap-link-btn");
+    const recapBtn = e.target?.closest?.(".recap-link-btn");
     if (!recapBtn) return;
     e.preventDefault();
     const lectureId = recapBtn.getAttribute("data-lecture-id");

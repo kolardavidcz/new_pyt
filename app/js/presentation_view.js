@@ -222,7 +222,7 @@ export function stepSlide(dir) {
   const item = state.itemsById.get(tab.itemId);
   if (!item) return;
   const pages = pagesFor(item.path);
-  const slides = state.pagesIndex[item.path] || pages;
+  const slides = (pages && pages.length) ? pages : (state.pagesIndex[item.path] || []);
   if (!slides.length) return;
 
   if (tab.kind === "presentation") {
