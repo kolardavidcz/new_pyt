@@ -5,10 +5,11 @@
  * Writes to both data/ and public/data/ to guarantee instant resolution in both local dev server and Vercel.
  */
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderCompactAsciiExceptionTreeHtml } from "../app/js/exceptions_tree.js";
+import { compileMarkdownLecture } from "./markdown_compiler.mjs";
 
 const ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "data");
@@ -19,6 +20,17 @@ const QUIZZES_OUT_DIRS = [join(DATA_DIR, "quizzes"), join(PUB_DIR, "data", "quiz
 
 for (const d of [...LECTURES_OUT_DIRS, ...QUIZZES_OUT_DIRS]) {
   mkdirSync(d, { recursive: true });
+}
+
+// Clean up legacy redundant week-XX.json duplicates in favor of canonical lectures--week-XX.json
+for (const d of LECTURES_OUT_DIRS) {
+  for (let w = 0; w <= 15; w++) {
+    const pad = String(w).padStart(2, "0");
+    const dup = join(d, `week-${pad}.json`);
+    if (existsSync(dup)) {
+      try { unlinkSync(dup); } catch {}
+    }
+  }
 }
 
 console.log("⚡ Pre-building Quiz Chunks and Static Lectures...");
@@ -838,48 +850,58 @@ for (const [relPath, filePath] of fileMap.entries()) {
     const pathSlug = cleanRel.replace(/[\/\\]/g, "--");
     const baseName = filePath.split(/[/\\]/).pop().replace(/\.html?$/, "");
     
-    // Extract section chunks
-    const slides = [];
-    const sectionRegex = /<section[^>]*id=["']([^"']+)["'][^>]*>([\s\S]*?)<\/section>/gi;
-    let match;
-    let idx = 0;
+    let slides = [];
+    const mdPath = join(ROOT, "content", `${cleanRel}.md`);
 
-    while ((match = sectionRegex.exec(htmlContent)) !== null) {
-      const sectionId = match[1];
-      const sectionInner = transformMathExpressions(transformPreBlocks(transformCodeBlockquotes(transformExampleTags(match[2], dirname(filePath)))));
-      
-      // Extract title header if present and cleanly decode HTML entities
-      const hMatch = sectionInner.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i);
-      const title = hMatch ? decodeHtml(hMatch[1].replace(/<[^>]+>/g, "").trim()) : `Section ${idx + 1}`;
+    if (existsSync(mdPath)) {
+      // 1. Preferred Modern Markdown Lecture source
+      const mdContent = readFileSync(mdPath, "utf-8");
+      const compiled = compileMarkdownLecture(mdContent, pathSlug);
+      slides = compiled.slides;
+    } else {
+      // 2. Fallback to Legacy HTML lecture file
+      const htmlContent = readFileSync(filePath, "utf-8");
+      const sectionRegex = /<section[^>]*id=["']([^"']+)["'][^>]*>([\s\S]*?)<\/section>/gi;
+      let match;
+      let idx = 0;
 
-      // Check metadata with multiple key variants
-      const candidateKeys = [
-        `${cleanRel}#${sectionId}`,
-        `${pathSlug}#${sectionId}`,
-        `${baseName}#${sectionId}`,
-      ];
-      let slideMeta = null;
-      for (const ck of candidateKeys) {
-        if (slidesMetadata[ck]) {
-          slideMeta = slidesMetadata[ck];
-          break;
+      while ((match = sectionRegex.exec(htmlContent)) !== null) {
+        const sectionId = match[1];
+        const sectionInner = transformMathExpressions(transformPreBlocks(transformCodeBlockquotes(transformExampleTags(match[2], dirname(filePath)))));
+        
+        // Extract title header if present and cleanly decode HTML entities
+        const hMatch = sectionInner.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/i);
+        const title = hMatch ? decodeHtml(hMatch[1].replace(/<[^>]+>/g, "").trim()) : `Section ${idx + 1}`;
+
+        // Check metadata with multiple key variants
+        const candidateKeys = [
+          `${cleanRel}#${sectionId}`,
+          `${pathSlug}#${sectionId}`,
+          `${baseName}#${sectionId}`,
+        ];
+        let slideMeta = null;
+        for (const ck of candidateKeys) {
+          if (slidesMetadata[ck]) {
+            slideMeta = slidesMetadata[ck];
+            break;
+          }
         }
+
+        const tags = (slideMeta && Array.isArray(slideMeta.tags)) ? slideMeta.tags : [];
+        const diff = (slideMeta && typeof slideMeta === "object") ? (slideMeta.diff || null) : (typeof slideMeta === "string" ? slideMeta : null);
+        const alreadyStudiedIn = (slideMeta && typeof slideMeta === "object") ? (slideMeta.already_studied_in || null) : null;
+
+        slides.push({
+          id: sectionId,
+          idx,
+          title,
+          tags,
+          diff,
+          already_studied_in: alreadyStudiedIn,
+          html: sectionInner,
+        });
+        idx++;
       }
-
-      const tags = (slideMeta && Array.isArray(slideMeta.tags)) ? slideMeta.tags : [];
-      const diff = (slideMeta && typeof slideMeta === "object") ? (slideMeta.diff || null) : (typeof slideMeta === "string" ? slideMeta : null);
-      const alreadyStudiedIn = (slideMeta && typeof slideMeta === "object") ? (slideMeta.already_studied_in || null) : null;
-
-      slides.push({
-        id: sectionId,
-        idx,
-        title,
-        tags,
-        diff,
-        already_studied_in: alreadyStudiedIn,
-        html: sectionInner,
-      });
-      idx++;
     }
 
     // Splice matching intersection slides for this lecture
@@ -919,16 +941,19 @@ for (const [relPath, filePath] of fileMap.entries()) {
         );
       }
 
-      slides.splice(insertIdx, 0, {
-        id: isl.id || `intersection_${insertIdx}`,
-        idx: insertIdx,
-        title: isl.title || "Intersection Slide",
-        tags: isl.tags || ["Core"],
-        diff: isl.diff || null,
-        is_intersection: true,
-        already_studied_in: null,
-        html: islHtml,
-      });
+      const targetId = isl.id || `intersection_${insertIdx}`;
+      if (!slides.some((s) => s.id === targetId)) {
+        slides.splice(insertIdx, 0, {
+          id: targetId,
+          idx: insertIdx,
+          title: isl.title || "Intersection Slide",
+          tags: isl.tags || ["Core"],
+          diff: isl.diff || null,
+          is_intersection: true,
+          already_studied_in: null,
+          html: islHtml,
+        });
+      }
     }
 
     // Re-index idx sequentially
@@ -943,9 +968,9 @@ for (const [relPath, filePath] of fileMap.entries()) {
       for (const outDir of LECTURES_OUT_DIRS) {
         writeFileSync(join(outDir, `${pathSlug}.json`), payload, "utf-8");
         
-        // Also write baseName if it's not a known duplicate collision
+        // Also write baseName if it's not a known duplicate collision and not a master lecture
         const collisions = ["overview", "basics", "fp", "coroutines", "decorators", "example-1", "example-2", "magic", "pnm", "procvicovani.2", "_comprehensions"];
-        if (!collisions.includes(baseName)) {
+        if (!collisions.includes(baseName) && !pathSlug.startsWith("lectures--") && !/^week-\d+$/.test(baseName)) {
           writeFileSync(join(outDir, `${baseName}.json`), payload, "utf-8");
         }
       }

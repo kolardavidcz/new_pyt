@@ -214,9 +214,11 @@ function buildItemNode(item) {
   row.dataset.id = item.id;
   if (state.focusedTreeKey === key) row.classList.add("active");
 
-  const icon = item.kind === "exercise" ? svgExercise() : svgFile();
-  const iconClass = item.kind === "exercise" ? "exercise" : "lecture";
+  const isMaster = item.kind === "master-lecture";
+  const icon = isMaster ? '<span style="font-size:12px;display:grid;place-items:center;">⭐</span>' : (item.kind === "exercise" ? svgExercise() : svgFile());
+  const iconClass = isMaster ? "master-lecture" : (item.kind === "exercise" ? "exercise" : "lecture");
   const isEx = item.kind === "exercise";
+  if (isMaster) row.classList.add("tree-row-master-lecture");
   const studied = state.studied?.has(item.id)
     ? `<span class="studied-dot" title="${isEx ? "Vyřešeno (Splněno)" : "Prostudováno (Splněno)"}">✓</span>`
     : state.skipped?.has(item.id)

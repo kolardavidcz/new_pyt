@@ -131,6 +131,44 @@ export function showWeek(weekId) {
     header.appendChild(milestoneEl);
   }
 
+  // Master Lecture (Tier 1) Hero Banner
+  const masterLec = (week.lectures || []).find((l) => l.kind === "master-lecture");
+  if (masterLec) {
+    const mlCard = el("div", { className: "week-master-lecture-hero" });
+    const slideCount = masterLec.totalSlides || 27;
+    mlCard.innerHTML = `
+      <div class="wml-badge-row">
+        <span class="wml-badge">⭐ TIER 1 · 90MIN MASTER PŘEDNÁŠKA</span>
+        <span class="wml-badge-sub">${slideCount} slajdů · Kontrastivní model C/Java → Python 3.12+ stdlib</span>
+      </div>
+      <h2 class="wml-title">${escapeHtml(masterLec.title)}</h2>
+      <p class="wml-desc">${escapeHtml(masterLec.desc || "")}</p>
+      ${masterLec.compare ? `<div class="wml-compare"><strong>💡 Didaktický most:</strong> ${escapeHtml(masterLec.compare)}</div>` : ""}
+      <div class="wml-actions">
+        <button type="button" class="btn primary wml-btn-launch" title="Spustit celoobrazovkovou prezentaci se slajdy">
+          ▶ Spustit prezentaci (slajd po slajdu ⛶)
+        </button>
+        <button type="button" class="btn wml-btn-read" title="Otevřít celou přednášku jako souvislý text">
+          📖 Číst jako ucelený text (scrollable)
+        </button>
+      </div>
+    `;
+    const btnLaunch = mlCard.querySelector(".wml-btn-launch");
+    if (btnLaunch) {
+      btnLaunch.addEventListener("click", () => {
+        window.__pcsNavigate?.({ kind: "page", id: masterLec.id, pageId: "id1" });
+        toggleFullscreen(true);
+      });
+    }
+    const btnRead = mlCard.querySelector(".wml-btn-read");
+    if (btnRead) {
+      btnRead.addEventListener("click", () => {
+        window.__pcsNavigate?.({ kind: "lecture", id: masterLec.id });
+      });
+    }
+    header.appendChild(mlCard);
+  }
+
   main.appendChild(header);
   main.appendChild(buildWeekCatalogBlock(week, { hideTitle: true }));
 }
@@ -165,11 +203,19 @@ function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = false }
     wrap.appendChild(titleRow);
   }
 
+  // Pull out Master Lectures (Tier 1) so they always appear prominently at the top
+  const masterLectures = items.filter((i) => i.kind === "master-lecture");
+  if (masterLectures.length) {
+    wrap.appendChild(section("⭐ Master Přednáška (Tier 1 — 90min výklad)", masterLectures));
+  }
+
+  const regularItems = items.filter((i) => i.kind !== "master-lecture");
+
   // If week has shelves, group them nicely
   if (week.shelves && week.shelves.length) {
     const matchedSlugs = new Set();
     for (const shelf of week.shelves) {
-      const shelfItems = items.filter((it) => {
+      const shelfItems = regularItems.filter((it) => {
         const matches = (shelf.slugs || []).some(s => (it.slug || "").includes(s) || (it.path || "").includes(s));
         if (matches) matchedSlugs.add(it.id);
         return matches;
@@ -190,17 +236,17 @@ function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = false }
     }
 
     // Uncategorized shelf items
-    const remainingItems = items.filter(it => !matchedSlugs.has(it.id));
+    const remainingItems = regularItems.filter(it => !matchedSlugs.has(it.id));
     if (remainingItems.length) {
       wrap.appendChild(section("Ostatní doplňková témata", remainingItems));
     }
     return wrap;
   }
 
-  const lectures = items.filter((i) => i.kind === "lecture");
-  const exercises = items.filter((i) => i.kind === "exercise");
+  const lectures = regularItems.filter((i) => i.kind === "lecture");
+  const exercises = regularItems.filter((i) => i.kind === "exercise");
 
-  if (lectures.length) wrap.appendChild(section("Přednášky (Lectures)", lectures));
+  if (lectures.length) wrap.appendChild(section("📚 Referenční archiv témat (Tier 2)", lectures));
   if (exercises.length) wrap.appendChild(section("Cvičení & Projekty (Labs)", exercises));
   if (!items.length) {
     wrap.appendChild(el("p", { className: "desc" }, "Žádné položky neodpovídají aktuálnímu filtru."));
@@ -220,17 +266,19 @@ function section(title, items) {
 
 function itemCard(item) {
   // Default open = full lecture / structured exercise
+  const isMaster = item.kind === "master-lecture";
   const card = el("button", {
     type: "button",
-    className: "card" + (item.kind === "exercise" ? " card-exercise" : ""),
+    className: "card" + (item.kind === "exercise" ? " card-exercise" : "") + (isMaster ? " card-master-lecture" : ""),
     onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
   });
   const exMeta = state.exercises[item.path];
   const taskCount = exMeta?.task_count || exMeta?.tasks?.length || 0;
+  const slideCount = item.totalSlides || 27;
   card.innerHTML = `
     <div class="card-top">
       <div class="card-title">${escapeHtml(item.title)}</div>
-      <div class="card-kind">${escapeHtml(item.kind)}</div>
+      <div class="card-kind">${isMaster ? "⭐ Tier 1 Master" : escapeHtml(item.kind)}</div>
     </div>
     ${item.desc ? `<div class="card-desc">${escapeHtml(item.desc)}</div>` : ""}
     ${item.compare ? `<div class="card-compare">${escapeHtml(item.compare)}</div>` : ""}
@@ -238,6 +286,7 @@ function itemCard(item) {
       ${badgesHtml(item.tags)}
       ${flavorHtml(item.diff)}
       ${taskCount ? `<span class="task-count-chip">${taskCount} úkolů</span>` : ""}
+      ${isMaster ? `<span class="task-count-chip" style="background:rgba(56,189,248,0.2);color:#38bdf8;border-color:rgba(56,189,248,0.4)">${slideCount} slajdů ⛶</span>` : ""}
       ${starsHtml(item, 10, "bar")}
     </div>
   `;
@@ -325,16 +374,27 @@ function lectureToolbar(item, mode) {
   const bar = el("div", { className: "item-actions lecture-toolbar" });
 
   if (mode === "full") {
-    if (pages.length) {
+    const hasSlides = pages.length > 0 || item.kind === "master-lecture" || (item.slug && item.slug.startsWith("lectures--"));
+    if (hasSlides) {
       bar.appendChild(el("button", {
         type: "button",
         className: "btn primary",
         title: "Start full screen presentation",
         onClick: () => {
-          window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[0].id });
+          const firstPageId = pages[0]?.id || "id1";
+          window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: firstPageId });
           toggleFullscreen(true);
         },
       }, "See as presentation ⛶"));
+
+      bar.appendChild(el("button", {
+        type: "button",
+        className: "btn",
+        title: "View all slides outline",
+        onClick: () => {
+          window.__pcsNavigate?.({ kind: "presentation", id: item.id });
+        },
+      }, "All slides 📋"));
     }
   } else {
     bar.appendChild(el("button", {

@@ -159,8 +159,8 @@ function targetToRoute(target) {
   const kind = target.kind;
   if (kind === "home") return { kind: "home" };
   if (kind === "week") return { kind: "week", id: target.id };
-  if (kind === "lecture" || kind === "exercise" || kind === "content") {
-    return { kind: kind === "content" ? "lecture" : kind, id: target.id };
+  if (kind === "lecture" || kind === "exercise" || kind === "content" || kind === "master-lecture") {
+    return { kind: kind === "content" || kind === "master-lecture" ? "lecture" : kind, id: target.id };
   }
   if (kind === "presentation") return { kind: "presentation", id: target.id };
   if (kind === "page") return { kind: "page", id: target.id, pageId: target.pageId };
@@ -173,8 +173,8 @@ function targetToRoute(target) {
 function routeToHash(route) {
   if (!route || route.kind === "home") return "#/";
   if (route.kind === "week") return `#/week/${enc(route.id)}`;
-  if (route.kind === "lecture" || route.kind === "exercise") {
-    return `#/${route.kind}/${enc(route.id)}`;
+  if (route.kind === "lecture" || route.kind === "exercise" || route.kind === "master-lecture") {
+    return `#/${route.kind === "master-lecture" ? "lecture" : route.kind}/${enc(route.id)}`;
   }
   if (route.kind === "presentation") return `#/presentation/${enc(route.id)}`;
   if (route.kind === "page") return `#/page/${enc(route.id)}/${enc(route.pageId)}`;
@@ -195,13 +195,13 @@ function parseHash(hash) {
   const [a, b, c] = parts;
 
   if (a === "week" && b) return { kind: "week", id: dec(b) };
-  if ((a === "lecture" || a === "exercise" || a === "content" || a === "item") && b) {
+  if ((a === "lecture" || a === "exercise" || a === "content" || a === "item" || a === "master-lecture") && b) {
     const itemId = dec(parts.slice(1).join("/"));
     if (slideVal) {
       const formattedSlide = (!slideVal.startsWith("id") && /^\d+$/.test(slideVal)) ? `id${slideVal}` : slideVal;
       return { kind: "page", id: itemId, pageId: formattedSlide };
     }
-    return { kind: a === "content" || a === "item" ? "lecture" : a, id: itemId };
+    return { kind: a === "content" || a === "item" || a === "master-lecture" ? "lecture" : a, id: itemId };
   }
   if (a === "presentation" && b) return { kind: "presentation", id: dec(parts.slice(1).join("/")) };
   if (a === "page" && parts.length >= 3) {
@@ -267,7 +267,7 @@ function applyRoute(route) {
     }
   }
   // Resolve content kind: prefer item existence, fallback to dynamic item registration for disk files
-  if (route.kind === "lecture" || route.kind === "exercise" || route.kind === "presentation") {
+  if (route.kind === "lecture" || route.kind === "exercise" || route.kind === "presentation" || route.kind === "master-lecture") {
     let item = state.itemsById.get(route.id);
     if (!item && route.id) {
       const allItems = Array.from(state.itemsById.values());
@@ -371,7 +371,7 @@ function ensureTab(target) {
     const w = state.weeksById.get(weekId);
     title = w ? `W${w.week}: ${w.title}` : target.id;
     tabKind = "week";
-  } else if (kind === "lecture" || kind === "exercise" || kind === "content") {
+  } else if (kind === "lecture" || kind === "exercise" || kind === "content" || kind === "master-lecture") {
     // Default: full lecture content
     itemId = target.id;
     const item = state.itemsById.get(itemId);
@@ -672,7 +672,7 @@ export function updateStatusBarControls(tab) {
   const sbPresentation = document.getElementById("sbPresentationControls");
   if (!sbExplorer || !sbPresentation) return;
 
-  const isLectureOrPage = tab && (tab.kind === "page" || tab.kind === "presentation" || tab.kind === "lecture" || tab.kind === "exercise");
+  const isLectureOrPage = tab && (tab.kind === "page" || tab.kind === "presentation" || tab.kind === "lecture" || tab.kind === "exercise" || tab.kind === "master-lecture");
   const item = tab?.itemId ? state.itemsById.get(tab.itemId) : null;
 
   if (!isLectureOrPage || !item) {

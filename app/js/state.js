@@ -1790,6 +1790,11 @@ export function buildIndexes(course) {
       }
       if (item.slug) {
         state.itemsById.set("lecture:" + item.slug, item);
+        state.itemsById.set(item.slug, item);
+      }
+      if (item.kind === "master-lecture") {
+        state.itemsById.set("master-lecture:" + item.slug, item);
+        state.itemsById.set("master-lecture:" + (item.id.replace(/^lecture:/, "")), item);
       }
     }
     for (const ex of week.exercises || []) {
