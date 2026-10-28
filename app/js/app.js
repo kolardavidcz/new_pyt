@@ -10,7 +10,7 @@ import {
 import { renderTree, setTreeSelectHandler, expandAll, collapseAll } from "./tree.js";
 import { navigate, refreshActiveView, closeTab, initHistory, getInitialRoute, initScrollTracker } from "./router.js";
 import { openPalette, closePalette, isPaletteOpen, initPalette, setPaletteHandler } from "./palette.js";
-import { toggleFullscreen, updatePageStudyButtons, showLogin } from "./content.js";
+import { toggleFullscreen, updatePageStudyButtons, showLogin, stepSlide } from "./content.js";
 import { initAdminPanel, openAdminModal, updateAdminUIElements } from "./admin.js";
 import { escapeHtml } from "./ui.js";
 
@@ -197,30 +197,6 @@ function renderErrorLogList() {
 function openErrorLogModal() {
   renderErrorLogList();
   document.getElementById("errorLogModal")?.classList.remove("hidden");
-}
-
-function stepSlide(dir) {
-  const tab = state.tabs.find((t) => t.id === state.activeTabId);
-  if (!tab || !tab.itemId) return;
-  const item = state.itemsById.get(tab.itemId);
-  if (!item) return;
-  const pages = pagesFor(item.path);
-  if (!pages.length) return;
-
-  if (tab.kind === "presentation") {
-    if (dir > 0) {
-      navigate({ kind: "page", id: item.id, pageId: pages[0].id });
-    }
-    return;
-  }
-
-  if (tab.kind === "page") {
-    const idx = pages.findIndex((p) => p.id === tab.pageId);
-    const nextIdx = idx + dir;
-    if (nextIdx >= 0 && nextIdx < pages.length) {
-      navigate({ kind: "page", id: item.id, pageId: pages[nextIdx].id });
-    }
-  }
 }
 
 function updateUserUI() {

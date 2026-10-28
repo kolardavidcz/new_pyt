@@ -75,6 +75,9 @@ class MockElement {
   }
 
   get textContent() {
+    if (this.children.length > 0) {
+      return this.children.map(c => c.textContent).join("");
+    }
     return this._textContent;
   }
 
@@ -273,7 +276,7 @@ console.log("=== RUNNING FRONTEND MODULAR & ARCHITECTURE TESTS ===");
 console.log("\n[TEST 1] Verifying Public API Re-exports from content.js...");
 const expectedExports = [
   "showHome", "showWeek", "showFullContent", "showPresentation", "showPage",
-  "showSearchResults", "showProgress", "showLogin", "toggleFullscreen",
+  "showSearchResults", "showProgress", "showLogin", "toggleFullscreen", "stepSlide",
   "fetchAndExtract", "updatePageStudyButtons", "renderSlide", "loadAndInlineExamples",
   "autoContrastImage", "scanAndContrastImages", "printCoursePlan"
 ];
@@ -346,5 +349,40 @@ assert.deepEqual(navigatedTo, { kind: "lecture", id: "lecture:lectures/week-00.h
   "Read button must navigate to continuous lecture view");
 console.log("  ✓ Hero Launch button triggers presentation on slide 1");
 console.log("  ✓ Hero Read button triggers continuous text view");
+
+// 6. Verify Filtered Empty State Handling
+console.log("\n[TEST 6] Verifying Filtered Empty States...");
+// Set filter text that does not match anything
+state.filters.text = "nonexistent_term_xyz_123";
+showWeek("week-0");
+let pDesc = mainEl.querySelectorAll(".desc");
+assert.ok(pDesc.some(p => p.textContent.includes("Žádné položky neodpovídají")),
+  "Week 0 with empty filter results must render empty-state feedback paragraph");
+
+showWeek("week-99");
+pDesc = mainEl.querySelectorAll(".desc");
+assert.ok(pDesc.some(p => p.textContent.includes("Žádné položky neodpovídají")),
+  "Week 99 shelf with empty filter results must render empty-state feedback paragraph");
+state.filters.text = "";
+console.log("  ✓ Week views render friendly empty-state feedback when filtered");
+
+// 7. Verify stepSlide Presentation Navigation
+console.log("\n[TEST 7] Verifying stepSlide Presentation Navigation...");
+const testItem = state.itemsById.get("lecture:lectures/week-00.html");
+state.pagesIndex[testItem.path] = [{ id: "id1" }, { id: "id2" }, { id: "id3" }];
+state.tabs = [{ id: "tab-1", kind: "page", itemId: "lecture:lectures/week-00.html", pageId: "id1" }];
+state.activeTabId = "tab-1";
+navigatedTo = null;
+content.stepSlide(1);
+assert.ok(navigatedTo && navigatedTo.kind === "page" && navigatedTo.pageId !== "id1",
+  "stepSlide(+1) must advance to next slide");
+
+state.tabs[0].pageId = navigatedTo.pageId;
+const currentSlide = navigatedTo.pageId;
+navigatedTo = null;
+content.stepSlide(-1);
+assert.ok(navigatedTo && navigatedTo.kind === "page" && navigatedTo.pageId === "id1",
+  "stepSlide(-1) must return to previous slide");
+console.log("  ✓ stepSlide navigates forward and backward correctly");
 
 console.log("\n✅ ALL FRONTEND ARCHITECTURE & BUG VERIFICATION TESTS PASSED SUCCESSFULLY!");

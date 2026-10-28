@@ -22,7 +22,10 @@ b:\python_overview\
 │       ├── app.js            # SPA initialization & async module bootsrap
 │       ├── state.js          # Reactive state, user database, password hashing & quiz shuffle
 │       ├── router.js         # Hash-based SPA router (#/lecture/*, #/week/*, #/progress, #/login)
-│       ├── content.js        # Main views renderer (Lectures, Exercises, User Profile, Login Card)
+│       ├── content.js        # Main views orchestrator & backward-compatible ESM public API re-exports
+│       ├── catalog_view.js   # Catalog views: Home view, single week view, shelf grouping, item cards
+│       ├── presentation_view.js # Presentation view: Slide-by-slide mode, floating nav, slide counter, shortcuts
+│       ├── slide_renderer.js # Slide DOM node creation, URL rewriting, code example inlining, adaptive contrast
 │       ├── quiz.js           # Quiz engine, answer validation & improvement modal
 │       ├── sync.js           # Upstash Redis KV cloud progress synchronization
 │       ├── format.js         # Code tokenization, Czech unicode support & inline code pills

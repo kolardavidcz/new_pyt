@@ -201,6 +201,7 @@ export function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = 
 
   // If week has shelves, group them nicely
   if (week.shelves && week.shelves.length) {
+    let renderedAnyShelf = false;
     const matchedSlugs = new Set();
     for (const shelf of week.shelves) {
       const shelfItems = regularItems.filter((it) => {
@@ -210,6 +211,7 @@ export function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = 
       });
 
       if (shelfItems.length) {
+        renderedAnyShelf = true;
         const shelfSec = el("div", { className: "shelf-section" },
           el("div", { className: "shelf-header" },
             el("h2", {}, `${shelf.icon || "📁"} ${shelf.title}`),
@@ -226,7 +228,11 @@ export function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = 
     // Uncategorized shelf items
     const remainingItems = regularItems.filter(it => !matchedSlugs.has(it.id));
     if (remainingItems.length) {
+      renderedAnyShelf = true;
       wrap.appendChild(section("Ostatní doplňková témata", remainingItems));
+    }
+    if (!renderedAnyShelf) {
+      wrap.appendChild(el("p", { className: "desc" }, "Žádné položky neodpovídají aktuálnímu filtru."));
     }
     return wrap;
   }
@@ -236,7 +242,7 @@ export function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = 
 
   if (lectures.length) wrap.appendChild(section("📚 Referenční archiv témat (Tier 2)", lectures));
   if (exercises.length) wrap.appendChild(section("Cvičení & Projekty (Labs)", exercises));
-  if (!items.length) {
+  if (!lectures.length && !exercises.length && (hideMasterLecture || !masterLectures.length)) {
     wrap.appendChild(el("p", { className: "desc" }, "Žádné položky neodpovídají aktuálnímu filtru."));
   }
   return wrap;

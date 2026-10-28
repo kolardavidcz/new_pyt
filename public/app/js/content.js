@@ -25,7 +25,7 @@ import {
   showHome, showWeek, buildWeekCatalogBlock, section, itemCard,
 } from "./catalog_view.js";
 import {
-  showPresentation, showPage, showItemIndex, toggleFullscreen,
+  showPresentation, showPage, showItemIndex, toggleFullscreen, stepSlide,
 } from "./presentation_view.js";
 import {
   renderSlide, autoContrastImage, scanAndContrastImages, loadAndInlineExamples,
@@ -35,7 +35,7 @@ import {
 
 // Re-export Public APIs for backward compatibility with router, tree, and app
 export { showHome, showWeek, buildWeekCatalogBlock, section, itemCard };
-export { showPresentation, showPage, showItemIndex, toggleFullscreen };
+export { showPresentation, showPage, showItemIndex, toggleFullscreen, stepSlide };
 export {
   renderSlide, autoContrastImage, scanAndContrastImages, loadAndInlineExamples,
   fetchAndExtract, rewriteContentUrls, resolvePresentationHref,
