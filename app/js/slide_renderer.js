@@ -594,7 +594,7 @@ export async function fetchAndExtract(path) {
         const slides = Array.isArray(data) ? data : (data?.slides && Array.isArray(data.slides) ? data.slides : null);
         if (slides && slides.length > 0) {
           cache.set(path, slides);
-          if (!state.pagesIndex[path] || !state.pagesIndex[path].length) {
+          if (!state.pagesIndex[path] || state.pagesIndex[path].length !== slides.length) {
             const mappedPages = slides.map((sl) => ({
               id: sl.id,
               title: sl.title,

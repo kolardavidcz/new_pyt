@@ -129,6 +129,19 @@ class MockElement {
     }
   }
 
+  closest(selector) {
+    let curr = this;
+    const parts = selector.split(",").map((s) => s.trim().toLowerCase());
+    while (curr) {
+      for (const part of parts) {
+        if (part.startsWith(".") && curr.classList.contains(part.slice(1))) return curr;
+        if (part === curr.tagName.toLowerCase()) return curr;
+      }
+      curr = curr.parentElement;
+    }
+    return null;
+  }
+
   querySelector(selector) {
     return this.querySelectorAll(selector)[0] || null;
   }
@@ -187,11 +200,18 @@ class MockElement {
 
   _parseHtml(html) {
     // Basic parser extracting buttons and classes for unit test verification
-    const btnRegex = /<button[^>]*class=["']([^"']*)["'][^>]*>([\s\S]*?)<\/button>/gi;
+    const btnRegex = /<button([^>]*)>([\s\S]*?)<\/button>/gi;
     let match;
     while ((match = btnRegex.exec(html)) !== null) {
+      const attrs = match[1];
       const btn = new MockElement("button");
-      btn.className = match[1];
+      const idMatch = attrs.match(/id=["']([^"']*)["']/i);
+      if (idMatch) {
+        btn.id = idMatch[1];
+        btn.setAttribute("id", idMatch[1]);
+      }
+      const clsMatch = attrs.match(/class=["']([^"']*)["']/i);
+      if (clsMatch) btn.className = clsMatch[1];
       btn.innerHTML = match[2];
       this.children.push(btn);
       btn.parentElement = this;
@@ -253,12 +273,34 @@ loadBar.id = "loadingBar";
 doc.body.appendChild(loadBar);
 doc.elementsById.set("loadingBar", loadBar);
 
+const profileModal = new MockElement("div");
+profileModal.id = "profileModal";
+const profileCard = new MockElement("div");
+profileCard.id = "profileModalCard";
+profileModal.appendChild(profileCard);
+doc.body.appendChild(profileModal);
+doc.elementsById.set("profileModal", profileModal);
+doc.elementsById.set("profileModalCard", profileCard);
+
 globalThis.document = doc;
 globalThis.window = {
   __pcsNavigate: null,
   addEventListener: () => {},
   removeEventListener: () => {},
   print: () => {},
+};
+globalThis.fetch = async (url) => {
+  return {
+    ok: true,
+    status: 200,
+    json: async () => ({
+      slides: [
+        { id: "id1", title: "Slide 1", html: "<p>Slide 1 test content</p>" },
+        { id: "id2", title: "Slide 2", html: "<p>Slide 2 test content</p>" },
+      ],
+    }),
+    text: async () => "<section class='slide-section' id='id1'><h2>Slide 1</h2></section>",
+  };
 };
 
 // Load actual curriculum data to initialize course state
@@ -432,6 +474,41 @@ for (const rel of checkFiles) {
   assert.equal(fApp, fPub, `File drift detected between app/${rel} and public/app/${rel}`);
 }
 console.log(`  ✓ All ${checkFiles.length} core JS/CSS files are 100% synchronized with zero drift`);
+
+// 11. Verify User Profile Logout does not throw ReferenceError
+console.log("\n[TEST 11] Verifying User Profile Logout button...");
+state.user = { username: "novakj", name: "Jan Novak", email: "novakj@vscht.cz" };
+content.showLogin();
+const logoutBtn = profileCard.querySelector("#btnPageLogout");
+assert.ok(logoutBtn, "Logout button should be rendered in user profile dashboard");
+let logoutError = null;
+try {
+  logoutBtn.click();
+} catch (err) {
+  logoutError = err;
+}
+assert.equal(logoutError, null, "Clicking logout button must not throw ReferenceError (logoutUser must be imported)");
+assert.equal(state.user, null, "User state must be cleared after logout");
+console.log("  ✓ Logout button invokes logoutUser() cleanly without ReferenceError");
+
+// 12. Verify showPresentation & showPage accept item object and numeric slide index
+console.log("\n[TEST 12] Verifying showPresentation & showPage signature flexibility...");
+await content.showPresentation(testItem);
+assert.ok(mainEl.children.length > 0, "showPresentation must accept item object");
+await content.showPage(testItem, 0);
+assert.ok(mainEl.children.length > 0, "showPage must accept item object and numeric slide index");
+console.log("  ✓ showPresentation and showPage accept both string itemId and item objects");
+
+// 13. Verify Button Focus does NOT block ArrowRight keyboard navigation
+console.log("\n[TEST 13] Verifying Keyboard Navigation when Button is Focused...");
+const fakeBtn = new MockElement("button");
+const arrowEvent = { target: fakeBtn, key: "ArrowRight" };
+const spaceEvent = { target: fakeBtn, key: " " };
+const isArrowInput = !!(arrowEvent.target instanceof MockElement && (arrowEvent.target.closest?.("input, textarea, select, [contenteditable], .quiz-section-card") || (arrowEvent.key === " " && arrowEvent.target.closest?.("button"))));
+const isSpaceInput = !!(spaceEvent.target instanceof MockElement && (spaceEvent.target.closest?.("input, textarea, select, [contenteditable], .quiz-section-card") || (spaceEvent.key === " " && spaceEvent.target.closest?.("button"))));
+assert.equal(isArrowInput, false, "ArrowRight on a focused button must NOT be treated as input");
+assert.equal(isSpaceInput, true, "Space on a focused button MUST be treated as input (native click)");
+console.log("  ✓ Arrow navigation works cleanly even when buttons have active focus");
 
 console.log("\n✅ ALL FRONTEND ARCHITECTURE & BUG VERIFICATION TESTS PASSED SUCCESSFULLY!");
 

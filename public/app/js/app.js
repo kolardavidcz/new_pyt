@@ -465,7 +465,7 @@ function bindChrome() {
     }
 
     // Slide navigation & Fullscreen shortcut (ArrowLeft / ArrowRight, PageUp / PageDown, Space, F)
-    const isInput = !!(e.target instanceof Element && e.target.closest("input, textarea, select, button, [contenteditable], .quiz-section-card"));
+    const isInput = !!(e.target instanceof Element && (e.target.closest("input, textarea, select, [contenteditable], .quiz-section-card") || (e.key === " " && e.target.closest("button"))));
     if (!isInput && !isPaletteOpen() && !meta) {
       const activeTab = state.tabs.find((t) => t.id === state.activeTabId);
       const isPresentation = activeTab && (activeTab.kind === "page" || activeTab.kind === "presentation");

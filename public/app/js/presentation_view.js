@@ -38,7 +38,7 @@ export function toggleFullscreen(forceState) {
 /* ── Presentation Outline (All Slides) ─────────────────── */
 
 export async function showPresentation(itemId) {
-  const item = state.itemsById.get(itemId);
+  const item = (typeof itemId === "object" && itemId !== null) ? itemId : state.itemsById.get(itemId);
   const main = document.getElementById("main");
   if (!item) {
     if (main) {
@@ -97,7 +97,7 @@ export function showItemIndex(itemId) {
 /* ── Single Slide (Presentation Step) ──────────────────── */
 
 export async function showPage(itemId, pageId) {
-  const item = state.itemsById.get(itemId);
+  const item = (typeof itemId === "object" && itemId !== null) ? itemId : state.itemsById.get(itemId);
   const main = document.getElementById("main");
   if (!item) {
     if (main) main.innerHTML = `<div class="error-box">Item not found.</div>`;
@@ -130,12 +130,16 @@ export async function showPage(itemId, pageId) {
 
   try {
     const slides = await fetchAndExtract(item.path);
-    const page = slides.find((s) => s.id === pageId) || slides[0];
+    let targetPageId = pageId;
+    if (typeof pageId === "number") {
+      targetPageId = slides[pageId]?.id || `id${pageId + 1}`;
+    }
+    const page = (targetPageId ? slides.find((s) => s.id === targetPageId) : null) || slides[0];
     if (!page) {
-      main.innerHTML = `<div class="error-box">Page <code>${escapeHtml(pageId)}</code> not found in lecture.</div>`;
+      main.innerHTML = `<div class="error-box">Page <code>${escapeHtml(String(pageId ?? ""))}</code> not found in lecture.</div>`;
       return;
     }
-    const subTitle = page.title || pageId;
+    const subTitle = page.title || page.id || "Slide";
     document.title = item.weekNum != null ? `W${item.weekNum} • ${subTitle}` : `newpyt • ${subTitle}`;
 
     const returnBreadcrumb = renderRecapReturnBreadcrumb(item);
@@ -145,9 +149,12 @@ export async function showPage(itemId, pageId) {
     main.appendChild(hero);
 
     const pages = pagesFor(item.path);
-    const effectivePages = (pages && pages.length) ? pages : slides;
-    const actualPageId = page.id || pageId;
-    const idx = effectivePages.findIndex((p) => p.id === actualPageId);
+    const effectivePages = (slides && slides.length) ? slides : pages;
+    const actualPageId = page.id || targetPageId;
+    let idx = effectivePages.findIndex((p) => p.id === actualPageId);
+    if (idx === -1 && pages && pages.length) {
+      idx = pages.findIndex((p) => p.id === actualPageId);
+    }
     const currentSlideNum = Math.max(idx, 0) + 1;
     const totalSlideCount = effectivePages.length;
 
@@ -225,7 +232,7 @@ export function stepSlide(dir) {
   const slides = (pages && pages.length) ? pages : (state.pagesIndex[item.path] || []);
   if (!slides.length) return;
 
-  if (tab.kind === "presentation") {
+  if (tab.kind === "presentation" || tab.kind === "content" || tab.kind === "lecture") {
     if (dir > 0) {
       window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: slides[0].id });
     }

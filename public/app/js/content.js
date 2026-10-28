@@ -10,6 +10,7 @@ import {
   syncCloudProgress, forceCloudDownload, forceCloudUpload, setCodeBlockColor, logLinkError,
   setPrintWithQuizzes, getQuizFor,
   registerUser, loginWithPassword, resetUserPassword, isAdminUser, syncUsersDbFromCloud,
+  logoutUser,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
 import { highlightRoot } from "./highlight.js";
@@ -243,11 +244,12 @@ export function buildBottomNavBar(item) {
 /* ── Full Lecture / Exercise Content (Default Open) ────── */
 
 export async function showFullContent(itemId) {
-  const item = state.itemsById.get(itemId);
+  const item = (typeof itemId === "object" && itemId !== null) ? itemId : state.itemsById.get(itemId);
   const main = document.getElementById("main");
   if (!item) {
-    logLinkError({ targetId: itemId, message: `Lecture or exercise item not found: ${itemId}` });
-    if (main) main.innerHTML = `<div class="error-box">Item not found: <code>${escapeHtml(itemId)}</code></div>`;
+    const targetId = typeof itemId === "object" ? itemId?.id : itemId;
+    logLinkError({ targetId, message: `Lecture or exercise item not found: ${targetId}` });
+    if (main) main.innerHTML = `<div class="error-box">Item not found: <code>${escapeHtml(targetId)}</code></div>`;
     return;
   }
   markSeen(item.id);
