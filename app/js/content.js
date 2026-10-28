@@ -1,23 +1,51 @@
-/** Content loading: catalog views + lecture HTML extraction */
+/**
+ * Python Course Shell — Main Content & Presentation Orchestrator
+ * Clean entry point re-exporting public APIs preserving all existing caller signatures.
+ */
 
 import {
-  state, pagesFor, slideDiff, slideTags, weekVisibleItems, filteredItems, markSeen,
-  isStudied, isSkipped, isCompleted, toggleStudied, toggleSkipped, setStudied, setSkipped,
-  cycleStudyStatus, getStudyStatus, getTaskStatus, cycleTaskStatus,
-  getCourseStats, getWeekStats,
-  setUser, logoutUser, syncCloudProgress, forceCloudDownload, forceCloudUpload, setCodeBlockColor, logLinkError,
-  saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, setPrintWithQuizzes, getQuizFor, getQuizForDeck,
+  state, pagesFor, filteredItems, markSeen,
+  isCompleted, cycleStudyStatus, getStudyStatus, getTaskStatus, cycleTaskStatus,
+  getCourseStats,
+  syncCloudProgress, forceCloudDownload, forceCloudUpload, setCodeBlockColor, logLinkError,
+  setPrintWithQuizzes, getQuizFor,
   registerUser, loginWithPassword, resetUserPassword, isAdminUser, syncUsersDbFromCloud,
 } from "./state.js";
 import { clear, el, starsHtml, scoreBarHtml, badgesHtml, flavorHtml, escapeHtml } from "./ui.js";
-import { highlightRoot, highlightCode, dedentCode } from "./highlight.js";
+import { highlightRoot } from "./highlight.js";
 import { renderTree } from "./tree.js";
 import { formatInlineCode, isFlexibleCodeFillCorrect, parseQuestionContent } from "./format.js";
-import { renderQuizSection, openImprovementModal, openPresentationImprovementModal, updatePrintQuizButtons } from "./quiz.js";
+import {
+  renderQuizSection, openImprovementModal, openPresentationImprovementModal, updatePrintQuizButtons,
+} from "./quiz.js";
 import { openAdminModal } from "./admin.js";
 
+// Modular Presentation, Catalog, and Slide Rendering imports
+import {
+  showHome, showWeek, buildWeekCatalogBlock, section, itemCard,
+} from "./catalog_view.js";
+import {
+  showPresentation, showPage, showItemIndex, toggleFullscreen,
+} from "./presentation_view.js";
+import {
+  renderSlide, autoContrastImage, scanAndContrastImages, loadAndInlineExamples,
+  fetchAndExtract, rewriteContentUrls, resolvePresentationHref,
+  renderRecapReturnBreadcrumb,
+} from "./slide_renderer.js";
+
+// Re-export Public APIs for backward compatibility with router, tree, and app
+export { showHome, showWeek, buildWeekCatalogBlock, section, itemCard };
+export { showPresentation, showPage, showItemIndex, toggleFullscreen };
+export {
+  renderSlide, autoContrastImage, scanAndContrastImages, loadAndInlineExamples,
+  fetchAndExtract, rewriteContentUrls, resolvePresentationHref,
+};
 export { formatInlineCode, isFlexibleCodeFillCorrect, parseQuestionContent };
-export { renderQuizSection, openImprovementModal, openPresentationImprovementModal, updatePrintQuizButtons };
+export {
+  renderQuizSection, openImprovementModal, openPresentationImprovementModal, updatePrintQuizButtons,
+};
+
+/* ── Loading Bar Helper ────────────────────────────────── */
 
 export function setLoading(on) {
   const bar = document.getElementById("loadingBar");
@@ -25,292 +53,7 @@ export function setLoading(on) {
   bar.classList.toggle("active", !!on);
 }
 
-/* ── Welcome: all weeks + full lecture/exercise catalogs ─ */
-
-export function showHome() {
-  const main = document.getElementById("main");
-  const course = state.course;
-  const weeks = course?.weeks || [];
-
-  main.className = "catalog catalog-home";
-  clear(main);
-
-  const header = el("div", { className: "catalog-header" });
-  header.innerHTML = `
-    <h1>Python Course Workspace</h1>
-    <p class="desc">Jiný UI pro <a href="http://vyuka.ookami.cz/index.python.html" target="_blank" rel="noopener noreferrer">ookami-&gt;pyt</a> od Pana Inženýra Znamenáčka, senior Full stack developera a pedagoga :)<br>Pokud něco nebude fungovat napište mi na <a href="mailto:kolarv@vscht.cz">kolarv@vscht.cz</a> &lt;3</p>
-
-    <div class="welcome-keys" style="justify-content:flex-start;margin-top:12px">
-      <span><kbd class="kbd">Ctrl+P</kbd> Tisk / Print</span>
-      <span><kbd class="kbd">Ctrl+K</kbd> Quick open</span>
-      <span><kbd class="kbd">Ctrl+B</kbd> Toggle sidebar</span>
-      <span><kbd class="kbd">Ctrl+Shift+F</kbd> Search</span>
-      <span><kbd class="kbd">Browser ←</kbd> Previous view</span>
-    </div>
-  `;
-  main.appendChild(header);
-
-  for (const week of weeks) {
-    main.appendChild(buildWeekCatalogBlock(week, { showWeekLink: true }));
-  }
-
-  if (!weeks.length) {
-    main.appendChild(el("p", { className: "desc" }, "No weeks loaded."));
-  }
-}
-
-/* ── Single week catalog ───────────────────────────────── */
-
-export function showWeek(weekId) {
-  let week = state.weeksById.get(weekId);
-  if (!week && weekId) {
-    const normalized = "week-" + String(weekId).replace(/^w/, "");
-    week = state.weeksById.get(normalized);
-  }
-  const main = document.getElementById("main");
-  if (!week) {
-    main.className = "";
-    main.innerHTML = `<div class="error-box">Week not found: <code>${escapeHtml(weekId)}</code></div>`;
-    return;
-  }
-
-  main.className = "catalog";
-  clear(main);
-
-  const items = weekVisibleItems(week);
-  let weekLabel = `Týden ${week.week}`;
-  if (week.week === 99) weekLabel = "Doplňkový regál (W99)";
-  const wStats = getWeekStats(week);
-  
-  const header = el("div", { className: "catalog-header" },
-    el("h1", {}, `${weekLabel}: ${week.title}`),
-    week.description ? el("p", { className: "desc" }, week.description) : null,
-    el("div", { className: "catalog-stats" },
-      el("span", { className: "catalog-stat-pill" }, `⏱️ ${week.time_estimate || "90 min přednáška + 45 min lab"}`),
-      el("span", { className: "catalog-stat-pill" }, `📚 ${wStats.lecturesCompleted}/${wStats.lecturesTotal} přednášek`),
-      el("span", { className: "catalog-stat-pill" }, `💻 ${wStats.exercisesCompleted}/${wStats.exercisesTotal} cvičení`),
-      el("span", { className: "catalog-stat-pill" }, `🎯 ${wStats.pct}% splněno`),
-    ),
-  );
-
-  // Pedagogical Callouts
-  if (week.objective || week.c_java_bridge) {
-    const callouts = el("div", { className: "week-hero-callouts" });
-    if (week.objective) {
-      callouts.appendChild(el("div", { className: "week-hero-callout objective" },
-        el("span", { className: "callout-icon" }, "🎯"),
-        el("div", { className: "callout-body" },
-          el("strong", {}, "Cíl týdne"),
-          el("span", {}, week.objective),
-        ),
-      ));
-    }
-    if (week.c_java_bridge) {
-      callouts.appendChild(el("div", { className: "week-hero-callout bridge" },
-        el("span", { className: "callout-icon" }, "⚡"),
-        el("div", { className: "callout-body" },
-          el("strong", {}, "Most z C / C++ / Javy"),
-          el("span", {}, week.c_java_bridge),
-        ),
-      ));
-    }
-    header.appendChild(callouts);
-  }
-
-  // Milestone Banner
-  if (week.milestone) {
-    const m = week.milestone;
-    const milestoneEl = el("div", { className: "week-milestone-card" },
-      el("div", { className: "milestone-badge" }, `🏆 Semestrální projektový milník ${m.number}`),
-      el("h3", { className: "milestone-title" }, m.title),
-      el("p", { className: "milestone-desc" }, m.desc),
-      el("div", { className: "milestone-skills" },
-        ...(m.skills || []).map((s) => el("span", { className: "milestone-skill-pill" }, s)),
-      ),
-    );
-    header.appendChild(milestoneEl);
-  }
-
-  // Master Lecture (Tier 1) Hero Banner
-  const masterLec = (week.lectures || []).find((l) => l.kind === "master-lecture");
-  if (masterLec) {
-    const mlCard = el("div", { className: "week-master-lecture-hero" });
-    const slideCount = masterLec.totalSlides || 27;
-    mlCard.innerHTML = `
-      <div class="wml-badge-row">
-        <span class="wml-badge">⭐ TIER 1 · 90MIN MASTER PŘEDNÁŠKA</span>
-        <span class="wml-badge-sub">${slideCount} slajdů · Kontrastivní model C/Java → Python 3.12+ stdlib</span>
-      </div>
-      <h2 class="wml-title">${escapeHtml(masterLec.title)}</h2>
-      <p class="wml-desc">${escapeHtml(masterLec.desc || "")}</p>
-      ${masterLec.compare ? `<div class="wml-compare"><strong>💡 Didaktický most:</strong> ${escapeHtml(masterLec.compare)}</div>` : ""}
-      <div class="wml-actions">
-        <button type="button" class="btn primary wml-btn-launch" title="Spustit celoobrazovkovou prezentaci se slajdy">
-          ▶ Spustit prezentaci (slajd po slajdu ⛶)
-        </button>
-        <button type="button" class="btn wml-btn-read" title="Otevřít celou přednášku jako souvislý text">
-          📖 Číst jako ucelený text (scrollable)
-        </button>
-      </div>
-    `;
-    const btnLaunch = mlCard.querySelector(".wml-btn-launch");
-    if (btnLaunch) {
-      btnLaunch.addEventListener("click", () => {
-        window.__pcsNavigate?.({ kind: "page", id: masterLec.id, pageId: "id1" });
-        toggleFullscreen(true);
-      });
-    }
-    const btnRead = mlCard.querySelector(".wml-btn-read");
-    if (btnRead) {
-      btnRead.addEventListener("click", () => {
-        window.__pcsNavigate?.({ kind: "lecture", id: masterLec.id });
-      });
-    }
-    header.appendChild(mlCard);
-  }
-
-  main.appendChild(header);
-  main.appendChild(buildWeekCatalogBlock(week, { hideTitle: true }));
-}
-
-/**
- * Shared week body: Lectures + Exercises card grids (same as week click).
- */
-function buildWeekCatalogBlock(week, { showWeekLink = false, hideTitle = false } = {}) {
-  const items = weekVisibleItems(week);
-  const wrap = el("div", { className: "week-block", dataset: { weekId: week.id } });
-
-  if (!hideTitle) {
-    const isGray = week.week === 99 || week.isRemovedSection;
-    const badgeText = isGray ? "Shelf" : `W${week.week}`;
-    const titleRow = el("div", { className: "week-block-header" });
-    if (showWeekLink) {
-      const btn = el("button", {
-        type: "button",
-        className: "week-block-title",
-        onClick: () => window.__pcsNavigate?.({ kind: "week", id: week.id }),
-      });
-      btn.innerHTML = `<span class="week-num">${badgeText}</span> ${escapeHtml(week.title)}`;
-      titleRow.appendChild(btn);
-    } else {
-      titleRow.innerHTML = `<h2 class="week-block-title static"><span class="week-num">${badgeText}</span> ${escapeHtml(week.title)}</h2>`;
-    }
-    if (week.description) {
-      titleRow.appendChild(el("p", { className: "week-block-desc" }, week.description));
-    }
-    const count = el("span", { className: "week-block-count" }, `${items.length} items`);
-    titleRow.appendChild(count);
-    wrap.appendChild(titleRow);
-  }
-
-  // Pull out Master Lectures (Tier 1) so they always appear prominently at the top
-  const masterLectures = items.filter((i) => i.kind === "master-lecture");
-  if (masterLectures.length) {
-    wrap.appendChild(section("⭐ Master Přednáška (Tier 1 — 90min výklad)", masterLectures));
-  }
-
-  const regularItems = items.filter((i) => i.kind !== "master-lecture");
-
-  // If week has shelves, group them nicely
-  if (week.shelves && week.shelves.length) {
-    const matchedSlugs = new Set();
-    for (const shelf of week.shelves) {
-      const shelfItems = regularItems.filter((it) => {
-        const matches = (shelf.slugs || []).some(s => (it.slug || "").includes(s) || (it.path || "").includes(s));
-        if (matches) matchedSlugs.add(it.id);
-        return matches;
-      });
-
-      if (shelfItems.length) {
-        const shelfSec = el("div", { className: "shelf-section" },
-          el("div", { className: "shelf-header" },
-            el("h2", {}, `${shelf.icon || "📁"} ${shelf.title}`),
-            shelf.desc ? el("p", {}, shelf.desc) : null,
-          ),
-        );
-        const grid = el("div", { className: "card-grid" });
-        for (const item of shelfItems) grid.appendChild(itemCard(item));
-        shelfSec.appendChild(grid);
-        wrap.appendChild(shelfSec);
-      }
-    }
-
-    // Uncategorized shelf items
-    const remainingItems = regularItems.filter(it => !matchedSlugs.has(it.id));
-    if (remainingItems.length) {
-      wrap.appendChild(section("Ostatní doplňková témata", remainingItems));
-    }
-    return wrap;
-  }
-
-  const lectures = regularItems.filter((i) => i.kind === "lecture");
-  const exercises = regularItems.filter((i) => i.kind === "exercise");
-
-  if (lectures.length) wrap.appendChild(section("📚 Referenční archiv témat (Tier 2)", lectures));
-  if (exercises.length) wrap.appendChild(section("Cvičení & Projekty (Labs)", exercises));
-  if (!items.length) {
-    wrap.appendChild(el("p", { className: "desc" }, "Žádné položky neodpovídají aktuálnímu filtru."));
-  }
-  return wrap;
-}
-
-function section(title, items) {
-  const sec = el("div", { className: "catalog-section" },
-    el("h2", {}, title),
-  );
-  const grid = el("div", { className: "card-grid" });
-  for (const item of items) grid.appendChild(itemCard(item));
-  sec.appendChild(grid);
-  return sec;
-}
-
-function itemCard(item) {
-  // Default open = full lecture / structured exercise
-  const isMaster = item.kind === "master-lecture";
-  const card = el("button", {
-    type: "button",
-    className: "card" + (item.kind === "exercise" ? " card-exercise" : "") + (isMaster ? " card-master-lecture" : ""),
-    onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
-  });
-  const exMeta = state.exercises[item.path];
-  const taskCount = exMeta?.task_count || exMeta?.tasks?.length || 0;
-  const slideCount = item.totalSlides || 27;
-  card.innerHTML = `
-    <div class="card-top">
-      <div class="card-title">${escapeHtml(item.title)}</div>
-      <div class="card-kind">${isMaster ? "⭐ Tier 1 Master" : escapeHtml(item.kind)}</div>
-    </div>
-    ${item.desc ? `<div class="card-desc">${escapeHtml(item.desc)}</div>` : ""}
-    ${item.compare ? `<div class="card-compare">${escapeHtml(item.compare)}</div>` : ""}
-    <div class="card-footer">
-      ${badgesHtml(item.tags)}
-      ${flavorHtml(item.diff)}
-      ${taskCount ? `<span class="task-count-chip">${taskCount} úkolů</span>` : ""}
-      ${isMaster ? `<span class="task-count-chip" style="background:rgba(56,189,248,0.2);color:#38bdf8;border-color:rgba(56,189,248,0.4)">${slideCount} slajdů ⛶</span>` : ""}
-      ${starsHtml(item, 10, "bar")}
-    </div>
-  `;
-  return card;
-}
-
-/* ── Lecture toolbar (shared) ──────────────────────────── */
-
-export function toggleFullscreen(forceState) {
-  const isFS = !!document.fullscreenElement || document.documentElement.classList.contains("presentation-fullscreen-mode");
-  const targetState = forceState !== undefined ? forceState : !isFS;
-
-  if (targetState) {
-    document.documentElement.classList.add("presentation-fullscreen-mode");
-    if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
-  } else {
-    document.documentElement.classList.remove("presentation-fullscreen-mode");
-    if (document.exitFullscreen && document.fullscreenElement) {
-      document.exitFullscreen().catch(() => {});
-    }
-  }
-}
+/* ── Study Status Controls & Toolbar ────────────────────── */
 
 export function updatePageStudyButtons() {
   const currentTab = state.tabs.find((t) => t.id === state.activeTabId);
@@ -337,7 +80,7 @@ export function updatePageStudyButtons() {
   });
 }
 
-function renderStudyActionControl(itemId, { isBottom = false } = {}) {
+export function renderStudyActionControl(itemId, { isBottom = false } = {}) {
   const item = state.itemsById.get(itemId);
   const isExercise = item?.kind === "exercise" || (itemId && itemId.startsWith("exercise:"));
   const status = getStudyStatus(itemId);
@@ -352,7 +95,7 @@ function renderStudyActionControl(itemId, { isBottom = false } = {}) {
     onClick: () => {
       cycleStudyStatus(itemId);
       updatePageStudyButtons();
-      try { renderTree(); } catch { /* */ }
+      try { renderTree(); } catch { /* ignore */ }
       window.__pcsUpdateStatus?.();
     },
   });
@@ -368,7 +111,7 @@ function renderStudyActionControl(itemId, { isBottom = false } = {}) {
   return btn;
 }
 
-function lectureToolbar(item, mode) {
+export function lectureToolbar(item, mode) {
   // mode: "full" | "presentation" | "page"
   const pages = pagesFor(item.path);
   const bar = el("div", { className: "item-actions lecture-toolbar" });
@@ -431,7 +174,7 @@ function lectureToolbar(item, mode) {
   return bar;
 }
 
-function lectureHero(item, { compact = false } = {}) {
+export function lectureHero(item, { compact = false } = {}) {
   const hero = el("div", { className: "item-hero" });
   const isGray = item.weekNum === 99 || item.week === 99;
   const weekBadge = isGray ? "Gray" : `W${item.weekNum}`;
@@ -449,7 +192,7 @@ function lectureHero(item, { compact = false } = {}) {
   return hero;
 }
 
-function buildBottomNavBar(item) {
+export function buildBottomNavBar(item) {
   const items = state.items;
   const idx = items.findIndex((it) => it.id === item.id);
   const prevItem = idx > 0 ? items[idx - 1] : null;
@@ -497,188 +240,14 @@ function buildBottomNavBar(item) {
   return bar;
 }
 
-/**
- * Presentation mode: page index (outline of slides).
- * Replaces the old "item index" as secondary view.
- */
-export async function showPresentation(itemId) {
-  const item = state.itemsById.get(itemId);
-  const main = document.getElementById("main");
-  if (!item) {
-    main.className = "";
-    main.innerHTML = `<div class="error-box">Item not found.</div>`;
-    return;
-  }
-
-  markSeen(item.id);
-  const pages = pagesFor(item.path);
-
-  main.className = "lecture-view";
-  clear(main);
-
-  const hero = lectureHero(item);
-  hero.appendChild(lectureToolbar(item, "presentation"));
-  main.appendChild(hero);
-
-  if (pages.length) {
-    const sec = el("div", { className: "catalog", style: { paddingTop: "4px", paddingBottom: "16px" } },
-      el("div", { className: "catalog-section" },
-        el("h2", {}, `Presentation Outline · ${pages.length} slides`),
-      ),
-    );
-    const list = el("div", { className: "page-list" });
-    pages.forEach((p, i) => {
-      const diff = resolveSlideDiff(p, item.slug, p.id);
-      const tags = resolveSlideTags(p, item.slug, p.id);
-      const row = el("button", {
-        type: "button",
-        className: "page-row",
-        onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: p.id }),
-      });
-      row.innerHTML = `
-        <span class="page-num">${String(i + 1).padStart(2, "0")}</span>
-        <span class="page-title">${escapeHtml(p.title)}</span>
-        ${badgesHtml(tags)}
-        ${diff ? flavorHtml(diff) : ""}
-      `;
-      list.appendChild(row);
-    });
-    sec.querySelector(".catalog-section").appendChild(list);
-    main.appendChild(sec);
-  }
-
-  // Always load full lecture content below outline
-  await loadFullContent(item, main);
-}
-
-/** @deprecated alias kept for any leftover imports */
-export function showItemIndex(itemId) {
-  return showPresentation(itemId);
-}
-
-/* ── Single slide (presentation step) ──────────────────── */
-
-export async function showPage(itemId, pageId) {
-  const item = state.itemsById.get(itemId);
-  const main = document.getElementById("main");
-  if (!item) {
-    main.innerHTML = `<div class="error-box">Item not found.</div>`;
-    return;
-  }
-  markSeen(item.id);
-
-  // Exercise úkol: show full exercise UI and scroll/focus one task
-  if (item.kind === "exercise") {
-    const structured = state.exercises[item.path]
-      || await fetchAndExtractExercise(item.path).catch(() => null);
-    if (structured?.tasks?.length) {
-      main.className = "lecture-view exercise-view";
-      clear(main);
-      renderExerciseView(item, structured, main);
-      requestAnimationFrame(() => {
-        const node = document.getElementById(pageId);
-        if (node) {
-          node.classList.add("task-card-focus");
-          node.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      });
-      return;
-    }
-  }
-
-  setLoading(true);
-  main.className = "lecture-view presentation-page-view";
-  clear(main);
-
-  try {
-    const slides = await fetchAndExtract(item.path);
-    const page = slides.find((s) => s.id === pageId) || slides[0];
-    if (!page) {
-      main.innerHTML = `<div class="error-box">Page <code>${escapeHtml(pageId)}</code> not found in lecture.</div>`;
-      return;
-    }
-    const subTitle = page.title || pageId;
-    document.title = item.weekNum != null ? `W${item.weekNum} • ${subTitle}` : `newpyt • ${subTitle}`;
-
-    const returnBreadcrumb = renderRecapReturnBreadcrumb(item);
-    if (returnBreadcrumb) main.appendChild(returnBreadcrumb);
-
-    const hero = lectureHero(item, { compact: true });
-    main.appendChild(hero);
-
-    const pages = pagesFor(item.path);
-    const idx = pages.findIndex((p) => p.id === pageId);
-
-    const nav = el("div", { className: "item-actions lecture-toolbar presentation-floating-nav" });
-    nav.appendChild(el("button", {
-      type: "button", className: "btn primary",
-      title: "Open full lecture",
-      onClick: () => {
-        toggleFullscreen(false);
-        window.__pcsNavigate?.({ kind: item.kind, id: item.id });
-      },
-    }, "Open full lecture"));
-    nav.appendChild(el("button", {
-      type: "button", className: "btn",
-      title: "View all slides",
-      onClick: () => window.__pcsNavigate?.({ kind: "presentation", id: item.id }),
-    }, "All slides"));
-    if (idx > 0) {
-      nav.appendChild(el("button", {
-        type: "button", className: "btn",
-        title: "Previous slide (←)",
-        onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[idx - 1].id }),
-      }, "← Prev"));
-    }
-    if (idx >= 0 && idx < pages.length - 1) {
-      nav.appendChild(el("button", {
-        type: "button", className: "btn",
-        title: "Next slide (→)",
-        onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: pages[idx + 1].id }),
-      }, "Next →"));
-    }
-
-    nav.appendChild(el("button", {
-      type: "button", className: "btn btn-suggest-update",
-      title: "Suggest an edit to the presentation content or report an issue",
-      onClick: () => openPresentationImprovementModal(item),
-    }, "Navrhnout úpravu"));
-
-    if (pages.length) {
-      const pos = el("span", {
-        className: "slide-pos",
-        title: "Aktuální pozice v prezentaci",
-      }, `${Math.max(idx, 0) + 1} / ${pages.length}`);
-      nav.appendChild(pos);
-    }
-    main.appendChild(nav);
-
-    const slideEl = renderSlide(page, item, idx >= 0 ? idx + 1 : 1);
-    main.appendChild(slideEl);
-    await loadAndInlineExamples(slideEl);
-    highlightRoot(slideEl);
-    scanAndContrastImages(slideEl);
-
-    const isLastSlide = idx < 0 || idx === pages.length - 1;
-    if (isLastSlide) {
-      const quizEl = await renderQuizSection(item);
-      if (quizEl) main.appendChild(quizEl);
-    }
-  } catch (err) {
-    main.innerHTML = `<div class="error-box">Failed to load content.<br/><code>${escapeHtml(err.message)}</code></div>`;
-  } finally {
-    setLoading(false);
-  }
-}
-
-/* ── Full lecture / exercise (default open) ────────────── */
+/* ── Full Lecture / Exercise Content (Default Open) ────── */
 
 export async function showFullContent(itemId) {
   const item = state.itemsById.get(itemId);
   const main = document.getElementById("main");
   if (!item) {
     logLinkError({ targetId: itemId, message: `Lecture or exercise item not found: ${itemId}` });
-    main.innerHTML = `<div class="error-box">Item not found: <code>${escapeHtml(itemId)}</code></div>`;
+    if (main) main.innerHTML = `<div class="error-box">Item not found: <code>${escapeHtml(itemId)}</code></div>`;
     return;
   }
   markSeen(item.id);
@@ -703,7 +272,7 @@ export async function showFullContent(itemId) {
   await loadFullContent(item, main);
 }
 
-function updateExerciseMetaProgress(metaEl, tasks) {
+export function updateExerciseMetaProgress(metaEl, tasks) {
   if (!metaEl || !tasks) return;
   const total = tasks.length;
   let solved = 0;
@@ -723,7 +292,7 @@ function updateExerciseMetaProgress(metaEl, tasks) {
 /**
  * Structured exercise view: separated úkol cards with prompt / hint / solution.
  */
-async function renderExerciseView(item, data, main) {
+export async function renderExerciseView(item, data, main) {
   main.className = "lecture-view exercise-view";
 
   const hero = lectureHero(item);
@@ -795,7 +364,7 @@ function scoreBarsHtml(score, max = 5) {
   return html;
 }
 
-function renderTaskCard(task, item, onTaskStatusChanged) {
+export function renderTaskCard(task, item, onTaskStatusChanged) {
   const card = el("article", {
     className: "task-card",
     id: task.id,
@@ -894,7 +463,7 @@ function renderTaskCard(task, item, onTaskStatusChanged) {
   return card;
 }
 
-async function loadFullContent(item, main) {
+export async function loadFullContent(item, main) {
   setLoading(true);
   try {
     // Runtime fallback: extract .priklad blocks if no transform data
@@ -1004,7 +573,7 @@ async function loadFullContent(item, main) {
 }
 
 /** Live parse exercise HTML in the browser (fallback if JSON missing). */
-async function fetchAndExtractExercise(path) {
+export async function fetchAndExtractExercise(path) {
   const url = "/" + path.replace(/^\//, "");
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
@@ -1045,645 +614,11 @@ async function fetchAndExtractExercise(path) {
   return { title, notes: [], tasks, task_count: tasks.length, path };
 }
 
-function resolveSlideTags(slide, slug, pageId) {
-  if (Array.isArray(slide?.tags)) return slide.tags;
-  const skey = `${slug}#${pageId}`;
-  if (state.slides && state.slides[skey] && Array.isArray(state.slides[skey].tags)) {
-    return state.slides[skey].tags;
-  }
-  if (!state.slides || Object.keys(state.slides).length === 0) {
-    return ["Loading…"];
-  }
-  return [];
-}
-
-function resolveSlideDiff(slide, slug, pageId) {
-  if (slide?.diff) return slide.diff;
-  return slideDiff(slug, pageId);
-}
-
-function getRecapReturn() {
-  if (state.recapReturn) return state.recapReturn;
-  try {
-    const raw = sessionStorage.getItem("pcs_recap_return");
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return null;
-}
-
-function setRecapReturn(data) {
-  state.recapReturn = data;
-  try {
-    if (data) sessionStorage.setItem("pcs_recap_return", JSON.stringify(data));
-    else sessionStorage.removeItem("pcs_recap_return");
-  } catch {}
-}
-
-function renderRecapReturnBreadcrumb(currentItem) {
-  const ret = getRecapReturn();
-  if (!ret) return null;
-  // If we navigated back to the origin, dismiss the breadcrumb
-  if (ret.fromId === currentItem?.id && (!ret.fromPageId || ret.fromPageId === currentItem?.pageId)) {
-    setRecapReturn(null);
-    return null;
-  }
-
-  const bar = el("div", { className: "recap-return-floating-banner" });
-  const fromWeekStr = typeof ret.fromWeek === "number" ? (ret.fromWeek === 99 ? "Gray" : `W${ret.fromWeek}`) : "";
-  bar.innerHTML = `
-    <span class="recap-return-icon">↶</span>
-    <span class="recap-return-text">Přešli jste z: <strong>${fromWeekStr ? fromWeekStr + " " : ""}${escapeHtml(ret.fromTitle || "předchozího výkladu")}</strong> (slajd #${escapeHtml(ret.fromPageId || "1")})</span>
-    <button type="button" class="recap-return-btn" title="Vrátit se zpět na předchozí přednášku">
-      ← Zpět na původní místo
-    </button>
-    <button type="button" class="recap-return-dismiss" title="Zavřít" aria-label="Zavřít">×</button>
-  `;
-  const btn = bar.querySelector(".recap-return-btn");
-  if (btn) {
-    btn.addEventListener("click", () => {
-      const target = { ...ret };
-      setRecapReturn(null);
-      window.__pcsNavigate?.({ kind: target.fromKind || "lecture", id: target.fromId, pageId: target.fromPageId });
-    });
-  }
-  const close = bar.querySelector(".recap-return-dismiss");
-  if (close) {
-    close.addEventListener("click", () => {
-      setRecapReturn(null);
-      bar.remove();
-    });
-  }
-  return bar;
-}
-
-function resolveAlreadyStudied(slide, slug, pageId) {
-  if (slide?.already_studied_in) return slide.already_studied_in;
-  const key = `${slug}#${pageId}`;
-  if (state.slides?.[key]?.already_studied_in) return state.slides[key].already_studied_in;
-  return null;
-}
-
-function renderSlide(page, item, num) {
-  const diff = resolveSlideDiff(page, item.slug, page.id);
-  const tags = resolveSlideTags(page, item.slug, page.id);
-  const alreadyStudied = resolveAlreadyStudied(page, item.slug, page.id);
-
-  const slide = el("article", {
-    className: "slide" + (page.is_intersection ? " is-intersection" : ""),
-    id: page.id,
-  });
-  const header = el("div", { className: "slide-header" });
-  header.innerHTML = `
-    <span class="slide-num">${String(num).padStart(2, "0")}</span>
-    <h2 class="slide-title">${escapeHtml(page.title)}</h2>
-    ${page.is_intersection ? '<span class="slide-intersection-badge">✦ Extra Přehled</span>' : ""}
-    ${badgesHtml(tags)}
-    ${diff ? flavorHtml(diff) : ""}
-  `;
-  slide.appendChild(header);
-
-  if (alreadyStudied) {
-    const recapBanner = el("div", { className: "slide-recap-banner" });
-    const primWeek = alreadyStudied.week === 99 ? "Gray" : `W${alreadyStudied.week}`;
-    const primLec = alreadyStudied.lecture_title || "původní přednášce";
-    recapBanner.innerHTML = `
-      <span class="recap-pill">[JIŽ PROBRÁNO]</span>
-      <span class="recap-desc">Tento výklad / příklad byl původně probrán v:</span>
-      <button type="button" class="recap-link-btn"
-        data-lecture-id="${escapeHtml(alreadyStudied.lecture_id)}"
-        data-slide-id="${escapeHtml(alreadyStudied.slide_id)}"
-        data-from-id="${escapeHtml(item.id)}"
-        data-from-title="${escapeHtml(item.title)}"
-        data-from-week="${escapeHtml(item.week != null ? String(item.week) : "")}"
-        data-from-page-id="${escapeHtml(page.id)}"
-        title="Přejít na původní výklad">
-        <strong>${primWeek} ${escapeHtml(primLec)}</strong> (slajd #${escapeHtml(alreadyStudied.slide_id)}) →
-      </button>
-    `;
-    slide.appendChild(recapBanner);
-  }
-
-  const body = el("div", { className: "slide-body" });
-  body.innerHTML = rewriteContentUrls(page.html || "", item.path);
-  slide.appendChild(body);
-
-  return slide;
-}
-
-/* ── Fetch / extract ───────────────────────────────────── */
-
-const cache = new Map();
-
-export async function fetchAndExtract(path) {
-  if (!path) return [];
-  if (cache.has(path)) {
-    const cached = cache.get(path);
-    if (Array.isArray(cached) && cached.length > 0) return cached;
-  }
-
-  const cleanRel = path.replace(/\\/g, "/").replace(/^.*?(vyuka_downloaded|content)\//, "").replace(/^\//, "").replace(/\.(html?|md)$/, "");
-  const pathSlug = cleanRel.replace(/[\/\\]/g, "--");
-  const baseName = path.split("/").pop().replace(/\.(html?|md)$/, "");
-
-  // 1. Try static pre-rendered JSON slide tree (canonical pathSlug, then fallback to baseName)
-  const candidates = [pathSlug, baseName].filter(Boolean);
-  for (const s of candidates) {
-    try {
-      const res = await fetch(`/data/lectures/${s}.json`);
-      if (res.ok) {
-        const data = await res.json();
-        const slides = Array.isArray(data) ? data : (data?.slides && Array.isArray(data.slides) ? data.slides : null);
-        if (slides && slides.length > 0) {
-          cache.set(path, slides);
-          if (!state.pagesIndex[path] || !state.pagesIndex[path].length) {
-            const mappedPages = slides.map((sl) => ({
-              id: sl.id,
-              title: sl.title,
-              tags: sl.tags || ["Core"],
-              diff: sl.diff || "basics",
-              is_intersection: !!sl.is_intersection,
-            }));
-            state.pagesIndex[path] = mappedPages;
-            state.pagesIndex[pathSlug] = mappedPages;
-          }
-          return slides;
-        }
-      }
-    } catch { /* ignore */ }
-  }
-
-  // 2. Fallback: Raw HTML fetch + client-side DOMParser
-  const cleanPath = path.replace(/^\//, "");
-  const urlsToTry = [
-    "/" + cleanPath,
-    "/app/" + cleanPath,
-    "/public/" + cleanPath,
-  ];
-
-  let html = null;
-  for (const url of urlsToTry) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) {
-        const text = await res.text();
-        if (text && text.includes("<")) {
-          html = text;
-          break;
-        }
-      }
-    } catch { /* try next url fallback */ }
-  }
-
-  if (!html) {
-    console.warn(`Could not fetch content HTML for path: ${path}`);
-    return [];
-  }
-
-  const slides = extractSlides(html);
-  if (slides.length > 0) {
-    cache.set(path, slides);
-  }
-  return slides;
-}
-
-function extractSlides(html) {
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  const sections = doc.querySelectorAll("section.slide-section, section[id^='id']");
-  const slides = [];
-
-  if (sections.length) {
-    sections.forEach((sec) => {
-      const id = sec.id || `id${slides.length + 1}`;
-      const title =
-        sec.getAttribute("data-title") ||
-        sec.querySelector(".section-title, h2")?.textContent?.trim() ||
-        id;
-      const body = sec.querySelector(".section-body") || sec;
-      slides.push({ id, title, html: body.innerHTML });
-    });
-    return slides;
-  }
-
-  const main =
-    doc.querySelector("#contentMain, .content-main, main, article, .slides-container") ||
-    doc.body;
-  if (main) {
-    main.querySelectorAll(
-      ".titlebar, .tabbar, .activitybar, .obsah-sidebar, .app-container > .titlebar, script, link, style",
-    ).forEach((n) => n.remove());
-    slides.push({
-      id: "id1",
-      title: doc.title || "Content",
-      html: main.innerHTML,
-    });
-  }
-  return slides;
-}
-
-const LINK_REMAP_TABLE = {
-  "xML.encoding.xml": "text/encoding_xML.html",
-  "encoding.xml": "text/encoding_xML.html",
-  "/materialy/python/modules/html.entites.xml": "python/modules/_modules.html",
-  "html.entites.xml": "python/modules/_modules.html",
-  "strings.xml": "python/types/_sequences.html",
-  "dictionaries.xml": "python/types/dictionaries.html",
-  "sets.xml": "python/types/sets.html",
-  "tuples.xml": "python/types/tuples.html",
-  "lists.xml": "python/types/lists.html",
-  "frozensets.xml": "python/types/frozensets.html",
-  "print.xml": "python/cmd/overview.html",
-  "functional.xml": "python/functions/functional.html",
-  "generic.xml": "python/functions/generic.html",
-  "advanced.xml": "python/functions/advanced-1.html",
-  "advanced-3.xml": "python/functions/advanced-3.html",
-  "generators.xml": "python/generators/generators.html",
-  "tempfile.xml": "python/files/tempfile.html",
-  "virtualenv.xml": "python/packages/venv.html",
-  "scope.xml": "python/functions/scope.html",
-  "decorators.xml": "python/functions/decorators.html",
-  "parameters.xml": "python/functions/parameters.html",
-  "xslt.xml": "web/xml/overview.html?slide=id12",
-  "dtd.xml": "web/xml/xml.html?slide=id10",
-  "relaxng.xml": "web/xml/overview.html?slide=id9",
-  "xmlschema.xml": "web/xml/overview.html?slide=id8",
-  "xpath.xml": "web/xml/xpath.html",
-  "xpath2.xml": "web/xml/xpath2.html",
-  "xml.xml": "web/xml/xml.html",
-  "hopfield.xml": "python/numpy/vectorization.html",
-  "XXX.xml": "web/css/overview.html",
-  "new_order.html": "#/",
-  "/new_order.html": "#/",
-};
-
-function resolvePresentationHref(href, lecturePath) {
-  if (!href) return null;
-
-  // Static asset downloads (_files/ directory or C/code assets)
-  if (href.includes("_files/") || /\.(c|h|base64|pyx|d|sh|cmd|log|txt|png|jpg|jpeg|gif|sqlite)$/i.test(href)) {
-    const normLecture = lecturePath.replace(/\\/g, "/");
-    const dir = normLecture.substring(0, normLecture.lastIndexOf("/"));
-    const cleanAsset = href.replace(/^(\.\/|\/)/, "");
-    const assetUrl = "/" + (cleanAsset.startsWith("vyuka_downloaded") ? cleanAsset : `${dir}/${cleanAsset.replace(/^[./]+/, "")}`);
-    return { type: "external", url: assetUrl };
-  }
-
-  // External link (not ookami.cz or vercel)
-  if (/^https?:\/\//i.test(href) && !href.includes("ookami.cz") && !href.includes("vercel.app")) {
-    return { type: "external", url: href };
-  }
-  if (href.startsWith("zetcode.com")) {
-    return { type: "external", url: "http://" + href };
-  }
-
-  // Clean domain
-  let clean = href.replace(/^https?:\/\/vyuka\.ookami\.cz\//i, "/").replace(/^https?:\/\/[^/]+\//i, "/");
-  if (clean.includes("slad=")) clean = clean.replace("slad=", "slajd=");
-  let slideParam = null;
-  if (/^slajd=\d+/i.test(clean)) {
-    slideParam = clean.replace(/^slajd=/i, "");
-    clean = "";
-  }
-
-  // Extract & strip slide and parameter query params (?slajd=5, &slajd=5, ?slide=5, &par=1, &amp;par=1)
-  const slajdMatch = clean.match(/[?&](slajd|slide)=([^&]*)/i);
-  if (slajdMatch && slajdMatch[2].trim() !== "") {
-    slideParam = slajdMatch[2].trim();
-  }
-  clean = clean.replace(/([?&]|&amp;)(slajd|slide|par)=[^&]*/gi, "");
-
-  let hashFrag = "";
-  if (clean.includes("#")) {
-    const parts = clean.split("#");
-    clean = parts[0];
-    hashFrag = parts[1];
-  }
-
-  // Apply explicit LINK_REMAP_TABLE override if available
-  const cleanBasename = clean.split("/").pop();
-  if (LINK_REMAP_TABLE[cleanBasename]) {
-    clean = LINK_REMAP_TABLE[cleanBasename];
-  } else if (LINK_REMAP_TABLE[clean]) {
-    clean = LINK_REMAP_TABLE[clean];
-  }
-
-  const normalizedPath = lecturePath.replace(/\\/g, "/");
-  const curBasename = normalizedPath.split("/").pop();
-
-  // Same-presentation link
-  if (!clean || clean === curBasename || clean.replace(/\.xml$/, ".html") === curBasename) {
-    let targetSlide = slideParam || hashFrag || "";
-    if (targetSlide && !targetSlide.startsWith("id") && /^\d+$/.test(targetSlide)) {
-      targetSlide = `id${targetSlide}`;
-    }
-    const curLectureId = "lecture:" + normalizedPath.replace(/^vyuka_downloaded\//, "");
-    let hash = `#/lecture/${encodeURIComponent(curLectureId)}`;
-    if (targetSlide) hash += `?slide=${encodeURIComponent(targetSlide)}`;
-    return { type: "same_presentation", hash, slide: targetSlide };
-  }
-
-  // Home / new_order link
-  if (clean === "/new_order.html" || clean === "new_order.html" || clean === "/index.html" || clean === "#/") {
-    return { type: "home", hash: "#/" };
-  }
-
-  // Cross-presentation link
-  if (clean.endsWith(".xml")) {
-    clean = clean.slice(0, -4) + ".html";
-  }
-
-  const currentDirParts = normalizedPath.split("/").slice(0, -1);
-  let targetPath = "";
-
-  const knownCategories = ["python/", "web/", "text/", "techs/", "media/", "dvcs/", "jupyter/"];
-  const isCategoryAbs = knownCategories.some(cat => clean.startsWith(cat) || clean.startsWith("/" + cat));
-
-  if (clean.startsWith("/materialy/")) {
-    targetPath = "vyuka_downloaded" + clean;
-  } else if (clean.startsWith("materialy/")) {
-    targetPath = "vyuka_downloaded/" + clean;
-  } else if (isCategoryAbs) {
-    targetPath = "vyuka_downloaded/materialy/" + clean.replace(/^\//, "");
-  } else if (clean.startsWith("/")) {
-    targetPath = "vyuka_downloaded/materialy" + clean;
-  } else {
-    // Relative path resolution
-    const combined = [...currentDirParts, ...clean.split("/")];
-    const norm = [];
-    for (const p of combined) {
-      if (p === "..") {
-        if (norm.length) norm.pop();
-      } else if (p !== "." && p !== "") {
-        norm.push(p);
-      }
-    }
-    targetPath = norm.join("/");
-  }
-
-  let targetSlide = slideParam || hashFrag || "";
-  if (targetSlide && !targetSlide.startsWith("id") && /^\d+$/.test(targetSlide)) {
-    targetSlide = `id${targetSlide}`;
-  }
-
-  let canonicalId = "lecture:" + targetPath.replace(/^vyuka_downloaded\//, "");
-  if (state.itemsById) {
-    const matchedItem = state.itemsById.get(canonicalId) ||
-                        state.itemsById.get("lecture:" + targetPath.replace(/^vyuka_downloaded\/materialy\//, "")) ||
-                        state.itemsById.get("lecture:" + clean);
-    if (matchedItem && matchedItem.id) {
-      canonicalId = matchedItem.id;
-    }
-  }
-
-  let hash = `#/lecture/${encodeURIComponent(canonicalId)}`;
-  if (targetSlide) hash += `?slide=${encodeURIComponent(targetSlide)}`;
-
-  return { type: "cross_presentation", hash, targetPath, slide: targetSlide };
-}
-
-// ============================================================================
-// Adaptive Image Contrast Engine (for transparent images in dark/light themes)
-// ============================================================================
-
-const PRECLASSIFIED_IMAGE_CONTRAST = {
-  // Dark + Transparent (needs light background in dark theme)
-  "Ulam_spiral_howto.png": "img-contrast-dark-ink",
-  "Sacks_spiral.png": "img-contrast-dark-ink",
-  "objekty.png": "img-contrast-dark-ink",
-  "zivot/1000.png": "img-contrast-dark-ink",
-  "logo_[zirael.org].png": "img-contrast-dark-ink",
-  "screenshot-0.png": "img-contrast-dark-ink",
-  "screenshot-1.png": "img-contrast-dark-ink",
-  "screenshot-2.png": "img-contrast-dark-ink",
-
-  // Light + Transparent (needs dark background in light theme)
-  "Brown_matplotlib.png": "img-contrast-light-ink",
-  "pathlib-inheritance.png": "img-contrast-light-ink",
-  "mandelbrot.png": "img-contrast-light-ink",
-  "anim-00.png": "img-contrast-light-ink",
-  "example_histogram.png": "img-contrast-light-ink",
-  "example_subplot.png": "img-contrast-light-ink",
-  "example_time.png": "img-contrast-light-ink",
-  "plot-01.png": "img-contrast-light-ink",
-  "plot-02.png": "img-contrast-light-ink",
-  "plot-03.png": "img-contrast-light-ink",
-  "plot-04a.png": "img-contrast-light-ink",
-  "plot-04b.png": "img-contrast-light-ink",
-  "plot-04c.png": "img-contrast-light-ink",
-  "plot-04d.png": "img-contrast-light-ink",
-  "plot-05a.png": "img-contrast-light-ink",
-  "plot-05b.png": "img-contrast-light-ink",
-  "showcase_integral.png": "img-contrast-light-ink",
-  "faktorial.png": "img-contrast-light-ink",
-  "fibonacci.png": "img-contrast-light-ink",
-  "notebook.png": "img-contrast-light-ink"
-};
-
-export function autoContrastImage(img) {
-  if (!img || img.dataset.contrastChecked) return;
-
-  // Check pre-classified map first
-  const src = img.getAttribute("src") || "";
-  for (const [key, cls] of Object.entries(PRECLASSIFIED_IMAGE_CONTRAST)) {
-    if (src.includes(key)) {
-      img.classList.add(cls);
-      img.dataset.contrastChecked = "1";
-      return;
-    }
-  }
-
-  const analyze = () => {
-    if (!img.naturalWidth || !img.naturalHeight) return;
-    img.dataset.contrastChecked = "1";
-
-    try {
-      const maxDim = 48;
-      const w = Math.min(img.naturalWidth, maxDim);
-      const h = Math.max(1, Math.round((img.naturalHeight / img.naturalWidth) * w));
-      const canvas = document.createElement("canvas");
-      canvas.width = w;
-      canvas.height = h;
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      if (!ctx) return;
-
-      ctx.drawImage(img, 0, 0, w, h);
-      const { data } = ctx.getImageData(0, 0, w, h);
-      const totalPixels = w * h;
-
-      let trans = 0;
-      let vis = 0;
-      let darkVis = 0;
-      let lightVis = 0;
-      let totLum = 0;
-
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i];
-        const g = data[i + 1];
-        const b = data[i + 2];
-        const a = data[i + 3];
-
-        if (a < 235) trans++;
-        if (a > 25) {
-          vis++;
-          const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-          totLum += lum;
-          if (lum < 95) darkVis++;
-          if (lum > 165) lightVis++;
-        }
-      }
-
-      const transRatio = totalPixels > 0 ? trans / totalPixels : 0;
-      const avgLum = vis > 0 ? totLum / vis : 128;
-      const darkRatio = vis > 0 ? darkVis / vis : 0;
-      const lightRatio = vis > 0 ? lightVis / vis : 0;
-
-      if (transRatio > 0.04) {
-        // Dark + transparent: dark ink on transparent background
-        if (avgLum < 130 || (darkRatio > 0.35 && avgLum < 160)) {
-          img.classList.add("img-contrast-dark-ink");
-          img.dataset.contrastType = "dark-transparent";
-        }
-        // Light + transparent: light ink on transparent background
-        else if (avgLum > 165 || (lightRatio > 0.35 && avgLum > 120)) {
-          img.classList.add("img-contrast-light-ink");
-          img.dataset.contrastType = "light-transparent";
-        }
-      }
-    } catch (e) {
-      // Cross-origin canvas restriction, ignore silently
-    }
-  };
-
-  if (img.complete && img.naturalWidth > 0) {
-    analyze();
-  } else {
-    img.addEventListener("load", analyze, { once: true });
-  }
-}
-
-export function scanAndContrastImages(root = document) {
-  if (!root || !root.querySelectorAll) return;
-  root.querySelectorAll("img").forEach((img) => autoContrastImage(img));
-}
-
-if (typeof window !== "undefined") {
-  window.autoContrastImage = autoContrastImage;
-  window.scanAndContrastImages = scanAndContrastImages;
-}
-
-function rewriteContentUrls(html, lecturePath) {
-  const baseDir = lecturePath.replace(/\\/g, "/").replace(/\/[^/]+$/, "/");
-  const baseUrl = "/" + baseDir;
-
-  const wrap = document.createElement("div");
-  wrap.innerHTML = html;
-
-  wrap.querySelectorAll("[src]").forEach((node) => {
-    const src = node.getAttribute("src");
-    if (!src || /^(https?:|data:|\/|#)/i.test(src)) return;
-    const resolvedUrl = baseUrl + src.replace(/^\.\//, "");
-    node.setAttribute("src", resolvedUrl);
-
-    if (node.tagName === "IMG") {
-      node.setAttribute("loading", "lazy");
-      const cleanRel = resolvedUrl.replace(/^\/vyuka_downloaded\//, "").replace(/^\//, "");
-      node.dataset.fallbackSrc = `http://vyuka.ookami.cz/${cleanRel}`;
-      node.setAttribute(
-        "onerror",
-        "if(!this.dataset.fallbackTried){this.dataset.fallbackTried='1';this.src=this.dataset.fallbackSrc;}else{this.style.display='none';}"
-      );
-      node.setAttribute("onload", "window.autoContrastImage && window.autoContrastImage(this)");
-
-      // Check preclassified map right during HTML generation
-      for (const [key, cls] of Object.entries(PRECLASSIFIED_IMAGE_CONTRAST)) {
-        if (resolvedUrl.includes(key)) {
-          node.classList.add(cls);
-          break;
-        }
-      }
-    }
-  });
-
-  wrap.querySelectorAll("a[href]").forEach((node) => {
-    const href = node.getAttribute("href");
-    if (!href || /^(mailto:|data:)/i.test(href)) return;
-
-    const res = resolvePresentationHref(href, lecturePath);
-    if (!res) return;
-
-    if (res.type === "external") {
-      node.setAttribute("target", "_blank");
-      node.setAttribute("rel", "noopener noreferrer");
-      node.classList.add("external-link");
-    } else if (res.hash) {
-      node.setAttribute("href", res.hash);
-      node.classList.add("internal-pres-link");
-      if (res.slide) node.dataset.targetSlide = res.slide;
-    }
-  });
-
-  wrap.querySelectorAll("example").forEach((ex) => {
-    const src = ex.getAttribute("src") || "";
-    let lang = ex.getAttribute("lang") || "python";
-    if (src.endsWith(".out") || src.endsWith(".txt")) lang = "plain";
-
-    const fullUrl = /^(https?:|\/)/i.test(src) ? src : baseUrl + src.replace(/^\.\//, "");
-    const pre = document.createElement("pre");
-    pre.className = `code-block lang-${lang}`;
-    pre.dataset.exampleSrc = fullUrl;
-    pre.dataset.exampleLang = lang;
-    pre.innerHTML = `<code># Loading ${escapeHtml(src)}…</code>`;
-    ex.replaceWith(pre);
-  });
-
-  return wrap.innerHTML;
-}
-
-export async function loadAndInlineExamples(root) {
-  if (!root) return;
-  const examplePres = root.querySelectorAll("pre[data-example-src]");
-  if (!examplePres.length) return;
-
-  await Promise.all(
-    [...examplePres].map(async (pre) => {
-      const url = pre.dataset.exampleSrc;
-      const lang = pre.dataset.exampleLang || "python";
-      const cleanUrl = url.replace(/^\//, "");
-      const urlsToTry = [
-        "/" + cleanUrl,
-        "/public/" + cleanUrl,
-        "/app/" + cleanUrl,
-      ];
-
-      let text = null;
-      for (const tryUrl of urlsToTry) {
-        try {
-          const res = await fetch(tryUrl, { cache: "no-store" });
-          if (res.ok) {
-            text = await res.text();
-            break;
-          }
-        } catch { /* try next url fallback */ }
-      }
-
-      if (text !== null) {
-        const formatted = dedentCode(text);
-        pre.innerHTML = `<code>${highlightCode(formatted, lang)}</code>`;
-        pre.dataset.hl = "1";
-        delete pre.dataset.exampleSrc;
-      } else {
-        const code = pre.querySelector("code") || pre;
-        code.textContent = `# example file: ${url}\n# (HTTP 404 - Not found)`;
-      }
-    })
-  );
-}
-
-
-
-/* ── Search / progress ─────────────────────────────────── */
+/* ── Search Results View ───────────────────────────────── */
 
 export function showSearchResults(query) {
   const main = document.getElementById("main");
+  if (!main) return;
   main.className = "catalog";
   clear(main);
 
@@ -1708,38 +643,7 @@ export function showSearchResults(query) {
   main.appendChild(grid);
 }
 
-// === Cumulative Study Depth Tiers & PDF Generator ===
-
-const TIERS = [
-  {
-    level: 1,
-    label: "Pass",
-    desc: "Minimum to finish the course — Core items, relevance ≥ 7",
-    filter: (item) => (item.tags || []).includes("Core") && (item.relevance || 0) >= 7,
-  },
-  {
-    level: 2,
-    label: "Solid",
-    desc: "Confident practitioner — Core + relevance ≥ 5, no Skip",
-    filter: (item) => {
-      const tags = item.tags || [];
-      if (tags.includes("Skip")) return false;
-      return tags.includes("Core") || (item.relevance || 0) >= 5;
-    },
-  },
-  {
-    level: 3,
-    label: "Advanced",
-    desc: "Deeper mastery — everything except Skip",
-    filter: (item) => !(item.tags || []).includes("Skip"),
-  },
-  {
-    level: 4,
-    label: "Complete",
-    desc: "Full deep understanding — all items",
-    filter: () => true,
-  },
-];
+/* ── Printable Course Plan ─────────────────────────────── */
 
 export function printCoursePlan() {
   const isDone = (id) => isCompleted(id);
@@ -1792,11 +696,11 @@ export function printCoursePlan() {
     const lecs = weekItems.filter((it) => it.kind === "lecture");
     const exs = weekItems.filter((it) => it.kind === "exercise");
 
-    const section = el("div", { className: "print-tier-week" });
+    const sectionEl = el("div", { className: "print-tier-week" });
     const head = el("div", { className: "print-tier-week-head" });
     const weekLabel = week.week === 0 ? "W0 (Nástroje)" : `W${week.week}`;
     head.textContent = `${weekLabel} · ${week.title}`;
-    section.appendChild(head);
+    sectionEl.appendChild(head);
 
     const cols = el("div", { className: "print-tier-cols" });
 
@@ -1829,8 +733,8 @@ export function printCoursePlan() {
     exCol.innerHTML = `<div class="print-tier-col-title">Exercises (${exs.length})</div>` + (exs.length ? exs.map(renderRow).join("") : `<div class="ptr-empty">—</div>`);
 
     cols.append(lecCol, exCol);
-    section.appendChild(cols);
-    output.appendChild(section);
+    sectionEl.appendChild(cols);
+    output.appendChild(sectionEl);
   }
 
   document.body.appendChild(output);
@@ -1853,6 +757,8 @@ if (typeof window !== "undefined") {
   window.printCoursePlan = printCoursePlan;
   window.printTier = printCoursePlan;
 }
+
+/* ── Progress Dashboard ────────────────────────────────── */
 
 function progressVibe(pct, studiedN, total) {
   if (total === 0) return "Catalog is empty — run the import tools first.";
@@ -1917,7 +823,7 @@ function studyTile(item, doneStatus, size) {
   btn.querySelector(".st-cycle-mini")?.addEventListener("click", (e) => {
     e.stopPropagation();
     cycleStudyStatus(item.id);
-    try { renderTree(); } catch { /* */ }
+    try { renderTree(); } catch { /* ignore */ }
     window.__pcsUpdateStatus?.();
     showProgress();
   });
@@ -1957,7 +863,7 @@ function detailedExerciseCard(item, doneStatus) {
   const triggerCycle = (e) => {
     e.stopPropagation();
     cycleStudyStatus(item.id);
-    try { renderTree(); } catch { /* */ }
+    try { renderTree(); } catch { /* ignore */ }
     window.__pcsUpdateStatus?.();
     showProgress();
   };
@@ -1995,13 +901,12 @@ function detailedExerciseCard(item, doneStatus) {
 
 export function showProgress() {
   const main = document.getElementById("main");
+  if (!main) return;
   main.className = "catalog progress-view";
   clear(main);
 
   const stats = getCourseStats();
   const pct = stats.total.pct;
-  const level = progressLevel(pct);
-  const vibe = progressVibe(pct, stats.total.completed, stats.total.total);
   const wrap = el("div", { className: "progress-view" });
 
   // Hero
@@ -2224,9 +1129,9 @@ export function showProgress() {
           localStorage.removeItem("pcs-seen-v1");
           localStorage.removeItem("pcs-studied-v1");
           localStorage.removeItem("pcs-skipped-v1");
-        } catch { /* */ }
+        } catch { /* ignore */ }
         showProgress();
-        try { renderTree(); } catch { /* */ }
+        try { renderTree(); } catch { /* ignore */ }
         window.__pcsUpdateStatus?.();
       }
     },
@@ -2257,7 +1162,7 @@ export function showLogin(reason = null) {
   profileModal.classList.remove("hidden");
 }
 
-function renderUserProfileDashboard(u) {
+export function renderUserProfileDashboard(u) {
   const items = state.items || [];
   const total = items.length;
   const studiedCount = state.studied.size;
@@ -2355,33 +1260,33 @@ function renderUserProfileDashboard(u) {
   });
 
   card.querySelector("#btnManualSync")?.addEventListener("click", async (e) => {
-    const btn = e.currentTarget;
-    btn.textContent = "Synchronizuji…";
-    btn.disabled = true;
+    const syncBtn = e.currentTarget;
+    syncBtn.textContent = "Synchronizuji…";
+    syncBtn.disabled = true;
     await syncCloudProgress();
-    btn.textContent = "Synchronizováno ✓";
+    syncBtn.textContent = "Synchronizováno ✓";
     setTimeout(() => {
-      btn.textContent = "Synchronizovat 🔄";
-      btn.disabled = false;
+      syncBtn.textContent = "Synchronizovat 🔄";
+      syncBtn.disabled = false;
       showLogin();
     }, 1000);
   });
 
   card.querySelector("#btnForceDownload")?.addEventListener("click", async (e) => {
-    const btn = e.currentTarget;
-    btn.textContent = "Stahuji…";
-    btn.disabled = true;
+    const dlBtn = e.currentTarget;
+    dlBtn.textContent = "Stahuji…";
+    dlBtn.disabled = true;
     const ok = await forceCloudDownload();
-    btn.textContent = ok ? "Stáhnuto ✓" : "Chyba ✕";
+    dlBtn.textContent = ok ? "Stáhnuto ✓" : "Chyba ✕";
     setTimeout(() => { showLogin(); }, 900);
   });
 
   card.querySelector("#btnForceUpload")?.addEventListener("click", async (e) => {
-    const btn = e.currentTarget;
-    btn.textContent = "Odesílám…";
-    btn.disabled = true;
+    const upBtn = e.currentTarget;
+    upBtn.textContent = "Odesílám…";
+    upBtn.disabled = true;
     const ok = await forceCloudUpload();
-    btn.textContent = ok ? "Odesláno ✓" : "Chyba ✕";
+    upBtn.textContent = ok ? "Odesláno ✓" : "Chyba ✕";
     setTimeout(() => { showLogin(); }, 900);
   });
 
@@ -2407,7 +1312,7 @@ function renderUserProfileDashboard(u) {
   return card;
 }
 
-function renderLoginForm(reason = null) {
+export function renderLoginForm(reason = null) {
   const card = el("div", { className: "v2-card", style: "width:100%; border:none; padding:0; background:transparent;" });
   card.innerHTML = `
     <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle, #333); padding-bottom:10px; margin-bottom:14px;">
@@ -2611,30 +1516,3 @@ function renderLoginForm(reason = null) {
 
   return card;
 }
-
-// Global click delegation for cross-lecture recap buttons
-if (typeof document !== "undefined") {
-  document.addEventListener("click", (e) => {
-    const recapBtn = e.target.closest(".recap-link-btn");
-    if (!recapBtn) return;
-    e.preventDefault();
-    const lectureId = recapBtn.getAttribute("data-lecture-id");
-    const slideId = recapBtn.getAttribute("data-slide-id");
-    const fromId = recapBtn.getAttribute("data-from-id");
-    const fromTitle = recapBtn.getAttribute("data-from-title");
-    const fromWeek = recapBtn.getAttribute("data-from-week");
-    const fromPageId = recapBtn.getAttribute("data-from-page-id");
-
-    if (lectureId) {
-      setRecapReturn({
-        fromKind: "page",
-        fromId,
-        fromTitle,
-        fromWeek: fromWeek !== "" ? Number(fromWeek) : null,
-        fromPageId,
-      });
-      window.__pcsNavigate?.({ kind: "lecture", id: lectureId, pageId: slideId });
-    }
-  });
-}
-
