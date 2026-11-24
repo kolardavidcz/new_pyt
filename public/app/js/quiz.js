@@ -504,6 +504,7 @@ export async function renderQuizSection(item) {
         inlineInput.addEventListener("keydown", (e) => {
           if (e.key === "Enter") {
             e.preventDefault();
+            if (e.isComposing || e.keyCode === 229) return;
             e.stopPropagation();
             const val = inlineInput.value.trim();
             if (val) handleEvaluate(val);

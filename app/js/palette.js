@@ -64,6 +64,7 @@ export function initPalette() {
       paintActive();
     } else if (e.key === "Enter") {
       e.preventDefault();
+      if (e.isComposing || e.keyCode === 229) return;
       pick(activeIndex);
     }
   });

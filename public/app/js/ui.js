@@ -33,7 +33,9 @@ export function el(tag, props = {}, ...children) {
 }
 
 export function clear(node) {
-  if (node) node.textContent = "";
+  if (!node) return;
+  if (typeof node.replaceChildren === "function") node.replaceChildren();
+  else node.textContent = "";
 }
 
 /* ── Global Component: Inline Code Pill ────────────────── */

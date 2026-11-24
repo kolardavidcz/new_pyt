@@ -612,12 +612,49 @@ function toggleSidebar() {
   applySidebarWidth();
 }
 
+function getSystemTheme() {
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+}
+
+function applyThemeFromStorage() {
+  let stored = null;
+  try { stored = localStorage.getItem("pcs-theme"); } catch { /* ignore */ }
+  const scheme = stored === "light" || stored === "dark" ? stored : "light dark";
+  const meta = document.querySelector('meta[name="color-scheme"]');
+  if (meta) meta.content = scheme;
+  const resolved = scheme === "light dark" ? getSystemTheme() : scheme;
+  document.documentElement.setAttribute("data-theme", resolved);
+}
+
 function toggleTheme() {
   const html = document.documentElement;
-  const next = html.getAttribute("data-theme") === "light" ? "dark" : "light";
+  const current = html.getAttribute("data-theme") === "light" ? "light" : "dark";
+  const next = current === "light" ? "dark" : "light";
+  const sys = getSystemTheme();
+  const meta = document.querySelector('meta[name="color-scheme"]');
+
+  if (next === sys) {
+    // Returning to system preference: remove stored override rather than pinning it
+    try { localStorage.removeItem("pcs-theme"); } catch { /* ignore */ }
+    if (meta) meta.content = "light dark";
+  } else {
+    try { localStorage.setItem("pcs-theme", next); } catch { /* ignore */ }
+    if (meta) meta.content = next;
+  }
   html.setAttribute("data-theme", next);
-  try { localStorage.setItem("pcs-theme", next); } catch { /* */ }
 }
+
+// Keep theme synchronized across tabs and OS scheme changes (only when following system)
+window.addEventListener("storage", (e) => {
+  if (e.key === "pcs-theme") applyThemeFromStorage();
+});
+window.matchMedia?.("(prefers-color-scheme: light)")?.addEventListener("change", () => {
+  let stored = null;
+  try { stored = localStorage.getItem("pcs-theme"); } catch { /* ignore */ }
+  if (stored !== "light" && stored !== "dark") {
+    applyThemeFromStorage();
+  }
+});
 
 function applySidebarWidth() {
   document.documentElement.style.setProperty("--sidebar-w", state.sidebarWidth + "px");

@@ -2055,11 +2055,11 @@ export function filteredItems() {
   let list = state.items.filter((it) => itemMatchesFilters(it));
   const sort = state.filters.sort;
   if (sort === "relevance-desc") {
-    list = [...list].sort((a, b) => (b.relevance - a.relevance) || a.title.localeCompare(b.title, "cs"));
+    list = list.toSorted((a, b) => (b.relevance - a.relevance) || a.title.localeCompare(b.title, "cs"));
   } else if (sort === "relevance-asc") {
-    list = [...list].sort((a, b) => (a.relevance - b.relevance) || a.title.localeCompare(b.title, "cs"));
+    list = list.toSorted((a, b) => (a.relevance - b.relevance) || a.title.localeCompare(b.title, "cs"));
   } else if (sort === "title") {
-    list = [...list].sort((a, b) => a.title.localeCompare(b.title, "cs"));
+    list = list.toSorted((a, b) => a.title.localeCompare(b.title, "cs"));
   }
   // course order: keep original
   return list;

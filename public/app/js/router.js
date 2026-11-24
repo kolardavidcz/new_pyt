@@ -758,14 +758,14 @@ export function updateStatusBarControls(tab) {
   if (!isLectureOrPage || !item) {
     sbExplorer.classList.remove("hidden");
     sbPresentation.classList.add("hidden");
-    sbPresentation.innerHTML = "";
+    sbPresentation.replaceChildren();
     return;
   }
 
   const token = ++statusBarRenderToken;
   sbExplorer.classList.add("hidden");
   sbPresentation.classList.remove("hidden");
-  sbPresentation.innerHTML = "";
+  sbPresentation.replaceChildren();
 
   const pages = pagesFor(item.path);
   const curPageId = tab.pageId;

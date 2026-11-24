@@ -466,6 +466,7 @@ const checkFiles = [
   "css/lecture.css",
   "css/shell.css",
   "css/slides.css",
+  "css/tokens.css",
   "js/admin.js",
   "js/app.js",
   "js/catalog_view.js",
@@ -480,6 +481,7 @@ const checkFiles = [
   "js/state.js",
   "js/sync.js",
   "js/tree.js",
+  "js/ui.js",
 ];
 for (const rel of checkFiles) {
   const fApp = fs.readFileSync(path.join(appDir, rel), "utf-8");

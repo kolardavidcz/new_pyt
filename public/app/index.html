@@ -3,12 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark light" />
+  <meta name="color-scheme" content="light dark" />
   <title>newpyt · VSČHT Praha</title>
   <script>
     (function () {
-      var t = localStorage.getItem("pcs-theme") || "dark";
-      document.documentElement.setAttribute("data-theme", t);
+      var stored = null;
+      try { stored = localStorage.getItem("pcs-theme"); } catch (e) {}
+      var scheme = stored === "light" || stored === "dark" ? stored : "light dark";
+      var meta = document.querySelector('meta[name="color-scheme"]');
+      if (meta) meta.content = scheme;
+      var resolved = scheme === "light dark"
+        ? (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark")
+        : scheme;
+      document.documentElement.setAttribute("data-theme", resolved);
     })();
   </script>
   <link rel="icon" type="image/svg+xml" href="/app/favicon.svg" />
