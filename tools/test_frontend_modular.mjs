@@ -307,7 +307,10 @@ globalThis.fetch = async (url) => {
 const courseData = JSON.parse(fs.readFileSync(path.resolve("data/course.json"), "utf8"));
 
 // Import modules
-const { state, buildIndexes } = await import("../app/js/state.js");
+const {
+  state, buildIndexes, ensureShuffledOptions, getCourseStats, isLectureKind,
+  logLinkError, saveQuizScore, resetDeckQuizScores, registerUser,
+} = await import("../app/js/state.js");
 buildIndexes(courseData);
 
 const { showHome, showWeek, buildWeekCatalogBlock, section, itemCard } = await import("../app/js/catalog_view.js");
@@ -458,14 +461,24 @@ console.log("\n[TEST 10] Verifying Zero-Drift between app/ and public/app/...");
 const appDir = path.join(ROOT, "app");
 const pubAppDir = path.join(ROOT, "public", "app");
 const checkFiles = [
+  "index.html",
+  "css/content.css",
   "css/lecture.css",
+  "css/shell.css",
+  "css/slides.css",
+  "js/admin.js",
   "js/app.js",
   "js/catalog_view.js",
+  "js/checklist_view.js",
   "js/content.js",
+  "js/exceptions_view.js",
+  "js/palette.js",
   "js/presentation_view.js",
+  "js/quiz.js",
   "js/router.js",
   "js/slide_renderer.js",
   "js/state.js",
+  "js/sync.js",
   "js/tree.js",
 ];
 for (const rel of checkFiles) {
@@ -509,6 +522,98 @@ const isSpaceInput = !!(spaceEvent.target instanceof MockElement && (spaceEvent.
 assert.equal(isArrowInput, false, "ArrowRight on a focused button must NOT be treated as input");
 assert.equal(isSpaceInput, true, "Space on a focused button MUST be treated as input (native click)");
 console.log("  ✓ Arrow navigation works cleanly even when buttons have active focus");
+
+// 14. Verify ensureShuffledOptions actually mutates q.options, updates q.answer, and is idempotent
+console.log("\n[TEST 14] Verifying ensureShuffledOptions mutation, 4th distractor padding & idempotency...");
+const sampleMcq = {
+  id: "q-shuffle-test-1",
+  type: "multiple_choice",
+  question: "What does len([1, 2, 3]) return?",
+  options: ["A) 3", "B) 2", "C) 4"],
+  answer: 0,
+};
+ensureShuffledOptions(sampleMcq, "test-deck", 0);
+assert.equal(sampleMcq._shuffled, true, "ensureShuffledOptions must set _shuffled = true");
+assert.equal(sampleMcq.options.length, 4, "3-option MCQ must be padded to 4 options");
+assert.equal(sampleMcq.options[sampleMcq.answer], "3", "q.answer must point to the exact moved correct option text");
+const snapshotOpts = [...sampleMcq.options];
+const snapshotAns = sampleMcq.answer;
+ensureShuffledOptions(sampleMcq, "test-deck", 0);
+assert.deepEqual(sampleMcq.options, snapshotOpts, "Second call to ensureShuffledOptions must be idempotent");
+assert.equal(sampleMcq.answer, snapshotAns, "Second call must preserve answer index");
+
+// Verify distribution is not stuck at index 0 across 40 synthetic questions
+const ansCounts = [0, 0, 0, 0];
+for (let k = 0; k < 40; k++) {
+  const q = {
+    id: `dist-${k}`,
+    type: "multiple_choice",
+    question: `Synthetic Python question number ${k}?`,
+    options: ["Correct", "Wrong1", "Wrong2", "Wrong3"],
+    answer: 0,
+  };
+  ensureShuffledOptions(q, "dist-deck", k);
+  assert.equal(q.options[q.answer], "Correct");
+  ansCounts[q.answer]++;
+}
+assert.ok(ansCounts[1] > 0 && ansCounts[2] > 0 && ansCounts[3] > 0, `Shuffled answers must distribute across A/B/C/D, got ${JSON.stringify(ansCounts)}`);
+console.log(`  ✓ ensureShuffledOptions shuffles deterministically (A:${ansCounts[0]} B:${ansCounts[1]} C:${ansCounts[2]} D:${ansCounts[3]})`);
+
+// 15. Verify getCourseStats includes all 12 Tier-1 Master Lectures
+console.log("\n[TEST 15] Verifying getCourseStats includes Tier-1 Master Lectures...");
+const masterItems = state.items.filter((i) => i.kind === "master-lecture");
+assert.equal(masterItems.length, 12, "Course should have 12 Tier-1 Master Lectures");
+const statsBefore = getCourseStats();
+state.studied.add(masterItems[0].id);
+const statsAfter = getCourseStats();
+assert.equal(statsAfter.lectures.completed, statsBefore.lectures.completed + 1, "Marking a master-lecture studied must increment lectures.completed");
+assert.equal(isLectureKind(masterItems[0]), true, "isLectureKind must return true for master-lecture");
+state.studied.delete(masterItems[0].id);
+console.log("  ✓ Tier-1 Master Lectures are properly counted in getCourseStats()");
+
+// 16. Verify 4-Level Checklist & Interactive Exceptions Explorer views render cleanly
+console.log("\n[TEST 16] Verifying showChecklist() and showExceptions() views...");
+assert.equal(typeof content.showChecklist, "function", "content.showChecklist must be exported");
+assert.equal(typeof content.showExceptions, "function", "content.showExceptions must be exported");
+content.showChecklist();
+assert.ok(mainEl.classList.contains("checklist-view"), "showChecklist must set checklist-view class");
+assert.ok(mainEl.children.length > 0, "showChecklist must render checklist content");
+content.showExceptions();
+assert.ok(mainEl.classList.contains("exceptions-view"), "showExceptions must set exceptions-view class");
+assert.ok(mainEl.children.length > 0, "showExceptions must render exceptions explorer content");
+console.log("  ✓ showChecklist() and showExceptions() render cleanly");
+
+// 17. Verify logLinkError works safely on fresh state without throwing
+console.log("\n[TEST 17] Verifying logLinkError safety...");
+state.errorLinkLog = undefined;
+logLinkError({ targetId: "missing:test", message: "Unit test missing item" });
+assert.ok(Array.isArray(state.errorLinkLog) && state.errorLinkLog.length === 1, "logLinkError must safely initialize errorLinkLog array");
+state.errorLinkLog = [];
+console.log("  ✓ logLinkError handles uninitialized errorLinkLog safely");
+
+// 18. Verify resetDeckQuizScores({ onlyWrong: true }) preserves correct answers
+console.log("\n[TEST 18] Verifying Retry-Wrong-Only quiz reset...");
+saveQuizScore("unit-deck", "q1", { selected: 0, isCorrect: true });
+saveQuizScore("unit-deck", "q2", { selected: 1, isCorrect: false });
+resetDeckQuizScores("unit-deck", { onlyWrong: true });
+assert.ok(state.quizScores["unit-deck"]?.q1?.isCorrect === true, "Correct answer q1 must be preserved");
+assert.equal(state.quizScores["unit-deck"]?.q2, undefined, "Incorrect answer q2 must be cleared");
+resetDeckQuizScores("unit-deck");
+assert.equal(state.quizScores["unit-deck"], undefined, "Full deck reset must clear entire deck");
+console.log("  ✓ Retry-Wrong-Only preserves correct answers and resets wrong ones");
+
+// 19. Verify registerUser with autoLogin: false does not clobber current admin session
+console.log("\n[TEST 19] Verifying registerUser({ autoLogin: false }) preserves admin session...");
+const mockStorage = new Map();
+globalThis.localStorage = {
+  getItem: (k) => (mockStorage.has(k) ? mockStorage.get(k) : null),
+  setItem: (k, v) => mockStorage.set(k, String(v)),
+  removeItem: (k) => mockStorage.delete(k),
+};
+state.user = { username: "adminuser", email: "adminuser@vscht.cz", role: "admin" };
+await registerUser({ email: "newadmin@vscht.cz", password: "secret", autoLogin: false });
+assert.equal(state.user.username, "adminuser", "Admin session must remain intact after creating another account");
+console.log("  ✓ Creating a user with autoLogin: false preserves active admin session");
 
 console.log("\n✅ ALL FRONTEND ARCHITECTURE & BUG VERIFICATION TESTS PASSED SUCCESSFULLY!");
 

@@ -14,11 +14,24 @@ import {
 import {
   setLoading, lectureHero, lectureToolbar, loadFullContent,
   fetchAndExtractExercise, renderExerciseView,
+  nextContentRenderId, isContentRenderCurrent, enhanceCodeBlocks,
 } from "./content.js";
 
-/* ── Fullscreen Toggle ─────────────────────────────────── */
+/* ── Fullscreen Toggle & Native Escape Sync ────────────── */
+
+let fsChangeListenerBound = false;
+function ensureFullscreenListener() {
+  if (fsChangeListenerBound || typeof document === "undefined") return;
+  fsChangeListenerBound = true;
+  document.addEventListener("fullscreenchange", () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.classList.remove("presentation-fullscreen-mode");
+    }
+  });
+}
 
 export function toggleFullscreen(forceState) {
+  ensureFullscreenListener();
   const isFS = !!document.fullscreenElement || document.documentElement.classList.contains("presentation-fullscreen-mode");
   const targetState = forceState !== undefined ? forceState : !isFS;
 
@@ -38,6 +51,7 @@ export function toggleFullscreen(forceState) {
 /* ── Presentation Outline (All Slides) ─────────────────── */
 
 export async function showPresentation(itemId) {
+  const renderId = nextContentRenderId();
   const item = (typeof itemId === "object" && itemId !== null) ? itemId : state.itemsById.get(itemId);
   const main = document.getElementById("main");
   if (!item) {
@@ -86,7 +100,7 @@ export async function showPresentation(itemId) {
   }
 
   // Always load full lecture content below outline
-  await loadFullContent(item, main);
+  await loadFullContent(item, main, renderId);
 }
 
 /** @deprecated alias kept for any leftover imports */
@@ -97,6 +111,7 @@ export function showItemIndex(itemId) {
 /* ── Single Slide (Presentation Step) ──────────────────── */
 
 export async function showPage(itemId, pageId) {
+  const renderId = nextContentRenderId();
   const item = (typeof itemId === "object" && itemId !== null) ? itemId : state.itemsById.get(itemId);
   const main = document.getElementById("main");
   if (!item) {
@@ -109,10 +124,12 @@ export async function showPage(itemId, pageId) {
   if (item.kind === "exercise") {
     const structured = state.exercises[item.path]
       || await fetchAndExtractExercise(item.path).catch(() => null);
+    if (!isContentRenderCurrent(renderId)) return;
     if (structured?.tasks?.length) {
       main.className = "lecture-view exercise-view";
       clear(main);
-      renderExerciseView(item, structured, main);
+      await renderExerciseView(item, structured, main, renderId);
+      if (!isContentRenderCurrent(renderId)) return;
       requestAnimationFrame(() => {
         const node = document.getElementById(pageId);
         if (node) {
@@ -130,6 +147,8 @@ export async function showPage(itemId, pageId) {
 
   try {
     const slides = await fetchAndExtract(item.path);
+    if (!isContentRenderCurrent(renderId)) return;
+
     let targetPageId = pageId;
     if (typeof pageId === "number") {
       targetPageId = slides[pageId]?.id || `id${pageId + 1}`;
@@ -141,6 +160,9 @@ export async function showPage(itemId, pageId) {
     }
     const subTitle = page.title || page.id || "Slide";
     document.title = item.weekNum != null ? `W${item.weekNum} • ${subTitle}` : `newpyt • ${subTitle}`;
+
+    // Refresh breadcrumb & status bar now that pagesIndex is guaranteed populated
+    window.__pcsRefreshChrome?.();
 
     const returnBreadcrumb = renderRecapReturnBreadcrumb(item);
     if (returnBreadcrumb) main.appendChild(returnBreadcrumb);
@@ -157,6 +179,20 @@ export async function showPage(itemId, pageId) {
     }
     const currentSlideNum = Math.max(idx, 0) + 1;
     const totalSlideCount = effectivePages.length;
+    const progressPct = totalSlideCount > 0 ? Math.round((currentSlideNum / totalSlideCount) * 100) : 0;
+
+    // Sleek slide progress strip at top of presentation view
+    if (totalSlideCount > 1) {
+      const progWrap = el("div", {
+        className: "slide-progress-track",
+        title: `Postup prezentací: ${currentSlideNum} z ${totalSlideCount} (${progressPct} %)`,
+      });
+      progWrap.appendChild(el("div", {
+        className: "slide-progress-fill",
+        style: { width: `${progressPct}%` },
+      }));
+      main.appendChild(progWrap);
+    }
 
     const nav = el("div", { className: "item-actions lecture-toolbar presentation-floating-nav" });
     nav.appendChild(el("button", {
@@ -170,7 +206,10 @@ export async function showPage(itemId, pageId) {
     nav.appendChild(el("button", {
       type: "button", className: "btn",
       title: "View all slides",
-      onClick: () => window.__pcsNavigate?.({ kind: "presentation", id: item.id }),
+      onClick: () => {
+        toggleFullscreen(false);
+        window.__pcsNavigate?.({ kind: "presentation", id: item.id });
+      },
     }, "All slides"));
 
     if (idx > 0) {
@@ -187,6 +226,35 @@ export async function showPage(itemId, pageId) {
         onClick: () => window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: effectivePages[idx + 1].id }),
       }, "Next →"));
     }
+
+    // Quick slide jumper dropdown for instant navigation during 90-min lectures
+    if (totalSlideCount > 1) {
+      const jumpSelect = el("select", {
+        className: "slide-jump-select",
+        "aria-label": "Přejít na snímek",
+        title: "Rychlý skok na libovolný snímek",
+        onChange: (e) => {
+          const nextId = e.target.value;
+          if (nextId && nextId !== actualPageId) {
+            window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: nextId });
+          }
+        },
+      });
+      effectivePages.forEach((sl, sIdx) => {
+        const opt = document.createElement("option");
+        opt.value = sl.id;
+        opt.textContent = `${String(sIdx + 1).padStart(2, "0")}. ${sl.title || sl.id}`;
+        if (sl.id === actualPageId) opt.selected = true;
+        jumpSelect.appendChild(opt);
+      });
+      nav.appendChild(jumpSelect);
+    }
+
+    nav.appendChild(el("button", {
+      type: "button", className: "btn",
+      title: "Přepnout režim celé obrazovky (F / Esc)",
+      onClick: () => toggleFullscreen(),
+    }, "⛶"));
 
     nav.appendChild(el("button", {
       type: "button", className: "btn btn-suggest-update",
@@ -206,18 +274,25 @@ export async function showPage(itemId, pageId) {
     const slideEl = renderSlide(page, item, currentSlideNum);
     main.appendChild(slideEl);
     await loadAndInlineExamples(slideEl);
+    if (!isContentRenderCurrent(renderId)) return;
     highlightRoot(slideEl);
+    enhanceCodeBlocks(slideEl);
     scanAndContrastImages(slideEl);
 
     const isLastSlide = idx < 0 || idx === totalSlideCount - 1;
     if (isLastSlide) {
       const quizEl = await renderQuizSection(item);
-      if (quizEl) main.appendChild(quizEl);
+      if (!isContentRenderCurrent(renderId)) return;
+      if (quizEl) {
+        enhanceCodeBlocks(quizEl);
+        main.appendChild(quizEl);
+      }
     }
   } catch (err) {
+    if (!isContentRenderCurrent(renderId)) return;
     main.innerHTML = `<div class="error-box">Failed to load content.<br/><code>${escapeHtml(err.message)}</code></div>`;
   } finally {
-    setLoading(false);
+    if (isContentRenderCurrent(renderId)) setLoading(false);
   }
 }
 

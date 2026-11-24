@@ -39,6 +39,16 @@ export function getChecklistKey() {
   return u ? syncEngine.getKey(u, "checklist") : CHECKLIST_KEY;
 }
 
+export function getQuizScoresKey() {
+  const u = state.user?.username;
+  return u ? syncEngine.getKey(u, "quiz_scores") : QUIZ_SCORES_KEY;
+}
+
+/** True for both Tier-1 master lectures and Tier-2 reference lectures. */
+export function isLectureKind(item) {
+  return Boolean(item && (item.kind === "lecture" || item.kind === "master-lecture"));
+}
+
 /** @type {import("./types.js").AppState} */
 export const state = {
   course: null,
@@ -116,32 +126,76 @@ export const state = {
   /** Scroll ratio memory per item id for full lectures */
   itemScrollRatios: {},
 
+  /** Runtime broken link error log */
+  errorLinkLog: [],
+
+  /** Most recently visited lecture/exercise/page for "Continue studying" */
+  lastVisited: null,
+
   user: null,
 };
 
 const QUIZ_SCORES_KEY = "pcs-quiz-scores-v1";
 const QUESTION_IMPROVEMENTS_KEY = "pcs-question-improvements-v1";
+const LAST_VISITED_KEY = "pcs-last-visited-v1";
+
+export function setLastVisited(item, pageId = null) {
+  if (!item || !item.id) return;
+  const entry = {
+    id: item.id,
+    kind: item.kind,
+    title: item.title,
+    weekNum: item.weekNum,
+    pageId: pageId || null,
+    timestamp: Date.now(),
+  };
+  state.lastVisited = entry;
+  try {
+    localStorage.setItem(LAST_VISITED_KEY, JSON.stringify(entry));
+  } catch { /* ignore */ }
+}
 
 export function saveQuizScore(slug, qId, scoreInfo) {
+  if (!slug || !qId) return;
   if (!state.quizScores[slug]) state.quizScores[slug] = {};
   state.quizScores[slug][qId] = {
     ...scoreInfo,
     timestamp: new Date().toISOString(),
+    updatedAt: Date.now(),
   };
   try {
+    localStorage.setItem(getQuizScoresKey(), JSON.stringify(state.quizScores));
     localStorage.setItem(QUIZ_SCORES_KEY, JSON.stringify(state.quizScores));
   } catch { /* ignore */ }
+  if (state.user?.username) {
+    syncEngine.kvSet(syncEngine.getKey(state.user.username, "quiz_scores"), state.quizScores);
+  }
   notifyStateChange("quizScore", { slug, qId, scoreInfo });
 }
 
-export function resetDeckQuizScores(slug) {
-  if (state.quizScores[slug]) {
+export function resetDeckQuizScores(slug, { onlyWrong = false } = {}) {
+  if (!state.quizScores[slug]) return;
+  if (onlyWrong) {
+    const next = {};
+    for (const [qId, rec] of Object.entries(state.quizScores[slug])) {
+      if (rec?.isCorrect) next[qId] = rec;
+    }
+    if (Object.keys(next).length > 0) {
+      state.quizScores[slug] = next;
+    } else {
+      delete state.quizScores[slug];
+    }
+  } else {
     delete state.quizScores[slug];
-    try {
-      localStorage.setItem(QUIZ_SCORES_KEY, JSON.stringify(state.quizScores));
-    } catch { /* ignore */ }
-    notifyStateChange("quizScoreReset", { slug });
   }
+  try {
+    localStorage.setItem(getQuizScoresKey(), JSON.stringify(state.quizScores));
+    localStorage.setItem(QUIZ_SCORES_KEY, JSON.stringify(state.quizScores));
+  } catch { /* ignore */ }
+  if (state.user?.username) {
+    syncEngine.kvSet(syncEngine.getKey(state.user.username, "quiz_scores"), state.quizScores);
+  }
+  notifyStateChange("quizScoreReset", { slug, onlyWrong });
 }
 
 export async function saveQuestionImprovement(data) {
@@ -391,6 +445,7 @@ export async function resetUserPassword(usernameOrEmail, newPassword) {
   const passwordHash = await hashPassword(newPassword, salt);
   userRecord.salt = salt;
   userRecord.passwordHash = passwordHash;
+  userRecord.updatedAt = Date.now();
   saveUserToDb(userRecord);
   notifyStateChange("userPasswordReset", { username: userRecord.username });
   return true;
@@ -459,12 +514,13 @@ const ERROR_LOG_KEY = "pcs-error-link-log-v1";
 
 export function logLinkError(errData) {
   if (!errData || (!errData.href && !errData.targetId)) return;
+  if (!Array.isArray(state.errorLinkLog)) state.errorLinkLog = [];
   const entry = {
     id: `err-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     timestamp: new Date().toISOString(),
     href: errData.href || "",
     targetId: errData.targetId || "",
-    source: errData.source || window.location.hash || "app",
+    source: errData.source || (typeof window !== "undefined" ? window.location?.hash : "") || "app",
     message: errData.message || "Item not found",
     tag: errData.tag || "bad_link",
     status: "open",
@@ -557,7 +613,13 @@ export function getUsersDb() {
   return {};
 }
 
-export async function syncUsersDbFromCloud() {
+let lastUsersCloudSync = 0;
+
+export async function syncUsersDbFromCloud({ force = true } = {}) {
+  if (!force && Date.now() - lastUsersCloudSync < 15000) {
+    return getUsersDb();
+  }
+  lastUsersCloudSync = Date.now();
   try {
     const resp = await fetch("/api/sync?key=" + encodeURIComponent(USERS_DB_KEY));
     if (!resp.ok) return getUsersDb();
@@ -568,7 +630,18 @@ export async function syncUsersDbFromCloud() {
     }
     if (raw && typeof raw === "object" && !Array.isArray(raw)) {
       const local = getUsersDb();
-      const merged = { ...raw, ...local };
+      const merged = { ...local };
+      for (const [k, cloudRec] of Object.entries(raw)) {
+        const localRec = merged[k];
+        if (!localRec) {
+          merged[k] = cloudRec;
+        } else {
+          const cloudT = Number(cloudRec?.updatedAt || 0);
+          const localT = Number(localRec?.updatedAt || 0);
+          // Cloud wins ties so cross-device password resets propagate cleanly
+          merged[k] = cloudT >= localT ? { ...localRec, ...cloudRec } : localRec;
+        }
+      }
       localStorage.setItem(USERS_DB_KEY, JSON.stringify(merged));
       return merged;
     }
@@ -596,7 +669,7 @@ export function saveUserToDb(userRecord) {
   pushUsersDbToCloud().catch(() => {});
 }
 
-export async function registerUser({ email, password }) {
+export async function registerUser({ email, password, autoLogin = true }) {
   const rawEmail = String(email || "").trim().toLowerCase();
   if (!rawEmail) {
     throw new Error("Zadejte platný e-mail.");
@@ -605,12 +678,13 @@ export async function registerUser({ email, password }) {
   const fullEmail = rawEmail.includes("@") ? rawEmail : `${cleanUsername}@vscht.cz`;
 
   // Pre-sync with cloud before checking for duplicates
-  let db = await syncUsersDbFromCloud();
+  let db = await syncUsersDbFromCloud({ force: true });
   if (db[cleanUsername]) {
     throw new Error(`Účet pro ${fullEmail} již existuje. Přihlaste se.`);
   }
   const salt = generateSalt();
   const passwordHash = await hashPassword(password, salt);
+  const now = Date.now();
   const userRecord = {
     username: cleanUsername,
     email: fullEmail,
@@ -618,13 +692,17 @@ export async function registerUser({ email, password }) {
     passwordHash,
     faculty: "VSČHT Praha",
     studentId: String(Math.floor(100000 + Math.random() * 900000)),
+    createdAt: new Date(now).toISOString(),
+    updatedAt: now,
   };
   saveUserToDb(userRecord);
   const sessionUser = { ...userRecord };
   delete sessionUser.passwordHash;
   delete sessionUser.salt;
-  setUser(sessionUser);
-  await syncCloudProgress();
+  if (autoLogin) {
+    setUser(sessionUser);
+    await syncCloudProgress();
+  }
   return sessionUser;
 }
 
@@ -709,6 +787,7 @@ export function logoutUser() {
   state.studyStatusEntries = {};
   state.checklistEntries = {};
   state.seenEntries = {};
+  state.quizScores = {};
   state.lastSyncTime = 0;
   loadPersisted();
   notifyStateChange("user", { user: null });
@@ -752,11 +831,28 @@ export function loadPersisted() {
       if (Array.isArray(arr)) state.errorLinkLog = arr;
     }
   } catch { /* ignore */ }
+  try {
+    const rawLast = localStorage.getItem(LAST_VISITED_KEY);
+    if (rawLast) {
+      const parsedLast = JSON.parse(rawLast);
+      if (parsedLast && parsedLast.id) state.lastVisited = parsedLast;
+    }
+  } catch { /* ignore */ }
   document.documentElement.setAttribute("data-code-block-color", state.codeBlockColor);
   document.documentElement.setAttribute("data-print-quizzes", state.printWithQuizzes ? "true" : "false");
-  // Pre-sync registered users and admins list from cloud in background
-  syncUsersDbFromCloud().catch(() => {});
+  // Pre-sync registered users and admins list from cloud in background (throttled)
+  syncUsersDbFromCloud({ force: false }).catch(() => {});
   syncAdminsListFromCloud().catch(() => {});
+
+  // Load local quiz scores even for guests (read/practice mode)
+  state.quizScores = {};
+  try {
+    const rawQ = localStorage.getItem(QUIZ_SCORES_KEY);
+    if (rawQ) {
+      const obj = JSON.parse(rawQ);
+      if (obj && typeof obj === "object") state.quizScores = obj;
+    }
+  } catch { /* ignore */ }
 
   // Unauthenticated guests: progress is not tracked or saved until user logs in
   if (!state.user?.username) {
@@ -854,13 +950,24 @@ export function loadPersisted() {
     if (rec.v === true || rec.v === "solved" || rec.v === "studied") state.checklist.add(id);
   }
 
-  try {
-    const raw = localStorage.getItem(QUIZ_SCORES_KEY);
-    if (raw) {
-      const obj = JSON.parse(raw);
-      if (obj && typeof obj === "object") state.quizScores = obj;
-    }
-  } catch { /* ignore */ }
+  const qKey = getQuizScoresKey();
+  const mergedQuizScores = { ...(state.quizScores || {}) };
+  for (const key of [QUIZ_SCORES_KEY, qKey]) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const obj = JSON.parse(raw);
+        if (obj && typeof obj === "object") {
+          for (const [deck, answers] of Object.entries(obj)) {
+            if (answers && typeof answers === "object") {
+              mergedQuizScores[deck] = { ...(mergedQuizScores[deck] || {}), ...answers };
+            }
+          }
+        }
+      }
+    } catch { /* ignore */ }
+  }
+  state.quizScores = mergedQuizScores;
 
   syncCloudProgress();
 }
@@ -914,13 +1021,19 @@ const GENERIC_DISTRACTORS = [
   "Všechny uvedené možnosti jsou správné"
 ];
 
-/** FNV-1a 32-bit hash for uniform 25% option distribution */
+/** FNV-1a 32-bit hash with Murmur3 avalanche finalizer for uniform 25% option distribution */
 function hashFnv32(str) {
   let hVal = 0x811c9dc5;
   for (let i = 0; i < str.length; i++) {
     hVal ^= str.charCodeAt(i);
-    hVal += (hVal << 1) + (hVal << 4) + (hVal << 7) + (hVal << 8) + (hVal << 24);
+    hVal = Math.imul(hVal, 0x01000193);
   }
+  // Finalize avalanche so low bits (hash % 4) are uniform even with shared suffixes
+  hVal ^= hVal >>> 16;
+  hVal = Math.imul(hVal, 0x85ebca6b);
+  hVal ^= hVal >>> 13;
+  hVal = Math.imul(hVal, 0xc2b2ae35);
+  hVal ^= hVal >>> 16;
   return hVal >>> 0;
 }
 
@@ -935,36 +1048,50 @@ export function ensureShuffledOptions(q, deckKey = "", idx = 0) {
     return;
   }
 
-  // Determine original correct option text
+  // Determine original correct option index and text BEFORE shuffling
+  let originalCorrectIdx = -1;
   let originalCorrectText = "";
   if (typeof q.answer === "number" && q.options[q.answer] !== undefined) {
+    originalCorrectIdx = q.answer;
     originalCorrectText = q.options[q.answer];
   } else if (typeof q.answer === "string" && q.answer) {
     originalCorrectText = q.answer;
+    const normAns = q.answer.replace(/^[A-D]\)\s*/, "").trim().toLowerCase();
+    originalCorrectIdx = q.options.findIndex((o) => String(o).replace(/^[A-D]\)\s*/, "").trim().toLowerCase() === normAns);
   } else {
+    originalCorrectIdx = 0;
     originalCorrectText = q.options[0];
   }
 
   const cleanOriginalCorrect = String(originalCorrectText).replace(/^[A-D]\)\s*/, "").trim();
 
-  // If question has 3 options, add plausible 4th distractor so Option D gets ~25% representation
-  if (q.options.length === 3) {
+  // Preserve expected answer for code_fill / fill_blank_choice before shuffling suggestion chips
+  if ((q.type === "code_fill" || q.type === "fill_blank_choice") && !q.expected && cleanOriginalCorrect) {
+    q.expected = cleanOriginalCorrect;
+  }
+
+  // If multiple-choice question has 3 options, add plausible 4th distractor so Option D gets ~25% representation
+  const isCodeFill = q.type === "code_fill" || q.type === "fill_blank_choice";
+  if (!isCodeFill && q.options.length === 3) {
     const dIdx = hashFnv32(`${deckKey}:${q.id || idx}:distractor`) % GENERIC_DISTRACTORS.length;
     const newOpt = GENERIC_DISTRACTORS[dIdx];
-    if (!q.options.includes(newOpt) && !q.options.some(o => String(o).replace(/^[A-D]\)\s*/, "").trim() === newOpt)) {
+    if (!q.options.includes(newOpt) && !q.options.some((o) => String(o).replace(/^[A-D]\)\s*/, "").trim() === newOpt)) {
       q.options.push(newOpt);
     }
   }
 
-  const cleanOpts = q.options.map(opt => String(opt).replace(/^[A-D]\)\s*/, "").trim());
+  const cleanOpts = q.options.map((opt) => String(opt).replace(/^[A-D]\)\s*/, "").trim());
 
   // Uniform seed based on deckKey, question ID, index, and stem text
   const seedStr = `${deckKey}:${q.id || idx}:${q.question || ""}:${cleanOpts.length}`;
   const hash = hashFnv32(seedStr);
   const targetIdx = hash % cleanOpts.length;
 
-  // Filter out correct option and shuffle distractors
-  const distractors = cleanOpts.filter(opt => opt !== cleanOriginalCorrect);
+  // Filter out the correct option by index (falling back to text) so duplicate strings never shrink the array
+  const distractors = originalCorrectIdx >= 0
+    ? cleanOpts.filter((_, i) => i !== originalCorrectIdx)
+    : cleanOpts.filter((opt) => opt !== cleanOriginalCorrect);
+
   const shuffledDistract = [...distractors];
   for (let i = shuffledDistract.length - 1; i > 0; i--) {
     const swapIdx = (hash + i * 17) % (i + 1);
@@ -973,17 +1100,20 @@ export function ensureShuffledOptions(q, deckKey = "", idx = 0) {
     shuffledDistract[swapIdx] = tmp;
   }
 
-  // Reconstruct options array placing correct answer exactly at targetIdx (25% A, 25% B, 25% C, 25% D)
-  let newOptions = [];
+  // Reconstruct options array placing correct answer at targetIdx (~25% A, 25% B, 25% C, 25% D)
+  const newOptions = [];
   let distPointer = 0;
   for (let i = 0; i < cleanOpts.length; i++) {
     if (i === targetIdx) {
       newOptions.push(cleanOriginalCorrect);
     } else {
-      newOptions.push(shuffledDistract[distPointer++] || "Není k dispozici");
+      newOptions.push(shuffledDistract[distPointer++] ?? "Není k dispozici");
     }
   }
 
+  q.options = newOptions;
+  q.answer = targetIdx;
+  q._shuffled = true;
 }
 
 export async function getQuizForDeck(item) {
@@ -1180,6 +1310,14 @@ export async function syncCloudProgress() {
       ["seen"]
     );
 
+    // 4. Sync Quiz Scores dictionary across devices
+    const quizResult = await syncEngine.syncDict(
+      username,
+      "quiz_scores",
+      state.quizScores || {},
+      getQuizScoresKey()
+    );
+
     let changed = false;
 
     if (studyResult.changed) {
@@ -1215,6 +1353,14 @@ export async function syncCloudProgress() {
           state.seen.add(id);
         }
       }
+      changed = true;
+    }
+
+    if (quizResult.changed) {
+      state.quizScores = quizResult.dict || {};
+      try {
+        localStorage.setItem(QUIZ_SCORES_KEY, JSON.stringify(state.quizScores));
+      } catch { /* ignore */ }
       changed = true;
     }
 
@@ -1318,6 +1464,9 @@ export async function forceCloudUpload() {
   persistStudyStatus();
   persistChecklist();
   persistSeen();
+  if (state.quizScores) {
+    syncEngine.kvSet(syncEngine.getKey(username, "quiz_scores"), state.quizScores);
+  }
 
   try {
     await syncEngine.flush();
@@ -1328,6 +1477,60 @@ export async function forceCloudUpload() {
     console.error("Force upload failed:", err);
     return false;
   }
+}
+
+/**
+ * Cleanly resets all study progress, exercise task checkmarks, seen markers, and quiz scores,
+ * writing fresh LWW tombstones so subsequent cloud syncs do not resurrect cleared progress.
+ */
+export async function resetAllProgress() {
+  const now = Date.now();
+  for (const id of Object.keys(state.studyStatusEntries)) {
+    state.studyStatusEntries[id] = { v: "default", t: now };
+  }
+  for (const id of [...state.studied, ...state.skipped]) {
+    state.studyStatusEntries[id] = { v: "default", t: now };
+  }
+  for (const id of Object.keys(state.checklistEntries)) {
+    state.checklistEntries[id] = { v: false, t: now };
+  }
+  for (const id of state.checklist) {
+    state.checklistEntries[id] = { v: false, t: now };
+  }
+  for (const id of Object.keys(state.seenEntries)) {
+    state.seenEntries[id] = { v: false, t: now };
+  }
+  for (const id of state.seen) {
+    state.seenEntries[id] = { v: false, t: now };
+  }
+
+  state.seen.clear();
+  state.studied.clear();
+  state.skipped.clear();
+  state.checklist.clear();
+  state.quizScores = {};
+
+  try {
+    localStorage.removeItem(SEEN_KEY);
+    localStorage.removeItem(STUDIED_KEY);
+    localStorage.removeItem(SKIPPED_KEY);
+    localStorage.removeItem(CHECKLIST_KEY);
+    localStorage.removeItem(STUDY_STATUS_KEY);
+    localStorage.removeItem(QUIZ_SCORES_KEY);
+    if (state.user?.username) {
+      localStorage.setItem(getQuizScoresKey(), JSON.stringify({}));
+    }
+  } catch { /* ignore */ }
+
+  if (state.user?.username) {
+    persistStudyStatus();
+    persistChecklist();
+    persistSeen();
+    syncEngine.kvSet(syncEngine.getKey(state.user.username, "quiz_scores"), {});
+    await syncEngine.flush().catch(() => {});
+  }
+
+  notifyStateChange("studied", { reset: true });
 }
 
 export function persistSeen() {
@@ -1684,9 +1887,9 @@ export function setSkipped(itemId, on) {
 export function getCourseStats() {
   const allItems = state.items || [];
 
-  // 1. Target Active Lectures (W0..W13 non-skip, excluding W98 & W99 shelf)
+  // 1. Target Active Lectures (W0..W13 non-skip, including Tier-1 master lectures, excluding W98 & W99 shelf)
   const targetLectures = allItems.filter(
-    (it) => it.kind === "lecture" && it.weekNum < 90 && !it.tags?.includes("Skip")
+    (it) => isLectureKind(it) && it.weekNum < 90 && !it.tags?.includes("Skip")
   );
   const studiedLectures = targetLectures.filter((it) => isStudied(it.id));
   const skippedLectures = targetLectures.filter((it) => isSkipped(it.id));
@@ -1705,7 +1908,7 @@ export function getCourseStats() {
 
   // 4. Reference / Self-study shelf (W98, W99 & in-week skip)
   const shelfLectures = allItems.filter(
-    (it) => it.kind === "lecture" && (it.weekNum >= 90 || it.tags?.includes("Skip"))
+    (it) => isLectureKind(it) && (it.weekNum >= 90 || it.tags?.includes("Skip"))
   );
   const completedShelf = shelfLectures.filter((it) => isCompleted(it.id));
 

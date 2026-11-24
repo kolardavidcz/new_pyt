@@ -19,9 +19,11 @@
 - **Salted SHA-256 Hashing**: Secure local password authentication powered by the browser Web Crypto API.
 - **Instant Cross-Device Sync**: Progress automatically synchronizes to cloud storage (Upstash Redis KV), keeping your study tracking updated across laptop, tablet, and mobile.
 
-### 🧩 3. Interactive Quizzes & Exercise Dojo
-- **Balanced Multiple-Choice Quizzes**: Uniform, unbiased option distribution (~25% A, 25% B, 25% C, 25% D) across 665+ questions using deterministic FNV-1a hashing.
-- **Code Fill & Output Prediction**: Interactive code completion with draggable nápověda pills and instant evaluation.
+### 🧩 3. Interactive Quizzes, Study Plan & Exception Explorer
+- **Balanced Multiple-Choice Quizzes**: Uniform, unbiased option distribution (~25% A, 25% B, 25% C, 25% D) across 830+ questions using deterministic FNV-1a + Murmur3 avalanche hashing, live score progress bar, **"Opakovat jen chyby" (Retry Wrong Only)** mode, and cross-device cloud score sync.
+- **Code Fill & One-Click Code Copy**: Interactive code completion with draggable nápověda pills, instant evaluation, and hover copy buttons on every code block (automatically stripping `>>>` REPL prompts).
+- **4-Level Study Plan & C/Java Footguns (`#/checklist`)**: Interactive competency checklist across 4 skill levels plus side-by-side comparisons of the Top 7 C/C++/Java → Python pitfalls.
+- **Interactive Python Exception Explorer (`#/exceptions`)**: Searchable, category-filtered hierarchy of all 68 standard Python 3.12+ exceptions with inheritance chains and Czech explanations.
 - **Dual Exercise Ratings**: Exercises feature independent **T** (Technical Syntax) and **L** (Logical/Algorithmic) difficulty ratings.
 
 ### 🖨️ 4. Unified Print Engine (`Ctrl+P`)

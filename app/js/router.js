@@ -1,15 +1,34 @@
 /** Tab bar + navigation router + browser History API */
 
-import { state, pagesFor, getStudyStatus, cycleStudyStatus, getQuizFor } from "./state.js";
-import { clear, svgClose, el, escapeHtml } from "./ui.js";
+import { state, pagesFor, getStudyStatus, cycleStudyStatus, getQuizFor, setLastVisited } from "./state.js";
+import { clear, svgClose, el } from "./ui.js";
 import {
   showHome, showWeek, showFullContent, showPresentation, showPage,
   showSearchResults, showProgress, showLogin, toggleFullscreen,
+  showChecklist, showExceptions,
 } from "./content.js";
 import { revealItem, renderTree } from "./tree.js";
 
 /** When true, navigate() does not push a new history entry (used for popstate). */
 let suppressHistory = false;
+
+/** Monotonic token incremented on every navigation to cancel stale async renders. */
+let navigationGeneration = 0;
+
+export function getNavigationGeneration() {
+  return navigationGeneration;
+}
+
+export function bumpNavigationGeneration() {
+  return ++navigationGeneration;
+}
+
+let scrollRestoreTimers = [];
+
+function cancelScrollRestore() {
+  for (const id of scrollRestoreTimers) clearTimeout(id);
+  scrollRestoreTimers = [];
+}
 
 /**
  * Navigate to a course view.
@@ -17,7 +36,9 @@ let suppressHistory = false;
  * @param {{ replace?: boolean, skipHistory?: boolean }} [opts]
  */
 export function navigate(target, opts = {}) {
+  cancelScrollRestore();
   saveCurrentTabScroll();
+  navigationGeneration++;
   const tab = ensureTab(target);
   activateTab(tab.id);
   renderTabs();
@@ -27,6 +48,8 @@ export function navigate(target, opts = {}) {
   updateChrome(tab);
 
   if (tab.itemId) {
+    const item = state.itemsById.get(tab.itemId);
+    if (item) setLastVisited(item, tab.pageId);
     revealItem(tab.itemId, tab.pageId);
   } else if (tab.weekId) {
     state.focusedTreeKey = tab.weekId;
@@ -37,6 +60,13 @@ export function navigate(target, opts = {}) {
   if (!opts.skipHistory && !suppressHistory) {
     pushHistory(targetToRoute(target), opts.replace);
   }
+}
+
+export function refreshChromeForActiveTab() {
+  const tab = state.tabs.find((t) => t.id === state.activeTabId);
+  if (!tab) return;
+  renderBreadcrumb(tab);
+  updateChrome(tab);
 }
 
 /* ── Tab Scroll Position Memory & Sync ──────────────────── */
@@ -59,10 +89,13 @@ export function saveCurrentTabScroll() {
 
 export function restoreTabScroll(tab) {
   if (!tab) return;
+  cancelScrollRestore();
 
   if (!state.itemScrollRatios) state.itemScrollRatios = {};
 
+  const tabId = tab.id;
   const performRestore = () => {
+    if (state.activeTabId !== tabId) return;
     const editorBody = document.querySelector(".editor-body");
     if (!editorBody) return;
 
@@ -79,21 +112,27 @@ export function restoreTabScroll(tab) {
 
     if (targetY != null && targetY > 0) {
       editorBody.scrollTop = targetY;
-    } else if (tab.scrollTop === 0) {
+    } else if (tab.scrollTop === 0 || tab.scrollTop == null) {
       editorBody.scrollTop = 0;
     }
   };
 
   requestAnimationFrame(performRestore);
-  setTimeout(performRestore, 50);
-  setTimeout(performRestore, 200);
-  setTimeout(performRestore, 500);
+  scrollRestoreTimers.push(
+    setTimeout(performRestore, 50),
+    setTimeout(performRestore, 200),
+    setTimeout(performRestore, 500)
+  );
 }
 
 let scrollTrackerBound = false;
 export function initScrollTracker() {
   const editorBody = document.querySelector(".editor-body");
   if (!editorBody || scrollTrackerBound) return;
+
+  // Cancel any pending restore timer as soon as the user interacts with scroll
+  editorBody.addEventListener("wheel", cancelScrollRestore, { passive: true });
+  editorBody.addEventListener("touchstart", cancelScrollRestore, { passive: true });
 
   let isTicking = false;
   editorBody.addEventListener(
@@ -166,6 +205,8 @@ function targetToRoute(target) {
   if (kind === "page") return { kind: "page", id: target.id, pageId: target.pageId };
   if (kind === "search") return { kind: "search" };
   if (kind === "progress") return { kind: "progress" };
+  if (kind === "checklist") return { kind: "checklist" };
+  if (kind === "exceptions") return { kind: "exceptions" };
   if (kind === "login") return { kind: "login" };
   return { kind: "home" };
 }
@@ -180,6 +221,8 @@ function routeToHash(route) {
   if (route.kind === "page") return `#/page/${enc(route.id)}/${enc(route.pageId)}`;
   if (route.kind === "search") return "#/search";
   if (route.kind === "progress") return "#/progress";
+  if (route.kind === "checklist") return "#/checklist";
+  if (route.kind === "exceptions") return "#/exceptions";
   if (route.kind === "login") return "#/login";
   return "#/";
 }
@@ -211,6 +254,8 @@ function parseHash(hash) {
   }
   if (a === "search") return { kind: "search" };
   if (a === "progress") return { kind: "progress" };
+  if (a === "checklist") return { kind: "checklist" };
+  if (a === "exceptions") return { kind: "exceptions" };
   if (a === "login") return { kind: "login" };
   return { kind: "home" };
 }
@@ -248,41 +293,41 @@ function routeKey(r) {
   return [r.kind, r.id || "", r.pageId || ""].join("|");
 }
 
-function applyRoute(route) {
+export function applyRoute(route, opts = { skipHistory: true }) {
   if (!route) {
-    navigate({ kind: "home" }, { skipHistory: true });
+    navigate({ kind: "home" }, opts);
     return;
   }
   if (route.kind === "week") {
     let weekId = route.id;
     if (!state.weeksById.has(weekId)) {
-      const normalized = "week-" + String(weekId).replace(/^w/, "");
+      const normalized = "week-" + String(weekId).replace(/^w/i, "");
       if (state.weeksById.has(normalized)) {
         weekId = normalized;
       }
     }
     if (weekId !== route.id) {
-      navigate({ kind: "week", id: weekId }, { skipHistory: true });
+      navigate({ kind: "week", id: weekId }, opts);
       return;
     }
   }
   // Resolve content kind: prefer item existence, fallback to dynamic item registration for disk files
-  if (route.kind === "lecture" || route.kind === "exercise" || route.kind === "presentation" || route.kind === "master-lecture") {
+  if (route.kind === "lecture" || route.kind === "exercise" || route.kind === "presentation" || route.kind === "master-lecture" || route.kind === "page") {
     let item = state.itemsById.get(route.id);
     if (!item && route.id) {
       const allItems = Array.from(state.itemsById.values());
-      const matched = allItems.find(i => 
+      const matched = allItems.find((i) =>
         i.slug === route.id ||
         i.id.endsWith("/" + route.id + ".html") ||
         i.id.endsWith("/" + route.id) ||
         i.path.endsWith("/" + route.id + ".html") ||
         i.path.endsWith("/" + route.id)
-      ) || (route.id.startsWith("ex-") ? allItems.filter(i => i.kind === "exercise")[(parseInt(route.id.replace(/^ex-/, ""), 10) || 1) - 1] : null);
+      ) || (route.id.startsWith("ex-") ? allItems.filter((i) => i.kind === "exercise")[(parseInt(route.id.replace(/^ex-/, ""), 10) || 1) - 1] : null);
       if (matched) {
         item = matched;
       }
     }
-    if (!item && route.id) {
+    if (!item && route.id && route.kind !== "page") {
       const rawPath = route.id.replace(/^(lecture|exercise|presentation):/, "");
       const fullPath = rawPath.startsWith("vyuka_downloaded/")
         ? rawPath
@@ -306,11 +351,15 @@ function applyRoute(route) {
       state.itemsById.set("lecture:" + fullPath.replace(/^vyuka_downloaded\/materialy\//, ""), item);
     }
     if (item) {
-      navigate({ kind: route.kind === "presentation" ? "presentation" : item.kind, id: item.id }, { skipHistory: true });
+      if (route.kind === "page") {
+        navigate({ kind: "page", id: item.id, pageId: route.pageId }, opts);
+      } else {
+        navigate({ kind: route.kind === "presentation" ? "presentation" : item.kind, id: item.id }, opts);
+      }
       return;
     }
   }
-  navigate(route, { skipHistory: true });
+  navigate(route, opts);
 }
 
 /* ── Tabs ──────────────────────────────────────────────── */
@@ -403,6 +452,14 @@ function ensureTab(target) {
     id = "progress";
     title = "Progress";
     tabKind = "progress";
+  } else if (kind === "checklist") {
+    id = "checklist";
+    title = "Studijní plán";
+    tabKind = "checklist";
+  } else if (kind === "exceptions") {
+    id = "exceptions";
+    title = "Strom výjimek";
+    tabKind = "exceptions";
   } else if (kind === "login") {
     id = "login";
     title = "Přihlášení / Profil";
@@ -480,6 +537,8 @@ function tabToTarget(tab) {
   if (tab.kind === "page") return { kind: "page", id: tab.itemId, pageId: tab.pageId };
   if (tab.kind === "search") return { kind: "search" };
   if (tab.kind === "progress") return { kind: "progress" };
+  if (tab.kind === "checklist") return { kind: "checklist" };
+  if (tab.kind === "exceptions") return { kind: "exceptions" };
   if (tab.kind === "login") return { kind: "login" };
   return { kind: "home" };
 }
@@ -553,6 +612,12 @@ function renderView(tab) {
     case "progress":
       showProgress();
       break;
+    case "checklist":
+      showChecklist();
+      break;
+    case "exceptions":
+      showExceptions();
+      break;
     case "login":
       showLogin();
       break;
@@ -602,6 +667,12 @@ export function renderBreadcrumb(tab) {
   } else if (tab.kind === "progress") {
     parts.push(sep());
     parts.push(crumbCurrent("Progress"));
+  } else if (tab.kind === "checklist") {
+    parts.push(sep());
+    parts.push(crumbCurrent("Studijní plán (4 Úrovně)"));
+  } else if (tab.kind === "exceptions") {
+    parts.push(sep());
+    parts.push(crumbCurrent("Strom výjimek"));
   } else if (tab.kind === "login") {
     parts.push(sep());
     parts.push(crumbCurrent("Přihlášení / Profil"));
@@ -645,7 +716,7 @@ function updateChrome(tab) {
     const item = tab.itemId ? state.itemsById.get(tab.itemId) : null;
     if (item) path = item.path;
     else if (tab.weekId) path = tab.weekId;
-    else if (tab.kind === "search" || tab.kind === "progress" || tab.kind === "login") path = tab.kind;
+    else if (tab.kind === "search" || tab.kind === "progress" || tab.kind === "checklist" || tab.kind === "exceptions" || tab.kind === "login") path = tab.kind;
 
     const w = tab.weekId ? state.weeksById.get(tab.weekId) : (item?.weekNum != null ? state.weeksById.get(item.weekId) : null);
     const weekNum = item?.weekNum ?? w?.week;
@@ -667,12 +738,21 @@ function updateChrome(tab) {
   updateStatusBarControls(tab);
 }
 
+let statusBarRenderToken = 0;
+
 export function updateStatusBarControls(tab) {
   const sbExplorer = document.getElementById("sbExplorerControls");
   const sbPresentation = document.getElementById("sbPresentationControls");
   if (!sbExplorer || !sbPresentation) return;
 
-  const isLectureOrPage = tab && (tab.kind === "page" || tab.kind === "presentation" || tab.kind === "lecture" || tab.kind === "exercise" || tab.kind === "master-lecture");
+  const isLectureOrPage = tab && (
+    tab.kind === "page" ||
+    tab.kind === "presentation" ||
+    tab.kind === "content" ||
+    tab.kind === "lecture" ||
+    tab.kind === "exercise" ||
+    tab.kind === "master-lecture"
+  );
   const item = tab?.itemId ? state.itemsById.get(tab.itemId) : null;
 
   if (!isLectureOrPage || !item) {
@@ -682,6 +762,7 @@ export function updateStatusBarControls(tab) {
     return;
   }
 
+  const token = ++statusBarRenderToken;
   sbExplorer.classList.add("hidden");
   sbPresentation.classList.remove("hidden");
   sbPresentation.innerHTML = "";
@@ -690,28 +771,38 @@ export function updateStatusBarControls(tab) {
   const curPageId = tab.pageId;
   const pageIdx = curPageId ? pages.findIndex((p) => p.id === curPageId) : 0;
   const status = getStudyStatus(item.id);
-  const quiz = getQuizFor(item.slug);
+  const isExercise = item.kind === "exercise" || (item.id && item.id.startsWith("exercise:"));
 
   // 1. Topic Title Badge / Link
   const weekLabel = (item.weekNum === 99 || item.week === 99) ? "Gray" : (item.weekNum != null ? `W${item.weekNum}` : "Course");
   const topicBadge = el("span", {
     className: "sb-item",
-    style: { fontWeight: "600", cursor: "pointer", maxWidth: "260px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+    style: {
+      display: "block",
+      flex: "0 1 220px",
+      minWidth: "60px",
+      fontWeight: "600",
+      cursor: "pointer",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    },
     title: item.title,
     onClick: () => navigate({ kind: item.kind, id: item.id })
   }, `${weekLabel}: ${item.title}`);
   sbPresentation.appendChild(topicBadge);
 
-  // 2. Slide Navigation (Prev / Counter / Next)
-  if (pages.length > 0) {
-    const hasPrev = pageIdx > 0;
+  // 2. Slide Navigation (Prev / Counter / Next) — shown in slide-by-slide and outline modes
+  if (!isExercise && pages.length > 0 && (tab.kind === "page" || tab.kind === "presentation")) {
+    const effectiveIdx = pageIdx >= 0 ? pageIdx : 0;
+    const hasPrev = tab.kind === "page" && effectiveIdx > 0;
     const prevBtn = el("button", {
       type: "button",
       className: `sb-btn ${hasPrev ? "" : "disabled"}`,
       disabled: !hasPrev,
       title: "Předchozí snímek (←)",
       onClick: () => {
-        if (hasPrev) navigate({ kind: "page", id: item.id, pageId: pages[pageIdx - 1].id });
+        if (hasPrev) navigate({ kind: "page", id: item.id, pageId: pages[effectiveIdx - 1].id });
       }
     }, "◀ Předchozí");
     sbPresentation.appendChild(prevBtn);
@@ -719,17 +810,21 @@ export function updateStatusBarControls(tab) {
     const counterSpan = el("span", {
       className: "sb-item",
       style: { fontFamily: "var(--font-mono, monospace)", fontSize: "11px", opacity: "0.95" }
-    }, `Snímek ${Math.max(1, pageIdx + 1)} / ${pages.length}`);
+    }, tab.kind === "page" ? `Snímek ${effectiveIdx + 1} / ${pages.length}` : `${pages.length} snímků`);
     sbPresentation.appendChild(counterSpan);
 
-    const hasNext = pageIdx < pages.length - 1;
+    const hasNext = tab.kind === "presentation" ? pages.length > 0 : effectiveIdx < pages.length - 1;
     const nextBtn = el("button", {
       type: "button",
       className: `sb-btn ${hasNext ? "" : "disabled"}`,
       disabled: !hasNext,
       title: "Další snímek (→)",
       onClick: () => {
-        if (hasNext) navigate({ kind: "page", id: item.id, pageId: pages[pageIdx + 1].id });
+        if (tab.kind === "presentation") {
+          navigate({ kind: "page", id: item.id, pageId: pages[0].id });
+        } else if (hasNext) {
+          navigate({ kind: "page", id: item.id, pageId: pages[effectiveIdx + 1].id });
+        }
       }
     }, "Další ▶");
     sbPresentation.appendChild(nextBtn);
@@ -739,7 +834,6 @@ export function updateStatusBarControls(tab) {
   const rightWrap = el("div", { className: "sb-right", style: { marginLeft: "auto", display: "flex", gap: "6px", alignItems: "center" } });
 
   // 3a. Study Status Cycle Button (3-state)
-  const isExercise = item.kind === "exercise" || (item.id && item.id.startsWith("exercise:"));
   const studyBtn = el("button", {
     type: "button",
     className: `sb-btn sb-btn-study-cycle ${status === "studied" ? "is-studied" : status === "skipped" ? "is-skipped" : ""}`,
@@ -767,27 +861,20 @@ export function updateStatusBarControls(tab) {
     const fsBtn = el("button", {
       type: "button",
       className: "sb-btn",
-      title: "Režim prezentace na celou obrazovku",
-      onClick: () => toggleFullscreen()
+      title: "Režim prezentace na celou obrazovku (F)",
+      onClick: () => {
+        if (tab.kind !== "page") {
+          navigate({ kind: "page", id: item.id, pageId: pages[0].id });
+        }
+        toggleFullscreen();
+      }
     }, "⛶ Prezentace");
     rightWrap.appendChild(fsBtn);
   }
 
-  // 3d. Quiz Button (if quiz available)
-  if (quiz && quiz.questions?.length) {
-    const quizBtn = el("button", {
-      type: "button",
-      className: "sb-btn sb-btn-primary",
-      title: `Otestovat znalosti (${quiz.questions.length} otázek)`,
-      onClick: () => {
-        navigate({ kind: "presentation", id: item.id });
-        setTimeout(() => {
-          document.querySelector(".quiz-section")?.scrollIntoView({ behavior: "smooth" });
-        }, 150);
-      }
-    }, `🎯 Kvíz (${quiz.questions.length})`);
-    rightWrap.appendChild(quizBtn);
-  }
+  // 3d. Placeholder for async Quiz button (inserted before Bug button once resolved)
+  const quizSlot = el("span", { style: { display: "contents" } });
+  rightWrap.appendChild(quizSlot);
 
   // 3e. Bug report button on statusbar
   const bugBtn = el("button", {
@@ -799,6 +886,29 @@ export function updateStatusBarControls(tab) {
   rightWrap.appendChild(bugBtn);
 
   sbPresentation.appendChild(rightWrap);
+
+  // Resolve quiz asynchronously with stale-guard token
+  getQuizFor(item).then((questions) => {
+    if (token !== statusBarRenderToken) return;
+    if (!Array.isArray(questions) || !questions.length) return;
+    const quizBtn = el("button", {
+      type: "button",
+      className: "sb-btn sb-btn-primary",
+      title: `Otestovat znalosti (${questions.length} otázek)`,
+      onClick: () => {
+        const existingQuiz = document.getElementById("quizSection");
+        if (existingQuiz) {
+          existingQuiz.scrollIntoView({ behavior: "smooth" });
+          return;
+        }
+        navigate({ kind: item.kind, id: item.id });
+        setTimeout(() => {
+          document.getElementById("quizSection")?.scrollIntoView({ behavior: "smooth" });
+        }, 250);
+      }
+    }, `🎯 Kvíz (${questions.length})`);
+    quizSlot.appendChild(quizBtn);
+  }).catch(() => {});
 }
 
 function decodeHtml(s) {

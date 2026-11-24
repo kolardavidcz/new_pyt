@@ -505,13 +505,17 @@ if (typeof document !== "undefined") {
 
     if (lectureId) {
       setRecapReturn({
-        fromKind: "page",
+        fromKind: fromPageId ? "page" : "lecture",
         fromId,
         fromTitle,
         fromWeek: fromWeek !== "" ? Number(fromWeek) : null,
         fromPageId,
       });
-      window.__pcsNavigate?.({ kind: "lecture", id: lectureId, pageId: slideId });
+      if (slideId) {
+        window.__pcsNavigate?.({ kind: "page", id: lectureId, pageId: slideId });
+      } else {
+        window.__pcsNavigate?.({ kind: "lecture", id: lectureId });
+      }
     }
   });
 }
@@ -543,6 +547,7 @@ export function renderSlide(page, item, num) {
     const recapBanner = el("div", { className: "slide-recap-banner" });
     const primWeek = alreadyStudied.week === 99 ? "Gray" : `W${alreadyStudied.week}`;
     const primLec = alreadyStudied.lecture_title || "původní přednášce";
+    const itemWeekVal = item.weekNum != null ? item.weekNum : item.week;
     recapBanner.innerHTML = `
       <span class="recap-pill">[JIŽ PROBRÁNO]</span>
       <span class="recap-desc">Tento výklad / příklad byl původně probrán v:</span>
@@ -551,7 +556,7 @@ export function renderSlide(page, item, num) {
         data-slide-id="${escapeHtml(alreadyStudied.slide_id)}"
         data-from-id="${escapeHtml(item.id)}"
         data-from-title="${escapeHtml(item.title)}"
-        data-from-week="${escapeHtml(item.week != null ? String(item.week) : "")}"
+        data-from-week="${escapeHtml(itemWeekVal != null ? String(itemWeekVal) : "")}"
         data-from-page-id="${escapeHtml(page.id)}"
         title="Přejít na původní výklad">
         <strong>${primWeek} ${escapeHtml(primLec)}</strong> (slajd #${escapeHtml(alreadyStudied.slide_id)}) →
@@ -590,7 +595,11 @@ export async function fetchAndExtract(path) {
     try {
       const res = await fetch(`/data/lectures/${s}.json`);
       if (res.ok) {
-        const data = await res.json();
+        let data = await res.json();
+        if (data && typeof data.$redirect === "string") {
+          const redirRes = await fetch(data.$redirect);
+          if (redirRes.ok) data = await redirRes.json();
+        }
         const slides = Array.isArray(data) ? data : (data?.slides && Array.isArray(data.slides) ? data.slides : null);
         if (slides && slides.length > 0) {
           cache.set(path, slides);

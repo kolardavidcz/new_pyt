@@ -57,19 +57,22 @@ export async function openAdminModal() {
 
   if (!adminModalEl) {
     adminModalEl = el("div", { className: "modal-overlay hidden", id: "adminModal" });
+    adminModalEl.addEventListener("click", (e) => {
+      if (e.target === adminModalEl) closeAdminModal();
+    });
     document.body.appendChild(adminModalEl);
   }
 
   renderAdminModalContent("improvements");
   adminModalEl.classList.remove("hidden");
 
-  // Automatic background refresh from cloud
+  // Single automatic background refresh from cloud
   loadQuestionImprovements().then(() => {
     if (adminModalEl && !adminModalEl.classList.contains("hidden")) {
       const activeTabBtn = adminModalEl.querySelector(".admin-tab-btn.active");
       const activeTab = activeTabBtn?.getAttribute("data-tab") || "improvements";
       if (activeTab === "improvements") {
-        renderImprovementsTab();
+        renderImprovementsTab({ preserveFilter: true });
         const openCount = (state.questionImprovements || []).filter((i) => (i.status || "open") === "open").length;
         const tabBtn = adminModalEl.querySelector('.admin-tab-btn[data-tab="improvements"]');
         if (tabBtn) {
@@ -181,10 +184,12 @@ function renderAdminModalContent(activeTab = "improvements") {
     </div>
   `;
 
-  // Close handlers
+  // Close handler
   adminModalEl.querySelector("#btnCloseAdminModal")?.addEventListener("click", closeAdminModal);
-  adminModalEl.addEventListener("click", (e) => {
-    if (e.target === adminModalEl) closeAdminModal();
+
+  // Prevent default form submissions without inline handlers
+  adminModalEl.querySelectorAll("form").forEach((f) => {
+    f.addEventListener("submit", (e) => e.preventDefault());
   });
 
   // Tab switching
@@ -207,13 +212,13 @@ function renderAdminModalContent(activeTab = "improvements") {
   else if (activeTab === "relevance") renderRelevanceTab();
 }
 
-function renderImprovementsTab() {
+function renderImprovementsTab({ preserveFilter = false } = {}) {
   const container = adminModalEl?.querySelector("#admImpList");
   const searchInput = adminModalEl?.querySelector("#admSearchImp");
   const statusSelect = adminModalEl?.querySelector("#admFilterStatus");
   if (!container) return;
 
-  if (searchInput) {
+  if (searchInput && !preserveFilter) {
     searchInput.value = "";
   }
 
@@ -399,19 +404,9 @@ function renderImprovementsTab() {
     });
   }
 
-  searchInput?.addEventListener("input", updateList);
-  statusSelect?.addEventListener("change", updateList);
+  if (searchInput) searchInput.oninput = updateList;
+  if (statusSelect) statusSelect.onchange = updateList;
   updateList();
-
-  // Automatic background refresh from cloud
-  loadQuestionImprovements().then(() => {
-    updateList();
-    const openCount = (state.questionImprovements || []).filter((i) => (i.status || "open") === "open").length;
-    const tabBtn = adminModalEl?.querySelector('.admin-tab-btn[data-tab="improvements"]');
-    if (tabBtn) {
-      tabBtn.innerHTML = `Připomínky a diagnostika ${openCount > 0 ? `<span class="admin-badge-count">${openCount}</span>` : ""}`;
-    }
-  });
 }
 
 function renderUsersTab() {
@@ -433,14 +428,15 @@ function renderUsersTab() {
 
       try {
         const cleanEmail = username.includes("@") ? username : `${username}@vscht.cz`;
-        await registerUser({ email: cleanEmail, password });
-        addAdminUser(cleanEmail);
+        await registerUser({ email: cleanEmail, password, autoLogin: false });
+        addAdminUser(cleanEmail.split("@")[0]);
         if (uInput) uInput.value = "";
         if (pInput) pInput.value = "";
         if (msgEl) msgEl.textContent = `✓ Účet správce "${cleanEmail}" byl úspěšně vytvořen.`;
         renderUsersTab();
       } catch (err) {
-        addAdminUser(username);
+        const cleanUser = username.includes("@") ? username.split("@")[0] : username;
+        addAdminUser(cleanUser);
         await resetUserPassword(username, password);
         if (msgEl) msgEl.textContent = `✓ Účet "${username}" byl povýšen na správce s novým heslem.`;
         renderUsersTab();
@@ -588,7 +584,7 @@ function renderRelevanceTab() {
         <div class="admin-rel-row">
           <div style="flex:1; min-width:0;">
             <strong style="font-size:13px; color:var(--fg);">${escapeHtml(it.title)}</strong>
-            <div style="font-size:11px; color:var(--fg-muted);">Týden ${it.weekNum || 1} · <code>${escapeHtml(key)}</code> · <span style="color:#6a9955;">AI relevance: ${relAI}/10</span></div>
+            <div style="font-size:11px; color:var(--fg-muted);">Týden ${it.weekNum ?? 0} · <code>${escapeHtml(key)}</code> · <span style="color:#6a9955;">AI relevance: ${relAI}/10</span></div>
           </div>
           <div style="display:flex; align-items:center; gap:12px;">
             <span class="rel-bar-preview">${starsHtml(it, 10, "bar")}</span>

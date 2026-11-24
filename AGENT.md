@@ -21,12 +21,14 @@ b:\python_overview\
 │   └── js/
 │       ├── app.js            # SPA initialization & async module bootsrap
 │       ├── state.js          # Reactive state, user database, password hashing & quiz shuffle
-│       ├── router.js         # Hash-based SPA router (#/lecture/*, #/week/*, #/progress, #/login)
-│       ├── content.js        # Main views orchestrator & backward-compatible ESM public API re-exports
-│       ├── catalog_view.js   # Catalog views: Home view, single week view, shelf grouping, item cards
-│       ├── presentation_view.js # Presentation view: Slide-by-slide mode, floating nav, slide counter, shortcuts
+│       ├── router.js         # Hash-based SPA router (#/lecture/*, #/week/*, #/progress, #/checklist, #/exceptions, #/login)
+│       ├── content.js        # Main views orchestrator, render-generation guard & backward-compatible ESM re-exports
+│       ├── catalog_view.js   # Catalog views: Home view + resume bar, single week view, shelf grouping, item cards
+│       ├── checklist_view.js # 4-Level Python Study Plan & C/Java -> Python Footguns cheatsheet (#/checklist)
+│       ├── exceptions_view.js # Interactive searchable Python 3.12+ Exceptions Hierarchy Explorer (#/exceptions)
+│       ├── presentation_view.js # Presentation view: Slide-by-slide mode, progress bar, slide jumper, floating nav, shortcuts
 │       ├── slide_renderer.js # Slide DOM node creation, URL rewriting, code example inlining, adaptive contrast
-│       ├── quiz.js           # Quiz engine, answer validation & improvement modal
+│       ├── quiz.js           # Quiz engine, live score header, retry-wrong mode, validation & improvement modal
 │       ├── sync.js           # Upstash Redis KV cloud progress synchronization
 │       ├── format.js         # Code tokenization, Czech unicode support & inline code pills
 │       ├── tree.js           # Explorer sidebar tree view rendering

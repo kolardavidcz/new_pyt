@@ -57,7 +57,14 @@ export class CloudSyncEngine {
       if (!res.ok) return null;
       const data = await res.json();
       if (!data || data.result === undefined || data.result === null) return null;
-      return typeof data.result === "string" ? JSON.parse(data.result) : data.result;
+      if (typeof data.result === "string") {
+        try {
+          return JSON.parse(data.result);
+        } catch {
+          return data.result;
+        }
+      }
+      return data.result;
     } catch {
       return null;
     }
@@ -216,12 +223,28 @@ export class CloudSyncEngine {
     for (const [key, remoteVal] of Object.entries(remoteDict)) {
       if (!mergedDict[key]) {
         mergedDict[key] = remoteVal;
-      } else if (typeof remoteVal === "object" && remoteVal !== null) {
+      } else if (typeof remoteVal === "object" && remoteVal !== null && typeof mergedDict[key] === "object" && mergedDict[key] !== null) {
         const localVal = mergedDict[key];
-        const remoteTime = remoteVal.updatedAt || remoteVal.timestamp || 0;
-        const localTime = localVal.updatedAt || localVal.timestamp || 0;
-        if (remoteTime >= localTime) {
-          mergedDict[key] = { ...localVal, ...remoteVal };
+        const remoteTime = new Date(remoteVal.updatedAt || remoteVal.timestamp || 0).getTime() || 0;
+        const localTime = new Date(localVal.updatedAt || localVal.timestamp || 0).getTime() || 0;
+        if (remoteTime > 0 || localTime > 0) {
+          if (remoteTime >= localTime) {
+            mergedDict[key] = { ...localVal, ...remoteVal };
+          }
+        } else {
+          // Nested map (e.g. quiz_scores: deckSlug -> { qId -> { selected, isCorrect, updatedAt } })
+          const nested = { ...localVal };
+          for (const [subKey, subRemote] of Object.entries(remoteVal)) {
+            const subLocal = nested[subKey];
+            if (!subLocal) {
+              nested[subKey] = subRemote;
+            } else {
+              const srt = new Date(subRemote?.updatedAt || subRemote?.timestamp || 0).getTime() || 0;
+              const slt = new Date(subLocal?.updatedAt || subLocal?.timestamp || 0).getTime() || 0;
+              if (srt >= slt) nested[subKey] = { ...subLocal, ...subRemote };
+            }
+          }
+          mergedDict[key] = nested;
         }
       }
     }

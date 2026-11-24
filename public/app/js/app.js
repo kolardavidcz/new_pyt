@@ -8,7 +8,10 @@ import {
   loadRelevanceOverrides, getCourseStats,
 } from "./state.js";
 import { renderTree, setTreeSelectHandler, expandAll, collapseAll } from "./tree.js";
-import { navigate, refreshActiveView, closeTab, initHistory, getInitialRoute, initScrollTracker } from "./router.js";
+import {
+  navigate, applyRoute, refreshActiveView, refreshChromeForActiveTab,
+  closeTab, initHistory, getInitialRoute, initScrollTracker, updateStatusBarControls,
+} from "./router.js";
 import { openPalette, closePalette, isPaletteOpen, initPalette, setPaletteHandler } from "./palette.js";
 import { toggleFullscreen, updatePageStudyButtons, showLogin, stepSlide } from "./content.js";
 import { initAdminPanel, openAdminModal, updateAdminUIElements } from "./admin.js";
@@ -53,6 +56,7 @@ async function boot() {
   setTreeSelectHandler(handleNavigate);
   window.__pcsNavigate = handleNavigate;
   window.__pcsUpdateStatus = updateStatus;
+  window.__pcsRefreshChrome = refreshChromeForActiveTab;
   window.__pcsState = state;
   initHistory();
   initScrollTracker();
@@ -64,27 +68,42 @@ async function boot() {
   });
   setInterval(() => syncCloudProgress(), 30000);
 
-  // Reactive Event Bus listener: auto-update UI components when state mutates
+  // Reactive Event Bus listener: targeted in-place updates without clobbering active lectures/quizzes
+  const REFRESHABLE_DASHBOARD_KINDS = new Set(["home", "week", "progress", "checklist", "search"]);
   onStateChange((_, changeType, payload) => {
     if (changeType === "requireLogin") {
       showLogin(payload?.reason);
+      return;
+    }
+    if (changeType === "seen") {
+      try { renderTree(); } catch {}
+      updateStatus();
       return;
     }
     if (
       changeType === "studied" ||
       changeType === "checklist" ||
       changeType === "cloudSync" ||
-      changeType === "seen" ||
       changeType === "user"
     ) {
       updatePageStudyButtons();
       try { renderTree(); } catch {}
       updateStatus();
       updateUserUI();
-      updateCloudSyncUI(changeType === "cloudSync" ? payload?.status : "synced");
+      const syncUiStatus = changeType === "cloudSync"
+        ? (payload?.status === "error" ? "error" : "synced")
+        : "synced";
+      updateCloudSyncUI(syncUiStatus);
+
       const tab = state.tabs.find((t) => t.id === state.activeTabId);
       if (tab) {
-        refreshActiveView();
+        updateStatusBarControls(tab);
+        const shouldRefreshView =
+          REFRESHABLE_DASHBOARD_KINDS.has(tab.kind) &&
+          (changeType !== "cloudSync" || payload?.changed === true || Boolean(payload?.force));
+        if (shouldRefreshView) {
+          refreshActiveView();
+        }
       }
     }
   });
@@ -105,15 +124,15 @@ async function boot() {
     renderTree();
     updateStatus();
     updateUserUI();
-    // Restore deep link or land on welcome
+    // Restore deep link (with slug/week normalization) or land on welcome
     const initial = getInitialRoute();
-    navigate(initial, { replace: true });
+    applyRoute(initial, { replace: true });
   } catch (err) {
     const main = document.getElementById("main");
     main.className = "state-panel";
     main.innerHTML = `
       <h2>Could not load course data</h2>
-      <p>${escape(err.message)}</p>
+      <p>${escapeHtml(err.message)}</p>
       <p class="hint">Run: python tools/import_course_data.py<br/>then: python serve.py</p>
     `;
   }
@@ -456,6 +475,21 @@ function bindChrome() {
       if (isPaletteOpen()) {
         e.preventDefault();
         closePalette();
+        return;
+      }
+      const openModalIds = ["adminModal", "questionImproveModal", "bugReportModal", "errorLogModal", "profileModal"];
+      for (const mId of openModalIds) {
+        const mEl = document.getElementById(mId);
+        if (mEl && !mEl.classList.contains("hidden")) {
+          e.preventDefault();
+          mEl.classList.add("hidden");
+          return;
+        }
+      }
+      if (document.documentElement.classList.contains("presentation-fullscreen-mode")) {
+        e.preventDefault();
+        toggleFullscreen(false);
+        return;
       }
     }
     // Close tab Ctrl+Q or Ctrl+W
@@ -525,7 +559,8 @@ function updateStatus() {
   const stats = getCourseStats();
   const visible = filteredItems().length;
   if (counts) {
-    counts.textContent = `${stats.total.completed} / ${stats.total.total} splněno (${stats.total.pct}%) · ${stats.lectures.completed}/${stats.lectures.total} přednášek · ${stats.exercises.completed}/${stats.exercises.total} cvičení`;
+    const filterPrefix = filtersActive() ? `${visible}/${state.items.length} zobrazeno · ` : "";
+    counts.textContent = `${filterPrefix}${stats.total.completed} / ${stats.total.total} splněno (${stats.total.pct}%) · ${stats.lectures.completed}/${stats.lectures.total} přednášek · ${stats.exercises.completed}/${stats.exercises.total} cvičení`;
   }
   if (filter) {
     if (!filtersActive()) {
@@ -543,6 +578,14 @@ function updateStatus() {
 }
 
 function setView(view) {
+  if (view === "checklist") {
+    navigate({ kind: "checklist" });
+    return;
+  }
+  if (view === "exceptions") {
+    navigate({ kind: "exceptions" });
+    return;
+  }
   state.view = view;
   document.querySelectorAll(".activity-btn[data-view]").forEach((b) => {
     b.classList.toggle("active", b.dataset.view === "explorer");
@@ -554,7 +597,7 @@ function setView(view) {
   if (title) title.textContent = "Explorer";
   treeRoot?.classList.remove("hidden");
   filterStrip?.classList.remove("hidden");
-  if (view === "explorer" && !state.sidebarOpen) {
+  if ((view === "explorer" || view === "search") && !state.sidebarOpen) {
     toggleSidebar();
   }
 }

@@ -3,9 +3,10 @@
  * Home view, week catalog view, shelf grouping, and item card rendering.
  */
 
-import { state, weekVisibleItems, getWeekStats } from "./state.js";
+import { state, weekVisibleItems, getWeekStats, getCourseStats, getStudyStatus, isCompleted, getQuizFor } from "./state.js";
 import { clear, el, escapeHtml, badgesHtml, flavorHtml, starsHtml } from "./ui.js";
 import { toggleFullscreen } from "./presentation_view.js";
+import { fetchAndExtract } from "./slide_renderer.js";
 
 /* ── Welcome: All Weeks + Full Course Catalogs ─────────── */
 
@@ -31,6 +32,60 @@ export function showHome() {
         <span><kbd class="kbd">Browser ←</kbd> Previous view</span>
       </div>
     `;
+
+    // Quick Resume & Study Tools Bar
+    const stats = getCourseStats();
+    const quickBar = el("div", { className: "home-quick-bar" });
+
+    const lastItem = state.lastVisited?.id ? state.itemsById.get(state.lastVisited.id) : null;
+    if (lastItem) {
+      const wLabel = lastItem.weekNum === 99 ? "Gray" : `W${lastItem.weekNum}`;
+      quickBar.appendChild(el("button", {
+        type: "button",
+        className: "btn primary home-resume-btn",
+        title: `Pokračovat tam, kde jste skončili: ${lastItem.title}`,
+        onClick: () => {
+          if (state.lastVisited?.pageId) {
+            window.__pcsNavigate?.({ kind: "page", id: lastItem.id, pageId: state.lastVisited.pageId });
+          } else {
+            window.__pcsNavigate?.({ kind: lastItem.kind, id: lastItem.id });
+          }
+        },
+      }, el("span", { className: "home-resume-label" }, `▶ Pokračovat: ${wLabel} · ${lastItem.title}`)));
+    } else {
+      const nextMaster = (state.items || []).find((it) => it.kind === "master-lecture" && !isCompleted(it.id));
+      if (nextMaster) {
+        quickBar.appendChild(el("button", {
+          type: "button",
+          className: "btn primary home-resume-btn",
+          title: `Spustit doporučenou přednášku: ${nextMaster.title}`,
+          onClick: () => window.__pcsNavigate?.({ kind: nextMaster.kind, id: nextMaster.id }),
+        }, el("span", { className: "home-resume-label" }, `▶ Začít: W${nextMaster.weekNum} · ${nextMaster.title}`)));
+      }
+    }
+
+    quickBar.appendChild(el("button", {
+      type: "button",
+      className: "btn home-tool-btn",
+      title: "4-úrovňový studijní plán Pythonu a přehled pastí z C/Javy (Ctrl+Shift+C)",
+      onClick: () => window.__pcsNavigate?.({ kind: "checklist" }),
+    }, "📋 Studijní plán (4 Úrovně)"));
+
+    quickBar.appendChild(el("button", {
+      type: "button",
+      className: "btn home-tool-btn",
+      title: "Interaktivní strom standardních výjimek v Pythonu s vyhledáváním",
+      onClick: () => window.__pcsNavigate?.({ kind: "exceptions" }),
+    }, "⚡ Strom výjimek"));
+
+    quickBar.appendChild(el("button", {
+      type: "button",
+      className: "btn home-tool-btn",
+      title: "Otevřít studijní nástěnku a statistiky",
+      onClick: () => window.__pcsNavigate?.({ kind: "progress" }),
+    }, `📊 Postup: ${stats.total.completed}/${stats.total.total} (${stats.total.pct} %)`));
+
+    header.appendChild(quickBar);
     main.appendChild(header);
 
     for (const week of weeks) {
@@ -261,9 +316,17 @@ export function section(title, items) {
 export function itemCard(item) {
   // Default open = full lecture / structured exercise
   const isMaster = item.kind === "master-lecture";
+  const status = getStudyStatus(item.id);
+  const statusClass = status === "studied" ? " card-studied" : status === "skipped" ? " card-skipped" : "";
+  const statusPill = status === "studied"
+    ? `<span class="card-status-pill studied" title="${item.kind === "exercise" ? "Vyřešeno" : "Prostudováno"}">✓</span>`
+    : status === "skipped"
+      ? `<span class="card-status-pill skipped" title="Přeskočeno (ovládám)">↷</span>`
+      : "";
+
   const card = el("button", {
     type: "button",
-    className: "card" + (item.kind === "exercise" ? " card-exercise" : "") + (isMaster ? " card-master-lecture" : ""),
+    className: "card" + (item.kind === "exercise" ? " card-exercise" : "") + (isMaster ? " card-master-lecture" : "") + statusClass,
     onClick: () => window.__pcsNavigate?.({ kind: item.kind, id: item.id }),
   });
   const exMeta = state.exercises[item.path];
@@ -271,7 +334,7 @@ export function itemCard(item) {
   const slideCount = item.totalSlides || 27;
   card.innerHTML = `
     <div class="card-top">
-      <div class="card-title">${escapeHtml(item.title)}</div>
+      <div class="card-title">${statusPill}${escapeHtml(item.title)}</div>
       <div class="card-kind">${isMaster ? "⭐ Tier 1 Master" : escapeHtml(item.kind)}</div>
     </div>
     ${item.desc ? `<div class="card-desc">${escapeHtml(item.desc)}</div>` : ""}
@@ -284,5 +347,18 @@ export function itemCard(item) {
       ${starsHtml(item, 10, "bar")}
     </div>
   `;
+
+  // Hover prefetching for instant navigation from catalog cards
+  let hoverTimer = null;
+  card.addEventListener("pointerenter", () => {
+    hoverTimer = setTimeout(() => {
+      if (item.path) fetchAndExtract(item.path).catch(() => {});
+      if (item.id) getQuizFor(item).catch(() => {});
+    }, 60);
+  });
+  card.addEventListener("pointerleave", () => {
+    if (hoverTimer) clearTimeout(hoverTimer);
+  });
+
   return card;
 }

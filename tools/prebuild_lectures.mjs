@@ -68,8 +68,8 @@ if (existsSync(quizFile)) {
       for (const w of course.weeks || []) {
         for (const lec of w.lectures || []) {
           const slug = lec.slug;
-          const base = (lec.path || "").split("/").pop().replace(/\.html?$/, "");
-          const cleanPath = (lec.path || "").replace(/^vyuka_downloaded\//, "").replace(/\.html?$/, "");
+          const base = (lec.path || "").split("/").pop().replace(/\.(html?|md)$/, "");
+          const cleanPath = (lec.path || "").replace(/^vyuka_downloaded\//, "").replace(/\.(html?|md)$/, "");
           
           const matchingQuestions = rawQuizzes[lec.quiz_deck] ||
                                     rawQuizzes[slug] ||
@@ -104,7 +104,7 @@ if (existsSync(quizFile)) {
         weekDecks[wKey] = {};
         
         for (const lec of w.lectures || []) {
-          const base = (lec.path || "").split("/").pop().replace(/\.html?$/, "");
+          const base = (lec.path || "").split("/").pop().replace(/\.(html?|md)$/, "");
           const dKey = lec.quiz_deck || lec.slug || base;
           const questions = rawQuizzes[dKey] || rawQuizzes[base] || rawQuizzes[lec.slug];
           if (questions) {
@@ -989,6 +989,42 @@ for (const [relPath, filePath] of fileMap.entries()) {
       pagesIndexMap[`public/vyuka_downloaded/${relPath}`] = pageEntries;
     }
   } catch { /* ignore */ }
+}
+
+// 3. COMPILE & INDEX TIER-1 MARKDOWN MASTER LECTURES (content/lectures/*.md)
+const masterLecturesDir = join(ROOT, "content", "lectures");
+if (existsSync(masterLecturesDir)) {
+  for (const name of readdirSync(masterLecturesDir).sort()) {
+    if (!name.endsWith(".md")) continue;
+    try {
+      const mdPath = join(masterLecturesDir, name);
+      const base = name.replace(/\.md$/, "");
+      const pathSlug = `lectures--${base}`;
+      const mdContent = readFileSync(mdPath, "utf-8");
+      const compiled = compileMarkdownLecture(mdContent, pathSlug);
+      const slides = compiled?.slides || [];
+      if (slides.length > 0) {
+        slides.forEach((s, i) => { s.idx = i; });
+        const payload = JSON.stringify({ slug: pathSlug, total: slides.length, slides }, null, 2);
+        for (const outDir of LECTURES_OUT_DIRS) {
+          writeFileSync(join(outDir, `${pathSlug}.json`), payload, "utf-8");
+        }
+        const pageEntries = slides.map((s) => ({
+          id: s.id,
+          title: s.title,
+          tags: s.tags || ["Core"],
+          diff: s.diff || "basics",
+          is_intersection: s.is_intersection || false,
+        }));
+        pagesIndexMap[`content/lectures/${name}`] = pageEntries;
+        pagesIndexMap[`lectures/${base}`] = pageEntries;
+        pagesIndexMap[pathSlug] = pageEntries;
+        prebuiltCount++;
+      }
+    } catch (err) {
+      console.error(`  ❌ Error compiling master lecture ${name}:`, err);
+    }
+  }
 }
 
 const pagesIndexPath = join(DATA_DIR, "pages-index.json");

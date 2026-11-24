@@ -6,7 +6,7 @@
 import {
   state, pagesFor, filteredItems, markSeen,
   isCompleted, cycleStudyStatus, getStudyStatus, getTaskStatus, cycleTaskStatus,
-  getCourseStats,
+  getCourseStats, isLectureKind, resetAllProgress,
   syncCloudProgress, forceCloudDownload, forceCloudUpload, setCodeBlockColor, logLinkError,
   setPrintWithQuizzes, getQuizFor,
   registerUser, loginWithPassword, resetUserPassword, isAdminUser, syncUsersDbFromCloud,
@@ -33,10 +33,13 @@ import {
   fetchAndExtract, rewriteContentUrls, resolvePresentationHref,
   renderRecapReturnBreadcrumb,
 } from "./slide_renderer.js";
+import { showChecklist } from "./checklist_view.js";
+import { showExceptions } from "./exceptions_view.js";
 
 // Re-export Public APIs for backward compatibility with router, tree, and app
 export { showHome, showWeek, buildWeekCatalogBlock, section, itemCard };
 export { showPresentation, showPage, showItemIndex, toggleFullscreen, stepSlide };
+export { showChecklist, showExceptions };
 export {
   renderSlide, autoContrastImage, scanAndContrastImages, loadAndInlineExamples,
   fetchAndExtract, rewriteContentUrls, resolvePresentationHref,
@@ -46,12 +49,68 @@ export {
   renderQuizSection, openImprovementModal, openPresentationImprovementModal, updatePrintQuizButtons,
 };
 
-/* ── Loading Bar Helper ────────────────────────────────── */
+/* ── Render Generation Guard & Loading Bar Helper ──────── */
+
+let contentRenderGeneration = 0;
+
+export function nextContentRenderId() {
+  return ++contentRenderGeneration;
+}
+
+export function isContentRenderCurrent(id) {
+  return id === contentRenderGeneration;
+}
 
 export function setLoading(on) {
   const bar = document.getElementById("loadingBar");
   if (!bar) return;
   bar.classList.toggle("active", !!on);
+}
+
+/**
+ * Enhances all rendered `<pre class="code-block">` elements under `root`
+ * with a clean, hover-revealed one-click copy button (hidden in print).
+ */
+export function enhanceCodeBlocks(root) {
+  if (!root || !root.querySelectorAll) return;
+  root.querySelectorAll("pre.code-block").forEach((pre) => {
+    if (pre.dataset.copyEnhanced === "1") return;
+    if (pre.querySelector(".inline-code-fill-input")) return;
+    pre.dataset.copyEnhanced = "1";
+    const btn = el("button", {
+      type: "button",
+      className: "code-copy-btn",
+      title: "Zkopírovat kód do schránky",
+      "aria-label": "Zkopírovat kód",
+      onClick: async (e) => {
+        e.stopPropagation();
+        const codeEl = pre.querySelector("code");
+        const raw = codeEl ? codeEl.textContent : pre.textContent;
+        // Strip interactive Python REPL prompts if copying a REPL block so code runs cleanly
+        const lines = String(raw || "").split("\n");
+        const hasRepl = lines.some((l) => /^>>> /.test(l));
+        const textToCopy = hasRepl
+          ? lines
+              .filter((l) => /^>>> |^\.\.\. /.test(l) || l === ">>>" || l === "...")
+              .map((l) => l.replace(/^(?:>>>|\.\.\.) ?/, ""))
+              .join("\n")
+          : String(raw || "");
+        try {
+          await navigator.clipboard.writeText(textToCopy);
+          btn.textContent = "✓ Zkopírováno";
+          btn.classList.add("copied");
+          setTimeout(() => {
+            btn.textContent = "Kopírovat";
+            btn.classList.remove("copied");
+          }, 1600);
+        } catch {
+          btn.textContent = "Chyba";
+          setTimeout(() => { btn.textContent = "Kopírovat"; }, 1400);
+        }
+      },
+    }, "Kopírovat");
+    pre.appendChild(btn);
+  });
 }
 
 /* ── Study Status Controls & Toolbar ────────────────────── */
@@ -244,6 +303,7 @@ export function buildBottomNavBar(item) {
 /* ── Full Lecture / Exercise Content (Default Open) ────── */
 
 export async function showFullContent(itemId) {
+  const renderId = nextContentRenderId();
   const item = (typeof itemId === "object" && itemId !== null) ? itemId : state.itemsById.get(itemId);
   const main = document.getElementById("main");
   if (!item) {
@@ -260,7 +320,7 @@ export async function showFullContent(itemId) {
   if (item.kind === "exercise") {
     const structured = state.exercises[item.path];
     if (structured && structured.tasks?.length) {
-      await renderExerciseView(item, structured, main);
+      await renderExerciseView(item, structured, main, renderId);
       return;
     }
   }
@@ -271,7 +331,7 @@ export async function showFullContent(itemId) {
   const hero = lectureHero(item);
   hero.appendChild(lectureToolbar(item, "full"));
   main.appendChild(hero);
-  await loadFullContent(item, main);
+  await loadFullContent(item, main, renderId);
 }
 
 export function updateExerciseMetaProgress(metaEl, tasks) {
@@ -294,7 +354,8 @@ export function updateExerciseMetaProgress(metaEl, tasks) {
 /**
  * Structured exercise view: separated úkol cards with prompt / hint / solution.
  */
-export async function renderExerciseView(item, data, main) {
+export async function renderExerciseView(item, data, main, renderId = null) {
+  const activeRenderId = renderId ?? contentRenderGeneration;
   main.className = "lecture-view exercise-view";
 
   const hero = lectureHero(item);
@@ -350,9 +411,12 @@ export async function renderExerciseView(item, data, main) {
   }
   main.appendChild(list);
   await loadAndInlineExamples(list);
+  if (!isContentRenderCurrent(activeRenderId)) return;
   highlightRoot(list);
+  enhanceCodeBlocks(list);
   scanAndContrastImages(list);
   const quizEl = await renderQuizSection(item);
+  if (!isContentRenderCurrent(activeRenderId)) return;
   if (quizEl) main.appendChild(quizEl);
   main.appendChild(buildBottomNavBar(item));
 }
@@ -465,19 +529,22 @@ export function renderTaskCard(task, item, onTaskStatusChanged) {
   return card;
 }
 
-export async function loadFullContent(item, main) {
+export async function loadFullContent(item, main, renderId = null) {
+  const activeRenderId = renderId ?? contentRenderGeneration;
   setLoading(true);
   try {
     // Runtime fallback: extract .priklad blocks if no transform data
     if (item.kind === "exercise") {
       const live = await fetchAndExtractExercise(item.path);
+      if (!isContentRenderCurrent(activeRenderId)) return;
       if (live?.tasks?.length) {
-        renderExerciseView(item, live, main);
+        await renderExerciseView(item, live, main, activeRenderId);
         return;
       }
     }
 
     const slides = await fetchAndExtract(item.path);
+    if (!isContentRenderCurrent(activeRenderId)) return;
     if (!slides.length) {
       main.appendChild(el("div", { className: "error-box" },
         "No content sections found. Raw path: ",
@@ -511,7 +578,11 @@ export async function loadFullContent(item, main) {
     }
     main.appendChild(frag);
     await loadAndInlineExamples(main);
-    for (const node of nodes) highlightRoot(node);
+    if (!isContentRenderCurrent(activeRenderId)) return;
+    for (const node of nodes) {
+      highlightRoot(node);
+      enhanceCodeBlocks(node);
+    }
     scanAndContrastImages(main);
 
     // Defer mounting remaining offscreen slides
@@ -520,6 +591,7 @@ export async function loadFullContent(item, main) {
       main.appendChild(remainingContainer);
 
       const mountRemaining = async () => {
+        if (!isContentRenderCurrent(activeRenderId) || !remainingContainer.isConnected) return;
         const remFrag = document.createDocumentFragment();
         const remNodes = [];
         for (let i = initialBatchSize; i < slides.length; i++) {
@@ -529,12 +601,16 @@ export async function loadFullContent(item, main) {
         }
         remainingContainer.appendChild(remFrag);
         await loadAndInlineExamples(remainingContainer);
-        for (const node of remNodes) highlightRoot(node);
+        if (!isContentRenderCurrent(activeRenderId)) return;
+        for (const node of remNodes) {
+          highlightRoot(node);
+          enhanceCodeBlocks(node);
+        }
         scanAndContrastImages(remainingContainer);
       };
 
-      if ("requestIdleCallback" in window) {
-        requestIdleCallback(() => mountRemaining());
+      if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+        window.requestIdleCallback(() => mountRemaining());
       } else {
         setTimeout(() => mountRemaining(), 50);
       }
@@ -542,11 +618,13 @@ export async function loadFullContent(item, main) {
 
     main.appendChild(buildBottomNavBar(item));
     const quizEl = await renderQuizSection(item);
+    if (!isContentRenderCurrent(activeRenderId)) return;
     if (quizEl) {
       const slideText = main.innerText || "";
       if (slideText.trim().length < 600) {
         quizEl.classList.add("compact-lecture-quiz");
       }
+      enhanceCodeBlocks(quizEl);
       main.appendChild(quizEl);
     }
 
@@ -565,12 +643,13 @@ export async function loadFullContent(item, main) {
       }, { once: true, passive: true });
     });
   } catch (err) {
+    if (!isContentRenderCurrent(activeRenderId)) return;
     main.appendChild(el("div", { className: "error-box" },
       "Failed to load: ",
       el("code", {}, err.message),
     ));
   } finally {
-    setLoading(false);
+    if (isContentRenderCurrent(activeRenderId)) setLoading(false);
   }
 }
 
@@ -675,7 +754,7 @@ export function printCoursePlan() {
 
     if (weekItems.length) {
       weekMap.set(week, weekItems);
-      totalLecs += weekItems.filter((i) => i.kind === "lecture").length;
+      totalLecs += weekItems.filter((i) => isLectureKind(i)).length;
       totalExs += weekItems.filter((i) => i.kind === "exercise").length;
       totalStudied += weekItems.filter((i) => isDone(i.id)).length;
     }
@@ -695,7 +774,7 @@ export function printCoursePlan() {
   output.appendChild(header);
 
   for (const [week, weekItems] of weekMap) {
-    const lecs = weekItems.filter((it) => it.kind === "lecture");
+    const lecs = weekItems.filter((it) => isLectureKind(it));
     const exs = weekItems.filter((it) => it.kind === "exercise");
 
     const sectionEl = el("div", { className: "print-tier-week" });
@@ -825,9 +904,6 @@ function studyTile(item, doneStatus, size) {
   btn.querySelector(".st-cycle-mini")?.addEventListener("click", (e) => {
     e.stopPropagation();
     cycleStudyStatus(item.id);
-    try { renderTree(); } catch { /* ignore */ }
-    window.__pcsUpdateStatus?.();
-    showProgress();
   });
 
   return btn;
@@ -865,9 +941,6 @@ function detailedExerciseCard(item, doneStatus) {
   const triggerCycle = (e) => {
     e.stopPropagation();
     cycleStudyStatus(item.id);
-    try { renderTree(); } catch { /* ignore */ }
-    window.__pcsUpdateStatus?.();
-    showProgress();
   };
 
   head.querySelector(".sec-status-pill")?.addEventListener("click", triggerCycle);
@@ -881,10 +954,14 @@ function detailedExerciseCard(item, doneStatus) {
       const tS = t.technical_score ?? 1;
       const lS = t.logical_score ?? 1;
       const tStatus = getTaskStatus(t.id);
-      const tRow = el("div", { className: `study-task-item${tStatus === "solved" ? " is-solved" : tStatus === "skipped" ? " is-skipped" : ""}` });
+      const tRow = el("div", {
+        className: `study-task-item${tStatus === "solved" ? " is-solved" : tStatus === "skipped" ? " is-skipped" : ""}`,
+        style: { cursor: "pointer" },
+        title: "Klikněte pro přechod na úkol (ikona vlevo mění stav úkolu)",
+      });
       tRow.innerHTML = `
         <div class="sti-top">
-          <span class="sti-status-icon ${tStatus}">${tStatus === "solved" ? "✓" : tStatus === "skipped" ? "↷" : "○"}</span>
+          <span class="sti-status-icon ${tStatus}" title="Klikněte pro přepnutí stavu úkolu">${tStatus === "solved" ? "✓" : tStatus === "skipped" ? "↷" : "○"}</span>
           <span class="sti-num">Úkol ${t.num}</span>
           <span class="sti-title">${formatInlineCode(t.summary || t.title)}</span>
           <div class="sti-scores">
@@ -893,6 +970,13 @@ function detailedExerciseCard(item, doneStatus) {
           </div>
         </div>
       `;
+      tRow.querySelector(".sti-status-icon")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        cycleTaskStatus(t.id);
+      });
+      tRow.addEventListener("click", () => {
+        window.__pcsNavigate?.({ kind: "page", id: item.id, pageId: t.id });
+      });
       list.appendChild(tRow);
     }
     card.appendChild(list);
@@ -991,7 +1075,7 @@ export function showProgress() {
       </header>
     `;
 
-    const lecs = weekItems.filter((it) => it.kind === "lecture");
+    const lecs = weekItems.filter((it) => isLectureKind(it));
     const exs = weekItems.filter((it) => it.kind === "exercise");
 
     if (week.shelves && week.shelves.length) {
@@ -1122,16 +1206,9 @@ export function showProgress() {
   foot.appendChild(el("button", {
     type: "button",
     className: "btn progress-reset",
-    onClick: () => {
-      if (confirm("Resetovat veškerý studijní postup a historii?")) {
-        state.seen.clear();
-        state.studied.clear();
-        state.skipped.clear();
-        try {
-          localStorage.removeItem("pcs-seen-v1");
-          localStorage.removeItem("pcs-studied-v1");
-          localStorage.removeItem("pcs-skipped-v1");
-        } catch { /* ignore */ }
+    onClick: async () => {
+      if (confirm("Resetovat veškerý studijní postup, úkoly, kvízy a historii?")) {
+        await resetAllProgress();
         showProgress();
         try { renderTree(); } catch { /* ignore */ }
         window.__pcsUpdateStatus?.();
@@ -1165,10 +1242,10 @@ export function showLogin(reason = null) {
 }
 
 export function renderUserProfileDashboard(u) {
-  const items = state.items || [];
-  const total = items.length;
-  const studiedCount = state.studied.size;
-  const pct = total > 0 ? Math.round((studiedCount / total) * 100) : 0;
+  const stats = getCourseStats();
+  const total = stats.total.total;
+  const studiedCount = stats.total.completed;
+  const pct = stats.total.pct;
   const initials = (u.name || u.username)
     .split(" ")
     .map((n) => n[0])

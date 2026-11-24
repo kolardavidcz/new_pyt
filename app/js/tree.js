@@ -56,6 +56,31 @@ export function renderTree() {
   checkNode.appendChild(checkRow);
   frag.appendChild(checkNode);
 
+  // Top special node for Interactive Python Exceptions Tree
+  const excNode = document.createElement("div");
+  excNode.className = "tree-node";
+  excNode.dataset.key = "exceptions";
+  const excRow = document.createElement("div");
+  excRow.className = "tree-row" + (state.focusedTreeKey === "exceptions" ? " active" : "");
+  excRow.setAttribute("role", "treeitem");
+  excRow.tabIndex = 0;
+  excRow.dataset.kind = "exceptions";
+  excRow.dataset.id = "exceptions";
+  excRow.innerHTML = `
+    <span class="tree-twistie"></span>
+    <span class="tree-icon" style="color:var(--accent)">⚡</span>
+    <span class="tree-label">Strom výjimek (Python 3.12+)</span>
+  `;
+  excRow.addEventListener("click", () => select("exceptions", "exceptions"));
+  excRow.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      select("exceptions", "exceptions");
+    }
+  });
+  excNode.appendChild(excRow);
+  frag.appendChild(excNode);
+
   const weeks = state.course.weeks || [];
   for (const week of weeks) {
     const items = weekVisibleItems(week);

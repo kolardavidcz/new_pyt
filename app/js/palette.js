@@ -1,6 +1,6 @@
 /** Command palette (Ctrl+K / Ctrl+Shift+P) */
 
-import { state, filteredItems } from "./state.js";
+import { state, filteredItems, pagesFor, getStudyStatus } from "./state.js";
 import { clear } from "./ui.js";
 
 let open = false;
@@ -77,7 +77,8 @@ function updateResults(q) {
   const commands = [
     { kind: "cmd", title: "Go to Welcome", meta: "home", action: { kind: "home" } },
     { kind: "cmd", title: "Show Progress", meta: "progress", action: { kind: "progress" } },
-    { kind: "cmd", title: "Studijní plán (4 Úrovně) 📋", meta: "checklist plan study level", action: { kind: "checklist" } },
+    { kind: "cmd", title: "Studijní plán (4 Úrovně) 📋", meta: "checklist plan study level footguns", action: { kind: "checklist" } },
+    { kind: "cmd", title: "Strom výjimek (Python Exceptions Explorer) ⚡", meta: "exceptions errors vyjimky keyerror valueerror traceback", action: { kind: "exceptions" } },
     { kind: "cmd", title: "Close Active Tab (Zavřít podstránku) [Ctrl+Q / Ctrl+W]", meta: "close tab subpage subpage ctrl+q ctrl+w", action: { kind: "cmd-close-tab" } },
     { kind: "cmd", title: "Show Link Error Log Database 🐞 (Zobrazit databázi chybových odkazů)", meta: "link error log database chybove odkazy bug report", action: { kind: "cmd-link-error-log" } },
     { kind: "cmd", title: "Clear Filters", meta: "filters", action: { kind: "cmd-clear-filters" } },
@@ -112,12 +113,34 @@ function updateResults(q) {
       ...(item.tags || []), item.diff, `w${item.weekNum}`,
     ].join(" ").toLowerCase();
     if (!query || hay.includes(query)) {
+      const st = getStudyStatus(item.id);
+      const stMark = st === "studied" ? "✓ " : st === "skipped" ? "↷ " : "";
       results.push({
         kind: item.kind,
-        title: item.title,
+        title: `${stMark}${item.title}`,
         meta: `W${item.weekNum} · rel:${item.relevance}/10 · ${(item.tags || []).join(",")}`,
         action: { kind: item.kind, id: item.id },
       });
+    }
+  }
+
+  // Slide-level search when user types >= 2 chars
+  if (query.length >= 2 && results.length < 40) {
+    for (const item of state.items) {
+      if (results.length >= 40) break;
+      const pages = pagesFor(item.path);
+      for (const p of pages) {
+        if (results.length >= 40) break;
+        const pTitle = p.title || "";
+        if (pTitle.toLowerCase().includes(query)) {
+          results.push({
+            kind: "slide",
+            title: pTitle,
+            meta: `${item.title} · W${item.weekNum}`,
+            action: { kind: "page", id: item.id, pageId: p.id },
+          });
+        }
+      }
     }
   }
 

@@ -3,10 +3,22 @@
  * Handles quiz rendering, options evaluation, code fill inputs, explanation popups & improvements.
  */
 
-import { state, saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, getQuizFor } from "./state.js";
+import { state, saveQuizScore, resetDeckQuizScores, saveQuestionImprovement, getQuizFor, setPrintWithQuizzes } from "./state.js";
 import { clear, el, escapeHtml, escapeAttr } from "./ui.js";
 import { highlightCode, dedentCode } from "./highlight.js";
 import { formatInlineCode, isFlexibleCodeFillCorrect, parseQuestionContent } from "./format.js";
+
+function ensureImproveModal() {
+  let modal = document.getElementById("questionImproveModal");
+  if (!modal) {
+    modal = el("div", { className: "modal-overlay hidden", id: "questionImproveModal" });
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.classList.add("hidden");
+    });
+    document.body.appendChild(modal);
+  }
+  return modal;
+}
 
 export function updatePrintQuizButtons() {
   const on = state.printWithQuizzes;
@@ -18,11 +30,7 @@ export function updatePrintQuizButtons() {
 }
 
 export function openImprovementModal(deckKey, q, qIdx) {
-  let modal = document.getElementById("questionImproveModal");
-  if (!modal) {
-    modal = el("div", { className: "modal-overlay hidden", id: "questionImproveModal" });
-    document.body.appendChild(modal);
-  }
+  const modal = ensureImproveModal();
 
   const qId = q.id || `q-${qIdx + 1}`;
   const stemClean = (q.question || "").replace(/```[\s\S]*?```/g, "").trim();
@@ -88,9 +96,6 @@ export function openImprovementModal(deckKey, q, qIdx) {
   const closeModal = () => modal.classList.add("hidden");
   modal.querySelector(".btn-close-modal")?.addEventListener("click", closeModal);
   modal.querySelector(".btn-cancel-modal")?.addEventListener("click", closeModal);
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
-  });
 
   const submitBtn = modal.querySelector(".btn-submit-improve");
   const notesInput = modal.querySelector(".improve-notes-input");
@@ -132,11 +137,7 @@ export function openImprovementModal(deckKey, q, qIdx) {
 }
 
 export function openPresentationImprovementModal(item) {
-  let modal = document.getElementById("questionImproveModal");
-  if (!modal) {
-    modal = el("div", { className: "modal-overlay hidden", id: "questionImproveModal" });
-    document.body.appendChild(modal);
-  }
+  const modal = ensureImproveModal();
 
   const deckKey = item.slug || item.id || item.path || "prezentace";
   const title = item.title || deckKey;
@@ -201,9 +202,6 @@ export function openPresentationImprovementModal(item) {
   const closeModal = () => modal.classList.add("hidden");
   modal.querySelector(".btn-close-modal")?.addEventListener("click", closeModal);
   modal.querySelector(".btn-cancel-modal")?.addEventListener("click", closeModal);
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
-  });
 
   const submitBtn = modal.querySelector(".btn-submit-improve");
   const notesInput = modal.querySelector(".improve-notes-input");
@@ -252,8 +250,49 @@ export async function renderQuizSection(item) {
   const card = el("section", { className: "quiz-section-card", id: "quizSection" });
 
   const scoreMap = state.quizScores[deckKey] || {};
-  const answeredCount = Object.keys(scoreMap).length;
-  const correctCount = Object.values(scoreMap).filter((s) => s.isCorrect).length;
+
+  // Quiz Header with live score, progress bar, print toggle & retry-wrong action
+  const headerRow = el("div", { className: "quiz-header-row" });
+  const headerTitle = el("div", { className: "quiz-header-title-group" });
+  headerTitle.innerHTML = `
+    <h2 class="quiz-section-title">🎯 Kontrolní kvíz</h2>
+    <span class="quiz-score-pill">Skóre: <strong class="score-val">0 / ${questions.length}</strong> <span class="score-pct"></span></span>
+  `;
+
+  const headerActions = el("div", { className: "quiz-header-actions" });
+  const retryWrongBtn = el("button", {
+    type: "button",
+    className: "btn secondary sm btn-retry-wrong hidden",
+    title: "Resetovat pouze chybně zodpovězené otázky a zkusit je znovu",
+    onClick: async () => {
+      resetDeckQuizScores(deckKey, { onlyWrong: true });
+      const refreshed = await renderQuizSection(item);
+      const oldSec = document.getElementById("quizSection");
+      if (refreshed && oldSec) oldSec.replaceWith(refreshed);
+    },
+  }, "↺ Opakovat chyby");
+
+  const printToggleBtn = el("button", {
+    type: "button",
+    className: `btn secondary sm btn-quiz-toggle${state.printWithQuizzes ? " is-active" : ""}`,
+    title: state.printWithQuizzes
+      ? "Tisk obsahuje kvízy na konci (Kliknutím vypnete)"
+      : "Tisk bez kvízů (Kliknutím zapnete kvízy v tisku)",
+    onClick: () => {
+      setPrintWithQuizzes(!state.printWithQuizzes);
+      updatePrintQuizButtons();
+    },
+  }, state.printWithQuizzes ? "🖨 Kvíz v tisku ✓" : "🖨 Kvíz v tisku ☐");
+
+  headerActions.append(retryWrongBtn, printToggleBtn);
+  headerRow.append(headerTitle, headerActions);
+  card.appendChild(headerRow);
+
+  const progressTrack = el("div", { className: "quiz-progress-track", "aria-label": "Postup kvízem" });
+  const progressCorrectBar = el("div", { className: "quiz-progress-fill correct" });
+  const progressWrongBar = el("div", { className: "quiz-progress-fill incorrect" });
+  progressTrack.append(progressCorrectBar, progressWrongBar);
+  card.appendChild(progressTrack);
 
   const list = el("div", { className: "quiz-questions-list" });
 
@@ -261,12 +300,30 @@ export async function renderQuizSection(item) {
     const curScores = state.quizScores[deckKey] || {};
     const curAnswered = Object.keys(curScores).length;
     const curCorrect = Object.values(curScores).filter((s) => s.isCorrect).length;
+    const curWrong = curAnswered - curCorrect;
+    const total = questions.length;
+    const pct = total > 0 ? Math.round((curCorrect / total) * 100) : 0;
+
     const scoreVal = card.querySelector(".score-val");
-    if (scoreVal) scoreVal.textContent = `${curCorrect} / ${questions.length}`;
+    const scorePct = card.querySelector(".score-pct");
+    if (scoreVal) scoreVal.textContent = `${curCorrect} / ${total}`;
+    if (scorePct) scorePct.textContent = curAnswered > 0 ? `(${pct} %)` : "";
+
+    progressCorrectBar.style.width = `${total > 0 ? (curCorrect / total) * 100 : 0}%`;
+    progressWrongBar.style.width = `${total > 0 ? (curWrong / total) * 100 : 0}%`;
+
+    if (curWrong > 0) {
+      retryWrongBtn.textContent = `↺ Opakovat chyby (${curWrong})`;
+      retryWrongBtn.classList.remove("hidden");
+    } else {
+      retryWrongBtn.classList.add("hidden");
+    }
   }
+  updateHeaderStats();
 
   questions.forEach((q, idx) => {
-    const qCard = el("article", { className: `quiz-q-card qtype-${q.type}`, id: `qcard-${q.id || idx}` });
+    const qId = q.id || `q-${idx + 1}`;
+    const qCard = el("article", { className: `quiz-q-card qtype-${q.type}`, id: `qcard-${qId}` });
     
     let typeLabel = "Otázka";
     if (q.type === "multiple_choice") typeLabel = "Výběr ABCD";
@@ -296,7 +353,7 @@ export async function renderQuizSection(item) {
       qCard.appendChild(codeWrapEl);
     }
 
-    const savedState = scoreMap[q.id];
+    const savedState = scoreMap[qId];
     const explanationEl = el("div", { className: "quiz-explanation hidden" });
 
     function showExplanation(isCorrect, expectedText, onRetry) {
@@ -400,6 +457,17 @@ export async function renderQuizSection(item) {
 
       const inlineInput = qCard.querySelector(".inline-code-fill-input");
 
+      const handleReset = () => {
+        explanationEl.classList.add("hidden");
+        if (inlineInput) {
+          inlineInput.disabled = false;
+          inlineInput.value = "";
+          inlineInput.size = blankLen;
+          inlineInput.classList.remove("correct", "incorrect");
+          inlineInput.focus();
+        }
+      };
+
       const handleEvaluate = (val) => {
         if (!val) return;
         const cleanVal = val.replace(/^[A-D]\)\s*/, "").trim();
@@ -412,24 +480,13 @@ export async function renderQuizSection(item) {
           inlineInput.classList.add(isCorrect ? "correct" : "incorrect");
         }
 
-        saveQuizScore(deckKey, q.id, {
+        saveQuizScore(deckKey, qId, {
           selected: cleanVal,
           isCorrect: isCorrect,
         });
 
-        showExplanation(isCorrect, expectedClean, null);
+        showExplanation(isCorrect, expectedClean, isCorrect ? null : handleReset);
         updateHeaderStats();
-      };
-
-      const handleReset = () => {
-        explanationEl.classList.add("hidden");
-        if (inlineInput) {
-          inlineInput.disabled = false;
-          inlineInput.value = "";
-          inlineInput.size = 6;
-          inlineInput.classList.remove("correct", "incorrect");
-          inlineInput.focus();
-        }
       };
 
       verifyBtn.addEventListener("click", (e) => {
@@ -526,8 +583,7 @@ export async function renderQuizSection(item) {
         inlineInput.value = cleanUserVal;
         inlineInput.size = Math.max(6, cleanUserVal.length + 1);
         inlineInput.classList.add(savedState.isCorrect ? "correct" : "incorrect");
-        updateLiveFill(userVal, savedState.isCorrect);
-        showExplanation(savedState.isCorrect, expectedClean);
+        showExplanation(savedState.isCorrect, expectedClean, savedState.isCorrect ? null : handleReset);
       }
 
     } else if (q.options && q.options.length) {
@@ -548,7 +604,7 @@ export async function renderQuizSection(item) {
 
             updateLiveFill(optText, isCorrectOpt);
 
-            saveQuizScore(deckKey, q.id, {
+            saveQuizScore(deckKey, qId, {
               selected: optIdx,
               isCorrect: isCorrectOpt,
             });
@@ -573,10 +629,10 @@ export async function renderQuizSection(item) {
         optsWrap.appendChild(btn);
       });
       qCard.appendChild(optsWrap);
-    }
 
-    if (savedState) {
-      showExplanation(savedState.isCorrect);
+      if (savedState) {
+        showExplanation(savedState.isCorrect);
+      }
     }
 
     qCard.appendChild(explanationEl);

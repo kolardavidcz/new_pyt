@@ -325,7 +325,12 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             kv_url, kv_token = get_kv_config()
             if not kv_token:
-                self.send_error(500, "Upstash KV token not configured in environment")
+                local_resp = json.dumps({"result": None, "localOnly": True}).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.send_header("Content-Length", str(len(local_resp)))
+                self.end_headers()
+                self.wfile.write(local_resp)
                 return
             try:
                 req = urllib.request.Request(
